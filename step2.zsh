@@ -38,6 +38,7 @@ brew install --cask postman
 brew install --cask notion                                       
 brew install --cask android-commandlinetools
 brew install --cask microsoft-teams
+brew install --cask iterm2
 
 git config --global user.name "Lars Artmann"
 git config --global user.email "git@lars.software"
