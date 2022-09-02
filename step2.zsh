@@ -12,6 +12,7 @@ brew install go
 brew install terraform
 brew install terraformer
 brew install firebase-cli
+brew install docker
 
 brew install wget
 sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
