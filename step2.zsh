@@ -41,6 +41,7 @@ brew install --cask android-commandlinetools
 brew install --cask microsoft-teams
 brew install --cask iterm2
 brew install --cask steam
+brew install --cask whatsapp
 
 git config --global user.name "Lars Artmann"
 git config --global user.email "git@lars.software"
