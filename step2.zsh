@@ -11,6 +11,7 @@ brew install ruby
 brew install go
 brew install terraform
 brew install terraformer
+brew install pre-commit
 brew install firebase-cli
 brew install docker
 
