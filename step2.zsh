@@ -17,6 +17,7 @@ brew install docker
 brew install rust
 brew install redis
 brew install git-town
+brew install vercel-cli
 
 brew install wget
 sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
