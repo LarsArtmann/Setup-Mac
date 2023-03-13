@@ -1,5 +1,6 @@
 brew install git
 brew install node
+brew install pnpm
 brew install gradle
 brew install maven
 brew install zip
