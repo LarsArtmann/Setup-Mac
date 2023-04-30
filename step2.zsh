@@ -24,6 +24,7 @@ brew install wget
 sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 
 brew install --cask google-chrome
+brew install --cask firefox
 brew install --cask chrome-remote-desktop-host
 brew install --cask spotify
 brew install --cask anydesk
