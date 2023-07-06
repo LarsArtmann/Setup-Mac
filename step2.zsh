@@ -58,3 +58,4 @@ ssh-keygen -o -t rsa -C "git@lars.software"
 gcloud init
 firebase login
 gcloud components install cbt alpha beta
+brew install ffmpeg
