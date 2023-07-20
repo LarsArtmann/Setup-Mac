@@ -60,3 +60,4 @@ firebase login
 gcloud components install cbt alpha beta
 brew install ffmpeg
 brew install --cask obsidian
+brew install jq
