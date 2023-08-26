@@ -61,3 +61,4 @@ gcloud components install cbt alpha beta
 brew install ffmpeg
 brew install --cask obsidian
 brew install jq
+brew install stripe/stripe-cli/stripe
