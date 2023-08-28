@@ -62,3 +62,4 @@ brew install ffmpeg
 brew install --cask obsidian
 brew install jq
 brew install stripe/stripe-cli/stripe
+brew install parallel
