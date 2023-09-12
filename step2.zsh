@@ -65,3 +65,4 @@ brew install stripe/stripe-cli/stripe
 brew install parallel
 brew install rename
 brew install ncdu
+brew install zstd
