@@ -1,7 +1,7 @@
 command=$@
 zsh "$command" &&
-echo "$command added locally"
-echo "$command" >> step2.sh &&
+echo "Added "$command" locally"
+echo "$command" >> step2.zsh &&
 git commit -am "$command" &&
 git push &&
-echo "$command added to git"
+echo "Added "$command" git"

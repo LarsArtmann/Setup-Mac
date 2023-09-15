@@ -69,3 +69,4 @@ brew install zstd
 brew tap oven-sh/bun
 brew install bun
 pip3 install -U crcmod
+brew install bat
