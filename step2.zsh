@@ -72,3 +72,4 @@ pip3 install -U crcmod
 brew install bat
 brew install fd
 brew install fzf
+/opt/homebrew/opt/fzf/install
