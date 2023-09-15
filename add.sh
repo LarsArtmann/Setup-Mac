@@ -1,6 +1,7 @@
-command=$1
-echo $command >> step2.sh &&
-git -am $command &&
+command=$@
+echo "$command" >> step2.sh &&
+git commit -am "$command" &&
 git push &&
-exec $command
-echo $command added :)
+exec "$command"
+echo "$command added :)"
+
