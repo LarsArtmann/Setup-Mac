@@ -73,3 +73,4 @@ brew install bat
 brew install fd
 brew install fzf
 /opt/homebrew/opt/fzf/install
+brew install hyperfine
