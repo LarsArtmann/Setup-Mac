@@ -75,3 +75,4 @@ brew install fzf
 /opt/homebrew/opt/fzf/install
 brew install hyperfine
 brew install gource
+brew install gcsfuse
