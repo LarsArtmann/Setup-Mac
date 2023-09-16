@@ -75,5 +75,11 @@ brew install fzf
 /opt/homebrew/opt/fzf/install
 brew install hyperfine
 brew install gource
-brew install gcsfuse
 brew install --cask macfuse
+git clone https://github.com/GoogleCloudPlatform/gcsfuse.git
+cd gcsfuse
+go install .
+echo "export PATH="$PATH:$HOME/go/bin" >> ~/.zshrc
+cd ..
+rm -r ./gcsfuse
+
