@@ -76,3 +76,4 @@ brew install fzf
 brew install hyperfine
 brew install gource
 brew install gcsfuse
+brew install --cask macfuse
