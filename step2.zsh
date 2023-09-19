@@ -82,5 +82,3 @@ go install .
 echo "export PATH="$PATH:$HOME/go/bin" >> ~/.zshrc
 cd ..
 rm -r ./gcsfuse
-
-brew install hyperfine
