@@ -83,4 +83,4 @@ echo "export PATH="$PATH:$HOME/go/bin" >> ~/.zshrc
 cd ..
 rm -r ./gcsfuse
 brew install --cask responsively
-pnpm -g autarky
+pnpm add -g autarky
