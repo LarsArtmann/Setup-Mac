@@ -85,3 +85,4 @@ rm -r ./gcsfuse
 brew install --cask responsively
 pnpm add -g autarky
 brew install --cask timing
+brew install --cask warp
