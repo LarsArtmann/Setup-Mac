@@ -87,3 +87,4 @@ pnpm add -g autarky
 brew install --cask timing
 brew install --cask warp
 brew install unbound
+brew install lightbend/brew/kalix
