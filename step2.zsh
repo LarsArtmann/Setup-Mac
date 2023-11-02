@@ -91,3 +91,4 @@ brew install lightbend/brew/kalix
 brew install grpcurl
 brew install mozjpeg
 brew install jpegoptim
+brew install webp
