@@ -89,3 +89,4 @@ brew install --cask warp
 brew install unbound
 brew install lightbend/brew/kalix
 brew install grpcurl
+brew install mozjpeg
