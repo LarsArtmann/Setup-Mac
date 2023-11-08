@@ -95,3 +95,4 @@ brew install webp
 brew install --cask deepl
 brew install docker-buildx
 brew install colima
+brew install hadolint
