@@ -98,3 +98,4 @@ brew install colima
 brew install hadolint
 brew install depot/tap/depot
 brew install tursodatabase/tap/turso
+brew install dasel
