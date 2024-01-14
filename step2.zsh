@@ -101,3 +101,4 @@ brew install tursodatabase/tap/turso
 brew install dasel
 brew install --cask ghidra
 brew install tree
+brew install android-platform-tools
