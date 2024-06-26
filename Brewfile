@@ -88,6 +88,7 @@ cask "google-drive"
 cask "intellij-idea"
 cask "iterm2"
 cask "jetbrains-toolbox"
+cask "little-snitch"
 cask "macfuse"
 cask "macpass"
 cask "multimc"
@@ -121,3 +122,4 @@ mas "Quick Camera", id: 598853070
 mas "Scaler", id: 1612708557
 mas "Sticky Notes", id: 1150887374
 mas "TripMode", id: 1513400665
+mas "Urban VPN Desktop", id: 1517772049

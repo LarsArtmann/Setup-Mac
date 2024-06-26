@@ -104,3 +104,4 @@ brew install tree
 brew install android-platform-tools
 brew install python
 brew install mas
+brew install --cask little-snitch
