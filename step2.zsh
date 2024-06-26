@@ -105,3 +105,4 @@ brew install android-platform-tools
 brew install python
 brew install mas
 brew install --cask macx-youtube-downloader
+brew install --cask little-snitch
