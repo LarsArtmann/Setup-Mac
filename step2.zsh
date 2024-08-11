@@ -106,3 +106,4 @@ brew install python
 brew install mas
 brew install --cask little-snitch
 brew install sqlc
+brew install corepack
