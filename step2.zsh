@@ -108,3 +108,4 @@ brew install --cask little-snitch
 brew install sqlc
 brew install corepack
 brew install sevenzip
+brew install golangci-lint
