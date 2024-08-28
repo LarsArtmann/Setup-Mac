@@ -109,3 +109,4 @@ brew install sqlc
 brew install corepack
 brew install sevenzip
 brew install golangci-lint
+brew install telegram
