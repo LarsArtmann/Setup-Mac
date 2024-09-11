@@ -110,3 +110,4 @@ brew install corepack
 brew install sevenzip
 brew install golangci-lint
 brew install telegram
+brew install --cask jan
