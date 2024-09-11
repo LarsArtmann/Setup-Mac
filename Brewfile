@@ -49,6 +49,7 @@ brew "maven"
 brew "mozjpeg"
 brew "ncdu"
 brew "node@20", link: true
+brew "ollama"
 brew "openjdk@17"
 brew "openssl@1.1"
 brew "parallel"
