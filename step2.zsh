@@ -114,3 +114,4 @@ brew install --cask jan
 brew install ollama
 brew install dotnet
 brew install --cask secretive
+brew install kubectl
