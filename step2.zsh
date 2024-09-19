@@ -115,3 +115,4 @@ brew install ollama
 brew install dotnet
 brew install --cask secretive
 brew install kubectl
+brew install awscli aws-iam-authenticator aws-vault
