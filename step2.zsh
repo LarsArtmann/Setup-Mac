@@ -117,3 +117,4 @@ brew install --cask secretive
 brew install kubectl
 brew install awscli aws-iam-authenticator aws-vault
 brew install cloudflare-warp
+brew install gpg2 gnupg pinentry-mac
