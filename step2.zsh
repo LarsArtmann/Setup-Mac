@@ -118,3 +118,4 @@ brew install kubectl
 brew install awscli aws-iam-authenticator aws-vault
 brew install cloudflare-warp
 brew install gpg2 gnupg pinentry-mac
+brew install --cask docker
