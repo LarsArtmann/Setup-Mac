@@ -120,3 +120,4 @@ brew install cloudflare-warp
 brew install gpg2 gnupg pinentry-mac
 brew install --cask docker
 brew install —cask zoom
+brew install exiftool

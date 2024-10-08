@@ -21,6 +21,7 @@ brew "corepack", link: false
 brew "dasel"
 brew "docker-buildx"
 brew "dotnet"
+brew "exiftool"
 brew "fd"
 brew "ffmpeg"
 brew "firebase-cli"
