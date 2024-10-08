@@ -121,3 +121,4 @@ brew install gpg2 gnupg pinentry-mac
 brew install --cask docker
 brew install —cask zoom
 brew install exiftool
+mas install 1207332399
