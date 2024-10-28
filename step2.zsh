@@ -122,3 +122,4 @@ brew install --cask docker
 brew install —cask zoom
 brew install exiftool
 mas install 1207332399
+brew install openapi-generator

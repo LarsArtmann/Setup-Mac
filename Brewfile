@@ -56,6 +56,7 @@ brew "mozjpeg"
 brew "ncdu"
 brew "node@20"
 brew "ollama"
+brew "openapi-generator"
 brew "openjdk@17"
 brew "openssl@1.1"
 brew "parallel"
@@ -128,6 +129,7 @@ mas "AusweisApp", id: 948660805
 mas "Boop", id: 1518425043
 mas "Color Picker", id: 1545870783
 mas "Day Progress", id: 6450280202
+mas "iLovePDF", id: 1207332399
 mas "io.bgoerke.photo-anonymizator", id: 1624700848
 mas "Numbers", id: 409203825
 mas "Outbank", id: 1094255754
