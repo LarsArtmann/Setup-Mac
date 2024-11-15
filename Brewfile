@@ -3,6 +3,7 @@ tap "depot/tap"
 tap "homebrew/bundle"
 tap "libsql/sqld"
 tap "lightbend/brew"
+tap "omissis/go-jsonschema"
 tap "oven-sh/bun"
 tap "stripe/stripe-cli"
 tap "surrealdb/tap"
@@ -16,14 +17,13 @@ brew "libssh2"
 brew "bat"
 brew "unbound"
 brew "colima"
-brew "node"
-brew "corepack", link: false
 brew "dasel"
 brew "docker-buildx"
 brew "dotnet"
 brew "exiftool"
 brew "fd"
 brew "ffmpeg"
+brew "node"
 brew "firebase-cli"
 brew "fswatch"
 brew "fzf"
@@ -54,7 +54,7 @@ brew "mas"
 brew "maven"
 brew "mozjpeg"
 brew "ncdu"
-brew "node@20"
+brew "node@20", link: true
 brew "ollama"
 brew "openapi-generator"
 brew "openjdk@17"
@@ -129,6 +129,7 @@ mas "AusweisApp", id: 948660805
 mas "Boop", id: 1518425043
 mas "Color Picker", id: 1545870783
 mas "Day Progress", id: 6450280202
+mas "Dice", id: 1501716820
 mas "iLovePDF", id: 1207332399
 mas "io.bgoerke.photo-anonymizator", id: 1624700848
 mas "Numbers", id: 409203825
