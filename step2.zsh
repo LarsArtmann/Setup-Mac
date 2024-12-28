@@ -125,3 +125,4 @@ mas install 1207332399
 brew install openapi-generator
 brew tap omissis/go-jsonschema
 brew install --cask vlc
+brew install --cask frappe-books
