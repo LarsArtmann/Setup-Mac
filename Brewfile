@@ -1,5 +1,6 @@
 tap "buildpacks/tap"
 tap "depot/tap"
+tap "hashicorp/tap"
 tap "homebrew/bundle"
 tap "libsql/sqld"
 tap "lightbend/brew"

@@ -126,3 +126,4 @@ brew install openapi-generator
 brew tap omissis/go-jsonschema
 brew install --cask vlc
 brew install --cask frappe-books
+brew tap hashicorp/tap
