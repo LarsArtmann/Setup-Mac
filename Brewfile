@@ -16,13 +16,13 @@ brew "aws-vault"
 brew "awscli"
 brew "libssh2"
 brew "bat"
-brew "unbound"
 brew "colima"
 brew "dasel"
 brew "docker-buildx"
 brew "dotnet"
 brew "exiftool"
 brew "fd"
+brew "unbound"
 brew "ffmpeg"
 brew "node"
 brew "firebase-cli"
@@ -55,7 +55,8 @@ brew "mas"
 brew "maven"
 brew "mozjpeg"
 brew "ncdu"
-brew "node@20", link: true
+brew "nmap"
+brew "node@20"
 brew "ollama"
 brew "openapi-generator"
 brew "openjdk@17"
@@ -146,3 +147,4 @@ mas "Scaler", id: 1612708557
 mas "Sticky Notes", id: 1150887374
 mas "TripMode", id: 1513400665
 mas "Urban VPN Desktop", id: 1517772049
+mas "WireGuard", id: 1451685025
