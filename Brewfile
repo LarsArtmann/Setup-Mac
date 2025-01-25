@@ -11,12 +11,14 @@ tap "stripe/stripe-cli"
 tap "surrealdb/tap"
 tap "tursodatabase/tap"
 brew "zstd"
+brew "libtiff"
 brew "webp"
 brew "aws-iam-authenticator"
 brew "aws-vault"
 brew "awscli"
 brew "libssh2"
 brew "bat"
+brew "freetype"
 brew "colima"
 brew "dasel"
 brew "docker-buildx"
@@ -45,6 +47,7 @@ brew "hyperfine"
 brew "libheif"
 brew "imagemagick"
 brew "jenv"
+brew "jpeg"
 brew "jpegoptim"
 brew "jq"
 brew "openjdk@11"
@@ -82,6 +85,7 @@ brew "virtualenv"
 brew "wget"
 brew "yamllint"
 brew "zip"
+brew "zlib"
 brew "buildpacks/tap/pack"
 brew "depot/tap/depot"
 brew "hashicorp/tap/terraform"
@@ -127,6 +131,7 @@ cask "responsively"
 cask "secretive"
 cask "signal"
 cask "sublime-text"
+cask "tailscale"
 cask "telegram"
 cask "timing"
 cask "tor-browser"
@@ -139,15 +144,13 @@ mas "Boop", id: 1518425043
 mas "Color Picker", id: 1545870783
 mas "Day Progress", id: 6450280202
 mas "Dice", id: 1501716820
-mas "iLovePDF", id: 1207332399
-mas "io.bgoerke.photo-anonymizator", id: 1624700848
 mas "Numbers", id: 409203825
 mas "Outbank", id: 1094255754
 mas "Pages", id: 409201541
 mas "Pastebot", id: 1179623856
+mas "Photo Anonymizator", id: 1624700848
 mas "Quick Camera", id: 598853070
 mas "Scaler", id: 1612708557
 mas "Sticky Notes", id: 1150887374
 mas "TripMode", id: 1513400665
-mas "Urban VPN Desktop", id: 1517772049
 mas "WireGuard", id: 1451685025
