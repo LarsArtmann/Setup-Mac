@@ -16,6 +16,9 @@ sed -i '' "s/simple/$(scutil --get LocalHostName)/" flake.nix
 
 nix --extra-experimental-features "nix-command flakes" run nix-darwin/master#darwin-rebuild -- switch
 
+# Adds symlink to nix config folder
+ln -s /etc/nix-darwin/ ./nix
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
 eval "$(/opt/homebrew/bin/brew shellenv)"
