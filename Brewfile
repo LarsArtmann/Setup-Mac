@@ -109,6 +109,7 @@ cask "docker"
 cask "firefox"
 cask "frappe-books"
 cask "ghidra"
+cask "ghostty"
 cask "google-chrome"
 cask "google-cloud-sdk"
 cask "google-drive"
@@ -144,6 +145,7 @@ mas "Boop", id: 1518425043
 mas "Color Picker", id: 1545870783
 mas "Day Progress", id: 6450280202
 mas "Dice", id: 1501716820
+mas "Draw Things", id: 6444050820
 mas "Numbers", id: 409203825
 mas "Outbank", id: 1094255754
 mas "Pages", id: 409201541

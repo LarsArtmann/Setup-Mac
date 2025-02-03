@@ -133,3 +133,4 @@ brew install nmap
 brew install yamllint
 brew install humansignal/tap/label-studio
 brew install --cask tailscale
+brew install --cask ghostty
