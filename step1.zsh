@@ -1,3 +1,6 @@
+# Sudo
+sudo -i
+
 # Nix
 sh <(curl -L https://nixos.org/nix/install)
 
