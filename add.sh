@@ -3,7 +3,8 @@ $command &&
 echo "Added "$command" locally"
 echo "$command" >> step2.zsh &&
 echo "Backup old Brewfile..." &&
-mv Brewfile "$(shasum Brewfile | tr '  ' '_')" ||
+mkdir backups ||
+mv Brewfile "backups/$(shasum Brewfile | tr '  ' '_')" ||
 echo "Dump new Brewfile..." &&
 brew bundle dump &&
 echo "Git commit..." &&
