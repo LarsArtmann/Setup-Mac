@@ -1,0 +1,61 @@
+rm -rv ~/.bun/install/cache
+rm -rv ~/IdeaProjects/nobletary/packages/kunden/.next/cache
+rm -rv ~/IdeaProjects/nobletary/packages/website/.next/cache
+rm -rv ~/IdeaProjects/nobletary/.nx/cache
+rm -rv ~/IdeaProjects/gov.pl/.next/cache
+rm -rv ~/Library/Caches/Google/AndroidStudio20*
+rm -rv ~/Library/Android/sdk
+rm -rv ~/Library/Caches/lima
+rm -rv ~/Library/Application\ Support/Digiarty
+rm -rv ~/Library/Containers/com.everimaging.fotormac/Data/Library/Application\ Support/everimaging/
+rm -rv ~/.gradle/caches/*
+rm -rv ~/.cache/puppeteer
+rm -rv ~/.nuget/packages
+rm -rv ~/.android/avd
+
+# Commands:
+npm cache clean --force
+npm cache verify
+pnpm store prune
+colima delete
+limactl delete colima
+brew autoremove
+brew cleanup --prune=all -s
+nix-store --gc
+
+
+# JetBrains [NOT RECOMMENDED!]
+# rm -rv ~/Library/Caches/JetBrains/*
+# rm -rv ~/Library/Logs/JetBrains/*
+
+# Docker
+# rm -rv ~/Library/Containers/com.docker.docker ## Do not delete ~/Library/Containers/com.docker.docker/.com.apple.containermanagerd.metadata.plist
+
+# Adobe
+# rm -rv /Library/Application\ Support/Adobe
+# rm -rv ~/Library/Caches/Adobe
+# rm -rv ~/Library/Caches/Adobe\ InDesign
+# rm -rv ~/Library/Logs/Adobe
+# rm -rv ~/Library/Logs/CreativeCloud
+# rm -rv ~/Library/Logs/AdobeVulcan
+
+# Spotify
+# rm -rv ~/Library/Caches/com.spotify.client
+
+# Find more places with
+# ncdu 
+#  --exclude "/Users/larsartmann/Library/CloudStorage/*" \
+#  --exclude "/System/Volumes/Data/Users/larsartmann/Library/CloudStorage/*" \
+#  --exclude "/Users/larsartmann/Library/Application Support/CallHistoryTransactions" \
+#  --exclude "/Users/larsartmann/Library/Group Containers/group.com.apple.PegasusConfiguration" \
+#  --exclude "/Users/larsartmann/Library/Containers/*"
+
+# Others
+# /Users/larsartmann/Library/Group\ Containers/4C6364ACXT.com.parallels.desktop.appstore
+
+# Jan [NOT RECOMMENDED!]
+# rm -rv ~/Library/Application\ Support/Jan/data/models/*
+
+# Zip downloads folder
+# zip -r "$(date '+%Y-%m-%d %H_%M_%S') downloads.zip" ~/downloads/*
+
