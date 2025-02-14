@@ -1,1 +1,0 @@
-/etc/nix-darwin/
