@@ -23,6 +23,8 @@ brew autoremove
 brew cleanup --prune=all -s
 nix-store --gc
 
+# JetBrains Recommended
+rm -rv /Users/larsartmann/Library/Caches/JetBrains/Toolbox/temp/*
 
 # JetBrains [NOT RECOMMENDED!]
 # rm -rv ~/Library/Caches/JetBrains/*
@@ -43,18 +45,42 @@ nix-store --gc
 # rm -rv ~/Library/Caches/com.spotify.client
 
 # Find more places with
-# ncdu 
-#  --exclude "/Users/larsartmann/Library/CloudStorage/*" \
-#  --exclude "/System/Volumes/Data/Users/larsartmann/Library/CloudStorage/*" \
+# ncdu \
+#  --exclude "/Users/larsartmann/Library/CloudStorage" \
+#  --exclude "/System/Volumes/Data/Users/larsartmann/Library/CloudStorage" \
 #  --exclude "/Users/larsartmann/Library/Application Support/CallHistoryTransactions" \
 #  --exclude "/Users/larsartmann/Library/Group Containers/group.com.apple.PegasusConfiguration" \
-#  --exclude "/Users/larsartmann/Library/Containers/*"
+#  --exclude "/Users/larsartmann/Library/Containers"
+#  --exclude "/Users/larsartmann/Library/Google Drive"
+#  --exclude "/Users/larsartmann/Library/Application Support/CallHistoryTransactions"
+#  --exclude "/Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com"
+
+# Old JetBrains IDE versions (Cache)
+# rm -rv /Users/larsartmann/Library/Caches/JetBrains/WebStorm2024.2
+# rm -rv /Users/larsartmann/Library/Caches/JetBrains/IntelliJIdea2024.2-backup
+# rm -rv /Users/larsartmann/Library/Caches/JetBrains/IntelliJIdea2024.2
+# rm -rv /Users/larsartmann/Library/Caches/JetBrains/Rider2024.2
+# rm -rv /Users/larsartmann/Library/Caches/JetBrains/GoLand2024.2
+
+# Old JetBrains IDE versions (Application Support)
+# rm -rv /Users/larsartmann/Library/Application\ Support/JetBrains/WebStorm2024.2
+# rm -rv /Users/larsartmann/Library/Application\ Support/JetBrains/IntelliJIdea2024.2-backup
+# rm -rfv /Users/larsartmann/Library/Application\ Support/JetBrains/IntelliJIdea2024.2
+# rm -rfv /Users/larsartmann/Library/Application\ Support/JetBrains/Rider2024.2
+# rm -rfv /Users/larsartmann/Library/Application\ Support/JetBrains/GoLand2024.2
 
 # Others
 # /Users/larsartmann/Library/Group\ Containers/4C6364ACXT.com.parallels.desktop.appstore
 
 # Jan [NOT RECOMMENDED!]
 # rm -rv ~/Library/Application\ Support/Jan/data/models/*
+
+# Facefusion
+# rm -rv /Users/larsartmann/facefusion/.assets/models/*
+
+# Diffusionbee
+# rm -rv /Users/larsartmann/.diffusionbee/downloaded_assets/*
+# rm -rv /Users/larsartmann/.diffusionbee/inp_images/*
 
 # Zip downloads folder
 # zip -r "$(date '+%Y-%m-%d %H_%M_%S') downloads.zip" ~/downloads/*
