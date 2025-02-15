@@ -27,18 +27,68 @@
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew, ... }:
   let
-    configuration = { pkgs, ... }: {
+    configuration = { pkgs, lib, overlays, ... }: {
       # List packages installed in system profile. To search by name, run:
-      # $ nix-env -qaP | grep wget
+      # $ nix-env -qaP | grep <PACKAGE_NAME>
       environment.systemPackages = with pkgs; [
         age
+        awscli2
+        aws-iam-authenticator
+        aws-vault
+        bat # Cat(1) clone with syntax highlighting and Git integration.
+        bun # JavaScript runtime, bundler, transpiler and package manager – all in one.
+        fd # Simple, fast and user-friendly alternative to find.
         comma
-        colmena
-        jqp
+        colmena # Simple, stateless NixOS deployment tool
+        go
+        git
+        git-lfs
+        gradle
+        ffmpeg
+        fzf
+        htop
+        graphviz
+        unbound
+        pre-commit
+        ncdu # Disk usage analyzer with an ncurses interface.
+        maven
+        hyperfine # Command-line benchmarking tool
+        kotlin
+        terraformer # CLI tool to generate terraform files from existing infrastructure (reverse Terraform). Infrastructure to Code.
+        exiftool # Tool to read, write and edit EXIF meta information
+        redis
+        ruby
+        # rust
+        rustup # Rust toolchain installer.
+        openapi-generator-cli # Allows generation of API client libraries (SDK generation), server stubs and documentation automatically given an OpenAPI Spec.
+        yamllint
+        tree # Command to produce a depth indented directory listing
+        nmap # Free and open source utility for network discovery and security auditing.
+        jq
+        jqp # TUI playground to experiment with jq
+        sqlc # Generate type-safe code from SQL for golang
         nh # For nix clean
+        ollama # Get up and running with large language models locally
+        #ONLY PROBLEMS: sublime4 # Sophisticated text editor for code, markup and prose
+        #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your “Signal Android” or “Signal iOS” app.
         wget
+        #NO aarch64-apple-darwin support: cloudflare-warp # Replaces the connection between your device and the Internet with a modern, optimized, protocol
         zsh
+        nushell # Modern shell written in Rust
+        zip
+        stripe-cli # Command-line tool for Stripe.
+        vault # Tool for managing secrets.
+        terraform # Tool for building, changing, and versioning infrastructure.
+        turso-cli # This is the command line interface (CLI) to Turso.
+        zlib # Lossless data-compression library.
+        zstd # Zstandard - Fast real-time compression algorithm
       ];
+
+       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+         "vault" # ‘bsl11’ licence
+         "terraform" # ‘bsl11’ licence
+         #"cloudflare-warp" # ‘unfree’ licence
+       ];
 
       environment.shellAliases = {
         l = "ls -laSh";
@@ -56,115 +106,52 @@
           "humansignal/tap"
           "lightbend/brew"
           "omissis/go-jsonschema"
-          "oven-sh/bun"
-          "stripe/stripe-cli"
-          "surrealdb/tap"
           "tursodatabase/tap"
         ];
         brews = [
-            "zstd"
-            "libtiff"
-            "webp"
-            "aws-iam-authenticator"
-            "aws-vault"
-            "awscli"
-            "libssh2"
-            "bat"
-            "freetype"
-            "colima"
             "dasel"
             "docker-buildx"
             "dotnet"
-            "exiftool"
-            "fd"
-            "unbound"
-            "ffmpeg"
             "node"
             "firebase-cli"
             "fswatch"
-            "fzf"
-            "ghostscript"
-            "git"
-            "git-lfs"
             "gnupg"
-            "go"
             "golangci-lint"
             "gource"
-            "gradle"
-            "graphviz"
             "grpcurl"
             "hadolint"
-            "htop"
-            "huggingface-cli"
-            "hyperfine"
+            "huggingface-cli" # No nix package found - 2025-02-15
             "libheif"
             "imagemagick"
-            "jenv"
-            "jpeg"
-            "jpegoptim"
-            "jq"
             "openjdk@11"
-            "ki"
-            "kotlin"
-            "kubernetes-cli"
+            "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
+            "kubernetes-cli" # No nix package found - 2025-02-15
             "lsusb"
             "mas"
-            "maven"
             "mozjpeg"
-            "ncdu"
-            "nmap"
-            "node@20"
-            "ollama"
-            "openapi-generator"
             "openjdk@17"
-            "openssl@1.1"
+            "openssl@1.1" # Most likely not needed, for Sublime Text
             "parallel"
             "pinentry-mac"
-            "pipx"
-            "pre-commit"
-            "python@3.10"
-            "python@3.11"
-            "redis"
             "rename"
-            "ruby"
-            "rust"
-            "rustup"
-            "sevenzip"
-            "sqlc"
-            "terraformer"
-            "tree"
-            "vercel-cli"
+            "sevenzip" # nix only has p7zip
             "virtualenv"
-            "wget"
-            "yamllint"
-            "zip"
-            "zlib"
             "buildpacks/tap/pack"
             "depot/tap/depot"
-            "hashicorp/tap/terraform"
-            "hashicorp/tap/vault"
             "humansignal/tap/label-studio"
             "lightbend/brew/kalix"
             "omissis/go-jsonschema/go-jsonschema"
-            "oven-sh/bun/bun"
-            "stripe/stripe-cli/stripe"
-            "surrealdb/tap/surreal"
-            "tursodatabase/tap/turso"
         ];
         casks = [
             "android-commandlinetools"
             "android-platform-tools"
             "anydesk"
-            "betterdiscord-installer"
-            "chrome-remote-desktop-host"
             "cloudflare-warp"
-            "deepl"
+            "deepl" # No nix package found - 2025-02-15
             "discord"
             "docker"
             "firefox"
-            "frappe-books"
             "ghidra"
-            "ghostty"
             "google-chrome"
             "google-cloud-sdk"
             "google-drive"
@@ -328,10 +315,17 @@
     };
 
     programs.nh = {
-        enable = true;
-        clean.enable = true;
-        clean.extraArgs = "--keep-since 4d --keep 3";
-        flake = " /etc/nix-darwin/";
-      };
+      enable = true;
+      clean.enable = true;
+      clean.extraArgs = "--keep-since 4d --keep 3";
+      flake = " /etc/nix-darwin/";
+    };
+
+    programs.git = {
+      enable = true;
+      lfs.enable = true;
+      userName = "Lars Artmann";
+      userEmail = "git@lars.softare";
+    };
   };
 }
