@@ -227,9 +227,15 @@
         ActivityMonitor.ShowCategory = null;
         ActivityMonitor.SortColumn = "CPUUsage";
         ActivityMonitor.SortDirection = 0;
+        controlcenter.BatteryShowPercentage = true;
         # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
         # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.dock
         finder.AppleShowAllExtensions = true;
+        finder.AppleShowAllFiles = true;
+        finder.FXEnableExtensionChangeWarning = true;
+        finder.FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
+        finder.ShowPathbar = true;
+        finder.ShowStatusBar = true;
         # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
         hitoolbox.AppleFnUsageType = "Change Input Source";
         loginwindow.GuestEnabled = false;
