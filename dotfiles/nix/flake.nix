@@ -48,7 +48,6 @@
         fzf
         htop
         graphviz
-        unbound
         pre-commit
         ncdu # Disk usage analyzer with an ncurses interface.
         maven
@@ -76,8 +75,10 @@
         wget
         #NO aarch64-apple-darwin support: cloudflare-warp # Replaces the connection between your device and the Internet with a modern, optimized, protocol
         zsh
+        iterm2 # command line terminal
         nushell # Modern shell written in Rust
         zip
+        imagemagick # Software suite to create, edit, compose, or convert bitmap images
         stripe-cli # Command-line tool for Stripe.
         vault # Tool for managing secrets.
         terraform # Tool for building, changing, and versioning infrastructure.
@@ -86,11 +87,11 @@
         zstd # Zstandard - Fast real-time compression algorithm
       ];
 
-       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-         "vault" # ‘bsl11’ licence
-         "terraform" # ‘bsl11’ licence
-         #"cloudflare-warp" # ‘unfree’ licence
-       ];
+      nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+        "vault" # ‘bsl11’ licence
+        "terraform" # ‘bsl11’ licence
+        #"cloudflare-warp" # ‘unfree’ licence
+      ];
 
       environment.shellAliases = {
         l = "ls -laSh";
@@ -102,69 +103,64 @@
         enable = true;
         taps = [
           "homebrew/bundle"
-          "buildpacks/tap"
-          "depot/tap"
-          "hashicorp/tap"
-          "humansignal/tap"
-          "lightbend/brew"
-          "omissis/go-jsonschema"
-          "tursodatabase/tap"
+          # only needed for buildpacks/tap/pack: "buildpacks/tap"
+          # only needed for depot/tap/depot: "depot/tap"
+          "humansignal/tap" # needed for lable-studio
+          # only needed for lightbend/brew/kalix": "lightbend/brew"
+          # only needed for omissis/go-jsonschema/go-jsonschema: "omissis/go-jsonschema"
+          "tursodatabase/tap"# needed for turso
         ];
         brews = [
-            "dasel"
+            # rarely used: "dasel"
             "docker-buildx"
             "dotnet"
             "node"
             "firebase-cli"
-            "fswatch"
-            "gnupg"
-            "golangci-lint"
-            "gource"
-            "grpcurl"
-            "hadolint"
+            # rarely used: "fswatch"
+            "gnupg" # needed for GPG (e.g. git)
+            "pinentry-mac" # needed for GPG (e.g. git)
+            # rarely used: "golangci-lint"
+            # rarely used: "gource"
+            # rarely used: "grpcurl"
+            # rarely used: "hadolint"
             "huggingface-cli" # No nix package found - 2025-02-15
-            "libheif"
-            "imagemagick"
             "openjdk@11"
             "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
             "kubernetes-cli" # No nix package found - 2025-02-15
-            "lsusb"
+            # rarely used: "lsusb"
             "mas"
-            "mozjpeg"
             "openjdk@17"
             "openssl@1.1" # Most likely not needed, for Sublime Text
-            "parallel"
-            "pinentry-mac"
-            "rename"
-            "sevenzip" # nix only has p7zip
-            "virtualenv"
-            "buildpacks/tap/pack"
-            "depot/tap/depot"
+            # rarely used: "parallel"
+            # rarely used: "rename"
+            # rarely used: "sevenzip" # nix only has p7zip
+            # rarely used: "virtualenv"
+            # rarely used: "buildpacks/tap/pack"
+            # rarely used: "depot/tap/depot"
             "humansignal/tap/label-studio"
-            "lightbend/brew/kalix"
-            "omissis/go-jsonschema/go-jsonschema"
+            # rarely used: "lightbend/brew/kalix"
+            # rarely used: "omissis/go-jsonschema/go-jsonschema"
         ];
         casks = [
-            "android-commandlinetools"
-            "android-platform-tools"
-            "anydesk"
+            # rarely used: "android-commandlinetools"
+            # rarely used: "android-platform-tools"
+            # rarely used: "anydesk"
             "cloudflare-warp"
             "deepl" # No nix package found - 2025-02-15
             "discord"
             "docker"
             "firefox"
-            "ghidra"
+            # rarely used: "ghidra"
             "google-chrome"
             "google-cloud-sdk"
             "google-drive"
             "intellij-idea"
-            "iterm2"
-            "jan"
+            # rarely used since I switched to open-webui: "jan"
             "jetbrains-toolbox"
             "little-snitch"
             "macfuse"
             "macpass"
-            "multimc"
+            # rarely used: "multimc"
             "notion"
             "obs"
             "obs-virtualcam"
@@ -178,27 +174,26 @@
             "sublime-text"
             "tailscale"
             "telegram"
-            "timing"
+            # rarely used since it's not worth +96€ a year: "timing"
             "tor-browser"
             "vlc"
-            "warp"
             "whatsapp"
         ];
         masApps = {
-            "Amphetamine" = 937984704;
+            # rarely used: "Amphetamine" = 937984704;
             "AusweisApp" = 948660805;
-            "Boop" = 1518425043;
+            # rarely used: "Boop" = 1518425043;
             "Color Picker" = 1545870783;
-            "Day Progress" = 6450280202;
+            # rarely used, cool but no real value: "Day Progress" = 6450280202;
             "Dice" = 1501716820;
             "Numbers" = 409203825;
             "Outbank" = 1094255754;
-            "Pages" = 409201541;
+            # rarely used: "Pages" = 409201541;
             "Pastebot" = 1179623856;
             "Photo Anonymizator" = 1624700848;
             "Quick Camera" = 598853070;
-            "Scaler" = 1612708557;
-            "Sticky Notes" = 1150887374;
+            # rarely used: "Scaler" = 1612708557;
+            # rarely used: "Sticky Notes" = 1150887374;
             "TripMode" = 1513400665;
             "WireGuard" = 1451685025;
         };
@@ -292,9 +287,6 @@
 
             # User owning the Homebrew prefix
             user = "larsartmann";
-
-            # Automatically migrate existing Homebrew installations
-            autoMigrate = true;
           };
         }
       ];
@@ -335,5 +327,42 @@
       userName = "Lars Artmann";
       userEmail = "git@lars.softare";
     };
+
+    /*services.unbound = {
+      enable = true;
+      checkconf = true;
+      settings = {
+        server = {
+          # When only using Unbound as DNS, make sure to replace 127.0.0.1 with your ip address
+          # When using Unbound in combination with pi-hole or Adguard, leave 127.0.0.1, and point Adguard to 127.0.0.1:PORT
+          interface = [ "127.0.0.1" "::1" ];
+          port = 5335;
+          access-control = [ "127.0.0.0/8 allow" "::1/128 allow" ];
+          # Based on recommended settings in https://docs.pi-hole.net/guides/dns/unbound/#configure-unbound
+          harden-glue = true;
+          harden-dnssec-stripped = true;
+          use-caps-for-id = false;
+          prefetch = true;
+          edns-buffer-size = 1232;
+
+          # Custom settings
+          hide-identity = true;
+          hide-version = true;
+        };
+        forward-zone = [
+          {
+            name = ".";
+            forward-addr = "9.9.9.9@853";
+          }
+          {
+            name = "example.org.";
+            forward-addr = [
+              "9.9.9.9@853"
+              "2620:fe::9@853"
+            ];
+          }
+        ];
+      };
+    };*/
   };
 }
