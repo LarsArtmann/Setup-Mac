@@ -65,6 +65,8 @@
         tree # Command to produce a depth indented directory listing
         nmap # Free and open source utility for network discovery and security auditing.
         jq
+        kubernetes-helm # Package manager for kubernetes
+        kubectl # Kubernetes cluster's control plane
         jqp # TUI playground to experiment with jq
         sqlc # Generate type-safe code from SQL for golang
         nh # For nix clean
