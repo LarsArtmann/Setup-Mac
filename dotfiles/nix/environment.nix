@@ -1,5 +1,11 @@
 { pkgs, ... }: {
   environment = {
+    variables = {
+      EDITOR = "nano";
+      LANG = "en_GB.UTF-8";
+      SHELL = "/Users/larsartmann/.nix-profile/bin/nu";# TODO make dynamic, something like: "${pkgs.nu}";
+    };
+
     # List packages installed in system profile. To search by name, run:
     # $ nix-env -qaP | grep <PACKAGE_NAME>
     systemPackages = with pkgs; [
@@ -59,7 +65,11 @@
       zstd # Zstandard - Fast real-time compression algorithm
     ];
 
-    shells = [ pkgs.nushell  ];
+    shells = with pkgs; [
+      bashInteractive
+      zsh
+      nushell
+    ];
     shellAliases = {
       t = "echo 'Test :)'";
       l = "ls -laSh";
