@@ -64,6 +64,7 @@
       turso-cli # This is the command line interface (CLI) to Turso.
       zlib # Lossless data-compression library.
       zstd # Zstandard - Fast real-time compression algorithm
+      gitleaks # Scan git repos (or files) for secrets
     ];
 
     shells = with pkgs; [
