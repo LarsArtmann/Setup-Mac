@@ -15,7 +15,7 @@
       "docker-buildx"
       "dotnet"
       "node"
-      "firebase-cli"
+      # Just blocks: "firebase-cli"
       # rarely used: "fswatch"
       "gnupg" # needed for GPG (e.g. git)
       "pinentry-mac" # needed for GPG (e.g. git)
@@ -78,6 +78,7 @@
       "tor-browser"
       "vlc"
       "whatsapp"
+      "openzfs" # Nixpkgs not available for darwin
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;

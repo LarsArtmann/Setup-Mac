@@ -18,6 +18,7 @@
       fd # Simple, fast and user-friendly alternative to find.
       comma
       colmena # Simple, stateless NixOS deployment tool
+      code2prompt # A CLI tool to convert your codebase into a single LLM prompt with source tree, prompt templating, and token counting. - https://github.com/mufeedvh/code2prompt?tab=readme-ov-file
       go
       git
       git-lfs
@@ -75,6 +76,7 @@
       l = "ls -laSh";
       nixup = "darwin-rebuild switch";
       mkdir = "mkdir -p";
+      c2p = "code2prompt . --output=code2prompt.md --tokens";
     };
   };
 }
