@@ -65,6 +65,7 @@
       zlib # Lossless data-compression library.
       zstd # Zstandard - Fast real-time compression algorithm
       gitleaks # Scan git repos (or files) for secrets
+      beancount # Double-entry bookkeeping computer language
     ];
 
     shells = with pkgs; [
