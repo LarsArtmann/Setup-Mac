@@ -7,7 +7,7 @@
       # only needed for depot/tap/depot: "depot/tap"
       "humansignal/tap" # needed for lable-studio
       # only needed for lightbend/brew/kalix": "lightbend/brew"
-      # only needed for omissis/go-jsonschema/go-jsonschema: "omissis/go-jsonschema"
+      "omissis/go-jsonschema" # Needed for my CV project
       "tursodatabase/tap" # needed for turso
     ];
     brews = [
@@ -39,7 +39,7 @@
       # rarely used: "depot/tap/depot"
       "humansignal/tap/label-studio"
       # rarely used: "lightbend/brew/kalix"
-      # rarely used: "omissis/go-jsonschema/go-jsonschema"
+      "omissis/go-jsonschema/go-jsonschema" # Needed for my CV project
     ];
     casks = [
       # rarely used: "android-commandlinetools"
