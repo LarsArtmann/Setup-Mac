@@ -54,6 +54,7 @@
             "vault" # ‘bsl11’ licence
             "terraform" # ‘bsl11’ licence
             #"cloudflare-warp" # ‘unfree’ licence
+            "cursor" # ‘unfree’
           ];
         };
       };

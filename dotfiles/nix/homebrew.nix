@@ -98,8 +98,10 @@
       "TripMode" = 1513400665;
       "WireGuard" = 1451685025;
     };
-    onActivation.autoUpdate = true;
-    onActivation.upgrade = true;
-    onActivation.cleanup = "zap";
+    onActivation = {
+      autoUpdate = true;
+      upgrade = true;
+      cleanup = "zap";
+    };
   };
 }
