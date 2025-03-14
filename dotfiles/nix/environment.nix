@@ -67,6 +67,7 @@
       gitleaks # Scan git repos (or files) for secrets
       beancount # Double-entry bookkeeping computer language
       code-cursor # AI-powered code editor built on vscode
+      duti  # Utility to set default applications
     ];
 
     shells = with pkgs; [

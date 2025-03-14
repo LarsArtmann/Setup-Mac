@@ -32,7 +32,7 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
 
         # MacOS
-        security.pam.enableSudoTouchIdAuth = true;
+        security.pam.services.sudo_local.touchIdAuth = true;
         # TODO: ADD https://mynixos.com/nix-darwin/options/system
         # TODO: ADD https://mynixos.com/nix-darwin/options/programs
         # TODO: ADD https://mynixos.com/nix-darwin/options/security
@@ -40,11 +40,14 @@
 
         time.timeZone = null;
 
-        nix.settings = {
-          # Necessary for using flakes on this system.
-          experimental-features = "nix-command flakes";
-          #automatic = true;
-          #channels = "https://nixos.org/channels/nixpkgs-unstable";
+        nix = {
+            enable = true;
+            settings = {
+              # Necessary for using flakes on this system.
+              experimental-features = "nix-command flakes";
+              #automatic = true;
+              #channels = "https://nixos.org/channels/nixpkgs-unstable";
+            };
         };
 
         nixpkgs = {
@@ -93,6 +96,7 @@
 
           # User-specific configurations
           ./users.nix
+          ./fileAssociations.nix
         ];
       };
     };
