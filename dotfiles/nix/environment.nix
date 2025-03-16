@@ -68,6 +68,7 @@
       beancount # Double-entry bookkeeping computer language
       code-cursor # AI-powered code editor built on vscode
       duti  # Utility to set default applications
+      pnpm_10 # Fast, disk space efficient package manager for JavaScript
     ];
 
     shells = with pkgs; [
