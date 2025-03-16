@@ -40,3 +40,4 @@ verified_link "$CURRENT_DIR/dotfiles/nix/programs.nix" /etc/nix-darwin/programs.
 verified_link "$CURRENT_DIR/dotfiles/nix/system.nix" /etc/nix-darwin/system.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/users.nix" /etc/nix-darwin/users.nix
 verified_link "$CURRENT_DIR/dotfiles/.bashrc"  ~/.bashrc
+verified_link "$CURRENT_DIR/dotfiles/.zshrc"  ~/.zshrc
