@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 {
   programs = {
+    # TODO: ADD https://mynixos.com/nix-darwin/options/programs
     #https://github.com/LnL7/nix-darwin/blob/master/modules/programs/zsh/default.nix
     zsh = {
       enable = true;

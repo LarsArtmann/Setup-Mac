@@ -33,8 +33,6 @@
 
         # MacOS
         security.pam.services.sudo_local.touchIdAuth = true;
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system
-        # TODO: ADD https://mynixos.com/nix-darwin/options/programs
         # TODO: ADD https://mynixos.com/nix-darwin/options/security
         # TODO: ADD https://mynixos.com/nix-darwin/options/services.tailscale
 
@@ -96,7 +94,6 @@
 
           # User-specific configurations
           ./users.nix
-          ./fileAssociations.nix
         ];
       };
     };

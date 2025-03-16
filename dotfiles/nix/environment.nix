@@ -1,9 +1,13 @@
 { pkgs, ... }: {
   environment = {
+    # TODO: https://mynixos.com/nix-darwin/options/environment
+    #darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
+
     variables = {
       EDITOR = "nano";
       LANG = "en_GB.UTF-8";
-      SHELL = "/Users/larsartmann/.nix-profile/bin/nu";# TODO make dynamic, something like: "${pkgs.nu}";
+      SHELL = "$HOME/.nix-profile/bin/nu";# TODO make dynamic, something like: "${pkgs.nu}";
+      #NIX_PATH = "$HOME/.nix-defexpr/channels:nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels";
     };
 
     # List packages installed in system profile. To search by name, run:

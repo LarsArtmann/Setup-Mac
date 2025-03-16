@@ -1,5 +1,24 @@
-{ ... }: {
+{ pkgs, ... }: {
   system = {
+    activationScripts = {
+      # Consider switching to home-manager since this seems to be a user-specific configuration
+      #   while it might be executed as root
+      setFileAssociations.text = ''
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .txt all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .md all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .json all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .yaml all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .yml all
+        ${pkgs.duti}/bin/duti -s com.apple.TextEdit .rtf all
+      '';
+    };
+
+    checks = {
+      verifyBuildUsers = true;
+      verifyMacOSVersion = true;
+      #verifyNixPath = true; DO NOT enable! "error: file 'darwin-config' was not found in the Nix search path"
+    };
+
     defaults = {
       ActivityMonitor = {
         IconType = null;
@@ -50,8 +69,29 @@
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.WindowManager
     };
 
+    keyboard = {
+      nonUS = {
+        remapTilde = false;
+      };
+      #enableKeyMapping = false;
+      remapCapsLockToControl = false;
+      remapCapsLockToEscape = false;
+      swapLeftCommandAndLeftAlt = false;
+      swapLeftCtrlAndFn = false;
+    };
+
+    startup = {
+      chime = true;
+    };
+
     # Set Git commit hash for darwin-version.
     #configurationRevision = self.rev or self.dirtyRev or null;
+
+    #darwinLabel = "";
+    nixpkgsRelease = "unstable";
+
+    #patches = [ ];
+    #profile = "";
 
     # Used for backwards compatibility, please read the changelog before changing.
     # $ darwin-rebuild changelog
