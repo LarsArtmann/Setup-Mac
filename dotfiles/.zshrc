@@ -78,9 +78,6 @@ source $ZSH/oh-my-zsh.sh
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
@@ -110,15 +107,7 @@ esac
 # bun completions
 [ -s "/Users/larsartmann/.bun/_bun" ] && source "/Users/larsartmann/.bun/_bun"
 
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export PATH="$PATH:$HOME/go/bin"
-
-# Created by `pipx` on 2024-04-19 05:55:10
-export PATH="$PATH:/Users/larsartmann/.local/bin"
 
 # GPG (Wolt)
 export GPG_TTY=$(tty)

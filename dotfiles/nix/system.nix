@@ -1,36 +1,44 @@
 { ... }: {
   system = {
     defaults = {
-      ActivityMonitor.IconType = null;
-      ActivityMonitor.OpenMainWindow = true;
-      ActivityMonitor.ShowCategory = null;
-      ActivityMonitor.SortColumn = "CPUUsage";
-      ActivityMonitor.SortDirection = 0;
+      ActivityMonitor = {
+        IconType = null;
+        OpenMainWindow = true;
+        ShowCategory = null;
+        SortColumn = "CPUUsage";
+        SortDirection = 0;
+      };
       controlcenter.BatteryShowPercentage = true;
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.dock
-      finder.AppleShowAllExtensions = true;
-      finder.AppleShowAllFiles = true;
-      finder.FXEnableExtensionChangeWarning = true;
-      finder.FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
-      finder.ShowPathbar = false;
-      finder.ShowStatusBar = true;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
+      finder = {
+        AppleShowAllExtensions = true;
+        AppleShowAllFiles = true;
+        FXEnableExtensionChangeWarning = true;
+        FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
+        ShowPathbar = false;
+        ShowStatusBar = true;
+        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
+      };
       hitoolbox.AppleFnUsageType = "Change Input Source";
       loginwindow.GuestEnabled = false;
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.loginwindow
-      menuExtraClock.FlashDateSeparators = false;
-      menuExtraClock.IsAnalog = null;
-      menuExtraClock.Show24Hour = true;
-      menuExtraClock.ShowDate = 0;
-      menuExtraClock.ShowDayOfMonth = null;
-      menuExtraClock.ShowDayOfWeek = null;
-      menuExtraClock.ShowSeconds = true;
-      NSGlobalDomain.AppleShowAllFiles = true;
-      NSGlobalDomain.AppleICUForce24HourTime = true;
-      NSGlobalDomain.AppleTemperatureUnit = "Celsius";
-      NSGlobalDomain.AppleMeasurementUnits = "Centimeters";
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.NSGlobalDomain
+      menuExtraClock = {
+        FlashDateSeparators = false;
+        IsAnalog = null;
+        Show24Hour = true;
+        ShowDate = 0;
+        ShowDayOfMonth = null;
+        ShowDayOfWeek = null;
+        ShowSeconds = true;
+      };
+      NSGlobalDomain = {
+        AppleShowAllFiles = true;
+        AppleICUForce24HourTime = true;
+        AppleTemperatureUnit = "Celsius";
+        AppleMeasurementUnits = "Centimeters";
+        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.NSGlobalDomain
+      };
       screencapture.location = "~/Desktop";
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screencapture
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screensaver

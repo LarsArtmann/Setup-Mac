@@ -1,5 +1,4 @@
 HOME="/Users/larsartmann"
-BUN="$HOME/.bun/bin"
 HOME_BREW_BIN="/opt/homebrew/bin"
 HOME_BREW_SBIN="/opt/homebrew/sbin"
 PNPM="$HOME/Library/pnpm"
@@ -17,7 +16,6 @@ LOCAL_BIN="$HOME/.local/bin"
 GO="$HOME/go/bin"
 
 ALL_PATHS=(
-  "$BUN"
   "$HOME_BREW_BIN"
   "$HOME_BREW_SBIN"
   "$PNPM"
