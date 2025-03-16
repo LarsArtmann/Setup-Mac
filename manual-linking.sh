@@ -39,5 +39,8 @@ verified_link "$CURRENT_DIR/dotfiles/nix/homebrew.nix" /etc/nix-darwin/homebrew.
 verified_link "$CURRENT_DIR/dotfiles/nix/programs.nix" /etc/nix-darwin/programs.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/system.nix" /etc/nix-darwin/system.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/users.nix" /etc/nix-darwin/users.nix
-verified_link "$CURRENT_DIR/dotfiles/.bashrc"  ~/.bashrc
-verified_link "$CURRENT_DIR/dotfiles/.zshrc"  ~/.zshrc
+verified_link "$CURRENT_DIR/dotfiles/.bash_profile" ~/.bash_profile
+verified_link "$CURRENT_DIR/dotfiles/.bashrc" ~/.bashrc
+verified_link "$CURRENT_DIR/dotfiles/.zshrc" ~/.zshrc
+verified_link "$CURRENT_DIR/dotfiles/.zprofile" ~/.zprofile
+verified_link "$CURRENT_DIR/dotfiles/.fzf.zsh" ~/.fzf.zsh
