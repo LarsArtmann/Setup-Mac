@@ -6,7 +6,7 @@ check_file_or_symlink() {
 
     if [ -e "$path" ]; then
         if [ -L "$path" ]; then
-            echo "Error: A symbolic link already exists at $path."
+            echo "Notice: A symbolic link already exists at $path."
         elif [ -f "$path" ]; then
             echo "Error: A regular file already exists at $path."
         else
@@ -29,11 +29,14 @@ verified_link() {
 }
 
 CURRENT_DIR=$(pwd)
+# TODO: consider linking the entire nix folder
 verified_link "$CURRENT_DIR/dotfiles/.ssh/config" ~/.ssh/config
 verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/environment.nix
+verified_link "$CURRENT_DIR/dotfiles/nix/fileAssociations.nix" /etc/nix-darwin/fileAssociations.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/flake.lock" /etc/nix-darwin/flake.lock
 verified_link "$CURRENT_DIR/dotfiles/nix/flake.nix" /etc/nix-darwin/flake.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/homebrew.nix" /etc/nix-darwin/homebrew.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/programs.nix" /etc/nix-darwin/programs.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/system.nix" /etc/nix-darwin/system.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/users.nix" /etc/nix-darwin/users.nix
+verified_link "$CURRENT_DIR/dotfiles/.bashrc"  ~/.bashrc
