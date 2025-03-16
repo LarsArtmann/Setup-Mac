@@ -1,0 +1,17 @@
+[user]
+	name = Lars Artmann
+	email = git@lars.software
+	signingkey = 36037D6670FCE557
+[core]
+	autocrlf = input
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[url "ssh://git@github.com/creditornot"]
+	insteadOf = https://github.com/creditornot
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
