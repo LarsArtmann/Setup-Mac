@@ -103,5 +103,8 @@
       upgrade = true;
       cleanup = "zap";
     };
+    global = {
+      brewfile = true;
+    };
   };
 }

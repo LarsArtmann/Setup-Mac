@@ -73,9 +73,9 @@
       nonUS = {
         remapTilde = false;
       };
-      #enableKeyMapping = false;
+      enableKeyMapping = true;
       remapCapsLockToControl = false;
-      remapCapsLockToEscape = false;
+      remapCapsLockToEscape = true;
       swapLeftCommandAndLeftAlt = false;
       swapLeftCtrlAndFn = false;
     };
