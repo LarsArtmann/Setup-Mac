@@ -2,7 +2,6 @@
   homebrew = {
     enable = true;
     taps = [
-      "homebrew/bundle"
       # only needed for buildpacks/tap/pack: "buildpacks/tap"
       # only needed for depot/tap/depot: "depot/tap"
       "humansignal/tap" # needed for lable-studio

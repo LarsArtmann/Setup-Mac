@@ -73,6 +73,7 @@
       code-cursor # AI-powered code editor built on vscode
       duti  # Utility to set default applications
       pnpm_10 # Fast, disk space efficient package manager for JavaScript
+      just # Handy way to save and run project-specific commands
     ];
 
     shells = with pkgs; [

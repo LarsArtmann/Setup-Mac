@@ -3,8 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:LnL7/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     # Optional: Declarative tap management
@@ -14,10 +16,6 @@
     };
     homebrew-cask = {
       url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
-    homebrew-bundle = {
-      url = "github:homebrew/homebrew-bundle";
       flake = false;
     };
     colmena.url = "github:zhaofengli/colmena";
@@ -39,13 +37,11 @@
         time.timeZone = null;
 
         nix = {
-            enable = true;
-            settings = {
-              # Necessary for using flakes on this system.
-              experimental-features = "nix-command flakes";
-              #automatic = true;
-              #channels = "https://nixos.org/channels/nixpkgs-unstable";
-            };
+          enable = true;
+          settings = {
+            # Necessary for using flakes on this system.
+            experimental-features = "nix-command flakes";
+          };
         };
 
         nixpkgs = {
@@ -89,6 +85,10 @@
 
               # User owning the Homebrew prefix
               user = "larsartmann";
+
+              # Enable fully-declarative tap management
+              # With mutableTaps disabled, taps can no longer be added imperatively with `brew tap`.
+              #mutableTaps = false;
             };
           }
 
