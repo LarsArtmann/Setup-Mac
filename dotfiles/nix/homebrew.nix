@@ -78,6 +78,7 @@
       "vlc"
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
+      "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;
