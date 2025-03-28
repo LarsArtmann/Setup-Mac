@@ -74,6 +74,7 @@
       duti  # Utility to set default applications
       pnpm_10 # Fast, disk space efficient package manager for JavaScript
       just # Handy way to save and run project-specific commands
+      k9s # Kubernetes CLI to manage your clusters in real-time
     ];
 
     shells = with pkgs; [
