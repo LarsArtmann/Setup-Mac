@@ -75,6 +75,7 @@
       pnpm_10 # Fast, disk space efficient package manager for JavaScript
       just # Handy way to save and run project-specific commands
       k9s # Kubernetes CLI to manage your clusters in real-time
+      cilium-cli # CLI for Cilium
     ];
 
     shells = with pkgs; [
