@@ -76,6 +76,7 @@
       just # Handy way to save and run project-specific commands
       k9s # Kubernetes CLI to manage your clusters in real-time
       cilium-cli # CLI for Cilium
+      keepassxc # Free, open-source, cross-platform password manager
     ];
 
     shells = with pkgs; [
