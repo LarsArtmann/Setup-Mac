@@ -77,6 +77,7 @@
       k9s # Kubernetes CLI to manage your clusters in real-time
       cilium-cli # CLI for Cilium
       keepassxc # Free, open-source, cross-platform password manager
+      k8sgpt # Kubernetes LLM CLI
     ];
 
     shells = with pkgs; [
