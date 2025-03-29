@@ -42,6 +42,15 @@
             # Necessary for using flakes on this system.
             experimental-features = "nix-command flakes";
           };
+          gc = {
+            automatic = true;
+            interval = { Hour = 0; Minute = 0; };
+            options = "--delete-older-than 3d";
+          };
+          optimise = {
+            automatic = true;
+            interval = { Weekday = 0; Hour = 0; Minute = 0; };
+          };
         };
 
         nixpkgs = {
