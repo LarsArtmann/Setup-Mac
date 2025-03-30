@@ -44,3 +44,4 @@ verified_link "$CURRENT_DIR/dotfiles/.fzf.zsh" ~/.fzf.zsh
 verified_link "$CURRENT_DIR/dotfiles/.gitconfig" ~/.gitconfig
 verified_link "$CURRENT_DIR/dotfiles/.zprofile" ~/.zprofile
 verified_link "$CURRENT_DIR/dotfiles/.zshrc" ~/.zshrc
+#verified_link "" ~/.kube/config

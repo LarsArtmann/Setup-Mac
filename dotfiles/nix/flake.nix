@@ -101,6 +101,8 @@
             };
           }
 
+          ./networking.nix
+
           # User-specific configurations
           ./users.nix
         ];
