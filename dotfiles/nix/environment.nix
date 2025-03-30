@@ -78,6 +78,7 @@
       cilium-cli # CLI for Cilium
       keepassxc # Free, open-source, cross-platform password manager
       k8sgpt # Kubernetes LLM CLI
+      helmfile # Declarative spec for deploying Helm charts
     ];
 
     shells = with pkgs; [
