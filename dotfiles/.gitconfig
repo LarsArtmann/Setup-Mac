@@ -1,7 +1,7 @@
 [user]
 	name = Lars Artmann
 	email = git@lars.software
-	signingkey = 36037D6670FCE557
+	signingkey = 76687BB69B36BFB1B1C58FA878B4350389C71333
 [core]
 	autocrlf = input
 [filter "lfs"]
