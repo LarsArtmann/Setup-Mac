@@ -31,10 +31,12 @@ verified_link() {
 CURRENT_DIR=$(pwd)
 # TODO: consider linking the entire nix folder
 verified_link "$CURRENT_DIR/dotfiles/.ssh/config" ~/.ssh/config
+verified_link "$CURRENT_DIR/dotfiles/nix/core.nix" /etc/nix-darwin/core.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/environment.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/flake.lock" /etc/nix-darwin/flake.lock
 verified_link "$CURRENT_DIR/dotfiles/nix/flake.nix" /etc/nix-darwin/flake.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/homebrew.nix" /etc/nix-darwin/homebrew.nix
+verified_link "$CURRENT_DIR/dotfiles/nix/networking.nix" /etc/nix-darwin/networking.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/programs.nix" /etc/nix-darwin/programs.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/system.nix" /etc/nix-darwin/system.nix
 verified_link "$CURRENT_DIR/dotfiles/nix/users.nix" /etc/nix-darwin/users.nix

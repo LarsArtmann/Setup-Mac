@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs,... }: {
   environment = {
     # TODO: https://mynixos.com/nix-darwin/options/environment
     #darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
@@ -51,7 +51,7 @@
       kubectl # Kubernetes cluster's control plane
       jqp # TUI playground to experiment with jq
       sqlc # Generate type-safe code from SQL for golang
-      nh # For nix clean
+      /*nixpkgs-nh-dev*/nh # For nix clean
       ollama # Get up and running with large language models locally
       #ONLY PROBLEMS: sublime4 # Sophisticated text editor for code, markup and prose
       #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your “Signal Android” or “Signal iOS” app.
@@ -79,6 +79,7 @@
       keepassxc # Free, open-source, cross-platform password manager
       k8sgpt # Kubernetes LLM CLI
       helmfile # Declarative spec for deploying Helm charts
+      tokei # Program that allows you to count your code, quickly
     ];
 
     shells = with pkgs; [
@@ -89,7 +90,7 @@
     shellAliases = {
       t = "echo 'Test :)'";
       l = "ls -laSh";
-      nixup = "darwin-rebuild switch";
+      nixup = "nh darwin switch /Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/";
       mkdir = "mkdir -p";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
     };
