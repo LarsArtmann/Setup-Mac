@@ -27,15 +27,16 @@
     #  enable = true;
     #  shellAliases = (import ./environment.nix).environment.shellAliases;
     #};
-    nh = {
-      enable = true;
-      package = nixpkgs-nh-dev.default;
-      clean = {
-        enable = true;
-        extraArgs = "--keep-since 4d --keep 3";
-      };
-      flake = "/etc/nix-darwin/";
-    };
+    #error: The option `programs.nh' does not exist.
+    #nh = {
+    #  enable = true;
+    #  package = nixpkgs-nh-dev;
+    #  clean = {
+    #    enable = true;
+    #    extraArgs = "--keep-since 4d --keep 3";
+    #  };
+    #  flake = "/etc/nix-darwin/";
+    #};
     #git = {
     #  enable = true;
     #  lfs.enable = true;

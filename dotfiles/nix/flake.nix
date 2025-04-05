@@ -81,18 +81,20 @@
           ./users.nix
 
           # Home Manager integration
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              users.larsartmann = { pkgs, ... }: {
-                imports = [ ./home.nix ];
-                home.username = "larsartmann";
-                home.homeDirectory = "/Users/larsartmann";
-              };
-            };
-          }
+          #home-manager.darwinModules.home-manager
+          #{
+          #  home-manager = {
+          #    useGlobalPkgs = true;
+          #    useUserPackages = true;
+          #    users.larsartmann = {
+          #      home = {
+          #        username = "larsartmann";
+          #        homeDirectory = "/Users/larsartmann";
+          #        stateVersion = "25.05";
+          #      };
+          #    };
+          #  };
+          #}
         ];
       };
     };
