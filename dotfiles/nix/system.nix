@@ -41,7 +41,7 @@
         orientation = "bottom";
         showhidden = false;
         tilesize = 67;
-        show-recents = true;
+        show-recents = false;
         show-process-indicators = true;
         static-only = false;
         mru-spaces = true;
