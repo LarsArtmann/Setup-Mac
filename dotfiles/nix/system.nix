@@ -11,6 +11,12 @@
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .yml all
         ${pkgs.duti}/bin/duti -s com.apple.TextEdit .rtf all
       '';
+
+      # Set Finder to always calculate folder sizes
+      setFinderCalculateAllSizes.text = ''
+        defaults write com.apple.finder FXCalculateAllSizes -bool true
+        killall Finder
+      '';
     };
 
     checks = {
