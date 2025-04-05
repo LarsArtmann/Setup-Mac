@@ -84,4 +84,3 @@ rm -rv /Users/larsartmann/Library/Caches/JetBrains/Toolbox/temp/*
 
 # Zip downloads folder
 # zip -r "$(date '+%Y-%m-%d %H_%M_%S') downloads.zip" ~/downloads/*
-

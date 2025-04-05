@@ -85,3 +85,5 @@ result-*
 # Augment Code
 .idea/AugmentWebviewStateStore.xml
 
+# Pre-commit
+.pre-commit-cache/
