@@ -93,6 +93,9 @@
       nixup = "nh darwin switch /Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/";
       mkdir = "mkdir -p";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
+      firebase-login = "firebase login";
+      gcloud-init = "gcloud init";
+      gcloud-components-install = "gcloud components install cbt alpha beta";
     };
   };
 }

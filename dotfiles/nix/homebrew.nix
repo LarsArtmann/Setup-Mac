@@ -14,8 +14,9 @@
       "docker-buildx"
       "dotnet"
       "node"
-      # Just blocks: "firebase-cli"
+      "firebase-cli" # For Firebase login and management
       # rarely used: "fswatch"
+      "git-town" # Git workflow manager
       "gnupg" # needed for GPG (e.g. git)
       "pinentry-mac" # needed for GPG (e.g. git)
       # rarely used: "golangci-lint"
@@ -51,7 +52,7 @@
       "firefox"
       # rarely used: "ghidra"
       "google-chrome"
-      "google-cloud-sdk"
+      "google-cloud-sdk" # For Google Cloud setup and management
       "google-drive"
       "intellij-idea"
       # rarely used since I switched to open-webui: "jan"
@@ -70,6 +71,7 @@
       "responsively"
       "secretive"
       "signal"
+      "spotify" # Music streaming service
       "sublime-text"
       "tailscale"
       "telegram"
