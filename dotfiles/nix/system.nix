@@ -96,8 +96,6 @@
 
         # Gesture options
         TrackpadThreeFingerTapGesture = 2; # 0 to disable, 2 for Look up & data detectors
-        TrackpadTwoFingerDoubleTapGesture = 1;
-        TrackpadTwoFingerFromRightEdgeSwipeGesture = 3;
       };
 
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
