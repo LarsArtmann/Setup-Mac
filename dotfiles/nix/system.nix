@@ -37,7 +37,7 @@
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
 
       dock = {
-        autohide = false;
+        autohide = true;
         orientation = "bottom";
         showhidden = false;
         tilesize = 67;
@@ -83,15 +83,19 @@
       spaces.spans-displays = null;
 
       trackpad = {
-        Clicking = true;
-        TrackpadRightClick = true;
-        TrackpadThreeFingerDrag = false;
-        TrackpadFiveFingerPinchGesture = 2;
-        TrackpadFourFingerHorizSwipeGesture = 2;
-        TrackpadFourFingerPinchGesture = 2;
-        TrackpadFourFingerVertSwipeGesture = 2;
-        TrackpadThreeFingerHorizSwipeGesture = 2;
-        TrackpadThreeFingerVertSwipeGesture = 2;
+        # Standard trackpad options
+        Clicking = true;                # Enable tap to click
+        TrackpadRightClick = true;      # Enable two-finger right click
+        Dragging = false;               # Disable tap-to-drag
+        TrackpadThreeFingerDrag = false; # Disable three finger drag
+
+        # Click strength options
+        ActuationStrength = 1;          # 0 for Silent Clicking, 1 to disable
+        FirstClickThreshold = 1;        # 0 for light, 1 for medium, 2 for firm
+        SecondClickThreshold = 1;       # 0 for light, 1 for medium, 2 for firm
+
+        # Gesture options
+        TrackpadThreeFingerTapGesture = 2; # 0 to disable, 2 for Look up & data detectors
         TrackpadTwoFingerDoubleTapGesture = 1;
         TrackpadTwoFingerFromRightEdgeSwipeGesture = 3;
       };
