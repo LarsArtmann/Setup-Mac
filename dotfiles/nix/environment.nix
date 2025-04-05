@@ -51,7 +51,7 @@
       kubectl # Kubernetes cluster's control plane
       jqp # TUI playground to experiment with jq
       sqlc # Generate type-safe code from SQL for golang
-      /*nixpkgs-nh-dev*/nh # For nix clean
+      nixpkgs-nh-dev.default # For nix clean - using latest dev version
       ollama # Get up and running with large language models locally
       #ONLY PROBLEMS: sublime4 # Sophisticated text editor for code, markup and prose
       #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your “Signal Android” or “Signal iOS” app.

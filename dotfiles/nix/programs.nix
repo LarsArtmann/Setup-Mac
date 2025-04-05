@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, nixpkgs-nh-dev, ... }:
 {
   programs = {
     # TODO: ADD https://mynixos.com/nix-darwin/options/programs
@@ -27,14 +27,15 @@
     #  enable = true;
     #  shellAliases = (import ./environment.nix).environment.shellAliases;
     #};
-    #nh = {
-    #  enable = true;
-    #  clean = {
-    #    enable = true;
-    #    extraArgs = "--keep-since 4d --keep 3";
-    #  };
-    #  flake = " /etc/nix-darwin/";
-    #};
+    nh = {
+      enable = true;
+      package = nixpkgs-nh-dev.default;
+      clean = {
+        enable = true;
+        extraArgs = "--keep-since 4d --keep 3";
+      };
+      flake = "/etc/nix-darwin/";
+    };
     #git = {
     #  enable = true;
     #  lfs.enable = true;

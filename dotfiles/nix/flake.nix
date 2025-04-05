@@ -13,7 +13,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpkgs-nh-dev.url = "github:viperML/nh";
+    nixpkgs-nh-dev = {
+      url = "github:viperML/nh/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     # Optional: Declarative tap management
@@ -28,7 +31,7 @@
     colmena.url = "github:zhaofengli/colmena";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@imports:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -38,6 +41,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
+        specialArgs = { inherit nixpkgs-nh-dev; };
         modules = [
           # Core system configuration
           base
