@@ -83,9 +83,15 @@
           # Home Manager integration
           home-manager.darwinModules.home-manager
           {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.larsartmann = import ./home.nix;
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.larsartmann = { pkgs, ... }: {
+                imports = [ ./home.nix ];
+                home.username = "larsartmann";
+                home.homeDirectory = "/Users/larsartmann";
+              };
+            };
           }
         ];
       };

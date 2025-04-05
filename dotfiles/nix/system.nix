@@ -88,14 +88,6 @@
         TrackpadRightClick = true;      # Enable two-finger right click
         Dragging = false;               # Disable tap-to-drag
         TrackpadThreeFingerDrag = false; # Disable three finger drag
-
-        # Click strength options
-        ActuationStrength = 1;          # 0 for Silent Clicking, 1 to disable
-        FirstClickThreshold = 1;        # 0 for light, 1 for medium, 2 for firm
-        SecondClickThreshold = 1;       # 0 for light, 1 for medium, 2 for firm
-
-        # Gesture options
-        TrackpadThreeFingerTapGesture = 2; # 0 to disable, 2 for Look up & data detectors
       };
 
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
