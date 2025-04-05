@@ -35,7 +35,18 @@
       };
       controlcenter.BatteryShowPercentage = true;
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.dock
+
+      dock = {
+        autohide = false;
+        orientation = "bottom";
+        showhidden = false;
+        tilesize = 67;
+        show-recents = true;
+        show-process-indicators = true;
+        static-only = false;
+        mru-spaces = true;
+        wvous-br-corner = 14; # Hot corner: bottom right - Quick Note
+      };
       finder = {
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
@@ -70,7 +81,21 @@
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.smb
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
       spaces.spans-displays = null;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.trackpad
+
+      trackpad = {
+        Clicking = true;
+        TrackpadRightClick = true;
+        TrackpadThreeFingerDrag = false;
+        TrackpadFiveFingerPinchGesture = 2;
+        TrackpadFourFingerHorizSwipeGesture = 2;
+        TrackpadFourFingerPinchGesture = 2;
+        TrackpadFourFingerVertSwipeGesture = 2;
+        TrackpadThreeFingerHorizSwipeGesture = 2;
+        TrackpadThreeFingerVertSwipeGesture = 2;
+        TrackpadTwoFingerDoubleTapGesture = 1;
+        TrackpadTwoFingerFromRightEdgeSwipeGesture = 3;
+      };
+
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.WindowManager
     };

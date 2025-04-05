@@ -8,6 +8,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nixpkgs-nh-dev.url = "github:viperML/nh";
 
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -23,7 +28,7 @@
     colmena.url = "github:zhaofengli/colmena";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev,... }@imports:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@imports:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -70,6 +75,14 @@
 
           # User-specific configurations
           ./users.nix
+
+          # Home Manager integration
+          home-manager.darwinModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.larsartmann = import ./home.nix;
+          }
         ];
       };
     };
