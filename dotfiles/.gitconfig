@@ -9,6 +9,8 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[url "ssh://git@github.com/LarsArtmann"]
+	insteadOf = https://github.com/LarsArtmann
 [url "ssh://git@github.com/creditornot"]
 	insteadOf = https://github.com/creditornot
 [commit]
