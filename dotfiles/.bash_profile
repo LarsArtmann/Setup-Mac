@@ -12,7 +12,8 @@ BIN="/bin"
 SBIN="/sbin"
 JET_BRAINS="$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
 LOCAL_BIN="$HOME/.local/bin"
-GO="$HOME/go/bin"
+GO_HOME="$HOME/go/bin"
+BUN_HOME="$HOME/.bun/bin"
 
 ALL_PATHS=(
   "$HOME_BREW_BIN"
@@ -28,7 +29,8 @@ ALL_PATHS=(
   "$SBIN"
   "$JET_BRAINS"
   "$LOCAL_BIN"
-  "$GO"
+  "$GO_HOME"
+  "$BUN_HOME"
 )
 
 export PATH=$(IFS=:; echo "${ALL_PATHS[*]}")
