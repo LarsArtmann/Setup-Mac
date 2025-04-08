@@ -62,7 +62,7 @@ After making changes to your configuration files, run:
 First time:
 
 ```sh
-nh shell github:viperML/nh/master
+nix shell github:viperML/nh/master
 nh darwin switch ./dotfiles/nix/
 ```
 
