@@ -7,6 +7,8 @@
   # TODO: ADD https://mynixos.com/nix-darwin/options/security
   # TODO: ADD https://mynixos.com/nix-darwin/options/services.tailscale
 
+  # I think leaving this null means that MacOS will
+  # manage the system timezone based on location itself.
   time.timeZone = null;
 
   nix = {
