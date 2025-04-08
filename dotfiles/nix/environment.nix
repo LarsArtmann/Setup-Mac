@@ -92,7 +92,7 @@
     shellAliases = {
       t = "echo 'Test :)'";
       l = "ls -laSh";
-      nixup = "nh darwin switch /Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/";
+      nixup = "nh darwin switch $HOME/Desktop/Setup-Mac/dotfiles/nix/";
       mkdir = "mkdir -p";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
       firebase-login = "firebase login";
