@@ -47,3 +47,15 @@ verified_link "$CURRENT_DIR/dotfiles/.gitconfig" ~/.gitconfig
 verified_link "$CURRENT_DIR/dotfiles/.zprofile" ~/.zprofile
 verified_link "$CURRENT_DIR/dotfiles/.zshrc" ~/.zshrc
 #verified_link "" ~/.kube/config
+
+# Nushell configuration
+mkdir -p ~/.config/nushell
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" ~/.config/nushell/aliases.nu
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" ~/.config/nushell/config.nu
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" ~/.config/nushell/env.nu
+
+# Nushell configuration in Library/Application Support
+mkdir -p "$HOME/Library/Application Support/nushell"
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" "$HOME/Library/Application Support/nushell/aliases.nu"
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" "$HOME/Library/Application Support/nushell/config.nu"
+verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" "$HOME/Library/Application Support/nushell/env.nu"
