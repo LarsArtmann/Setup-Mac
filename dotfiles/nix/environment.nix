@@ -81,6 +81,7 @@
       helmfile # Declarative spec for deploying Helm charts
       tokei # Program that allows you to count your code, quickly
       github-cli # GitHub’s official command line tool
+      devenv # Fast, Declarative, Reproducible, and Composable Developer Environments
     ];
 
     shells = with pkgs; [
