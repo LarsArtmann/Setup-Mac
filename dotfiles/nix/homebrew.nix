@@ -4,7 +4,7 @@
     taps = [
       # only needed for buildpacks/tap/pack: "buildpacks/tap"
       # only needed for depot/tap/depot: "depot/tap"
-      "humansignal/tap" # needed for lable-studio
+      "humansignal/tap" # needed for label-studio
       # only needed for lightbend/brew/kalix": "lightbend/brew"
       "omissis/go-jsonschema" # Needed for my CV project
       "tursodatabase/tap" # needed for turso
