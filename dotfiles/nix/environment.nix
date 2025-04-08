@@ -12,77 +12,132 @@
 
     # List packages installed in system profile. To search by name, run:
     # $ nix-env -qaP | grep <PACKAGE_NAME>
-    systemPackages = with pkgs; [
-      age
-      awscli2
-      aws-iam-authenticator
-      aws-vault
-      bat # Cat(1) clone with syntax highlighting and Git integration.
-      bun # JavaScript runtime, bundler, transpiler and package manager – all in one.
-      fd # Simple, fast and user-friendly alternative to find.
-      comma
-      colmena # Simple, stateless NixOS deployment tool
-      code2prompt # A CLI tool to convert your codebase into a single LLM prompt with source tree, prompt templating, and token counting. - https://github.com/mufeedvh/code2prompt?tab=readme-ov-file
-      go
-      git
-      git-lfs
-      gradle
-      ffmpeg
-      fzf
-      htop
-      graphviz
-      pre-commit
-      ncdu # Disk usage analyzer with an ncurses interface.
-      maven
-      hyperfine # Command-line benchmarking tool
-      kotlin
-      terraformer # CLI tool to generate terraform files from existing infrastructure (reverse Terraform). Infrastructure to Code.
-      exiftool # Tool to read, write and edit EXIF meta information
-      redis
-      ruby
-      # rust
-      rustup # Rust toolchain installer.
-      openapi-generator-cli # Allows generation of API client libraries (SDK generation), server stubs and documentation automatically given an OpenAPI Spec.
-      yamllint
-      tree # Command to produce a depth indented directory listing
-      nmap # Free and open source utility for network discovery and security auditing.
-      jq
-      kubernetes-helm # Package manager for kubernetes
-      kubectl # Kubernetes cluster's control plane
-      jqp # TUI playground to experiment with jq
-      sqlc # Generate type-safe code from SQL for golang
-      nh # For nix clean
-      ollama # Get up and running with large language models locally
-      #ONLY PROBLEMS: sublime4 # Sophisticated text editor for code, markup and prose
-      #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your “Signal Android” or “Signal iOS” app.
-      wget
-      #NO aarch64-apple-darwin support: cloudflare-warp # Replaces the connection between your device and the Internet with a modern, optimized, protocol
-      zsh
-      iterm2 # command line terminal
-      nushell # Modern shell written in Rust
-      zip
-      imagemagick # Software suite to create, edit, compose, or convert bitmap images
-      stripe-cli # Command-line tool for Stripe.
-      vault # Tool for managing secrets.
-      terraform # Tool for building, changing, and versioning infrastructure.
-      turso-cli # This is the command line interface (CLI) to Turso.
-      zlib # Lossless data-compression library.
-      zstd # Zstandard - Fast real-time compression algorithm
-      gitleaks # Scan git repos (or files) for secrets
-      beancount # Double-entry bookkeeping computer language
-      code-cursor # AI-powered code editor built on vscode
-      duti  # Utility to set default applications
-      pnpm_10 # Fast, disk space efficient package manager for JavaScript
-      just # Handy way to save and run project-specific commands
-      k9s # Kubernetes CLI to manage your clusters in real-time
-      cilium-cli # CLI for Cilium
-      keepassxc # Free, open-source, cross-platform password manager
-      k8sgpt # Kubernetes LLM CLI
-      helmfile # Declarative spec for deploying Helm charts
-      tokei # Program that allows you to count your code, quickly
-      github-cli # GitHub’s official command line tool
-      devenv # Fast, Declarative, Reproducible, and Composable Developer Environments
-    ];
+    systemPackages = with pkgs;
+      # Development tools
+      [
+        # Version control
+        git
+        git-lfs
+        github-cli
+        pre-commit
+
+        # Build tools
+        gradle
+        maven
+        just            # Task runner similar to make
+        devenv          # Developer environments
+
+        # Programming languages and runtimes
+        go
+        kotlin
+        ruby
+        # rust
+        rustup          # Rust toolchain installer
+        bun             # JavaScript runtime and package manager
+        pnpm_10         # Fast, disk space efficient package manager for JavaScript
+
+        # Development utilities
+        openapi-generator-cli  # Generate API clients from OpenAPI specs
+        sqlc            # Generate type-safe Go code from SQL
+        graphviz        # Graph visualization tools
+        yamllint        # YAML linter
+        tokei           # Count code statistics
+      ] ++
+
+      # Cloud and infrastructure tools
+      [
+        # AWS
+        awscli2
+        aws-iam-authenticator
+        aws-vault
+
+        # Kubernetes
+        kubectl         # Kubernetes control plane
+        kubernetes-helm # Package manager for Kubernetes
+        k9s             # Kubernetes CLI to manage clusters in real-time
+        cilium-cli      # CLI for Cilium
+        k8sgpt          # Kubernetes LLM CLI
+        helmfile        # Declarative spec for deploying Helm charts
+
+        # Infrastructure as Code
+        terraform       # Infrastructure as code
+        terraformer     # Generate Terraform files from existing infrastructure
+        colmena         # NixOS deployment tool
+
+        # Other cloud tools
+        stripe-cli      # Command-line tool for Stripe
+      ] ++
+
+      # Command line utilities
+      [
+        # File and text manipulation
+        bat             # Better cat with syntax highlighting
+        fd              # Alternative to find
+        fzf             # Fuzzy finder
+        jq              # JSON processor
+        jqp             # TUI playground for jq
+        tree            # Directory listing
+        ncdu            # Disk usage analyzer
+        zip             # Compression utility
+        zlib            # Compression library
+        zstd            # Fast compression algorithm
+
+        # System utilities
+        htop            # Process viewer
+        hyperfine       # Command-line benchmarking tool
+        nmap            # Network discovery and security auditing
+        duti            # Set default applications
+
+        # Nix utilities
+        comma           # Run commands without installing them
+        nh              # Nix helper tools
+
+        # Other utilities
+        wget            # File downloader
+        age             # Encryption tool
+      ] ++
+
+      # Media tools
+      [
+        ffmpeg          # Audio/video converter
+        imagemagick     # Image manipulation
+        exiftool        # Read/write EXIF metadata
+      ] ++
+
+      # Security tools
+      [
+        gitleaks        # Scan repos for secrets
+        vault           # Secret management
+      ] ++
+
+      # AI and ML tools
+      [
+        ollama          # Run LLMs locally
+        code2prompt     # Convert code to LLM prompts
+        code-cursor     # AI-powered code editor
+      ] ++
+
+      # Database tools
+      [
+        redis           # In-memory database
+        turso-cli       # Edge database CLI
+      ] ++
+
+      # Applications
+      [
+        iterm2          # Terminal emulator
+        keepassxc       # Password manager
+        beancount       # Plain text accounting
+        #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
+        #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your "Signal Android" or "Signal iOS" app.
+        #NO aarch64-apple-darwin support: cloudflare-warp # Optimized internet protocol
+      ] ++
+
+      # Shells (also defined in shells below)
+      [
+        zsh
+        nushell         # Modern shell written in Rust
+      ];
 
     shells = with pkgs; [
       bashInteractive
