@@ -26,7 +26,6 @@
       "huggingface-cli" # No nix package found - 2025-02-15
       "openjdk@11"
       "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
-      "kubernetes-cli" # No nix package found - 2025-02-15
       # rarely used: "lsusb"
       "mas"
       "openjdk@17"

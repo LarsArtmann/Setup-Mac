@@ -1,4 +1,4 @@
-{ config, pkgs, nixpkgs-nh-dev, ... }:
+{ ... }:
 {
   programs = {
     # TODO: ADD https://mynixos.com/nix-darwin/options/programs
@@ -41,7 +41,7 @@
     #  enable = true;
     #  lfs.enable = true;
     #  userName = "Lars Artmann";
-    #  userEmail = "git@lars.softare";
+    #  userEmail = "git@lars.software";
     #};
   };
 }
