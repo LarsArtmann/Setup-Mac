@@ -80,6 +80,7 @@
       k8sgpt # Kubernetes LLM CLI
       helmfile # Declarative spec for deploying Helm charts
       tokei # Program that allows you to count your code, quickly
+      github-cli # GitHub’s official command line tool
     ];
 
     shells = with pkgs; [
