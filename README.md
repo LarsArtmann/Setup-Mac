@@ -25,6 +25,10 @@ This repository contains:
    nix-build https://github.com/LnL7/nix-darwin/archive/master.tar.gz -A installer
    ./result/bin/darwin-installer
    ```
+#### !!! MANUAL work (currently) !!!
+```bash
+mkdir -p ~/.ssh/sockets
+```
 
 ### Setup
 
