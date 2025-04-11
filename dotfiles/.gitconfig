@@ -26,3 +26,5 @@
 	postBuffer = 524288000
 [ssh]
 	multiplexing = true
+[pull]
+	rebase = true
