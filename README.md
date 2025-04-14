@@ -106,11 +106,11 @@ This repository uses pre-commit hooks to ensure code quality and prevent secrets
 
 ## TODOs
 
-- [ ] Check out all configs in ~/.config folder
-- [ ] Implement Home Manager for better dotfile management
 - [x] Create a backup/restore mechanism (implemented in update-system.sh)
 - [x] Add a unified update command (implemented as update-system.sh)
 - [x] Add a script to check for outdated packages (implemented as check-outdated.sh)
+- [ ] Check out all configs in ~/.config folder
+- [ ] Implement Home Manager for better dotfile management
 - [ ] Implement a modular configuration structure
 - [ ] Add a testing mechanism for configuration changes
 - [ ] Create a documentation system for tools and configurations

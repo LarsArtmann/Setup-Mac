@@ -80,6 +80,7 @@
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
+      "orbstack" # A better Docker runner for macOS; Nixpkgs not available 2025-04-14
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;
