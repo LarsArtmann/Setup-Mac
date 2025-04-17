@@ -126,6 +126,7 @@
 
       # Applications
       [
+        alacritty       # Terminal emulator
         iterm2          # Terminal emulator
         keepassxc       # Password manager
         beancount       # Plain text accounting
