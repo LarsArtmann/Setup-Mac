@@ -16,7 +16,6 @@
       "node"
       "firebase-cli" # For Firebase login and management
       # rarely used: "fswatch"
-      "git-town" # Git workflow manager
       "gnupg" # needed for GPG (e.g. git)
       "pinentry-mac" # needed for GPG (e.g. git)
       # rarely used: "golangci-lint"

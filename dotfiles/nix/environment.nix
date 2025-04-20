@@ -18,6 +18,7 @@
         # Version control
         git
         git-lfs
+        git-town # Git workflow manager
         github-cli
         lazygit
         pre-commit
