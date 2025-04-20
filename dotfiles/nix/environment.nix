@@ -19,6 +19,7 @@
         git
         git-lfs
         github-cli
+        lazygit
         pre-commit
 
         # Build tools
