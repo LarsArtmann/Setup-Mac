@@ -38,6 +38,11 @@
         bun             # JavaScript runtime and package manager
         pnpm_10         # Fast, disk space efficient package manager for JavaScript
 
+        jetbrains.idea-ultimate
+        jetbrains.webstorm
+        jetbrains.goland
+        jetbrains.rider
+
         # Development utilities
         openapi-generator-cli  # Generate API clients from OpenAPI specs
         sqlc            # Generate type-safe Go code from SQL
