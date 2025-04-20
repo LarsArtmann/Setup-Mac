@@ -146,6 +146,11 @@
       [
         zsh
         nushell         # Modern shell written in Rust
+      ] ++
+
+      # Fonts
+      [
+        jetbrains-mono
       ];
 
     shells = with pkgs; [
