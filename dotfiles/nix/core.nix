@@ -36,6 +36,10 @@
       "terraform" # ‘bsl11’ licence
       #"cloudflare-warp" # ‘unfree’ licence
       "cursor" # ‘unfree’
+      "idea-ultimate" # ‘unfree’ licence
+      "webstorm" # ‘unfree’ licence
+      "goland" # ‘unfree’ licence
+      "rider" # ‘unfree’ licence
     ];
   };
 }
