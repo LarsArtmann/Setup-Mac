@@ -31,15 +31,18 @@
   nixpkgs = {
     # The platform the configuration will be used on.
     hostPlatform = "aarch64-darwin";
-    config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-      "vault" # ‘bsl11’ licence
-      "terraform" # ‘bsl11’ licence
-      #"cloudflare-warp" # ‘unfree’ licence
-      "cursor" # ‘unfree’
-      "idea-ultimate" # ‘unfree’ licence
-      "webstorm" # ‘unfree’ licence
-      "goland" # ‘unfree’ licence
-      "rider" # ‘unfree’ licence
-    ];
+    config = {
+      allowUnsupportedSystem = true;
+      allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
+        "vault" # ‘bsl11’ licence
+        "terraform" # ‘bsl11’ licence
+        #"cloudflare-warp" # ‘unfree’ licence
+        "cursor" # ‘unfree’
+        "idea-ultimate" # ‘unfree’ licence
+        "webstorm" # ‘unfree’ licence
+        "goland" # ‘unfree’ licence
+        "rider" # ‘unfree’ licence
+      ];
+    };
   };
 }
