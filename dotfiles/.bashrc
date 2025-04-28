@@ -1,4 +1,2 @@
 # Keep this empty
-
-# Turso - always automatically added back by turso-cli
-export PATH="$PATH:/Users/larsartmann/.turso"
+# Using PATH from nix-darwin instead of modifying it here

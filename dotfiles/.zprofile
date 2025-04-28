@@ -1,8 +1,4 @@
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Using PATH from nix-darwin instead of setting it with brew shellenv
+# This ensures consistency across shells
 
-
-alias diskStealer="ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/"
-
-# Added by OrbStack: command-line tools and integration
-# This won't be added again if you remove it.
-source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+# Note: OrbStack integration is now handled through nix-darwin PATH configuration
