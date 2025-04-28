@@ -29,5 +29,8 @@ if $system_path != null {
 $env.EDITOR = "nano"
 $env.LANG = "en_GB.UTF-8"
 
+# Set JAVA_HOME explicitly since it's not being set by nix-darwin
+$env.JAVA_HOME = (which java | get path | path dirname | path dirname)
+
 # Debug: Uncomment to see the PATH when nushell starts
 # print $"PATH: ($env.PATH | str join ':')"
