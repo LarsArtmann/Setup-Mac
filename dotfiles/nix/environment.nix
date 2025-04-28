@@ -183,7 +183,7 @@ in
       [
         # Terminal emulators
         alacritty # Terminal emulator
-        ghostty # Fast, native, feature-rich terminal emulator
+        #BROKEN version ghostty-1.1.3: ghostty # Fast, native, feature-rich terminal emulator
         iterm2 # Terminal emulator
 
         # Utilities
