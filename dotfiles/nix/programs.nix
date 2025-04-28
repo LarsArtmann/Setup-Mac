@@ -1,5 +1,6 @@
 { pkgs, lib, ... }:
 {
+  services.tailscale.enable = true;
   programs = {
     # TODO: ADD https://mynixos.com/nix-darwin/options/programs
     #https://github.com/LnL7/nix-darwin/blob/master/modules/programs/zsh/default.nix
