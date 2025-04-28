@@ -42,6 +42,7 @@
         "webstorm" # ‘unfree’ licence
         "goland" # ‘unfree’ licence
         "rider" # ‘unfree’ licence
+        "google-chrome" # ‘unfree’ licence
       ];
     };
   };

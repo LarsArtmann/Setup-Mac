@@ -17,6 +17,15 @@
         defaults write com.apple.finder FXCalculateAllSizes -bool true
         killall Finder
       '';
+
+      # Register applications with Launch Services and update Spotlight index for Nix apps
+      registerApplications.text = ''
+        echo "Registering applications with Launch Services..."
+        /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "/Applications/Nix Apps"
+
+        echo "Updating Spotlight index for Nix applications..."
+        mdimport "/Applications/Nix Apps"
+      '';
     };
 
     checks = {

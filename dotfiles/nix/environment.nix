@@ -192,7 +192,7 @@ in
 
         # Browsers and Internet
         firefox # Web browser
-        # google-chrome # Web browser - temporarily disabled to test build
+        google-chrome # Web browser
         # tor-browser-bundle-bin # Privacy-focused browser - temporarily disabled to test build
         tailscale # VPN service
 
