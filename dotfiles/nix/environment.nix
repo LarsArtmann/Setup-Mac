@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+
+let
+  homeDir = "/Users/larsartmann";
+in
+{
   environment = {
     # TODO: https://mynixos.com/nix-darwin/options/environment
     #darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
@@ -17,7 +22,7 @@
           "/opt/homebrew/sbin"
 
           # Nix paths
-          "$HOME/.nix-profile/bin"
+          "${homeDir}/.nix-profile/bin"
           "/run/current-system/sw/bin"
           "/nix/var/nix/profiles/default/bin"
 
@@ -29,16 +34,16 @@
           "/sbin"
 
           # Tool-specific paths
-          "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
-          "$HOME/.local/bin"
-          "$HOME/go/bin"
-          "$HOME/.bun/bin"
-          "$HOME/.turso"
-          "$HOME/.orbstack/bin"
+          "${homeDir}/Library/Application Support/JetBrains/Toolbox/scripts"
+          "${homeDir}/.local/bin"
+          "${homeDir}/go/bin"
+          "${homeDir}/.bun/bin"
+          "${homeDir}/.turso"
+          "${homeDir}/.orbstack/bin"
         ];
 
-      # Java Home configuration
-      JAVA_HOME = "/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home";
+      # Java Home configuration - using Nix-installed JDK 21
+      JAVA_HOME = "${pkgs.jdk}/lib/openjdk";
     };
 
     # List packages installed in system profile. To search by name, run:
@@ -57,17 +62,18 @@
         # Build tools
         gradle
         maven
-        just            # Task runner similar to make
-        devenv          # Developer environments
+        just # Task runner similar to make
+        devenv # Developer environments
 
         # Programming languages and runtimes
         go
+        jdk             # Java Development Kit (JDK 21)
         kotlin
         ruby
         # rust
-        rustup          # Rust toolchain installer
-        bun             # JavaScript runtime and package manager
-        pnpm_10         # Fast, disk space efficient package manager for JavaScript
+        rustup # Rust toolchain installer
+        bun # JavaScript runtime and package manager
+        pnpm_10 # Fast, disk space efficient package manager for JavaScript
 
         # Temporary disabled because of storage issues
         #jetbrains.idea-ultimate
@@ -76,18 +82,18 @@
         #jetbrains.rider
 
         # Development utilities
-        openapi-generator-cli  # Generate API clients from OpenAPI specs
-        typespec        # API specification language with rich features for the cloud
-        sqlc            # Generate type-safe Go code from SQL
-        graphviz        # Graph visualization tools
-        yamllint        # YAML linter
-        tokei           # Count code statistics
+        openapi-generator-cli # Generate API clients from OpenAPI specs
+        typespec # API specification language with rich features for the cloud
+        sqlc # Generate type-safe Go code from SQL
+        graphviz # Graph visualization tools
+        yamllint # YAML linter
+        tokei # Count code statistics
       ] ++
 
       # Cloud and infrastructure tools
       [
         # Google Cloud
-        google-cloud-sdk  # Google Cloud Platform CLI
+        google-cloud-sdk # Google Cloud Platform CLI
 
         # AWS
         awscli2
@@ -95,84 +101,84 @@
         aws-vault
 
         # Kubernetes
-        kubectl         # Kubernetes control plane
+        kubectl # Kubernetes control plane
         kubernetes-helm # Package manager for Kubernetes
-        k9s             # Kubernetes CLI to manage clusters in real-time
-        cilium-cli      # CLI for Cilium
-        k8sgpt          # Kubernetes LLM CLI
-        helmfile        # Declarative spec for deploying Helm charts
+        k9s # Kubernetes CLI to manage clusters in real-time
+        cilium-cli # CLI for Cilium
+        k8sgpt # Kubernetes LLM CLI
+        helmfile # Declarative spec for deploying Helm charts
 
         # Infrastructure as Code
-        terraform       # Infrastructure as code
-        terraformer     # Generate Terraform files from existing infrastructure
-        colmena         # NixOS deployment tool
+        terraform # Infrastructure as code
+        terraformer # Generate Terraform files from existing infrastructure
+        colmena # NixOS deployment tool
 
         # Other cloud tools
-        stripe-cli      # Command-line tool for Stripe
+        stripe-cli # Command-line tool for Stripe
         #rustdesk       # Remote desktop and screen sharing; NOT for nix-darwin (lastest check 2025-04-16)
       ] ++
 
       # Command line utilities
       [
         # File and text manipulation
-        bat             # Better cat with syntax highlighting
-        fd              # Alternative to find
-        fzf             # Fuzzy finder
-        jq              # JSON processor
-        jqp             # TUI playground for jq
-        tree            # Directory listing
-        ncdu            # Disk usage analyzer
-        zip             # Compression utility
-        zlib            # Compression library
-        zstd            # Fast compression algorithm
+        bat # Better cat with syntax highlighting
+        fd # Alternative to find
+        fzf # Fuzzy finder
+        jq # JSON processor
+        jqp # TUI playground for jq
+        tree # Directory listing
+        ncdu # Disk usage analyzer
+        zip # Compression utility
+        zlib # Compression library
+        zstd # Fast compression algorithm
 
         # System utilities
-        htop            # Process viewer
-        hyperfine       # Command-line benchmarking tool
-        nmap            # Network discovery and security auditing
-        duti            # Set default applications
+        htop # Process viewer
+        hyperfine # Command-line benchmarking tool
+        nmap # Network discovery and security auditing
+        duti # Set default applications
 
         # Nix utilities
-        comma           # Run commands without installing them
-        nh              # Nix helper tools
+        comma # Run commands without installing them
+        nh # Nix helper tools
 
         # Other utilities
-        wget            # File downloader
-        age             # Encryption tool
+        wget # File downloader
+        age # Encryption tool
       ] ++
 
       # Media tools
       [
-        ffmpeg          # Audio/video converter
-        imagemagick     # Image manipulation
-        exiftool        # Read/write EXIF metadata
+        ffmpeg # Audio/video converter
+        imagemagick # Image manipulation
+        exiftool # Read/write EXIF metadata
       ] ++
 
       # Security tools
       [
-        gitleaks        # Scan repos for secrets
-        vault           # Secret management
+        gitleaks # Scan repos for secrets
+        vault # Secret management
       ] ++
 
       # AI and ML tools
       [
-        ollama          # Run LLMs locally
-        code2prompt     # Convert code to LLM prompts
-        code-cursor     # AI-powered code editor
+        ollama # Run LLMs locally
+        code2prompt # Convert code to LLM prompts
+        code-cursor # AI-powered code editor
       ] ++
 
       # Database tools
       [
-        redis           # In-memory database
-        turso-cli       # Edge database CLI
+        redis # In-memory database
+        turso-cli # Edge database CLI
       ] ++
 
       # Applications
       [
-        alacritty       # Terminal emulator
-        iterm2          # Terminal emulator
-        keepassxc       # Password manager
-        beancount       # Plain text accounting
+        alacritty # Terminal emulator
+        iterm2 # Terminal emulator
+        keepassxc # Password manager
+        beancount # Plain text accounting
         grandperspective # Disk usage visualization tool
         #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
         #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your "Signal Android" or "Signal iOS" app.
@@ -182,7 +188,7 @@
       # Shells (also defined in shells below)
       [
         zsh
-        nushell         # Modern shell written in Rust
+        nushell # Modern shell written in Rust
       ] ++
 
       # Fonts
@@ -196,9 +202,10 @@
       nushell
     ];
     shellAliases = {
-      l = "ls -laSh";
+      l = "ls -la";
       nixup = "darwin switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
+      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
   };
 }
