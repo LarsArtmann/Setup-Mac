@@ -85,7 +85,7 @@ in
 
         # Development utilities
         openapi-generator-cli # Generate API clients from OpenAPI specs
-        typespec # API specification language with rich features for the cloud
+        # typespec # API specification language with rich features for the cloud - temporarily disabled due to build issues
         sqlc # Generate type-safe Go code from SQL
         graphviz # Graph visualization tools
         yamllint # YAML linter
@@ -93,7 +93,7 @@ in
         firebase-tools # Firebase CLI
         docker-buildx # Docker Buildx CLI plugin
         gnupg # GnuPG
-        pinentry-mac # Pinentry for macOS
+        pinentry_mac # Pinentry for macOS
       ] ++
 
       # Cloud and infrastructure tools
