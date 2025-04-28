@@ -87,3 +87,7 @@ result-*
 
 # Pre-commit
 .pre-commit-cache/
+
+# macOS
+.DS_Store
+**/.DS_Store
