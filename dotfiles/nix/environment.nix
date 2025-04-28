@@ -183,6 +183,7 @@ in
       [
         # Terminal emulators
         alacritty # Terminal emulator
+        ghostty # Fast, native, feature-rich terminal emulator
         iterm2 # Terminal emulator
 
         # Utilities
