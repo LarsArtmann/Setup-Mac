@@ -75,7 +75,7 @@ in
         rustup          # Rust toolchain installer
         bun             # JavaScript runtime and package manager
         pnpm_10         # Fast, disk space efficient package manager for JavaScript
-        # dotnetCorePackages.sdk_8_0 # .NET Core SDK - temporarily disabled
+        dotnetCorePackages.sdk_8_0 # .NET Core SDK
 
         # Temporary disabled because of storage issues
         #jetbrains.idea-ultimate
@@ -191,10 +191,10 @@ in
         grandperspective # Disk usage visualization tool
 
         # Browsers and Internet
-        # firefox # Web browser - temporarily disabled
+        firefox # Web browser
         # google-chrome # Web browser - temporarily disabled to test build
         # tor-browser-bundle-bin # Privacy-focused browser - temporarily disabled to test build
-        # tailscale # VPN service - temporarily disabled
+        tailscale # VPN service
 
         # Media
         # vlc # Media player - temporarily disabled
