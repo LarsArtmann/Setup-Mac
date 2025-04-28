@@ -45,7 +45,7 @@
       # rarely used: "anydesk"
       "cloudflare-warp"
       "deepl" # No nix package found - 2025-02-15
-      "discord"
+      # "discord" # replaced by legcord
       "docker"
       "firefox"
       # rarely used: "ghidra"
@@ -54,6 +54,7 @@
       "google-drive"
       # rarely used since I switched to open-webui: "jan"
       "jetbrains-toolbox"
+      "legcord" # lightweight Discord - nix package exist, but does not work on my MacOS version - 2025-04-28
       "little-snitch"
       "macfuse"
       "macpass"
