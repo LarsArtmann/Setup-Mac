@@ -1,6 +1,13 @@
 { pkgs, lib, ... }:
 {
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    # TODO: add
+    # useRoutingFeatures = "both";
+    #  openFirewall = true;
+    #  authKeyFile = "/Users/larsartmann/.config/tailscale/authkey";
+    #  extraUpFlags = [ "--ssh" "--accept-routes" ];
+  };
   programs = {
     # TODO: ADD https://mynixos.com/nix-darwin/options/programs
     #https://github.com/LnL7/nix-darwin/blob/master/modules/programs/zsh/default.nix
