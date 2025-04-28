@@ -23,11 +23,13 @@
       # rarely used: "grpcurl"
       # rarely used: "hadolint"
       "huggingface-cli" # No nix package found - 2025-02-15
-      "openjdk@11"
+      # Using JDK from Nixpkgs instead
+      # "openjdk@11"
       "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
       # rarely used: "lsusb"
       "mas"
-      "openjdk@17"
+      # Using JDK from Nixpkgs instead
+      # "openjdk@17"
       "openssl@1.1" # Most likely not needed, for Sublime Text
       # rarely used: "parallel"
       # rarely used: "rename"
