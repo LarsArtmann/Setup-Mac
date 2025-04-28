@@ -69,12 +69,12 @@ in
         go
         jdk             # Java Development Kit (JDK 21)
         kotlin
-        # nodejs          # Node.js JavaScript runtime - temporarily disabled
+        nodejs          # Node.js JavaScript runtime
         ruby
         # rust
         rustup          # Rust toolchain installer
-        # bun             # JavaScript runtime and package manager - temporarily disabled
-        # pnpm_10         # Fast, disk space efficient package manager for JavaScript - temporarily disabled
+        bun             # JavaScript runtime and package manager
+        pnpm_10         # Fast, disk space efficient package manager for JavaScript
         # dotnetCorePackages.sdk_8_0 # .NET Core SDK - temporarily disabled
 
         # Temporary disabled because of storage issues
@@ -90,8 +90,8 @@ in
         graphviz # Graph visualization tools
         yamllint # YAML linter
         tokei # Count code statistics
-        # firebase-tools # Firebase CLI - temporarily disabled
-        # docker-buildx # Docker Buildx CLI plugin - temporarily disabled
+        firebase-tools # Firebase CLI
+        docker-buildx # Docker Buildx CLI plugin
         gnupg # GnuPG
         pinentry_mac # Pinentry for macOS
       ] ++
