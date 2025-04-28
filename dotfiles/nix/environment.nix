@@ -192,16 +192,16 @@ in
 
         # Browsers and Internet
         firefox # Web browser
-        google-chrome # Web browser
-        tor-browser-bundle-bin # Privacy-focused browser
+        # google-chrome # Web browser - temporarily disabled to test build
+        # tor-browser-bundle-bin # Privacy-focused browser - temporarily disabled to test build
         tailscale # VPN service
 
         # Media
         vlc # Media player
 
         # Communication
-        telegram-desktop # Messaging app
-        signal-desktop # Secure messaging app
+        # telegram-desktop # Messaging app - temporarily disabled to test build
+        # signal-desktop # Secure messaging app - temporarily disabled to test build
 
         #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
         #NO aarch64-apple-darwin support: cloudflare-warp # Optimized internet protocol
