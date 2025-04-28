@@ -1,4 +1,4 @@
-{ pkgs,... }: {
+{ pkgs, lib, ... }: {
   environment = {
     # TODO: https://mynixos.com/nix-darwin/options/environment
     #darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
@@ -6,8 +6,39 @@
     variables = {
       EDITOR = "nano";
       LANG = "en_GB.UTF-8";
-      SHELL = "$HOME/.nix-profile/bin/nu";# TODO make dynamic, something like: "${pkgs.nu}";
+      SHELL = "${pkgs.nushell}/bin/nu"; # Dynamic reference to nushell package
       #NIX_PATH = "$HOME/.nix-defexpr/channels:nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels";
+
+      # Custom PATH configuration
+      PATH =
+        lib.concatStringsSep ":" [
+          # Homebrew paths
+          "/opt/homebrew/bin"
+          "/opt/homebrew/sbin"
+
+          # Nix paths
+          "$HOME/.nix-profile/bin"
+          "/run/current-system/sw/bin"
+          "/nix/var/nix/profiles/default/bin"
+
+          # System paths
+          "/usr/local/bin"
+          "/usr/bin"
+          "/bin"
+          "/usr/sbin"
+          "/sbin"
+
+          # Tool-specific paths
+          "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
+          "$HOME/.local/bin"
+          "$HOME/go/bin"
+          "$HOME/.bun/bin"
+          "$HOME/.turso"
+          "$HOME/.orbstack/bin"
+        ];
+
+      # Java Home configuration
+      JAVA_HOME = "/Library/Java/JavaVirtualMachines/openjdk-17.jdk/Contents/Home";
     };
 
     # List packages installed in system profile. To search by name, run:
