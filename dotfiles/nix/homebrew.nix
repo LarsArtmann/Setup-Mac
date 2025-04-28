@@ -56,6 +56,7 @@
       "jetbrains-toolbox"
       "legcord" # lightweight Discord - nix package exist, but does not work on my MacOS version - 2025-04-28
       "little-snitch"
+      "lulu" # Open source firewall to block unknown outgoing connections - https://objective-see.org/products/lulu.html
       "macfuse"
       "macpass"
       # rarely used: "multimc"
