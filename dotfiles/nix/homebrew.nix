@@ -50,7 +50,7 @@
       "firefox"
       # rarely used: "ghidra"
       "google-chrome"
-      "google-cloud-sdk" # For Google Cloud setup and management
+      # Replaced with Nix package: "google-cloud-sdk"
       "google-drive"
       # rarely used since I switched to open-webui: "jan"
       "jetbrains-toolbox"

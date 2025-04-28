@@ -53,6 +53,9 @@
 
       # Cloud and infrastructure tools
       [
+        # Google Cloud
+        google-cloud-sdk  # Google Cloud Platform CLI
+
         # AWS
         awscli2
         aws-iam-authenticator
