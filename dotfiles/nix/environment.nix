@@ -69,11 +69,13 @@ in
         go
         jdk             # Java Development Kit (JDK 21)
         kotlin
+        nodejs          # Node.js JavaScript runtime
         ruby
         # rust
-        rustup # Rust toolchain installer
-        bun # JavaScript runtime and package manager
-        pnpm_10 # Fast, disk space efficient package manager for JavaScript
+        rustup          # Rust toolchain installer
+        bun             # JavaScript runtime and package manager
+        pnpm_10         # Fast, disk space efficient package manager for JavaScript
+        dotnetCorePackages.sdk_8_0 # .NET Core SDK
 
         # Temporary disabled because of storage issues
         #jetbrains.idea-ultimate
@@ -88,6 +90,10 @@ in
         graphviz # Graph visualization tools
         yamllint # YAML linter
         tokei # Count code statistics
+        firebase-tools # Firebase CLI
+        docker-buildx # Docker Buildx CLI plugin
+        gnupg # GnuPG
+        pinentry-mac # Pinentry for macOS
       ] ++
 
       # Cloud and infrastructure tools
@@ -175,13 +181,29 @@ in
 
       # Applications
       [
+        # Terminal emulators
         alacritty # Terminal emulator
         iterm2 # Terminal emulator
+
+        # Utilities
         keepassxc # Password manager
         beancount # Plain text accounting
         grandperspective # Disk usage visualization tool
+
+        # Browsers and Internet
+        firefox # Web browser
+        google-chrome # Web browser
+        tor-browser-bundle-bin # Privacy-focused browser
+        tailscale # VPN service
+
+        # Media
+        vlc # Media player
+
+        # Communication
+        telegram-desktop # Messaging app
+        signal-desktop # Secure messaging app
+
         #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
-        #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your "Signal Android" or "Signal iOS" app.
         #NO aarch64-apple-darwin support: cloudflare-warp # Optimized internet protocol
       ] ++
 

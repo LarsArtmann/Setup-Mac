@@ -11,13 +11,13 @@
     ];
     brews = [
       # rarely used: "dasel"
-      "docker-buildx"
-      "dotnet"
-      "node"
-      "firebase-cli" # For Firebase login and management
+      # Moved to Nixpkgs: "docker-buildx"
+      # Moved to Nixpkgs: "dotnet"
+      # Moved to Nixpkgs: "node"
+      # Moved to Nixpkgs: "firebase-cli"
       # rarely used: "fswatch"
-      "gnupg" # needed for GPG (e.g. git)
-      "pinentry-mac" # needed for GPG (e.g. git)
+      # Moved to Nixpkgs: "gnupg"
+      # Moved to Nixpkgs: "pinentry-mac"
       # rarely used: "golangci-lint"
       # rarely used: "gource"
       # rarely used: "grpcurl"
@@ -49,9 +49,9 @@
       "deepl" # No nix package found - 2025-02-15
       # "discord" # replaced by legcord
       "docker"
-      "firefox"
+      # Moved to Nixpkgs: "firefox"
       # rarely used: "ghidra"
-      "google-chrome"
+      # Moved to Nixpkgs: "google-chrome"
       # Replaced with Nix package: "google-cloud-sdk"
       "google-drive"
       # rarely used since I switched to open-webui: "jan"
@@ -71,14 +71,14 @@
       "raycast"
       "responsively"
       "secretive"
-      "signal"
+      # Moved to Nixpkgs: "signal"
       "spotify" # Music streaming service
       "sublime-text"
-      "tailscale"
-      "telegram"
+      # Moved to Nixpkgs: "tailscale"
+      # Moved to Nixpkgs: "telegram"
       # rarely used since it's not worth +96€ a year: "timing"
-      "tor-browser"
-      "vlc"
+      # Moved to Nixpkgs: "tor-browser"
+      # Moved to Nixpkgs: "vlc"
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
