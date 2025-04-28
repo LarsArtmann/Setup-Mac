@@ -171,6 +171,7 @@
         iterm2          # Terminal emulator
         keepassxc       # Password manager
         beancount       # Plain text accounting
+        grandperspective # Disk usage visualization tool
         #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
         #DO NOT move before backup!: signal-desktop # Signal Desktop is an Electron application that links with your "Signal Android" or "Signal iOS" app.
         #NO aarch64-apple-darwin support: cloudflare-warp # Optimized internet protocol
