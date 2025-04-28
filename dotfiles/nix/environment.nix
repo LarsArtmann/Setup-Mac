@@ -193,14 +193,9 @@
       nushell
     ];
     shellAliases = {
-      t = "echo 'Test :)'";
       l = "ls -laSh";
-      nixup = "nh darwin switch $HOME/Desktop/Setup-Mac/dotfiles/nix/";
-      mkdir = "mkdir -p";
+      nixup = "darwin switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
-      firebase-login = "firebase login";
-      gcloud-init = "gcloud init";
-      gcloud-components-install = "gcloud components install cbt alpha beta";
     };
   };
 }
