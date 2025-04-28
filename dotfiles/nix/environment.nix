@@ -191,13 +191,13 @@ in
         grandperspective # Disk usage visualization tool
 
         # Browsers and Internet
-        firefox # Web browser
+        # firefox # Web browser - temporarily disabled
         # google-chrome # Web browser - temporarily disabled to test build
         # tor-browser-bundle-bin # Privacy-focused browser - temporarily disabled to test build
-        tailscale # VPN service
+        # tailscale # VPN service - temporarily disabled
 
         # Media
-        vlc # Media player
+        # vlc # Media player - temporarily disabled
 
         # Communication
         # telegram-desktop # Messaging app - temporarily disabled to test build
