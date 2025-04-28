@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, lib, ... }:
 {
   programs = {
     # TODO: ADD https://mynixos.com/nix-darwin/options/programs
@@ -23,10 +23,10 @@
       #  theme = "robbyrussell";
       #};
     };
-    #nushell = {
-    #  enable = true;
-    #  shellAliases = (import ./environment.nix).environment.shellAliases;
-    #};
+    nushell = {
+      enable = true;
+      shellAliases = (import ./environment.nix { pkgs = pkgs; lib = lib; }).environment.shellAliases;
+    };
     #error: The option `programs.nh' does not exist.
     #nh = {
     #  enable = true;
