@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Function to safely create directories with error handling
+ensure_directory() {
+    local dir="$1"
+    echo "Ensuring directory exists: $dir"
+
+    if ! mkdir -p "$dir" 2>/dev/null; then
+        echo "Error: Failed to create directory at $dir"
+        return 1
+    else
+        echo "Directory created or already exists at $dir"
+        return 0
+    fi
+}
+
 check_file_or_symlink() {
     local path="$1"
     local command="$2"
@@ -49,13 +63,19 @@ verified_link "$CURRENT_DIR/dotfiles/.zshrc" ~/.zshrc
 #verified_link "" ~/.kube/config
 
 # Nushell configuration
-mkdir -p ~/.config/nushell
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" ~/.config/nushell/aliases.nu
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" ~/.config/nushell/config.nu
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" ~/.config/nushell/env.nu
+if ensure_directory ~/.config/nushell; then
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" ~/.config/nushell/aliases.nu
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" ~/.config/nushell/config.nu
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" ~/.config/nushell/env.nu
+else
+    echo "Error: Failed to create Nushell configuration directory. Skipping Nushell configuration."
+fi
 
 # Nushell configuration in Library/Application Support
-mkdir -p "$HOME/Library/Application Support/nushell"
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" "$HOME/Library/Application Support/nushell/aliases.nu"
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" "$HOME/Library/Application Support/nushell/config.nu"
-verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" "$HOME/Library/Application Support/nushell/env.nu"
+if ensure_directory "$HOME/Library/Application Support/nushell"; then
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" "$HOME/Library/Application Support/nushell/aliases.nu"
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" "$HOME/Library/Application Support/nushell/config.nu"
+    verified_link "$CURRENT_DIR/dotfiles/.config/nushell/env.nu" "$HOME/Library/Application Support/nushell/env.nu"
+else
+    echo "Error: Failed to create Nushell Application Support directory. Skipping Nushell Application Support configuration."
+fi
