@@ -1,39 +1,33 @@
 # env.nu for nushell
 # Environment variables configuration
 
-# Define path components
-let home = "/Users/larsartmann"
-let homebrew_bin = "/opt/homebrew/bin"
-let homebrew_sbin = "/opt/homebrew/sbin"
-let google_cloud = "/opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin"
-let nix = $"($home)/.nix-profile/bin"
-let nix_darwin = "/run/current-system/sw/bin"
-let nix_other = "/nix/var/nix/profiles/default/bin"
-let user_local_bin = "/usr/local/bin"
-let user_bin = "/usr/bin"
-let bin = "/bin"
-let sbin = "/sbin"
-let jet_brains = $"($home)/Library/Application Support/JetBrains/Toolbox/scripts"
-let local_bin = $"($home)/.local/bin"
-let go_home = $"($home)/go/bin"
-let bun_home = $"($home)/.bun/bin"
-let turso_home = $"($home)/.turso"
+# Ensure nushell inherits the system PATH from nix-darwin
+# This approach ensures consistency across shells
 
-# Set PATH environment variable
-$env.PATH = [
-  $homebrew_bin
-  $homebrew_sbin
-  $google_cloud
-  $nix
-  $nix_darwin
-  $nix_other
-  $user_local_bin
-  $user_bin
-  $bin
-  $sbin
-  $jet_brains
-  $local_bin
-  $go_home
-  $bun_home
-  $turso_home
-]
+# Get the system PATH from the environment
+# This will capture the PATH set by nix-darwin
+let system_path = (sys).env.PATH
+
+# If we have a system PATH, use it
+if $system_path != null {
+  # Convert the colon-separated PATH string to a list
+  $env.PATH = ($system_path | split row ":")
+} else {
+  # Fallback minimal PATH if system PATH is not available
+  $env.PATH = [
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
+    "/usr/local/bin"
+    "/usr/bin"
+    "/bin"
+    "/usr/sbin"
+    "/sbin"
+  ]
+}
+
+# Set other environment variables as needed
+$env.EDITOR = "nano"
+$env.LANG = "en_GB.UTF-8"
+
+# Debug: Uncomment to see the PATH when nushell starts
+# print $"PATH: ($env.PATH | str join ':')"
