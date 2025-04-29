@@ -201,8 +201,8 @@ in
         # vlc # Media player - temporarily disabled
 
         # Communication
-        # telegram-desktop # Messaging app - temporarily disabled to test build
-        # signal-desktop # Secure messaging app - temporarily disabled to test build
+        telegram-desktop # Messaging app
+        signal-desktop # Secure messaging app
 
         # Other
         #NO darwin support: activitywatch
