@@ -67,14 +67,14 @@ in
 
         # Programming languages and runtimes
         go
-        jdk             # Java Development Kit (JDK 21)
+        jdk # Java Development Kit (JDK 21)
         kotlin
-        nodejs          # Node.js JavaScript runtime
+        nodejs # Node.js JavaScript runtime
         ruby
         # rust
-        rustup          # Rust toolchain installer
-        bun             # JavaScript runtime and package manager
-        pnpm_10         # Fast, disk space efficient package manager for JavaScript
+        rustup # Rust toolchain installer
+        bun # JavaScript runtime and package manager
+        pnpm_10 # Fast, disk space efficient package manager for JavaScript
         dotnetCorePackages.sdk_8_0 # .NET Core SDK
 
         # Temporary disabled because of storage issues
@@ -203,6 +203,9 @@ in
         # Communication
         # telegram-desktop # Messaging app - temporarily disabled to test build
         # signal-desktop # Secure messaging app - temporarily disabled to test build
+
+        # Other
+        #NO darwin support: activitywatch
 
         #ONLY PROBLEMS: sublime4 # Text editor for code, markup and prose
         #NO aarch64-apple-darwin support: cloudflare-warp # Optimized internet protocol

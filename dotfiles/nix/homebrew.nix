@@ -84,6 +84,7 @@
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
       "orbstack" # A better Docker runner for macOS; Nixpkgs not available 2025-04-14
       "rustdesk" # Remote desktop and screen sharing
+      "activitywatch" # Activity tracking
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;
