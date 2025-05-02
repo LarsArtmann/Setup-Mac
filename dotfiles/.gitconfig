@@ -30,3 +30,5 @@
 	rebase = true
 [push]
 	autoSetupRemote = true
+[gpg]
+	program = /run/current-system/sw/bin/gpg

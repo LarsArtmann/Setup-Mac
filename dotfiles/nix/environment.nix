@@ -151,6 +151,7 @@ in
         # Other utilities
         wget # File downloader
         age # Encryption tool
+        treefmt # Universal code formatter for multiple languages
       ] ++
 
       # Media tools
