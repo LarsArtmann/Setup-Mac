@@ -203,7 +203,7 @@ in
 
         # Communication
         telegram-desktop # Messaging app
-        signal-desktop # Secure messaging app
+        signal-desktop-bin # Secure messaging app
 
         # Other
         #NO darwin support: activitywatch
