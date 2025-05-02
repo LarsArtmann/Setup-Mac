@@ -230,7 +230,7 @@ in
     ];
     shellAliases = {
       l = "ls -la";
-      nixup = "darwin switch";
+      nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
       diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
