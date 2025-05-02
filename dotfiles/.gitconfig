@@ -32,3 +32,5 @@
 	autoSetupRemote = true
 [gpg]
 	program = /run/current-system/sw/bin/gpg
+[git-town]
+	sync-perennial-strategy = rebase
