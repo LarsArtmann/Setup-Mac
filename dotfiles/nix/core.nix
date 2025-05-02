@@ -43,7 +43,7 @@
         "goland" # ‘unfree’ licence
         "rider" # ‘unfree’ licence
         "google-chrome" # ‘unfree’ licence
-        "signal-desktop" # ‘agpl3Only free unfree’
+        "signal-desktop-bin" # ‘agpl3Only free unfree’
       ];
     };
   };
