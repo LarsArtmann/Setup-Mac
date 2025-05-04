@@ -164,7 +164,7 @@ in
       # Security tools
       [
         gitleaks # Scan repos for secrets
-        vault # Secret management
+        #DISABLED because of: VERY long build time (~5:30min) (seems like it has no caching) + rarely used: vault # Secret management
       ] ++
 
       # AI and ML tools
@@ -204,6 +204,7 @@ in
         # Communication
         telegram-desktop # Messaging app
         signal-desktop-bin # Secure messaging app
+        #BROKE because of 'valgrind-3.24.0' dependency: franz # All in one messaging app
 
         # Other
         #NO darwin support: activitywatch
