@@ -94,6 +94,7 @@ in
         docker-buildx # Docker Buildx CLI plugin
         gnupg # GnuPG
         pinentry_mac # Pinentry for macOS
+        mitmproxy2swagger # Convert mitmproxy logs to OpenAPI spec
       ] ++
 
       # Cloud and infrastructure tools
@@ -165,6 +166,7 @@ in
       [
         gitleaks # Scan repos for secrets
         #DISABLED because of: VERY long build time (~5:30min) (seems like it has no caching) + rarely used: vault # Secret management
+        mitmproxy # man in the middle proxy for intercepting HTTP requests
       ] ++
 
       # AI and ML tools
