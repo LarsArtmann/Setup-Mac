@@ -79,6 +79,7 @@
       # rarely used since it's not worth +96€ a year: "timing"
       # Moved to Nixpkgs: "tor-browser"
       # Moved to Nixpkgs: "vlc"
+      "franz" # All in one messaging app - Because nixpkgs is BROKEN
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
