@@ -122,7 +122,7 @@ in
 
         # Other cloud tools
         stripe-cli # Command-line tool for Stripe
-        #rustdesk       # Remote desktop and screen sharing; NOT for nix-darwin (lastest check 2025-04-16)
+        #rustdesk       # Remote desktop and screen sharing; NOT for nix-darwin (latest check 2025-04-16)
       ] ++
 
       # Command line utilities
