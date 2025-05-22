@@ -2,6 +2,11 @@
   description = "Lars nix-darwin system flake";
 
   inputs = {
+    # GPGME 1.24.2 is currently broken in nixpkgs-unstable (marked as broken)
+    # GPGME 1.24.3 was released on May 19, 2025 to fix these issues
+    # Last nixpkgs update: Feb 20, 2025 (commit 5032ae4) - updated to 1.24.2
+    # No PR for 1.24.3 found yet - waiting for community update
+    # See: https://github.com/NixOS/nixpkgs/commits/master/pkgs/development/libraries/gpgme
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
       url = "github:LnL7/nix-darwin/master";
@@ -45,6 +50,8 @@
         modules = [
           # Core system configuration
           base
+
+
           ./core.nix
           ./system.nix
 
