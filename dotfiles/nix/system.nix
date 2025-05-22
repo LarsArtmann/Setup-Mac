@@ -1,5 +1,6 @@
 { pkgs, ... }: {
   system = {
+    primaryUser = "larsartmann";
     activationScripts = {
       # Consider switching to home-manager since this seems to be a user-specific configuration
       #   while it might be executed as root
