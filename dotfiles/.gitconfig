@@ -7,6 +7,7 @@
 	compression = 9
 	packedGitLimit = 512m
 	packedGitWindowSize = 512m
+	pager = cat
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -34,3 +35,5 @@
 	program = /run/current-system/sw/bin/gpg
 [git-town]
 	sync-perennial-strategy = rebase
+[pager]
+	diff = cat
