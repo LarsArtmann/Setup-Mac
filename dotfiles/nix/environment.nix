@@ -95,6 +95,7 @@ in
         gnupg # GnuPG
         pinentry_mac # Pinentry for macOS
         mitmproxy2swagger # Convert mitmproxy logs to OpenAPI spec
+        uv # Ultra-fast Python package installer and resolver, written in Rust
       ] ++
 
       # Cloud and infrastructure tools
