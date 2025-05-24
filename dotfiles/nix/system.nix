@@ -43,8 +43,13 @@
         SortColumn = "CPUUsage";
         SortDirection = 0;
       };
-      controlcenter.BatteryShowPercentage = true;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
+      controlcenter = {
+        BatteryShowPercentage = true;
+        WiFiShowPercentage = true;
+        BluetoothShowPercentage = true;
+        SoundShowPercentage = true;
+        AccessibilityShortcuts = true;
+      };
 
       dock = {
         autohide = true;
@@ -64,11 +69,22 @@
         FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
         ShowPathbar = false;
         ShowStatusBar = true;
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
+        _FXShowPosixPathInTitle = true;  # Show full POSIX path in Finder title
+        CreateDesktop = true;            # Show desktop icons
+        QuitMenuItem = true;             # Allow quitting Finder
+        FXDefaultSearchScope = "SCcf";   # Search current folder by default
+        FXPreferredViewStyle = "Nlsv";   # Use list view by default
+        FXCalculateAllSizes = true;      # Calculate all folder sizes
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
-      loginwindow.GuestEnabled = false;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.loginwindow
+      loginwindow = {
+        GuestEnabled = false;
+        DisableConsoleAccess = true;     # Disable console access at login
+        LoginwindowText = "Welcome to Lars's Mac";  # Custom login message
+        ShutDownDisabled = false;        # Allow shutdown from login window
+        RestartDisabled = false;         # Allow restart from login window
+        SleepDisabled = false;           # Allow sleep from login window
+      };
       menuExtraClock = {
         FlashDateSeparators = false;
         IsAnalog = null;
