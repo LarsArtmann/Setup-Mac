@@ -134,6 +134,7 @@ in
         fzf # Fuzzy finder
         jq # JSON processor
         jqp # TUI playground for jq
+        ripgrep # Fast grep replacement (rg command)
         tree # Directory listing
         ncdu # Disk usage analyzer
         zip # Compression utility
