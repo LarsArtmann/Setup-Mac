@@ -129,6 +129,7 @@ in
       [
         # File and text manipulation
         bat # Better cat with syntax highlighting
+        glow # Markdown renderer for the terminal
         fd # Alternative to find
         fzf # Fuzzy finder
         jq # JSON processor
