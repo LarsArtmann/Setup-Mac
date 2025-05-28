@@ -129,11 +129,13 @@ in
       [
         # File and text manipulation
         bat # Better cat with syntax highlighting
+        glow # Markdown renderer for the terminal
         fd # Alternative to find
         fzf # Fuzzy finder
         jq # JSON processor
         jqp # TUI playground for jq
         yq-go # YAML processor (Go implementation)
+        ripgrep # Fast grep replacement (rg command)
         tree # Directory listing
         ncdu # Disk usage analyzer
         zip # Compression utility
