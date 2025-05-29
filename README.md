@@ -8,6 +8,7 @@ This repository contains:
 
 - **Dotfiles**: Configuration files for various tools and applications
 - **Nix Configuration**: Declarative system configuration using nix-darwin
+- **NUR Integration**: Access to Nix User Repository for community packages
 - **Homebrew Integration**: Managed through nix-homebrew
 - **Pre-commit Hooks**: Ensuring code quality and security
 - **Command-line Tools**: Includes `jq` (JSON), `yq` (YAML), and other productivity tools
@@ -56,9 +57,10 @@ Edit `dotfiles/nix/environment.nix` and add your aliases to the `shellAliases` s
 ### Installing New Packages
 
 - **Nix Packages**: Add to the `systemPackages` list in `dotfiles/nix/environment.nix`
+- **NUR Packages**: Access community packages via `nur.repos.<maintainer>.<package>` (e.g., `nur.repos.goreleaser.goreleaser`)
 - **Homebrew Packages**: Add to the appropriate section in `dotfiles/nix/homebrew.nix`
 
-Note: Always prefer nix packages over Homebrew packages when possible.
+Note: Always prefer nix packages over Homebrew packages when possible. NUR provides access to community-maintained packages that may not be available in the main nixpkgs repository.
 
 ### Applying Changes
 
