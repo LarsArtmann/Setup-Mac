@@ -1,7 +1,9 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, nur, ... }:
 
 let
   homeDir = "/Users/larsartmann";
+  # NUR packages can be accessed via nur.repos.<maintainer>.<package>
+  # Example: nur.repos.goreleaser.goreleaser
 in
 {
   environment = {
