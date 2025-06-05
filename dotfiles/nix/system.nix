@@ -44,11 +44,13 @@
         SortDirection = 0;
       };
       controlcenter = {
-        BatteryShowPercentage = true;
-        WiFiShowPercentage = true;
-        BluetoothShowPercentage = true;
-        SoundShowPercentage = true;
-        AccessibilityShortcuts = true;
+        AirDrop = true;                  # Show AirDrop control in menu bar
+        BatteryShowPercentage = true;    # Show battery percentage in menu bar
+        Bluetooth = true;                # Show bluetooth control in menu bar
+        Display = true;                  # Show Screen Brightness control in menu bar
+        FocusModes = true;               # Show Focus control in menu bar
+        NowPlaying = true;               # Show Now Playing control in menu bar
+        Sound = true;                    # Show sound control in menu bar
       };
 
       dock = {
@@ -74,7 +76,6 @@
         QuitMenuItem = true;             # Allow quitting Finder
         FXDefaultSearchScope = "SCcf";   # Search current folder by default
         FXPreferredViewStyle = "Nlsv";   # Use list view by default
-        FXCalculateAllSizes = true;      # Calculate all folder sizes
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
       loginwindow = {
@@ -95,11 +96,30 @@
         ShowSeconds = true;
       };
       NSGlobalDomain = {
-        AppleShowAllFiles = true;
-        AppleICUForce24HourTime = true;
-        AppleTemperatureUnit = "Celsius";
-        AppleMeasurementUnits = "Centimeters";
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.NSGlobalDomain
+        AppleShowAllFiles = true;               # Show hidden files everywhere
+        AppleICUForce24HourTime = true;         # Use 24-hour time format
+        AppleTemperatureUnit = "Celsius";       # Use Celsius for temperature
+        AppleMeasurementUnits = "Centimeters";  # Use metric measurements
+        AppleKeyboardUIMode = 3;                # Enable full keyboard access
+        ApplePressAndHoldEnabled = false;       # Disable press-and-hold for accented characters
+        AppleScrollerPagingBehavior = true;     # Jump to the spot clicked on scroll bar
+        AppleShowScrollBars = "WhenScrolling";  # Show scroll bars when scrolling
+        InitialKeyRepeat = 15;                  # Fast key repeat initial delay
+        KeyRepeat = 2;                          # Fast key repeat rate
+        NSAutomaticCapitalizationEnabled = false;      # Disable automatic capitalization
+        NSAutomaticDashSubstitutionEnabled = false;    # Disable smart dashes
+        NSAutomaticPeriodSubstitutionEnabled = false;  # Disable period substitution
+        NSAutomaticQuoteSubstitutionEnabled = false;   # Disable smart quotes
+        NSAutomaticSpellingCorrectionEnabled = false;  # Disable auto-correct
+        NSDocumentSaveNewDocumentsToCloud = false;     # Save to disk by default
+        NSNavPanelExpandedStateForSaveMode = true;     # Expand save panel by default
+        NSNavPanelExpandedStateForSaveMode2 = true;    # Expand save panel by default
+        NSTableViewDefaultSizeMode = 2;                # Use medium size for table views
+        NSTextShowsControlCharacters = true;           # Show control characters in text
+        NSUseAnimatedFocusRing = false;                # Disable animated focus ring
+        NSWindowResizeTime = 0.001;                    # Fast window resize animations
+        PMPrintingExpandedStateForPrint = true;        # Expand print panel by default
+        PMPrintingExpandedStateForPrint2 = true;       # Expand print panel by default
       };
       screencapture.location = "~/Desktop";
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screencapture
