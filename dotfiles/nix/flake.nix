@@ -34,9 +34,14 @@
       flake = false;
     };
     colmena.url = "github:zhaofengli/colmena";
+    
+    nix-jetbrains-plugins = {
+      url = "github:theCapypara/nix-jetbrains-plugins";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, nix-jetbrains-plugins, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -46,7 +51,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit nixpkgs-nh-dev; };
+        specialArgs = { inherit nixpkgs-nh-dev nix-jetbrains-plugins; };
         modules = [
           # Core system configuration
           base
@@ -61,6 +66,9 @@
 
           # Programs
           ./programs.nix
+          
+          # JetBrains configuration
+          ./jetbrains.nix
 
           # Homebrew integration
           ./homebrew.nix
