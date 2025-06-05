@@ -7,42 +7,38 @@ let
   buildIdeWithPlugins = nix-jetbrains-plugins.lib."${system}".buildIdeWithPlugins;
   
   # Common plugins that are useful across most JetBrains IDEs
+  # Plugin IDs from JetBrains Marketplace (shown at bottom of plugin pages)
   commonPluginIds = [
     "com.intellij.plugins.watcher"        # File Watcher - monitor file changes
-    "com.kstenschke.shifter"              # Shifter - smart text manipulation
-    "mobi.hsz.idea.gitignore"             # .ignore - gitignore support
+    "mobi.hsz.idea.gitignore"             # .ignore - gitignore and other ignore files support
+    "org.jetbrains.plugins.github"       # GitHub integration (if not built-in)
+  ];
+  
+  # Popular additional plugins (using proper plugin IDs)
+  enhancementPluginIds = [
+    "IdeaVIM"                             # Vim emulation (plugin ID: IdeaVIM)
     "String Manipulation"                 # String manipulation utilities
-    "org.jetbrains.plugins.github"       # GitHub integration
-    "HighlightBracketPair"               # Highlight matching brackets
-    "IdeaVIM"                             # Vim emulation
-  ];
-  
-  # Language-specific plugins for relevant IDEs
-  kotlinPluginIds = [
-    "org.jetbrains.kotlin"                # Kotlin language support
-  ];
-  
-  goPluginIds = [
-    "org.jetbrains.plugins.go"           # Go language support
-  ];
-  
-  rustPluginIds = [
-    "org.rust.lang"                       # Rust language support
   ];
 
 in
 {
   environment.systemPackages = with pkgs; [
-    # IntelliJ IDEA Ultimate with plugins
-    (buildIdeWithPlugins jetbrains "idea-ultimate" (commonPluginIds ++ kotlinPluginIds))
+    # Start with the most commonly used IDEs
     
-    # WebStorm with common plugins
+    # IntelliJ IDEA Ultimate - primary IDE for Java/Kotlin development
+    (buildIdeWithPlugins jetbrains "idea-ultimate" commonPluginIds)
+    
+    # WebStorm - for web development (JavaScript, TypeScript, etc.)
     (buildIdeWithPlugins jetbrains "webstorm" commonPluginIds)
     
-    # GoLand with Go-specific plugins
-    (buildIdeWithPlugins jetbrains "goland" (commonPluginIds ++ goPluginIds))
+    # Uncomment additional IDEs as needed:
+    # GoLand for Go development
+    # (buildIdeWithPlugins jetbrains "goland" commonPluginIds)
     
-    # Rider with common plugins (.NET development)
-    (buildIdeWithPlugins jetbrains "rider" commonPluginIds)
+    # Rider for .NET development  
+    # (buildIdeWithPlugins jetbrains "rider" commonPluginIds)
   ];
+  
+  # Note: Plugin IDs can be found at the bottom of JetBrains Marketplace pages
+  # Example: https://plugins.jetbrains.com/plugin/7374-gitignore -> ID: mobi.hsz.idea.gitignore
 }

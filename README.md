@@ -56,6 +56,7 @@ Edit `dotfiles/nix/environment.nix` and add your aliases to the `shellAliases` s
 
 - **Nix Packages**: Add to the `systemPackages` list in `dotfiles/nix/environment.nix`
 - **Homebrew Packages**: Add to the appropriate section in `dotfiles/nix/homebrew.nix`
+- **JetBrains IDEs with Plugins**: Configure in `dotfiles/nix/jetbrains.nix`
 
 Note: Always prefer nix packages over Homebrew packages when possible.
 
@@ -101,8 +102,37 @@ This repository uses pre-commit hooks to ensure code quality and prevent secrets
     - **flake.nix**: Main Nix configuration entry point
     - **environment.nix**: Environment variables and packages
     - **homebrew.nix**: Homebrew packages and configuration
+    - **jetbrains.nix**: JetBrains IDEs with declarative plugin management
     - **core.nix, system.nix, etc.**: Other system configuration files
 - **manual-linking.sh**: Script to create symbolic links for dotfiles
+
+## JetBrains IDE Configuration
+
+This setup includes declarative configuration for JetBrains IDEs with plugin management through [nix-jetbrains-plugins](https://github.com/theCapypara/nix-jetbrains-plugins).
+
+### Included IDEs and Plugins
+
+The configuration in `dotfiles/nix/jetbrains.nix` includes:
+
+- **IntelliJ IDEA Ultimate** with common development plugins
+- **WebStorm** with common web development plugins  
+
+Additional IDEs (GoLand, Rider) are available but commented out to reduce initial download size.
+
+### Common Plugins Included
+
+- File Watcher - Monitor file changes and run tasks automatically
+- .ignore - Enhanced support for .gitignore and other ignore files
+- GitHub integration - Enhanced Git/GitHub support (if not built-in)
+
+### Customizing JetBrains Setup
+
+To add or remove IDEs or plugins, edit `dotfiles/nix/jetbrains.nix`. 
+
+**Finding Plugin IDs**: Plugin IDs can be found at the bottom of JetBrains Marketplace pages.
+Example: Visit https://plugins.jetbrains.com/plugin/7374-gitignore and scroll to bottom to find ID: `mobi.hsz.idea.gitignore`
+
+**Adding More IDEs**: Uncomment the additional IDE configurations in `jetbrains.nix` as needed.
 
 ## TODOs
 
