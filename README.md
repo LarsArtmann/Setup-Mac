@@ -10,6 +10,7 @@ This repository contains:
 - **Nix Configuration**: Declarative system configuration using nix-darwin
 - **Homebrew Integration**: Managed through nix-homebrew
 - **Pre-commit Hooks**: Ensuring code quality and security
+- **Command-line Tools**: Includes `jq` (JSON), `yq` (YAML), and other productivity tools
 
 ## Getting Started
 
