@@ -23,6 +23,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     # Optional: Declarative tap management
     homebrew-core = {
@@ -36,7 +41,7 @@
     colmena.url = "github:zhaofengli/colmena";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, nur, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -46,7 +51,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit nixpkgs-nh-dev; };
+        specialArgs = { inherit nixpkgs-nh-dev nur; };
         modules = [
           # Core system configuration
           base
