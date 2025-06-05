@@ -79,6 +79,7 @@ in
         dotnetCorePackages.sdk_8_0 # .NET Core SDK
 
         # Temporary disabled because of storage issues
+        # Now managed through jetbrains.nix module
         #jetbrains.idea-ultimate
         #jetbrains.webstorm
         #jetbrains.goland
