@@ -67,6 +67,7 @@ in
 
         # Programming languages and runtimes
         go
+        templ # Go HTML template language and tool
         jdk # Java Development Kit (JDK 21)
         kotlin
         nodejs # Node.js JavaScript runtime
