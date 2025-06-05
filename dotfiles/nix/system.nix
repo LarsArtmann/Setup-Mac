@@ -121,10 +121,22 @@
         PMPrintingExpandedStateForPrint = true;        # Expand print panel by default
         PMPrintingExpandedStateForPrint2 = true;       # Expand print panel by default
       };
-      screencapture.location = "~/Desktop";
+      screencapture = {
+        location = "~/Desktop";              # Default screenshot location
+        disable-shadow = false;              # Include shadows in window screenshots
+        include-date = true;                 # Include date in screenshot filename
+        show-thumbnail = true;               # Show thumbnail after taking screenshot
+        type = "png";                        # Screenshot file format
+      };
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screencapture
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screensaver
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.smb
+      screensaver = {
+        askForPassword = true;               # Require password after screensaver
+        askForPasswordDelay = 0;             # Require password immediately
+      };
+      smb = {
+        NetBIOSName = "LarsMac";             # NetBIOS name for SMB sharing
+        ServerDescription = "Lars's Mac";    # Description for SMB server
+      };
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
       spaces.spans-displays = null;
 
@@ -136,8 +148,21 @@
         TrackpadThreeFingerDrag = false; # Disable three finger drag
       };
 
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.WindowManager
+      universalaccess = {
+        closeViewScrollWheelToggle = false;  # Disable scroll wheel zoom toggle
+        closeViewZoomFollowsFocus = false;   # Zoom doesn't follow keyboard focus
+        mouseDriverCursorSize = 1.0;         # Normal cursor size
+        reduceMotion = false;                # Allow motion and animations
+        reduceTransparency = false;          # Allow transparency effects
+      };
+
+      WindowManager = {
+        EnableStandardClickToShowDesktop = false;  # Disable click desktop to show desktop
+        StandardHideDesktopIcons = false;          # Show desktop icons
+        StandardHideWidgets = true;                # Hide widgets by default
+        StageManagerHideDesktopIcons = false;     # Show desktop icons in Stage Manager
+        GloballyEnabled = false;                   # Disable Stage Manager globally
+      };
     };
 
     keyboard = {
