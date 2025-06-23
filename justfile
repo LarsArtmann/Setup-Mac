@@ -36,11 +36,7 @@ switch:
 update:
     @echo "📦 Updating system packages..."
     @echo "Updating Nix flake..."
-    nix flake update ./dotfiles/nix/
-    @echo "Applying updated configuration..."
-    @just switch
-    @echo "Updating Homebrew..."
-    brew update && brew upgrade
+    cd dotfiles/nix && nix flake update
     @echo "✅ System updated"
 
 # Clean up caches and old packages
