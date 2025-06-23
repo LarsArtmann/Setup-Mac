@@ -8,6 +8,8 @@
 	packedGitLimit = 512m
 	packedGitWindowSize = 512m
 	pager = cat
+	quotePath = false
+	editor = nano
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -15,8 +17,6 @@
 	required = true
 [url "ssh://git@github.com/LarsArtmann"]
 	insteadOf = https://github.com/LarsArtmann
-[url "ssh://git@github.com/creditornot"]
-	insteadOf = https://github.com/creditornot
 [commit]
 	gpgsign = true
 [tag]
@@ -37,3 +37,13 @@
 	sync-perennial-strategy = rebase
 [pager]
 	diff = cat
+[init]
+	defaultBranch = master
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[gc]
+	auto = 6700
+	autopacklimit = 50
+	autodetach = true
+	pruneexpire = 2 weeks ago
+
