@@ -3,3 +3,4 @@
 
 # Turso
 export PATH="$PATH:/Users/larsartmann/.turso"
+export GH_PAGER=""

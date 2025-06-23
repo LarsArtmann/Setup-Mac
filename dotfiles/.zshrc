@@ -105,3 +105,4 @@ source $ZSH/oh-my-zsh.sh
 # GPG (Wolt)
 export GPG_TTY=$(tty)
 autoload -U compinit; compinit
+export GH_PAGER=""
