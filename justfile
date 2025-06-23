@@ -29,7 +29,7 @@ link:
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
     @echo "🔄 Applying Nix configuration..."
-    nh darwin switch .
+    nh darwin switch ./dotfiles/nix/
     @echo "✅ Nix configuration applied"
 
 # Update system and packages
