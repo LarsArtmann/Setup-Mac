@@ -1,4 +1,4 @@
-{ lib, ... }: {
+{ lib, nur, ... }: {
   # Set Git commit hash for darwin-version.
   # system.configurationRevision = self.rev or self.dirtyRev or null;
 
@@ -31,6 +31,10 @@
   nixpkgs = {
     # The platform the configuration will be used on.
     hostPlatform = "aarch64-darwin";
+    # Add NUR overlay to make packages available
+    overlays = [
+      nur.overlay
+    ];
     config = {
       allowUnsupportedSystem = true;
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
