@@ -58,6 +58,7 @@ verified_link "$CURRENT_DIR/dotfiles/.bash_profile" ~/.bash_profile
 verified_link "$CURRENT_DIR/dotfiles/.bashrc" ~/.bashrc
 verified_link "$CURRENT_DIR/dotfiles/.fzf.zsh" ~/.fzf.zsh
 verified_link "$CURRENT_DIR/dotfiles/.gitconfig" ~/.gitconfig
+verified_link "$CURRENT_DIR/dotfiles/.gitignore_global" ~/.gitignore_global
 verified_link "$CURRENT_DIR/dotfiles/.zprofile" ~/.zprofile
 verified_link "$CURRENT_DIR/dotfiles/.zshrc" ~/.zshrc
 #verified_link "" ~/.kube/config
