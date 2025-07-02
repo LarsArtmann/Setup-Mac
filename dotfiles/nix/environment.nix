@@ -119,7 +119,7 @@ in
 
         # Infrastructure as Code
         terraform # Infrastructure as code
-        terraformer # Generate Terraform files from existing infrastructure
+        #DISABLED since used rarely: terraformer # Generate Terraform files from existing infrastructure
         colmena # NixOS deployment tool
 
         # Other cloud tools
@@ -178,7 +178,6 @@ in
       [
         ollama # Run LLMs locally
         code2prompt # Convert code to LLM prompts
-        code-cursor # AI-powered code editor
       ] ++
 
       # Database tools
@@ -190,7 +189,7 @@ in
       # Applications
       [
         # Terminal emulators
-        alacritty # Terminal emulator
+        #DISABLED since iterm2 is preferred: alacritty # Terminal emulator
         #BROKEN version ghostty-1.1.3: ghostty # Fast, native, feature-rich terminal emulator
         iterm2 # Terminal emulator
 
