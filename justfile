@@ -42,6 +42,8 @@ update:
 # Clean up caches and old packages
 clean:
     @echo "🧹 Cleaning up system..."
+    @echo "Cleaning Nix generations that are older than 1 days..."
+    sudo nix-collect-garbage --delete-older-than 1d
     @echo "Cleaning Nix store..."
     nix-store --gc
     @echo "Cleaning Homebrew..."
@@ -51,6 +53,8 @@ clean:
     npm cache clean --force || true
     @echo "Cleaning pnpm store..."
     pnpm store prune || true
+    @echo "Cleaning go caches..."
+    go clean -cache -testcache -modcache
     @echo "✅ Cleanup complete"
 
 # Deep clean using the paths from your cleanup file
@@ -162,6 +166,20 @@ rollback:
     darwin-rebuild rollback
     @echo "✅ Rollback complete"
 
+# Create private environment file for secrets
+env-private:
+    @echo "🔒 Creating private environment file..."
+    @echo "# Private environment variables - DO NOT COMMIT" > ~/.env.private
+    @echo "# This file is sourced by .zshrc but not tracked in git" >> ~/.env.private
+    @echo "" >> ~/.env.private
+    @echo "# GitHub CLI integration" >> ~/.env.private
+    @echo 'export GITHUB_TOKEN=$$(gh auth token 2>/dev/null || echo "")' >> ~/.env.private
+    @echo 'export GITHUB_PERSONAL_ACCESS_TOKEN="$$GITHUB_TOKEN"' >> ~/.env.private
+    @echo "" >> ~/.env.private
+    @echo "# Add other private environment variables here" >> ~/.env.private
+    @echo "# export SOME_API_KEY=\"your-key-here\"" >> ~/.env.private
+    @echo "✅ Private environment file created at ~/.env.private"
+
 # Show help with detailed descriptions
 help:
     @echo "Setup-Mac Task Runner"
@@ -182,6 +200,9 @@ help:
     @echo "  check          - Check system status and outdated packages"
     @echo "  backup         - Create configuration backup"
     @echo "  deep-clean     - Perform thorough cleanup"
+    @echo ""
+    @echo "Environment:"
+    @echo "  env-private    - Create private environment file for secrets"
     @echo ""
     @echo "Git & Pre-commit:"
     @echo "  pre-commit-install - Install pre-commit hooks"
