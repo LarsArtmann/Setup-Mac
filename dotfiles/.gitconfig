@@ -10,6 +10,7 @@
 	pager = cat
 	quotePath = false
 	editor = nano
+	excludesfile = /Users/larsartmann/.gitignore_global
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
