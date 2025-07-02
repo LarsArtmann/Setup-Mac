@@ -106,3 +106,7 @@ source $ZSH/oh-my-zsh.sh
 export GPG_TTY=$(tty)
 autoload -U compinit; compinit
 export GH_PAGER=""
+
+# Source private environment variables (not tracked in git)
+[ -f ~/.env.private ] && source ~/.env.private
+
