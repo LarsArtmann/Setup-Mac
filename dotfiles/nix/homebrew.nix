@@ -48,7 +48,7 @@
       "cloudflare-warp"
       "deepl" # No nix package found - 2025-02-15
       # "discord" # replaced by legcord
-      "docker"
+      # "docker" # switched to OrbStack - better performance and resource usage
       # Moved to Nixpkgs: "firefox"
       # rarely used: "ghidra"
       # Moved to Nixpkgs: "google-chrome"

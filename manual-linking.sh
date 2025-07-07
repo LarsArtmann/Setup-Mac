@@ -80,3 +80,10 @@ if ensure_directory "$HOME/Library/Application Support/nushell"; then
 else
     echo "Error: Failed to create Nushell Application Support directory. Skipping Nushell Application Support configuration."
 fi
+
+# Starship configuration
+if ensure_directory ~/.config; then
+    verified_link "$CURRENT_DIR/dotfiles/.config/starship.toml" ~/.config/starship.toml
+else
+    echo "Error: Failed to create .config directory. Skipping Starship configuration."
+fi

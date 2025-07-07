@@ -143,6 +143,7 @@ in
         zip # Compression utility
         zlib # Compression library
         zstd # Fast compression algorithm
+        starship # Cross-shell prompt
 
         # System utilities
         htop # Process viewer
