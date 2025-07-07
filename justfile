@@ -187,6 +187,22 @@ clean-backups:
     ls -1t | tail -n +11 | xargs rm -rf
     echo "✅ Old backups cleaned"
 
+# Rebuild zsh completion cache
+rebuild-completions:
+    @echo "🔄 Rebuilding zsh completion cache..."
+    #!/usr/bin/env bash
+    CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+    mkdir -p "$CACHE_DIR"
+    
+    # Remove old completion cache
+    rm -f "$CACHE_DIR"/zcompdump-*
+    
+    # Rebuild completions
+    zsh -c "autoload -Uz compinit && compinit -d '$CACHE_DIR/zcompdump-$ZSH_VERSION'"
+    
+    echo "✅ Completion cache rebuilt"
+    echo "💡 Next shell startup will use the fresh cache"
+
 # Show system information
 info:
     @echo "ℹ️  System Information"
@@ -324,6 +340,7 @@ help:
     @echo "  list-backups   - List available backups"
     @echo "  restore        - Restore from backup (usage: just restore BACKUP_NAME)"
     @echo "  clean-backups  - Clean old backups (keep last 10)"
+    @echo "  rebuild-completions - Rebuild zsh completion cache"
     @echo "  deep-clean     - Perform thorough cleanup"
     @echo ""
     @echo "Environment:"
