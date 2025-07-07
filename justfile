@@ -180,6 +180,16 @@ env-private:
     @echo "# export SOME_API_KEY=\"your-key-here\"" >> ~/.env.private
     @echo "✅ Private environment file created at ~/.env.private"
 
+# Benchmark shell startup performance
+benchmark:
+    @echo "🏃 Benchmarking shell startup performance..."
+    @echo "Testing zsh startup time (10 runs):"
+    hyperfine --warmup 3 --runs 10 'zsh -i -c exit'
+    @echo ""
+    @echo "Testing bash startup time for comparison:"
+    hyperfine --warmup 3 --runs 10 'bash -i -c exit'
+    @echo "✅ Benchmark complete"
+
 # Show help with detailed descriptions
 help:
     @echo "Setup-Mac Task Runner"
@@ -195,6 +205,7 @@ help:
     @echo "  format         - Format code with treefmt"
     @echo "  test           - Test configuration without applying"
     @echo "  dev            - Run development workflow (format, check, test)"
+    @echo "  benchmark      - Benchmark shell startup performance"
     @echo ""
     @echo "Maintenance:"
     @echo "  check          - Check system status and outdated packages"
