@@ -190,6 +190,42 @@ benchmark:
     hyperfine --warmup 3 --runs 10 'bash -i -c exit'
     @echo "✅ Benchmark complete"
 
+# Health check for shell and development environment
+health:
+    @echo "🏥 Running health check for development environment..."
+    @echo ""
+    @echo "=== Shell Configuration ==="
+    @echo -n "Starship prompt: "
+    @if command -v starship >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
+    @echo -n "Zsh completions: "
+    @if zsh -c 'autoload -Uz compinit && echo "✅ Working"' 2>/dev/null; then echo "✅ Working"; else echo "❌ Broken"; fi
+    @echo -n "Git completions: "
+    @if zsh -c 'autoload -Uz _git && echo "✅ Working"' 2>/dev/null; then echo "✅ Working"; else echo "❌ Missing"; fi
+    @echo ""
+    @echo "=== Essential Tools ==="
+    @echo -n "Bun: "
+    @if command -v bun >/dev/null 2>&1; then echo "✅ $(bun --version)"; else echo "❌ Missing"; fi
+    @echo -n "FZF: "
+    @if command -v fzf >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
+    @echo -n "Git: "
+    @if command -v git >/dev/null 2>&1; then echo "✅ $(git --version | cut -d' ' -f3)"; else echo "❌ Missing"; fi
+    @echo -n "Just: "
+    @if command -v just >/dev/null 2>&1; then echo "✅ $(just --version | cut -d' ' -f2)"; else echo "❌ Missing"; fi
+    @echo ""
+    @echo "=== Dotfile Links ==="
+    @echo -n ".zshrc link: "
+    @if [ -L ~/.zshrc ]; then echo "✅ Linked to $(readlink ~/.zshrc)"; else echo "❌ Not linked"; fi
+    @echo -n "Starship config: "
+    @if [ -f ~/.config/starship.toml ]; then echo "✅ Present"; else echo "❌ Missing"; fi
+    @echo -n "Git config: "
+    @if [ -L ~/.gitconfig ]; then echo "✅ Linked"; else echo "❌ Not linked"; fi
+    @echo ""
+    @echo "=== Shell Startup Test ==="
+    @echo -n "Zsh startup errors: "
+    @if zsh -i -c 'exit' 2>&1 | grep -q "error\|Error\|ERROR\|WARN"; then echo "❌ Has errors/warnings"; else echo "✅ Clean startup"; fi
+    @echo ""
+    @echo "✅ Health check complete"
+
 # Show help with detailed descriptions
 help:
     @echo "Setup-Mac Task Runner"
@@ -206,6 +242,7 @@ help:
     @echo "  test           - Test configuration without applying"
     @echo "  dev            - Run development workflow (format, check, test)"
     @echo "  benchmark      - Benchmark shell startup performance"
+    @echo "  health         - Health check for shell and dev environment"
     @echo ""
     @echo "Maintenance:"
     @echo "  check          - Check system status and outdated packages"
