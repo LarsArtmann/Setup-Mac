@@ -108,20 +108,84 @@ backup:
     BACKUP_DIR="backups/$(date '+%Y-%m-%d_%H-%M-%S')"
     mkdir -p "$BACKUP_DIR"
     
-    # Backup Nix configuration
-    cp -r dotfiles/nix "$BACKUP_DIR/"
+    # Backup entire dotfiles directory
+    cp -r dotfiles "$BACKUP_DIR/"
     
-    # Backup key dotfiles
-    cp dotfiles/.gitconfig "$BACKUP_DIR/" || true
-    cp dotfiles/.zshrc "$BACKUP_DIR/" || true
-    cp dotfiles/.bashrc "$BACKUP_DIR/" || true
+    # Backup justfile and manual-linking script
+    cp justfile "$BACKUP_DIR/" || true
+    cp manual-linking.sh "$BACKUP_DIR/" || true
     
-    # Create backup info
+    # Backup current shell state
+    mkdir -p "$BACKUP_DIR/shell_state"
+    cp ~/.zcompdump* "$BACKUP_DIR/shell_state/" 2>/dev/null || true
+    
+    # Create comprehensive backup info
     echo "Backup created: $(date)" > "$BACKUP_DIR/backup_info.txt"
     echo "Git commit: $(git rev-parse HEAD)" >> "$BACKUP_DIR/backup_info.txt"
+    echo "Git branch: $(git branch --show-current)" >> "$BACKUP_DIR/backup_info.txt"
     echo "System: $(uname -a)" >> "$BACKUP_DIR/backup_info.txt"
+    echo "Zsh version: $(zsh --version)" >> "$BACKUP_DIR/backup_info.txt"
+    echo "Shell startup time: $(time zsh -i -c exit 2>&1 | grep real)" >> "$BACKUP_DIR/backup_info.txt"
     
     echo "✅ Backup created in $BACKUP_DIR"
+
+# Auto-backup before making changes (internal use)
+auto-backup:
+    @echo "🔄 Creating automatic backup before changes..."
+    #!/usr/bin/env bash
+    BACKUP_DIR="backups/auto_$(date '+%Y-%m-%d_%H-%M-%S')"
+    mkdir -p "$BACKUP_DIR"
+    cp -r dotfiles "$BACKUP_DIR/"
+    cp justfile "$BACKUP_DIR/" 2>/dev/null || true
+    echo "$(date): Auto-backup before changes" > "$BACKUP_DIR/backup_info.txt"
+    echo "Git commit: $(git rev-parse HEAD)" >> "$BACKUP_DIR/backup_info.txt"
+    echo "✅ Auto-backup created in $BACKUP_DIR"
+
+# List available backups
+list-backups:
+    @echo "📋 Available backups:"
+    @ls -la backups/ 2>/dev/null | grep "^d" | awk '{print $9, $6, $7, $8}' | sort -r || echo "No backups found"
+
+# Restore from a backup
+restore BACKUP_NAME:
+    @echo "🔄 Restoring from backup: {{BACKUP_NAME}}"
+    #!/usr/bin/env bash
+    BACKUP_PATH="backups/{{BACKUP_NAME}}"
+    if [ ! -d "$BACKUP_PATH" ]; then
+        echo "❌ Backup not found: $BACKUP_PATH"
+        exit 1
+    fi
+    
+    # Create safety backup first
+    just auto-backup
+    
+    # Restore dotfiles
+    if [ -d "$BACKUP_PATH/dotfiles" ]; then
+        echo "Restoring dotfiles..."
+        cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
+    fi
+    
+    # Restore other files
+    if [ -f "$BACKUP_PATH/justfile" ]; then
+        echo "Restoring justfile..."
+        cp "$BACKUP_PATH/justfile" .
+    fi
+    
+    if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
+        echo "Restoring manual-linking.sh..."
+        cp "$BACKUP_PATH/manual-linking.sh" .
+    fi
+    
+    echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
+    echo "💡 Original state backed up automatically before restore."
+
+# Clean old backups (keep last 10)
+clean-backups:
+    @echo "🧹 Cleaning old backups (keeping last 10)..."
+    #!/usr/bin/env bash
+    cd backups 2>/dev/null || exit 0
+    ls -1t | tail -n +11 | xargs rm -rf
+    echo "✅ Old backups cleaned"
 
 # Show system information
 info:
@@ -247,6 +311,9 @@ help:
     @echo "Maintenance:"
     @echo "  check          - Check system status and outdated packages"
     @echo "  backup         - Create configuration backup"
+    @echo "  list-backups   - List available backups"
+    @echo "  restore        - Restore from backup (usage: just restore BACKUP_NAME)"
+    @echo "  clean-backups  - Clean old backups (keep last 10)"
     @echo "  deep-clean     - Perform thorough cleanup"
     @echo ""
     @echo "Environment:"
