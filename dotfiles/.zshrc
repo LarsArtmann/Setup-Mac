@@ -1,46 +1,39 @@
-# Minimal .zshrc with starship prompt
+# Minimal .zshrc with starship prompt and async loading
 # Backup of original config saved as ~/.zshrc.backup.*
+
+# Debug mode - set ZSH_DEBUG=1 to enable verbose startup logging
+if [[ -n "$ZSH_DEBUG" ]]; then
+  ZSH_DEBUG_START=$(date +%s%3N)
+  echo "[DEBUG] Starting .zshrc initialization at $(date '+%T.%3N')"
+  set -x  # Enable command tracing
+fi
 
 # Skip slow security checks for faster startup
 ZSH_DISABLE_COMPFIX=true
 
 # Initialize starship prompt
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading starship prompt at $(date '+%T.%3N')"
 eval "$(starship init zsh)"
 
-# Lazy load completions - only when needed
-autoload -Uz compinit
-_comp_loaded=false
-
-# Function to load completions on first tab press
-_lazy_comp() {
-  if ! $_comp_loaded; then
-    compinit -C
-    _comp_loaded=true
-  fi
-  unset -f _lazy_comp
-  # Re-trigger completion
-  zle expand-or-complete
+# Load zsh-defer for async plugin loading
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading zsh-defer at $(date '+%T.%3N')"
+source "$(nix-build --no-out-link '<nixpkgs>' -A zsh-defer)/share/zsh-defer/zsh-defer.plugin.zsh" 2>/dev/null || {
+  # Fallback if zsh-defer not available
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Using zsh-defer fallback"
+  zsh-defer() { "$@"; }
 }
 
-# Override tab to lazy load completions
-zle -N _lazy_comp
-bindkey '^I' _lazy_comp
+# Load completions immediately - we need them working!
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading completions at $(date '+%T.%3N')"
+autoload -Uz compinit && compinit -C
 
-# Essential tool integrations
-[ -s "/Users/larsartmann/.bun/_bun" ] && source "/Users/larsartmann/.bun/_bun"
+# Async load bun completions after shell startup
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Scheduling async bun loading at $(date '+%T.%3N')"
+zsh-defer -c '[ -s "/Users/larsartmann/.bun/_bun" ] && source "/Users/larsartmann/.bun/_bun"'
 
-# Lazy load fzf - only when first used
-_fzf_loaded=false
-_load_fzf() {
-  if ! $_fzf_loaded && [ -f ~/.fzf.zsh ]; then
-    source ~/.fzf.zsh
-    _fzf_loaded=true
-  fi
-}
-
-# Create wrapper functions for fzf commands
-fzf() { _load_fzf; command fzf "$@"; }
-__fzf_select__() { _load_fzf; command __fzf_select__ "$@"; }
+# Async load fzf after shell startup
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Scheduling async fzf loading at $(date '+%T.%3N')"
+zsh-defer -c '[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh'
 
 # Environment
 export GPG_TTY=$(tty)
@@ -63,3 +56,10 @@ alias tc='bun typecheck'
 # Navigation shortcuts
 alias proj='cd ~/WebstormProjects'
 alias dots='cd ~/.dotfiles'
+
+# Debug mode completion and cleanup
+if [[ -n "$ZSH_DEBUG" ]]; then
+  echo "[DEBUG] Completed .zshrc initialization at $(date '+%T.%3N')"
+  echo "[DEBUG] Total startup time: $(($(date +%s%3N) - ZSH_DEBUG_START))ms" 2>/dev/null || true
+  set +x  # Disable command tracing
+fi

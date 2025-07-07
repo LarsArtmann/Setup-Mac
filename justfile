@@ -254,6 +254,15 @@ benchmark:
     hyperfine --warmup 3 --runs 10 'bash -i -c exit'
     @echo "✅ Benchmark complete"
 
+# Debug shell startup with verbose logging
+debug:
+    @echo "🐛 Running shell startup in debug mode..."
+    @echo "This will show detailed timing and command tracing."
+    @echo "----------------------------------------"
+    ZSH_DEBUG=1 zsh -i -c 'echo "Debug startup complete"'
+    @echo "----------------------------------------"
+    @echo "✅ Debug run complete"
+
 # Health check for shell and development environment
 health:
     @echo "🏥 Running health check for development environment..."
@@ -306,6 +315,7 @@ help:
     @echo "  test           - Test configuration without applying"
     @echo "  dev            - Run development workflow (format, check, test)"
     @echo "  benchmark      - Benchmark shell startup performance"
+    @echo "  debug          - Debug shell startup with verbose logging"
     @echo "  health         - Health check for shell and dev environment"
     @echo ""
     @echo "Maintenance:"
