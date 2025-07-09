@@ -46,6 +46,11 @@ fi
 # Clean up old completion dumps to save space
 find "$_zsh_cache_dir" -name "zcompdump-*" -mtime +7 -delete 2>/dev/null
 
+# Configure case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' menu select
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
 # Async load bun completions after shell startup
 [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Scheduling async bun loading at $(date '+%T.%3N')"
 zsh-defer -c '[ -s "/Users/larsartmann/.bun/_bun" ] && source "/Users/larsartmann/.bun/_bun"'

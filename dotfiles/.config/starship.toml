@@ -27,9 +27,9 @@ style = "bold cyan"
 
 # Git branch: Clean branch display (robbyrussell style)
 [git_branch]
-symbol = "git:("
+symbol = "git:"
 style = "bold green"
-format = "[$symbol$branch)]($style)"
+format = "[$symbol($branch)]($style)"
 
 # Git status: Clean status indicators (robbyrussell style)
 [git_status]

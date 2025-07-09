@@ -144,6 +144,7 @@ in
         zlib # Compression library
         zstd # Fast compression algorithm
         starship # Cross-shell prompt
+        zsh-defer # Async zsh plugin loading
 
         # System utilities
         htop # Process viewer
