@@ -76,15 +76,36 @@ if ! command -v claude &> /dev/null; then
     exit 1
 fi
 
-# Function to get current config value
+# Global config cache
+CLAUDE_CONFIG_CACHE=""
+CACHE_LOADED=false
+
+# Function to load config once and cache it from ~/.claude.json directly
+load_config_cache() {
+    if [[ "$CACHE_LOADED" == "false" ]]; then
+        if [[ -f ~/.claude.json ]]; then
+            if [[ "$DRY_RUN" != "true" ]]; then
+                log_info "Loading claude configuration from ~/.claude.json (one-time)..."
+            fi
+            # Read .global section directly from ~/.claude.json using jq
+            CLAUDE_CONFIG_CACHE=$(jq -r '.global // {}' ~/.claude.json 2>/dev/null || echo '{}')
+            CACHE_LOADED=true
+        else
+            CLAUDE_CONFIG_CACHE='{}'
+            CACHE_LOADED=true
+        fi
+    fi
+}
+
+# Function to get current config value (uses cached ~/.claude.json data)
 get_config_value() {
     local key="$1"
-    if [[ -f ~/.claude.json ]]; then
-        # Use claude config ls -g to get the actual config values
-        claude config ls -g 2>/dev/null | jq -r ".${key} // null" 2>/dev/null || echo "null"
-    else
-        echo "null"
-    fi
+    
+    # Ensure config is loaded
+    load_config_cache
+    
+    # Use cached config from ~/.claude.json instead of subprocess calls
+    echo "$CLAUDE_CONFIG_CACHE" | jq -r ".${key} // null" 2>/dev/null || echo "null"
 }
 
 # Function to execute command with dry-run support
@@ -188,7 +209,9 @@ set_config_if_needed "diffTool" "bat"
 
 # Handle environment variables separately (more complex JSON structure)
 log_info "Configuring environment variables..."
-current_env=$(claude config ls -g 2>/dev/null | jq -r '.env // {}' 2>/dev/null || echo '{}')
+# Use cached config instead of subprocess call
+load_config_cache
+current_env=$(echo "$CLAUDE_CONFIG_CACHE" | jq -r '.env // {}' 2>/dev/null || echo '{}')
 target_env='{"EDITOR":"nano", "CLAUDE_CODE_ENABLE_TELEMETRY":"1", "OTEL_METRICS_EXPORTER":"otlp", "OTEL_LOGS_EXPORTER":"otlp", "OTEL_EXPORTER_OTLP_PROTOCOL":"grpc", "OTEL_EXPORTER_OTLP_ENDPOINT":"http://localhost:4317", "OTEL_METRIC_EXPORT_INTERVAL":"10000", "OTEL_LOGS_EXPORT_INTERVAL":"5000"}'
 
 # Compare the JSON objects properly
