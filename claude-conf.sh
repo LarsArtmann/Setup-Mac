@@ -25,12 +25,25 @@ while [[ $# -gt 0 ]]; do
             CREATE_BACKUP=true
             shift
             ;;
+        --profile)
+            CURRENT_PROFILE="$2"
+            shift 2
+            ;;
         --help)
             echo "Usage: $0 [OPTIONS]"
             echo "Options:"
-            echo "  --dry-run    Preview changes without applying them"
-            echo "  --backup     Create backup before applying changes"
-            echo "  --help       Show this help message"
+            echo "  --dry-run              Preview changes without applying them"
+            echo "  --backup               Create backup before applying changes"
+            echo "  --profile PROFILE      Use configuration profile (dev/prod/personal)"
+            echo "  --help                 Show this help message"
+            echo ""
+            echo "Profiles:"
+            echo "  dev/development        High performance settings for development"
+            echo "  prod/production        Conservative settings for production"
+            echo "  personal/default       Balanced settings for personal use"
+            echo ""
+            echo "Environment Variables:"
+            echo "  CLAUDE_PROFILE         Set default profile (overridden by --profile)"
             exit 0
             ;;
         *)
@@ -80,6 +93,113 @@ fi
 CLAUDE_CONFIG_CACHE=""
 CACHE_LOADED=false
 
+# Configuration Schema - Centralized configuration management
+# Using space-separated format for bash 3+ compatibility
+CLAUDE_CONFIG_KEYS="theme parallelTasksCount preferredNotifChannel messageIdleNotifThresholdMs autoUpdates diffTool"
+CLAUDE_CONFIG_VALUES="dark-daltonized 20 iterm2_with_bell 1000 false bat"
+
+# Function to get schema value by key
+get_schema_value() {
+    local key="$1"
+    local keys_array=($CLAUDE_CONFIG_KEYS)
+    local values_array=($CLAUDE_CONFIG_VALUES)
+    
+    for i in "${!keys_array[@]}"; do
+        if [[ "${keys_array[i]}" == "$key" ]]; then
+            echo "${values_array[i]}"
+            return 0
+        fi
+    done
+    echo ""
+}
+
+# Environment Variables Schema
+CLAUDE_ENV_SCHEMA='{
+    "EDITOR": "nano",
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "OTEL_METRICS_EXPORTER": "otlp",
+    "OTEL_LOGS_EXPORTER": "otlp",
+    "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+    "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+    "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+    "OTEL_LOGS_EXPORT_INTERVAL": "5000"
+}'
+
+# Configuration profiles support (dev/prod/personal)
+CURRENT_PROFILE="${CLAUDE_PROFILE:-default}"
+
+# ConfigService - Service-oriented configuration management
+config_service_load_profile() {
+    local profile="${1:-$CURRENT_PROFILE}"
+    
+    case "$profile" in
+        "dev"|"development")
+            log_info "Loading development profile..."
+            # Development profile: more verbose, faster updates
+            CLAUDE_CONFIG_VALUES="dark-daltonized 50 iterm2_with_bell 500 false bat"
+            CLAUDE_ENV_SCHEMA='{
+                "EDITOR": "nano",
+                "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                "OTEL_METRICS_EXPORTER": "otlp",
+                "OTEL_LOGS_EXPORTER": "otlp",
+                "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+                "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+                "OTEL_METRIC_EXPORT_INTERVAL": "5000",
+                "OTEL_LOGS_EXPORT_INTERVAL": "2500"
+            }'
+            ;;
+        "prod"|"production")
+            log_info "Loading production profile..."
+            # Production profile: stable, conservative settings
+            CLAUDE_CONFIG_VALUES="dark-daltonized 10 iterm2_with_bell 2000 false bat"
+            CLAUDE_ENV_SCHEMA='{
+                "EDITOR": "nano",
+                "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+                "OTEL_METRICS_EXPORTER": "none",
+                "OTEL_LOGS_EXPORTER": "none"
+            }'
+            ;;
+        "personal"|"default"|*)
+            log_info "Loading personal/default profile..."
+            # Personal profile: balanced settings (original)
+            CLAUDE_CONFIG_VALUES="dark-daltonized 20 iterm2_with_bell 1000 false bat"
+            CLAUDE_ENV_SCHEMA='{
+                "EDITOR": "nano",
+                "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+                "OTEL_METRICS_EXPORTER": "otlp",
+                "OTEL_LOGS_EXPORTER": "otlp",
+                "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",
+                "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",
+                "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+                "OTEL_LOGS_EXPORT_INTERVAL": "5000"
+            }'
+            ;;
+    esac
+    
+    log_success "✓ Profile '$profile' loaded"
+}
+
+# ConfigService - Validate profile configuration
+config_service_validate_profile() {
+    local profile="${1:-$CURRENT_PROFILE}"
+    
+    case "$profile" in
+        "dev"|"development"|"prod"|"production"|"personal"|"default")
+            return 0
+            ;;
+        *)
+            log_error "❌ Invalid profile '$profile'. Valid profiles: dev, prod, personal"
+            return 1
+            ;;
+    esac
+}
+
+# ConfigService - Get profile-specific backup name
+config_service_get_backup_name() {
+    local profile="${1:-$CURRENT_PROFILE}"
+    echo "claude-config-${profile}-$(date +%Y%m%d_%H%M%S)"
+}
+
 # Function to load config once and cache it from ~/.claude.json directly
 load_config_cache() {
     if [[ "$CACHE_LOADED" == "false" ]]; then
@@ -87,8 +207,8 @@ load_config_cache() {
             if [[ "$DRY_RUN" != "true" ]]; then
                 log_info "Loading claude configuration from ~/.claude.json (one-time)..."
             fi
-            # Read .global section directly from ~/.claude.json using jq
-            CLAUDE_CONFIG_CACHE=$(jq -r '.global // {}' ~/.claude.json 2>/dev/null || echo '{}')
+            # Read FLAT structure directly from ~/.claude.json (NO .global section!)
+            CLAUDE_CONFIG_CACHE=$(cat ~/.claude.json 2>/dev/null || echo '{}')
             CACHE_LOADED=true
         else
             CLAUDE_CONFIG_CACHE='{}'
@@ -97,12 +217,23 @@ load_config_cache() {
     fi
 }
 
+# Function to invalidate cache (force reload on next access)
+invalidate_config_cache() {
+    if [[ "$DRY_RUN" != "true" ]]; then
+        log_info "🔄 Cache invalidated - next config read will reload from file"
+    fi
+    CACHE_LOADED=false
+    CLAUDE_CONFIG_CACHE=""
+}
+
 # Function to get current config value (uses cached ~/.claude.json data)
 get_config_value() {
     local key="$1"
     
-    # Ensure config is loaded
-    load_config_cache
+    # Ensure config is loaded (silently - no log output during value retrieval)
+    if [[ "$CACHE_LOADED" == "false" ]]; then
+        load_config_cache >/dev/null 2>&1
+    fi
     
     # Use cached config from ~/.claude.json instead of subprocess calls
     echo "$CLAUDE_CONFIG_CACHE" | jq -r ".${key} // null" 2>/dev/null || echo "null"
@@ -121,7 +252,7 @@ execute_command() {
     fi
 }
 
-# Function to set config if different
+# Function to set config if different (NO cache invalidation here)
 set_config_if_needed() {
     local key="$1"
     local new_value="$2"
@@ -129,7 +260,18 @@ set_config_if_needed() {
     
     current_value=$(get_config_value "$key")
     
-    if [[ "$current_value" != "$new_value" && "$current_value" != "\"$new_value\"" ]]; then
+    # Handle quoted values properly - remove quotes for comparison
+    if [[ "$current_value" == "\"$new_value\"" ]]; then
+        current_value="$new_value"
+    fi
+    
+    # Also handle the case where current value has quotes
+    current_value=$(echo "$current_value" | sed 's/^"//;s/"$//')
+    
+    # Debug output to see what's being compared
+    # echo "DEBUG: Comparing '$current_value' vs '$new_value'" >&2
+    
+    if [[ "$current_value" != "$new_value" ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
             log_warning "[DRY-RUN] Would set $key: $current_value -> $new_value"
         else
@@ -137,99 +279,132 @@ set_config_if_needed() {
             claude config set -g "$key" "$new_value"
             log_success "✓ $key updated"
         fi
+        return 0  # Changed
     else
         log_info "✓ $key already set to $new_value (skipping)"
+        return 1  # No change
     fi
 }
 
 # Function to create backup of current configuration
 create_backup() {
     if [[ "$CREATE_BACKUP" == "true" || "$DRY_RUN" == "true" ]]; then
-        local backup_file="$HOME/.claude.json.backup.$(date +%Y%m%d_%H%M%S)"
+        local backup_name=$(config_service_get_backup_name "$CURRENT_PROFILE")
+        local backup_file="$HOME/.${backup_name}.json"
         if [[ "$DRY_RUN" == "true" ]]; then
             log_warning "[DRY-RUN] Would create backup: $backup_file"
         else
-            log_info "Creating backup: $backup_file"
+            log_info "Creating profile-aware backup: $backup_file"
             cp "$HOME/.claude.json" "$backup_file" 2>/dev/null || true
             log_success "✓ Backup created: $backup_file"
         fi
     fi
 }
 
-# Function to check if bun has updates available
-check_bun_updates() {
+# Function to check if claude-code needs updates
+check_claude_updates() {
     if ! command -v bun &> /dev/null; then
-        log_warning "bun not found - skipping version check"
+        log_warning "bun not found - skipping claude-code update check"
+        return 1
+    fi
+    
+    if ! command -v claude &> /dev/null; then
+        log_warning "claude command not found - skipping update check"
         return 1
     fi
     
     local current_version
-    local latest_version
-    
     current_version=$(bun --version 2>/dev/null || echo "unknown")
     log_info "Current bun version: $current_version"
     
-    # For now, we'll always suggest running update since checking latest version
-    # remotely would require network calls and might slow down the script
+    # Always attempt to update claude-code to ensure latest features
     return 0
 }
 
-# Function to smart update bun packages
-smart_update_bun() {
-    if check_bun_updates; then
-        execute_command "bun update -g" "Updating global bun packages..."
+# Function to smart update claude-code specifically
+smart_update_claude() {
+    if check_claude_updates; then
+        execute_command "bun update -g @anthropic-ai/claude-code" "Updating claude-code package..."
         if [[ "$DRY_RUN" != "true" ]]; then
-            log_success "✓ Global packages updated"
+            log_success "✓ claude-code package updated"
         fi
     else
-        log_info "✓ Bun not available or up to date (skipping)"
+        log_info "✓ Bun or claude not available (skipping claude-code update)"
     fi
 }
+
+# Initialize ConfigService and validate profile
+if ! config_service_validate_profile "$CURRENT_PROFILE"; then
+    exit 1
+fi
+
+# Load configuration profile
+config_service_load_profile "$CURRENT_PROFILE"
 
 # Display mode information
 if [[ "$DRY_RUN" == "true" ]]; then
     log_warning "🔍 DRY-RUN MODE: No changes will be applied"
 fi
 
+if [[ "$CURRENT_PROFILE" != "default" && "$CURRENT_PROFILE" != "personal" ]]; then
+    log_info "🎯 Using profile: $CURRENT_PROFILE"
+fi
+
 # Create backup if requested
 create_backup
 
-# Update global packages with smart checking
-smart_update_bun
+# Update claude-code package specifically
+smart_update_claude
 
 # Configure Claude settings with conditional updates
 log_info "Configuring Claude settings..."
 
-set_config_if_needed "theme" "dark-daltonized"
-set_config_if_needed "parallelTasksCount" "20"
-set_config_if_needed "preferredNotifChannel" "iterm2_with_bell"
-set_config_if_needed "messageIdleNotifThresholdMs" "1000"
-set_config_if_needed "autoUpdates" "false"
-set_config_if_needed "diffTool" "bat"
+# Apply configuration from schema instead of hard-coded values
+keys_array=($CLAUDE_CONFIG_KEYS)
+config_changes_made=false
+
+for config_key in "${keys_array[@]}"; do
+    schema_value=$(get_schema_value "$config_key")
+    if set_config_if_needed "$config_key" "$schema_value"; then
+        config_changes_made=true
+    fi
+done
 
 # Handle environment variables separately (more complex JSON structure)
 log_info "Configuring environment variables..."
 # Use cached config instead of subprocess call
 load_config_cache
+
+# Get current environment variables from cache (FLAT structure, not .global.env)
 current_env=$(echo "$CLAUDE_CONFIG_CACHE" | jq -r '.env // {}' 2>/dev/null || echo '{}')
-target_env='{"EDITOR":"nano", "CLAUDE_CODE_ENABLE_TELEMETRY":"1", "OTEL_METRICS_EXPORTER":"otlp", "OTEL_LOGS_EXPORTER":"otlp", "OTEL_EXPORTER_OTLP_PROTOCOL":"grpc", "OTEL_EXPORTER_OTLP_ENDPOINT":"http://localhost:4317", "OTEL_METRIC_EXPORT_INTERVAL":"10000", "OTEL_LOGS_EXPORT_INTERVAL":"5000"}'
 
-# Compare the JSON objects properly
-target_env_normalized=$(echo "$target_env" | jq -S .)
-current_env_normalized=$(echo "$current_env" | jq -S .)
+# Use environment schema instead of hard-coded JSON
+target_env="$CLAUDE_ENV_SCHEMA"
 
-if [[ "$current_env_normalized" != "$target_env_normalized" ]]; then
+# Efficient JSON comparison using single jq call with conditional
+env_needs_update=$(echo "$current_env" "$target_env" | jq -s '.[0] != .[1]' 2>/dev/null || echo 'true')
+
+if [[ "$env_needs_update" == "true" ]]; then
     if [[ "$DRY_RUN" == "true" ]]; then
         log_warning "[DRY-RUN] Would update environment variables (OTEL_METRIC_EXPORT_INTERVAL for debugging)"
     else
         log_info "Updating environment variables (OTEL_METRIC_EXPORT_INTERVAL for debugging)"
         claude config set -g env "$target_env"
+        config_changes_made=true
         # Note: Environment variables may not persist due to claude config limitations
         log_warning "⚠️  Note: Environment variables may not persist due to claude config limitations"
         log_success "✓ Environment variables command executed"
     fi
 else
     log_info "✓ Environment variables already configured (skipping)"
+fi
+
+# BATCH INVALIDATION: Reload cache once after ALL changes for validation
+if [[ "$config_changes_made" == "true" && "$DRY_RUN" != "true" ]]; then
+    log_info "Reloading config cache after batch changes for validation..."
+    invalidate_config_cache
+    # Load fresh cache once for validation phase
+    load_config_cache >/dev/null 2>&1
 fi
 
 # Validate configuration after changes
@@ -242,25 +417,17 @@ validate_configuration() {
     log_info "Validating configuration..."
     local config_valid=true
     
-    # Check critical settings
-    local current_theme=$(get_config_value "theme")
-    local current_parallel=$(get_config_value "parallelTasksCount")
-    local current_diff=$(get_config_value "diffTool")
-    
-    if [[ "$current_theme" != "dark-daltonized" ]]; then
-        log_error "❌ Theme validation failed: expected 'dark-daltonized', got '$current_theme'"
-        config_valid=false
-    fi
-    
-    if [[ "$current_parallel" != "20" ]]; then
-        log_error "❌ Parallel tasks validation failed: expected '20', got '$current_parallel'"
-        config_valid=false
-    fi
-    
-    if [[ "$current_diff" != "bat" ]]; then
-        log_error "❌ Diff tool validation failed: expected 'bat', got '$current_diff'"
-        config_valid=false
-    fi
+    # Validate all configuration settings against schema
+    local keys_array=($CLAUDE_CONFIG_KEYS)
+    for config_key in "${keys_array[@]}"; do
+        local current_value=$(get_config_value "$config_key")
+        local expected_value=$(get_schema_value "$config_key")
+        
+        if [[ "$current_value" != "$expected_value" ]]; then
+            log_error "❌ $config_key validation failed: expected '$expected_value', got '$current_value'"
+            config_valid=false
+        fi
+    done
     
     if [[ "$config_valid" == "true" ]]; then
         log_success "✓ Configuration validation passed"
