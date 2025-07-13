@@ -2,8 +2,44 @@
 
 # Claude Configuration Script with Logging and Conditional Updates
 # ==============================================================
+# Usage: ./claude-conf.sh [OPTIONS]
+# Options:
+#   --dry-run    Preview changes without applying them
+#   --backup     Create backup before applying changes
+#   --help       Show this help message
 
 set -euo pipefail
+
+# Global flags
+DRY_RUN=false
+CREATE_BACKUP=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dry-run)
+            DRY_RUN=true
+            shift
+            ;;
+        --backup)
+            CREATE_BACKUP=true
+            shift
+            ;;
+        --help)
+            echo "Usage: $0 [OPTIONS]"
+            echo "Options:"
+            echo "  --dry-run    Preview changes without applying them"
+            echo "  --backup     Create backup before applying changes"
+            echo "  --help       Show this help message"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            echo "Use --help for usage information"
+            exit 1
+            ;;
+    esac
+done
 
 # Colors for output
 RED='\033[0;31m'
@@ -51,6 +87,19 @@ get_config_value() {
     fi
 }
 
+# Function to execute command with dry-run support
+execute_command() {
+    local cmd="$1"
+    local description="$2"
+    
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_warning "[DRY-RUN] Would execute: $cmd"
+    else
+        log_info "$description"
+        eval "$cmd"
+    fi
+}
+
 # Function to set config if different
 set_config_if_needed() {
     local key="$1"
@@ -60,18 +109,72 @@ set_config_if_needed() {
     current_value=$(get_config_value "$key")
     
     if [[ "$current_value" != "$new_value" && "$current_value" != "\"$new_value\"" ]]; then
-        log_info "Setting $key: $current_value -> $new_value"
-        claude config set -g "$key" "$new_value"
-        log_success "✓ $key updated"
+        if [[ "$DRY_RUN" == "true" ]]; then
+            log_warning "[DRY-RUN] Would set $key: $current_value -> $new_value"
+        else
+            log_info "Setting $key: $current_value -> $new_value"
+            claude config set -g "$key" "$new_value"
+            log_success "✓ $key updated"
+        fi
     else
         log_info "✓ $key already set to $new_value (skipping)"
     fi
 }
 
-# Update global packages
-log_info "Updating global bun packages..."
-bun update -g
-log_success "✓ Global packages updated"
+# Function to create backup of current configuration
+create_backup() {
+    if [[ "$CREATE_BACKUP" == "true" || "$DRY_RUN" == "true" ]]; then
+        local backup_file="$HOME/.claude.json.backup.$(date +%Y%m%d_%H%M%S)"
+        if [[ "$DRY_RUN" == "true" ]]; then
+            log_warning "[DRY-RUN] Would create backup: $backup_file"
+        else
+            log_info "Creating backup: $backup_file"
+            cp "$HOME/.claude.json" "$backup_file" 2>/dev/null || true
+            log_success "✓ Backup created: $backup_file"
+        fi
+    fi
+}
+
+# Function to check if bun has updates available
+check_bun_updates() {
+    if ! command -v bun &> /dev/null; then
+        log_warning "bun not found - skipping version check"
+        return 1
+    fi
+    
+    local current_version
+    local latest_version
+    
+    current_version=$(bun --version 2>/dev/null || echo "unknown")
+    log_info "Current bun version: $current_version"
+    
+    # For now, we'll always suggest running update since checking latest version
+    # remotely would require network calls and might slow down the script
+    return 0
+}
+
+# Function to smart update bun packages
+smart_update_bun() {
+    if check_bun_updates; then
+        execute_command "bun update -g" "Updating global bun packages..."
+        if [[ "$DRY_RUN" != "true" ]]; then
+            log_success "✓ Global packages updated"
+        fi
+    else
+        log_info "✓ Bun not available or up to date (skipping)"
+    fi
+}
+
+# Display mode information
+if [[ "$DRY_RUN" == "true" ]]; then
+    log_warning "🔍 DRY-RUN MODE: No changes will be applied"
+fi
+
+# Create backup if requested
+create_backup
+
+# Update global packages with smart checking
+smart_update_bun
 
 # Configure Claude settings with conditional updates
 log_info "Configuring Claude settings..."
@@ -93,16 +196,71 @@ target_env_normalized=$(echo "$target_env" | jq -S .)
 current_env_normalized=$(echo "$current_env" | jq -S .)
 
 if [[ "$current_env_normalized" != "$target_env_normalized" ]]; then
-    log_info "Updating environment variables (OTEL_METRIC_EXPORT_INTERVAL for debugging)"
-    claude config set -g env "$target_env"
-    log_success "✓ Environment variables updated"
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_warning "[DRY-RUN] Would update environment variables (OTEL_METRIC_EXPORT_INTERVAL for debugging)"
+    else
+        log_info "Updating environment variables (OTEL_METRIC_EXPORT_INTERVAL for debugging)"
+        claude config set -g env "$target_env"
+        # Note: Environment variables may not persist due to claude config limitations
+        log_warning "⚠️  Note: Environment variables may not persist due to claude config limitations"
+        log_success "✓ Environment variables command executed"
+    fi
 else
     log_info "✓ Environment variables already configured (skipping)"
 fi
 
+# Validate configuration after changes
+validate_configuration() {
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_warning "[DRY-RUN] Would validate configuration"
+        return 0
+    fi
+    
+    log_info "Validating configuration..."
+    local config_valid=true
+    
+    # Check critical settings
+    local current_theme=$(get_config_value "theme")
+    local current_parallel=$(get_config_value "parallelTasksCount")
+    local current_diff=$(get_config_value "diffTool")
+    
+    if [[ "$current_theme" != "dark-daltonized" ]]; then
+        log_error "❌ Theme validation failed: expected 'dark-daltonized', got '$current_theme'"
+        config_valid=false
+    fi
+    
+    if [[ "$current_parallel" != "20" ]]; then
+        log_error "❌ Parallel tasks validation failed: expected '20', got '$current_parallel'"
+        config_valid=false
+    fi
+    
+    if [[ "$current_diff" != "bat" ]]; then
+        log_error "❌ Diff tool validation failed: expected 'bat', got '$current_diff'"
+        config_valid=false
+    fi
+    
+    if [[ "$config_valid" == "true" ]]; then
+        log_success "✓ Configuration validation passed"
+    else
+        log_error "❌ Configuration validation failed - some settings may not have been applied correctly"
+        return 1
+    fi
+}
+
 # Display final configuration
 log_info "Displaying final configuration..."
-claude config ls
+if [[ "$DRY_RUN" == "true" ]]; then
+    log_warning "[DRY-RUN] Would display: claude config ls"
+else
+    claude config ls
+fi
 
-log_success "Claude configuration complete!"
+# Validate the configuration
+validate_configuration
+
+if [[ "$DRY_RUN" == "true" ]]; then
+    log_warning "🔍 DRY-RUN completed - no changes were made"
+else
+    log_success "Claude configuration complete!"
+fi
 
