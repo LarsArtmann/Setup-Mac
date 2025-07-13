@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/bitfield/script"
 	"github.com/fatih/color"
@@ -335,11 +336,115 @@ func (m *StaticProfileManager) ValidateProfile(profile Profile) error {
 	return fmt.Errorf("invalid profile '%s'. Valid profiles: dev, prod, personal", profile)
 }
 
+// BackupManager interface for managing configuration backups
+type BackupManager interface {
+	CreateBackup(profile Profile) (string, error)
+	RestoreBackup(backupPath string) error
+	ListBackups() ([]string, error)
+}
+
+// FileBackupManager implements BackupManager using filesystem
+type FileBackupManager struct {
+	logger     Logger
+	configPath string
+	dryRun     bool
+}
+
+func NewFileBackupManager(logger Logger, dryRun bool) *FileBackupManager {
+	homeDir, _ := os.UserHomeDir()
+	return &FileBackupManager{
+		logger:     logger,
+		configPath: filepath.Join(homeDir, ".claude.json"),
+		dryRun:     dryRun,
+	}
+}
+
+func (b *FileBackupManager) CreateBackup(profile Profile) (string, error) {
+	timestamp := time.Now().Format("20060102_150405")
+	backupName := fmt.Sprintf("claude-config-%s-%s.json", profile, timestamp)
+	
+	homeDir, _ := os.UserHomeDir()
+	backupPath := filepath.Join(homeDir, backupName)
+
+	if b.dryRun {
+		b.logger.Warning(fmt.Sprintf("[DRY-RUN] Would create backup: %s", backupPath))
+		return backupPath, nil
+	}
+
+	// Check if source config exists
+	if _, err := os.Stat(b.configPath); os.IsNotExist(err) {
+		b.logger.Warning("No existing config file to backup")
+		return "", nil
+	}
+
+	b.logger.Info(fmt.Sprintf("Creating profile-aware backup: %s", backupPath))
+	
+	// Copy the file using script library
+	content, err := script.File(b.configPath).String()
+	if err != nil {
+		return "", fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	_, err = script.Echo(content).WriteFile(backupPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to create backup: %w", err)
+	}
+
+	b.logger.Success(fmt.Sprintf("✓ Backup created: %s", backupPath))
+	return backupPath, nil
+}
+
+func (b *FileBackupManager) RestoreBackup(backupPath string) error {
+	if b.dryRun {
+		b.logger.Warning(fmt.Sprintf("[DRY-RUN] Would restore from backup: %s", backupPath))
+		return nil
+	}
+
+	// Check if backup exists
+	if _, err := os.Stat(backupPath); os.IsNotExist(err) {
+		return fmt.Errorf("backup file not found: %s", backupPath)
+	}
+
+	b.logger.Info(fmt.Sprintf("Restoring configuration from backup: %s", backupPath))
+
+	// Copy backup to config location
+	content, err := script.File(backupPath).String()
+	if err != nil {
+		return fmt.Errorf("failed to read backup file: %w", err)
+	}
+
+	_, err = script.Echo(content).WriteFile(b.configPath)
+	if err != nil {
+		return fmt.Errorf("failed to restore backup: %w", err)
+	}
+
+	b.logger.Success("✓ Configuration restored from backup")
+	return nil
+}
+
+func (b *FileBackupManager) ListBackups() ([]string, error) {
+	homeDir, _ := os.UserHomeDir()
+	
+	// Find all claude config backup files
+	backups, err := script.FindFiles(homeDir).Match("claude-config-*.json").Slice()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list backups: %w", err)
+	}
+
+	if len(backups) == 0 {
+		b.logger.Info("No backups found")
+		return []string{}, nil
+	}
+
+	return backups, nil
+}
+
 // ClaudeConfigurator is the main application struct
 type ClaudeConfigurator struct {
 	configReader   ConfigReader
 	configWriter   ConfigWriter
 	profileManager ProfileManager
+	backupManager  BackupManager
 	logger         Logger
 	options        ApplicationOptions
 }
@@ -351,6 +456,7 @@ func NewClaudeConfigurator(options ApplicationOptions) *ClaudeConfigurator {
 		configReader:   NewCachedConfigReader(logger),
 		configWriter:   NewClaudeConfigWriter(logger, options.DryRun),
 		profileManager: NewStaticProfileManager(logger),
+		backupManager:  NewFileBackupManager(logger, options.DryRun),
 		logger:         logger,
 		options:        options,
 	}
@@ -377,6 +483,14 @@ func (c *ClaudeConfigurator) Run() error {
 	profileConfig, err := c.profileManager.LoadProfile(profile)
 	if err != nil {
 		return fmt.Errorf("failed to load profile: %w", err)
+	}
+
+	// Create backup if requested
+	if c.options.CreateBackup {
+		_, err := c.backupManager.CreateBackup(profile)
+		if err != nil {
+			return fmt.Errorf("failed to create backup: %w", err)
+		}
 	}
 
 	// Configure Claude settings
