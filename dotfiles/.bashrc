@@ -1,6 +1,7 @@
 # Keep this empty
 # Using PATH from nix-darwin instead of modifying it here
 
-# Turso
+# Turso 
 export PATH="$PATH:/Users/larsartmann/.turso"
+export PATH="$PATH:/Users/larsartmann/.opencode/bin"
 export GH_PAGER=""

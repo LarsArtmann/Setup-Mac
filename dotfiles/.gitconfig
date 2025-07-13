@@ -37,7 +37,7 @@
 [git-town]
 	sync-perennial-strategy = rebase
 [pager]
-	diff = cat
+	diff = bat
 [init]
 	defaultBranch = master
 [url "git@github.com:"]
