@@ -200,7 +200,7 @@ docker run --rm -v ~/.claude.json:/home/claude/.claude.json claude-conf:2.0.0 --
     - name: Verify installation
       command: /usr/local/bin/claude-conf --help
       register: help_output
-      
+
     - name: Display help
       debug:
         msg: "{{ help_output.stdout }}"
@@ -293,7 +293,7 @@ cd claude-configs
 
 # 2. Environment-specific branches
 git checkout production
-git checkout staging  
+git checkout staging
 git checkout development
 
 # 3. Deploy with CI/CD
@@ -347,7 +347,7 @@ echo "✅ Validation passed"
 sudo chown root:root /usr/local/bin/claude-conf
 sudo chmod 755 /usr/local/bin/claude-conf
 
-# Secure configuration files  
+# Secure configuration files
 chmod 644 ~/.claude.json
 chmod 600 ~/.claude-config-*.json  # Backup files
 chmod 700 ~/.claude-backups/       # Backup directory
@@ -489,7 +489,7 @@ log_structured() {
     local level="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%dT%H:%M:%S.%3NZ')
-    
+
     echo "{\"timestamp\":\"$timestamp\",\"level\":\"$level\",\"message\":\"$message\",\"profile\":\"$CURRENT_PROFILE\"}" >> /var/log/claude-conf.jsonl
 }
 ```
@@ -770,7 +770,7 @@ check_health() {
 # Run health check
 if ! check_health; then
     echo "❌ Health check failed - sending alert"
-    
+
     # Send alert email
     mail -s "Claude Configuration Tool Health Alert" "$ALERT_EMAIL" << EOF
 The Claude Configuration Tool health check has failed.
@@ -781,7 +781,7 @@ Log: tail -20 $HEALTH_LOG
 
 Please investigate immediately.
 EOF
-    
+
     exit 1
 fi
 
@@ -965,17 +965,17 @@ echo "timestamp,run,execution_time,memory_peak" > "$PROFILE_LOG"
 
 for i in $(seq 1 $RUNS); do
     echo "Run $i/$RUNS..."
-    
+
     # Measure execution time and memory
     /usr/bin/time -l ./claude-conf.sh --dry-run --profile prod 2>/tmp/time-output.txt >/dev/null
-    
+
     # Parse time output
     real_time=$(grep "real" /tmp/time-output.txt | awk '{print $1}')
     memory_peak=$(grep "maximum resident set size" /tmp/time-output.txt | awk '{print $1}')
-    
+
     # Log results
     echo "$(date '+%Y-%m-%d %H:%M:%S'),$i,$real_time,$memory_peak" >> "$PROFILE_LOG"
-    
+
     sleep 1
 done
 
@@ -1052,14 +1052,14 @@ while true; do
     start_time=$(date +%s.%N)
     claude-conf --dry-run --profile prod >/dev/null 2>&1
     end_time=$(date +%s.%N)
-    
+
     execution_time=$(echo "$end_time - $start_time" | bc)
-    
+
     if (( $(echo "$execution_time > $PERF_THRESHOLD" | bc -l) )); then
         echo "⚠️  Performance degradation detected: ${execution_time}s"
         # Alert logic here
     fi
-    
+
     sleep 300  # Test every 5 minutes
 done
 ```

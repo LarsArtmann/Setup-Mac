@@ -260,7 +260,7 @@ env-private:
     @echo "# export SOME_API_KEY=\"your-key-here\"" >> ~/.env.private
     @echo "✅ Private environment file created at ~/.env.private"
 
-# Benchmark shell startup performance
+# Benchmark shell startup performance (legacy)
 benchmark:
     @echo "🏃 Benchmarking shell startup performance..."
     @echo "Testing zsh startup time (10 runs):"
@@ -269,6 +269,134 @@ benchmark:
     @echo "Testing bash startup time for comparison:"
     hyperfine --warmup 3 --runs 10 'bash -i -c exit'
     @echo "✅ Benchmark complete"
+
+# Comprehensive system performance benchmarks
+benchmark-all:
+    @echo "🚀 Running comprehensive system benchmarks..."
+    ./scripts/benchmark-system.sh
+    @echo "✅ All benchmarks complete"
+
+# Benchmark shell startup only
+benchmark-shells:
+    @echo "🐚 Benchmarking shell startup performance..."
+    ./scripts/benchmark-system.sh --shells
+    @echo "✅ Shell benchmarks complete"
+
+# Benchmark build tools performance
+benchmark-build:
+    @echo "🔨 Benchmarking build tools performance..."
+    ./scripts/benchmark-system.sh --build-tools
+    @echo "✅ Build tool benchmarks complete"
+
+# Benchmark system commands
+benchmark-system:
+    @echo "⚙️  Benchmarking system commands..."
+    ./scripts/benchmark-system.sh --system
+    @echo "✅ System command benchmarks complete"
+
+# Benchmark file operations
+benchmark-files:
+    @echo "📁 Benchmarking file operations..."
+    ./scripts/benchmark-system.sh --file-ops
+    @echo "✅ File operation benchmarks complete"
+
+# Show benchmark performance report
+benchmark-report:
+    @echo "📊 Generating performance report..."
+    ./scripts/benchmark-system.sh --report
+    @echo "✅ Report generated"
+
+# Clean old benchmark results
+benchmark-clean:
+    @echo "🧹 Cleaning old benchmark results..."
+    ./scripts/benchmark-system.sh --cleanup
+    @echo "✅ Benchmark cleanup complete"
+
+# Performance Monitoring
+# ======================
+
+# Setup performance monitoring system
+perf-setup:
+    @echo "🔧 Setting up performance monitoring..."
+    ./scripts/performance-monitor.sh setup-monitoring
+    @echo "✅ Performance monitoring setup complete"
+
+# Run performance monitoring benchmark
+perf-benchmark:
+    @echo "📊 Running performance monitoring benchmark..."
+    ./scripts/performance-monitor.sh benchmark-all
+    @echo "✅ Performance benchmark complete"
+
+# Generate performance report
+perf-report DAYS="7":
+    @echo "📈 Generating performance report ({{DAYS}} days)..."
+    ./scripts/performance-monitor.sh report {{DAYS}}
+    @echo "✅ Performance report generated"
+
+# Show performance alerts
+perf-alerts:
+    @echo "🚨 Showing performance alerts..."
+    ./scripts/performance-monitor.sh alerts
+    @echo "✅ Alerts displayed"
+
+# Clear performance cache
+perf-cache-clear PATTERN="*":
+    @echo "🧹 Clearing performance cache..."
+    ./scripts/performance-monitor.sh cache-clear {{PATTERN}}
+    @echo "✅ Performance cache cleared"
+
+# Context Detection and Analysis
+# ==============================
+
+# Detect current shell context
+context-detect:
+    @echo "🔍 Detecting current shell context..."
+    ./scripts/shell-context-detector.sh detect
+    @echo "✅ Context detection complete"
+
+# Log current shell session for analysis
+context-log:
+    @echo "📝 Logging current shell session..."
+    ./scripts/shell-context-detector.sh log
+    @echo "✅ Session logged"
+
+# Analyze shell usage patterns
+context-analyze:
+    @echo "📊 Analyzing shell usage patterns..."
+    ./scripts/shell-context-detector.sh analyze
+    @echo "✅ Analysis complete"
+
+# Get loading optimization recommendations
+context-recommend:
+    @echo "💡 Generating loading recommendations..."
+    ./scripts/shell-context-detector.sh recommend
+    @echo "✅ Recommendations generated"
+
+# Create context-aware loading hook
+context-setup:
+    @echo "🔧 Creating context-aware loading hook..."
+    ./scripts/shell-context-detector.sh create-hook
+    @echo "✅ Context-aware loading hook created"
+
+# Comprehensive Performance Analysis
+# ==================================
+
+# Run full performance analysis
+perf-full-analysis:
+    @echo "🚀 Running comprehensive performance analysis..."
+    @just benchmark-all
+    @just perf-benchmark
+    @just context-analyze
+    @just context-recommend
+    @just perf-report
+    @echo "✅ Full performance analysis complete"
+
+# Setup all automation systems
+automation-setup:
+    @echo "🤖 Setting up all automation systems..."
+    @just perf-setup
+    @just context-setup
+    @echo "✅ All automation systems setup complete"
 
 # Debug shell startup with verbose logging
 debug:
@@ -385,9 +513,39 @@ go-dev package="./...":
     go build {{package}}
     @echo "✅ Go development workflow complete"
 
-# Update Go tools (using go install)
-go-update-tools:
-    @echo "🔄 Updating Go development tools..."
+# Auto-update all Go binaries using gup (recommended)
+go-auto-update:
+    @echo "🚀 Auto-updating all Go binaries with gup..."
+    gup update
+    @echo "✅ All Go binaries updated automatically"
+
+# Check which Go binaries need updates
+go-check-updates:
+    @echo "🔍 Checking which Go binaries need updates..."
+    gup check
+    @echo "✅ Update check complete"
+
+# List all Go binaries installed via 'go install'
+go-list-binaries:
+    @echo "📋 Listing all Go binaries..."
+    gup list
+    @echo "✅ Binary list complete"
+
+# Export current Go binary list to gup.conf for reproducible installs
+go-export-config:
+    @echo "📦 Exporting Go binary configuration..."
+    gup export
+    @echo "✅ Configuration exported to gup.conf"
+
+# Import Go binaries from gup.conf (useful for new machines)
+go-import-config:
+    @echo "📥 Importing Go binaries from configuration..."
+    gup import
+    @echo "✅ Binaries imported from gup.conf"
+
+# Update Go tools (manual method using go install)
+go-update-tools-manual:
+    @echo "🔄 Manually updating Go development tools..."
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     go install mvdan.cc/gofumpt@latest
     go install golang.org/x/tools/gopls@latest
@@ -397,7 +555,15 @@ go-update-tools:
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
     go install github.com/bufbuild/buf/cmd/buf@latest
     go install github.com/go-delve/delve/cmd/dlv@latest
-    @echo "✅ Go tools updated"
+    go install github.com/nao1215/gup@latest
+    @echo "✅ Go tools updated manually"
+
+# Complete Go setup - install core tools and export config
+go-setup:
+    @echo "🛠️  Setting up complete Go development environment..."
+    @just go-update-tools-manual
+    @just go-export-config
+    @echo "✅ Go development environment setup complete"
 
 # Show Go tools versions
 go-tools-version:
@@ -464,19 +630,25 @@ help:
     @echo "  health         - Health check for shell and dev environment"
     @echo ""
     @echo "Go Development Tools:"
-    @echo "  go-lint           - Run golangci-lint on Go code"
-    @echo "  go-format         - Format Go code with gofumpt"
-    @echo "  go-gen-tests      - Generate Go tests with gotests"
-    @echo "  go-gen-mocks      - Generate Go mocks with mockgen"
-    @echo "  go-wire           - Generate wire dependency injection"
-    @echo "  go-debug          - Start Go debugger (delve) for binary"
-    @echo "  go-debug-test     - Start Go debugger for tests"
-    @echo "  go-check          - Run gopls language server check"
-    @echo "  go-proto-gen      - Generate protobuf Go code with buf"
-    @echo "  go-proto-lint     - Lint protobuf files with buf"
-    @echo "  go-dev            - Full Go development workflow"
-    @echo "  go-update-tools   - Update all Go development tools"
-    @echo "  go-tools-version  - Show versions of all Go tools"
+    @echo "  go-lint               - Run golangci-lint on Go code"
+    @echo "  go-format             - Format Go code with gofumpt"
+    @echo "  go-gen-tests          - Generate Go tests with gotests"
+    @echo "  go-gen-mocks          - Generate Go mocks with mockgen"
+    @echo "  go-wire               - Generate wire dependency injection"
+    @echo "  go-debug              - Start Go debugger (delve) for binary"
+    @echo "  go-debug-test         - Start Go debugger for tests"
+    @echo "  go-check              - Run gopls language server check"
+    @echo "  go-proto-gen          - Generate protobuf Go code with buf"
+    @echo "  go-proto-lint         - Lint protobuf files with buf"
+    @echo "  go-dev                - Full Go development workflow"
+    @echo "  go-auto-update        - Auto-update all Go binaries with gup"
+    @echo "  go-check-updates      - Check which Go binaries need updates"
+    @echo "  go-list-binaries      - List all Go binaries"
+    @echo "  go-export-config      - Export Go binary config to gup.conf"
+    @echo "  go-import-config      - Import Go binaries from gup.conf"
+    @echo "  go-update-tools-manual - Update tools manually with go install"
+    @echo "  go-setup              - Complete Go development environment setup"
+    @echo "  go-tools-version      - Show versions of all Go tools"
     @echo ""
     @echo "Maintenance:"
     @echo "  check          - Check system status and outdated packages"

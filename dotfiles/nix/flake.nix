@@ -87,16 +87,16 @@
           # User-specific configurations
           ./users.nix
 
-          # Home Manager integration
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.larsartmann = ./home.nix;
-            };
-          }
+          # Home Manager integration - temporarily disabled to migrate configs
+          # home-manager.darwinModules.home-manager
+          # {
+          #   home-manager = {
+          #     useGlobalPkgs = true;
+          #     useUserPackages = true;
+          #     extraSpecialArgs = { inherit inputs; };
+          #     users.larsartmann = ./home.nix;
+          #   };
+          # }
         ];
       };
     };

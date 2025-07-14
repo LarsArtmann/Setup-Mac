@@ -70,19 +70,19 @@ in
         go
         templ # Go HTML template language and tool
         go-tools # Go static analysis tools (staticcheck.dev)
-        
+
         # Go development tools
         golangci-lint # Fast linters runner for Go
         gofumpt # Stricter gofmt
         gopls # Go language server
         gotests # Generate Go tests
-        go-wire # Compile-time dependency injection for Go
+        wire # Compile-time dependency injection for Go
         mockgen # Generate mocks for Go interfaces
         protoc-gen-go # Protocol buffer compiler for Go
         buf # Modern protobuf toolchain
         delve # Go debugger
         gup # Auto-update Go binaries installed via 'go install'
-        
+
         jdk # Java Development Kit (JDK 21)
         kotlin
         nodejs # Node.js JavaScript runtime

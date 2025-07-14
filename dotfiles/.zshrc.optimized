@@ -1,0 +1,241 @@
+# Optimized .zshrc with Automation and Monitoring
+# Integrates all GROUP 4 automation tools for performance optimization
+
+# ============================================================================
+# STARTUP TIMING AND DEBUG SETUP
+# ============================================================================
+
+# Debug mode - set ZSH_DEBUG=1 to enable verbose startup logging
+if [[ -n "$ZSH_DEBUG" ]]; then
+  ZSH_DEBUG_START=$(date +%s%3N)
+  echo "[DEBUG] Starting optimized .zshrc initialization at $(date '+%T.%3N')"
+  set -x  # Enable command tracing
+fi
+
+# Performance monitoring setup
+export ZSH_PERF_MONITOR=1
+_perf_monitor_startup_time=$(date +%s%3N)
+
+# Skip slow security checks for faster startup
+ZSH_DISABLE_COMPFIX=true
+
+# ============================================================================
+# CONTEXT DETECTION AND SMART LOADING
+# ============================================================================
+
+# Load context detection system
+if [[ -f "${XDG_CACHE_HOME:-$HOME/.cache}/shell-context/loading-hook.zsh" ]]; then
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading context detection at $(date '+%T.%3N')"
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/shell-context/loading-hook.zsh"
+fi
+
+# Load lazy loading system
+if [[ -f "/Users/larsartmann/Desktop/Setup-Mac/scripts/plugin-lazy-loader.zsh" ]]; then
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading lazy loader at $(date '+%T.%3N')"
+  source "/Users/larsartmann/Desktop/Setup-Mac/scripts/plugin-lazy-loader.zsh"
+fi
+
+# ============================================================================
+# PROMPT INITIALIZATION (HIGH PRIORITY)
+# ============================================================================
+
+# Initialize starship prompt immediately for better UX
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading starship prompt at $(date '+%T.%3N')"
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+else
+  # Fallback minimal prompt if starship not available
+  export PS1='%n@%m:%~$ '
+fi
+
+# ============================================================================
+# COMPLETION SYSTEM WITH SMART CACHING
+# ============================================================================
+
+[[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading completions at $(date '+%T.%3N')"
+autoload -Uz compinit
+
+# Smart completion cache: rebuild only when needed
+_zsh_cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+_zcompdump="$_zsh_cache_dir/zcompdump-${ZSH_VERSION}"
+
+# Ensure cache directory exists
+[[ ! -d "$_zsh_cache_dir" ]] && mkdir -p "$_zsh_cache_dir"
+
+# Context-aware completion loading
+if [[ -n "$SHELL_FAST_MODE" ]]; then
+  # Skip completions in fast mode
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Skipping completions (fast mode)"
+elif [[ -n "$SHELL_MINIMAL_MODE" ]]; then
+  # Minimal completions only
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading minimal completions"
+  compinit -C -d "$_zcompdump"
+else
+  # Full completion system with smart caching
+  if [[ ! -f "$_zcompdump" ]] || [[ "$_zcompdump" -ot $(find /usr/share/zsh /opt/homebrew/share/zsh ~/.nix-profile/share/zsh -name "_*" -newer "$_zcompdump" 2>/dev/null | head -1) ]] || [[ $(date -r "$_zcompdump" +%j) != $(date +%j) ]] 2>/dev/null; then
+    [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Rebuilding completion cache"
+    compinit -d "$_zcompdump"
+  else
+    [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Using cached completions"
+    compinit -C -d "$_zcompdump"
+  fi
+  
+  # Configure completion behavior
+  zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+  zstyle ':completion:*' menu select
+  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+fi
+
+# Clean up old completion dumps to save space
+find "$_zsh_cache_dir" -name "zcompdump-*" -mtime +7 -delete 2>/dev/null &
+
+# ============================================================================
+# ZSH-DEFER LOADING SYSTEM
+# ============================================================================
+
+# Load zsh-defer for async plugin loading (if not in fast mode)
+if [[ -z "$SHELL_FAST_MODE" ]]; then
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading zsh-defer at $(date '+%T.%3N')"
+  source "$(nix-build --no-out-link '<nixpkgs>' -A zsh-defer)/share/zsh-defer/zsh-defer.plugin.zsh" 2>/dev/null || {
+    # Fallback if zsh-defer not available
+    [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Using zsh-defer fallback"
+    zsh-defer() { "$@"; }
+  }
+else
+  # In fast mode, disable async loading
+  zsh-defer() { return 0; }
+fi
+
+# ============================================================================
+# CONTEXT-BASED TOOL LOADING
+# ============================================================================
+
+# Load tools based on detected context (handled by lazy loader)
+# This section is automatically managed by the plugin-lazy-loader.zsh
+
+# Additional context-specific optimizations
+if [[ -n "$SHELL_FAST_MODE" ]]; then
+  # In fast mode, skip all non-essential loading
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Fast mode enabled - skipping tool loading"
+elif [[ -n "$SHELL_MINIMAL_MODE" ]]; then
+  # In minimal mode, load only essential tools
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Minimal mode enabled - loading essential tools only"
+  
+  # Load only git completions if in git repo
+  if git rev-parse --git-dir >/dev/null 2>&1; then
+    lazy_load "git_tools" "true"
+  fi
+else
+  # Normal mode - full loading with optimizations
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Normal mode - full loading enabled"
+  
+  # Context-based loading is handled by lazy loader
+  # Additional immediate loads for interactive shells
+  if [[ $- == *i* ]]; then
+    # Load FZF for interactive shells (async)
+    zsh-defer lazy_load "fzf"
+  fi
+fi
+
+# ============================================================================
+# ENVIRONMENT VARIABLES
+# ============================================================================
+
+# Core environment setup
+export GPG_TTY=$(tty)
+export GH_PAGER=""
+
+# Source private environment variables (not tracked in git)
+[[ -f ~/.env.private ]] && source ~/.env.private
+
+# ============================================================================
+# ALIASES AND SHORTCUTS
+# ============================================================================
+
+# Git aliases from development workflow (only in interactive mode)
+if [[ $- == *i* ]] && [[ -z "$SHELL_FAST_MODE" ]]; then
+  alias gs='git town sync'
+  alias gnpr='git town new-pull-request'
+  alias gco='git town switch'
+  
+  # Development shortcuts from CLAUDE.md
+  alias d='bun dev'
+  alias t='bun test'
+  alias l='bun lint'
+  alias tc='bun typecheck'
+  
+  # Navigation shortcuts
+  alias proj='cd ~/WebstormProjects'
+  alias dots='cd ~/.dotfiles'
+  
+  # Performance monitoring shortcuts
+  alias perf-bench='just benchmark-shells'
+  alias perf-report='just perf-report'
+  alias context-check='just context-detect'
+fi
+
+# ============================================================================
+# PERFORMANCE MONITORING INTEGRATION
+# ============================================================================
+
+# Load performance monitoring hook
+if [[ -f "${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor/monitoring-hook.zsh" ]] && [[ -z "$SHELL_FAST_MODE" ]]; then
+  [[ -n "$ZSH_DEBUG" ]] && echo "[DEBUG] Loading performance monitoring at $(date '+%T.%3N')"
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor/monitoring-hook.zsh"
+fi
+
+# ============================================================================
+# LAZY LOADING STATUS AND CLEANUP
+# ============================================================================
+
+# Show lazy loading status in debug mode
+if [[ -n "$ZSH_DEBUG" ]] && [[ -z "$SHELL_FAST_MODE" ]]; then
+  zsh-defer lazy_status
+fi
+
+# ============================================================================
+# STARTUP COMPLETION AND TIMING
+# ============================================================================
+
+# Debug mode completion and cleanup
+if [[ -n "$ZSH_DEBUG" ]]; then
+  echo "[DEBUG] Completed optimized .zshrc initialization at $(date '+%T.%3N')"
+  echo "[DEBUG] Total startup time: $(($(date +%s%3N) - ZSH_DEBUG_START))ms" 2>/dev/null || true
+  set +x  # Disable command tracing
+fi
+
+# Performance monitoring completion (async to avoid blocking)
+if [[ -n "$ZSH_PERF_MONITOR" ]] && [[ $- == *i* ]]; then
+  _perf_monitor_log_startup() {
+    local end_time=$(date +%s%3N)
+    local startup_duration=$(echo "scale=6; ($end_time - $_perf_monitor_startup_time) / 1000000" | bc -l 2>/dev/null || echo "0")
+    
+    # Log to performance monitor (async to avoid impacting startup)
+    (
+      local metrics_file="${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor/metrics.json"
+      mkdir -p "$(dirname "$metrics_file")"
+      echo "{\"timestamp\":\"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\",\"type\":\"startup\",\"name\":\"zsh\",\"value\":$startup_duration,\"context\":{\"auto\":true,\"optimized\":true},\"hostname\":\"$HOSTNAME\",\"user\":\"$USER\"}" >> "$metrics_file"
+    ) &
+    
+    # Remove the hook after first use
+    autoload -U add-zsh-hook
+    add-zsh-hook -d precmd _perf_monitor_log_startup
+  }
+  
+  # Schedule logging after prompt is ready
+  autoload -U add-zsh-hook
+  add-zsh-hook precmd _perf_monitor_log_startup
+fi
+
+# ============================================================================
+# FINAL OPTIMIZATIONS
+# ============================================================================
+
+# Cleanup temporary variables
+unset _zsh_cache_dir _zcompdump
+
+# Context-aware final loading
+if [[ -z "$SHELL_FAST_MODE" ]] && [[ -z "$SHELL_MINIMAL_MODE" ]]; then
+  # Final context-based loading after everything is set up
+  zsh-defer lazy_load_context
+fi

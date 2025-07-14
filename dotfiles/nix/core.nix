@@ -34,16 +34,17 @@
     config = {
       allowUnsupportedSystem = true;
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-        "vault" # ‘bsl11’ licence
-        "terraform" # ‘bsl11’ licence
-        #"cloudflare-warp" # ‘unfree’ licence
-        "cursor" # ‘unfree’
-        "idea-ultimate" # ‘unfree’ licence
-        "webstorm" # ‘unfree’ licence
-        "goland" # ‘unfree’ licence
-        "rider" # ‘unfree’ licence
-        "google-chrome" # ‘unfree’ licence
-        "signal-desktop-bin" # ‘agpl3Only free unfree’
+        "vault" # 'bsl11' licence
+        "terraform" # 'bsl11' licence
+        #"cloudflare-warp" # 'unfree' licence
+        "cursor" # 'unfree'
+        "idea-ultimate" # 'unfree' licence
+        "webstorm" # 'unfree' licence
+        "goland" # 'unfree' licence
+        "rider" # 'unfree' licence
+        "google-chrome" # 'unfree' licence
+        "signal-desktop-bin" # 'agpl3Only free unfree'
+        "castlabs-electron" # needed for tidal-hifi
       ];
     };
   };

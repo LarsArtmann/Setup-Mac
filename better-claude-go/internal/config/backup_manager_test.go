@@ -142,7 +142,7 @@ func (suite *BackupManagerTestSuite) TestCreateBackup_WithExistingConfig() {
 	// Create a mock config file
 	configContent := `{"theme": "dark", "parallelTasksCount": "20"}`
 	configPath := filepath.Join(suite.tempDir, ".claude.json")
-	err := os.WriteFile(configPath, []byte(configContent), 0644)
+	err := os.WriteFile(configPath, []byte(configContent), 0o644)
 	suite.Require().NoError(err)
 
 	backupPath, err := suite.backupManager.CreateBackup(ProfileProd)
@@ -169,7 +169,7 @@ func (suite *BackupManagerTestSuite) TestCreateBackup_WithExistingConfig() {
 func (suite *BackupManagerTestSuite) TestCreateBackup_FilenameFormat() {
 	// Create a mock config file
 	configPath := filepath.Join(suite.tempDir, ".claude.json")
-	err := os.WriteFile(configPath, []byte("{}"), 0644)
+	err := os.WriteFile(configPath, []byte("{}"), 0o644)
 	suite.Require().NoError(err)
 
 	backupPath, err := suite.backupManager.CreateBackup(ProfilePersonal)
@@ -218,7 +218,7 @@ func (suite *BackupManagerTestSuite) TestRestoreBackup_ValidBackup() {
 	// Create a backup file
 	backupContent := `{"theme": "light", "parallelTasksCount": "10"}`
 	backupPath := filepath.Join(suite.tempDir, "claude-config-dev-20240101_120000.json")
-	err := os.WriteFile(backupPath, []byte(backupContent), 0644)
+	err := os.WriteFile(backupPath, []byte(backupContent), 0o644)
 	suite.Require().NoError(err)
 
 	// Restore the backup
@@ -263,7 +263,7 @@ func (suite *BackupManagerTestSuite) TestListBackups_WithBackups() {
 
 	for _, filename := range backupFiles {
 		filePath := filepath.Join(suite.tempDir, filename)
-		err := os.WriteFile(filePath, []byte("{}"), 0644)
+		err := os.WriteFile(filePath, []byte("{}"), 0o644)
 		suite.Require().NoError(err)
 	}
 
@@ -276,7 +276,7 @@ func (suite *BackupManagerTestSuite) TestListBackups_WithBackups() {
 
 	for _, filename := range otherFiles {
 		filePath := filepath.Join(suite.tempDir, filename)
-		err := os.WriteFile(filePath, []byte("{}"), 0644)
+		err := os.WriteFile(filePath, []byte("{}"), 0o644)
 		suite.Require().NoError(err)
 	}
 
@@ -328,7 +328,7 @@ func (suite *BackupManagerTestSuite) TestCreateBackup_ErrorScenarios() {
 func (suite *BackupManagerTestSuite) TestCreateBackup_Concurrent() {
 	// Create a mock config file
 	configPath := filepath.Join(suite.tempDir, ".claude.json")
-	err := os.WriteFile(configPath, []byte("{}"), 0644)
+	err := os.WriteFile(configPath, []byte("{}"), 0o644)
 	suite.Require().NoError(err)
 
 	// Create multiple backups quickly to test timestamp uniqueness

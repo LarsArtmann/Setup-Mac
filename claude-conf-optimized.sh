@@ -473,6 +473,7 @@ log_info "Displaying final configuration..."
 if [[ "$DRY_RUN" == "true" ]]; then
     log_warning "[DRY-RUN] Would display: claude config ls"
 else
+    // TODO: We should set hasCompletedProjectOnboarding, hasTrustDialogAccepted to true for the local config too
     claude config ls
 fi
 

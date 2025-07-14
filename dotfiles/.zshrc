@@ -1,3 +1,6 @@
+# Enable zsh profiling
+zmodload zsh/zprof
+
 # Minimal .zshrc with starship prompt and async loading
 # Backup of original config saved as ~/.zshrc.backup.*
 
@@ -87,3 +90,6 @@ if [[ -n "$ZSH_DEBUG" ]]; then
   echo "[DEBUG] Total startup time: $(($(date +%s%3N) - ZSH_DEBUG_START))ms" 2>/dev/null || true
   set +x  # Disable command tracing
 fi
+
+# Show zsh profiling information
+zprof

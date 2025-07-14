@@ -1,8 +1,9 @@
 package main
 
 import (
-	"better-claude/internal/functional"
 	"testing"
+
+	"better-claude/internal/functional"
 )
 
 func TestResultTypes(t *testing.T) {

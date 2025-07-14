@@ -32,7 +32,12 @@
       "Bash(nixup:*)",
       "Bash(ZSH_DEBUG=1 zsh -i -c \"exit\")",
       "Bash(gcloud version:*)",
-      "Bash(gup:*)"
+      "Bash(gup:*)",
+      "Bash(terraform version)",
+      "Bash(redis-server:*)",
+      "Bash(bat:*)",
+      "Bash(fzf:*)",
+      "Bash(test:*)"
     ],
     "deny": []
   }

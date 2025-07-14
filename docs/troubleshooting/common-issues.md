@@ -1,6 +1,25 @@
-# Troubleshooting Guide
+# Comprehensive Troubleshooting Guide
 
-This guide covers common issues you might encounter when setting up or maintaining your Nix Darwin development environment.
+This guide covers common issues you might encounter when setting up, maintaining, or optimizing your Nix Darwin development environment. It includes specific troubleshooting for the optimization project and performance issues.
+
+## Quick Diagnosis
+
+Before diving into specific issues, try these diagnostic commands:
+
+```bash
+# System health check
+./scripts/health-check.sh
+
+# Performance benchmark
+./shell-performance-benchmark.sh
+
+# View recent optimizations
+cat .last_optimization_backup 2>/dev/null || echo "No recent optimizations"
+
+# Check current configuration status
+claude config ls
+nix show-config
+```
 
 ## Installation Issues
 
@@ -258,27 +277,271 @@ brew list
    darwin-rebuild switch --flake .#Lars-MacBook-Air --show-trace --verbose
    ```
 
+## Optimization Issues
+
+### Performance Optimization Failures
+
+**Problem:** Optimization script fails or causes system instability.
+
+**Solutions:**
+1. **Rollback to previous state:**
+   ```bash
+   # Check if backup exists
+   ls -la *optimization-backup-*
+
+   # Restore from backup (adjust path as needed)
+   backup_dir=$(cat .last_optimization_backup)
+   cp "$backup_dir/zshrc.bak" ~/.zshrc
+   cp "$backup_dir/claude.json.bak" ~/.claude.json
+   sudo cp "$backup_dir/nix.conf.bak" /etc/nix/nix.conf
+
+   # Restart affected services
+   sudo launchctl kickstart -k system/org.nixos.nix-daemon
+   source ~/.zshrc
+   ```
+
+2. **Run optimization in dry-run mode first:**
+   ```bash
+   ./scripts/optimize.sh --dry-run --profile balanced
+   ```
+
+3. **Use conservative profile:**
+   ```bash
+   ./scripts/optimize.sh --profile conservative --verbose
+   ```
+
+### Claude Configuration Issues
+
+**Problem:** Claude optimizations not applying or causing errors.
+
+**Solutions:**
+1. **Reset Claude configuration:**
+   ```bash
+   # Backup current config
+   cp ~/.claude.json ~/.claude.json.backup
+
+   # Reset to defaults
+   claude config reset
+
+   # Re-apply optimizations
+   ./claude-conf-optimized.sh --profile personal
+   ```
+
+2. **Profile-specific issues:**
+   ```bash
+   # Try different profile
+   ./claude-conf-optimized.sh --profile prod --dry-run
+
+   # Check profile validation
+   CLAUDE_PROFILE=dev ./claude-conf-optimized.sh --dry-run
+   ```
+
+### Shell Performance Issues
+
+**Problem:** Shell startup is slow after optimization.
+
+**Solutions:**
+1. **Profile shell startup:**
+   ```bash
+   # Add to .zshrc temporarily
+   zmodload zsh/zprof
+   # ... restart shell ...
+   zprof  # See timing breakdown
+   ```
+
+2. **Check for problematic plugins:**
+   ```bash
+   # Disable Oh-My-Zsh plugins temporarily
+   mv ~/.oh-my-zsh ~/.oh-my-zsh.disabled
+   # Test startup time
+   time zsh -i -c exit
+   ```
+
+3. **Optimize lazy loading:**
+   ```bash
+   # Check if version managers are using lazy loading
+   grep -E "(nvm|rbenv|pyenv)" ~/.zshrc
+   ```
+
+### Nix Configuration Problems
+
+**Problem:** Nix operations slow or failing after optimization.
+
+**Solutions:**
+1. **Check Nix configuration syntax:**
+   ```bash
+   sudo nix show-config
+   # Look for any error messages
+   ```
+
+2. **Restore default Nix config:**
+   ```bash
+   sudo cp /etc/nix/nix.conf /etc/nix/nix.conf.backup
+   sudo tee /etc/nix/nix.conf << EOF
+   experimental-features = nix-command flakes
+   EOF
+   sudo launchctl kickstart -k system/org.nixos.nix-daemon
+   ```
+
+3. **Check disk space and store health:**
+   ```bash
+   df -h /nix
+   nix store verify --all
+   ```
+
+## Performance Monitoring
+
+### Continuous Performance Tracking
+
+**Set up monitoring:**
+```bash
+# Create performance baseline
+./shell-performance-benchmark.sh > baseline_$(date +%Y%m%d).txt
+
+# Schedule regular benchmarks
+echo "0 6 * * 1 cd $(pwd) && ./shell-performance-benchmark.sh > weekly_benchmark_\$(date +\%Y\%m\%d).txt" | crontab -
+```
+
+### Performance Regression Detection
+
+**Check for regressions:**
+```bash
+# Compare current performance to baseline
+./scripts/performance-compare.sh baseline_20250714.txt
+
+# Monitor resource usage
+top -l 1 | head -20
+vm_stat
+```
+
+### Memory Usage Issues
+
+**Problem:** High memory usage after optimizations.
+
+**Solutions:**
+1. **Check memory hogs:**
+   ```bash
+   ps aux | sort -k 4 -nr | head -10
+   ```
+
+2. **Clear caches aggressively:**
+   ```bash
+   sudo purge
+   ./scripts/cleanup.sh --cache-retention 0
+   ```
+
+3. **Adjust Nix settings:**
+   ```bash
+   # Reduce parallel builds
+   echo "max-jobs = 2" | sudo tee -a /etc/nix/nix.conf
+   ```
+
+## Maintenance Automation
+
+### Automated Health Checks
+
+**Set up monitoring scripts:**
+```bash
+# Daily health check
+echo "0 2 * * * cd $(pwd) && ./scripts/health-check.sh --alert" | crontab -
+
+# Weekly cleanup
+echo "0 3 * * 0 cd $(pwd) && ./scripts/cleanup.sh" | crontab -
+
+# Monthly optimization review
+echo "0 1 1 * * cd $(pwd) && ./scripts/optimize.sh --dry-run --profile balanced" | crontab -
+```
+
+### Log Monitoring
+
+**Check system logs for issues:**
+```bash
+# Recent errors
+sudo log show --predicate 'eventMessage contains "error"' --last 1h
+
+# Nix-specific logs
+sudo log show --predicate 'process == "nix-daemon"' --last 1h
+
+# Performance-related logs
+sudo log show --predicate 'eventMessage contains "performance"' --last 24h
+```
+
+## Emergency Recovery
+
+### Complete System Reset
+
+**If optimizations cause major issues:**
+
+1. **Safe mode boot:** Hold Shift during startup
+2. **Reset configurations:**
+   ```bash
+   # Reset shell config
+   cp /etc/zshrc ~/.zshrc
+
+   # Reset Nix config
+   sudo rm /etc/nix/nix.conf
+   sudo /nix/var/nix/profiles/default/bin/nix-env --install nix
+
+   # Reset Claude config
+   rm ~/.claude.json
+   ```
+
+3. **Reinstall if necessary:**
+   ```bash
+   # Reinstall nix-darwin
+   darwin-rebuild switch --flake .#Lars-MacBook-Air
+   ```
+
+### Data Recovery
+
+**Recover important data:**
+```bash
+# Find all backup directories
+find . -name "*backup*" -type d
+
+# List recent backups
+ls -la *optimization-backup-*
+
+# Check git history for configuration changes
+git log --oneline --since="1 week ago" -- dotfiles/ scripts/
+```
+
 ## Preventive Measures
 
 1. **Regular maintenance:**
    ```bash
    # Weekly cleanup
+   ./scripts/cleanup.sh --backup-retention 30
    nix-collect-garbage -d
    brew cleanup
 
    # Monthly updates
    nix flake update
    darwin-rebuild switch --flake .#Lars-MacBook-Air
+
+   # Quarterly optimization review
+   ./scripts/optimize.sh --dry-run --profile balanced
    ```
 
 2. **Backup important configs:**
    - This entire repository
    - SSH keys (backed up via Secretive)
    - Application settings not managed by Nix
+   - Performance baselines and benchmarks
 
 3. **Test changes:**
    ```bash
    # Always test before applying
    nix flake check
    darwin-rebuild check --flake .#Lars-MacBook-Air
+   ./scripts/optimize.sh --dry-run
+   ```
+
+4. **Monitor performance:**
+   ```bash
+   # Create performance baselines
+   ./shell-performance-benchmark.sh > performance_baseline.txt
+
+   # Regular performance checks
+   ./scripts/health-check.sh --comprehensive
    ```

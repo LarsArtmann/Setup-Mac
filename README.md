@@ -44,7 +44,7 @@ After installation, you'll have access to 100+ development tools including:
 
 **Languages & Runtimes:**
 - Go (with templ, sqlc, go-tools)
-- Node.js, Bun, pnpm 
+- Node.js, Bun, pnpm
 - Java (JDK 21), Kotlin
 - .NET Core SDK, Ruby, Rust
 - Python utilities (uv)
