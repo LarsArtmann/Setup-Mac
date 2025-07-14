@@ -148,36 +148,36 @@ list-backups:
 
 # Restore from a backup
 restore BACKUP_NAME:
-    @echo "🔄 Restoring from backup: {{BACKUP_NAME}}"
-    #!/usr/bin/env bash
-    BACKUP_PATH="backups/{{BACKUP_NAME}}"
-    if [ ! -d "$BACKUP_PATH" ]; then
-        echo "❌ Backup not found: $BACKUP_PATH"
-        exit 1
-    fi
-    
-    # Create safety backup first
-    just auto-backup
-    
-    # Restore dotfiles
-    if [ -d "$BACKUP_PATH/dotfiles" ]; then
-        echo "Restoring dotfiles..."
-        cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
-    fi
-    
-    # Restore other files
-    if [ -f "$BACKUP_PATH/justfile" ]; then
-        echo "Restoring justfile..."
-        cp "$BACKUP_PATH/justfile" .
-    fi
-    
-    if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
-        echo "Restoring manual-linking.sh..."
-        cp "$BACKUP_PATH/manual-linking.sh" .
-    fi
-    
-    echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
-    echo "💡 Original state backed up automatically before restore."
+	@echo "🔄 Restoring from backup: {{BACKUP_NAME}}"
+	#!/usr/bin/env bash
+	BACKUP_PATH="backups/{{BACKUP_NAME}}"
+	if [ ! -d "$BACKUP_PATH" ]; then
+	echo "❌ Backup not found: $BACKUP_PATH"
+	exit 1
+	fi
+	
+	# Create safety backup first
+	just auto-backup
+	
+	# Restore dotfiles
+	if [ -d "$BACKUP_PATH/dotfiles" ]; then
+	echo "Restoring dotfiles..."
+	cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
+	fi
+	
+	# Restore other files
+	if [ -f "$BACKUP_PATH/justfile" ]; then
+	echo "Restoring justfile..."
+	cp "$BACKUP_PATH/justfile" .
+	fi
+	
+	if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
+	echo "Restoring manual-linking.sh..."
+	cp "$BACKUP_PATH/manual-linking.sh" .
+	fi
+	
+	echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
+	echo "💡 Original state backed up automatically before restore."
 
 # Clean old backups (keep last 10)
 clean-backups:
@@ -315,6 +315,36 @@ health:
     @echo ""
     @echo "✅ Health check complete"
 
+# Configure Claude AI settings using the Go tool
+claude-config profile="personal" *ARGS="":
+    @echo "🤖 Configuring Claude AI with profile: {{profile}}"
+    better-claude configure --profile {{profile}} {{ARGS}}
+    @echo "✅ Claude configuration complete"
+
+# Configure Claude AI with backup (recommended for production)
+claude-config-safe profile="personal" *ARGS="":
+    @echo "🤖 Configuring Claude AI with profile: {{profile}} (with backup)"
+    better-claude configure --profile {{profile}} --backup {{ARGS}}
+    @echo "✅ Claude configuration complete with backup"
+
+# Create a backup of current Claude configuration
+claude-backup profile="personal":
+    @echo "💾 Creating Claude configuration backup for profile: {{profile}}"
+    better-claude backup --profile {{profile}}
+    @echo "✅ Backup complete"
+
+# Restore Claude configuration from backup
+claude-restore backup_file:
+    @echo "🔄 Restoring Claude configuration from: {{backup_file}}"
+    better-claude restore {{backup_file}}
+    @echo "✅ Restore complete"
+
+# Test Claude configuration (dry-run mode)
+claude-test profile="personal":
+    @echo "🧪 Testing Claude configuration for profile: {{profile}} (dry-run)"
+    better-claude configure --profile {{profile}} --dry-run
+    @echo "✅ Test complete - no changes made"
+
 # Show help with detailed descriptions
 help:
     @echo "Setup-Mac Task Runner"
@@ -345,6 +375,13 @@ help:
     @echo ""
     @echo "Environment:"
     @echo "  env-private    - Create private environment file for secrets"
+    @echo ""
+    @echo "Claude AI Configuration:"
+    @echo "  claude-config         - Configure Claude AI with specified profile"
+    @echo "  claude-config-safe    - Configure Claude AI with backup (recommended)"
+    @echo "  claude-backup         - Create backup of current Claude configuration"
+    @echo "  claude-restore        - Restore Claude configuration from backup"
+    @echo "  claude-test           - Test Claude configuration (dry-run mode)"
     @echo ""
     @echo "Git & Pre-commit:"
     @echo "  pre-commit-install - Install pre-commit hooks"

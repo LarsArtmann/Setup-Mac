@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./manual-linking.sh:*)",
+      "Bash(readlink:*)",
+      "Bash(starship config:*)",
+      "Bash(starship:*)",
+      "Bash(source:*)",
+      "Bash(nh darwin switch:*)",
+      "Bash(./claude-conf.sh)",
+      "Bash(./claude-conf.sh:*)",
+      "Bash(time:*)",
+      "Bash(./better-claude --help)",
+      "Bash(./better-claude --dry-run --profile dev)",
+      "Bash(./better-claude:*)",
+      "Bash(nix search:*)",
+      "Bash(nu:*)",
+      "Bash(pre-commit:*)"
+    ],
+    "deny": []
+  }
+}
