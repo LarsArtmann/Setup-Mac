@@ -68,6 +68,7 @@ in
         # Programming languages and runtimes
         go
         templ # Go HTML template language and tool
+        go-tools # Go static analysis tools (staticcheck.dev)
         jdk # Java Development Kit (JDK 21)
         kotlin
         nodejs # Node.js JavaScript runtime
@@ -208,6 +209,7 @@ in
 
         # Media
         # vlc # Media player - temporarily disabled
+        tidal-hifi # Web version of Tidal running in electron with hifi support
 
         # Communication
         telegram-desktop # Messaging app
@@ -239,6 +241,7 @@ in
     ];
     shellAliases = {
       l = "ls -la";
+      t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
       diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
