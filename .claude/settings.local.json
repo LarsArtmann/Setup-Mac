@@ -37,7 +37,9 @@
       "Bash(redis-server:*)",
       "Bash(bat:*)",
       "Bash(fzf:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(./scripts/optimize.sh:*)",
+      "Bash(env)"
     ],
     "deny": []
   }
