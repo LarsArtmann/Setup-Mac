@@ -1,0 +1,39 @@
+# treefmt configuration for Setup-Mac project
+# Universal code formatter configuration
+
+# [formatter.nix]
+# command = "nixfmt"
+# includes = ["*.nix"]
+# Note: nixfmt not available in PATH, disabled for now
+
+[formatter.go]
+command = "gofmt"
+options = ["-w"]
+includes = ["*.go"]
+
+# [formatter.javascript]
+# command = "prettier"
+# options = ["--write"]
+# includes = ["*.js", "*.ts", "*.jsx", "*.tsx", "*.json", "*.yaml", "*.yml", "*.md"]
+# Note: prettier not in standard PATH, disabled for now
+
+# [formatter.shell]
+# command = "shfmt"
+# options = ["-w", "-i", "2"]
+# includes = ["*.sh", "*.bash"]
+# Note: shfmt not available in nix packages, disabled for now
+
+# Global settings
+[global]
+excludes = [
+    "*.lock",
+    "node_modules/",
+    ".git/",
+    "target/",
+    "build/",
+    "dist/",
+    ".next/",
+    ".cache/",
+    "backups/",
+    "*.log"
+]

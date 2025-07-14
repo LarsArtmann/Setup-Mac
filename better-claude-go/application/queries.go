@@ -127,15 +127,15 @@ func (q GetConfigurationHistoryQuery) Validate() error {
 
 // ConfigurationProjection represents the read model for a configuration
 type ConfigurationProjection struct {
-	ID                string                       `json:"id"`
-	Profile           string                       `json:"profile"`
-	Settings          map[string]string            `json:"settings"`
-	EnvVariables      map[string]string            `json:"env_variables"`
-	Version           int                          `json:"version"`
-	CreatedAt         time.Time                    `json:"created_at"`
-	LastModifiedAt    time.Time                    `json:"last_modified_at"`
-	LastBackupPath    string                       `json:"last_backup_path,omitempty"`
-	ValidationStatus  ValidationStatusProjection   `json:"validation_status"`
+	ID               string                     `json:"id"`
+	Profile          string                     `json:"profile"`
+	Settings         map[string]string          `json:"settings"`
+	EnvVariables     map[string]string          `json:"env_variables"`
+	Version          int                        `json:"version"`
+	CreatedAt        time.Time                  `json:"created_at"`
+	LastModifiedAt   time.Time                  `json:"last_modified_at"`
+	LastBackupPath   string                     `json:"last_backup_path,omitempty"`
+	ValidationStatus ValidationStatusProjection `json:"validation_status"`
 }
 
 // ValidationStatusProjection represents the validation status in the read model
@@ -148,11 +148,11 @@ type ValidationStatusProjection struct {
 
 // ProfileProjection represents the read model for a profile
 type ProfileProjection struct {
-	Name         string            `json:"name"`
-	DisplayName  string            `json:"display_name"`
-	Description  string            `json:"description"`
-	Settings     map[string]string `json:"settings"`
-	IsDefault    bool              `json:"is_default"`
+	Name        string            `json:"name"`
+	DisplayName string            `json:"display_name"`
+	Description string            `json:"description"`
+	Settings    map[string]string `json:"settings"`
+	IsDefault   bool              `json:"is_default"`
 }
 
 // EventProjection represents a domain event in the read model
@@ -278,7 +278,7 @@ func (h *GetAllConfigurationsQueryHandler) Handle(ctx context.Context, query Que
 
 	projections := make([]*ConfigurationProjection, len(configs))
 	getHandler := &GetConfigurationQueryHandler{repo: h.repo}
-	
+
 	for i, config := range configs {
 		projections[i] = getHandler.toProjection(config)
 	}
@@ -323,11 +323,11 @@ func (h *GetAvailableProfilesQueryHandler) Handle(ctx context.Context, query Que
 		}
 
 		projections[i] = &ProfileProjection{
-			Name:         profile.Value(),
-			DisplayName:  h.getDisplayName(profile),
-			Description:  h.getDescription(profile),
-			Settings:     settingsMap,
-			IsDefault:    profile.IsEqual(domain.ProfilePersonal),
+			Name:        profile.Value(),
+			DisplayName: h.getDisplayName(profile),
+			Description: h.getDescription(profile),
+			Settings:    settingsMap,
+			IsDefault:   profile.IsEqual(domain.ProfilePersonal),
 		}
 	}
 

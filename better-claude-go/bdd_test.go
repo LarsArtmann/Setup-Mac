@@ -17,19 +17,19 @@ type BDDTestContext struct {
 	mockConfigReader  *MockConfigReader
 	mockConfigWriter  *MockConfigWriter
 	mockBackupManager *MockBackupManager
-	
-	profile         Profile
-	enableDryRun    bool
-	enableBackup    bool
-	forwardArgs     []string
-	lastError       error
-	lastConfig      *Config
+
+	profile          Profile
+	enableDryRun     bool
+	enableBackup     bool
+	forwardArgs      []string
+	lastError        error
+	lastConfig       *Config
 	validationErrors ValidationErrors
-	
+
 	// For validation scenarios
-	testProfile    Profile
-	testConfig     Config
-	testOptions    ApplicationOptions
+	testProfile Profile
+	testConfig  Config
+	testOptions ApplicationOptions
 }
 
 func (ctx *BDDTestContext) resetContext() {
@@ -37,7 +37,7 @@ func (ctx *BDDTestContext) resetContext() {
 	ctx.mockConfigReader = NewMockConfigReader()
 	ctx.mockConfigWriter = NewMockConfigWriter()
 	ctx.mockBackupManager = NewMockBackupManager()
-	
+
 	ctx.profile = ""
 	ctx.enableDryRun = false
 	ctx.enableBackup = false
@@ -45,7 +45,7 @@ func (ctx *BDDTestContext) resetContext() {
 	ctx.lastError = nil
 	ctx.lastConfig = nil
 	ctx.validationErrors = ValidationErrors{}
-	
+
 	ctx.testProfile = ""
 	ctx.testConfig = Config{}
 	ctx.testOptions = ApplicationOptions{}
@@ -59,7 +59,7 @@ func (ctx *BDDTestContext) createConfigurator() {
 		Help:         false,
 		ForwardArgs:  ctx.forwardArgs,
 	}
-	
+
 	ctx.configurator = &ClaudeConfigurator{
 		configReader:   ctx.mockConfigReader,
 		configWriter:   ctx.mockConfigWriter,
@@ -137,7 +137,7 @@ func (ctx *BDDTestContext) theConfigurationShouldBePreviewed() error {
 	if len(ctx.mockLogger.WarningMessages) == 0 {
 		return fmt.Errorf("expected dry run messages, but none found")
 	}
-	
+
 	dryRunFound := false
 	for _, msg := range ctx.mockLogger.WarningMessages {
 		if strings.Contains(msg, "[DRY-RUN]") {
@@ -145,11 +145,11 @@ func (ctx *BDDTestContext) theConfigurationShouldBePreviewed() error {
 			break
 		}
 	}
-	
+
 	if !dryRunFound {
 		return fmt.Errorf("expected [DRY-RUN] messages, but none found")
 	}
-	
+
 	return nil
 }
 
@@ -194,17 +194,17 @@ func (ctx *BDDTestContext) theParallelTasksCountShouldBe(count string) error {
 	if exists && writtenValue == count {
 		return nil
 	}
-	
+
 	// If not written, check if current config already matches (no change needed)
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.ParallelTasksCount == count {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected parallel tasks count to be '%s', but got '%s'", count, currentConfig.ParallelTasksCount)
 }
 
@@ -213,16 +213,16 @@ func (ctx *BDDTestContext) theThemeShouldBe(theme string) error {
 	if exists && writtenValue == theme {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.Theme == theme {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected theme to be '%s', but got '%s'", theme, currentConfig.Theme)
 }
 
@@ -231,16 +231,16 @@ func (ctx *BDDTestContext) theNotificationChannelShouldBe(channel string) error 
 	if exists && writtenValue == channel {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.PreferredNotifChannel == channel {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected notification channel to be '%s', but got '%s'", channel, currentConfig.PreferredNotifChannel)
 }
 
@@ -249,16 +249,16 @@ func (ctx *BDDTestContext) theTelemetryShouldBeEnabled() error {
 	if exists && telemetryValue == "1" {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.Env["CLAUDE_CODE_ENABLE_TELEMETRY"] == "1" {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected telemetry to be enabled (CLAUDE_CODE_ENABLE_TELEMETRY=1)")
 }
 
@@ -267,16 +267,16 @@ func (ctx *BDDTestContext) theTelemetryShouldBeDisabled() error {
 	if exists && telemetryValue == "0" {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.Env["CLAUDE_CODE_ENABLE_TELEMETRY"] == "0" {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected telemetry to be disabled (CLAUDE_CODE_ENABLE_TELEMETRY=0)")
 }
 
@@ -299,16 +299,16 @@ func (ctx *BDDTestContext) editorShouldBeSetTo(value string) error {
 	if exists && editorValue == value {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.Env["EDITOR"] == value {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected EDITOR to be '%s'", value)
 }
 
@@ -317,16 +317,16 @@ func (ctx *BDDTestContext) claudeCodeEnableTelemetryShouldBeSetTo(value string) 
 	if exists && telemetryValue == value {
 		return nil
 	}
-	
+
 	currentConfig, err := ctx.mockConfigReader.ReadConfig()
 	if err != nil {
 		return err
 	}
-	
+
 	if currentConfig.Env["CLAUDE_CODE_ENABLE_TELEMETRY"] == value {
 		return nil
 	}
-	
+
 	return fmt.Errorf("expected CLAUDE_CODE_ENABLE_TELEMETRY to be '%s'", value)
 }
 
@@ -352,11 +352,11 @@ func (ctx *BDDTestContext) claudeShouldBeStartedWithTheForwardedArguments() erro
 			break
 		}
 	}
-	
+
 	if !claudeStartFound {
 		return fmt.Errorf("expected claude to be started with forwarded arguments")
 	}
-	
+
 	return nil
 }
 
@@ -479,12 +479,12 @@ func (ctx *BDDTestContext) theErrorShouldMentionValidation(message string) error
 	if !ctx.validationErrors.HasErrors() {
 		return fmt.Errorf("expected validation errors mentioning '%s', but no errors found", message)
 	}
-	
+
 	errorMsg := ctx.validationErrors.Error()
 	if !strings.Contains(errorMsg, message) {
 		return fmt.Errorf("expected validation error to contain '%s', but got: %v", message, errorMsg)
 	}
-	
+
 	return nil
 }
 
@@ -519,7 +519,7 @@ func (ctx *BDDTestContext) allErrorsShouldBeProperlyFormatted() error {
 // Test runner for BDD tests
 func TestBDDFeatures(t *testing.T) {
 	ctx := &BDDTestContext{}
-	
+
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(sc *godog.ScenarioContext) {
 			// Configuration feature steps
@@ -531,10 +531,10 @@ func TestBDDFeatures(t *testing.T) {
 			sc.Given(`^I enable backup creation$`, ctx.iEnableBackupCreation)
 			sc.Given(`^I have arguments to forward: "([^"]*)"$`, ctx.iHaveArgumentsToForward)
 			sc.Given(`^I want to see help information$`, ctx.iWantToSeeHelpInformation)
-			
+
 			sc.When(`^I run the configuration command$`, ctx.iRunTheConfigurationCommand)
 			sc.When(`^I run the help command$`, ctx.iRunTheHelpCommand)
-			
+
 			sc.Then(`^the configuration should be applied successfully$`, ctx.theConfigurationShouldBeAppliedSuccessfully)
 			sc.Then(`^the configuration should be previewed$`, ctx.theConfigurationShouldBePreviewed)
 			sc.Then(`^no changes should be applied$`, ctx.noChangesShouldBeApplied)
@@ -554,7 +554,7 @@ func TestBDDFeatures(t *testing.T) {
 			sc.Then(`^available profiles should be listed$`, ctx.availableProfilesShouldBeListed)
 			sc.Then(`^command options should be explained$`, ctx.commandOptionsShouldBeExplained)
 			sc.Then(`^Claude should be started with the forwarded arguments$`, ctx.claudeShouldBeStartedWithTheForwardedArguments)
-			
+
 			// Validation feature steps
 			sc.Given(`^the validation system is available$`, ctx.theValidationSystemIsAvailable)
 			sc.Given(`^I have a profile "([^"]*)"$`, ctx.iHaveAProfile)
@@ -570,11 +570,11 @@ func TestBDDFeatures(t *testing.T) {
 			sc.Given(`^I have a configuration with multiple errors$`, ctx.iHaveAConfigurationWithMultipleErrors)
 			sc.Given(`^I have a valid configuration$`, ctx.iHaveAValidConfiguration)
 			sc.Given(`^I have an invalid configuration with wrong theme$`, ctx.iHaveAnInvalidConfigurationWithWrongTheme)
-			
+
 			sc.When(`^I validate the profile$`, ctx.iValidateTheProfile)
 			sc.When(`^I validate the configuration$`, ctx.iValidateTheConfiguration)
 			sc.When(`^I validate the application options$`, ctx.iValidateTheApplicationOptions)
-			
+
 			sc.Then(`^the validation should "([^"]*)"$`, func(result string) error {
 				if result == "pass" {
 					return ctx.theValidationShouldPass()
@@ -597,7 +597,7 @@ func TestBDDFeatures(t *testing.T) {
 			TestingT: t,
 		},
 	}
-	
+
 	if suite.Run() != 0 {
 		t.Fatal("non-zero status returned, failed to run feature tests")
 	}

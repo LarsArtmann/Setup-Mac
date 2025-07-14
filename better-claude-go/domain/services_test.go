@@ -268,7 +268,7 @@ func (suite *DomainServicesTestSuite) TestProfileMigrationService_CalculateMigra
 	changes := suite.migrationService.CalculateMigrationChanges(*devProfile, *prodProfile)
 
 	assert.NotEmpty(suite.T(), changes, "Migration between different profiles should have changes")
-	
+
 	// Verify specific expected changes between dev and prod profiles
 	found := false
 	for _, change := range changes {
@@ -311,7 +311,7 @@ func (suite *DomainServicesTestSuite) TestProfileMigrationService_GetMigrationRi
 	risks := suite.migrationService.GetMigrationRisks(*devProfile, *prodProfile)
 
 	assert.NotEmpty(suite.T(), risks, "Migration from dev to prod should have risks")
-	
+
 	// Check for performance-related risks
 	foundPerformanceRisk := false
 	for _, risk := range risks {
@@ -331,7 +331,7 @@ func (suite *DomainServicesTestSuite) TestProfileMigrationService_GetMigrationRi
 
 	// Should have fewer or lower severity risks
 	assert.NotEmpty(suite.T(), risks, "Migration should still have some risks")
-	
+
 	// Verify risk levels are appropriate
 	for _, risk := range risks {
 		assert.Contains(suite.T(), []string{"low", "medium"}, risk.Level, "Risk level should be low or medium")
@@ -398,7 +398,7 @@ func (suite *DomainServicesTestSuite) TestDomainServices_ThreadSafety() {
 
 	assert.NoError(suite.T(), err1)
 	assert.NoError(suite.T(), err2)
-	
+
 	// Both services should behave identically
 	invalidValue, _ := NewConfigValue("invalid")
 	err1 = service1.ValidateTheme(*invalidValue)

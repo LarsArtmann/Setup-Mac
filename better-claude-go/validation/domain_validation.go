@@ -479,7 +479,7 @@ func NewSecurityValidator() *SecurityValidator {
 		regexp.MustCompile(`<script[^>]*>.*?</script>`), // XSS
 		regexp.MustCompile(`javascript:`),               // JavaScript protocol
 		regexp.MustCompile(`data:.*script`),             // Data URLs with script
-		regexp.MustCompile(`[;&|`+"`"+`]`),              // Command injection characters
+		regexp.MustCompile(`[;&|` + "`" + `]`),          // Command injection characters
 		regexp.MustCompile(`\$\{.*?\}`),                 // Template injection
 		regexp.MustCompile(`\{\{.*?\}\}`),               // Template injection
 		regexp.MustCompile(`\.\./`),                     // Path traversal

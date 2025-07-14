@@ -14,7 +14,7 @@ type ApplicationOptions struct {
 // Config alias for easier importing in tests
 type Config = config.Config
 
-// Profile alias for easier importing in tests  
+// Profile alias for easier importing in tests
 type Profile = config.Profile
 
 // ConfigKey alias for easier importing in tests
@@ -35,7 +35,7 @@ var (
 
 // ConfigKey constants for easier access
 var (
-	KeyTheme                        = config.KeyTheme
+	KeyTheme                       = config.KeyTheme
 	KeyParallelTasksCount          = config.KeyParallelTasksCount
 	KeyPreferredNotifChannel       = config.KeyPreferredNotifChannel
 	KeyMessageIdleNotifThresholdMs = config.KeyMessageIdleNotifThresholdMs

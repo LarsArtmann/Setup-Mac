@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"better-claude/internal/functional"
+	"testing"
 )
 
 func TestResultTypes(t *testing.T) {
@@ -47,7 +47,7 @@ func TestFunctionalComposition(t *testing.T) {
 	// Test Map function
 	initial := functional.Success(5)
 	doubled := functional.Map(initial, func(i int) int { return i * 2 })
-	
+
 	if !doubled.IsSuccess() {
 		t.Error("Expected mapped result to be successful")
 	}
@@ -59,7 +59,7 @@ func TestFunctionalComposition(t *testing.T) {
 	squared := functional.FlatMap(doubled, func(i int) functional.Result[int] {
 		return functional.Success(i * i)
 	})
-	
+
 	if !squared.IsSuccess() {
 		t.Error("Expected flatmapped result to be successful")
 	}
@@ -72,7 +72,7 @@ func TestErrorRecovery(t *testing.T) {
 	// Test recovery from failure
 	failed := functional.Failure[string](functional.NewError("initial error"))
 	recovered := failed.Recover(func(error) string { return "recovered" })
-	
+
 	if !recovered.IsSuccess() {
 		t.Error("Expected recovered result to be successful")
 	}
@@ -86,7 +86,7 @@ func TestTryFunction(t *testing.T) {
 	successResult := functional.Try(func() (string, error) {
 		return "success", nil
 	})
-	
+
 	if !successResult.IsSuccess() {
 		t.Error("Expected Try result to be successful")
 	}
@@ -98,7 +98,7 @@ func TestTryFunction(t *testing.T) {
 	failResult := functional.Try(func() (string, error) {
 		return "", functional.NewError("try failed")
 	})
-	
+
 	if !failResult.IsFailure() {
 		t.Error("Expected Try result to be failure")
 	}

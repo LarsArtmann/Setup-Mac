@@ -80,7 +80,7 @@ Profiles available:
 
 		// Configure Claude settings using functional programming patterns
 		settingsMap := map[config.ConfigKey]string{
-			config.KeyTheme:                        profileConfig.Config.Theme,
+			config.KeyTheme:                       profileConfig.Config.Theme,
 			config.KeyParallelTasksCount:          profileConfig.Config.ParallelTasksCount,
 			config.KeyPreferredNotifChannel:       profileConfig.Config.PreferredNotifChannel,
 			config.KeyMessageIdleNotifThresholdMs: profileConfig.Config.MessageIdleNotifThresholdMs,

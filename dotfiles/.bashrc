@@ -1,8 +1,5 @@
 # Keep this empty
 # Using PATH from nix-darwin instead of modifying it here
+# All PATH modifications are now consolidated in dotfiles/nix/environment.nix
 
-# Turso 
-export PATH="$PATH:/Users/larsartmann/.turso"
-export PATH="$PATH:/Users/larsartmann/.opencode/bin"
-export PATH="$PATH:/Users/larsartmann/.local/bin"
 export GH_PAGER=""

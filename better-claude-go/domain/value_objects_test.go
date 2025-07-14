@@ -15,8 +15,8 @@ type ValueObjectsTestSuite struct {
 // Profile Value Object Tests
 func (suite *ValueObjectsTestSuite) TestProfile_NewProfile_ValidValues() {
 	validProfiles := []string{
-		"dev", "development", 
-		"prod", "production", 
+		"dev", "development",
+		"prod", "production",
 		"personal", "default",
 		"DEV", "DEVELOPMENT", // Test case normalization
 		"  prod  ", // Test whitespace trimming
@@ -24,7 +24,7 @@ func (suite *ValueObjectsTestSuite) TestProfile_NewProfile_ValidValues() {
 
 	for _, profileValue := range validProfiles {
 		profile, err := NewProfile(profileValue)
-		
+
 		assert.NoError(suite.T(), err, "Profile '%s' should be valid", profileValue)
 		assert.NotNil(suite.T(), profile)
 		assert.NotEmpty(suite.T(), profile.Value())
@@ -38,7 +38,7 @@ func (suite *ValueObjectsTestSuite) TestProfile_NewProfile_InvalidValues() {
 
 	for _, profileValue := range invalidProfiles {
 		profile, err := NewProfile(profileValue)
-		
+
 		assert.Error(suite.T(), err, "Profile '%s' should be invalid", profileValue)
 		assert.Nil(suite.T(), profile)
 		assert.Contains(suite.T(), err.Error(), "invalid profile")
@@ -60,7 +60,7 @@ func (suite *ValueObjectsTestSuite) TestProfile_Normalization() {
 
 	for _, tc := range testCases {
 		profile, err := NewProfile(tc.input)
-		
+
 		assert.NoError(suite.T(), err)
 		assert.Equal(suite.T(), tc.expected, profile.Value())
 	}
@@ -92,7 +92,7 @@ func (suite *ValueObjectsTestSuite) TestProfile_TypeCheckers() {
 
 	for _, tc := range testCases {
 		profile, _ := NewProfile(tc.profileValue)
-		
+
 		assert.Equal(suite.T(), tc.isDev, profile.IsDevelopment(), "Profile %s development check", tc.profileValue)
 		assert.Equal(suite.T(), tc.isProd, profile.IsProduction(), "Profile %s production check", tc.profileValue)
 		assert.Equal(suite.T(), tc.isPersonal, profile.IsPersonal(), "Profile %s personal check", tc.profileValue)
@@ -101,7 +101,7 @@ func (suite *ValueObjectsTestSuite) TestProfile_TypeCheckers() {
 
 func (suite *ValueObjectsTestSuite) TestProfile_StringRepresentation() {
 	profile, _ := NewProfile("dev")
-	
+
 	assert.Equal(suite.T(), "dev", profile.String())
 	assert.Equal(suite.T(), "dev", profile.Value())
 }
@@ -125,7 +125,7 @@ func (suite *ValueObjectsTestSuite) TestConfigKey_NewConfigKey_ValidValues() {
 
 	for _, keyValue := range validKeys {
 		key, err := NewConfigKey(keyValue)
-		
+
 		assert.NoError(suite.T(), err, "ConfigKey '%s' should be valid", keyValue)
 		assert.NotNil(suite.T(), key)
 		assert.NotEmpty(suite.T(), key.Value())
@@ -134,14 +134,14 @@ func (suite *ValueObjectsTestSuite) TestConfigKey_NewConfigKey_ValidValues() {
 
 func (suite *ValueObjectsTestSuite) TestConfigKey_NewConfigKey_InvalidValues() {
 	invalidKeys := []string{
-		"", " ", "key with spaces", "key-with-dashes", 
+		"", " ", "key with spaces", "key-with-dashes",
 		"key.with.dots", "key@with@symbols", "key/with/slashes",
 		"key with\ttabs", "key\nwith\nnewlines",
 	}
 
 	for _, keyValue := range invalidKeys {
 		key, err := NewConfigKey(keyValue)
-		
+
 		assert.Error(suite.T(), err, "ConfigKey '%s' should be invalid", keyValue)
 		assert.Nil(suite.T(), key)
 	}
@@ -149,7 +149,7 @@ func (suite *ValueObjectsTestSuite) TestConfigKey_NewConfigKey_InvalidValues() {
 
 func (suite *ValueObjectsTestSuite) TestConfigKey_Trimming() {
 	key, err := NewConfigKey("  validKey  ")
-	
+
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), "validKey", key.Value())
 }
@@ -165,7 +165,7 @@ func (suite *ValueObjectsTestSuite) TestConfigKey_Equality() {
 
 func (suite *ValueObjectsTestSuite) TestConfigKey_StringRepresentation() {
 	key, _ := NewConfigKey("theme")
-	
+
 	assert.Equal(suite.T(), "theme", key.String())
 	assert.Equal(suite.T(), "theme", key.Value())
 }
@@ -183,13 +183,13 @@ func (suite *ValueObjectsTestSuite) TestConfigKey_Constants() {
 // ConfigValue Value Object Tests
 func (suite *ValueObjectsTestSuite) TestConfigValue_NewConfigValue_Success() {
 	testValues := []string{
-		"", "simple_value", "value with spaces", "123", 
+		"", "simple_value", "value with spaces", "123",
 		"true", "false", "complex-value-123", "🎨",
 	}
 
 	for _, value := range testValues {
 		configValue, err := NewConfigValue(value)
-		
+
 		assert.NoError(suite.T(), err, "ConfigValue should accept any string value")
 		assert.NotNil(suite.T(), configValue)
 		assert.Equal(suite.T(), value, configValue.Value())
@@ -198,8 +198,8 @@ func (suite *ValueObjectsTestSuite) TestConfigValue_NewConfigValue_Success() {
 
 func (suite *ValueObjectsTestSuite) TestConfigValue_IsEmpty() {
 	testCases := []struct {
-		value    string
-		isEmpty  bool
+		value   string
+		isEmpty bool
 	}{
 		{"", true},
 		{" ", true},
@@ -212,7 +212,7 @@ func (suite *ValueObjectsTestSuite) TestConfigValue_IsEmpty() {
 
 	for _, tc := range testCases {
 		configValue, _ := NewConfigValue(tc.value)
-		
+
 		assert.Equal(suite.T(), tc.isEmpty, configValue.IsEmpty(), "Value '%s' empty check", tc.value)
 	}
 }
@@ -228,7 +228,7 @@ func (suite *ValueObjectsTestSuite) TestConfigValue_Equality() {
 
 func (suite *ValueObjectsTestSuite) TestConfigValue_StringRepresentation() {
 	value, _ := NewConfigValue("test_value")
-	
+
 	assert.Equal(suite.T(), "test_value", value.String())
 	assert.Equal(suite.T(), "test_value", value.Value())
 }
@@ -238,7 +238,7 @@ func (suite *ValueObjectsTestSuite) TestValueObjects_Immutability() {
 	// Profile immutability
 	profile, _ := NewProfile("dev")
 	originalValue := profile.Value()
-	
+
 	// Cannot modify the value from outside (it's private)
 	// This test ensures the structure supports immutability
 	assert.Equal(suite.T(), originalValue, profile.Value())
@@ -361,7 +361,7 @@ func (suite *ValueObjectsTestSuite) TestMustCreateProfile_Panic() {
 // Value Object Collections Tests
 func (suite *ValueObjectsTestSuite) TestPredefinedProfiles_Uniqueness() {
 	profiles := []Profile{
-		ProfileDev, ProfileDevelopment, ProfileProd, 
+		ProfileDev, ProfileDevelopment, ProfileProd,
 		ProfileProduction, ProfilePersonal, ProfileDefault,
 	}
 
@@ -395,14 +395,14 @@ func (suite *ValueObjectsTestSuite) TestPredefinedConfigKeys_Uniqueness() {
 func (suite *ValueObjectsTestSuite) TestValueObjects_Performance() {
 	// Test that value object creation is reasonably fast
 	// (This is a basic test; more sophisticated benchmarks could be added)
-	
+
 	for i := 0; i < 1000; i++ {
 		_, err := NewProfile("dev")
 		assert.NoError(suite.T(), err)
-		
+
 		_, err = NewConfigKey("testKey")
 		assert.NoError(suite.T(), err)
-		
+
 		_, err = NewConfigValue("testValue")
 		assert.NoError(suite.T(), err)
 	}

@@ -1,0 +1,136 @@
+graph TB
+    subgraph "Command Layer Events"
+        ConfigureCommandReceived[Configure Command Received]
+        BackupCommandReceived[Backup Command Received]
+        RestoreCommandReceived[Restore Command Received]
+        HealthCheckCommandReceived[Health Check Command Received]
+    end
+
+    subgraph "Domain Events (Event Sourced)"
+        ConfigurationRequested[Configuration Requested]
+        ProfileValidated[Profile Validated]
+        ConfigurationValidated[Configuration Validated]
+        BackupRequested[Backup Requested]
+        ConfigurationApplied[Configuration Applied]
+        BackupCompleted[Backup Completed]
+        RestoreCompleted[Restore Completed]
+        ConfigurationFailed[Configuration Failed]
+        ValidationFailed[Validation Failed]
+    end
+
+    subgraph "Integration Events"
+        ClaudeServiceCalled[Claude Service Called]
+        ClaudeServiceSucceeded[Claude Service Succeeded]
+        ClaudeServiceFailed[Claude Service Failed]
+        FileSystemOperationRequested[File System Operation Requested]
+        FileSystemOperationCompleted[File System Operation Completed]
+        FileSystemOperationFailed[File System Operation Failed]
+        TelemetryEventEmitted[Telemetry Event Emitted]
+    end
+
+    subgraph "Event Store & Message Bus"
+        EventStore[(Event Store)]
+        MessageBus[Watermill Message Bus]
+        EventHandlers[Event Handlers]
+        Projections[Read Model Projections]
+        Sagas[Process Managers/Sagas]
+    end
+
+    subgraph "CQRS Query Events"
+        ProfileQueryExecuted[Profile Query Executed]
+        HealthCheckExecuted[Health Check Executed]
+        BackupListQueryExecuted[Backup List Query Executed]
+        ConfigurationQueryExecuted[Configuration Query Executed]
+    end
+
+    subgraph "Observability Events"
+        MetricEmitted[Metric Emitted]
+        TraceStarted[Trace Started]
+        TraceCompleted[Trace Completed]
+        LogEntryCreated[Log Entry Created]
+        PerformanceMetricRecorded[Performance Metric Recorded]
+    end
+
+    %% Command to Domain Event flow
+    ConfigureCommandReceived --> ConfigurationRequested
+    BackupCommandReceived --> BackupRequested
+    RestoreCommandReceived --> ConfigurationRequested
+    HealthCheckCommandReceived --> HealthCheckExecuted
+
+    %% Domain event processing
+    ConfigurationRequested --> ProfileValidated
+    ProfileValidated --> ConfigurationValidated
+    ConfigurationValidated --> ConfigurationApplied
+    BackupRequested --> BackupCompleted
+
+    %% Event sourcing flow
+    ConfigurationRequested --> EventStore
+    ProfileValidated --> EventStore
+    ConfigurationValidated --> EventStore
+    ConfigurationApplied --> EventStore
+    BackupCompleted --> EventStore
+    RestoreCompleted --> EventStore
+
+    %% Message bus processing
+    EventStore --> MessageBus
+    MessageBus --> EventHandlers
+    MessageBus --> Projections
+    MessageBus --> Sagas
+
+    %% Integration events
+    ConfigurationApplied --> ClaudeServiceCalled
+    ClaudeServiceCalled --> ClaudeServiceSucceeded
+    ClaudeServiceCalled --> ClaudeServiceFailed
+    BackupRequested --> FileSystemOperationRequested
+    FileSystemOperationRequested --> FileSystemOperationCompleted
+    FileSystemOperationRequested --> FileSystemOperationFailed
+
+    %% Error handling through events
+    ClaudeServiceFailed --> ConfigurationFailed
+    FileSystemOperationFailed --> ConfigurationFailed
+    ValidationFailed --> ConfigurationFailed
+
+    %% Query processing
+    ProfileQueryExecuted --> Projections
+    HealthCheckExecuted --> PerformanceMetricRecorded
+    BackupListQueryExecuted --> FileSystemOperationRequested
+    ConfigurationQueryExecuted --> Projections
+
+    %% Observability event flow
+    ConfigurationRequested --> TraceStarted
+    ConfigurationApplied --> TraceCompleted
+    ConfigurationApplied --> MetricEmitted
+    ConfigurationFailed --> LogEntryCreated
+    ClaudeServiceCalled --> PerformanceMetricRecorded
+    PerformanceMetricRecorded --> TelemetryEventEmitted
+
+    %% Saga coordination (process managers)
+    Sagas --> BackupRequested
+    Sagas --> ConfigurationRequested
+    Sagas -.->|"Compensation"| RestoreCompleted
+
+    %% Event replay capabilities
+    EventStore -.->|"Replay Events"| Projections
+    EventStore -.->|"Audit Trail"| LogEntryCreated
+
+    %% Advanced patterns
+    ConfigurationFailed -.->|"Circuit Breaker"| ClaudeServiceCalled
+    ClaudeServiceFailed -.->|"Retry Logic"| ClaudeServiceCalled
+    BackupCompleted -.->|"Cleanup"| FileSystemOperationRequested
+
+    classDef commands fill:#e3f2fd,stroke:#1976d2
+    classDef domainEvents fill:#e8f5e8,stroke:#388e3c
+    classDef integrationEvents fill:#fff3e0,stroke:#f57c00
+    classDef eventSourcing fill:#f3e5f5,stroke:#7b1fa2
+    classDef queries fill:#e0f2f1,stroke:#00695c
+    classDef observability fill:#fce4ec,stroke:#c2185b
+    classDef errors fill:#ffebee,stroke:#d32f2f
+    classDef compensation fill:#f9fbe7,stroke:#827717
+
+    class ConfigureCommandReceived,BackupCommandReceived,RestoreCommandReceived,HealthCheckCommandReceived commands
+    class ConfigurationRequested,ProfileValidated,ConfigurationValidated,BackupRequested,ConfigurationApplied,BackupCompleted,RestoreCompleted domainEvents
+    class ClaudeServiceCalled,ClaudeServiceSucceeded,FileSystemOperationRequested,FileSystemOperationCompleted,TelemetryEventEmitted integrationEvents
+    class EventStore,MessageBus,EventHandlers,Projections,Sagas eventSourcing
+    class ProfileQueryExecuted,HealthCheckExecuted,BackupListQueryExecuted,ConfigurationQueryExecuted queries
+    class MetricEmitted,TraceStarted,TraceCompleted,LogEntryCreated,PerformanceMetricRecorded observability
+    class ConfigurationFailed,ValidationFailed,ClaudeServiceFailed,FileSystemOperationFailed errors

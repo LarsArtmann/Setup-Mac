@@ -46,7 +46,7 @@ func (suite *ConfigurationAggregateTestSuite) TestNewConfiguration_Success() {
 
 func (suite *ConfigurationAggregateTestSuite) TestNewConfiguration_EmptyProfile() {
 	emptyProfile := Profile{value: ""}
-	
+
 	config, err := NewConfiguration(emptyProfile, "testUser")
 
 	assert.Error(suite.T(), err)
@@ -68,7 +68,7 @@ func (suite *ConfigurationAggregateTestSuite) TestChangeConfiguration_Success() 
 
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), config.UncommittedEvents(), 1)
-	
+
 	// Verify the setting was changed
 	setting, exists := config.GetSetting(ConfigKeyTheme)
 	assert.True(suite.T(), exists)
@@ -211,7 +211,7 @@ func (suite *ConfigurationAggregateTestSuite) TestLoadFromHistory_Success() {
 	// Create some events to replay
 	newProfile, _ := NewProfile("prod")
 	newValue, _ := NewConfigValue("light")
-	
+
 	events := []DomainEvent{
 		NewConfigurationCreated(originalID, suite.testProfile, config.Settings(), "testUser", 1),
 		NewConfigurationChanged(originalID, ConfigKeyTheme, *newValue, *newValue, "testUser", suite.testProfile, 2),
@@ -230,7 +230,7 @@ func (suite *ConfigurationAggregateTestSuite) TestLoadFromHistory_Success() {
 
 func (suite *ConfigurationAggregateTestSuite) TestLoadFromHistory_InvalidEvent() {
 	config := &Configuration{}
-	
+
 	// Create an empty events slice to test error handling
 	events := []DomainEvent{}
 
@@ -326,7 +326,7 @@ func (suite *ConfigurationAggregateTestSuite) TestBusinessRules_ThemeValidation(
 	for _, tc := range testCases {
 		value, _ := NewConfigValue(tc.theme)
 		err := config.ChangeConfiguration(ConfigKeyTheme, *value, "testUser")
-		
+
 		if tc.shouldError {
 			assert.Error(suite.T(), err, "Theme '%s' should be invalid", tc.theme)
 		} else {
@@ -380,9 +380,9 @@ func (suite *ConfigurationAggregateTestSuite) TestVersionIncrement() {
 
 func (suite *ConfigurationAggregateTestSuite) TestDefaultSettingsPerProfile() {
 	profiles := []struct {
-		profile            Profile
-		expectedParallel   string
-		expectedThreshold  string
+		profile           Profile
+		expectedParallel  string
+		expectedThreshold string
 	}{
 		{ProfileDev, "50", "500"},
 		{ProfileProd, "10", "2000"},

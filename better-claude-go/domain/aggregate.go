@@ -32,10 +32,10 @@ type Configuration struct {
 
 // ValidationStatus represents the current validation state
 type ValidationStatus struct {
-	IsValid      bool
-	LastChecked  time.Time
-	ErrorCount   int
-	Errors       []string
+	IsValid     bool
+	LastChecked time.Time
+	ErrorCount  int
+	Errors      []string
 }
 
 // NewConfiguration creates a new Configuration aggregate
@@ -52,14 +52,14 @@ func NewConfiguration(profile Profile, createdBy string) (*Configuration, error)
 	initialSettings := getDefaultSettingsForProfile(profile)
 
 	config := &Configuration{
-		id:               aggregateID,
-		version:          0,
-		profile:          profile,
-		settings:         initialSettings,
-		envVariables:     make(map[string]string),
-		createdAt:        now,
-		lastModifiedAt:   now,
-		validationStatus: ValidationStatus{IsValid: true, LastChecked: now, ErrorCount: 0},
+		id:                aggregateID,
+		version:           0,
+		profile:           profile,
+		settings:          initialSettings,
+		envVariables:      make(map[string]string),
+		createdAt:         now,
+		lastModifiedAt:    now,
+		validationStatus:  ValidationStatus{IsValid: true, LastChecked: now, ErrorCount: 0},
 		uncommittedEvents: make([]DomainEvent, 0),
 	}
 
@@ -150,10 +150,10 @@ func (c *Configuration) SwitchProfile(newProfile Profile, switchedBy string) err
 	}
 
 	oldProfile := c.profile
-	
+
 	// Get settings for new profile
 	newSettings := getDefaultSettingsForProfile(newProfile)
-	
+
 	// Count how many settings will change
 	configChanges := 0
 	for key, newValue := range newSettings {

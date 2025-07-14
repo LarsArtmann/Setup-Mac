@@ -13,13 +13,15 @@
 //   - Functional programming patterns for reliability
 //
 // Usage:
-//   better-claude [flags] [command]
+//
+//	better-claude [flags] [command]
 //
 // Examples:
-//   better-claude configure --profile dev
-//   better-claude --backup --dry-run configure
-//   better-claude backup --profile personal
-//   better-claude restore backup-file.json
+//
+//	better-claude configure --profile dev
+//	better-claude --backup --dry-run configure
+//	better-claude backup --profile personal
+//	better-claude restore backup-file.json
 package main
 
 import (
@@ -36,7 +38,7 @@ import (
 
 const (
 	// serviceName identifies this application in telemetry and logging
-	serviceName    = "better-claude"
+	serviceName = "better-claude"
 	// serviceVersion tracks the current release version for compatibility and debugging
 	serviceVersion = "2.0.0"
 )

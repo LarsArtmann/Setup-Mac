@@ -19,12 +19,12 @@ type DomainEvent interface {
 
 // BaseEvent provides common event functionality
 type BaseEvent struct {
-	ID          string                 `json:"id"`
-	Type        string                 `json:"type"`
-	AggregateId string                 `json:"aggregate_id"`
-	OccurredAt  time.Time              `json:"occurred_at"`
-	EventVersion int                   `json:"version"`
-	Data        map[string]interface{} `json:"data"`
+	ID           string                 `json:"id"`
+	Type         string                 `json:"type"`
+	AggregateId  string                 `json:"aggregate_id"`
+	OccurredAt   time.Time              `json:"occurred_at"`
+	EventVersion int                    `json:"version"`
+	Data         map[string]interface{} `json:"data"`
 }
 
 // EventID returns the unique identifier of the event
@@ -78,7 +78,7 @@ func NewConfigurationChanged(
 	version int,
 ) *ConfigurationChanged {
 	eventID := uuid.New().String()
-	
+
 	return &ConfigurationChanged{
 		BaseEvent: BaseEvent{
 			ID:           eventID,
@@ -121,7 +121,7 @@ func NewProfileSwitched(
 	version int,
 ) *ProfileSwitched {
 	eventID := uuid.New().String()
-	
+
 	return &ProfileSwitched{
 		BaseEvent: BaseEvent{
 			ID:           eventID,
@@ -146,9 +146,9 @@ func NewProfileSwitched(
 // ConfigurationCreated event occurs when a new configuration aggregate is created
 type ConfigurationCreated struct {
 	BaseEvent
-	Profile      Profile                    `json:"profile"`
+	Profile       Profile                   `json:"profile"`
 	InitialConfig map[ConfigKey]ConfigValue `json:"initial_config"`
-	CreatedBy    string                     `json:"created_by"`
+	CreatedBy     string                    `json:"created_by"`
 }
 
 // NewConfigurationCreated creates a new ConfigurationCreated event
@@ -160,13 +160,13 @@ func NewConfigurationCreated(
 	version int,
 ) *ConfigurationCreated {
 	eventID := uuid.New().String()
-	
+
 	// Convert config map to serializable format
 	configData := make(map[string]interface{})
 	for k, v := range initialConfig {
 		configData[k.Value()] = v.Value()
 	}
-	
+
 	return &ConfigurationCreated{
 		BaseEvent: BaseEvent{
 			ID:           eventID,
@@ -189,10 +189,10 @@ func NewConfigurationCreated(
 // BackupCreated event occurs when a configuration backup is created
 type BackupCreated struct {
 	BaseEvent
-	BackupPath   string  `json:"backup_path"`
-	Profile      Profile `json:"profile"`
-	CreatedBy    string  `json:"created_by"`
-	ConfigCount  int     `json:"config_count"`
+	BackupPath  string  `json:"backup_path"`
+	Profile     Profile `json:"profile"`
+	CreatedBy   string  `json:"created_by"`
+	ConfigCount int     `json:"config_count"`
 }
 
 // NewBackupCreated creates a new BackupCreated event
@@ -205,7 +205,7 @@ func NewBackupCreated(
 	version int,
 ) *BackupCreated {
 	eventID := uuid.New().String()
-	
+
 	return &BackupCreated{
 		BaseEvent: BaseEvent{
 			ID:           eventID,
@@ -230,10 +230,10 @@ func NewBackupCreated(
 // ConfigurationValidated event occurs when configuration validation is performed
 type ConfigurationValidated struct {
 	BaseEvent
-	Profile         Profile `json:"profile"`
-	ValidationPassed bool   `json:"validation_passed"`
-	ErrorCount      int     `json:"error_count"`
-	ValidatedBy     string  `json:"validated_by"`
+	Profile          Profile `json:"profile"`
+	ValidationPassed bool    `json:"validation_passed"`
+	ErrorCount       int     `json:"error_count"`
+	ValidatedBy      string  `json:"validated_by"`
 }
 
 // NewConfigurationValidated creates a new ConfigurationValidated event
@@ -246,7 +246,7 @@ func NewConfigurationValidated(
 	version int,
 ) *ConfigurationValidated {
 	eventID := uuid.New().String()
-	
+
 	return &ConfigurationValidated{
 		BaseEvent: BaseEvent{
 			ID:           eventID,

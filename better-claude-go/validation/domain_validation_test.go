@@ -31,7 +31,7 @@ func (suite *DomainValidationTestSuite) TestProfileValidation_ValidProfiles() {
 	for _, profileValue := range validProfiles {
 		profile, err := domain.NewProfile(profileValue)
 		assert.NoError(suite.T(), err, "Profile %s should be valid", profileValue)
-		
+
 		errors := suite.validator.ValidateProfile(*profile)
 		assert.Empty(suite.T(), errors, "Profile %s should pass domain validation", profileValue)
 	}
@@ -266,7 +266,7 @@ func (suite *DomainValidationTestSuite) TestConfigurationValidation_ValidConfigu
 
 func (suite *DomainValidationTestSuite) TestConfigurationValidation_InvalidConfigurations() {
 	invalidConfig := suite.scenarios.ConfigurationWithValidationErrors()
-	
+
 	errors := suite.validator.ValidateConfiguration(invalidConfig)
 	assert.NotEmpty(suite.T(), errors, "Invalid configuration should fail validation")
 	assert.Greater(suite.T(), len(errors), 0, "Should have validation errors")
@@ -350,7 +350,7 @@ func (suite *DomainValidationTestSuite) TestEnvironmentVariableValidation_Variab
 func (suite *DomainValidationTestSuite) TestCrossFieldValidation_ProfileConsistency() {
 	// Test that configuration values are consistent with profile
 	devConfig := suite.scenarios.ValidDevConfiguration()
-	
+
 	// Development profile should have specific characteristics
 	errors := suite.validator.ValidateProfileConsistency(devConfig)
 	assert.Empty(suite.T(), errors, "Dev configuration should be consistent with dev profile")
@@ -359,7 +359,7 @@ func (suite *DomainValidationTestSuite) TestCrossFieldValidation_ProfileConsiste
 	prodConfig := suite.scenarios.ValidProdConfiguration()
 	// Force inconsistency by changing profile but keeping prod settings
 	prodConfig.SwitchProfile(testfixtures.NewProfileBuilder().WithDev().Build(), "testUser")
-	
+
 	errors = suite.validator.ValidateProfileConsistency(prodConfig)
 	// This might or might not be an error depending on business rules
 	// The test verifies the validator can detect profile inconsistencies
@@ -400,7 +400,7 @@ func (suite *DomainValidationTestSuite) TestSecurityValidation_MaliciousInputs()
 
 	for _, maliciousInput := range maliciousInputs {
 		value := testfixtures.NewConfigValueBuilder().WithValue(maliciousInput).Build()
-		
+
 		// Test against all config keys
 		for _, key := range suite.scenarios.CommonConfigKeys() {
 			errors := suite.validator.ValidateConfigValue(key, value)
@@ -481,7 +481,7 @@ func (suite *DomainValidationTestSuite) TestValidationErrorMessages_Quality() {
 
 	assert.NotEmpty(suite.T(), errors)
 	error := errors[0]
-	
+
 	// Error should be specific and helpful
 	assert.Contains(suite.T(), error.Message, "theme")
 	assert.Contains(suite.T(), error.Message, "invalid-theme")
@@ -496,7 +496,7 @@ func (suite *DomainValidationTestSuite) TestValidationCaching_Performance() {
 
 	// First validation
 	errors1 := suite.validator.ValidateConfiguration(config)
-	
+
 	// Second validation (should be faster if cached)
 	errors2 := suite.validator.ValidateConfiguration(config)
 

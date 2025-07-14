@@ -114,54 +114,54 @@ func NewSchemaValidator(schema map[string]interface{}) *SchemaValidator {
 // ValidateConfig validates a Config struct against the schema
 func (v *SchemaValidator) ValidateConfig(config Config) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Convert struct to map for validation
 	configMap := structToMap(config)
-	
+
 	// Validate against schema
 	schemaErrors := v.validateValue("", configMap, v.schema)
 	errors = append(errors, schemaErrors...)
-	
+
 	return errors
 }
 
 // ValidateProfileConfig validates a ProfileConfig struct against the schema
 func (v *SchemaValidator) ValidateProfileConfig(profileConfig ProfileConfig) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Convert struct to map for validation
 	profileMap := structToMap(profileConfig)
-	
+
 	// Validate against schema
 	schemaErrors := v.validateValue("", profileMap, ProfileConfigSchema)
 	errors = append(errors, schemaErrors...)
-	
+
 	return errors
 }
 
 // ValidateApplicationOptions validates ApplicationOptions against the schema
 func (v *SchemaValidator) ValidateApplicationOptions(options ApplicationOptions) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Convert struct to map for validation
 	optionsMap := structToMap(options)
-	
+
 	// Validate against schema
 	schemaErrors := v.validateValue("", optionsMap, ApplicationOptionsSchema)
 	errors = append(errors, schemaErrors...)
-	
+
 	return errors
 }
 
 // validateValue recursively validates a value against a schema
 func (v *SchemaValidator) validateValue(path string, value interface{}, schema interface{}) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	schemaMap, ok := schema.(map[string]interface{})
 	if !ok {
 		return errors
 	}
-	
+
 	// Check type
 	if expectedType, exists := schemaMap["type"]; exists {
 		typeStr, ok := expectedType.(string)
@@ -176,7 +176,7 @@ func (v *SchemaValidator) validateValue(path string, value interface{}, schema i
 			}
 		}
 	}
-	
+
 	// Check enum values
 	if enumValues, exists := schemaMap["enum"]; exists {
 		if enumSlice, ok := enumValues.([]string); ok {
@@ -189,27 +189,27 @@ func (v *SchemaValidator) validateValue(path string, value interface{}, schema i
 			}
 		}
 	}
-	
+
 	// Check string constraints
 	if strValue, ok := value.(string); ok {
 		errors = append(errors, v.validateString(path, strValue, schemaMap)...)
 	}
-	
+
 	// Check numeric constraints
 	if numValue, ok := value.(float64); ok {
 		errors = append(errors, v.validateNumber(path, numValue, schemaMap)...)
 	}
-	
+
 	// Check object properties
 	if objValue, ok := value.(map[string]interface{}); ok {
 		errors = append(errors, v.validateObject(path, objValue, schemaMap)...)
 	}
-	
+
 	// Check array items
 	if arrValue, ok := value.([]interface{}); ok {
 		errors = append(errors, v.validateArray(path, arrValue, schemaMap)...)
 	}
-	
+
 	return errors
 }
 
@@ -247,20 +247,20 @@ func (v *SchemaValidator) validateEnum(value interface{}, enumValues []string) b
 	if !ok {
 		return false
 	}
-	
+
 	for _, enumValue := range enumValues {
 		if strValue == enumValue {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
 // validateString validates string constraints
 func (v *SchemaValidator) validateString(path, value string, schema map[string]interface{}) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Check minLength
 	if minLength, exists := schema["minLength"]; exists {
 		if minLen, ok := minLength.(int); ok {
@@ -273,7 +273,7 @@ func (v *SchemaValidator) validateString(path, value string, schema map[string]i
 			}
 		}
 	}
-	
+
 	// Check maxLength
 	if maxLength, exists := schema["maxLength"]; exists {
 		if maxLen, ok := maxLength.(int); ok {
@@ -286,7 +286,7 @@ func (v *SchemaValidator) validateString(path, value string, schema map[string]i
 			}
 		}
 	}
-	
+
 	// Check pattern (basic regex)
 	if pattern, exists := schema["pattern"]; exists {
 		if patternStr, ok := pattern.(string); ok {
@@ -300,14 +300,14 @@ func (v *SchemaValidator) validateString(path, value string, schema map[string]i
 			}
 		}
 	}
-	
+
 	return errors
 }
 
 // validateNumber validates numeric constraints
 func (v *SchemaValidator) validateNumber(path string, value float64, schema map[string]interface{}) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Check minimum
 	if minimum, exists := schema["minimum"]; exists {
 		if min, ok := minimum.(float64); ok {
@@ -328,7 +328,7 @@ func (v *SchemaValidator) validateNumber(path string, value float64, schema map[
 			}
 		}
 	}
-	
+
 	// Check maximum
 	if maximum, exists := schema["maximum"]; exists {
 		if max, ok := maximum.(float64); ok {
@@ -349,14 +349,14 @@ func (v *SchemaValidator) validateNumber(path string, value float64, schema map[
 			}
 		}
 	}
-	
+
 	return errors
 }
 
 // validateObject validates object properties
 func (v *SchemaValidator) validateObject(path string, value map[string]interface{}, schema map[string]interface{}) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Check required properties
 	if required, exists := schema["required"]; exists {
 		if requiredSlice, ok := required.([]string); ok {
@@ -367,7 +367,7 @@ func (v *SchemaValidator) validateObject(path string, value map[string]interface
 						fieldPath += "."
 					}
 					fieldPath += requiredProp
-					
+
 					errors = append(errors, ValidationError{
 						Field:   fieldPath,
 						Value:   nil,
@@ -377,7 +377,7 @@ func (v *SchemaValidator) validateObject(path string, value map[string]interface
 			}
 		}
 	}
-	
+
 	// Check properties
 	if properties, exists := schema["properties"]; exists {
 		if propsMap, ok := properties.(map[string]interface{}); ok {
@@ -387,7 +387,7 @@ func (v *SchemaValidator) validateObject(path string, value map[string]interface
 					fieldPath += "."
 				}
 				fieldPath += propName
-				
+
 				if propSchema, exists := propsMap[propName]; exists {
 					propErrors := v.validateValue(fieldPath, propValue, propSchema)
 					errors = append(errors, propErrors...)
@@ -395,14 +395,14 @@ func (v *SchemaValidator) validateObject(path string, value map[string]interface
 			}
 		}
 	}
-	
+
 	return errors
 }
 
 // validateArray validates array items
 func (v *SchemaValidator) validateArray(path string, value []interface{}, schema map[string]interface{}) ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Check items schema
 	if items, exists := schema["items"]; exists {
 		for i, item := range value {
@@ -411,7 +411,7 @@ func (v *SchemaValidator) validateArray(path string, value []interface{}, schema
 			errors = append(errors, itemErrors...)
 		}
 	}
-	
+
 	return errors
 }
 
@@ -432,7 +432,7 @@ func (v *SchemaValidator) matchesPattern(value, pattern string) bool {
 			}
 		}
 		return true
-		
+
 	case "^[0-9]+$":
 		// Non-negative integer pattern
 		if value == "" {
@@ -444,7 +444,7 @@ func (v *SchemaValidator) matchesPattern(value, pattern string) bool {
 			}
 		}
 		return true
-		
+
 	case "^[A-Z_][A-Z0-9_]*$":
 		// Environment variable name pattern
 		if value == "" {
@@ -462,7 +462,7 @@ func (v *SchemaValidator) matchesPattern(value, pattern string) bool {
 			}
 		}
 		return true
-		
+
 	case "^[^;&|]*$":
 		// No shell metacharacters pattern
 		for _, char := range value {
@@ -471,7 +471,7 @@ func (v *SchemaValidator) matchesPattern(value, pattern string) bool {
 			}
 		}
 		return true
-		
+
 	default:
 		// For unknown patterns, assume they match
 		return true
@@ -481,22 +481,22 @@ func (v *SchemaValidator) matchesPattern(value, pattern string) bool {
 // structToMap converts a struct to a map using JSON marshaling/unmarshaling
 func structToMap(obj interface{}) map[string]interface{} {
 	result := make(map[string]interface{})
-	
+
 	// Use reflection to handle struct conversion
 	value := reflect.ValueOf(obj)
 	if value.Kind() == reflect.Ptr {
 		value = value.Elem()
 	}
-	
+
 	if value.Kind() != reflect.Struct {
 		return result
 	}
-	
+
 	valueType := value.Type()
 	for i := 0; i < value.NumField(); i++ {
 		field := valueType.Field(i)
 		fieldValue := value.Field(i)
-		
+
 		// Get JSON tag name or use field name
 		jsonTag := field.Tag.Get("json")
 		fieldName := field.Name
@@ -507,13 +507,13 @@ func structToMap(obj interface{}) map[string]interface{} {
 				fieldName = jsonTag
 			}
 		}
-		
+
 		// Convert field value to interface{}
 		if fieldValue.IsValid() && fieldValue.CanInterface() {
 			result[fieldName] = fieldValue.Interface()
 		}
 	}
-	
+
 	return result
 }
 
@@ -521,7 +521,7 @@ func structToMap(obj interface{}) map[string]interface{} {
 func ValidateJSON(jsonStr string, schema map[string]interface{}) ValidationErrors {
 	var errors ValidationErrors
 	var value interface{}
-	
+
 	// Parse JSON
 	if err := json.Unmarshal([]byte(jsonStr), &value); err != nil {
 		errors = append(errors, ValidationError{
@@ -531,11 +531,11 @@ func ValidateJSON(jsonStr string, schema map[string]interface{}) ValidationError
 		})
 		return errors
 	}
-	
+
 	// Validate against schema
 	validator := NewSchemaValidator(schema)
 	schemaErrors := validator.validateValue("", value, schema)
 	errors = append(errors, schemaErrors...)
-	
+
 	return errors
 }

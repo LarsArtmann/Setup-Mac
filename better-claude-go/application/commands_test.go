@@ -100,7 +100,7 @@ func (suite *CommandHandlersTestSuite) TestCreateConfiguration_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	createResult, ok := result.(CreateConfigurationResult)
 	assert.True(suite.T(), ok)
 	assert.NotEmpty(suite.T(), createResult.ConfigurationID)
@@ -172,7 +172,7 @@ func (suite *CommandHandlersTestSuite) TestChangeConfiguration_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	changeResult, ok := result.(ChangeConfigurationResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, changeResult.ConfigurationID)
@@ -257,7 +257,7 @@ func (suite *CommandHandlersTestSuite) TestSwitchProfile_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	switchResult, ok := result.(SwitchProfileResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, switchResult.ConfigurationID)
@@ -316,7 +316,7 @@ func (suite *CommandHandlersTestSuite) TestCreateBackup_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	backupResult, ok := result.(CreateBackupResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, backupResult.ConfigurationID)
@@ -372,7 +372,7 @@ func (suite *CommandHandlersTestSuite) TestValidateConfiguration_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	validateResult, ok := result.(ValidateConfigurationResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, validateResult.ConfigurationID)
@@ -409,7 +409,7 @@ func (suite *CommandHandlersTestSuite) TestValidateConfiguration_WithErrors() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	validateResult, ok := result.(ValidateConfigurationResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, validateResult.ConfigurationID)
@@ -428,7 +428,7 @@ func (suite *CommandHandlersTestSuite) TestCommandHandler_InterfaceCompliance() 
 func (suite *CommandHandlersTestSuite) TestEventPublishing_AllCommands() {
 	// Test that all commands properly publish events
 	profile, _ := domain.NewProfile("dev")
-	
+
 	// Create configuration
 	createCommand := CreateConfigurationCommand{
 		Profile:   *profile,

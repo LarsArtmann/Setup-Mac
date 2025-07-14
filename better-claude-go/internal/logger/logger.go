@@ -49,7 +49,7 @@ func (l *ColorLogger) Info(message string) {
 
 func (l *ColorLogger) InfoCtx(ctx context.Context, message string) {
 	l.info.Printf("[INFO] %s\n", message)
-	
+
 	// Add trace information if available
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
@@ -70,7 +70,7 @@ func (l *ColorLogger) Success(message string) {
 
 func (l *ColorLogger) SuccessCtx(ctx context.Context, message string) {
 	l.success.Printf("[SUCCESS] %s\n", message)
-	
+
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
 		spanCtx := span.SpanContext()
@@ -91,7 +91,7 @@ func (l *ColorLogger) Warning(message string) {
 
 func (l *ColorLogger) WarningCtx(ctx context.Context, message string) {
 	l.warning.Printf("[WARNING] %s\n", message)
-	
+
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
 		spanCtx := span.SpanContext()
@@ -111,7 +111,7 @@ func (l *ColorLogger) Error(message string) {
 
 func (l *ColorLogger) ErrorCtx(ctx context.Context, message string) {
 	l.error.Printf("[ERROR] %s\n", message)
-	
+
 	span := trace.SpanFromContext(ctx)
 	if span.IsRecording() {
 		spanCtx := span.SpanContext()

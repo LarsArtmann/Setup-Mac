@@ -9,45 +9,33 @@
     stateVersion = "25.05"; # Please read the comment before changing.
   };
 
-  # Basic shell configuration
-  programs = {
-    # Enable Home Manager to manage itself
-    home-manager.enable = true;
+  # Enable Home Manager to manage itself
+  programs.home-manager.enable = true;
 
-    # Configure bash
-    bash = {
-      enable = true;
-      shellAliases = {
-        # Basic aliases - will be migrated from environment.nix
-        l = "ls -la";
-        t = "tree -h -L 2 -C --dirsfirst";
-        nixup = "darwin-rebuild switch";
-        c2p = "code2prompt . --output=code2prompt.md --tokens";
-        diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
-      };
-    };
-
-    # Configure zsh
-    zsh = {
-      enable = true;
-      shellAliases = {
-        # Same aliases for zsh
-        l = "ls -la";
-        t = "tree -h -L 2 -C --dirsfirst";
-        nixup = "darwin-rebuild switch";
-        c2p = "code2prompt . --output=code2prompt.md --tokens";
-        diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
-      };
-    };
-
-    # Configure nushell
-    nushell = {
-      enable = true;
-      # Note: nushell aliases have different syntax, will be configured separately
+  # Shell configuration with aliases migrated from environment.nix
+  programs.bash = {
+    enable = true;
+    shellAliases = {
+      l = "ls -la";
+      t = "tree -h -L 2 -C --dirsfirst";
+      nixup = "darwin-rebuild switch";
+      c2p = "code2prompt . --output=code2prompt.md --tokens";
+      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
   };
 
-  # Session variables that make sense to be user-specific
+  programs.zsh = {
+    enable = true;
+    shellAliases = {
+      l = "ls -la";
+      t = "tree -h -L 2 -C --dirsfirst";
+      nixup = "darwin-rebuild switch";
+      c2p = "code2prompt . --output=code2prompt.md --tokens";
+      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+    };
+  };
+
+  # Session variables that make sense to be user-specific (migrated from environment.nix)
   home.sessionVariables = {
     EDITOR = "nano";
     LANG = "en_GB.UTF-8";

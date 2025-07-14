@@ -87,22 +87,16 @@
           # User-specific configurations
           ./users.nix
 
-          # Home Manager integration - temporarily disabled to fix configuration
-          # home-manager.darwinModules.home-manager
-          # {
-          #   home-manager = {
-          #     useGlobalPkgs = true;
-          #     useUserPackages = true;
-          #     users.larsartmann = { config, pkgs, ... }: {
-          #       home = {
-          #         username = "larsartmann";
-          #         homeDirectory = "/Users/larsartmann";
-          #         stateVersion = "25.05";
-          #       };
-          #       programs.home-manager.enable = true;
-          #     };
-          #   };
-          # }
+          # Home Manager integration
+          home-manager.darwinModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs; };
+              users.larsartmann = ./home.nix;
+            };
+          }
         ];
       };
     };

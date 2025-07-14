@@ -16,11 +16,11 @@ import (
 
 // WatermillCommandBus implements application.CommandBus using Watermill
 type WatermillCommandBus struct {
-	publisher message.Publisher
+	publisher  message.Publisher
 	subscriber message.Subscriber
-	handlers  map[string]application.CommandHandler
-	logger    watermill.LoggerAdapter
-	mutex     sync.RWMutex
+	handlers   map[string]application.CommandHandler
+	logger     watermill.LoggerAdapter
+	mutex      sync.RWMutex
 }
 
 // NewWatermillCommandBus creates a new Watermill-based command bus
@@ -57,7 +57,7 @@ func (b *WatermillCommandBus) RegisterHandler(commandType string, handler applic
 	}
 
 	b.handlers[commandType] = handler
-	
+
 	// Subscribe to command messages
 	topicName := fmt.Sprintf("commands.%s", commandType)
 	messages, err := b.subscriber.Subscribe(context.Background(), topicName)
@@ -95,7 +95,7 @@ func (b *WatermillCommandBus) Send(ctx context.Context, command application.Comm
 
 	// Publish to appropriate topic
 	topicName := fmt.Sprintf("commands.%s", command.CommandType())
-	
+
 	b.logger.Info("Sending command", watermill.LogFields{
 		"command_id":   command.CommandID(),
 		"command_type": command.CommandType(),
@@ -114,7 +114,7 @@ func (b *WatermillCommandBus) processMessages(commandType string, handler applic
 		})
 
 		ctx := context.Background()
-		
+
 		// Deserialize command
 		command, err := b.deserializeCommand(msg.Payload, commandType)
 		if err != nil {
@@ -139,7 +139,7 @@ func (b *WatermillCommandBus) processMessages(commandType string, handler applic
 
 		// Acknowledge message
 		msg.Ack()
-		
+
 		b.logger.Info("Command processed successfully", watermill.LogFields{
 			"command_type": commandType,
 			"command_id":   command.CommandID(),
@@ -195,12 +195,12 @@ func (b *WatermillCommandBus) Close() error {
 
 // WatermillQueryBus implements application.QueryBus using Watermill
 type WatermillQueryBus struct {
-	publisher message.Publisher
+	publisher  message.Publisher
 	subscriber message.Subscriber
-	handlers  map[string]application.QueryHandler
-	logger    watermill.LoggerAdapter
-	mutex     sync.RWMutex
-	responses map[string]chan *queryResponse
+	handlers   map[string]application.QueryHandler
+	logger     watermill.LoggerAdapter
+	mutex      sync.RWMutex
+	responses  map[string]chan *queryResponse
 }
 
 type queryResponse struct {
@@ -251,7 +251,7 @@ func (b *WatermillQueryBus) RegisterHandler(queryType string, handler applicatio
 	}
 
 	b.handlers[queryType] = handler
-	
+
 	// Subscribe to query messages
 	topicName := fmt.Sprintf("queries.%s", queryType)
 	messages, err := b.subscriber.Subscribe(context.Background(), topicName)
@@ -279,7 +279,7 @@ func (b *WatermillQueryBus) Send(ctx context.Context, query application.Query) (
 	// Create response channel
 	responseID := uuid.New().String()
 	responseChan := make(chan *queryResponse, 1)
-	
+
 	b.mutex.Lock()
 	b.responses[responseID] = responseChan
 	b.mutex.Unlock()
@@ -306,7 +306,7 @@ func (b *WatermillQueryBus) Send(ctx context.Context, query application.Query) (
 
 	// Publish to appropriate topic
 	topicName := fmt.Sprintf("queries.%s", query.QueryType())
-	
+
 	b.logger.Info("Sending query", watermill.LogFields{
 		"query_id":    query.QueryID(),
 		"query_type":  query.QueryType(),
@@ -340,7 +340,7 @@ func (b *WatermillQueryBus) processQueryMessages(queryType string, handler appli
 
 		ctx := context.Background()
 		responseID := msg.Metadata.Get("response_id")
-		
+
 		// Deserialize query
 		query, err := b.deserializeQuery(msg.Payload, queryType)
 		if err != nil {
@@ -369,7 +369,7 @@ func (b *WatermillQueryBus) processQueryMessages(queryType string, handler appli
 		// Send response
 		b.sendResponse(responseID, result, nil)
 		msg.Ack()
-		
+
 		b.logger.Info("Query processed successfully", watermill.LogFields{
 			"query_type": queryType,
 			"query_id":   query.QueryID(),
@@ -382,7 +382,7 @@ func (b *WatermillQueryBus) processQueryMessages(queryType string, handler appli
 func (b *WatermillQueryBus) processResponseMessages(messages <-chan *message.Message) {
 	for msg := range messages {
 		responseID := msg.Metadata.Get("response_id")
-		
+
 		b.mutex.RLock()
 		responseChan, exists := b.responses[responseID]
 		b.mutex.RUnlock()

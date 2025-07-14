@@ -41,10 +41,10 @@ type ValidationService interface {
 
 // ValidationError represents a configuration validation error
 type ValidationError struct {
-	Field   string
-	Value   string
-	Message string
-	Code    string
+	Field    string
+	Value    string
+	Message  string
+	Code     string
 	Severity ValidationSeverity
 }
 
@@ -75,18 +75,18 @@ func (s ValidationSeverity) String() string {
 
 // ValidationSuggestion represents a suggestion to fix validation errors
 type ValidationSuggestion struct {
-	Field       string
-	CurrentValue string
+	Field          string
+	CurrentValue   string
 	SuggestedValue string
-	Reason      string
-	Impact      string
+	Reason         string
+	Impact         string
 }
 
 // ConfigurationComparison represents the differences between two configurations
 type ConfigurationComparison struct {
-	Added    map[ConfigKey]ConfigValue
-	Removed  map[ConfigKey]ConfigValue
-	Changed  map[ConfigKey]ConfigValueChange
+	Added     map[ConfigKey]ConfigValue
+	Removed   map[ConfigKey]ConfigValue
+	Changed   map[ConfigKey]ConfigValueChange
 	Unchanged map[ConfigKey]ConfigValue
 }
 
@@ -98,10 +98,10 @@ type ConfigValueChange struct {
 
 // ProfileRequirements represents requirements for profile selection
 type ProfileRequirements struct {
-	Performance      PerformanceLevel
-	ResourceUsage    ResourceUsage
+	Performance       PerformanceLevel
+	ResourceUsage     ResourceUsage
 	NotificationLevel NotificationLevel
-	Environment      Environment
+	Environment       Environment
 }
 
 // PerformanceLevel represents desired performance characteristics
@@ -145,19 +145,19 @@ const (
 
 // ProfileDifference represents a difference between profiles
 type ProfileDifference struct {
-	Setting     ConfigKey
+	Setting       ConfigKey
 	Profile1Value ConfigValue
 	Profile2Value ConfigValue
-	Impact      string
+	Impact        string
 }
 
 // ProfileUsage represents current usage patterns
 type ProfileUsage struct {
-	DailySessionHours    float64
-	ParallelTasksUsed    int
-	NotificationClicks   int
-	ErrorFrequency       float64
-	PerformanceIssues    int
+	DailySessionHours  float64
+	ParallelTasksUsed  int
+	NotificationClicks int
+	ErrorFrequency     float64
+	PerformanceIssues  int
 }
 
 // DefaultConfigurationService provides default implementations
@@ -517,7 +517,7 @@ func (s *ConfigurationValidationService) ValidateEnvironmentVariable(name, value
 	if name == "" {
 		return fmt.Errorf("environment variable name cannot be empty")
 	}
-	
+
 	// Check for system variables that should not be modified
 	systemVars := []string{"PATH", "HOME", "USER", "SHELL", "PWD", "TERM"}
 	for _, sysVar := range systemVars {
@@ -525,20 +525,20 @@ func (s *ConfigurationValidationService) ValidateEnvironmentVariable(name, value
 			return fmt.Errorf("system environment variable '%s' is not allowed", name)
 		}
 	}
-	
+
 	// Validate variable name format
 	validName := regexp.MustCompile(`^[A-Z][A-Z0-9_]*$`)
 	if !validName.MatchString(name) {
 		return fmt.Errorf("invalid environment variable name '%s'", name)
 	}
-	
+
 	return nil
 }
 
 // ValidateCompleteConfiguration validates a complete configuration
 func (s *ConfigurationValidationService) ValidateCompleteConfiguration(config *Configuration) []string {
 	var errors []string
-	
+
 	// Validate all settings
 	for key, value := range config.Settings() {
 		switch key {
@@ -568,7 +568,7 @@ func (s *ConfigurationValidationService) ValidateCompleteConfiguration(config *C
 			}
 		}
 	}
-	
+
 	return errors
 }
 
@@ -578,9 +578,9 @@ func (s *ConfigurationValidationService) ValidateCompleteConfiguration(config *C
 func (s *ProfileMigrationService) CalculateMigrationChanges(from, to Profile) []MigrationChange {
 	fromSettings := getDefaultSettingsForProfile(from)
 	toSettings := getDefaultSettingsForProfile(to)
-	
+
 	var changes []MigrationChange
-	
+
 	for key, toValue := range toSettings {
 		if fromValue, exists := fromSettings[key]; exists && !fromValue.IsEqual(toValue) {
 			changes = append(changes, MigrationChange{
@@ -590,7 +590,7 @@ func (s *ProfileMigrationService) CalculateMigrationChanges(from, to Profile) []
 			})
 		}
 	}
-	
+
 	return changes
 }
 
@@ -605,9 +605,9 @@ func (s *ProfileMigrationService) ValidateMigration(from, to Profile) error {
 // GetMigrationRisks returns risks associated with profile migration
 func (s *ProfileMigrationService) GetMigrationRisks(from, to Profile) []MigrationRisk {
 	var risks []MigrationRisk
-	
+
 	changes := s.CalculateMigrationChanges(from, to)
-	
+
 	for _, change := range changes {
 		switch change.Key {
 		case ConfigKeyParallelTasksCount:
@@ -626,6 +626,6 @@ func (s *ProfileMigrationService) GetMigrationRisks(from, to Profile) []Migratio
 			})
 		}
 	}
-	
+
 	return risks
 }

@@ -165,7 +165,7 @@ func (c *Configuration) LoadFromHistory(events []domain.DomainEvent) error {
 	// Recreate the aggregate using the creation event
 	profile := creationEvent.Profile
 	createdBy := creationEvent.CreatedBy
-	
+
 	newConfig, err := domain.NewConfiguration(profile, createdBy)
 	if err != nil {
 		return fmt.Errorf("failed to create configuration during replay: %w", err)

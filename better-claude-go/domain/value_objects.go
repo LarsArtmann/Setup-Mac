@@ -14,7 +14,7 @@ type Profile struct {
 func NewProfile(value string) (*Profile, error) {
 	// Normalize input
 	normalized := strings.ToLower(strings.TrimSpace(value))
-	
+
 	// Validate profile value
 	validProfiles := map[string]bool{
 		"dev":         true,
@@ -24,11 +24,11 @@ func NewProfile(value string) (*Profile, error) {
 		"personal":    true,
 		"default":     true,
 	}
-	
+
 	if !validProfiles[normalized] {
 		return nil, fmt.Errorf("invalid profile '%s': must be one of dev, development, prod, production, personal, default", value)
 	}
-	
+
 	return &Profile{value: normalized}, nil
 }
 
@@ -74,14 +74,14 @@ func NewConfigKey(value string) (*ConfigKey, error) {
 	if trimmed == "" {
 		return nil, fmt.Errorf("config key cannot be empty")
 	}
-	
+
 	// Validate key format (alphanumeric + underscores only)
 	for _, char := range trimmed {
 		if !((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9') || char == '_') {
 			return nil, fmt.Errorf("invalid config key '%s': only alphanumeric characters and underscores allowed", value)
 		}
 	}
-	
+
 	return &ConfigKey{value: trimmed}, nil
 }
 
@@ -134,7 +134,7 @@ func (v ConfigValue) IsEmpty() bool {
 
 // Predefined configuration keys as constants
 var (
-	ConfigKeyTheme                        = mustCreateConfigKey("theme")
+	ConfigKeyTheme                       = mustCreateConfigKey("theme")
 	ConfigKeyParallelTasksCount          = mustCreateConfigKey("parallelTasksCount")
 	ConfigKeyPreferredNotifChannel       = mustCreateConfigKey("preferredNotifChannel")
 	ConfigKeyMessageIdleNotifThresholdMs = mustCreateConfigKey("messageIdleNotifThresholdMs")

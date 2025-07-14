@@ -23,7 +23,7 @@ Better Claude v2.0.0 represents a complete rewrite and modernization of the Clau
 
 ### 📋 Profile-Based Configuration
 - **Development Profile**: High-performance settings (50 parallel tasks, 500ms threshold)
-- **Production Profile**: Conservative settings (10 parallel tasks, 2000ms threshold)  
+- **Production Profile**: Conservative settings (10 parallel tasks, 2000ms threshold)
 - **Personal Profile**: Balanced settings (20 parallel tasks, 1000ms threshold)
 - **Smart Defaults**: Optimized for each environment type
 
@@ -265,7 +265,7 @@ go build -o better-claude .
 - ✅ Complete rewrite in Go
 - ✅ Comprehensive testing suite
 - ✅ User documentation created
-- ✅ Deployment guide written  
+- ✅ Deployment guide written
 - ✅ Security audit completed
 - ✅ Performance optimization done
 - ✅ Build system configured

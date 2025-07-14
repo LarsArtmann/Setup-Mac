@@ -22,12 +22,12 @@ type EventStoreConfig struct {
 
 // WatermillEventStore implements event sourcing using Watermill
 type WatermillEventStore struct {
-	publisher   message.Publisher
-	subscriber  message.Subscriber
-	events      map[string][]StoredEvent
-	versions    map[string]int
-	mutex       sync.RWMutex
-	logger      watermill.LoggerAdapter
+	publisher  message.Publisher
+	subscriber message.Subscriber
+	events     map[string][]StoredEvent
+	versions   map[string]int
+	mutex      sync.RWMutex
+	logger     watermill.LoggerAdapter
 }
 
 // StoredEvent represents an event as stored in the event store

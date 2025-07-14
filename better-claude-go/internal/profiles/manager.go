@@ -13,12 +13,12 @@ import (
 type Profile = config.Profile
 
 const (
-	ProfileDev        = config.ProfileDev
+	ProfileDev         = config.ProfileDev
 	ProfileDevelopment = config.ProfileDevelopment
-	ProfileProd       = config.ProfileProd
-	ProfileProduction = config.ProfileProduction
-	ProfilePersonal   = config.ProfilePersonal
-	ProfileDefault    = config.ProfileDefault
+	ProfileProd        = config.ProfileProd
+	ProfileProduction  = config.ProfileProduction
+	ProfilePersonal    = config.ProfilePersonal
+	ProfileDefault     = config.ProfileDefault
 )
 
 // ProfileManager interface for managing configuration profiles
@@ -37,12 +37,12 @@ type StaticProfileManager struct {
 func NewStaticProfileManager(logger logger.Logger) *StaticProfileManager {
 	// Define profiles using functional composition
 	profiles := map[Profile]*config.ProfileConfig{
-		ProfileDev: createDevProfile(),
+		ProfileDev:         createDevProfile(),
 		ProfileDevelopment: createDevProfile(),
-		ProfileProd: createProdProfile(),
-		ProfileProduction: createProdProfile(),
-		ProfilePersonal: createPersonalProfile(),
-		ProfileDefault: createPersonalProfile(),
+		ProfileProd:        createProdProfile(),
+		ProfileProduction:  createProdProfile(),
+		ProfilePersonal:    createPersonalProfile(),
+		ProfileDefault:     createPersonalProfile(),
 	}
 
 	return &StaticProfileManager{
@@ -78,8 +78,8 @@ func (m *StaticProfileManager) ValidateProfile(profile Profile) error {
 
 	isValid := lo.Contains(validProfiles, profile)
 	if !isValid {
-		return fmt.Errorf("invalid profile '%s'. Valid profiles: %s", 
-			profile, 
+		return fmt.Errorf("invalid profile '%s'. Valid profiles: %s",
+			profile,
 			lo.Reduce(validProfiles, func(acc string, profile Profile, _ int) string {
 				if acc == "" {
 					return string(profile)
@@ -96,7 +96,7 @@ func createDevProfile() *config.ProfileConfig {
 	return &config.ProfileConfig{
 		Profile: ProfileDev,
 		Config: config.Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "50",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "500",
@@ -111,7 +111,7 @@ func createProdProfile() *config.ProfileConfig {
 	return &config.ProfileConfig{
 		Profile: ProfileProd,
 		Config: config.Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "10",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "2000",
@@ -126,7 +126,7 @@ func createPersonalProfile() *config.ProfileConfig {
 	return &config.ProfileConfig{
 		Profile: ProfilePersonal,
 		Config: config.Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "20",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "1000",
@@ -139,14 +139,14 @@ func createPersonalProfile() *config.ProfileConfig {
 
 func createDevEnvVars() map[string]string {
 	return map[string]string{
-		"EDITOR":                         "nano",
-		"CLAUDE_CODE_ENABLE_TELEMETRY":   "1",
-		"OTEL_METRICS_EXPORTER":          "otlp",
-		"OTEL_LOGS_EXPORTER":             "otlp",
-		"OTEL_EXPORTER_OTLP_PROTOCOL":    "grpc",
-		"OTEL_EXPORTER_OTLP_ENDPOINT":    "http://localhost:4317",
-		"OTEL_METRIC_EXPORT_INTERVAL":    "5000",
-		"OTEL_LOGS_EXPORT_INTERVAL":      "2500",
+		"EDITOR":                       "nano",
+		"CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+		"OTEL_METRICS_EXPORTER":        "otlp",
+		"OTEL_LOGS_EXPORTER":           "otlp",
+		"OTEL_EXPORTER_OTLP_PROTOCOL":  "grpc",
+		"OTEL_EXPORTER_OTLP_ENDPOINT":  "http://localhost:4317",
+		"OTEL_METRIC_EXPORT_INTERVAL":  "5000",
+		"OTEL_LOGS_EXPORT_INTERVAL":    "2500",
 	}
 }
 
@@ -161,13 +161,13 @@ func createProdEnvVars() map[string]string {
 
 func createPersonalEnvVars() map[string]string {
 	return map[string]string{
-		"EDITOR":                         "nano",
-		"CLAUDE_CODE_ENABLE_TELEMETRY":   "1",
-		"OTEL_METRICS_EXPORTER":          "otlp",
-		"OTEL_LOGS_EXPORTER":             "otlp",
-		"OTEL_EXPORTER_OTLP_PROTOCOL":    "grpc",
-		"OTEL_EXPORTER_OTLP_ENDPOINT":    "http://localhost:4317",
-		"OTEL_METRIC_EXPORT_INTERVAL":    "10000",
-		"OTEL_LOGS_EXPORT_INTERVAL":      "5000",
+		"EDITOR":                       "nano",
+		"CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+		"OTEL_METRICS_EXPORTER":        "otlp",
+		"OTEL_LOGS_EXPORTER":           "otlp",
+		"OTEL_EXPORTER_OTLP_PROTOCOL":  "grpc",
+		"OTEL_EXPORTER_OTLP_ENDPOINT":  "http://localhost:4317",
+		"OTEL_METRIC_EXPORT_INTERVAL":  "10000",
+		"OTEL_LOGS_EXPORT_INTERVAL":    "5000",
 	}
 }

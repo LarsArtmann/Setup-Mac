@@ -1,0 +1,91 @@
+graph TB
+    subgraph "CLI Events (Current)"
+        CommandParsed[Command Line Parsed]
+        ValidationFailed[Validation Failed]
+        ValidationPassed[Validation Passed]
+        ProfileSelected[Profile Selected]
+        BackupRequested[Backup Requested]
+        DryRunRequested[Dry Run Requested]
+    end
+
+    subgraph "Configuration Events (Current)"
+        ConfigLoaded[Configuration Loaded]
+        ConfigValidated[Configuration Validated]
+        ConfigApplied[Configuration Applied]
+        ConfigError[Configuration Error]
+        BackupCreated[Backup Created]
+        BackupFailed[Backup Failed]
+    end
+
+    subgraph "External System Events (Current)"
+        ClaudeAPICall[Claude API Called]
+        ClaudeAPISuccess[Claude API Success]
+        ClaudeAPIError[Claude API Error]
+        FileSystemAccess[File System Accessed]
+        FileSystemError[File System Error]
+        JSONProcessed[JSON Processed]
+    end
+
+    subgraph "Simple Event Flow (Current - Bash)"
+        StartScript[Script Start]
+        ParseArgs[Parse Arguments]
+        ValidateInput[Validate Input]
+        LoadConfig[Load Configuration]
+        ApplyConfig[Apply Configuration]
+        EndScript[Script End]
+    end
+
+    %% Simple linear flow in bash script
+    StartScript --> ParseArgs
+    ParseArgs --> CommandParsed
+    CommandParsed --> ValidateInput
+    ValidateInput --> ValidationPassed
+    ValidateInput --> ValidationFailed
+    ValidationFailed --> EndScript
+    ValidationPassed --> ProfileSelected
+    ProfileSelected --> LoadConfig
+    LoadConfig --> ConfigLoaded
+    ConfigLoaded --> ApplyConfig
+    ApplyConfig --> ConfigApplied
+    ConfigApplied --> EndScript
+
+    %% Backup flow
+    ProfileSelected -.-> BackupRequested
+    BackupRequested --> BackupCreated
+    BackupCreated --> LoadConfig
+
+    %% Dry run flow
+    ProfileSelected -.-> DryRunRequested
+    DryRunRequested --> ConfigValidated
+    ConfigValidated --> EndScript
+
+    %% External system interactions
+    ApplyConfig --> ClaudeAPICall
+    ClaudeAPICall --> ClaudeAPISuccess
+    ClaudeAPICall --> ClaudeAPIError
+    LoadConfig --> FileSystemAccess
+    FileSystemAccess --> JSONProcessed
+    BackupCreated --> FileSystemAccess
+
+    %% Error handling (limited in current bash implementation)
+    ClaudeAPIError -.-> ConfigError
+    FileSystemError -.-> ConfigError
+    ConfigError --> EndScript
+
+    %% Current limitations
+    ValidationFailed -.->|"Exit immediately"| EndScript
+    ConfigError -.->|"Limited recovery"| EndScript
+    ClaudeAPIError -.->|"No retry logic"| EndScript
+
+    classDef cliEvents fill:#e3f2fd,stroke:#1976d2
+    classDef configEvents fill:#f3e5f5,stroke:#7b1fa2
+    classDef externalEvents fill:#fff3e0,stroke:#f57c00
+    classDef flow fill:#e8f5e8,stroke:#388e3c
+    classDef errors fill:#ffebee,stroke:#d32f2f
+    classDef limitations fill:#fafafa,stroke:#616161
+
+    class CommandParsed,ValidationFailed,ValidationPassed,ProfileSelected,BackupRequested,DryRunRequested cliEvents
+    class ConfigLoaded,ConfigValidated,ConfigApplied,ConfigError,BackupCreated,BackupFailed configEvents
+    class ClaudeAPICall,ClaudeAPISuccess,ClaudeAPIError,FileSystemAccess,FileSystemError,JSONProcessed externalEvents
+    class StartScript,ParseArgs,ValidateInput,LoadConfig,ApplyConfig,EndScript flow
+    class ValidationFailed,ConfigError,ClaudeAPIError,FileSystemError,BackupFailed errors

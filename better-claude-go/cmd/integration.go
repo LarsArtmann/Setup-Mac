@@ -22,7 +22,7 @@ type DDDContainer struct {
 	QueryBus   *infrastructure.WatermillQueryBus
 
 	// Domain Services
-	ConfigService domain.ConfigurationService
+	ConfigService  domain.ConfigurationService
 	ProfileService domain.ProfileService
 
 	// Application Services
@@ -64,16 +64,16 @@ func NewDDDContainer() (*DDDContainer, error) {
 
 	// Create command handlers
 	commandHandlers := map[string]application.CommandHandler{
-		"create_configuration":    application.NewCreateConfigurationCommandHandler(repository),
-		"change_configuration":    application.NewChangeConfigurationCommandHandler(repository),
-		"switch_profile":          application.NewSwitchProfileCommandHandler(repository),
+		"create_configuration":   application.NewCreateConfigurationCommandHandler(repository),
+		"change_configuration":   application.NewChangeConfigurationCommandHandler(repository),
+		"switch_profile":         application.NewSwitchProfileCommandHandler(repository),
 		"create_backup":          application.NewCreateBackupCommandHandler(repository),
 		"validate_configuration": application.NewValidateConfigurationCommandHandler(repository),
 	}
 
 	// Create query handlers
 	queryHandlers := map[string]application.QueryHandler{
-		"get_configuration":             application.NewGetConfigurationQueryHandler(repository),
+		"get_configuration":            application.NewGetConfigurationQueryHandler(repository),
 		"get_configuration_by_profile": application.NewGetConfigurationByProfileQueryHandler(repository),
 		"get_all_configurations":       application.NewGetAllConfigurationsQueryHandler(repository),
 		"get_available_profiles":       application.NewGetAvailableProfilesQueryHandler(profileRepo),

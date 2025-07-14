@@ -1,0 +1,50 @@
+[user]
+	name = Lars Artmann
+	email = git@lars.software
+	signingkey = 76687BB69B36BFB1B1C58FA878B4350389C71333
+[core]
+	autocrlf = input
+	compression = 9
+	packedGitLimit = 512m
+	packedGitWindowSize = 512m
+	pager = cat
+	quotePath = false
+	editor = nano
+	excludesfile = /Users/larsartmann/.gitignore_global
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[url "ssh://git@github.com/LarsArtmann"]
+	insteadOf = https://github.com/LarsArtmann
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[submodule]
+	fetchJobs = 8
+[http]
+	postBuffer = 524288000
+[ssh]
+	multiplexing = true
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
+[gpg]
+	program = /run/current-system/sw/bin/gpg
+[git-town]
+	sync-perennial-strategy = rebase
+[pager]
+	diff = bat
+[init]
+	defaultBranch = master
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[gc]
+	auto = 6700
+	autopacklimit = 50
+	autodetach = true
+	pruneexpire = 2 weeks ago
+

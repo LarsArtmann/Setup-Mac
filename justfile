@@ -315,6 +315,105 @@ health:
     @echo ""
     @echo "✅ Health check complete"
 
+# Go Development Tools
+# ===================
+
+# Run Go linter with golangci-lint on current directory
+go-lint *ARGS="./...":
+    @echo "🔍 Running Go linters..."
+    golangci-lint run {{ARGS}}
+    @echo "✅ Go linting complete"
+
+# Format Go code with gofumpt (stricter than gofmt)
+go-format *ARGS=".":
+    @echo "🎨 Formatting Go code with gofumpt..."
+    gofumpt -l -w {{ARGS}}
+    @echo "✅ Go code formatted"
+
+# Generate Go tests for a package using gotests
+go-gen-tests package *ARGS="":
+    @echo "🧪 Generating Go tests for package: {{package}}"
+    gotests -all -w {{ARGS}} {{package}}
+    @echo "✅ Go tests generated"
+
+# Generate mocks for Go interfaces using mockgen
+go-gen-mocks source destination *ARGS="":
+    @echo "🎭 Generating Go mocks..."
+    mockgen -source={{source}} -destination={{destination}} {{ARGS}}
+    @echo "✅ Go mocks generated"
+
+# Generate wire dependency injection code
+go-wire *ARGS="":
+    @echo "🔌 Generating wire dependency injection..."
+    wire {{ARGS}}
+    @echo "✅ Wire generation complete"
+
+# Start Go debugger (delve) for a Go binary
+go-debug binary *ARGS="":
+    @echo "🐛 Starting Go debugger for: {{binary}}"
+    dlv exec {{binary}} {{ARGS}}
+
+# Start Go debugger for tests
+go-debug-test package *ARGS="":
+    @echo "🐛 Starting Go debugger for tests in: {{package}}"
+    dlv test {{package}} {{ARGS}}
+
+# Run gopls language server check on current directory
+go-check *ARGS=".":
+    @echo "🔍 Running gopls check..."
+    gopls check {{ARGS}}
+    @echo "✅ Gopls check complete"
+
+# Generate protobuf Go code using buf
+go-proto-gen *ARGS="":
+    @echo "🔧 Generating protobuf Go code..."
+    buf generate {{ARGS}}
+    @echo "✅ Protobuf generation complete"
+
+# Lint protobuf files using buf
+go-proto-lint *ARGS="":
+    @echo "🔍 Linting protobuf files..."
+    buf lint {{ARGS}}
+    @echo "✅ Protobuf linting complete"
+
+# Full Go development workflow - format, lint, test, build
+go-dev package="./...":
+    @echo "🛠️  Running full Go development workflow..."
+    @just go-format
+    @just go-lint {{package}}
+    go test {{package}}
+    go build {{package}}
+    @echo "✅ Go development workflow complete"
+
+# Update Go tools (using go install)
+go-update-tools:
+    @echo "🔄 Updating Go development tools..."
+    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+    go install mvdan.cc/gofumpt@latest
+    go install golang.org/x/tools/gopls@latest
+    go install github.com/cweill/gotests/gotests@latest
+    go install github.com/google/wire/cmd/wire@latest
+    go install go.uber.org/mock/mockgen@latest
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+    go install github.com/bufbuild/buf/cmd/buf@latest
+    go install github.com/go-delve/delve/cmd/dlv@latest
+    @echo "✅ Go tools updated"
+
+# Show Go tools versions
+go-tools-version:
+    @echo "📋 Go Development Tools Versions"
+    @echo "================================="
+    @echo -n "Go: "; go version | cut -d' ' -f3
+    @echo -n "golangci-lint: "; golangci-lint --version | head -1
+    @echo -n "gofumpt: "; gofumpt -version 2>/dev/null || echo "installed"
+    @echo -n "gopls: "; gopls version | head -1
+    @echo -n "gotests: "; gotests -version 2>/dev/null || echo "installed"
+    @echo -n "wire: "; wire version 2>/dev/null || echo "installed"
+    @echo -n "mockgen: "; mockgen --version 2>/dev/null || echo "installed"
+    @echo -n "protoc-gen-go: "; protoc-gen-go --version 2>/dev/null || echo "installed"
+    @echo -n "buf: "; buf --version 2>/dev/null | head -1 || echo "installed"
+    @echo -n "delve: "; dlv version | head -1
+
 # Configure Claude AI settings using the Go tool
 claude-config profile="personal" *ARGS="":
     @echo "🤖 Configuring Claude AI with profile: {{profile}}"
@@ -363,6 +462,21 @@ help:
     @echo "  benchmark      - Benchmark shell startup performance"
     @echo "  debug          - Debug shell startup with verbose logging"
     @echo "  health         - Health check for shell and dev environment"
+    @echo ""
+    @echo "Go Development Tools:"
+    @echo "  go-lint           - Run golangci-lint on Go code"
+    @echo "  go-format         - Format Go code with gofumpt"
+    @echo "  go-gen-tests      - Generate Go tests with gotests"
+    @echo "  go-gen-mocks      - Generate Go mocks with mockgen"
+    @echo "  go-wire           - Generate wire dependency injection"
+    @echo "  go-debug          - Start Go debugger (delve) for binary"
+    @echo "  go-debug-test     - Start Go debugger for tests"
+    @echo "  go-check          - Run gopls language server check"
+    @echo "  go-proto-gen      - Generate protobuf Go code with buf"
+    @echo "  go-proto-lint     - Lint protobuf files with buf"
+    @echo "  go-dev            - Full Go development workflow"
+    @echo "  go-update-tools   - Update all Go development tools"
+    @echo "  go-tools-version  - Show versions of all Go tools"
     @echo ""
     @echo "Maintenance:"
     @echo "  check          - Check system status and outdated packages"

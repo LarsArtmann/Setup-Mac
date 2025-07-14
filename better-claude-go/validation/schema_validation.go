@@ -10,18 +10,18 @@ import (
 
 // JSONSchema represents a JSON schema definition
 type JSONSchema struct {
-	Type                 string                    `json:"type"`
-	Properties           map[string]*JSONSchema    `json:"properties,omitempty"`
-	Required             []string                  `json:"required,omitempty"`
-	Enum                 []interface{}             `json:"enum,omitempty"`
-	Items                *JSONSchema               `json:"items,omitempty"`
-	AdditionalProperties interface{}               `json:"additionalProperties,omitempty"`
-	Pattern              string                    `json:"pattern,omitempty"`
-	Minimum              *float64                  `json:"minimum,omitempty"`
-	Maximum              *float64                  `json:"maximum,omitempty"`
-	MinLength            *int                      `json:"minLength,omitempty"`
-	MaxLength            *int                      `json:"maxLength,omitempty"`
-	Description          string                    `json:"description,omitempty"`
+	Type                 string                 `json:"type"`
+	Properties           map[string]*JSONSchema `json:"properties,omitempty"`
+	Required             []string               `json:"required,omitempty"`
+	Enum                 []interface{}          `json:"enum,omitempty"`
+	Items                *JSONSchema            `json:"items,omitempty"`
+	AdditionalProperties interface{}            `json:"additionalProperties,omitempty"`
+	Pattern              string                 `json:"pattern,omitempty"`
+	Minimum              *float64               `json:"minimum,omitempty"`
+	Maximum              *float64               `json:"maximum,omitempty"`
+	MinLength            *int                   `json:"minLength,omitempty"`
+	MaxLength            *int                   `json:"maxLength,omitempty"`
+	Description          string                 `json:"description,omitempty"`
 }
 
 // SchemaValidator provides JSON schema validation for domain objects
@@ -38,7 +38,7 @@ func NewSchemaValidator() *SchemaValidator {
 		configValueSchemas: make(map[string]*JSONSchema),
 		securityValidator:  NewSecurityValidator(),
 	}
-	
+
 	validator.initializeSchemas()
 	return validator
 }
@@ -58,7 +58,7 @@ func (sv *SchemaValidator) GetConfigValueSchema(key string) *JSONSchema {
 	if schema, exists := sv.configValueSchemas[key]; exists {
 		return schema
 	}
-	
+
 	// Return generic string schema for unknown keys
 	return &JSONSchema{
 		Type:        "string",
@@ -70,7 +70,7 @@ func (sv *SchemaValidator) GetConfigValueSchema(key string) *JSONSchema {
 func (sv *SchemaValidator) ValidateConfiguration(config *domain.Configuration) []ValidationError {
 	// Convert configuration to JSON-compatible format
 	configData := sv.ConfigurationToJSON(config)
-	
+
 	// Validate against schema
 	return sv.ValidateJSON(configData)
 }
@@ -78,15 +78,15 @@ func (sv *SchemaValidator) ValidateConfiguration(config *domain.Configuration) [
 // ValidateJSON validates JSON data against the configuration schema
 func (sv *SchemaValidator) ValidateJSON(data map[string]interface{}) []ValidationError {
 	var errors []ValidationError
-	
+
 	// Validate against main configuration schema
 	schemaErrors := sv.validateAgainstSchema(data, sv.configurationSchema, "")
 	errors = append(errors, schemaErrors...)
-	
+
 	// Additional security validation
 	securityErrors := sv.validateSecurity(data)
 	errors = append(errors, securityErrors...)
-	
+
 	return errors
 }
 
@@ -96,12 +96,12 @@ func (sv *SchemaValidator) ConfigurationToJSON(config *domain.Configuration) map
 	for key, value := range config.Settings() {
 		settings[key.Value()] = value.Value()
 	}
-	
+
 	envVars := make(map[string]interface{})
 	for key, value := range config.EnvVariables() {
 		envVars[key] = value
 	}
-	
+
 	return map[string]interface{}{
 		"profile":      config.Profile().Value(),
 		"settings":     settings,
@@ -116,18 +116,18 @@ func (sv *SchemaValidator) JSONToConfiguration(data map[string]interface{}) (*do
 	if !ok {
 		return nil, fmt.Errorf("profile field is required and must be a string")
 	}
-	
+
 	profile, err := domain.NewProfile(profileStr)
 	if err != nil {
 		return nil, fmt.Errorf("invalid profile: %w", err)
 	}
-	
+
 	// Create configuration
 	config, err := domain.NewConfiguration(*profile, "schema-created")
 	if err != nil {
 		return nil, fmt.Errorf("failed to create configuration: %w", err)
 	}
-	
+
 	// Apply settings if present
 	if settingsData, ok := data["settings"].(map[string]interface{}); ok {
 		for keyStr, valueData := range settingsData {
@@ -135,21 +135,21 @@ func (sv *SchemaValidator) JSONToConfiguration(data map[string]interface{}) (*do
 			if err != nil {
 				continue // Skip invalid keys
 			}
-			
+
 			valueStr, ok := valueData.(string)
 			if !ok {
 				continue // Skip non-string values
 			}
-			
+
 			value, err := domain.NewConfigValue(valueStr)
 			if err != nil {
 				continue // Skip invalid values
 			}
-			
+
 			config.ChangeConfiguration(*key, *value, "schema-created")
 		}
 	}
-	
+
 	return config, nil
 }
 
@@ -163,7 +163,7 @@ func (sv *SchemaValidator) initializeSchemas() {
 		},
 		Description: "Configuration profile that determines default settings",
 	}
-	
+
 	sv.configurationSchema = &JSONSchema{
 		Type: "object",
 		Properties: map[string]*JSONSchema{
@@ -171,7 +171,7 @@ func (sv *SchemaValidator) initializeSchemas() {
 			"settings": {
 				Type: "object",
 				Properties: map[string]*JSONSchema{
-					"theme":                        sv.createThemeSchema(),
+					"theme":                       sv.createThemeSchema(),
 					"parallelTasksCount":          sv.createParallelTasksCountSchema(),
 					"autoUpdates":                 sv.createAutoUpdatesSchema(),
 					"preferredNotifChannel":       sv.createNotificationChannelSchema(),
@@ -191,7 +191,7 @@ func (sv *SchemaValidator) initializeSchemas() {
 		AdditionalProperties: false,
 		Description:          "Complete configuration object",
 	}
-	
+
 	// Store individual config value schemas
 	sv.configValueSchemas["theme"] = sv.createThemeSchema()
 	sv.configValueSchemas["parallelTasksCount"] = sv.createParallelTasksCountSchema()
@@ -267,7 +267,7 @@ func (sv *SchemaValidator) createDiffToolSchema() *JSONSchema {
 
 func (sv *SchemaValidator) validateAgainstSchema(data interface{}, schema *JSONSchema, path string) []ValidationError {
 	var errors []ValidationError
-	
+
 	switch schema.Type {
 	case "object":
 		errors = append(errors, sv.validateObject(data, schema, path)...)
@@ -276,13 +276,13 @@ func (sv *SchemaValidator) validateAgainstSchema(data interface{}, schema *JSONS
 	case "array":
 		errors = append(errors, sv.validateArray(data, schema, path)...)
 	}
-	
+
 	return errors
 }
 
 func (sv *SchemaValidator) validateObject(data interface{}, schema *JSONSchema, path string) []ValidationError {
 	var errors []ValidationError
-	
+
 	objData, ok := data.(map[string]interface{})
 	if !ok {
 		errors = append(errors, ValidationError{
@@ -294,7 +294,7 @@ func (sv *SchemaValidator) validateObject(data interface{}, schema *JSONSchema, 
 		})
 		return errors
 	}
-	
+
 	// Validate required fields
 	for _, required := range schema.Required {
 		if _, exists := objData[required]; !exists {
@@ -307,11 +307,11 @@ func (sv *SchemaValidator) validateObject(data interface{}, schema *JSONSchema, 
 			})
 		}
 	}
-	
+
 	// Validate properties
 	for propName, propValue := range objData {
 		propPath := sv.joinPath(path, propName)
-		
+
 		if propSchema, exists := schema.Properties[propName]; exists {
 			propErrors := sv.validateAgainstSchema(propValue, propSchema, propPath)
 			errors = append(errors, propErrors...)
@@ -328,13 +328,13 @@ func (sv *SchemaValidator) validateObject(data interface{}, schema *JSONSchema, 
 			}
 		}
 	}
-	
+
 	return errors
 }
 
 func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, path string) []ValidationError {
 	var errors []ValidationError
-	
+
 	strData, ok := data.(string)
 	if !ok {
 		errors = append(errors, ValidationError{
@@ -346,7 +346,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 		})
 		return errors
 	}
-	
+
 	// Validate enum values
 	if len(schema.Enum) > 0 {
 		validEnum := false
@@ -356,7 +356,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 				break
 			}
 		}
-		
+
 		if !validEnum {
 			errors = append(errors, ValidationError{
 				Field:    path,
@@ -367,7 +367,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 			})
 		}
 	}
-	
+
 	// Validate pattern
 	if schema.Pattern != "" {
 		// Simple pattern validation (could be enhanced with regex)
@@ -381,7 +381,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 			})
 		}
 	}
-	
+
 	// Validate length constraints
 	if schema.MinLength != nil && len(strData) < *schema.MinLength {
 		errors = append(errors, ValidationError{
@@ -392,7 +392,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 			Severity: ValidationSeverityError,
 		})
 	}
-	
+
 	if schema.MaxLength != nil && len(strData) > *schema.MaxLength {
 		errors = append(errors, ValidationError{
 			Field:    path,
@@ -402,7 +402,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 			Severity: ValidationSeverityError,
 		})
 	}
-	
+
 	// Validate numeric constraints for string numbers
 	if schema.Minimum != nil || schema.Maximum != nil {
 		if numValue, err := strconv.ParseFloat(strData, 64); err == nil {
@@ -415,7 +415,7 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 					Severity: ValidationSeverityError,
 				})
 			}
-			
+
 			if schema.Maximum != nil && numValue > *schema.Maximum {
 				errors = append(errors, ValidationError{
 					Field:    path,
@@ -427,13 +427,13 @@ func (sv *SchemaValidator) validateString(data interface{}, schema *JSONSchema, 
 			}
 		}
 	}
-	
+
 	return errors
 }
 
 func (sv *SchemaValidator) validateArray(data interface{}, schema *JSONSchema, path string) []ValidationError {
 	var errors []ValidationError
-	
+
 	arrData, ok := data.([]interface{})
 	if !ok {
 		errors = append(errors, ValidationError{
@@ -445,7 +445,7 @@ func (sv *SchemaValidator) validateArray(data interface{}, schema *JSONSchema, p
 		})
 		return errors
 	}
-	
+
 	// Validate array items
 	if schema.Items != nil {
 		for i, item := range arrData {
@@ -454,20 +454,20 @@ func (sv *SchemaValidator) validateArray(data interface{}, schema *JSONSchema, p
 			errors = append(errors, itemErrors...)
 		}
 	}
-	
+
 	return errors
 }
 
 func (sv *SchemaValidator) validateSecurity(data map[string]interface{}) []ValidationError {
 	var errors []ValidationError
-	
+
 	// Validate environment variables for security
 	if envVars, ok := data["envVariables"].(map[string]interface{}); ok {
 		for name, value := range envVars {
 			if valueStr, ok := value.(string); ok {
 				securityErrors := sv.securityValidator.ValidateEnvironmentVariableValue(name, valueStr)
 				errors = append(errors, securityErrors...)
-				
+
 				// Additional schema-specific security checks
 				if sv.isSystemVariable(name) {
 					errors = append(errors, ValidationError{
@@ -481,7 +481,7 @@ func (sv *SchemaValidator) validateSecurity(data map[string]interface{}) []Valid
 			}
 		}
 	}
-	
+
 	// Validate configuration values for security
 	if settings, ok := data["settings"].(map[string]interface{}); ok {
 		for key, value := range settings {
@@ -497,7 +497,7 @@ func (sv *SchemaValidator) validateSecurity(data map[string]interface{}) []Valid
 			}
 		}
 	}
-	
+
 	return errors
 }
 
@@ -540,13 +540,13 @@ func (sv *SchemaValidator) isSystemVariable(name string) bool {
 		"PATH", "HOME", "USER", "SHELL", "PWD", "TERM", "LANG", "TZ",
 		"PS1", "PS2", "IFS", "TMPDIR", "LOGNAME", "HOSTNAME",
 	}
-	
+
 	for _, sysVar := range systemVars {
 		if name == sysVar {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

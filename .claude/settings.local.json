@@ -15,7 +15,24 @@
       "Bash(./better-claude:*)",
       "Bash(nix search:*)",
       "Bash(nu:*)",
-      "Bash(pre-commit:*)"
+      "Bash(pre-commit:*)",
+      "Bash(mockgen:*)",
+      "Bash(curl:*)",
+      "Bash(/Users/larsartmann/Desktop/Setup-Mac/shell-performance-benchmark.sh:*)",
+      "Bash(protoc-gen-go:*)",
+      "Bash(templ version:*)",
+      "Bash(kubectl version:*)",
+      "Bash(buf:*)",
+      "Bash(zsh:*)",
+      "Bash(ZSH_DEBUG=1 zsh -i -c 'exit')",
+      "Bash(hyperfine:*)",
+      "Bash(pkill:*)",
+      "Bash(dlv:*)",
+      "Bash(aws:*)",
+      "Bash(nixup:*)",
+      "Bash(ZSH_DEBUG=1 zsh -i -c \"exit\")",
+      "Bash(gcloud version:*)",
+      "Bash(gup:*)"
     ],
     "deny": []
   }

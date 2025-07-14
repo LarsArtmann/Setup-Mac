@@ -1,6 +1,5 @@
 # Using PATH and environment variables from nix-darwin instead of setting them here
 # This ensures consistency across shells
+# JAVA_HOME is now set in dotfiles/nix/environment.nix
 
-# Set JAVA_HOME explicitly since it's not being set by nix-darwin
-export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which java))))"
 export GOPRIVATE=github.com/LarsArtmann/*

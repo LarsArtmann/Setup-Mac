@@ -2,13 +2,13 @@
 
 # Claude Configuration Script with Enhanced Performance and Profile Management
 # ==========================================================================
-# 
+#
 # DESCRIPTION:
 #   Production-ready Claude AI configuration management tool with profile-based
 #   settings, automatic backups, and intelligent validation. Supports development,
 #   production, and personal environments with optimized performance.
 #
-# USAGE: 
+# USAGE:
 #   ./claude-conf.sh [OPTIONS]
 #
 # OPTIONS:
@@ -19,7 +19,7 @@
 #
 # PROFILES:
 #   dev/development        High-performance settings (50 tasks, 500ms threshold)
-#   prod/production        Conservative settings (10 tasks, 2000ms threshold)  
+#   prod/production        Conservative settings (10 tasks, 2000ms threshold)
 #   personal/default       Balanced settings (20 tasks, 1000ms threshold)
 #
 # ENVIRONMENT VARIABLES:
@@ -32,14 +32,14 @@
 #
 # DEPENDENCIES:
 #   - jq: JSON processor for configuration management
-#   - claude: Claude AI command-line interface  
+#   - claude: Claude AI command-line interface
 #   - bun: JavaScript runtime (optional, for updates)
 #
 # EXIT CODES:
 #   0: Success - configuration applied successfully
 #   1: Error - invalid profile, missing dependencies, or configuration failure
 #
-# SECURITY: 
+# SECURITY:
 #   - Input validation for all parameters
 #   - No dangerous operations (rm, sudo, downloads)
 #   - Automatic backup creation for safety
@@ -47,7 +47,7 @@
 #
 # PERFORMANCE:
 #   - Cached configuration loading
-#   - Batch validation operations  
+#   - Batch validation operations
 #   - Optimized JSON processing
 #   - ~1.5s execution time, 34MB peak memory
 #
@@ -111,7 +111,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Set default profile if not provided via argument  
+# Set default profile if not provided via argument
 # Priority: --profile flag > CLAUDE_PROFILE env var > personal default
 CURRENT_PROFILE="${CURRENT_PROFILE:-${CLAUDE_PROFILE:-personal}}"
 
@@ -133,7 +133,7 @@ log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
 
-# Log success messages (green) 
+# Log success messages (green)
 log_success() {
     echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
@@ -187,7 +187,7 @@ CLAUDE_CONFIG_KEYS="theme parallelTasksCount preferredNotifChannel messageIdleNo
 CLAUDE_CONFIG_VALUES="dark-daltonized 20 iterm2_with_bell 1000 false bat"
 
 # ============================================================================
-# CONFIGURATION SCHEMA FUNCTIONS  
+# CONFIGURATION SCHEMA FUNCTIONS
 # ============================================================================
 
 # Get configuration value by key from the current profile schema
@@ -198,7 +198,7 @@ get_schema_value() {
     local key="$1"
     local keys_array=($CLAUDE_CONFIG_KEYS)
     local values_array=($CLAUDE_CONFIG_VALUES)
-    
+
     # Linear search through configuration arrays (bash 3+ compatible)
     for i in "${!keys_array[@]}"; do
         if [[ "${keys_array[i]}" == "$key" ]]; then
@@ -216,7 +216,7 @@ CLAUDE_ENV_SCHEMA='{
     "EDITOR": "nano",                                          # Default text editor
     "CLAUDE_CODE_ENABLE_TELEMETRY": "1",                      # Enable telemetry collection
     "OTEL_METRICS_EXPORTER": "otlp",                          # OpenTelemetry metrics exporter
-    "OTEL_LOGS_EXPORTER": "otlp",                             # OpenTelemetry logs exporter  
+    "OTEL_LOGS_EXPORTER": "otlp",                             # OpenTelemetry logs exporter
     "OTEL_EXPORTER_OTLP_PROTOCOL": "grpc",                    # OTLP protocol (grpc/http)
     "OTEL_EXPORTER_OTLP_ENDPOINT": "http://localhost:4317",   # OTLP collector endpoint
     "OTEL_METRIC_EXPORT_INTERVAL": "10000",                   # Metrics export interval (ms)
@@ -236,7 +236,7 @@ CLAUDE_ENV_SCHEMA='{
 # Profiles: dev (high-performance), prod (conservative), personal (balanced)
 config_service_load_profile() {
     local profile="${1:-$CURRENT_PROFILE}"
-    
+
     case "$profile" in
         "dev"|"development")
             log_info "Loading development profile..."
@@ -280,14 +280,14 @@ config_service_load_profile() {
             }'
             ;;
     esac
-    
+
     log_success "✓ Profile '$profile' loaded"
 }
 
 # ConfigService - Validate profile configuration
 config_service_validate_profile() {
     local profile="${1:-$CURRENT_PROFILE}"
-    
+
     case "$profile" in
         "dev"|"development"|"prod"|"production"|"personal"|"default")
             return 0
@@ -334,12 +334,12 @@ invalidate_config_cache() {
 # Function to get current config value (uses cached ~/.claude.json data)
 get_config_value() {
     local key="$1"
-    
+
     # Ensure config is loaded (silently - no log output during value retrieval)
     if [[ "$CACHE_LOADED" == "false" ]]; then
         load_config_cache >/dev/null 2>&1
     fi
-    
+
     # Use cached config from ~/.claude.json instead of subprocess calls
     echo "$CLAUDE_CONFIG_CACHE" | jq -r ".${key} // null" 2>/dev/null || echo "null"
 }
@@ -348,7 +348,7 @@ get_config_value() {
 execute_command() {
     local cmd="$1"
     local description="$2"
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         log_warning "[DRY-RUN] Would execute: $cmd"
     else
@@ -362,20 +362,20 @@ set_config_if_needed() {
     local key="$1"
     local new_value="$2"
     local current_value
-    
+
     current_value=$(get_config_value "$key")
-    
+
     # Handle quoted values properly - remove quotes for comparison
     if [[ "$current_value" == "\"$new_value\"" ]]; then
         current_value="$new_value"
     fi
-    
+
     # Also handle the case where current value has quotes
     current_value=$(echo "$current_value" | sed 's/^"//;s/"$//')
-    
+
     # Debug output to see what's being compared
     # echo "DEBUG: Comparing '$current_value' vs '$new_value'" >&2
-    
+
     if [[ "$current_value" != "$new_value" ]]; then
         if [[ "$DRY_RUN" == "true" ]]; then
             log_warning "[DRY-RUN] Would set $key: $current_value -> $new_value"
@@ -412,16 +412,16 @@ check_claude_updates() {
         log_warning "bun not found - skipping claude-code update check"
         return 1
     fi
-    
+
     if ! command -v claude &> /dev/null; then
         log_warning "claude command not found - skipping update check"
         return 1
     fi
-    
+
     local current_version
     current_version=$(bun --version 2>/dev/null || echo "unknown")
     log_info "Current bun version: $current_version"
-    
+
     # Always attempt to update claude-code to ensure latest features
     return 0
 }
@@ -518,22 +518,22 @@ validate_configuration() {
         log_warning "[DRY-RUN] Would validate configuration"
         return 0
     fi
-    
+
     log_info "Validating configuration..."
     local config_valid=true
-    
+
     # Validate all configuration settings against schema
     local keys_array=($CLAUDE_CONFIG_KEYS)
     for config_key in "${keys_array[@]}"; do
         local current_value=$(get_config_value "$config_key")
         local expected_value=$(get_schema_value "$config_key")
-        
+
         if [[ "$current_value" != "$expected_value" ]]; then
             log_error "❌ $config_key validation failed: expected '$expected_value', got '$current_value'"
             config_valid=false
         fi
     done
-    
+
     if [[ "$config_valid" == "true" ]]; then
         log_success "✓ Configuration validation passed"
     else

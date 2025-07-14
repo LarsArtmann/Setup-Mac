@@ -34,11 +34,11 @@ type BackupRepository interface {
 
 // BackupInfo represents metadata about a configuration backup
 type BackupInfo struct {
-	Path         string
-	Profile      Profile
-	CreatedAt    string
-	ConfigCount  int
-	FileSize     int64
+	Path        string
+	Profile     Profile
+	CreatedAt   string
+	ConfigCount int
+	FileSize    int64
 }
 
 // RepositoryError represents errors from repository operations
@@ -86,7 +86,7 @@ type ConcurrencyError struct {
 }
 
 func (e ConcurrencyError) Error() string {
-	return fmt.Sprintf("concurrency error for aggregate %s: expected version %d, got %d", 
+	return fmt.Sprintf("concurrency error for aggregate %s: expected version %d, got %d",
 		e.AggregateID, e.ExpectedVersion, e.ActualVersion)
 }
 

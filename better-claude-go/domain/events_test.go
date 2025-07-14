@@ -11,12 +11,12 @@ import (
 // DomainEventsTestSuite contains tests for domain events
 type DomainEventsTestSuite struct {
 	suite.Suite
-	testProfile    Profile
-	testKey        ConfigKey
-	testOldValue   ConfigValue
-	testNewValue   ConfigValue
+	testProfile     Profile
+	testKey         ConfigKey
+	testOldValue    ConfigValue
+	testNewValue    ConfigValue
 	testAggregateID string
-	testSettings   map[ConfigKey]ConfigValue
+	testSettings    map[ConfigKey]ConfigValue
 }
 
 func (suite *DomainEventsTestSuite) SetupTest() {
@@ -33,7 +33,7 @@ func (suite *DomainEventsTestSuite) SetupTest() {
 	suite.testNewValue = *newValue
 
 	suite.testAggregateID = "test-aggregate-id"
-	
+
 	// Create test settings
 	suite.testSettings = make(map[ConfigKey]ConfigValue)
 	suite.testSettings[suite.testKey] = suite.testNewValue
@@ -80,7 +80,7 @@ func (suite *DomainEventsTestSuite) TestConfigurationCreated_InitialConfig() {
 
 	assert.NotNil(suite.T(), event.InitialConfig)
 	assert.Equal(suite.T(), len(suite.testSettings), len(event.InitialConfig))
-	
+
 	for key, value := range suite.testSettings {
 		eventValue, exists := event.InitialConfig[key]
 		assert.True(suite.T(), exists)
@@ -132,7 +132,7 @@ func (suite *DomainEventsTestSuite) TestConfigurationChanged_ValueChange() {
 func (suite *DomainEventsTestSuite) TestProfileSwitched_NewEvent() {
 	oldProfile, _ := NewProfile("dev")
 	newProfile, _ := NewProfile("prod")
-	
+
 	event := NewProfileSwitched(
 		suite.testAggregateID,
 		*oldProfile,
@@ -155,7 +155,7 @@ func (suite *DomainEventsTestSuite) TestProfileSwitched_NewEvent() {
 func (suite *DomainEventsTestSuite) TestProfileSwitched_ProfileChange() {
 	oldProfile, _ := NewProfile("personal")
 	newProfile, _ := NewProfile("production")
-	
+
 	event := NewProfileSwitched(
 		suite.testAggregateID,
 		*oldProfile,
@@ -175,7 +175,7 @@ func (suite *DomainEventsTestSuite) TestProfileSwitched_ProfileChange() {
 func (suite *DomainEventsTestSuite) TestBackupCreated_NewEvent() {
 	backupPath := "/test/backup/path.tar.gz"
 	configCount := 6
-	
+
 	event := NewBackupCreated(
 		suite.testAggregateID,
 		backupPath,
@@ -337,7 +337,7 @@ func (suite *DomainEventsTestSuite) TestDomainEvent_SerializationProperties() {
 func (suite *DomainEventsTestSuite) TestDomainEvent_EdgeCases() {
 	// Test with empty values where allowed
 	emptyValue, _ := NewConfigValue("")
-	
+
 	event := NewConfigurationChanged(
 		suite.testAggregateID,
 		suite.testKey,
@@ -355,7 +355,7 @@ func (suite *DomainEventsTestSuite) TestDomainEvent_EdgeCases() {
 func (suite *DomainEventsTestSuite) TestDomainEvent_LargeConfigChanges() {
 	// Test with large number of config changes
 	largeChangeCount := 100
-	
+
 	event := NewProfileSwitched(
 		suite.testAggregateID,
 		suite.testProfile,
@@ -385,11 +385,11 @@ func (suite *DomainEventsTestSuite) TestDomainEvent_ZeroConfigCount() {
 // Test Event Type Constants
 func (suite *DomainEventsTestSuite) TestDomainEvent_EventTypes() {
 	expectedEventTypes := map[DomainEvent]string{
-		NewConfigurationCreated(suite.testAggregateID, suite.testProfile, suite.testSettings, "user", 1):                                                    "ConfigurationCreated",
-		NewConfigurationChanged(suite.testAggregateID, suite.testKey, suite.testOldValue, suite.testNewValue, "user", suite.testProfile, 2):                "ConfigurationChanged",
-		NewProfileSwitched(suite.testAggregateID, suite.testProfile, ProfileProd, "user", 1, 3):                                                           "ProfileSwitched",
-		NewBackupCreated(suite.testAggregateID, "/path", suite.testProfile, "user", 5, 4):                                                                 "BackupCreated",
-		NewConfigurationValidated(suite.testAggregateID, suite.testProfile, true, 0, "user", 5):                                                          "ConfigurationValidated",
+		NewConfigurationCreated(suite.testAggregateID, suite.testProfile, suite.testSettings, "user", 1):                                    "ConfigurationCreated",
+		NewConfigurationChanged(suite.testAggregateID, suite.testKey, suite.testOldValue, suite.testNewValue, "user", suite.testProfile, 2): "ConfigurationChanged",
+		NewProfileSwitched(suite.testAggregateID, suite.testProfile, ProfileProd, "user", 1, 3):                                             "ProfileSwitched",
+		NewBackupCreated(suite.testAggregateID, "/path", suite.testProfile, "user", 5, 4):                                                   "BackupCreated",
+		NewConfigurationValidated(suite.testAggregateID, suite.testProfile, true, 0, "user", 5):                                             "ConfigurationValidated",
 	}
 
 	for event, expectedType := range expectedEventTypes {

@@ -27,7 +27,7 @@ func (suite *SchemaValidationTestSuite) SetupTest() {
 // Test JSON Schema Generation
 func (suite *SchemaValidationTestSuite) TestSchemaGeneration_Configuration() {
 	schema := suite.schemaValidator.GetConfigurationSchema()
-	
+
 	assert.NotNil(suite.T(), schema)
 	assert.Equal(suite.T(), "object", schema.Type)
 	assert.NotEmpty(suite.T(), schema.Properties)
@@ -37,7 +37,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaGeneration_Configuration() {
 
 func (suite *SchemaValidationTestSuite) TestSchemaGeneration_Profile() {
 	schema := suite.schemaValidator.GetProfileSchema()
-	
+
 	assert.NotNil(suite.T(), schema)
 	assert.Equal(suite.T(), "string", schema.Type)
 	assert.NotEmpty(suite.T(), schema.Enum)
@@ -48,7 +48,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaGeneration_Profile() {
 
 func (suite *SchemaValidationTestSuite) TestSchemaGeneration_ConfigValue() {
 	themeSchema := suite.schemaValidator.GetConfigValueSchema("theme")
-	
+
 	assert.NotNil(suite.T(), themeSchema)
 	assert.Equal(suite.T(), "string", themeSchema.Type)
 	assert.NotEmpty(suite.T(), themeSchema.Enum)
@@ -72,7 +72,7 @@ func (suite *SchemaValidationTestSuite) TestValidateConfiguration_ValidConfigs()
 
 func (suite *SchemaValidationTestSuite) TestValidateConfiguration_InvalidConfigs() {
 	invalidConfig := suite.scenarios.ConfigurationWithValidationErrors()
-	
+
 	errors := suite.schemaValidator.ValidateConfiguration(invalidConfig)
 	assert.NotEmpty(suite.T(), errors, "Invalid configuration should fail schema validation")
 }
@@ -80,16 +80,16 @@ func (suite *SchemaValidationTestSuite) TestValidateConfiguration_InvalidConfigs
 // Test JSON Serialization/Deserialization Validation
 func (suite *SchemaValidationTestSuite) TestJSONSerialization_Configuration() {
 	config := suite.scenarios.ValidDevConfiguration()
-	
+
 	// Convert to JSON-serializable format
 	configData := suite.schemaValidator.ConfigurationToJSON(config)
 	assert.NotNil(suite.T(), configData)
-	
+
 	// Validate the JSON structure
 	jsonBytes, err := json.Marshal(configData)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), jsonBytes)
-	
+
 	// Validate against schema
 	errors := suite.schemaValidator.ValidateJSON(configData)
 	assert.Empty(suite.T(), errors, "Serialized configuration should be valid JSON")
@@ -100,7 +100,7 @@ func (suite *SchemaValidationTestSuite) TestJSONDeserialization_Configuration() 
 	jsonData := map[string]interface{}{
 		"profile": "dev",
 		"settings": map[string]interface{}{
-			"theme":                        "dark",
+			"theme":                       "dark",
 			"parallelTasksCount":          "50",
 			"autoUpdates":                 "false",
 			"preferredNotifChannel":       "iterm2_with_bell",
@@ -112,11 +112,11 @@ func (suite *SchemaValidationTestSuite) TestJSONDeserialization_Configuration() 
 			"EDITOR":                       "nano",
 		},
 	}
-	
+
 	// Validate against schema
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.Empty(suite.T(), errors, "Valid JSON should pass schema validation")
-	
+
 	// Convert back to configuration
 	config, err := suite.schemaValidator.JSONToConfiguration(jsonData)
 	assert.NoError(suite.T(), err)
@@ -135,7 +135,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaConstraints_ThemeValues() {
 				"theme": theme,
 			},
 		}
-		
+
 		errors := suite.schemaValidator.ValidateJSON(jsonData)
 		assert.Empty(suite.T(), errors, "Valid theme '%s' should pass schema validation", theme)
 	}
@@ -147,7 +147,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaConstraints_ThemeValues() {
 				"theme": theme,
 			},
 		}
-		
+
 		errors := suite.schemaValidator.ValidateJSON(jsonData)
 		assert.NotEmpty(suite.T(), errors, "Invalid theme '%s' should fail schema validation", theme)
 	}
@@ -164,7 +164,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaConstraints_ParallelTasksCount
 				"parallelTasksCount": count,
 			},
 		}
-		
+
 		errors := suite.schemaValidator.ValidateJSON(jsonData)
 		assert.Empty(suite.T(), errors, "Valid count '%s' should pass schema validation", count)
 	}
@@ -176,7 +176,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaConstraints_ParallelTasksCount
 				"parallelTasksCount": count,
 			},
 		}
-		
+
 		errors := suite.schemaValidator.ValidateJSON(jsonData)
 		assert.NotEmpty(suite.T(), errors, "Invalid count '%s' should fail schema validation", count)
 	}
@@ -189,7 +189,7 @@ func (suite *SchemaValidationTestSuite) TestEnvironmentVariableSchema() {
 		"EDITOR":                       "nano",
 		"DEBUG":                        "true",
 	}
-	
+
 	invalidEnvVars := map[string]string{
 		"PATH": "dangerous",
 		"HOME": "dangerous",
@@ -200,12 +200,12 @@ func (suite *SchemaValidationTestSuite) TestEnvironmentVariableSchema() {
 	for k, v := range validEnvVars {
 		validEnvVarsInterface[k] = v
 	}
-	
+
 	jsonData := map[string]interface{}{
 		"profile":      "dev",
 		"envVariables": validEnvVarsInterface,
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.Empty(suite.T(), errors, "Valid environment variables should pass schema validation")
 
@@ -214,12 +214,12 @@ func (suite *SchemaValidationTestSuite) TestEnvironmentVariableSchema() {
 		invalidEnvVarsInterface := map[string]interface{}{
 			name: value,
 		}
-		
+
 		jsonData := map[string]interface{}{
 			"profile":      "dev",
 			"envVariables": invalidEnvVarsInterface,
 		}
-		
+
 		errors := suite.schemaValidator.ValidateJSON(jsonData)
 		assert.NotEmpty(suite.T(), errors, "Invalid environment variable '%s' should fail schema validation", name)
 	}
@@ -233,15 +233,15 @@ func (suite *SchemaValidationTestSuite) TestRequiredFields() {
 			"theme": "dark",
 		},
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.NotEmpty(suite.T(), errors, "Missing profile should fail schema validation")
-	
+
 	// Missing settings (if required)
 	jsonData = map[string]interface{}{
 		"profile": "dev",
 	}
-	
+
 	errors = suite.schemaValidator.ValidateJSON(jsonData)
 	// Settings might not be required if they have defaults
 	assert.True(suite.T(), len(errors) >= 0, "Schema validation should complete")
@@ -256,7 +256,7 @@ func (suite *SchemaValidationTestSuite) TestAdditionalProperties() {
 		},
 		"unknownField": "should be rejected",
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.NotEmpty(suite.T(), errors, "Unknown fields should fail schema validation")
 }
@@ -271,7 +271,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaEvolution_BackwardCompatibilit
 			// Missing newer fields should be okay
 		},
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(oldFormatJSON)
 	assert.Empty(suite.T(), errors, "Old configuration format should be backward compatible")
 }
@@ -286,7 +286,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaEvolution_ForwardCompatibility
 		},
 		"schemaVersion": "2.0", // Future schema version
 	}
-	
+
 	// This behavior depends on schema configuration
 	errors := suite.schemaValidator.ValidateJSON(futureFormatJSON)
 	assert.True(suite.T(), len(errors) >= 0, "Future format handling should complete")
@@ -299,12 +299,12 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidation_Performance() {
 	for i := 0; i < 100; i++ {
 		largeSettings[fmt.Sprintf("customField_%d", i)] = "value"
 	}
-	
+
 	jsonData := map[string]interface{}{
 		"profile":  "dev",
 		"settings": largeSettings,
 	}
-	
+
 	// Should handle large configurations efficiently
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.True(suite.T(), len(errors) >= 0, "Large configuration validation should complete")
@@ -316,10 +316,10 @@ func (suite *SchemaValidationTestSuite) TestSchemaErrorMessages_Quality() {
 	jsonData := map[string]interface{}{
 		"profile": "invalid_profile",
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(jsonData)
 	assert.NotEmpty(suite.T(), errors)
-	
+
 	// Error should be descriptive
 	errorMsg := errors[0].Message
 	assert.Contains(suite.T(), errorMsg, "profile")
@@ -337,10 +337,10 @@ func (suite *SchemaValidationTestSuite) TestCustomSchemaRules_ProfileSpecific() 
 			"parallelTasksCount": "100", // High count for dev
 		},
 	}
-	
+
 	errors := suite.schemaValidator.ValidateJSON(devConfigJSON)
 	assert.Empty(suite.T(), errors, "High parallel tasks should be allowed for dev profile")
-	
+
 	// Production profile should warn about high parallel task counts
 	prodConfigJSON := map[string]interface{}{
 		"profile": "prod",
@@ -348,7 +348,7 @@ func (suite *SchemaValidationTestSuite) TestCustomSchemaRules_ProfileSpecific() 
 			"parallelTasksCount": "100", // High count for prod
 		},
 	}
-	
+
 	errors = suite.schemaValidator.ValidateJSON(prodConfigJSON)
 	// Might generate warnings but not necessarily errors
 	assert.True(suite.T(), len(errors) >= 0, "Production validation should complete")
@@ -357,13 +357,13 @@ func (suite *SchemaValidationTestSuite) TestCustomSchemaRules_ProfileSpecific() 
 // Test Schema Validation Caching
 func (suite *SchemaValidationTestSuite) TestSchemaValidation_Caching() {
 	config := suite.scenarios.ValidDevConfiguration()
-	
+
 	// First validation
 	errors1 := suite.schemaValidator.ValidateConfiguration(config)
-	
+
 	// Second validation (should use cached schema)
 	errors2 := suite.schemaValidator.ValidateConfiguration(config)
-	
+
 	// Results should be consistent
 	assert.Equal(suite.T(), len(errors1), len(errors2))
 }
@@ -376,10 +376,10 @@ func TestSchemaValidationTestSuite(t *testing.T) {
 // Additional helper tests for schema utilities
 func TestSchemaValidator_Integration(t *testing.T) {
 	validator := NewSchemaValidator()
-	
+
 	// Test that validator can be created
 	assert.NotNil(t, validator)
-	
+
 	// Test basic schema functionality
 	schema := validator.GetConfigurationSchema()
 	assert.NotNil(t, schema)

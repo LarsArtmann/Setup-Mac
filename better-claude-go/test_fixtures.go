@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-	
+
 	"better-claude/internal/config"
 )
 
@@ -23,7 +23,7 @@ func NewProfileConfigBuilder() *ProfileConfigBuilder {
 	return &ProfileConfigBuilder{
 		profile: config.ProfilePersonal,
 		config: Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "20",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "1000",
@@ -102,7 +102,7 @@ type ConfigBuilder struct {
 func NewConfigBuilder() *ConfigBuilder {
 	return &ConfigBuilder{
 		config: config.Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "20",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "1000",
@@ -213,43 +213,43 @@ var (
 		ProfileProd, ProfileProduction,
 		ProfilePersonal, ProfileDefault,
 	}
-	
+
 	InvalidProfiles = []Profile{
 		"invalid", "test", "", "DEV", "PROD",
 	}
-	
+
 	ValidThemes = []string{
 		"dark-daltonized", "light", "dark", "auto",
 	}
-	
+
 	ValidNotificationChannels = []string{
 		"iterm2_with_bell", "desktop", "none",
 	}
-	
+
 	ValidDiffTools = []string{
 		"bat", "diff", "delta", "code",
 	}
-	
+
 	ValidParallelTasksCounts = []string{
 		"1", "10", "20", "50", "100", "1000",
 	}
-	
+
 	InvalidParallelTasksCounts = []string{
 		"0", "-1", "1001", "abc", "", "10.5",
 	}
-	
+
 	ValidMessageIdleThresholds = []string{
 		"0", "500", "1000", "2000", "60000",
 	}
-	
+
 	InvalidMessageIdleThresholds = []string{
 		"-1", "60001", "abc", "", "1000.5",
 	}
-	
+
 	ValidAutoUpdatesValues = []string{
 		"true", "false",
 	}
-	
+
 	InvalidAutoUpdatesValues = []string{
 		"yes", "no", "1", "0", "", "TRUE", "FALSE",
 	}
@@ -306,7 +306,7 @@ type MockConfigReader struct {
 func NewMockConfigReader() *MockConfigReader {
 	return &MockConfigReader{
 		config: &Config{
-			Theme:                        "dark-daltonized",
+			Theme:                       "dark-daltonized",
 			ParallelTasksCount:          "20",
 			PreferredNotifChannel:       "iterm2_with_bell",
 			MessageIdleNotifThresholdMs: "1000",
@@ -390,9 +390,9 @@ func (m *MockConfigWriter) GetWrittenEnvVar(key string) (string, bool) {
 
 // MockBackupManager for testing
 type MockBackupManager struct {
-	backups       []string
-	shouldError   bool
-	errorMsg      string
+	backups        []string
+	shouldError    bool
+	errorMsg       string
 	lastBackupPath string
 }
 
@@ -407,7 +407,7 @@ func (m *MockBackupManager) CreateBackup(profile Profile) (string, error) {
 	if m.shouldError {
 		return "", fmt.Errorf(m.errorMsg)
 	}
-	
+
 	timestamp := time.Now().Format("20060102_150405")
 	backupPath := filepath.Join(os.TempDir(), fmt.Sprintf("claude-config-%s-%s.json", profile, timestamp))
 	m.lastBackupPath = backupPath

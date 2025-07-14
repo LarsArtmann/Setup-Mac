@@ -28,9 +28,9 @@ type CommandBus interface {
 
 // CreateConfigurationCommand creates a new configuration
 type CreateConfigurationCommand struct {
-	ID        string              `json:"id"`
-	Profile   domain.Profile      `json:"profile"`
-	CreatedBy string              `json:"created_by"`
+	ID        string         `json:"id"`
+	Profile   domain.Profile `json:"profile"`
+	CreatedBy string         `json:"created_by"`
 }
 
 func (c CreateConfigurationCommand) CommandID() string {
@@ -53,11 +53,11 @@ func (c CreateConfigurationCommand) Validate() error {
 
 // ChangeConfigurationCommand updates a configuration setting
 type ChangeConfigurationCommand struct {
-	ID            string              `json:"id"`
-	AggregateID   string              `json:"aggregate_id"`
-	Key           domain.ConfigKey    `json:"key"`
-	Value         domain.ConfigValue  `json:"value"`
-	ChangedBy     string              `json:"changed_by"`
+	ID          string             `json:"id"`
+	AggregateID string             `json:"aggregate_id"`
+	Key         domain.ConfigKey   `json:"key"`
+	Value       domain.ConfigValue `json:"value"`
+	ChangedBy   string             `json:"changed_by"`
 }
 
 func (c ChangeConfigurationCommand) CommandID() string {
@@ -369,13 +369,13 @@ func (h *ValidateConfigurationCommandHandler) CanHandle(commandType string) bool
 
 // CommandResult represents the result of command execution
 type CommandResult struct {
-	Success      bool        `json:"success"`
-	CommandID    string      `json:"command_id"`
-	CommandType  string      `json:"command_type"`
-	Error        string      `json:"error,omitempty"`
-	AggregateID  string      `json:"aggregate_id,omitempty"`
-	Version      int         `json:"version,omitempty"`
-	Metadata     interface{} `json:"metadata,omitempty"`
+	Success     bool        `json:"success"`
+	CommandID   string      `json:"command_id"`
+	CommandType string      `json:"command_type"`
+	Error       string      `json:"error,omitempty"`
+	AggregateID string      `json:"aggregate_id,omitempty"`
+	Version     int         `json:"version,omitempty"`
+	Metadata    interface{} `json:"metadata,omitempty"`
 }
 
 // NewCommandResult creates a new command result

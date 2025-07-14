@@ -35,7 +35,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateConfig_Valid
 		WithDiffTool("bat").
 		WithEnvVar("VALID_VAR", "value").
 		Build()
-	
+
 	errors := suite.validator.ValidateConfig(config)
 	assert.False(suite.T(), errors.HasErrors(), "Valid config should pass schema validation")
 }
@@ -44,7 +44,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateConfig_Missi
 	config := NewConfigBuilder().
 		WithTheme(""). // Empty required field
 		Build()
-	
+
 	errors := suite.validator.ValidateConfig(config)
 	assert.True(suite.T(), errors.HasErrors(), "Config missing required field should fail")
 	assert.Contains(suite.T(), errors.Error(), "required", "Should mention required field")
@@ -54,7 +54,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateConfig_Inval
 	config := NewConfigBuilder().
 		WithTheme("invalid_theme").
 		Build()
-	
+
 	errors := suite.validator.ValidateConfig(config)
 	assert.True(suite.T(), errors.HasErrors(), "Invalid enum value should fail")
 	assert.Contains(suite.T(), errors.Error(), "must be one of", "Should list valid enum values")
@@ -64,7 +64,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateConfig_Inval
 	config := NewConfigBuilder().
 		WithParallelTasksCount("abc"). // Invalid number pattern
 		Build()
-	
+
 	errors := suite.validator.ValidateConfig(config)
 	assert.True(suite.T(), errors.HasErrors(), "Invalid pattern should fail")
 	assert.Contains(suite.T(), errors.Error(), "pattern", "Should mention pattern mismatch")
@@ -75,7 +75,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateConfig_Strin
 	config := NewConfigBuilder().
 		WithTheme(""). // Empty string fails minLength
 		Build()
-	
+
 	errors := suite.validator.ValidateConfig(config)
 	assert.True(suite.T(), errors.HasErrors(), "String below minimum length should fail")
 }
@@ -88,7 +88,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateProfileConfi
 		WithParallelTasksCount("50").
 		WithEnvVar("EDITOR", "nano").
 		Build()
-	
+
 	validator := NewSchemaValidator(ProfileConfigSchema)
 	errors := validator.ValidateProfileConfig(*profileConfig)
 	assert.False(suite.T(), errors.HasErrors(), "Valid profile config should pass")
@@ -98,7 +98,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateProfileConfi
 	profileConfig := NewProfileConfigBuilder().
 		WithProfile("invalid_profile").
 		Build()
-	
+
 	validator := NewSchemaValidator(ProfileConfigSchema)
 	errors := validator.ValidateProfileConfig(*profileConfig)
 	assert.True(suite.T(), errors.HasErrors(), "Invalid profile should fail")
@@ -112,7 +112,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateApplicationO
 		WithDryRun(true).
 		WithForwardArgs("chat", "status").
 		Build()
-	
+
 	validator := NewSchemaValidator(ApplicationOptionsSchema)
 	errors := validator.ValidateApplicationOptions(options)
 	assert.False(suite.T(), errors.HasErrors(), "Valid application options should pass")
@@ -122,7 +122,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateApplicationO
 	options := NewApplicationOptionsBuilder().
 		WithForwardArgs("command; dangerous", "rm | pipe").
 		Build()
-	
+
 	validator := NewSchemaValidator(ApplicationOptionsSchema)
 	errors := validator.ValidateApplicationOptions(options)
 	assert.True(suite.T(), errors.HasErrors(), "Dangerous forward args should fail")
@@ -147,10 +147,10 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateType() {
 		{42, "string", false},
 		{true, "string", false},
 	}
-	
+
 	for _, tc := range testCases {
 		result := suite.validator.validateType(tc.value, tc.expectedType)
-		assert.Equal(suite.T(), tc.shouldPass, result, 
+		assert.Equal(suite.T(), tc.shouldPass, result,
 			"Type validation for %v as %s should be %t", tc.value, tc.expectedType, tc.shouldPass)
 	}
 }
@@ -158,15 +158,15 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateType() {
 // Test Enum Validation
 func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateEnum() {
 	enumValues := []string{"option1", "option2", "option3"}
-	
+
 	validCases := []string{"option1", "option2", "option3"}
 	invalidCases := []string{"invalid", "OPTION1", "", "option4"}
-	
+
 	for _, value := range validCases {
 		result := suite.validator.validateEnum(value, enumValues)
 		assert.True(suite.T(), result, "Valid enum value %s should pass", value)
 	}
-	
+
 	for _, value := range invalidCases {
 		result := suite.validator.validateEnum(value, enumValues)
 		assert.False(suite.T(), result, "Invalid enum value %s should fail", value)
@@ -186,13 +186,13 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_MatchesPattern() {
 		{"0", "^[1-9][0-9]*$", false},
 		{"abc", "^[1-9][0-9]*$", false},
 		{"", "^[1-9][0-9]*$", false},
-		
+
 		// Non-negative integer pattern
 		{"0", "^[0-9]+$", true},
 		{"123", "^[0-9]+$", true},
 		{"abc", "^[0-9]+$", false},
 		{"", "^[0-9]+$", false},
-		
+
 		// Environment variable name pattern
 		{"VALID_NAME", "^[A-Z_][A-Z0-9_]*$", true},
 		{"_VALID", "^[A-Z_][A-Z0-9_]*$", true},
@@ -200,7 +200,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_MatchesPattern() {
 		{"123invalid", "^[A-Z_][A-Z0-9_]*$", false},
 		{"invalid-name", "^[A-Z_][A-Z0-9_]*$", false},
 		{"lowercase", "^[A-Z_][A-Z0-9_]*$", false},
-		
+
 		// No shell metacharacters pattern
 		{"safe_command", "^[^;&|]*$", true},
 		{"command args", "^[^;&|]*$", true},
@@ -208,7 +208,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_MatchesPattern() {
 		{"command & background", "^[^;&|]*$", false},
 		{"command | pipe", "^[^;&|]*$", false},
 	}
-	
+
 	for _, tc := range testCases {
 		result := suite.validator.matchesPattern(tc.value, tc.pattern)
 		assert.Equal(suite.T(), tc.matches, result,
@@ -223,22 +223,22 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateString() {
 		"maxLength": 10,
 		"pattern":   "^[a-zA-Z]+$",
 	}
-	
+
 	testCases := []struct {
 		value       string
 		shouldError bool
 		errorType   string
 	}{
-		{"abc", false, ""},                    // Valid
-		{"abcdefghij", false, ""},             // Valid at max length
-		{"ab", true, "minimum length"},        // Too short
+		{"abc", false, ""},                      // Valid
+		{"abcdefghij", false, ""},               // Valid at max length
+		{"ab", true, "minimum length"},          // Too short
 		{"abcdefghijk", true, "maximum length"}, // Too long
-		{"abc123", true, "pattern"},           // Invalid pattern
+		{"abc123", true, "pattern"},             // Invalid pattern
 	}
-	
+
 	for _, tc := range testCases {
 		errors := suite.validator.validateString("test", tc.value, schema)
-		
+
 		if tc.shouldError {
 			assert.True(suite.T(), errors.HasErrors(), "Should have error for: %s", tc.value)
 			assert.Contains(suite.T(), errors.Error(), tc.errorType, "Error should mention: %s", tc.errorType)
@@ -254,7 +254,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateNumber() {
 		"minimum": 1,
 		"maximum": 100,
 	}
-	
+
 	testCases := []struct {
 		value       float64
 		shouldError bool
@@ -266,10 +266,10 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateNumber() {
 		{0.5, true, "minimum value"},   // Below minimum
 		{101.0, true, "maximum value"}, // Above maximum
 	}
-	
+
 	for _, tc := range testCases {
 		errors := suite.validator.validateNumber("test", tc.value, schema)
-		
+
 		if tc.shouldError {
 			assert.True(suite.T(), errors.HasErrors(), "Should have error for: %f", tc.value)
 			assert.Contains(suite.T(), errors.Error(), tc.errorType, "Error should mention: %s", tc.errorType)
@@ -293,7 +293,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateObject() {
 			},
 		},
 	}
-	
+
 	// Valid object
 	validObj := map[string]interface{}{
 		"name": "John",
@@ -301,7 +301,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateObject() {
 	}
 	errors := suite.validator.validateObject("", validObj, schema)
 	assert.False(suite.T(), errors.HasErrors(), "Valid object should pass")
-	
+
 	// Missing required property
 	missingReq := map[string]interface{}{
 		"name": "John",
@@ -310,7 +310,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateObject() {
 	errors = suite.validator.validateObject("", missingReq, schema)
 	assert.True(suite.T(), errors.HasErrors(), "Object missing required property should fail")
 	assert.Contains(suite.T(), errors.Error(), "required", "Should mention required property")
-	
+
 	// Invalid property value
 	invalidProp := map[string]interface{}{
 		"name": "John",
@@ -324,16 +324,16 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateObject() {
 func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateArray() {
 	schema := map[string]interface{}{
 		"items": map[string]interface{}{
-			"type": "string",
+			"type":    "string",
 			"pattern": "^[a-zA-Z]+$",
 		},
 	}
-	
+
 	// Valid array
 	validArray := []interface{}{"abc", "def", "ghi"}
 	errors := suite.validator.validateArray("", validArray, schema)
 	assert.False(suite.T(), errors.HasErrors(), "Valid array should pass")
-	
+
 	// Invalid array item
 	invalidArray := []interface{}{"abc", "123", "def"}
 	errors = suite.validator.validateArray("", invalidArray, schema)
@@ -344,7 +344,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_ValidateArray() {
 // Test Struct to Map Conversion
 func (suite *SchemaValidationTestSuite) TestStructToMap() {
 	config := Config{
-		Theme:                        "dark",
+		Theme:                       "dark",
 		ParallelTasksCount:          "20",
 		PreferredNotifChannel:       "iterm2_with_bell",
 		MessageIdleNotifThresholdMs: "1000",
@@ -354,9 +354,9 @@ func (suite *SchemaValidationTestSuite) TestStructToMap() {
 			"VAR1": "value1",
 		},
 	}
-	
+
 	result := structToMap(config)
-	
+
 	assert.Equal(suite.T(), "dark", result["theme"])
 	assert.Equal(suite.T(), "20", result["parallelTasksCount"])
 	assert.Equal(suite.T(), "iterm2_with_bell", result["preferredNotifChannel"])
@@ -377,7 +377,7 @@ func (suite *SchemaValidationTestSuite) TestValidateJSON_ValidJSON() {
 		"diffTool": "bat",
 		"env": {}
 	}`
-	
+
 	errors := ValidateJSON(validJSON, ConfigSchema)
 	assert.False(suite.T(), errors.HasErrors(), "Valid JSON should pass validation")
 }
@@ -388,7 +388,7 @@ func (suite *SchemaValidationTestSuite) TestValidateJSON_InvalidJSON() {
 		"parallelTasksCount": "20",
 		"invalidField": true,
 	}` // Trailing comma makes it invalid
-	
+
 	errors := ValidateJSON(invalidJSON, ConfigSchema)
 	assert.True(suite.T(), errors.HasErrors(), "Invalid JSON should fail validation")
 	assert.Contains(suite.T(), errors.Error(), "invalid JSON", "Should mention JSON parsing error")
@@ -400,7 +400,7 @@ func (suite *SchemaValidationTestSuite) TestValidateJSON_SchemaViolation() {
 		"parallelTasksCount": "abc",
 		"env": {}
 	}`
-	
+
 	errors := ValidateJSON(jsonWithViolation, ConfigSchema)
 	assert.True(suite.T(), errors.HasErrors(), "JSON with schema violations should fail")
 	assert.Contains(suite.T(), errors.Error(), "must be one of", "Should mention enum violation")
@@ -413,7 +413,7 @@ func (suite *SchemaValidationTestSuite) TestSchemaValidator_EdgeCases() {
 	config := NewConfigBuilder().Build()
 	errors := emptyValidator.ValidateConfig(config)
 	assert.False(suite.T(), errors.HasErrors(), "Empty schema should not cause errors")
-	
+
 	// Nil values
 	var nilConfig Config
 	errors = suite.validator.ValidateConfig(nilConfig)
@@ -429,12 +429,12 @@ func (suite *SchemaValidationTestSuite) TestSchemaConstants() {
 	assert.NotNil(suite.T(), ConfigSchema)
 	assert.NotNil(suite.T(), ProfileConfigSchema)
 	assert.NotNil(suite.T(), ApplicationOptionsSchema)
-	
+
 	// Test schema structure
 	assert.Equal(suite.T(), "object", ConfigSchema["type"])
 	assert.NotNil(suite.T(), ConfigSchema["properties"])
 	assert.NotNil(suite.T(), ConfigSchema["required"])
-	
+
 	// Test required fields
 	required, ok := ConfigSchema["required"].([]string)
 	assert.True(suite.T(), ok, "Required should be a string slice")

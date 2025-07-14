@@ -84,7 +84,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfiguration_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	getResult, ok := result.(GetConfigurationResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, getResult.ConfigurationID)
@@ -130,7 +130,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationByProfile_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	getResult, ok := result.(GetConfigurationByProfileResult)
 	assert.True(suite.T(), ok)
 	assert.True(suite.T(), getResult.Profile.IsEqual(*profile))
@@ -161,7 +161,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurations_Success() {
 	profile2, _ := domain.NewProfile("prod")
 	config1, _ := domain.NewConfiguration(*profile1, "creator1")
 	config2, _ := domain.NewConfiguration(*profile2, "creator2")
-	
+
 	expectedConfigs := []*domain.Configuration{config1, config2}
 
 	query := ListConfigurationsQuery{}
@@ -174,7 +174,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurations_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	listResult, ok := result.(ListConfigurationsResult)
 	assert.True(suite.T(), ok)
 	assert.Len(suite.T(), listResult.Configurations, 2)
@@ -193,7 +193,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurations_Empty() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	listResult, ok := result.(ListConfigurationsResult)
 	assert.True(suite.T(), ok)
 	assert.Empty(suite.T(), listResult.Configurations)
@@ -206,7 +206,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationValidationStatus_Succes
 	configID := "test-config-id"
 	profile, _ := domain.NewProfile("dev")
 	config, _ := domain.NewConfiguration(*profile, "creator")
-	
+
 	// Run validation to set status
 	config.ValidateConfiguration("validator")
 
@@ -222,7 +222,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationValidationStatus_Succes
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	validationResult, ok := result.(GetConfigurationValidationStatusResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, validationResult.ConfigurationID)
@@ -237,7 +237,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationValidationStatus_WithEr
 	configID := "test-config-id"
 	profile, _ := domain.NewProfile("dev")
 	config, _ := domain.NewConfiguration(*profile, "creator")
-	
+
 	// Set invalid theme to force validation error
 	invalidTheme, _ := domain.NewConfigValue("")
 	config.ChangeConfiguration(domain.ConfigKeyTheme, *invalidTheme, "testUser")
@@ -255,7 +255,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationValidationStatus_WithEr
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	validationResult, ok := result.(GetConfigurationValidationStatusResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, validationResult.ConfigurationID)
@@ -270,7 +270,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationHistory_Success() {
 	configID := "test-config-id"
 	profile, _ := domain.NewProfile("dev")
 	config, _ := domain.NewConfiguration(*profile, "creator")
-	
+
 	// Generate some events
 	newValue, _ := domain.NewConfigValue("dark")
 	config.ChangeConfiguration(domain.ConfigKeyTheme, *newValue, "changer")
@@ -289,7 +289,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationHistory_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	historyResult, ok := result.(GetConfigurationHistoryResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), configID, historyResult.ConfigurationID)
@@ -302,7 +302,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationHistory_WithLimit() {
 	configID := "test-config-id"
 	profile, _ := domain.NewProfile("dev")
 	config, _ := domain.NewConfiguration(*profile, "creator")
-	
+
 	// Generate multiple events
 	for i := 0; i < 5; i++ {
 		newValue, _ := domain.NewConfigValue("value-" + string(rune(i)))
@@ -322,7 +322,7 @@ func (suite *QueryHandlersTestSuite) TestGetConfigurationHistory_WithLimit() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	historyResult, ok := result.(GetConfigurationHistoryResult)
 	assert.True(suite.T(), ok)
 	assert.LessOrEqual(suite.T(), len(historyResult.Events), 3)
@@ -350,7 +350,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurationsByValidationStatus_Va
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	listResult, ok := result.(ListConfigurationsByValidationStatusResult)
 	assert.True(suite.T(), ok)
 	assert.Len(suite.T(), listResult.Configurations, 1)
@@ -362,7 +362,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurationsByValidationStatus_In
 	// Arrange
 	profile, _ := domain.NewProfile("dev")
 	invalidConfig, _ := domain.NewConfiguration(*profile, "creator")
-	
+
 	// Set invalid theme
 	invalidTheme, _ := domain.NewConfigValue("")
 	invalidConfig.ChangeConfiguration(domain.ConfigKeyTheme, *invalidTheme, "testUser")
@@ -382,7 +382,7 @@ func (suite *QueryHandlersTestSuite) TestListConfigurationsByValidationStatus_In
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	listResult, ok := result.(ListConfigurationsByValidationStatusResult)
 	assert.True(suite.T(), ok)
 	assert.Len(suite.T(), listResult.Configurations, 1)
@@ -395,7 +395,7 @@ func (suite *QueryHandlersTestSuite) TestGetRecentConfigurations_Success() {
 	profile, _ := domain.NewProfile("dev")
 	config1, _ := domain.NewConfiguration(*profile, "creator1")
 	config2, _ := domain.NewConfiguration(*profile, "creator2")
-	
+
 	expectedConfigs := []*domain.Configuration{config1, config2}
 
 	query := GetRecentConfigurationsQuery{
@@ -410,7 +410,7 @@ func (suite *QueryHandlersTestSuite) TestGetRecentConfigurations_Success() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	recentResult, ok := result.(GetRecentConfigurationsResult)
 	assert.True(suite.T(), ok)
 	assert.Len(suite.T(), recentResult.Configurations, 2)
@@ -431,7 +431,7 @@ func (suite *QueryHandlersTestSuite) TestGetRecentConfigurations_DefaultLimit() 
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	recentResult, ok := result.(GetRecentConfigurationsResult)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), 10, recentResult.Limit) // Default limit
@@ -484,7 +484,7 @@ func (suite *QueryHandlersTestSuite) TestQueryPerformance_LargeResultSets() {
 	// Test handling of large result sets
 	largeConfigSet := make([]*domain.Configuration, 1000)
 	profile, _ := domain.NewProfile("dev")
-	
+
 	for i := 0; i < 1000; i++ {
 		config, _ := domain.NewConfiguration(*profile, "creator")
 		largeConfigSet[i] = config
@@ -499,7 +499,7 @@ func (suite *QueryHandlersTestSuite) TestQueryPerformance_LargeResultSets() {
 	// Assert
 	assert.NoError(suite.T(), err)
 	assert.NotNil(suite.T(), result)
-	
+
 	listResult, ok := result.(ListConfigurationsResult)
 	assert.True(suite.T(), ok)
 	assert.Len(suite.T(), listResult.Configurations, 1000)

@@ -123,7 +123,7 @@ get_schema_value() {
     local key="$1"
     local keys_array=($CLAUDE_CONFIG_KEYS)
     local values_array=($CLAUDE_CONFIG_VALUES)
-    
+
     for i in "${!keys_array[@]}"; do
         if [[ "${keys_array[i]}" == "$key" ]]; then
             echo "${values_array[i]}"
@@ -148,7 +148,7 @@ CLAUDE_ENV_SCHEMA='{
 # Configuration profiles support (dev/prod/personal)
 config_service_load_profile() {
     local profile="${1:-$CURRENT_PROFILE}"
-    
+
     case "$profile" in
         "dev"|"development")
             log_info "Loading development profile..."
@@ -189,7 +189,7 @@ config_service_load_profile() {
             }'
             ;;
     esac
-    
+
     # Profile loaded, schema values updated
     log_success "✓ Profile '$profile' loaded"
 }
@@ -197,7 +197,7 @@ config_service_load_profile() {
 # ConfigService - Validate profile configuration
 config_service_validate_profile() {
     local profile="${1:-$CURRENT_PROFILE}"
-    
+
     case "$profile" in
         "dev"|"development"|"prod"|"production"|"personal"|"default")
             return 0
@@ -243,35 +243,35 @@ invalidate_config_cache() {
 # Performance optimization: Batch get multiple config values with single jq call
 get_all_config_values() {
     local keys_str="$1"
-    
+
     # Ensure config is loaded
     if [[ "$CACHE_LOADED" == "false" ]]; then
         load_config_cache >/dev/null 2>&1
     fi
-    
+
     # Create jq query for all keys at once
     local jq_query=""
     local keys_array=($keys_str)
-    
+
     for key in "${keys_array[@]}"; do
         if [[ -n "$jq_query" ]]; then
             jq_query="$jq_query, "
         fi
         jq_query="$jq_query\"$key\": (.${key} // null)"
     done
-    
+
     echo "$CLAUDE_CONFIG_CACHE" | jq "{$jq_query}" 2>/dev/null || echo '{}'
 }
 
 # Function to get current config value (uses cached ~/.claude.json data)
 get_config_value() {
     local key="$1"
-    
+
     # Ensure config is loaded
     if [[ "$CACHE_LOADED" == "false" ]]; then
         load_config_cache >/dev/null 2>&1
     fi
-    
+
     echo "$CLAUDE_CONFIG_CACHE" | jq -r ".${key} // null" 2>/dev/null || echo "null"
 }
 
@@ -279,7 +279,7 @@ get_config_value() {
 execute_command() {
     local cmd="$1"
     local description="$2"
-    
+
     if [[ "$DRY_RUN" == "true" ]]; then
         log_warning "[DRY-RUN] Would execute: $cmd"
     else
@@ -292,22 +292,22 @@ execute_command() {
 batch_set_config() {
     local keys_str="$1"
     local config_changes_made=false
-    
+
     # Get all current values in one jq call
     local current_values
     current_values=$(get_all_config_values "$keys_str")
-    
+
     local keys_array=($keys_str)
     for config_key in "${keys_array[@]}"; do
         local new_value=$(get_schema_value "$config_key")
         local current_value=$(echo "$current_values" | jq -r ".${config_key} // null" 2>/dev/null || echo "null")
-        
+
         # Handle quoted values properly
         if [[ "$current_value" == "\"$new_value\"" ]]; then
             current_value="$new_value"
         fi
         current_value=$(echo "$current_value" | sed 's/^"//;s/"$//')
-        
+
         if [[ "$current_value" != "$new_value" ]]; then
             if [[ "$DRY_RUN" == "true" ]]; then
                 log_warning "[DRY-RUN] Would set $config_key: $current_value -> $new_value"
@@ -321,7 +321,7 @@ batch_set_config() {
             log_info "✓ $config_key already set to $new_value (skipping)"
         fi
     done
-    
+
     # Return success if any changes were made
     [[ "$config_changes_made" == "true" ]] && return 0 || return 1
 }
@@ -347,16 +347,16 @@ check_claude_updates() {
         log_warning "bun not found - skipping claude-code update check"
         return 1
     fi
-    
+
     if [[ "$HAS_CLAUDE" != "true" ]]; then
         log_warning "claude command not found - skipping update check"
         return 1
     fi
-    
+
     local current_version
     current_version=$(bun --version 2>/dev/null || echo "unknown")
     log_info "Current bun version: $current_version"
-    
+
     return 0
 }
 
@@ -441,25 +441,25 @@ validate_configuration() {
         log_warning "[DRY-RUN] Would validate configuration"
         return 0
     fi
-    
+
     log_info "Validating configuration..."
     local config_valid=true
-    
+
     # Performance optimization: Batch validation with single jq call
     local validation_results
     validation_results=$(get_all_config_values "$CLAUDE_CONFIG_KEYS")
-    
+
     local keys_array=($CLAUDE_CONFIG_KEYS)
     for config_key in "${keys_array[@]}"; do
         local current_value=$(echo "$validation_results" | jq -r ".${config_key} // null" 2>/dev/null || echo "null")
         local expected_value=$(get_schema_value "$config_key")
-        
+
         if [[ "$current_value" != "$expected_value" ]]; then
             log_error "❌ $config_key validation failed: expected '$expected_value', got '$current_value'"
             config_valid=false
         fi
     done
-    
+
     if [[ "$config_valid" == "true" ]]; then
         log_success "✓ Configuration validation passed"
     else

@@ -26,17 +26,17 @@ type ViperConfigManager struct {
 func NewViperConfigManager(logger logger.Logger, dryRun bool) *ViperConfigManager {
 	homeDir := lo.Must(os.UserHomeDir())
 	v := viper.New()
-	
+
 	// Configure viper for Claude config
 	v.SetConfigName(".claude")
 	v.SetConfigType("json")
 	v.AddConfigPath(homeDir)
 	v.AddConfigPath(".")
-	
+
 	// Environment variable support
 	v.SetEnvPrefix("CLAUDE")
 	v.AutomaticEnv()
-	
+
 	return &ViperConfigManager{
 		logger:     logger,
 		dryRun:     dryRun,
@@ -129,7 +129,7 @@ func (m *ViperConfigManager) InvalidateCache() {
 // GetCurrentConfigValue returns the current value for a given config key using functional patterns
 func (m *ViperConfigManager) GetCurrentConfigValue(config *Config, key ConfigKey) string {
 	configValueMap := map[ConfigKey]func(*Config) string{
-		KeyTheme:                        func(c *Config) string { return c.Theme },
+		KeyTheme:                       func(c *Config) string { return c.Theme },
 		KeyParallelTasksCount:          func(c *Config) string { return c.ParallelTasksCount },
 		KeyPreferredNotifChannel:       func(c *Config) string { return c.PreferredNotifChannel },
 		KeyMessageIdleNotifThresholdMs: func(c *Config) string { return c.MessageIdleNotifThresholdMs },

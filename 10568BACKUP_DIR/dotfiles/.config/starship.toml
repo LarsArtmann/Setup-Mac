@@ -1,0 +1,113 @@
+# Starship configuration for Lars Artmann
+# Optimized for performance and aligned with development workflow
+
+# Performance: Disable command timeout for faster response
+command_timeout = 1000
+
+# Format: Clean, minimal prompt similar to robbyrussell theme (single line)
+format = """
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$golang\
+$nodejs\
+$rust\
+$java\
+$python\
+$cmd_duration\
+$character"""
+
+# Directory: Show only current directory name (like robbyrussell)
+[directory]
+truncation_length = 1
+truncation_symbol = ""
+truncate_to_repo = false
+style = "bold cyan"
+
+# Git branch: Clean branch display (robbyrussell style)
+[git_branch]
+symbol = "git:"
+style = "bold green"
+format = "[$symbol($branch)]($style)"
+
+# Git status: Clean status indicators (robbyrussell style)
+[git_status]
+format = '[$all_status$ahead_behind]($style)'
+style = "bold green"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+conflicted = "="
+deleted = "✘"
+renamed = "»"
+modified = "+"
+staged = "+"
+untracked = "?"
+
+# Language versions: Only show when relevant
+[golang]
+symbol = "🐹 "
+style = "bold cyan"
+format = "[$symbol($version)]($style)"
+
+[nodejs]
+symbol = "⬢ "
+style = "bold green"
+format = "[$symbol($version)]($style)"
+
+[rust]
+symbol = "🦀 "
+style = "bold red"
+format = "[$symbol($version)]($style)"
+
+[java]
+symbol = "☕ "
+style = "bold red"
+format = "[$symbol($version)]($style)"
+
+[python]
+symbol = "🐍 "
+style = "bold yellow"
+format = "[$symbol($version)]($style)"
+
+# Command duration: Show for commands taking >2s
+[cmd_duration]
+min_time = 2000
+style = "bold yellow"
+format = "[$duration]($style)"
+
+# Character: Simple prompt character
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[➜](bold red)"
+
+# Git state: Show during rebases, merges, etc.
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+# Disable modules we don't need for performance
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
+
+[kubernetes]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[package]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[battery]
+disabled = true
+
+[time]
+disabled = true

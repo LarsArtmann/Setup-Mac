@@ -393,7 +393,7 @@ exit 0
    ```bash
    # macOS code signing
    codesign -s "Developer ID Application: Your Name" better-claude
-   
+
    # Verify signature
    codesign -v better-claude
    ```
@@ -402,7 +402,7 @@ exit 0
    ```bash
    # Generate checksums
    sha256sum better-claude-* > checksums.txt
-   
+
    # GPG sign checksums
    gpg --armor --detach-sign checksums.txt
    ```

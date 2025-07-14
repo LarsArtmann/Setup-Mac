@@ -563,7 +563,7 @@ chmod 700 ~/.claude-backups
 
 ### Q: Which profile should I use?
 
-**A:** 
+**A:**
 - **Personal**: Individual use, balanced settings
 - **Development**: Active coding, need fast feedback
 - **Production**: Stable environment, conservative settings
@@ -574,7 +574,7 @@ chmod 700 ~/.claude-backups
 
 ### Q: How often should I backup?
 
-**A:** 
+**A:**
 - Always backup before production changes
 - Consider daily backups for active development
 - Keep at least 3-5 recent backups
@@ -593,7 +593,7 @@ chmod 700 ~/.claude-backups
 
 ### Q: How do I contribute improvements?
 
-**A:** 
+**A:**
 1. Test your changes with all profiles
 2. Ensure backward compatibility
 3. Update documentation

@@ -21,7 +21,7 @@ Successfully modernized the `better-claude-go` codebase by replacing manual impl
 #### Files Created/Modified:
 - `/cmd/root.go` - Root command with global flag management
 - `/cmd/configure.go` - Main configuration command
-- `/cmd/backup.go` - Backup management command  
+- `/cmd/backup.go` - Backup management command
 - `/cmd/restore.go` - Restore functionality command
 - `/cmd/utils.go` - Shared utilities for commands
 - `/main.go` - Simplified main function with graceful shutdown
@@ -103,7 +103,7 @@ errors := lo.FilterMap(lo.Keys(settingsMap), func(key config.ConfigKey, _ int) (
 #### Tracing Coverage:
 - Root command execution
 - Configure command with profile and configuration operations
-- Backup and restore operations  
+- Backup and restore operations
 - Package updates
 - Claude command execution
 

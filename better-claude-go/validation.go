@@ -25,7 +25,7 @@ func (errs ValidationErrors) Error() string {
 	if len(errs) == 0 {
 		return ""
 	}
-	
+
 	messages := make([]string, len(errs))
 	for i, err := range errs {
 		messages[i] = err.Error()
@@ -49,7 +49,7 @@ type ProfileValidator struct {
 
 func (v ProfileValidator) Validate() ValidationErrors {
 	var errors ValidationErrors
-	
+
 	if v.Profile == "" {
 		errors = append(errors, ValidationError{
 			Field:   "profile",
@@ -58,25 +58,25 @@ func (v ProfileValidator) Validate() ValidationErrors {
 		})
 		return errors
 	}
-	
+
 	validProfiles := []Profile{
 		ProfileDev, ProfileDevelopment,
 		ProfileProd, ProfileProduction,
 		ProfilePersonal, ProfileDefault,
 	}
-	
+
 	for _, valid := range validProfiles {
 		if v.Profile == valid {
 			return errors // No errors, valid profile
 		}
 	}
-	
+
 	errors = append(errors, ValidationError{
 		Field:   "profile",
 		Value:   v.Profile,
 		Message: "invalid profile. Valid profiles: dev, development, prod, production, personal, default",
 	})
-	
+
 	return errors
 }
 
@@ -87,7 +87,7 @@ type ConfigValidator struct {
 
 func (v ConfigValidator) Validate() ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Validate theme
 	if v.Config.Theme == "" {
 		errors = append(errors, ValidationError{
@@ -96,7 +96,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			Message: "theme cannot be empty",
 		})
 	}
-	
+
 	// Validate parallel tasks count
 	if v.Config.ParallelTasksCount != "" {
 		if count, err := strconv.Atoi(v.Config.ParallelTasksCount); err != nil {
@@ -113,7 +113,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	// Validate notification channel
 	validChannels := []string{"iterm2_with_bell", "desktop", "none"}
 	if v.Config.PreferredNotifChannel != "" {
@@ -132,7 +132,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	// Validate message idle threshold
 	if v.Config.MessageIdleNotifThresholdMs != "" {
 		if threshold, err := strconv.Atoi(v.Config.MessageIdleNotifThresholdMs); err != nil {
@@ -149,7 +149,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	// Validate auto updates
 	if v.Config.AutoUpdates != "" {
 		if v.Config.AutoUpdates != "true" && v.Config.AutoUpdates != "false" {
@@ -160,7 +160,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	// Validate diff tool
 	validDiffTools := []string{"bat", "diff", "delta", "code"}
 	if v.Config.DiffTool != "" {
@@ -179,7 +179,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	// Validate environment variables
 	for key, value := range v.Config.Env {
 		if key == "" {
@@ -189,7 +189,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 				Message: "environment variable key cannot be empty",
 			})
 		}
-		
+
 		// Check for dangerous environment variables
 		dangerousVars := []string{"PATH", "HOME", "USER", "SHELL"}
 		for _, dangerous := range dangerousVars {
@@ -201,7 +201,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 				})
 			}
 		}
-		
+
 		// Validate environment variable name format
 		validEnvNamePattern := regexp.MustCompile(`^[A-Z_][A-Z0-9_]*$`)
 		if !validEnvNamePattern.MatchString(key) {
@@ -212,7 +212,7 @@ func (v ConfigValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	return errors
 }
 
@@ -223,11 +223,11 @@ type ApplicationOptionsValidator struct {
 
 func (v ApplicationOptionsValidator) Validate() ValidationErrors {
 	var errors ValidationErrors
-	
+
 	// Validate profile
 	profileValidator := ProfileValidator{Profile: v.Options.Profile}
 	errors = append(errors, profileValidator.Validate()...)
-	
+
 	// Validate forwarded arguments
 	for i, arg := range v.Options.ForwardArgs {
 		if strings.Contains(arg, ";") || strings.Contains(arg, "&") || strings.Contains(arg, "|") {
@@ -238,7 +238,7 @@ func (v ApplicationOptionsValidator) Validate() ValidationErrors {
 			})
 		}
 	}
-	
+
 	return errors
 }
 
