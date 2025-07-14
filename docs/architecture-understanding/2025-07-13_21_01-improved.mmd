@@ -1,0 +1,121 @@
+graph TB
+    subgraph "Development Environment"
+        User[User]
+        Terminal[Terminal/iTerm2]
+        Shell[Zsh + Starship]
+        IDE[JetBrains IDEs]
+    end
+
+    subgraph "Unified Configuration Management"
+        Justfile[Justfile - Task Runner]
+        HomeManager[Home Manager - ENABLED]
+        ClaudeConf[claude-conf.sh - PRIMARY]
+        NixFlake[Nix Flake System]
+    end
+
+    subgraph "Declarative Package Management"
+        NixDarwin[Nix Darwin - PRIMARY]
+        HomeManagerPackages[Home Manager Packages]
+        BrewMinimal[Homebrew - GUI Apps Only]
+        UnifiedPath[Unified PATH Management]
+    end
+
+    subgraph "Declarative Shell Environment"
+        HomeShell[Home Manager Shell Config]
+        StarshipDeclarative[Declarative Starship Config]
+        CompletionsManaged[Managed Completions]
+        EnvVarsManaged[Managed Environment Variables]
+    end
+
+    subgraph "Enhanced Development Tools"
+        GitImproved[Git + git-town + templates]
+        PreCommitActive[Pre-commit Hooks - ACTIVE]
+        GoToolchain[Go + Enhanced Tools]
+        ModernJS[Bun/Node.js Optimized]
+        ContainerTools[Docker/OrbStack]
+        CloudOptimized[Optimized Cloud CLIs]
+    end
+
+    subgraph "Streamlined Claude Integration"
+        ClaudePrimary[claude-conf.sh - Primary Tool]
+        ClaudeProfiles[Profile Management]
+        ClaudeBackup[Automated Backup]
+        ClaudeValidation[Configuration Validation]
+    end
+
+    subgraph "Automated Operations"
+        GHActionsEnhanced[Enhanced GitHub Actions]
+        AutomatedTesting[Automated Configuration Testing]
+        PerformanceMonitoring[Performance Monitoring]
+        AutoCleanup[Automated Cleanup]
+    end
+
+    subgraph "Documentation & Monitoring"
+        DocsStructure[Centralized Documentation]
+        ArchDocs[Architecture Documentation]
+        LearningDocs[Learning Documentation]
+        HealthChecks[Automated Health Checks]
+    end
+
+    %% Primary user flow
+    User --> Terminal
+    User --> IDE
+    User --> Justfile
+
+    %% Unified configuration management
+    Justfile --> HomeManager
+    Justfile --> NixFlake
+    Justfile --> ClaudeConf
+    HomeManager --> NixDarwin
+
+    %% Declarative package management
+    NixDarwin --> HomeManagerPackages
+    NixDarwin --> UnifiedPath
+    BrewMinimal --> HomeManagerPackages
+    UnifiedPath --> Shell
+
+    %% Declarative shell configuration
+    HomeManager --> HomeShell
+    HomeManager --> StarshipDeclarative
+    HomeManager --> CompletionsManaged
+    HomeManager --> EnvVarsManaged
+
+    %% Enhanced development environment
+    Terminal --> Shell
+    Shell --> GitImproved
+    Shell --> GoToolchain
+    Shell --> ModernJS
+    Shell --> ContainerTools
+    Shell --> CloudOptimized
+
+    %% Streamlined Claude integration
+    ClaudeConf --> ClaudeProfiles
+    ClaudeConf --> ClaudeBackup
+    ClaudeConf --> ClaudeValidation
+
+    %% Automated operations
+    GitImproved --> PreCommitActive
+    PreCommitActive --> GHActionsEnhanced
+    GHActionsEnhanced --> AutomatedTesting
+    AutomatedTesting --> PerformanceMonitoring
+    PerformanceMonitoring --> AutoCleanup
+
+    %% Documentation and monitoring
+    DocsStructure --> ArchDocs
+    DocsStructure --> LearningDocs
+    HealthChecks --> PerformanceMonitoring
+    HealthChecks --> AutoCleanup
+
+    %% Feedback loops
+    HealthChecks -.-> HomeManager
+    AutoCleanup -.-> NixDarwin
+    PerformanceMonitoring -.-> Shell
+
+    classDef primary fill:#ccffcc,stroke:#00aa00
+    classDef enhanced fill:#cceeff,stroke:#0088cc
+    classDef automated fill:#ffeecc,stroke:#cc8800
+    classDef eliminated fill:#f0f0f0,stroke:#888888
+
+    class HomeManager,NixDarwin,ClaudeConf primary
+    class GitImproved,GoToolchain,PreCommitActive,GHActionsEnhanced enhanced
+    class AutomatedTesting,PerformanceMonitoring,AutoCleanup,HealthChecks automated

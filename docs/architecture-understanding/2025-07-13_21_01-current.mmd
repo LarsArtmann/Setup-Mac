@@ -1,0 +1,113 @@
+graph TB
+    subgraph "Development Environment"
+        User[User]
+        Terminal[Terminal/iTerm2]
+        Shell[Zsh + Starship]
+        IDE[JetBrains IDEs]
+    end
+
+    subgraph "Configuration Management"
+        Justfile[Justfile - Task Runner]
+        ManualLink[manual-linking.sh]
+        ClaudeConf[claude-conf.sh]
+        BetterClaude[better-claude Go Binary]
+        BetterClaudeGo[better-claude-go Project]
+    end
+
+    subgraph "Package Management"
+        Nix[Nix Darwin]
+        Homebrew[Homebrew]
+        Dotfiles[Dotfiles Directory]
+        FlakeNix[flake.nix]
+        EnvNix[environment.nix]
+        HomeManagerDisabled[Home Manager - DISABLED]
+    end
+
+    subgraph "Shell Environment"
+        Zshrc[.zshrc]
+        NushellConfig[Nushell Config]
+        Starship[Starship Config]
+        Completions[Completion Cache]
+        PATH[PATH Management]
+    end
+
+    subgraph "Development Tools"
+        Git[Git + git-town]
+        PreCommit[Pre-commit Hooks]
+        Go[Go Toolchain]
+        Node[Node.js/Bun]
+        Docker[Docker/Containers]
+        Cloud[Cloud CLIs]
+    end
+
+    subgraph "Claude AI Integration"
+        ClaudeShell[claude-conf.sh - Simple]
+        ClaudeBinary[better-claude - Binary]
+        ClaudeProject[better-claude-go - DDD/CQRS]
+        ClaudeConfig[Claude Configuration]
+    end
+
+    subgraph "Automation & CI"
+        GHActions[GitHub Actions]
+        PreCommitHooks[Pre-commit Validation]
+        JustTasks[Just Tasks]
+        BackupSystem[Backup/Restore]
+    end
+
+    %% User interactions
+    User --> Terminal
+    User --> IDE
+    User --> Justfile
+
+    %% Task management flow
+    Justfile --> ManualLink
+    Justfile --> Nix
+    Justfile --> PreCommit
+    Justfile --> ClaudeConf
+    Justfile --> BackupSystem
+
+    %% Package management flow
+    Nix --> FlakeNix
+    FlakeNix --> EnvNix
+    EnvNix --> Dotfiles
+    Nix -.-> HomeManagerDisabled
+    Homebrew --> Dotfiles
+
+    %% Shell configuration
+    ManualLink --> Zshrc
+    ManualLink --> NushellConfig
+    ManualLink --> Starship
+    Shell --> Completions
+    EnvNix --> PATH
+
+    %% Development environment
+    Terminal --> Shell
+    Shell --> Git
+    Shell --> Go
+    Shell --> Node
+    Shell --> Docker
+    Shell --> Cloud
+
+    %% Claude integrations (redundant)
+    ClaudeShell -.-> ClaudeConfig
+    ClaudeBinary -.-> ClaudeConfig
+    ClaudeProject -.-> ClaudeConfig
+
+    %% CI/CD flow
+    Git --> PreCommitHooks
+    PreCommitHooks --> GHActions
+    GHActions --> BackupSystem
+
+    %% Issues (marked in red)
+    HomeManagerDisabled -.->|DISABLED| Dotfiles
+    ClaudeShell -.->|REDUNDANT| ClaudeBinary
+    ClaudeBinary -.->|REDUNDANT| ClaudeProject
+    PATH -.->|CONFLICTS| Shell
+
+    classDef disabled fill:#ffcccc,stroke:#ff0000
+    classDef redundant fill:#ffffcc,stroke:#ffaa00
+    classDef working fill:#ccffcc,stroke:#00aa00
+
+    class HomeManagerDisabled disabled
+    class ClaudeBinary,ClaudeProject redundant
+    class Justfile,Nix,Shell,Git working
