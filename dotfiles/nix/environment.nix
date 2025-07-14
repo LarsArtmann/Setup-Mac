@@ -14,33 +14,35 @@ in
       SHELL = "${pkgs.nushell}/bin/nu"; # Dynamic reference to nushell package
       #NIX_PATH = "$HOME/.nix-defexpr/channels:nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels";
 
-      # Custom PATH configuration
+      # Custom PATH configuration - optimized for performance
+      # Order: most frequently used first, system paths last
       PATH =
         lib.concatStringsSep ":" [
-          # Homebrew paths
+          # High-frequency development tools first
+          "${homeDir}/.local/bin"
+          "${homeDir}/go/bin"
+          "${homeDir}/.bun/bin"
+
+          # Homebrew paths (frequently used)
           "/opt/homebrew/bin"
           "/opt/homebrew/sbin"
 
-          # Nix paths
+          # Nix paths (managed packages)
           "${homeDir}/.nix-profile/bin"
           "/run/current-system/sw/bin"
           "/nix/var/nix/profiles/default/bin"
 
-          # System paths
+          # Tool-specific paths (less frequent)
+          "${homeDir}/Library/Application Support/JetBrains/Toolbox/scripts"
+          "${homeDir}/.turso"
+          "${homeDir}/.orbstack/bin"
+
+          # System paths (fallback, lowest priority)
           "/usr/local/bin"
           "/usr/bin"
           "/bin"
           "/usr/sbin"
           "/sbin"
-
-          # Tool-specific paths
-          "${homeDir}/Library/Application Support/JetBrains/Toolbox/scripts"
-          "${homeDir}/.local/bin"
-          "${homeDir}/go/bin"
-          "${homeDir}/.bun/bin"
-          "${homeDir}/.turso"
-          "${homeDir}/.opencode/bin"
-          "${homeDir}/.orbstack/bin"
         ];
 
       # Java Home configuration - using Nix-installed JDK 21

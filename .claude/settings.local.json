@@ -39,7 +39,9 @@
       "Bash(fzf:*)",
       "Bash(test:*)",
       "Bash(./scripts/optimize.sh:*)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(./scripts/maintenance.sh:*)",
+      "Bash(./shell-performance-benchmark.sh:*)"
     ],
     "deny": []
   }

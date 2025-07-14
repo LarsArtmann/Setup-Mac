@@ -571,6 +571,10 @@ main_maintenance() {
     local failed_tasks=()
     local completed_tasks=()
 
+    # Initialize arrays properly
+    failed_tasks=()
+    completed_tasks=()
+
     for task in "${tasks_to_run[@]}"; do
         case "$task" in
             cleanup)
