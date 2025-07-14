@@ -12,7 +12,16 @@ in
       EDITOR = "nano";
       LANG = "en_GB.UTF-8";
       SHELL = "${pkgs.nushell}/bin/nu"; # Dynamic reference to nushell package
-      #NIX_PATH = "$HOME/.nix-defexpr/channels:nixpkgs=flake:nixpkgs:/nix/var/nix/profiles/per-user/root/channels";
+
+      # Optimize NIX_PATH for better performance
+      NIX_PATH = "nixpkgs=flake:nixpkgs";
+
+      # Disable automatic homebrew analytics for faster startup
+      HOMEBREW_NO_ANALYTICS = "1";
+      HOMEBREW_NO_AUTO_UPDATE = "1";
+
+      # Optimize locale settings
+      LC_ALL = "en_GB.UTF-8";
 
       # Custom PATH configuration - optimized for performance
       # Order: most frequently used first, system paths last
@@ -261,6 +270,24 @@ in
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
       diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+
+      # Performance aliases
+      path = "echo $PATH | tr ':' '\\n' | nl";
+      envclean = "env | sort | less";
     };
+
+    # Optimize shell initialization
+    shellInit = ''
+      # Disable homebrew auto-update check in shells
+      export HOMEBREW_NO_AUTO_UPDATE=1
+      export HOMEBREW_NO_ANALYTICS=1
+
+      # Optimize terminal performance
+      export TERM=xterm-256color
+
+      # Reduce history size for better memory usage
+      export HISTSIZE=5000
+      export SAVEHIST=5000
+    '';
   };
 }
