@@ -43,8 +43,15 @@
         SortColumn = "CPUUsage";
         SortDirection = 0;
       };
-      controlcenter.BatteryShowPercentage = true;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
+      controlcenter = {
+        AirDrop = true;                  # Show AirDrop control in menu bar
+        BatteryShowPercentage = true;    # Show battery percentage in menu bar
+        Bluetooth = true;                # Show bluetooth control in menu bar
+        Display = true;                  # Show Screen Brightness control in menu bar
+        FocusModes = true;               # Show Focus control in menu bar
+        NowPlaying = true;               # Show Now Playing control in menu bar
+        Sound = true;                    # Show sound control in menu bar
+      };
 
       dock = {
         autohide = true;
@@ -64,11 +71,21 @@
         FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
         ShowPathbar = false;
         ShowStatusBar = true;
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
+        _FXShowPosixPathInTitle = true;  # Show full POSIX path in Finder title
+        CreateDesktop = true;            # Show desktop icons
+        QuitMenuItem = true;             # Allow quitting Finder
+        FXDefaultSearchScope = "SCcf";   # Search current folder by default
+        FXPreferredViewStyle = "Nlsv";   # Use list view by default
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
-      loginwindow.GuestEnabled = false;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.loginwindow
+      loginwindow = {
+        GuestEnabled = false;
+        DisableConsoleAccess = true;     # Disable console access at login
+        LoginwindowText = "Welcome to Lars's Mac";  # Custom login message
+        ShutDownDisabled = false;        # Allow shutdown from login window
+        RestartDisabled = false;         # Allow restart from login window
+        SleepDisabled = false;           # Allow sleep from login window
+      };
       menuExtraClock = {
         FlashDateSeparators = false;
         IsAnalog = null;
@@ -79,16 +96,47 @@
         ShowSeconds = true;
       };
       NSGlobalDomain = {
-        AppleShowAllFiles = true;
-        AppleICUForce24HourTime = true;
-        AppleTemperatureUnit = "Celsius";
-        AppleMeasurementUnits = "Centimeters";
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.NSGlobalDomain
+        AppleShowAllFiles = true;               # Show hidden files everywhere
+        AppleICUForce24HourTime = true;         # Use 24-hour time format
+        AppleTemperatureUnit = "Celsius";       # Use Celsius for temperature
+        AppleMeasurementUnits = "Centimeters";  # Use metric measurements
+        AppleKeyboardUIMode = 3;                # Enable full keyboard access
+        ApplePressAndHoldEnabled = false;       # Disable press-and-hold for accented characters
+        AppleScrollerPagingBehavior = true;     # Jump to the spot clicked on scroll bar
+        AppleShowScrollBars = "WhenScrolling";  # Show scroll bars when scrolling
+        InitialKeyRepeat = 15;                  # Fast key repeat initial delay
+        KeyRepeat = 2;                          # Fast key repeat rate
+        NSAutomaticCapitalizationEnabled = false;      # Disable automatic capitalization
+        NSAutomaticDashSubstitutionEnabled = false;    # Disable smart dashes
+        NSAutomaticPeriodSubstitutionEnabled = false;  # Disable period substitution
+        NSAutomaticQuoteSubstitutionEnabled = false;   # Disable smart quotes
+        NSAutomaticSpellingCorrectionEnabled = false;  # Disable auto-correct
+        NSDocumentSaveNewDocumentsToCloud = false;     # Save to disk by default
+        NSNavPanelExpandedStateForSaveMode = true;     # Expand save panel by default
+        NSNavPanelExpandedStateForSaveMode2 = true;    # Expand save panel by default
+        NSTableViewDefaultSizeMode = 2;                # Use medium size for table views
+        NSTextShowsControlCharacters = true;           # Show control characters in text
+        NSUseAnimatedFocusRing = false;                # Disable animated focus ring
+        NSWindowResizeTime = 0.001;                    # Fast window resize animations
+        PMPrintingExpandedStateForPrint = true;        # Expand print panel by default
+        PMPrintingExpandedStateForPrint2 = true;       # Expand print panel by default
       };
-      screencapture.location = "~/Desktop";
+      screencapture = {
+        location = "~/Desktop";              # Default screenshot location
+        disable-shadow = false;              # Include shadows in window screenshots
+        include-date = true;                 # Include date in screenshot filename
+        show-thumbnail = true;               # Show thumbnail after taking screenshot
+        type = "png";                        # Screenshot file format
+      };
       # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screencapture
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screensaver
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.smb
+      screensaver = {
+        askForPassword = true;               # Require password after screensaver
+        askForPasswordDelay = 0;             # Require password immediately
+      };
+      smb = {
+        NetBIOSName = "LarsMac";             # NetBIOS name for SMB sharing
+        ServerDescription = "Lars's Mac";    # Description for SMB server
+      };
       SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
       spaces.spans-displays = null;
 
@@ -100,8 +148,21 @@
         TrackpadThreeFingerDrag = false; # Disable three finger drag
       };
 
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.WindowManager
+      universalaccess = {
+        closeViewScrollWheelToggle = false;  # Disable scroll wheel zoom toggle
+        closeViewZoomFollowsFocus = false;   # Zoom doesn't follow keyboard focus
+        mouseDriverCursorSize = 1.0;         # Normal cursor size
+        reduceMotion = false;                # Allow motion and animations
+        reduceTransparency = false;          # Allow transparency effects
+      };
+
+      WindowManager = {
+        EnableStandardClickToShowDesktop = false;  # Disable click desktop to show desktop
+        StandardHideDesktopIcons = false;          # Show desktop icons
+        StandardHideWidgets = true;                # Hide widgets by default
+        StageManagerHideDesktopIcons = false;     # Show desktop icons in Stage Manager
+        GloballyEnabled = false;                   # Disable Stage Manager globally
+      };
     };
 
     keyboard = {
