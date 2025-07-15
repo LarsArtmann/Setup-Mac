@@ -1,0 +1,131 @@
+graph TB
+    %% Current Application Architecture
+    %% System Environment Layer
+    subgraph "System Environment"
+        direction TB
+        subgraph "Nix Darwin System"
+            nixdarwin[Nix Darwin<br/>System Configuration]
+            nixpkgs[Nixpkgs<br/>Package Management]
+            homebrew[Homebrew<br/>Cask/Formula Integration]
+        end
+        
+        subgraph "Home Manager"
+            hmconfig[Home Manager Config<br/>User Environment]
+            shells[Shell Configuration<br/>bash/zsh]
+            sessionvars[Session Variables<br/>EDITOR, LANG, PATH]
+        end
+        
+        subgraph "Development Tools"
+            bun[Bun Runtime<br/>JavaScript/TypeScript]
+            go[Go Toolchain<br/>Backend Development]
+            jetbrains[JetBrains Toolbox<br/>IDE Integration]
+            orbstack[OrbStack<br/>Container Runtime]
+        end
+    end
+
+    %% Configuration Management Layer
+    subgraph "Configuration Management"
+        direction TB
+        claudeconf[claude-conf.sh<br/>Legacy Shell Script]
+        betterclaudego[better-claude-go<br/>Modern Go Application]
+        
+        subgraph "Legacy Configuration"
+            shellscript[Shell-based Logic<br/>Manual File Operations]
+            backupmanual[Manual Backup<br/>Timestamp-based Files]
+            validation[Basic Validation<br/>File Existence Checks]
+        end
+        
+        subgraph "Modern Configuration (better-claude-go)"
+            direction TB
+            domain[Domain Layer<br/>Aggregates & Events]
+            application[Application Layer<br/>Commands & Queries]
+            infrastructure[Infrastructure Layer<br/>Event Store & Repositories]
+        end
+    end
+
+    %% Better Claude Go Internal Architecture
+    subgraph "Better Claude Go Architecture"
+        direction TB
+        subgraph "Domain Layer"
+            configaggregate[Configuration Aggregate<br/>Business Logic & Rules]
+            domainevents[Domain Events<br/>ConfigurationChanged, ProfileSwitched]
+            valueobjects[Value Objects<br/>ConfigKey, ConfigValue, Profile]
+        end
+        
+        subgraph "Application Layer"
+            commands[Commands<br/>CreateConfiguration, ChangeConfiguration]
+            queries[Queries<br/>GetConfiguration, GetHistory]
+            handlers[Command/Query Handlers<br/>Business Logic Orchestration]
+        end
+        
+        subgraph "Infrastructure Layer"
+            eventstore[Watermill Event Store<br/>In-Memory Event Persistence]
+            commandbus[Command Bus<br/>Watermill Message Bus]
+            querybus[Query Bus<br/>Request/Response Pattern]
+            repository[Repository<br/>Aggregate Persistence]
+        end
+    end
+
+    %% External Systems
+    subgraph "External Systems"
+        filesystem[File System<br/>Configuration Files]
+        claudefiles[Claude Configuration<br/>~/.claude/config.json]
+        backupfiles[Backup Files<br/>JSON-based Snapshots]
+    end
+
+    %% CLI Interface
+    subgraph "CLI Interface"
+        cobra[Cobra CLI<br/>Command Parser]
+        viper[Viper<br/>Configuration Management]
+        otel[OpenTelemetry<br/>Observability (Disabled)]
+    end
+
+    %% Relationships
+    nixdarwin --> hmconfig
+    nixdarwin --> homebrew
+    hmconfig --> shells
+    hmconfig --> sessionvars
+    
+    claudeconf --> shellscript
+    claudeconf --> backupmanual
+    claudeconf --> validation
+    
+    betterclaudego --> cobra
+    betterclaudego --> domain
+    betterclaudego --> application
+    betterclaudego --> infrastructure
+    
+    cobra --> viper
+    cobra --> handlers
+    
+    handlers --> commands
+    handlers --> queries
+    handlers --> configaggregate
+    
+    configaggregate --> domainevents
+    configaggregate --> valueobjects
+    
+    eventstore --> domainevents
+    commandbus --> commands
+    querybus --> queries
+    repository --> configaggregate
+    
+    infrastructure --> filesystem
+    infrastructure --> claudefiles
+    infrastructure --> backupfiles
+    
+    bun --> betterclaudego
+    go --> betterclaudego
+    
+    %% Styling
+    classDef systemBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef configBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef domainBox fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef infraBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef cliBox fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    
+    class nixdarwin,nixpkgs,homebrew,hmconfig,shells,sessionvars,bun,go,jetbrains,orbstack systemBox
+    class claudeconf,betterclaudego,shellscript,backupmanual,validation configBox
+    class configaggregate,domainevents,valueobjects,commands,queries,handlers domainBox
+    class eventstore,commandbus,querybus,repository,filesystem,claudefiles,backupfiles infraBox
+    class cobra,viper,otel cliBox

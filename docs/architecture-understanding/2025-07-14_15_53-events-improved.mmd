@@ -1,0 +1,296 @@
+graph TB
+    %% Improved Events & Commands Architecture with Modern Go Libraries
+    %% Command Side (Enhanced Write Operations)
+    subgraph "Enhanced Command Side"
+        direction TB
+        subgraph "Multi-Channel Input"
+            webcmds[Web UI Commands<br/>HTMX Form Submissions]
+            clicmds[CLI Commands<br/>Cobra-based Interface]
+            apicmds[API Commands<br/>REST/GraphQL Endpoints]
+            webhooks[Webhook Commands<br/>External System Integration]
+        end
+        
+        subgraph "Command Validation & Routing"
+            inputvalidation[Input Validation<br/>Schema-based Validation]
+            commandrouter[Command Router<br/>Type-safe Routing]
+            ratelimiting[Rate Limiting<br/>Command Throttling]
+            authz[Authorization<br/>Permission Checks]
+        end
+        
+        subgraph "Enhanced Application Commands"
+            createconfigv2[CreateConfigurationCommand v2<br/>Rich Metadata Support]
+            changeconfigv2[ChangeConfigurationCommand v2<br/>Batch Operations]
+            switchprofilev2[SwitchProfileCommand v2<br/>Migration Strategies]
+            createbackupv2[CreateBackupCommand v2<br/>Cloud Integration]
+            validateconfigv2[ValidateConfigurationCommand v2<br/>Advanced Validation Rules]
+            importconfig[ImportConfigurationCommand<br/>External Config Import]
+            exportconfig[ExportConfigurationCommand<br/>Multi-format Export]
+        end
+        
+        subgraph "Enhanced Command Handlers"
+            enhancedhandlers[Enhanced Command Handlers<br/>Comprehensive Error Handling]
+            sagaorchestrator[Saga Orchestrator<br/>Long-running Processes]
+            compensatingactions[Compensating Actions<br/>Rollback Support]
+            idempotency[Idempotency Handling<br/>Safe Retries]
+        end
+    end
+
+    %% Enhanced Domain Events
+    subgraph "Enhanced Domain Events"
+        direction TB
+        subgraph "Core Event Types"
+            configcreatedv2[ConfigurationCreated v2<br/>Rich Context Data]
+            configchangedv2[ConfigurationChanged v2<br/>Detailed Change Tracking]
+            profileswitchedv2[ProfileSwitched v2<br/>Migration Metadata]
+            backupcreatedv2[BackupCreated v2<br/>Cloud Storage Integration]
+            configvalidatedv2[ConfigurationValidated v2<br/>Detailed Validation Results]
+        end
+        
+        subgraph "New Event Types"
+            configimported[ConfigurationImported<br/>Import Operations]
+            configexported[ConfigurationExported<br/>Export Operations]
+            migrationstarted[MigrationStarted<br/>Schema Migrations]
+            migrationcompleted[MigrationCompleted<br/>Migration Results]
+            configsynchronized[ConfigurationSynchronized<br/>Multi-device Sync]
+            securityevent[SecurityEvent<br/>Access Control Events]
+        end
+        
+        subgraph "Event Metadata (Enhanced)"
+            eventidv2[Event ID<br/>ULIDs for Sortability]
+            causationid[Causation ID<br/>Command Tracking]
+            correlationid[Correlation ID<br/>Request Tracing]
+            eventversion[Event Version<br/>Schema Versioning]
+            metadata[Rich Metadata<br/>User, Session, Context]
+            encryption[Event Encryption<br/>Sensitive Data Protection]
+        end
+    end
+
+    %% Enhanced Event Store (Persistent)
+    subgraph "PostgreSQL Event Store"
+        direction TB
+        subgraph "Event Persistence"
+            eventtable[Events Table<br/>Append-only Event Log]
+            snapshottable[Snapshots Table<br/>Performance Optimization]
+            projectiontable[Projections Table<br/>Read Model Storage]
+            outboxtable[Outbox Table<br/>Reliable Message Publishing]
+        end
+        
+        subgraph "Advanced Features"
+            eventstreaming[Event Streaming<br/>Real-time Event Publishing]
+            eventreplay[Event Replay<br/>System Recovery & Testing]
+            snapshotting[Snapshotting<br/>Performance Optimization]
+            partitioning[Table Partitioning<br/>Scale Optimization]
+        end
+        
+        subgraph "Data Integrity"
+            transactions[ACID Transactions<br/>Consistency Guarantees]
+            optimisticlocking[Optimistic Locking<br/>Concurrency Control]
+            checksums[Event Checksums<br/>Data Integrity Verification]
+            encryption[Event Encryption<br/>Data Protection]
+        end
+    end
+
+    %% Enhanced Query Side (CQRS Read Models)
+    subgraph "Enhanced Query Side (CQRS)"
+        direction TB
+        subgraph "Query Types (Expanded)"
+            getconfigv2[GetConfigurationQuery v2<br/>Rich Filtering]
+            getbyprofilev2[GetConfigurationByProfileQuery v2<br/>Advanced Search]
+            getallv2[GetAllConfigurationsQuery v2<br/>Pagination & Sorting]
+            getprofilesv2[GetAvailableProfilesQuery v2<br/>Metadata-rich Results]
+            gethistoryv2[GetConfigurationHistoryQuery v2<br/>Advanced Filtering]
+            getanalytics[GetAnalyticsQuery<br/>Usage Analytics]
+            getsecurity[GetSecurityAuditQuery<br/>Security Events]
+            getperformance[GetPerformanceMetricsQuery<br/>System Performance]
+        end
+        
+        subgraph "Read Model Projections"
+            configreadmodel[Configuration Read Model<br/>Optimized for Queries]
+            profilereadmodel[Profile Read Model<br/>Profile Metadata]
+            auditreadmodel[Audit Read Model<br/>Security & Compliance]
+            analyticsreadmodel[Analytics Read Model<br/>Usage Patterns]
+            searchindex[Search Index<br/>Full-text Search]
+        end
+        
+        subgraph "Query Optimization"
+            caching[Redis Caching<br/>High-performance Queries]
+            indexing[Database Indexing<br/>Query Optimization]
+            materialized[Materialized Views<br/>Pre-computed Results]
+            partitioning[Read Model Partitioning<br/>Scale Optimization]
+        end
+    end
+
+    %% Enhanced Domain Aggregate
+    subgraph "Enhanced Configuration Aggregate"
+        direction TB
+        subgraph "Rich Domain Model"
+            aggregatev2[Configuration Aggregate v2<br/>Rich Business Logic]
+            businessrulesv2[Enhanced Business Rules<br/>Complex Validation Logic]
+            domainpolicies[Domain Policies<br/>Configurable Rules Engine]
+            invariants[Domain Invariants<br/>Consistency Enforcement]
+        end
+        
+        subgraph "Event Management"
+            uncommittedeventsv2[Uncommitted Events<br/>Type-safe Event Collection]
+            eventordering[Event Ordering<br/>Causal Consistency]
+            eventvalidation[Event Validation<br/>Schema Enforcement]
+            eventencryption[Event Encryption<br/>Sensitive Data Protection]
+        end
+    end
+
+    %% Enhanced Message Bus Architecture
+    subgraph "Enhanced Message Bus (Watermill + PostgreSQL)"
+        direction TB
+        subgraph "Message Infrastructure"
+            commandbusv2[Command Bus v2<br/>Persistent Message Queue]
+            querybusv2[Query Bus v2<br/>Request/Response with Caching]
+            eventbusv2[Event Bus v2<br/>Reliable Event Delivery]
+            deadletter[Dead Letter Queue<br/>Failed Message Handling]
+        end
+        
+        subgraph "Message Patterns"
+            pubsub[Pub/Sub Pattern<br/>Event Broadcasting]
+            requestreply[Request/Reply Pattern<br/>Synchronous Queries]
+            saga[Saga Pattern<br/>Distributed Transactions]
+            outbox[Outbox Pattern<br/>Transactional Messaging]
+        end
+        
+        subgraph "Reliability Features"
+            retrypolicy[Retry Policies<br/>Configurable Retry Logic]
+            circuitbreaker[Circuit Breaker<br/>Fault Tolerance]
+            loadbalancing[Load Balancing<br/>Message Distribution]
+            monitoring[Message Monitoring<br/>Queue Health Tracking]
+        end
+    end
+
+    %% Web UI Integration
+    subgraph "Web UI Event Integration"
+        direction TB
+        webui[Web UI (HTMX + Templ)<br/>Real-time Configuration Management]
+        websockets[WebSockets<br/>Real-time Event Streaming]
+        sse[Server-Sent Events<br/>Live Updates]
+        htmxforms[HTMX Forms<br/>Seamless Command Submission]
+    end
+
+    %% Observability & Monitoring
+    subgraph "Enhanced Observability"
+        direction TB
+        opentelemetry[OpenTelemetry<br/>Distributed Tracing]
+        prometheus[Prometheus Metrics<br/>System Monitoring]
+        structuredlogging[Structured Logging<br/>Zap Logger]
+        alerting[Alerting<br/>Anomaly Detection]
+    end
+
+    %% Enhanced Command Flow
+    webcmds --> inputvalidation
+    clicmds --> inputvalidation
+    apicmds --> inputvalidation
+    webhooks --> inputvalidation
+    
+    inputvalidation --> commandrouter
+    commandrouter --> ratelimiting
+    ratelimiting --> authz
+    
+    authz --> createconfigv2
+    authz --> changeconfigv2
+    authz --> switchprofilev2
+    authz --> createbackupv2
+    authz --> validateconfigv2
+    authz --> importconfig
+    authz --> exportconfig
+    
+    createconfigv2 --> commandbusv2
+    changeconfigv2 --> commandbusv2
+    switchprofilev2 --> commandbusv2
+    createbackupv2 --> commandbusv2
+    validateconfigv2 --> commandbusv2
+    importconfig --> commandbusv2
+    exportconfig --> commandbusv2
+    
+    commandbusv2 --> enhancedhandlers
+    enhancedhandlers --> sagaorchestrator
+    enhancedhandlers --> compensatingactions
+    enhancedhandlers --> idempotency
+    
+    enhancedhandlers --> aggregatev2
+    
+    %% Enhanced Event Flow
+    aggregatev2 --> uncommittedeventsv2
+    uncommittedeventsv2 --> configcreatedv2
+    uncommittedeventsv2 --> configchangedv2
+    uncommittedeventsv2 --> profileswitchedv2
+    uncommittedeventsv2 --> backupcreatedv2
+    uncommittedeventsv2 --> configvalidatedv2
+    uncommittedeventsv2 --> configimported
+    uncommittedeventsv2 --> configexported
+    uncommittedeventsv2 --> migrationstarted
+    uncommittedeventsv2 --> migrationcompleted
+    uncommittedeventsv2 --> configsynchronized
+    uncommittedeventsv2 --> securityevent
+    
+    configcreatedv2 --> eventtable
+    configchangedv2 --> eventtable
+    profileswitchedv2 --> eventtable
+    backupcreatedv2 --> eventtable
+    configvalidatedv2 --> eventtable
+    
+    eventtable --> eventstreaming
+    eventstreaming --> eventbusv2
+    eventbusv2 --> pubsub
+    
+    %% Enhanced Query Flow
+    getconfigv2 --> querybusv2
+    getbyprofilev2 --> querybusv2
+    getallv2 --> querybusv2
+    getprofilesv2 --> querybusv2
+    gethistoryv2 --> querybusv2
+    getanalytics --> querybusv2
+    getsecurity --> querybusv2
+    getperformance --> querybusv2
+    
+    querybusv2 --> caching
+    caching --> configreadmodel
+    caching --> profilereadmodel
+    caching --> auditreadmodel
+    caching --> analyticsreadmodel
+    
+    %% Web UI Integration
+    webcmds --> webui
+    webui --> websockets
+    websockets --> eventstreaming
+    webui --> htmxforms
+    htmxforms --> commandrouter
+    
+    %% Event Metadata Enhancement
+    configcreatedv2 --> eventidv2
+    configcreatedv2 --> causationid
+    configcreatedv2 --> correlationid
+    configcreatedv2 --> eventversion
+    configcreatedv2 --> metadata
+    configcreatedv2 --> encryption
+    
+    %% Observability Integration
+    commandbusv2 --> opentelemetry
+    querybusv2 --> opentelemetry
+    eventbusv2 --> opentelemetry
+    aggregatev2 --> structuredlogging
+    eventtable --> prometheus
+    
+    %% Styling
+    classDef commandBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef eventBox fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef queryBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef storeBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef aggregateBox fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef busBox fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    classDef webBox fill:#e3f2fd,stroke:#0d47a1,stroke-width:2px
+    classDef observabilityBox fill:#fafafa,stroke:#424242,stroke-width:2px
+    
+    class webcmds,clicmds,apicmds,webhooks,inputvalidation,commandrouter,ratelimiting,authz,createconfigv2,changeconfigv2,switchprofilev2,createbackupv2,validateconfigv2,importconfig,exportconfig,enhancedhandlers,sagaorchestrator,compensatingactions,idempotency commandBox
+    class configcreatedv2,configchangedv2,profileswitchedv2,backupcreatedv2,configvalidatedv2,configimported,configexported,migrationstarted,migrationcompleted,configsynchronized,securityevent,eventidv2,causationid,correlationid,eventversion,metadata,encryption eventBox
+    class getconfigv2,getbyprofilev2,getallv2,getprofilesv2,gethistoryv2,getanalytics,getsecurity,getperformance,configreadmodel,profilereadmodel,auditreadmodel,analyticsreadmodel,searchindex,caching,indexing,materialized,partitioning queryBox
+    class eventtable,snapshottable,projectiontable,outboxtable,eventstreaming,eventreplay,snapshotting,transactions,optimisticlocking,checksums storeBox
+    class aggregatev2,businessrulesv2,domainpolicies,invariants,uncommittedeventsv2,eventordering,eventvalidation,eventencryption aggregateBox
+    class commandbusv2,querybusv2,eventbusv2,deadletter,pubsub,requestreply,saga,outbox,retrypolicy,circuitbreaker,loadbalancing,monitoring busBox
+    class webui,websockets,sse,htmxforms webBox
+    class opentelemetry,prometheus,structuredlogging,alerting observabilityBox

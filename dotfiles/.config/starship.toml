@@ -1,15 +1,18 @@
-# Starship configuration for Lars Artmann
-# ULTRA-OPTIMIZED for maximum startup performance
+# Starship configuration for Lars Artmann  
+# EXTREME PERFORMANCE: <250ms budget compliance
 
-# Performance: Ultra-fast timeout and scan timeout
-command_timeout = 100
-scan_timeout = 10
+# BALANCED Performance: Optimized for 500ms 95%tile budget  
+command_timeout = 400   # 400ms max per command (room for multiple commands)
+scan_timeout = 100      # 100ms max scanning (thorough project detection)
 
-# Format: Minimal prompt - only essential components
+# Format: Enhanced prompt with performance budget
 format = """
 $directory\
 $git_branch\
 $git_status\
+$golang\
+$nodejs\
+$cmd_duration\
 $character"""
 
 # Directory: Minimal path display
@@ -118,7 +121,9 @@ disabled = true
 disabled = true
 
 [golang]
-disabled = true
+disabled = false
+symbol = "🐹 "
+style = "bold cyan"
 
 [haskell]
 disabled = true
@@ -157,7 +162,9 @@ disabled = true
 disabled = true
 
 [nodejs]
-disabled = true
+disabled = false
+symbol = "⬢ "
+style = "bold green"
 
 [ocaml]
 disabled = true
@@ -229,4 +236,6 @@ disabled = true
 disabled = true
 
 [cmd_duration]
-disabled = true
+disabled = false
+min_time = 2000  # Show duration for commands >2s
+style = "bold yellow"

@@ -1,0 +1,182 @@
+graph TB
+    %% Improved Application Architecture with Modern Go Libraries
+    %% System Environment Layer (Enhanced)
+    subgraph "Enhanced System Environment"
+        direction TB
+        subgraph "Nix Darwin System (Optimized)"
+            nixdarwin[Nix Darwin<br/>Declarative System Config]
+            nixpkgs[Nixpkgs<br/>Reproducible Packages]
+            homebrew[Homebrew<br/>GUI Apps Only]
+            flake[Nix Flakes<br/>Lock File Dependencies]
+        end
+        
+        subgraph "Home Manager (Type-Safe)"
+            hmconfig[Home Manager<br/>User Environment]
+            shells[Shell Configuration<br/>Performance Optimized]
+            sessionvars[Session Variables<br/>Type-Safe Configuration]
+            dotfiles[Dotfiles Management<br/>Version Controlled]
+        end
+        
+        subgraph "Development Tools (Modernized)"
+            bun[Bun Runtime<br/>Ultra-fast JS/TS]
+            go[Go 1.24+<br/>Latest Features]
+            templ[Templ<br/>Type-Safe HTML Templates]
+            air[Air<br/>Live Reload Development]
+        end
+    end
+
+    %% Web Application Layer (NEW)
+    subgraph "Web Application Layer"
+        direction TB
+        subgraph "Frontend (HTMX + Templ)"
+            htmx[HTMX<br/>HTML Over Wire]
+            tailwind[TailwindCSS<br/>Utility-First Styling]
+            alpine[Alpine.js<br/>Lightweight Interactivity]
+            templates[Templ Templates<br/>Type-Safe HTML Generation]
+        end
+        
+        subgraph "Web Framework"
+            gin[Gin<br/>High-Performance HTTP Router]
+            middleware[Middleware Stack<br/>Auth, Logging, CORS]
+            websockets[WebSockets<br/>Real-time Updates]
+            staticfiles[Static File Serving<br/>Optimized Asset Delivery]
+        end
+    end
+
+    %% Configuration Management Layer (Enhanced)
+    subgraph "Enhanced Configuration Management"
+        direction TB
+        modernconfig[better-claude-go v2.0<br/>Modern Go Application]
+        
+        subgraph "Modern Architecture"
+            direction TB
+            domain[Domain Layer<br/>Rich Domain Models]
+            application[Application Layer<br/>CQRS + Event Sourcing]
+            infrastructure[Infrastructure Layer<br/>Persistent Event Store]
+            presentation[Presentation Layer<br/>Web UI + CLI]
+        end
+    end
+
+    %% Better Claude Go Enhanced Architecture
+    subgraph "Enhanced Better Claude Go Architecture"
+        direction TB
+        subgraph "Domain Layer (Enhanced)"
+            configaggregate[Configuration Aggregate<br/>Rich Business Logic]
+            domainevents[Domain Events<br/>Complete Event Catalog]
+            valueobjects[Value Objects<br/>Type-Safe Primitives]
+            policies[Domain Policies<br/>Business Rules Engine]
+        end
+        
+        subgraph "Application Layer (CQRS)"
+            commands[Commands<br/>Write Operations]
+            queries[Queries<br/>Read Operations]
+            commandhandlers[Command Handlers<br/>Write Side Logic]
+            queryhandlers[Query Handlers<br/>Read Side Logic]
+            projections[Read Projections<br/>Optimized Query Models]
+        end
+        
+        subgraph "Infrastructure Layer (Persistent)"
+            eventstore[PostgreSQL Event Store<br/>ACID Transactions]
+            readstore[PostgreSQL Read Store<br/>Optimized Queries]
+            messagebus[Watermill Message Bus<br/>Event Publishing]
+            cache[Redis Cache<br/>High-Performance Caching]
+            monitoring[Observability<br/>Metrics, Tracing, Logging]
+        end
+    end
+
+    %% External Systems (Enhanced)
+    subgraph "Enhanced External Systems"
+        postgresql[PostgreSQL<br/>Primary Database]
+        redis[Redis<br/>Caching Layer]
+        filesystem[File System<br/>Configuration Files]
+        claudefiles[Claude Configuration<br/>Type-Safe JSON Schema]
+        backupcloud[Cloud Backup<br/>S3/GCS Integration]
+    end
+
+    %% CLI Interface (Enhanced)
+    subgraph "Enhanced CLI Interface"
+        cobra[Cobra CLI<br/>Rich Command Interface]
+        viper[Viper<br/>Configuration Management]
+        zap[Zap Logger<br/>Structured Logging]
+        otel[OpenTelemetry<br/>Full Observability]
+        migration[Database Migration<br/>golang-migrate]
+    end
+
+    %% Type Safety & Validation Layer (NEW)
+    subgraph "Type Safety & Validation"
+        sqlc[SQLC<br/>Type-Safe SQL]
+        wire[Wire<br/>Compile-Time DI]
+        validation[Input Validation<br/>Schema-Based]
+        testing[Comprehensive Testing<br/>Unit/Integration/E2E]
+    end
+
+    %% Relationships
+    nixdarwin --> hmconfig
+    nixdarwin --> flake
+    hmconfig --> shells
+    hmconfig --> dotfiles
+    
+    modernconfig --> presentation
+    presentation --> gin
+    presentation --> cobra
+    
+    gin --> htmx
+    gin --> middleware
+    gin --> websockets
+    
+    htmx --> templates
+    htmx --> tailwind
+    htmx --> alpine
+    
+    cobra --> viper
+    cobra --> commandhandlers
+    cobra --> queryhandlers
+    
+    commandhandlers --> commands
+    queryhandlers --> queries
+    commands --> configaggregate
+    queries --> projections
+    
+    configaggregate --> domainevents
+    configaggregate --> valueobjects
+    configaggregate --> policies
+    
+    domainevents --> eventstore
+    projections --> readstore
+    messagebus --> domainevents
+    
+    eventstore --> postgresql
+    readstore --> postgresql
+    cache --> redis
+    
+    infrastructure --> filesystem
+    infrastructure --> claudefiles
+    infrastructure --> backupcloud
+    
+    wire --> infrastructure
+    sqlc --> eventstore
+    sqlc --> readstore
+    migration --> postgresql
+    
+    zap --> monitoring
+    otel --> monitoring
+    
+    air --> gin
+    templ --> templates
+    
+    %% Styling
+    classDef systemBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef webBox fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef configBox fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef domainBox fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef infraBox fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef cliBox fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef typeBox fill:#f1f8e9,stroke:#33691e,stroke-width:2px
+    
+    class nixdarwin,nixpkgs,homebrew,flake,hmconfig,shells,sessionvars,dotfiles,bun,go,templ,air systemBox
+    class htmx,tailwind,alpine,templates,gin,middleware,websockets,staticfiles webBox
+    class modernconfig,domain,application,infrastructure,presentation configBox
+    class configaggregate,domainevents,valueobjects,policies,commands,queries,commandhandlers,queryhandlers,projections domainBox
+    class eventstore,readstore,messagebus,cache,monitoring,postgresql,redis,filesystem,claudefiles,backupcloud infraBox
+    class cobra,viper,zap,otel,migration cliBox
+    class sqlc,wire,validation,testing typeBox

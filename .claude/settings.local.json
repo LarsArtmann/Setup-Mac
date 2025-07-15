@@ -41,7 +41,17 @@
       "Bash(./scripts/optimize.sh:*)",
       "Bash(env)",
       "Bash(./scripts/maintenance.sh:*)",
-      "Bash(./shell-performance-benchmark.sh:*)"
+      "Bash(./shell-performance-benchmark.sh:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== Testing $script ===\")",
+      "Bash(bash:*)",
+      "Bash(done)",
+      "Bash(./scripts/health-check.sh:*)",
+      "Bash(./scripts/cleanup.sh:*)",
+      "Bash(./scripts/automation-setup.sh:*)",
+      "WebFetch(domain:elv.sh)",
+      "Bash(fish -c:*)",
+      "Bash(darwin-rebuild build:*)"
     ],
     "deny": []
   }

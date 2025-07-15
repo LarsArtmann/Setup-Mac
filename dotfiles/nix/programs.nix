@@ -9,47 +9,29 @@
     #  extraUpFlags = [ "--ssh" "--accept-routes" ];
   };
   programs = {
-    # TODO: ADD https://mynixos.com/nix-darwin/options/programs
-    #https://github.com/LnL7/nix-darwin/blob/master/modules/programs/zsh/default.nix
-    zsh = {
+    # MINIMAL CONFIGURATION: Fish shell only
+    fish = {
       enable = true;
-      enableCompletion = true;
-      enableFzfCompletion = true;
-      enableSyntaxHighlighting = true;
-      #autosuggestions.enable = true;
-      #syntaxHighlighting.enable = true;
-      #shellAliases = {
-      #  l = "ls -laSh";
-      #  rm = "rm -i";
-      #  nixup = "darwin-rebuild switch";
-      #  mkdir = "mkdir -p";
-      #};
-      #histSize = 10000;
-      #oh-my-zsh = {
-      #  enable = true;
-      #  plugins = [ "aliases" "fuck" ];
-      #  theme = "robbyrussell";
-      #};
+      useBabelfish = true;  # Bash/POSIX compatibility
+      shellAliases = {
+        # Essential shortcuts only
+        l = "ls -la";
+        t = "tree -h -L 2 -C --dirsfirst";
+      };
+      shellInit = ''
+        # PERFORMANCE: Disable greeting for faster startup
+        set -g fish_greeting
+
+        # COMPLETIONS: Universal completion engine (1000+ commands)
+        carapace _carapace fish | source
+
+        # PROMPT: Beautiful Starship prompt with 400ms timeout protection
+        starship init fish | source
+
+        # PERFORMANCE: Optimized history settings
+        set -g fish_history_size 5000
+        set -g fish_save_history 5000
+      '';
     };
-    #nushell = {
-    #  enable = true;
-    #  shellAliases = (import ./environment.nix { pkgs = pkgs; lib = lib; }).environment.shellAliases;
-    #};
-    #error: The option `programs.nh' does not exist.
-    #nh = {
-    #  enable = true;
-    #  package = nixpkgs-nh-dev;
-    #  clean = {
-    #    enable = true;
-    #    extraArgs = "--keep-since 4d --keep 3";
-    #  };
-    #  flake = "/etc/nix-darwin/";
-    #};
-    #git = {
-    #  enable = true;
-    #  lfs.enable = true;
-    #  userName = "Lars Artmann";
-    #  userEmail = "git@lars.software";
-    #};
   };
 }

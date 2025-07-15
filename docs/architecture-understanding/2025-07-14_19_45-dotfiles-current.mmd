@@ -1,0 +1,108 @@
+graph TB
+    subgraph "User Environment"
+        User[👤 User]
+        Terminal[🖥️ Terminal/iTerm2]
+        Shell[🐚 Zsh + Starship]
+        IDE[🎯 VS Code/JetBrains]
+    end
+
+    subgraph "Package Management"
+        NixDarwin[📦 Nix Darwin - PRIMARY]
+        HomeManager[🏠 Home Manager - ENABLED]
+        Homebrew[🍺 Homebrew - GUI Apps Only]
+        GoTools[🔧 Go Development Tools]
+    end
+
+    subgraph "Configuration Management"
+        FlakeNix[⚙️ flake.nix]
+        EnvironmentNix[🌍 environment.nix]
+        HomeNix[🏠 home.nix]
+        ProgramsNix[📋 programs.nix]
+        CoreNix[⚙️ core.nix]
+    end
+
+    subgraph "Development Tools"
+        Git[📊 Git + git-town]
+        GoLang[🔷 Go + 10 Tools]
+        NodeJS[🟢 Node.js + Bun]
+        CloudTools[☁️ kubectl/AWS/GCP]
+        SecurityTools[🔒 gitleaks/Security]
+    end
+
+    subgraph "Shell Environment"
+        ZshConfig[⚙️ .zshrc - Optimized]
+        StarshipConfig[⭐ starship.toml]
+        CompletionCache[📝 Completion Cache]
+        PathManagement[🛣️ PATH - Consolidated]
+    end
+
+    subgraph "Automation & Quality"
+        Justfile[⚡ Justfile - 40+ Commands]
+        PreCommitHooks[✅ Pre-commit - Working]
+        TreeFmt[🎨 treefmt - Universal Formatter]
+        PerformanceMonitoring[📊 Performance Scripts]
+    end
+
+    subgraph "Documentation & Knowledge"
+        Docs[📚 Comprehensive Docs]
+        TroubleshootingGuide[🆘 Troubleshooting]
+        GoToolsGuide[🔧 Go Tools Guide]
+        ArchitectureDocs[🏗️ Architecture Analysis]
+    end
+
+    %% User workflow
+    User --> Terminal
+    Terminal --> Shell
+    User --> IDE
+    User --> Justfile
+
+    %% Package management flow
+    NixDarwin --> FlakeNix
+    FlakeNix --> EnvironmentNix
+    FlakeNix --> HomeManager
+    HomeManager --> HomeNix
+    FlakeNix --> ProgramsNix
+    FlakeNix --> CoreNix
+    
+    %% Homebrew minimal integration
+    Homebrew -.-> NixDarwin
+
+    %% Shell configuration
+    HomeManager --> ZshConfig
+    HomeManager --> StarshipConfig
+    HomeManager --> CompletionCache
+    EnvironmentNix --> PathManagement
+    PathManagement --> Shell
+
+    %% Development environment
+    EnvironmentNix --> GoLang
+    EnvironmentNix --> NodeJS
+    EnvironmentNix --> CloudTools
+    EnvironmentNix --> SecurityTools
+    GoLang --> GoTools
+
+    %% Version control integration
+    Shell --> Git
+    Git --> PreCommitHooks
+    PreCommitHooks --> TreeFmt
+
+    %% Automation integration
+    Justfile --> NixDarwin
+    Justfile --> Git
+    Justfile --> GoTools
+    Justfile --> PerformanceMonitoring
+
+    %% Documentation integration
+    Docs --> TroubleshootingGuide
+    Docs --> GoToolsGuide
+    Docs --> ArchitectureDocs
+
+    classDef primary fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef working fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef optimized fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef documentation fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+
+    class NixDarwin,HomeManager,FlakeNix primary
+    class Git,GoLang,Shell,Justfile working
+    class ZshConfig,PathManagement,CompletionCache optimized
+    class Docs,TroubleshootingGuide,GoToolsGuide documentation
