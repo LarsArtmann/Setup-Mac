@@ -34,9 +34,10 @@
       flake = false;
     };
     colmena.url = "github:zhaofengli/colmena";
+    mac-app-util.url = "github:hraban/mac-app-util";
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -86,6 +87,9 @@
 
           # User-specific configurations
           ./users.nix
+
+          # mac-app-util for Spotlight integration
+          mac-app-util.darwinModules.default
 
           # Home Manager integration - temporarily disabled to migrate configs
           # home-manager.darwinModules.home-manager

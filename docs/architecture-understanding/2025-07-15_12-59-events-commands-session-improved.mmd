@@ -1,0 +1,138 @@
+graph TB
+    subgraph "Events & Commands Architecture - Improved State"
+        subgraph "Event Bus System"
+            EVENT_BUS[Central Event Bus]
+            EVENT_ROUTER[Event Router]
+            EVENT_FILTER[Event Filter]
+            EVENT_LOGGER[Event Logger]
+        end
+        
+        subgraph "Shell Events"
+            SHELL_STARTUP[Shell Startup Event]
+            CONFIG_RELOAD[Configuration Reload Event]
+            COMMAND_EXEC[Command Execution Event]
+            PERFORMANCE_EVENT[Performance Event]
+            CONTEXT_CHANGE[Context Change Event]
+        end
+        
+        subgraph "Command Patterns"
+            COMMAND_FACTORY[Command Factory]
+            COMMAND_VALIDATOR[Command Validator]
+            COMMAND_EXECUTOR[Command Executor]
+            COMMAND_HISTORY[Command History]
+            COMMAND_UNDO[Command Undo System]
+        end
+        
+        subgraph "Event Handlers"
+            ASYNC_HANDLER[Async Event Handler]
+            CONTEXT_HANDLER[Context-Aware Handler]
+            PERF_HANDLER[Performance Handler]
+            ALERT_HANDLER[Alert Handler]
+            ROLLBACK_HANDLER[Rollback Handler]
+        end
+        
+        subgraph "Command Execution Engine"
+            PIPELINE_EXECUTOR[Pipeline Executor]
+            BATCH_EXECUTOR[Batch Executor]
+            SCHEDULED_EXECUTOR[Scheduled Executor]
+            PRIORITY_QUEUE[Priority Queue]
+        end
+        
+        subgraph "Monitoring & Analytics"
+            REAL_TIME_MONITOR[Real-time Monitor]
+            PREDICTIVE_ANALYTICS[Predictive Analytics]
+            ANOMALY_DETECTION[Anomaly Detection]
+            PERFORMANCE_FORECASTING[Performance Forecasting]
+        end
+        
+        subgraph "Data Management"
+            EVENT_STORE[Event Store]
+            METRICS_AGGREGATOR[Metrics Aggregator]
+            DATA_WAREHOUSE[Data Warehouse]
+            CACHE_LAYER[Cache Layer]
+        end
+        
+        subgraph "Integration Layer"
+            NIX_INTEGRATION[Nix Integration]
+            GIT_INTEGRATION[Git Integration]
+            SHELL_INTEGRATION[Shell Integration]
+            EXTERNAL_APIS[External APIs]
+        end
+    end
+    
+    %% Enhanced Event Flow
+    USER_INPUT[User Input] --> EVENT_BUS
+    EVENT_BUS --> EVENT_ROUTER
+    EVENT_ROUTER --> EVENT_FILTER
+    EVENT_FILTER --> EVENT_LOGGER
+    
+    %% Event Distribution
+    EVENT_ROUTER --> SHELL_STARTUP
+    EVENT_ROUTER --> CONFIG_RELOAD
+    EVENT_ROUTER --> COMMAND_EXEC
+    EVENT_ROUTER --> PERFORMANCE_EVENT
+    EVENT_ROUTER --> CONTEXT_CHANGE
+    
+    %% Async Event Processing
+    SHELL_STARTUP --> ASYNC_HANDLER
+    CONFIG_RELOAD --> CONTEXT_HANDLER
+    COMMAND_EXEC --> PERF_HANDLER
+    PERFORMANCE_EVENT --> ALERT_HANDLER
+    CONTEXT_CHANGE --> ROLLBACK_HANDLER
+    
+    %% Command Pattern Flow
+    COMMAND_EXEC --> COMMAND_FACTORY
+    COMMAND_FACTORY --> COMMAND_VALIDATOR
+    COMMAND_VALIDATOR --> COMMAND_EXECUTOR
+    COMMAND_EXECUTOR --> COMMAND_HISTORY
+    COMMAND_HISTORY --> COMMAND_UNDO
+    
+    %% Advanced Execution
+    COMMAND_EXECUTOR --> PIPELINE_EXECUTOR
+    COMMAND_EXECUTOR --> BATCH_EXECUTOR
+    COMMAND_EXECUTOR --> SCHEDULED_EXECUTOR
+    PRIORITY_QUEUE --> PIPELINE_EXECUTOR
+    
+    %% Monitoring Integration
+    PERF_HANDLER --> REAL_TIME_MONITOR
+    REAL_TIME_MONITOR --> PREDICTIVE_ANALYTICS
+    PREDICTIVE_ANALYTICS --> ANOMALY_DETECTION
+    ANOMALY_DETECTION --> PERFORMANCE_FORECASTING
+    
+    %% Data Flow
+    EVENT_LOGGER --> EVENT_STORE
+    REAL_TIME_MONITOR --> METRICS_AGGREGATOR
+    METRICS_AGGREGATOR --> DATA_WAREHOUSE
+    DATA_WAREHOUSE --> CACHE_LAYER
+    
+    %% Integration Points
+    SHELL_INTEGRATION --> ASYNC_HANDLER
+    NIX_INTEGRATION --> CONTEXT_HANDLER
+    GIT_INTEGRATION --> PERF_HANDLER
+    EXTERNAL_APIS --> ALERT_HANDLER
+    
+    %% Feedback Loops
+    PERFORMANCE_FORECASTING --> EVENT_ROUTER
+    ANOMALY_DETECTION --> ALERT_HANDLER
+    CACHE_LAYER --> ASYNC_HANDLER
+    
+    %% Styling
+    classDef eventbus fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef event fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef command fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef handler fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef executor fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef monitor fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef data fill:#e8eaf6,stroke:#3f51b5,stroke-width:2px
+    classDef integration fill:#e0f2f1,stroke:#00695c,stroke-width:2px
+    classDef user fill:#ffebee,stroke:#d32f2f,stroke-width:3px
+    
+    class EVENT_BUS,EVENT_ROUTER,EVENT_FILTER,EVENT_LOGGER eventbus
+    class SHELL_STARTUP,CONFIG_RELOAD,COMMAND_EXEC,PERFORMANCE_EVENT,CONTEXT_CHANGE event
+    class COMMAND_FACTORY,COMMAND_VALIDATOR,COMMAND_EXECUTOR,COMMAND_HISTORY,COMMAND_UNDO command
+    class ASYNC_HANDLER,CONTEXT_HANDLER,PERF_HANDLER,ALERT_HANDLER,ROLLBACK_HANDLER handler
+    class PIPELINE_EXECUTOR,BATCH_EXECUTOR,SCHEDULED_EXECUTOR,PRIORITY_QUEUE executor
+    class REAL_TIME_MONITOR,PREDICTIVE_ANALYTICS,ANOMALY_DETECTION,PERFORMANCE_FORECASTING monitor
+    class EVENT_STORE,METRICS_AGGREGATOR,DATA_WAREHOUSE,CACHE_LAYER data
+    class NIX_INTEGRATION,GIT_INTEGRATION,SHELL_INTEGRATION,EXTERNAL_APIS integration
+    class USER_INPUT user

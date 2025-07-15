@@ -1,0 +1,106 @@
+graph TB
+    subgraph "Terminal Performance Architecture - Improved State"
+        subgraph "Shell Layer"
+            FISH[Fish Shell - Default - 10.73ms startup]
+            FISH_CONFIG[Fish Config ~/.config/fish/config.fish]
+            SHELL_INIT[Shell Initialization Script]
+        end
+        
+        subgraph "Prompt System"
+            STARSHIP[Starship Prompt - Optimized]
+            STARSHIP_CONFIG[Starship Config - 400ms timeout]
+            PROMPT_MODULES[Minimal Modules: Directory, Git, Go, Node, Duration]
+        end
+        
+        subgraph "Completion System"
+            CARAPACE[Carapace Universal Completions]
+            CARAPACE_COMPLETIONS[1000+ Command Completions]
+            LAZY_LOADING[Lazy Loading for Completions]
+        end
+        
+        subgraph "Configuration Management"
+            NIX_DARWIN[Nix Darwin Configuration]
+            NIX_ENVIRONMENT[environment.nix - Minimal Essential Packages]
+            NIX_PROGRAMS[programs.nix - Fish Only]
+            NIX_FLAKE[flake.nix - Clean System Definition]
+            CONFIG_VALIDATION[Configuration Validation]
+        end
+        
+        subgraph "Performance Monitoring"
+            AUTOMATED_MONITORING[Automated Performance Monitoring]
+            REGRESSION_DETECTION[Regression Detection System]
+            PERFORMANCE_HISTORY[Performance History Database]
+            ALERTS[Performance Alerts]
+        end
+        
+        subgraph "Development Tools"
+            OPTIMIZED_ALIASES[Optimized Dev Aliases]
+            SMART_GIT[Smart Git Integration]
+            FAST_SEARCH[Fast Search Tools]
+            CONTEXT_AWARE[Context-Aware Tools]
+        end
+        
+        subgraph "Maintenance System"
+            HEALTH_CHECK[System Health Checks]
+            AUTO_CLEANUP[Automated Cleanup]
+            BACKUP_SYSTEM[Configuration Backup]
+            ROLLBACK[Easy Rollback Procedures]
+        end
+    end
+    
+    %% Optimized Flow
+    USER --> FISH
+    FISH --> FISH_CONFIG
+    FISH_CONFIG --> SHELL_INIT
+    SHELL_INIT --> CARAPACE
+    SHELL_INIT --> STARSHIP
+    
+    %% Lazy Loading
+    CARAPACE --> LAZY_LOADING
+    LAZY_LOADING --> CARAPACE_COMPLETIONS
+    
+    %% Configuration Flow
+    NIX_DARWIN --> CONFIG_VALIDATION
+    CONFIG_VALIDATION --> NIX_ENVIRONMENT
+    CONFIG_VALIDATION --> NIX_PROGRAMS
+    NIX_ENVIRONMENT --> FISH
+    NIX_ENVIRONMENT --> CARAPACE
+    NIX_ENVIRONMENT --> STARSHIP
+    
+    %% Prompt System
+    STARSHIP --> STARSHIP_CONFIG
+    STARSHIP_CONFIG --> PROMPT_MODULES
+    
+    %% Performance Monitoring
+    AUTOMATED_MONITORING --> REGRESSION_DETECTION
+    REGRESSION_DETECTION --> PERFORMANCE_HISTORY
+    REGRESSION_DETECTION --> ALERTS
+    
+    %% Development Integration
+    FISH_CONFIG --> OPTIMIZED_ALIASES
+    OPTIMIZED_ALIASES --> SMART_GIT
+    OPTIMIZED_ALIASES --> FAST_SEARCH
+    OPTIMIZED_ALIASES --> CONTEXT_AWARE
+    
+    %% Maintenance System
+    HEALTH_CHECK --> AUTO_CLEANUP
+    HEALTH_CHECK --> BACKUP_SYSTEM
+    BACKUP_SYSTEM --> ROLLBACK
+    
+    %% Monitoring Integration
+    FISH --> AUTOMATED_MONITORING
+    STARSHIP --> AUTOMATED_MONITORING
+    CARAPACE --> AUTOMATED_MONITORING
+    
+    %% Styling
+    classDef optimized fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef config fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef monitoring fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef maintenance fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef user fill:#fce4ec,stroke:#c2185b,stroke-width:3px
+    
+    class FISH,FISH_CONFIG,CARAPACE,STARSHIP,SHELL_INIT optimized
+    class NIX_DARWIN,NIX_ENVIRONMENT,NIX_PROGRAMS,NIX_FLAKE,CONFIG_VALIDATION config
+    class AUTOMATED_MONITORING,REGRESSION_DETECTION,PERFORMANCE_HISTORY,ALERTS monitoring
+    class HEALTH_CHECK,AUTO_CLEANUP,BACKUP_SYSTEM,ROLLBACK maintenance
+    class USER user
