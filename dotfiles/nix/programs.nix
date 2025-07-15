@@ -15,7 +15,7 @@
       useBabelfish = true;  # Bash/POSIX compatibility
       shellAliases = {
         # Essential shortcuts only
-        l = "ls -la";
+        l = "ls -laSh";
         t = "tree -h -L 2 -C --dirsfirst";
       };
       shellInit = ''

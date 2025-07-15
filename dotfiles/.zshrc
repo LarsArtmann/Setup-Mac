@@ -50,21 +50,6 @@ export GH_PAGER=""
 # Source private environment variables (not tracked in git)
 [ -f ~/.env.private ] && source ~/.env.private
 
-# Git aliases from your development workflow
-alias gs='git town sync'
-alias gnpr='git town new-pull-request'
-alias gco='git town switch'
-
-# Development shortcuts from CLAUDE.md
-alias d='bun dev'
-alias t='bun test'
-alias l='bun lint'
-alias tc='bun typecheck'
-
-# Navigation shortcuts
-alias proj='cd ~/WebstormProjects'
-alias dots='cd ~/.dotfiles'
-
 # Debug mode completion and cleanup
 if [[ -n "$ZSH_DEBUG" ]]; then
   echo "[DEBUG] Completed .zshrc initialization at $(date '+%T.%3N')"
@@ -74,3 +59,5 @@ fi
 
 # Show zsh profiling information
 zprof
+
+echo "Go ROCK!"

@@ -8,8 +8,10 @@
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .txt all
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .md all
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .json all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .jsonl all
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .yaml all
         ${pkgs.duti}/bin/duti -s com.sublimetext.4 .yml all
+        ${pkgs.duti}/bin/duti -s com.sublimetext.4 .toml all
         ${pkgs.duti}/bin/duti -s com.apple.TextEdit .rtf all
       '';
 

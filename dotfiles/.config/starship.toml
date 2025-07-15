@@ -115,10 +115,10 @@ disabled = true
 disabled = true
 
 [git_commit]
-disabled = true
+disabled = false
 
 [git_state]
-disabled = true
+disabled = false
 
 [golang]
 disabled = false
@@ -159,7 +159,7 @@ disabled = true
 disabled = true
 
 [nix_shell]
-disabled = true
+disabled = false
 
 [nodejs]
 disabled = false
@@ -173,7 +173,7 @@ disabled = true
 disabled = true
 
 [package]
-disabled = true
+disabled = false
 
 [perl]
 disabled = true
@@ -203,7 +203,7 @@ disabled = true
 disabled = true
 
 [shell]
-disabled = true
+disabled = false
 
 [shlvl]
 disabled = true
@@ -218,10 +218,10 @@ disabled = true
 disabled = true
 
 [time]
-disabled = true
+disabled = false
 
 [username]
-disabled = true
+disabled = false
 
 [vagrant]
 disabled = true

@@ -1,13 +1,11 @@
-{ pkgs, lib, ... }:
-
-{
+{ lib, ... }: {
   # STARSHIP CONFIGURATION: Performance-optimized for Fish + Carapace + Starship
   programs.starship = {
     enable = true;
     settings = {
       # PERFORMANCE: Optimized for 500ms 95%tile budget
       command_timeout = 400; # Parallel execution, max 400ms total
-      scan_timeout = 100;    # Thorough project detection
+      scan_timeout = 100; # Thorough project detection
 
       # FORMAT: Enhanced prompt with performance budget
       format = lib.concatStrings [

@@ -51,7 +51,8 @@
       "Bash(./scripts/automation-setup.sh:*)",
       "WebFetch(domain:elv.sh)",
       "Bash(fish -c:*)",
-      "Bash(darwin-rebuild build:*)"
+      "Bash(darwin-rebuild build:*)",
+      "Bash(fish:*)"
     ],
     "deny": []
   }

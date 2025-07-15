@@ -16,7 +16,7 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      l = "ls -la";
+      l = "ls -laSh";
       t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
@@ -27,7 +27,18 @@
   programs.zsh = {
     enable = true;
     shellAliases = {
-      l = "ls -la";
+      l = "ls -laSh";
+      t = "tree -h -L 2 -C --dirsfirst";
+      nixup = "darwin-rebuild switch";
+      c2p = "code2prompt . --output=code2prompt.md --tokens";
+      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+    };
+  };
+
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      l = "ls -laSh";
       t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
