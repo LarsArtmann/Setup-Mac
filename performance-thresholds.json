@@ -1,0 +1,34 @@
+{
+  "shell_performance": {
+    "thresholds": {
+      "excellent": 50,
+      "good": 100,
+      "acceptable": 200,
+      "slow": 500,
+      "critical": 1000
+    },
+    "regression_alert": {
+      "percentage_increase": 20,
+      "absolute_increase_ms": 50
+    },
+    "targets": {
+      "fish": 50,
+      "zsh": 100,
+      "bash": 50
+    }
+  },
+  "deployment_performance": {
+    "thresholds": {
+      "fast": 30,
+      "normal": 120,
+      "slow": 300,
+      "timeout": 600
+    }
+  },
+  "monitoring": {
+    "frequency": "on_config_change",
+    "retention_days": 90,
+    "alert_channels": ["console", "file"],
+    "enable_trending": true
+  }
+}

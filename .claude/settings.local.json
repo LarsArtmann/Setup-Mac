@@ -59,7 +59,9 @@
       "WebFetch(domain:objective-see.org)",
       "Bash(darwin-rebuild switch:*)",
       "Bash(strace:*)",
-      "Bash(dtruss:*)"
+      "Bash(dtruss:*)",
+      "Bash(./scripts/activitywatch-config.sh:*)",
+      "Bash(./scripts/deployment-verify.sh:*)"
     ],
     "deny": []
   }
