@@ -57,7 +57,9 @@
       "Bash(nix flake check:*)",
       "Bash(/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/scripts/spotlight-privacy-setup.sh)",
       "WebFetch(domain:objective-see.org)",
-      "Bash(darwin-rebuild switch:*)"
+      "Bash(darwin-rebuild switch:*)",
+      "Bash(strace:*)",
+      "Bash(dtruss:*)"
     ],
     "deny": []
   }

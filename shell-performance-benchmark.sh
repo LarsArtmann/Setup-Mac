@@ -194,20 +194,23 @@ setup_performance_data
 # Check available shells
 print_header "Available Shells"
 SHELLS=()
-declare -A SHELL_PATHS=(
-    ["fish"]="/run/current-system/sw/bin/fish"
-    ["zsh"]="/run/current-system/sw/bin/zsh"
-    ["bash"]="/bin/bash"
-)
+# Shell paths
+FISH_PATH="/run/current-system/sw/bin/fish"
+ZSH_PATH="/run/current-system/sw/bin/zsh"
+BASH_PATH="/bin/bash"
 
-for shell in fish zsh bash; do
-    shell_path="${SHELL_PATHS[$shell]}"
+for shell_name in fish zsh bash; do
+    case "$shell_name" in
+        fish) shell_path="$FISH_PATH" ;;
+        zsh) shell_path="$ZSH_PATH" ;;
+        bash) shell_path="$BASH_PATH" ;;
+    esac
     if [[ -x "$shell_path" ]]; then
         version=$($shell_path --version 2>/dev/null | head -n1 || echo "Unknown version")
-        echo "✅ $shell: $version (at $shell_path)"
-        SHELLS+=("$shell")
+        echo "✅ $shell_name: $version (at $shell_path)"
+        SHELLS+=("$shell_name")
     else
-        echo "❌ $shell: Not available at $shell_path"
+        echo "❌ $shell_name: Not available at $shell_path"
     fi
 done
 echo
@@ -217,7 +220,11 @@ print_header "Hyperfine Benchmarks (10 runs each)"
 echo
 
 for shell in "${SHELLS[@]}"; do
-    shell_path="${SHELL_PATHS[$shell]}"
+    case "$shell" in
+        fish) shell_path="$FISH_PATH" ;;
+        zsh) shell_path="$ZSH_PATH" ;;
+        bash) shell_path="$BASH_PATH" ;;
+    esac
     config_file=$(get_config_file "$shell")
 
     echo -e "${YELLOW}Testing $shell startup time...${NC}"
@@ -260,7 +267,11 @@ print_header "Manual Timing Tests (for comparison)"
 echo
 
 for shell in "${SHELLS[@]}"; do
-    shell_path="${SHELL_PATHS[$shell]}"
+    case "$shell" in
+        fish) shell_path="$FISH_PATH" ;;
+        zsh) shell_path="$ZSH_PATH" ;;
+        bash) shell_path="$BASH_PATH" ;;
+    esac
     echo -e "${YELLOW}Manual timing for $shell (5 runs):${NC}"
 
     total_time=0

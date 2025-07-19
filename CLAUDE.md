@@ -4,39 +4,57 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Package Management Philosophy
 
-**CRITICAL: This project uses Nix as the primary package manager. Always prefer Nix over other package managers.**
+**🚨 CRITICAL: This setup requires ABSOLUTE CARE! Better slow than sorry! 🚨**
 
-- **Nix packages** (CLI tools, development tools): Add to `dotfiles/nix/environment.nix`
-- **Homebrew casks** (GUI applications only): Add to `dotfiles/nix/homebrew.nix`
-- **Never use**: `brew install`, `npm install -g`, `pip install`, manual downloads
-- **Exception**: Homebrew is managed declaratively through `nix-homebrew` integration
+**STRICT HIERARCHY: Nix is preferred over EVERYTHING else!**
+
+1. **FIRST CHOICE - Nix packages**: Always check `nix search nixpkgs <package>` first
+   - Add to `dotfiles/nix/environment.nix` systemPackages
+2. **FALLBACK ONLY - Homebrew**: Only when no Nix package exists
+   - Add to `dotfiles/nix/homebrew.nix` casks array (GUI apps only)
+3. **ABSOLUTELY FORBIDDEN**:
+   - `brew install` (bypasses declarative config)
+   - `npm install -g` (creates system pollution)
+   - `pip install` (conflicts with Nix environment)
+   - Manual downloads (untracked dependencies)
+   - Any package manager that bypasses Nix control
+
+**⚠️ DANGER ZONE**: This computer setup can be fucked up HARD! One wrong command can break the entire declarative system.
 
 ## Development Commands
 
 ### Primary Workflow (Just Task Runner)
+
+**🎯 ALWAYS PREFER `just` COMMANDS! Never use direct tools when just wrapper exists!**
+
 ```bash
 just --list                    # Show all available commands
 just setup                     # Initial system setup after cloning
-just switch                    # Apply Nix configuration changes (equivalent to nixup)
-just update                    # Update Nix flake inputs
-just clean                     # Clean up caches and old packages
-just check                     # Check system status and outdated packages
+just switch                    # PREFERRED: Apply Nix configuration changes
+just update                    # PREFERRED: Update Nix flake inputs
+just clean                     # PREFERRED: Clean up caches and old packages
+just check                     # PREFERRED: Check system status
+just test                      # PREFERRED: Test configuration before applying
+just rollback                  # EMERGENCY: Rollback to previous generation
 ```
 
-### Nix Operations
+### Nix Operations (ONLY if just unavailable)
 ```bash
-# Preferred deployment method (via just)
-just switch
-
-# Direct Nix commands (if just unavailable)
+# LAST RESORT - Direct Nix commands
 cd dotfiles/nix
 nh darwin switch .                    # Modern Nix deployment tool
-darwin-rebuild switch --flake .      # Traditional method
+darwin-rebuild switch --flake .      # Traditional method (requires sudo)
 
 # Package management
 nix search nixpkgs <package>         # Search for packages
 nix flake update                     # Update package sources
 ```
+
+### 🚨 CRITICAL DEPLOYMENT SAFETY 🚨
+1. **ALWAYS test first**: `just test` before `just switch`
+2. **NEVER force**: Let timeouts complete naturally
+3. **BACKUP first**: `just backup` before major changes
+4. **VERIFY after**: Check that changes actually applied
 
 ### Performance & Monitoring
 ```bash
