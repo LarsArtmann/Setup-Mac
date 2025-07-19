@@ -1,13 +1,13 @@
 # Reusable Prompts for Terminal Performance Optimization
 
-Date: 2025-07-15T12:59:41+02:00  
+Date: 2025-07-15T12:59:41+02:00
 Session: Terminal Performance & Fish Shell Migration
 
 ## 🚀 **Shell Performance Optimization Prompt**
 
 ### **Prompt Name:** "Ultimate Terminal Performance Optimization"
 
-### **Use Case:** 
+### **Use Case:**
 When terminal startup is slow (>500ms) and you want to achieve sub-100ms startup times while maintaining all functionality.
 
 ### **Prompt:**
@@ -15,7 +15,7 @@ When terminal startup is slow (>500ms) and you want to achieve sub-100ms startup
 You are a terminal performance optimization expert. I need to optimize my shell startup time from current slow performance to <100ms consistently.
 
 CURRENT SITUATION:
-- Current shell: [ZSH/Fish/Bash] 
+- Current shell: [ZSH/Fish/Bash]
 - Startup time: [XXX]ms (measured with hyperfine)
 - Performance budget: <500ms 95%tile, <250ms 50%tile
 - Must maintain all current functionality and aliases
@@ -55,7 +55,7 @@ Use hyperfine for accurate benchmarking and focus on customer value delivery.
 
 ### **Prompt Name:** "Safe Nix Darwin Configuration Deployment"
 
-### **Use Case:** 
+### **Use Case:**
 When deploying Nix darwin configurations and need to ensure complete, verified deployment without breaking the system.
 
 ### **Prompt:**
@@ -108,7 +108,7 @@ Focus on complete, verified deployment with no surprises.
 
 ### **Prompt Name:** "Terminal Performance Regression Monitoring"
 
-### **Use Case:** 
+### **Use Case:**
 When you've achieved good performance and need to maintain it over time with automated monitoring.
 
 ### **Prompt:**
@@ -156,7 +156,7 @@ Focus on preventing performance regressions while maintaining development veloci
 
 ### **Prompt Name:** "Shell Configuration Debugging & Troubleshooting"
 
-### **Use Case:** 
+### **Use Case:**
 When shell configuration isn't working as expected and you need systematic debugging.
 
 ### **Prompt:**
@@ -204,7 +204,7 @@ Focus on systematic problem-solving and preventive measures.
 
 ### **Prompt Name:** "Terminal Architecture Migration Planning"
 
-### **Use Case:** 
+### **Use Case:**
 When considering major architectural changes to terminal setup (e.g., ZSH to Fish migration).
 
 ### **Prompt:**

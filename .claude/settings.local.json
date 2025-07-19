@@ -52,7 +52,10 @@
       "WebFetch(domain:elv.sh)",
       "Bash(fish -c:*)",
       "Bash(darwin-rebuild build:*)",
-      "Bash(fish:*)"
+      "Bash(fish:*)",
+      "Bash(chsh:*)",
+      "Bash(nix flake check:*)",
+      "Bash(/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/scripts/spotlight-privacy-setup.sh)"
     ],
     "deny": []
   }
