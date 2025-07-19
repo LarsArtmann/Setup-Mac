@@ -59,6 +59,11 @@
       "legcord" # lightweight Discord - nix package exist, but does not work on my MacOS version - 2025-04-28
       "little-snitch"
       "lulu" # Open source firewall to block unknown outgoing connections - https://objective-see.org/products/lulu.html
+      # Security tools from Objective-See
+      "blockblock" # Monitors persistence locations for malware
+      "oversight" # Monitors microphone and webcam access
+      "knockknock" # Shows what's persistently installed on your Mac
+      "dnd" # Alerts user when files/folders are added to critical locations
       "macfuse"
       "macpass"
       # rarely used: "multimc"
