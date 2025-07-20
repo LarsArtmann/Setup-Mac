@@ -2,26 +2,123 @@
 
 let
   homeDir = "/Users/larsartmann";
+  
+  # Validation helpers
+  validateHomeDir = dir:
+    if !lib.pathExists dir then
+      lib.warn "Home directory ${dir} does not exist"
+    else dir;
+    
+  validatePackage = pkg:
+    if pkg == null then
+      throw "Package cannot be null"
+    else if !(lib.hasAttr "outPath" pkg) then
+      throw "Invalid package provided"
+    else pkg;
+    
 in
 {
+  # Enhanced environment configuration with validation
+  assertions = [
+    {
+      assertion = homeDir != null && homeDir != "";
+      message = "Home directory must be defined";
+    }
+    {
+      assertion = pkgs.fish != null;
+      message = "Fish shell package must be available";
+    }
+  ];
+  
   environment = {
-    # TODO: https://mynixos.com/nix-darwin/options/environment
-    #darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
+    # Enhanced environment configuration
+    # Additional environment settings for robustness
+    etc = {
+      # Create additional configuration files if needed
+      # "nix/nix.conf".text = ''
+      #   # Additional Nix configuration
+      # '';
+    };
+    
+    # Set Darwin configuration path for explicit configuration management  
+    # darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
 
     variables = {
+      # Core system settings
       EDITOR = "nano";
       LANG = "en_GB.UTF-8";
-      SHELL = "${pkgs.fish}/bin/fish"; # ULTIMATE MIN-MAX: Fish shell for performance
+      SHELL = "${validatePackage pkgs.fish}/bin/fish"; # ULTIMATE MIN-MAX: Fish shell for performance
 
       # Optimize NIX_PATH for better performance
       NIX_PATH = lib.mkForce "nixpkgs=flake:nixpkgs";
 
-      # Disable automatic homebrew analytics for faster startup
+      # Homebrew optimization
       HOMEBREW_NO_ANALYTICS = "1";
       HOMEBREW_NO_AUTO_UPDATE = "1";
+      HOMEBREW_NO_INSTALL_CLEANUP = "1";
+      HOMEBREW_NO_ENV_HINTS = "1";
 
-      # Optimize locale settings
+      # Locale optimization
       LC_ALL = "en_GB.UTF-8";
+      LC_CTYPE = "en_GB.UTF-8";
+      
+      # Development environment enhancements
+      PAGER = "less";
+      LESS = "-R -S -M +Gg";
+      
+      # Security and privacy
+      DOTNET_CLI_TELEMETRY_OPTOUT = "1";
+      NEXT_TELEMETRY_DISABLED = "1";
+      GATSBY_TELEMETRY_DISABLED = "1";
+      
+      # Performance optimizations
+      NODE_OPTIONS = "--max-old-space-size=4096";
+      NPM_CONFIG_AUDIT = "false";
+      NPM_CONFIG_FUND = "false";
+      
+      # Development workflow
+      DOCKER_BUILDKIT = "1";
+      COMPOSE_DOCKER_CLI_BUILD = "1";
+      
+      # Build and deployment optimization
+      NIXPKGS_ALLOW_UNFREE = "1";
+      NIXPKGS_ALLOW_BROKEN = "0";  # Strict: No broken packages
+      NIXPKGS_ALLOW_INSECURE = "0"; # Strict: No insecure packages
+      
+      # Go development optimization
+      GOPROXY = "https://proxy.golang.org,direct";
+      GOSUMDB = "sum.golang.org";
+      GOMODCACHE = "${homeDir}/.cache/go/mod";
+      GOCACHE = "${homeDir}/.cache/go/build";
+      
+      # Rust development optimization
+      CARGO_HOME = "${homeDir}/.cargo";
+      RUSTUP_HOME = "${homeDir}/.rustup";
+      CARGO_TARGET_DIR = "${homeDir}/.cache/cargo/target";
+      
+      # Python development optimization
+      PYTHONDONTWRITEBYTECODE = "1";
+      PYTHONUNBUFFERED = "1";
+      PIP_CACHE_DIR = "${homeDir}/.cache/pip";
+      
+      # Java development optimization
+      GRADLE_USER_HOME = "${homeDir}/.gradle";
+      MAVEN_OPTS = "-Xmx2g -XX:ReservedCodeCacheSize=1g";
+      
+      # Editor and tooling preferences
+      VISUAL = "nano";
+      BROWSER = "open";  # Use macOS default browser
+      MANPAGER = "less -R";
+      
+      # macOS-specific optimizations
+      TERM_PROGRAM = "iTerm.app";
+      COLORTERM = "truecolor";
+      
+      # Privacy and tracking opt-outs
+      DO_NOT_TRACK = "1";
+      ADBLOCK = "1";
+      DISABLE_OPENCOLLECTIVE = "1";
+      OPEN_SOURCE_CONTRIBUTOR = "true";
 
       # Custom PATH configuration - optimized for performance
       # Order: most frequently used first, system paths last

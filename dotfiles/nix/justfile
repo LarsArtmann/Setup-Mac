@@ -1,0 +1,174 @@
+# Just task runner for Nix configuration management
+# Provides convenient commands for validation, deployment, and development
+
+# Default recipe - show available commands
+default:
+    @just --list
+
+# Development workflow
+dev:
+    @echo "🔧 Starting development workflow..."
+    @just validate-quick
+    @echo "✅ Ready for development!"
+
+# Configuration validation commands
+validate *ARGS:
+    @echo "🔍 Running comprehensive configuration validation..."
+    ./scripts/config-validate.sh {{ARGS}}
+
+validate-quick:
+    @echo "⚡ Running quick validation for development..."
+    ./scripts/config-validate.sh --quick
+
+validate-strict:
+    @echo "🔒 Running strict validation (warnings as errors)..."
+    ./scripts/config-validate.sh --strict
+
+validate-nix:
+    @echo "❄️ Validating Nix configuration..."
+    ./scripts/config-validate.sh nix
+
+validate-shell:
+    @echo "🐚 Validating shell configurations..."
+    ./scripts/config-validate.sh shell
+
+validate-deps:
+    @echo "📦 Checking for dependency conflicts..."
+    ./scripts/config-validate.sh deps
+
+validate-report FILE="validation-report.md":
+    @echo "📊 Generating validation report..."
+    ./scripts/config-validate.sh --report {{FILE}} report
+
+# Nix system management
+build:
+    @echo "🏗️ Building Nix configuration..."
+    darwin-rebuild build --flake .
+
+switch:
+    @echo "🔄 Switching to new Nix configuration..."
+    just validate-strict
+    darwin-rebuild switch --flake .
+
+# Safe deployment with comprehensive validation
+deploy-safe:
+    @echo "🛡️ Starting safe deployment process..."
+    @echo "📋 Step 1: Backup current configuration"
+    -cp -r ~/.config ~/.config.backup.$(date +%Y%m%d_%H%M%S) 2>/dev/null || true
+    @echo "🔍 Step 2: Comprehensive validation"
+    just validate-strict
+    @echo "🏗️ Step 3: Build configuration"
+    just build
+    @echo "🔄 Step 4: Apply configuration"
+    just switch
+    @echo "✅ Safe deployment completed successfully!"
+
+# Development helpers
+check:
+    @echo "🔍 Checking Nix flake..."
+    nix flake check --show-trace
+
+update:
+    @echo "📦 Updating flake inputs..."
+    nix flake update
+
+clean:
+    @echo "🧹 Cleaning up..."
+    nix-collect-garbage -d
+    nix store optimise
+
+# Pre-commit setup and management
+setup-hooks:
+    @echo "🪝 Setting up pre-commit hooks..."
+    pre-commit install
+    pre-commit autoupdate
+
+run-hooks:
+    @echo "🔍 Running pre-commit hooks on all files..."
+    pre-commit run --all-files
+
+# Troubleshooting and debugging
+debug:
+    @echo "🐛 Debug information:"
+    @echo "📁 Project root: $(pwd)"
+    @echo "❄️ Nix version: $(nix --version)"
+    @echo "🏠 Home Manager: $(home-manager --version 2>/dev/null || echo 'Not installed')"
+    @echo "🍺 Homebrew: $(brew --version 2>/dev/null | head -1 || echo 'Not installed')"
+    @echo "🐚 Shell: $SHELL"
+    @echo "📋 PATH entries:"
+    @echo "$PATH" | tr ':' '\n' | head -10
+
+logs:
+    @echo "📋 Recent validation logs:"
+    @ls -la validation-*.log 2>/dev/null | head -5 || echo "No validation logs found"
+
+# System information
+info:
+    @echo "💻 System Information:"
+    @echo "🖥️  OS: $(uname -s) $(uname -r)"
+    @echo "🏗️  Architecture: $(uname -m)"
+    @echo "👤 User: $(whoami)"
+    @echo "📁 Home: $HOME"
+    @echo "🔧 Git: $(git --version)"
+
+# Configuration file management
+backup:
+    @echo "💾 Creating configuration backup..."
+    @mkdir -p backups
+    @tar -czf "backups/config-backup-$(date +%Y%m%d_%H%M%S).tar.gz" \
+        --exclude='.git' \
+        --exclude='result' \
+        --exclude='validation-*.log' \
+        --exclude='backups' \
+        .
+    @echo "✅ Backup created in backups/ directory"
+
+restore BACKUP:
+    @echo "🔄 Restoring from backup: {{BACKUP}}"
+    @tar -xzf "{{BACKUP}}" -C . --exclude='.git'
+    @echo "✅ Configuration restored"
+
+# Performance monitoring
+benchmark:
+    @echo "⏱️ Benchmarking system performance..."
+    @echo "🐚 Shell startup times:"
+    @echo -n "Fish: "; time fish -c "echo 'test'" 2>&1 | grep real || echo "Not available"
+    @echo -n "Zsh: "; time zsh -c "echo 'test'" 2>&1 | grep real || echo "Not available"
+    @echo -n "Bash: "; time bash -c "echo 'test'" 2>&1 | grep real || echo "Not available"
+
+# Documentation
+docs:
+    @echo "📚 Available documentation:"
+    @echo "📖 Configuration validation: docs/configuration-validation.md"
+    @echo "🎯 Usage examples: examples/validation-usage.sh"
+    @echo "🧪 Testing: test-validation.sh"
+
+# Help and usage examples
+help-validate:
+    @echo "🔍 Configuration Validation Help"
+    @echo ""
+    @echo "Quick commands:"
+    @echo "  just validate-quick    # Fast validation for development"
+    @echo "  just validate-strict   # Comprehensive validation with warnings as errors"
+    @echo "  just deploy-safe       # Safe deployment with full validation"
+    @echo ""
+    @echo "Specific validations:"
+    @echo "  just validate-nix      # Only Nix configuration"
+    @echo "  just validate-shell    # Only shell configurations"
+    @echo "  just validate-deps     # Only dependency conflicts"
+    @echo ""
+    @echo "Reports and debugging:"
+    @echo "  just validate-report   # Generate detailed validation report"
+    @echo "  just debug            # Show system debug information"
+    @echo "  just logs             # Show recent validation logs"
+
+# Aliases for common operations
+alias v := validate
+alias vq := validate-quick
+alias vst := validate-strict
+alias vn := validate-nix
+alias vsh := validate-shell
+alias vd := validate-deps
+alias b := build
+alias s := switch
+alias ds := deploy-safe

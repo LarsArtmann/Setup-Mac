@@ -45,8 +45,18 @@
         SortColumn = "CPUUsage";
         SortDirection = 0;
       };
-      controlcenter.BatteryShowPercentage = true;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.controlcenter
+      controlcenter = {
+        # Battery configuration
+        BatteryShowPercentage = true;  # Show battery percentage in menu bar
+        
+        # Control Center menu bar items (null = system default, true = show, false = hide)
+        AirDrop = null;           # AirDrop control - use system default
+        Bluetooth = true;         # Bluetooth control in menu bar
+        Display = true;          # Screen brightness control in menu bar
+        FocusModes = false;      # Focus modes control (Do Not Disturb)
+        NowPlaying = true;       # Now Playing media control
+        Sound = true;            # Volume control in menu bar
+      };
 
       dock = {
         autohide = true;
@@ -60,17 +70,59 @@
         wvous-br-corner = 14; # Hot corner: bottom right - Quick Note
       };
       finder = {
-        AppleShowAllExtensions = true;
-        AppleShowAllFiles = true;
-        FXEnableExtensionChangeWarning = true;
-        FXRemoveOldTrashItems = false; # Remove items from the Trash after 30 days
-        ShowPathbar = false;
-        ShowStatusBar = true;
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.finder
+        # File visibility and extensions
+        AppleShowAllExtensions = true;        # Always show file extensions
+        AppleShowAllFiles = true;             # Show hidden files
+        FXEnableExtensionChangeWarning = true; # Warn when changing file extensions
+        
+        # Window and view settings
+        _FXShowPosixPathInTitle = true;       # Show full POSIX path in window title
+        _FXSortFoldersFirst = true;           # Keep folders on top when sorting by name
+        _FXSortFoldersFirstOnDesktop = true;  # Keep folders on top on desktop
+        FXPreferredViewStyle = "clmv";        # Column view (icnv=icon, clmv=column, Flwv=gallery, Nlsv=list)
+        
+        # Search and navigation
+        FXDefaultSearchScope = "SCcf";        # Search current folder (SCev=entire volume, SCcf=current folder, SCsp=previous scope)
+        NewWindowTarget = "Home";             # New windows open to home folder
+        # NewWindowTargetPath = "";           # Custom path when NewWindowTarget is "Other"
+        
+        # Desktop and external media
+        CreateDesktop = true;                 # Show icons on desktop
+        ShowExternalHardDrivesOnDesktop = true;  # Show external drives on desktop
+        ShowHardDrivesOnDesktop = false;      # Don't show internal drives on desktop
+        ShowMountedServersOnDesktop = true;   # Show network volumes on desktop
+        ShowRemovableMediaOnDesktop = true;   # Show USB drives, etc. on desktop
+        
+        # Interface elements
+        ShowPathbar = true;                   # Show path breadcrumbs (was false, changing for better navigation)
+        ShowStatusBar = true;                 # Show status bar with file counts and disk space
+        QuitMenuItem = true;                  # Allow quitting Finder with Cmd+Q
+        
+        # Cleanup settings
+        FXRemoveOldTrashItems = false;        # Don't auto-remove items from trash after 30 days
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
-      loginwindow.GuestEnabled = false;
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.loginwindow
+      
+      loginwindow = {
+        # Guest account and security
+        GuestEnabled = false;                    # Disable guest account for security
+        DisableConsoleAccess = true;            # Disable console access for security
+        
+        # Login display options
+        SHOWFULLNAME = false;                   # Show username field instead of full names (more secure)
+        LoginwindowText = "Lars' MacBook Air";  # Custom login window text
+        
+        # Power management during login
+        PowerOffDisabledWhileLoggedIn = false;  # Allow power off while logged in
+        RestartDisabled = false;                # Allow restart from login window
+        RestartDisabledWhileLoggedIn = false;   # Allow restart while logged in
+        ShutDownDisabled = false;               # Allow shutdown from login window
+        ShutDownDisabledWhileLoggedIn = false;  # Allow shutdown while logged in
+        SleepDisabled = false;                  # Allow sleep from login window
+        
+        # Auto-login (disabled for security)
+        # autoLoginUser = null;                 # No auto-login for security
+      };
       menuExtraClock = {
         FlashDateSeparators = false;
         IsAnalog = null;
@@ -81,18 +133,66 @@
         ShowSeconds = true;
       };
       NSGlobalDomain = {
-        AppleShowAllFiles = true;
-        AppleICUForce24HourTime = true;
-        AppleTemperatureUnit = "Celsius";
-        AppleMeasurementUnits = "Centimeters";
-        # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.NSGlobalDomain
+        # File and interface behavior
+        AppleShowAllFiles = true;              # Show hidden files globally
+        AppleShowAllExtensions = true;         # Show all file extensions
+        
+        # Time and measurement localization
+        AppleICUForce24HourTime = true;       # Use 24-hour time format
+        AppleTemperatureUnit = "Celsius";     # Use Celsius for temperature
+        AppleMeasurementUnits = "Centimeters"; # Use metric measurements
+        AppleMetricUnits = 1;                 # Enable metric units globally (1 = true, 0 = false)
+        
+        # Interface appearance and behavior
+        AppleInterfaceStyle = "Dark";         # Use dark mode
+        AppleShowScrollBars = "Automatic";    # Show scrollbars automatically
+        NSAutomaticWindowAnimationsEnabled = true; # Enable window animations
+        NSScrollAnimationEnabled = true;     # Enable smooth scrolling
+        
+        # Keyboard and input settings
+        ApplePressAndHoldEnabled = false;     # Disable press-and-hold for faster key repeat
+        KeyRepeat = 2;                        # Fast key repeat (1-2 is fastest)
+        InitialKeyRepeat = 15;                # Short delay before key repeat starts
+        AppleKeyboardUIMode = 3;              # Enable full keyboard access for dialogs
+        
+        # Text editing behavior
+        NSAutomaticCapitalizationEnabled = false;    # Disable auto-capitalization
+        NSAutomaticSpellingCorrectionEnabled = false; # Disable auto-spelling correction
+        NSAutomaticPeriodSubstitutionEnabled = false; # Disable automatic period substitution
+        NSAutomaticQuoteSubstitutionEnabled = false;  # Disable smart quotes
+        NSAutomaticDashSubstitutionEnabled = false;   # Disable smart dashes
+        
+        # System behavior
+        NSDisableAutomaticTermination = true; # Prevent automatic app termination
+        AppleSpacesSwitchOnActivate = false;  # Don't switch to app's space when activated
+        
+        # Window and workspace behavior
+        AppleWindowTabbingMode = "always";    # Always prefer tabs in applications
+        
+        # Trackpad settings (if applicable)
+        "com.apple.trackpad.scaling" = 1.0;   # Trackpad tracking speed (0.0-3.0)
       };
-      screencapture.location = "~/Desktop";
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screencapture
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.screensaver
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.smb
-      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
-      spaces.spans-displays = null;
+      screencapture = {
+        location = "~/Desktop";               # Save screenshots to Desktop
+        type = "png";                        # Screenshot format (png, jpg, gif, pdf, tiff)
+        disable-shadow = false;              # Include shadows in window screenshots
+        show-thumbnail = true;               # Show thumbnail after capture
+      };
+      
+      screensaver = {
+        # Screensaver security settings
+        askForPassword = true;               # Require password after screensaver
+        askForPasswordDelay = 0;             # Require password immediately
+      };
+      
+      # SMB (Server Message Block) network settings
+      smb = {
+        NetBIOSName = "Lars-MacBook-Air";    # NetBIOS name for network discovery
+        ServerDescription = "Lars' MacBook Air"; # Server description for network
+      };
+      
+      SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false; # Manual macOS updates
+      spaces.spans-displays = null;          # Use system default for multi-display spaces
 
       trackpad = {
         # Standard trackpad options
@@ -102,8 +202,96 @@
         TrackpadThreeFingerDrag = false; # Disable three finger drag
       };
 
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.universalaccess
-      # TODO: ADD https://mynixos.com/nix-darwin/options/system.defaults.WindowManager
+      # Universal Access (Accessibility) settings
+      universalaccess = {
+        closeViewScrollWheelToggle = false;   # Disable zoom with scroll wheel + modifier
+        closeViewZoomFollowsFocus = false;    # Don't follow focus when zooming
+        mouseDriverCursorSize = 1.0;          # Standard cursor size (1.0-4.0)
+        reduceMotion = false;                 # Don't reduce UI motion (keep animations)
+        reduceTransparency = false;           # Keep interface transparency effects
+      };
+      
+      # Window Manager settings (Stage Manager and window behavior)
+      WindowManager = {
+        # Stage Manager configuration
+        EnableStandardClickToShowDesktop = true;  # Click desktop to show desktop
+        StandardHideDesktopIcons = false;          # Show desktop icons
+        StandardHideWidgets = false;               # Show widgets
+        HideDesktop = false;                       # Don't hide desktop
+        StageManagerHideWidgets = false;           # Show widgets in Stage Manager
+        AutoHide = false;                          # Don't auto-hide windows
+      };
+      
+      # Additional LaunchServices configuration for better app management
+      LaunchServices = {
+        LSQuarantine = false;  # Disable quarantine for downloaded apps (handle with caution)
+      };
+      
+      # Custom User Defaults for enhanced functionality
+      CustomUserPreferences = {
+        # Enhanced Finder settings beyond the standard options
+        "com.apple.finder" = {
+          # Show Library folder in home directory
+          "ShowLibraryFolder" = true;
+          # Enable spring loading for directories
+          "com.apple.springing.enabled" = true;
+          # Spring loading delay
+          "com.apple.springing.delay" = 0.5;
+          # Remove delay for window animations
+          "NSWindowResizeTime" = 0.001;
+        };
+        
+        # Enhanced Dock settings
+        "com.apple.dock" = {
+          # Remove auto-hide delay
+          "autohide-delay" = 0.0;
+          # Speed up auto-hide animation
+          "autohide-time-modifier" = 0.5;
+          # Make hidden apps translucent in Dock
+          "showhidden" = true;
+          # Don't animate opening applications from the Dock
+          "launchanim" = false;
+        };
+        
+        # Screenshot enhancements
+        "com.apple.screencapture" = {
+          # Include mouse cursor in screenshots
+          "showsCursor" = false;
+          # Disable drop shadow in screenshots
+          "disable-shadow" = true;
+        };
+        
+        # Safari security and privacy
+        "com.apple.Safari" = {
+          # Enable debug menus
+          "IncludeInternalDebugMenu" = true;
+          "IncludeDevelopMenu" = true;
+          "WebKitDeveloperExtrasEnabledPreferenceKey" = true;
+          "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
+          # Disable auto-fill
+          "AutoFillFromAddressBook" = false;
+          "AutoFillPasswords" = false;
+          "AutoFillCreditCardData" = false;
+          "AutoFillMiscellaneousForms" = false;
+        };
+        
+        # Menu bar clock with more precision
+        "com.apple.menuextra.clock" = {
+          "DateFormat" = "EEE d MMM HH:mm:ss";
+          "FlashDateSeparators" = false;
+          "IsAnalog" = false;
+        };
+        
+        # Performance optimizations
+        "NSGlobalDomain" = {
+          # Reduce window resize animations
+          "NSWindowResizeTime" = 0.001;
+          # Increase window resize speed for Cocoa applications
+          "NSDocumentRevisionsDebugMode" = true;
+          # Disable Resume system-wide
+          "NSQuitAlwaysKeepsWindows" = false;
+        };
+      };
     };
 
     keyboard = {

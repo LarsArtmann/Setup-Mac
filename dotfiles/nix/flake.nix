@@ -35,9 +35,21 @@
     };
     colmena.url = "github:zhaofengli/colmena";
     mac-app-util.url = "github:hraban/mac-app-util";
+    
+    # Nix User Repository for community packages
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    
+    # treefmt-nix for unified code formatting
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -47,7 +59,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit nixpkgs-nh-dev; };
+        specialArgs = { inherit nixpkgs-nh-dev nur; };
         modules = [
           # Core system configuration
           base
@@ -62,6 +74,12 @@
 
           # Programs
           ./programs.nix
+
+          # NUR community packages - enabled with enhanced configuration
+          ./nur.nix
+
+          # Code formatting with treefmt - enabled with comprehensive formatters
+          ./treefmt.nix
 
           # Homebrew integration
           ./homebrew.nix
