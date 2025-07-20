@@ -1,9 +1,9 @@
-{ pkgs, lib, ... }: 
+{ pkgs, lib, ... }:
 let
   # User configuration validation
   username = "larsartmann";
   userShell = pkgs.fish;
-  
+
   # Validate user configuration
   validateUserShell = shell:
     if shell == null then
@@ -11,7 +11,7 @@ let
     else if !(lib.hasAttr "outPath" shell) then
       throw "Invalid shell package provided"
     else shell;
-    
+
 in {
   # Enhanced user configuration with validation
   assertions = [
@@ -24,7 +24,7 @@ in {
       message = "User shell must be defined";
     }
   ];
-  
+
   users = {
     # Enhanced user configuration
     # Note: defaultUserShell option does not exist in nix-darwin

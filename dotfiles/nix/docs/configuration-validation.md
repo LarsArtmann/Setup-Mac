@@ -82,7 +82,7 @@ The main validation script provides several commands and options:
 
 - `all` - Run all validations (default)
 - `nix` - Run only Nix configuration validation
-- `shell` - Run only shell configuration validation  
+- `shell` - Run only shell configuration validation
 - `deps` - Run only dependency conflict detection
 - `report` - Generate detailed validation report
 
@@ -157,7 +157,7 @@ just benchmark       # Performance benchmarking
 - **Startup performance:** Measures startup time with thresholds
 - **Configuration testing:** Tests Fish-specific configurations
 
-#### Zsh Configuration  
+#### Zsh Configuration
 - **Syntax validation:** `zsh -n` for syntax checking
 - **Startup performance:** Monitors Zsh initialization time
 - **Profile validation:** Checks `.zshrc`, `.zprofile`, `.zshenv`
@@ -345,7 +345,7 @@ echo $PATH | tr ':' '\n'
 
 ```bash
 just debug           # System information
-just logs            # Recent validation logs  
+just logs            # Recent validation logs
 just benchmark       # Performance metrics
 just info           # Configuration status
 ```

@@ -1,0 +1,61 @@
+! Title: Lars Custom uBlock Filters
+! Description: Custom filters for enhanced privacy and performance
+! Homepage: https://github.com/larsartmann/setup-mac
+! License: MIT
+! Version: 1.0.0
+
+! == Enhanced Privacy Protection ==
+! Block additional tracking domains
+||googletagmanager.com^
+||google-analytics.com^
+||googleadservices.com^
+||doubleclick.net^
+||facebook.com/tr/*
+||connect.facebook.net^
+||hotjar.com^
+||mouseflow.com^
+||fullstory.com^
+||logrocket.com^
+
+! == Social Media Tracking ==
+! Block social media widgets and tracking
+||platform.twitter.com^
+||syndication.twitter.com^
+||facebook.com/plugins/*
+||connect.facebook.net/en_US/fbevents.js
+||instagram.com/embed.js
+||linkedin.com/analytics/*
+||pinterest.com/ct/*
+
+! == Development Environment Optimizations ==
+! Block common development tracking
+||segment.com^
+||segment.io^
+||mixpanel.com^
+||amplitude.com^
+||intercom.io^
+||drift.com^
+||zendesk.com/embeddable_framework/*
+
+! == Performance Optimizations ==
+! Block heavy analytics and marketing scripts
+||typekit.net^$script
+||fonts.googleapis.com^$css,important
+||cdnjs.cloudflare.com^$script,domain=~github.com|~stackoverflow.com
+||unpkg.com^$script,domain=~github.com|~npmjs.com
+
+! == Annoyance Filters ==
+! Block cookie banners and popups
+##.cookie-banner
+##.cookie-notice
+##.gdpr-banner
+##[id*="cookie"]
+##[class*="cookie-consent"]
+##[class*="privacy-banner"]
+
+! == Developer-Specific Blocks ==
+! Block unnecessary elements on development sites
+github.com##.js-feature-preview-indicator
+stackoverflow.com##.s-sidebarwidget--content > .grid
+! Remove promotional banners from documentation sites
+docs.github.com##.BorderGrid-row:has(.text-bold:contains("GitHub Copilot"))

@@ -1,19 +1,19 @@
-{ lib, ... }: 
+{ lib, ... }:
 let
   # Validation helpers for robust configuration
-  validateUser = user: 
+  validateUser = user:
     if user == null || user == "" then
       throw "User cannot be null or empty"
     else user;
-    
+
   validatePath = path:
     if path == null || path == "" then
       throw "Path cannot be null or empty"
     else path;
-    
+
   # System validation - simplified to always true for now
   validateMacOS = true;
-    
+
 in {
   # Ensure we're on a compatible system
   assertions = [
@@ -34,7 +34,7 @@ in {
       # Consider enabling for other services with caution:
       # sudo.touchIdAuth = true;  # May interfere with some workflows
     };
-    
+
     # Enhanced PKI (Public Key Infrastructure) settings
     pki = {
       # Additional certificate authorities can be added here if needed
@@ -42,7 +42,7 @@ in {
       # Enable certificate verification for enhanced security
       installCACerts = true;
     };
-    
+
     # Enhanced sudo configuration for better security
     sudo = {
       # Require password for wheel group (disable passwordless sudo)
@@ -69,7 +69,7 @@ in {
     settings = {
       # Necessary for using flakes on this system
       experimental-features = "nix-command flakes";
-      
+
       # Enhanced Nix settings for better performance and reliability
       auto-optimise-store = true;
       builders-use-substitutes = true;
@@ -94,20 +94,20 @@ in {
       trusted-users = [ "@admin" ];
       warn-dirty = false;
     };
-    
+
     # Enhanced garbage collection
     gc = {
       automatic = true;
       interval = { Hour = 2; Minute = 30; }; # Run at 2:30 AM
       options = "--delete-older-than 7d --max-freed 5G";
     };
-    
+
     # Enhanced store optimization
     optimise = {
       automatic = true;
       interval = { Weekday = 7; Hour = 3; Minute = 0; }; # Weekly on Sunday at 3 AM
     };
-    
+
     # Additional Nix configuration for robustness
     checkConfig = true;
     extraOptions = ''
@@ -116,7 +116,7 @@ in {
       keep-failed = false
       build-max-jobs = auto
       cores = 0
-      
+
       # Flake settings
       accept-flake-config = true
       show-trace = true

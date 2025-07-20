@@ -1,95 +1,167 @@
 # treefmt-nix Configuration
 # Unified code formatting for the project
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 
 {
-  # Install treefmt and formatters system-wide
-  environment.systemPackages = with pkgs; [
-    # Core treefmt tool
-    treefmt
-    
-    # Go formatters
-    go
-    gofumpt     # Enhanced Go formatter (stricter than gofmt)
-    
-    # JavaScript/TypeScript formatters
-    nodePackages.prettier
-    biome       # Modern JS/TS formatter and linter
-    
-    # Nix formatters
-    nixfmt-classic  # Official Nix formatter
-    alejandra       # Alternative Nix formatter
-    
-    # Shell script formatters
-    shfmt
-    
-    # JSON/YAML formatters
-    jq
-    yq-go
-    
-    # Markdown formatters (via prettier)
-    # Included in nodePackages.prettier
-    
-    # Additional useful formatters
-    nodePackages.eslint        # JavaScript linting
-    nodePackages."@biomejs/biome"  # Alternative modern toolchain
+  # Import treefmt-nix module and configure formatters
+  imports = [
+    inputs.treefmt-nix.darwinModules.default
   ];
 
-  # Create treefmt configuration in /etc
-  environment.etc."treefmt.toml" = {
-    text = ''
-      # treefmt configuration for Setup-Mac project
-      # Universal code formatter configuration
+  # Configure treefmt with comprehensive formatters
+  treefmt = {
+    # Enable treefmt system-wide
+    enable = true;
 
-      [formatter.go]
-      command = "gofumpt"
-      options = ["-w"]
-      includes = ["*.go"]
+    # Project root directory
+    projectRootFile = "flake.nix";
 
-      [formatter.javascript]
-      command = "prettier"
-      options = ["--write", "--tab-width", "2", "--single-quote", "--trailing-comma", "es5"]
-      includes = ["*.js", "*.ts", "*.jsx", "*.tsx", "*.json", "*.yaml", "*.yml", "*.md"]
+    # Configure formatters for different languages
+    programs = {
+      # Go formatting with gofumpt (enhanced formatter)
+      gofumpt = {
+        enable = true;
+        # gofumpt is stricter than gofmt, provides additional formatting rules
+      };
 
-      [formatter.nix]
-      command = "nixfmt"
-      options = ["--width", "100"]
-      includes = ["*.nix"]
+      # JavaScript/TypeScript formatting with prettier
+      prettier = {
+        enable = true;
+        # Configure prettier for consistent JS/TS/JSON/YAML/MD formatting
+        settings = {
+          tabWidth = 2;
+          singleQuote = true;
+          trailingComma = "es5";
+          printWidth = 100;
+          semi = true;
+          bracketSpacing = true;
+          arrowParens = "avoid";
+        };
+        # Include various web development file types
+        includes = [
+          "*.js"
+          "*.ts"
+          "*.jsx"
+          "*.tsx"
+          "*.json"
+          "*.yaml"
+          "*.yml"
+          "*.md"
+          "*.css"
+          "*.scss"
+          "*.html"
+        ];
+      };
 
-      [formatter.shell]
-      command = "shfmt"
-      options = ["-w", "-i", "2", "-ci"]
-      includes = ["*.sh", "*.bash"]
+      # Nix formatting with nixfmt
+      nixfmt = {
+        enable = true;
+        # Use consistent 100-character width for Nix files
+        settings = {
+          width = 100;
+        };
+      };
 
-      # Global settings
-      [global]
-      excludes = [
-          "*.lock",
-          "node_modules/",
-          ".git/",
-          "target/",
-          "build/",
-          "dist/",
-          ".next/",
-          ".cache/",
-          "backups/",
-          "*.log",
-          "result",
-          "result-*",
-          ".direnv/",
+      # Shell script formatting with shfmt
+      shfmt = {
+        enable = true;
+        # Configure shell formatting with 2-space indentation
+        settings = {
+          indent = 2;
+          case_indent = true;  # Indent case statements
+          space_redirects = true;  # Add space before redirects
+        };
+      };
+    };
+
+    # Global exclusions for treefmt
+    settings = {
+      global = {
+        excludes = [
+          # Lock files and dependencies
+          "*.lock"
+          "package-lock.json"
+          "yarn.lock"
+          "pnpm-lock.yaml"
+          "Cargo.lock"
+          "poetry.lock"
+
+          # Build artifacts and dependencies
+          "node_modules/"
+          ".next/"
+          "dist/"
+          "build/"
+          "target/"
           "vendor/"
-      ]
-    '';
+          ".cache/"
+
+          # Version control and environment
+          ".git/"
+          ".direnv/"
+          ".env*"
+
+          # Nix build results
+          "result"
+          "result-*"
+
+          # Backups and temporary files
+          "backups/"
+          "*.tmp"
+          "*.bak"
+          "*.backup"
+
+          # Log files
+          "*.log"
+
+          # IDE and editor files
+          ".vscode/"
+          ".idea/"
+          "*.swp"
+          "*.swo"
+          "*~"
+
+          # macOS system files
+          ".DS_Store"
+          "._*"
+        ];
+      };
+    };
   };
 
-  # Add shell aliases for convenient formatting
+  # Install additional formatting and linting tools system-wide
+  environment.systemPackages = with pkgs; [
+    # Core treefmt tool (provided by treefmt-nix)
+    # treefmt  # This is now handled by the treefmt-nix module
+
+    # Additional development tools that complement treefmt
+    nodePackages.eslint        # JavaScript linting
+    shellcheck                 # Shell script linting
+    yamllint                   # YAML linting
+
+    # Alternative formatters (for manual use if needed)
+    alejandra                  # Alternative Nix formatter
+    biome                      # Modern JS/TS formatter and linter
+
+    # JSON/YAML processing tools
+    jq                         # JSON processor
+    yq-go                      # YAML processor
+  ];
+
+  # Add convenient shell aliases for formatting
   programs.fish.shellInit = lib.mkAfter ''
     # treefmt aliases for convenient code formatting
     alias fmt='treefmt'
-    alias fmt-check='treefmt --check'
-    alias fmt-go='treefmt --formatters go'
-    alias fmt-js='treefmt --formatters javascript'  
-    alias fmt-nix='treefmt --formatters nix'
+    alias fmt-check='treefmt --fail-on-change'
+    alias fmt-go='treefmt --formatters gofumpt'
+    alias fmt-js='treefmt --formatters prettier'
+    alias fmt-nix='treefmt --formatters nixfmt'
+    alias fmt-shell='treefmt --formatters shfmt'
     alias fmt-all='treefmt --no-cache'
+    alias fmt-staged='git diff --cached --name-only | xargs treefmt'
+    alias fmt-ci='treefmt --ci'
+
+    # Additional formatting utilities
+    alias lint-shell='find . -name "*.sh" -not -path "./.*" | xargs shellcheck'
+    alias lint-yaml='find . -name "*.yml" -o -name "*.yaml" -not -path "./.*" | xargs yamllint'
   '';
 }

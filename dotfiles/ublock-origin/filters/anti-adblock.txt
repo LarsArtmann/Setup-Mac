@@ -1,0 +1,11 @@
+! Title: Anti-Adblock Circumvention
+! Description: Filters to circumvent anti-adblock detection
+! Version: 1.0.0
+
+! Generic anti-adblock circumvention
+@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$script,domain=~example.com
+@@/ads.js$script,1p
+@@||googletagservices.com/tag/js/gpt.js$script
+
+! Site-specific anti-adblock fixes
+! Add specific sites that block adblockers here

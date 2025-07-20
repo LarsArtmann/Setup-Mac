@@ -39,9 +39,9 @@ check_result() {
     local check_name="$1"
     local status="$2"
     local details="${3:-}"
-    
+
     TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
-    
+
     if [[ "$status" == "PASS" ]]; then
         echo -e "${GREEN}✅ $check_name${NC} $details"
         PASSED_CHECKS=$((PASSED_CHECKS + 1))
@@ -49,7 +49,7 @@ check_result() {
         echo -e "${RED}❌ $check_name${NC} $details"
         FAILED_CHECKS=$((FAILED_CHECKS + 1))
     fi
-    
+
     echo "[$(date +'%H:%M:%S')] $status: $check_name $details" >> "$VERIFICATION_LOG"
 }
 
@@ -102,7 +102,7 @@ print_header "Package Installation Verification"
 check_package() {
     local package_name="$1"
     local expected_path="$2"
-    
+
     if [[ -x "$expected_path" ]]; then
         version=$($expected_path --version 2>/dev/null | head -1 || echo "version unknown")
         check_result "Package: $package_name" "PASS" "($version)"
@@ -162,7 +162,7 @@ if command -v fish &> /dev/null; then
     fish -c "echo test" &> /dev/null
     end_time=$(date +%s%N)
     duration=$(( (end_time - start_time) / 1000000 )) # Convert to milliseconds
-    
+
     if [[ $duration -lt 100 ]]; then
         check_result "Fish Performance" "PASS" "(${duration}ms startup)"
     elif [[ $duration -lt 500 ]]; then
@@ -190,7 +190,7 @@ print_header "Configuration File Verification"
 check_config_file() {
     local config_name="$1"
     local config_path="$2"
-    
+
     if [[ -e "$config_path" ]]; then
         check_result "$config_name" "PASS"
     else

@@ -8,19 +8,19 @@
     nur.overlays.default
   ];
 
-  # Example community packages that can be installed via NUR
-  # Uncomment and add specific packages as needed
+  # Community packages installed via NUR
   environment.systemPackages = with pkgs; [
-    # Web development tools
-    # nur.repos.mic92.hello-nur  # Example package
-    
-    # Security tools from community
-    # nur.repos.mic92.cntr       # Container introspection tool
-    
-    # Development utilities
+    # Development utilities from community
+    # nur.repos.mic92.cntr       # Container introspection tool (if needed)
+
+    # Browser automation and security tools
     # nur.repos.bandithedoge.firefox-addons.ublock-origin  # For browser automation
+
+    # Additional community packages can be added here as needed
+    # Browse available packages: https://nur.nix-community.org/
   ] ++ lib.optionals pkgs.stdenv.isDarwin [
-    # macOS-specific community packages
+    # macOS-specific community packages from NUR
+    # Add Darwin-specific NUR packages here
   ];
 
   # NUR modules can be imported here

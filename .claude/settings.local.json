@@ -61,7 +61,14 @@
       "Bash(strace:*)",
       "Bash(dtruss:*)",
       "Bash(./scripts/activitywatch-config.sh:*)",
-      "Bash(./scripts/deployment-verify.sh:*)"
+      "Bash(./scripts/deployment-verify.sh:*)",
+      "Bash(darwin-rebuild check:*)",
+      "Bash(./scripts/sublime-text-sync.sh:*)",
+      "Bash(nix-build:*)",
+      "Bash(/Users/larsartmann/Desktop/Setup-Mac/scripts/ublock-origin-setup.sh:*)",
+      "Bash(/dev/null)",
+      "Bash(pgrep:*)",
+      "Bash(subl:*)"
     ],
     "deny": []
   }

@@ -35,13 +35,13 @@
     };
     colmena.url = "github:zhaofengli/colmena";
     mac-app-util.url = "github:hraban/mac-app-util";
-    
+
     # Nix User Repository for community packages
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
+
     # treefmt-nix for unified code formatting
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
@@ -59,7 +59,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit nixpkgs-nh-dev nur; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur; };
         modules = [
           # Core system configuration
           base

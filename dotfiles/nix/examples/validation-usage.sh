@@ -278,21 +278,21 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Install Nix
         uses: cachix/install-nix-action@v18
         with:
           enable_flakes: true
-          
+
       - name: Run Validation
         run: |
           chmod +x scripts/config-validate.sh
           ./scripts/config-validate.sh --strict
-          
+
       - name: Generate Report
         run: |
           ./scripts/config-validate.sh --report validation-report.md report
-          
+
       - name: Upload Report
         uses: actions/upload-artifact@v3
         with:
@@ -467,7 +467,7 @@ nix flake update
 echo "🔍 Validating updated configuration..."
 if just validate-strict; then
     echo "✅ Updates validated successfully"
-    
+
     # Test build
     echo "🏗️ Testing build..."
     if just build; then

@@ -21,7 +21,7 @@ sudo darwin-rebuild switch --flake .
 
 # OR install individually if Nix continues to fail
 brew install --cask blockblock
-brew install --cask oversight  
+brew install --cask oversight
 brew install --cask knockknock
 brew install --cask dnd
 ```
@@ -58,7 +58,7 @@ chsh -s /run/current-system/sw/bin/fish
    - Set notification preferences
    - Review baseline scan results
 
-#### Oversight Configuration  
+#### Oversight Configuration
 1. Launch Oversight
 2. Grant microphone/camera monitoring permissions
 3. Configure notification settings

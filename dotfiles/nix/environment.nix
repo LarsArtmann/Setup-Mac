@@ -2,20 +2,20 @@
 
 let
   homeDir = "/Users/larsartmann";
-  
+
   # Validation helpers
   validateHomeDir = dir:
     if !lib.pathExists dir then
       lib.warn "Home directory ${dir} does not exist"
     else dir;
-    
+
   validatePackage = pkg:
     if pkg == null then
       throw "Package cannot be null"
     else if !(lib.hasAttr "outPath" pkg) then
       throw "Invalid package provided"
     else pkg;
-    
+
 in
 {
   # Enhanced environment configuration with validation
@@ -29,7 +29,7 @@ in
       message = "Fish shell package must be available";
     }
   ];
-  
+
   environment = {
     # Enhanced environment configuration
     # Additional environment settings for robustness
@@ -39,8 +39,8 @@ in
       #   # Additional Nix configuration
       # '';
     };
-    
-    # Set Darwin configuration path for explicit configuration management  
+
+    # Set Darwin configuration path for explicit configuration management
     # darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
 
     variables = {
@@ -61,59 +61,59 @@ in
       # Locale optimization
       LC_ALL = "en_GB.UTF-8";
       LC_CTYPE = "en_GB.UTF-8";
-      
+
       # Development environment enhancements
       PAGER = "less";
       LESS = "-R -S -M +Gg";
-      
+
       # Security and privacy
       DOTNET_CLI_TELEMETRY_OPTOUT = "1";
       NEXT_TELEMETRY_DISABLED = "1";
       GATSBY_TELEMETRY_DISABLED = "1";
-      
+
       # Performance optimizations
       NODE_OPTIONS = "--max-old-space-size=4096";
       NPM_CONFIG_AUDIT = "false";
       NPM_CONFIG_FUND = "false";
-      
+
       # Development workflow
       DOCKER_BUILDKIT = "1";
       COMPOSE_DOCKER_CLI_BUILD = "1";
-      
+
       # Build and deployment optimization
       NIXPKGS_ALLOW_UNFREE = "1";
       NIXPKGS_ALLOW_BROKEN = "0";  # Strict: No broken packages
       NIXPKGS_ALLOW_INSECURE = "0"; # Strict: No insecure packages
-      
+
       # Go development optimization
       GOPROXY = "https://proxy.golang.org,direct";
       GOSUMDB = "sum.golang.org";
       GOMODCACHE = "${homeDir}/.cache/go/mod";
       GOCACHE = "${homeDir}/.cache/go/build";
-      
+
       # Rust development optimization
       CARGO_HOME = "${homeDir}/.cargo";
       RUSTUP_HOME = "${homeDir}/.rustup";
       CARGO_TARGET_DIR = "${homeDir}/.cache/cargo/target";
-      
+
       # Python development optimization
       PYTHONDONTWRITEBYTECODE = "1";
       PYTHONUNBUFFERED = "1";
       PIP_CACHE_DIR = "${homeDir}/.cache/pip";
-      
+
       # Java development optimization
       GRADLE_USER_HOME = "${homeDir}/.gradle";
       MAVEN_OPTS = "-Xmx2g -XX:ReservedCodeCacheSize=1g";
-      
+
       # Editor and tooling preferences
       VISUAL = "nano";
       BROWSER = "open";  # Use macOS default browser
       MANPAGER = "less -R";
-      
+
       # macOS-specific optimizations
       TERM_PROGRAM = "iTerm.app";
       COLORTERM = "truecolor";
-      
+
       # Privacy and tracking opt-outs
       DO_NOT_TRACK = "1";
       ADBLOCK = "1";
@@ -299,11 +299,12 @@ in
         exiftool # Read/write EXIF metadata
       ] ++
 
-      # Security tools
+      # Security and network monitoring tools
       [
         gitleaks # Scan repos for secrets
         #DISABLED because of: VERY long build time (~5:30min) (seems like it has no caching) + rarely used: vault # Secret management
         mitmproxy # man in the middle proxy for intercepting HTTP requests
+        netdata # Real-time performance monitoring tool
       ] ++
 
       # AI and ML tools
