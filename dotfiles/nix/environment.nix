@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, nix-ai-tools, ... }:
 
 let
   homeDir = "/Users/larsartmann";
@@ -201,7 +201,7 @@ in
         pnpm_10 # Fast, disk space efficient package manager for JavaScript
         dotnetCorePackages.sdk_8_0 # .NET Core SDK
 
-        # Temporary disabled because of storage issues
+        # Temporary disabled because of storage issues - and exiting installations via Toolbox
         #jetbrains.idea-ultimate
         #jetbrains.webstorm
         #jetbrains.goland
@@ -305,12 +305,14 @@ in
         #DISABLED because of: VERY long build time (~5:30min) (seems like it has no caching) + rarely used: vault # Secret management
         mitmproxy # man in the middle proxy for intercepting HTTP requests
         netdata # Real-time performance monitoring tool
+        adguardian # Terminal-based, real-time traffic monitoring
       ] ++
 
       # AI and ML tools
       [
         ollama # Run LLMs locally
         code2prompt # Convert code to LLM prompts
+        nix-ai-tools.packages.${pkgs.system}.crush # AI coding agent by Charmbracelet
       ] ++
 
       # Database tools

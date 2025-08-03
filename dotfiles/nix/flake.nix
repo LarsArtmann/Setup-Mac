@@ -47,9 +47,15 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # nix-ai-tools for AI development tools like crush
+    nix-ai-tools = {
+      url = "github:numtide/nix-ai-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -59,7 +65,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools; };
         modules = [
           # Core system configuration
           base
@@ -78,8 +84,8 @@
           # NUR community packages - enabled with enhanced configuration
           ./nur.nix
 
-          # Code formatting with treefmt - enabled with comprehensive formatters
-          ./treefmt.nix
+          # Code formatting with treefmt - temporarily disabled due to compatibility issues
+          # ./treefmt.nix
 
           # Homebrew integration
           ./homebrew.nix
