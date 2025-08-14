@@ -1,0 +1,61 @@
+My Chrome Plugins.txt
+- uBlock Origin
+- OneTab
+- ActivityWatch Web Watcher
+- Checker Plus for Gmail™
+- Application launcher for Drive (by Google) (why? review)
+- BlockTube
+- WhatFont
+- React Developer Tools
+- 9gag post filter
+- Reddit Image Opener (GitHub source verified)
+- DeepL: translate and write with AI
+
+### GitHub
+- Refined GitHub
+- GitHub Issue Link Status
+- GitHub Better Line Counts
+- GitHub Milestones Timeline
+- Lovely forks
+-
+
+
+### Social-Media YouTube
+- SponsorBlock for YouTube - Skip Sponsorships
+- DeArrow - Better Titles and Thumbnails
+- Youtube Playback Speed Control
+- YouTube Full Title For Videos
+
+## Manifest v3 issues
+
+## Unsure
+- Loom – Screen Recorder & Screen Capture
+- Wappalyzer - Technology profiler
+
+## Disabled
+- NSFW Filter [Disabled: due to high resource usage and non-state-of-the-art performance]
+- uMatrix (consider re-enabling)
+- Cookie-Editor [Disabled]
+- Dark Mode [Disabled]
+
+- Email Tracker by Mailtrack® [Disabled]
+- Export cookie JSON file for Puppeteer [Disabled]
+- Google Docs Offline
+- Google Translate
+- JetBrains Toolbox Extension
+- MetaMask
+- MeTube Downloader [Disabled]
+- Mailvelope - Secure your email with PGP [Disabled]
+- Minimal Theme for Twitter / X [Disabled]
+- ModHeader - Modify HTTP headers [Disabled]
+- SuperX (Twitter Analytics)
+- Ubersuggest - SEO and Keyword Discovery
+- Video Downloader Professional
+- Vue.js devtools
+
+
+
+
+
+
+

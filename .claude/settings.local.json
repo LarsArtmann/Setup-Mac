@@ -68,7 +68,21 @@
       "Bash(/Users/larsartmann/Desktop/Setup-Mac/scripts/ublock-origin-setup.sh:*)",
       "Bash(/dev/null)",
       "Bash(pgrep:*)",
-      "Bash(subl:*)"
+      "Bash(subl:*)",
+      "Bash(aw-server:*)",
+      "Bash(nethogs:*)",
+      "Bash(netdata:*)",
+      "Bash(nix profile list:*)",
+      "Bash(nix-store:*)",
+      "Bash(nettop:*)",
+      "Bash(darwin-rebuild:*)",
+      "Bash(hostname)",
+      "Bash(nh:*)",
+      "Bash(nix-env:*)",
+      "Bash(killall:*)",
+      "Bash(nix flake show:*)",
+      "Bash(adguardian:*)",
+      "Bash(pgrep:*)"
     ],
     "deny": []
   }
