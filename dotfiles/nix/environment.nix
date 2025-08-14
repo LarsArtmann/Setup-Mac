@@ -212,6 +212,7 @@ in
         # typespec # API specification language with rich features for the cloud - temporarily disabled due to build issues
         sqlc # Generate type-safe Go code from SQL
         graphviz # Graph visualization tools
+        mermaid-cli # Generate diagrams from text in a similar manner as markdown
         yamllint # YAML linter
         tokei # Count code statistics
         firebase-tools # Firebase CLI
