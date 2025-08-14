@@ -310,7 +310,7 @@ in
 
       # AI and ML tools
       [
-        ollama # Run LLMs locally
+        # DISABLED: temporary due to BROKEN build: ollama # Run LLMs locally
         code2prompt # Convert code to LLM prompts
         nix-ai-tools.packages.${pkgs.system}.crush # AI coding agent by Charmbracelet
       ] ++

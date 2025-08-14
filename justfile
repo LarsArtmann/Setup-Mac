@@ -345,6 +345,63 @@ perf-cache-clear PATTERN="*":
     ./scripts/performance-monitor.sh cache-clear {{PATTERN}}
     @echo "✅ Performance cache cleared"
 
+# Network and System Monitoring
+# ==============================
+
+# Start system monitoring with Netdata
+netdata-start:
+    @echo "🔧 Starting Netdata system monitoring..."
+    launchctl load ~/Library/LaunchAgents/com.netdata.agent.plist || netdata -c ~/monitoring/netdata/config/netdata.conf -D
+    @echo "✅ Netdata started - Dashboard available at http://localhost:19999"
+
+# Stop Netdata monitoring
+netdata-stop:
+    @echo "🛑 Stopping Netdata monitoring..."
+    launchctl unload ~/Library/LaunchAgents/com.netdata.agent.plist || sudo killall netdata || echo "Netdata was not running"
+    @echo "✅ Netdata stopped"
+
+# Start network monitoring with ntopng
+ntopng-start:
+    @echo "🌐 Starting ntopng network monitoring..."
+    launchctl load ~/Library/LaunchAgents/com.ntopng.daemon.plist || sudo ntopng --config-file ~/monitoring/ntopng/config/ntopng.conf --daemon
+    @echo "✅ ntopng started - Dashboard available at http://localhost:3000"
+
+# Stop ntopng monitoring
+ntopng-stop:
+    @echo "🛑 Stopping ntopng monitoring..."
+    launchctl unload ~/Library/LaunchAgents/com.ntopng.daemon.plist || sudo killall ntopng || echo "ntopng was not running"
+    @echo "✅ ntopng stopped"
+
+# Start comprehensive monitoring (both tools)
+monitor-all:
+    @echo "📊 Starting comprehensive monitoring..."
+    just netdata-start
+    just ntopng-start
+    @echo "✅ All monitoring tools started"
+    @echo "   Netdata: http://localhost:19999"
+    @echo "   ntopng:  http://localhost:3000"
+
+# Stop all monitoring tools
+monitor-stop:
+    @echo "🛑 Stopping all monitoring tools..."
+    just netdata-stop
+    just ntopng-stop
+    @echo "✅ All monitoring stopped"
+
+# Check monitoring status
+monitor-status:
+    @echo "📊 Checking monitoring status..."
+    @echo "Netdata:" && (pgrep netdata > /dev/null && echo "✅ Running" || echo "❌ Not running")
+    @echo "ntopng:" && (pgrep ntopng > /dev/null && echo "✅ Running" || echo "❌ Not running")
+
+# Restart all monitoring tools
+monitor-restart:
+    @echo "🔄 Restarting monitoring tools..."
+    just monitor-stop
+    sleep 2
+    just monitor-all
+    @echo "✅ Monitoring tools restarted"
+
 # Context Detection and Analysis
 # ==============================
 

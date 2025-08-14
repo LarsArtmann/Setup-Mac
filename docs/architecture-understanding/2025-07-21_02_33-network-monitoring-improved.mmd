@@ -1,0 +1,143 @@
+graph TB
+    %% Setup-Mac Improved Architecture - Network Monitoring Focus
+    %% Analysis Date: 2025-07-21_02_33
+    %% Focus: Task agent verification, platform compatibility, deployment paths, documentation integration
+    
+    subgraph "Enhanced Configuration Management"
+        FN[flake.nix<br/>Central Orchestration]
+        CV[Configuration Validator<br/>Pre-deployment validation]
+        FN --> CV
+        CV --> CN[core.nix<br/>Enhanced with validation]
+        CV --> EN[environment.nix<br/>Platform-aware packages]
+        CV --> HN[homebrew.nix<br/>Compatibility checks]
+        CV --> PN[programs.nix<br/>Context-aware shell]
+    end
+    
+    subgraph "Task Agent Verification Protocols"
+        TVA[Task Verification Agent<br/>Success/Failure tracking]
+        PCL[Platform Compatibility Layer<br/>Hardware detection & graceful degradation]
+        ART[Automated Rollback Triggers<br/>Failed deployment recovery]
+        TVA --> PCL
+        PCL --> ART
+    end
+    
+    subgraph "Simple vs Complex Deployment Paths"
+        SDP[Simple Deployment Path<br/>just setup-simple]
+        CDP[Complex Deployment Path<br/>just setup-full]
+        
+        SDP --> SMT[Minimal Tools<br/>Essential monitoring only]
+        SDP --> SBM[Basic Monitoring<br/>Netdata core features]
+        
+        CDP --> CMT[Complete Monitoring Stack<br/>Full tool integration]
+        CDP --> CAV[Comprehensive Validation<br/>Multi-stage verification]
+    end
+    
+    subgraph "Enhanced Monitoring Integration"
+        MO[Monitoring Orchestrator<br/>Unified management hub]
+        MA[Metrics Aggregator<br/>Time-series storage & regression detection]
+        
+        MO --> END[Enhanced Netdata<br/>Custom metrics & API endpoints]
+        MO --> ENT[Enhanced ntopng<br/>Security correlation & alerting]
+        MO --> MA
+        
+        MA --> RD[Regression Detection<br/>Performance threshold monitoring]
+        MA --> AS[Alert System<br/>Multi-channel notifications]
+    end
+    
+    subgraph "Security Event Orchestrator"
+        SEO[Security Event Orchestrator<br/>Unified threat monitoring]
+        
+        SEO --> ELS[Enhanced Little Snitch<br/>ML-based connection analysis]
+        SEO --> ELU[Enhanced LuLu<br/>Behavioral anomaly detection]
+        SEO --> TAR[Threat Analysis & Response<br/>Automated incident handling]
+        
+        TAR --> AR[Automated Response<br/>Block, alert, investigate]
+        TAR --> IR[Incident Reporting<br/>Security event correlation]
+    end
+    
+    subgraph "Documentation Integration with Reality"
+        DSA[Documentation Sync Agent<br/>Real-time config documentation]
+        RDS[Reality-Documentation Sync<br/>Drift detection & auto-update]
+        LIC[Link Integrity Checker<br/>Command availability verification]
+        
+        DSA --> RDS
+        RDS --> LIC
+        LIC --> AGD[Auto-Generated Documentation<br/>Current system state reflection]
+    end
+    
+    subgraph "Problem Resolution Layer"
+        IRS[Issue Resolution System<br/>Automated retry mechanisms]
+        CV2[Continuous Validation<br/>Predictive issue detection]
+        PAS[Performance Alert System<br/>Threshold-based notifications]
+        
+        IRS --> CV2
+        CV2 --> PAS
+        PAS --> ART
+    end
+    
+    subgraph "Enhanced Performance Architecture"
+        CAS[Context-Aware Shell<br/>Usage pattern analysis]
+        CAL[Context-Aware Loading<br/>Dynamic plugin management]
+        PAO[Performance Analytics & Optimization<br/>ML-driven recommendations]
+        
+        CAS --> CAL
+        CAL --> PAO
+        PAO --> RD
+    end
+    
+    subgraph "Enhanced Deployment Flow"
+        %% Simple Path
+        TVA ==> SDP
+        SDP ==> SMT
+        SMT ==> SBM
+        SBM ==> MO
+        
+        %% Complex Path  
+        TVA ==> CDP
+        CDP ==> CMT
+        CMT ==> CAV
+        CAV ==> MO
+        
+        %% Validation Chain
+        CV ==> TVA
+        PCL ==> IRS
+        MO ==> SEO
+        SEO ==> DSA
+    end
+    
+    subgraph "Real-time Feedback Loops"
+        RD --> CV
+        TAR --> CVA[Configuration Vulnerability Assessment]
+        CVA --> CV
+        AGD --> RDS
+        PAS --> IRS
+    end
+    
+    %% Key Improvement Annotations
+    CV -.- IMPROVE1["`**IMPROVEMENT**: Pre-validation prevents broken deployments`"]
+    TVA -.- IMPROVE2["`**IMPROVEMENT**: Every task has success criteria & verification`"]
+    SDP -.- IMPROVE3["`**IMPROVEMENT**: Choose deployment complexity based on needs`"]
+    DSA -.- IMPROVE4["`**IMPROVEMENT**: Documentation always reflects reality`"]
+    MO -.- IMPROVE5["`**IMPROVEMENT**: Unified monitoring with cross-tool correlation`"]
+    SEO -.- IMPROVE6["`**IMPROVEMENT**: Integrated security with automated response`"]
+    
+    %% Styling
+    classDef config fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    classDef verification fill:#e3f2fd,stroke:#0277bd,stroke-width:3px
+    classDef deployment fill:#f1f8e9,stroke:#33691e,stroke-width:3px
+    classDef monitoring fill:#f3e5f5,stroke:#4a148c,stroke-width:3px
+    classDef security fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    classDef documentation fill:#fce4ec,stroke:#880e4f,stroke-width:3px
+    classDef resolution fill:#e8f5e8,stroke:#2e7d32,stroke-width:3px
+    classDef performance fill:#fff8e1,stroke:#f57f17,stroke-width:3px
+    classDef improvement fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5
+    
+    class FN,CV,CN,EN,HN,PN config
+    class TVA,PCL,ART verification
+    class SDP,CDP,SMT,SBM,CMT,CAV deployment
+    class MO,MA,END,ENT,RD,AS monitoring
+    class SEO,ELS,ELU,TAR,AR,IR security
+    class DSA,RDS,LIC,AGD documentation
+    class IRS,CV2,PAS resolution
+    class CAS,CAL,PAO performance
+    class IMPROVE1,IMPROVE2,IMPROVE3,IMPROVE4,IMPROVE5,IMPROVE6 improvement

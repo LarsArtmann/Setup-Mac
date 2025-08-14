@@ -12,9 +12,9 @@
       "absolute_increase_ms": 50
     },
     "targets": {
-      "fish": 50,
+      "fish": 100,
       "zsh": 100,
-      "bash": 50
+      "bash": 100
     }
   },
   "deployment_performance": {

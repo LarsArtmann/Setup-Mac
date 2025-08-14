@@ -11,13 +11,7 @@
     ];
     brews = [
       # rarely used: "dasel"
-      # Moved to Nixpkgs: "docker-buildx"
-      # Moved to Nixpkgs: "dotnet"
-      # Moved to Nixpkgs: "node"
-      # Moved to Nixpkgs: "firebase-cli"
       # rarely used: "fswatch"
-      # Moved to Nixpkgs: "gnupg"
-      # Moved to Nixpkgs: "pinentry-mac"
       # rarely used: "golangci-lint"
       # rarely used: "gource"
       # rarely used: "grpcurl"
@@ -28,8 +22,6 @@
       "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
       # rarely used: "lsusb"
       "mas"
-      # Using JDK from Nixpkgs instead
-      # "openjdk@17"
       "openssl@1.1" # Most likely not needed, for Sublime Text
       # rarely used: "parallel"
       # rarely used: "rename"
@@ -76,14 +68,9 @@
       "raycast"
       "responsively"
       "secretive"
-      # Moved to Nixpkgs: "signal"
       "spotify" # Music streaming service
       "sublime-text"
-      # Moved to Nixpkgs: "tailscale"
-      # Moved to Nixpkgs: "telegram"
       # rarely used since it's not worth +96€ a year: "timing"
-      # Moved to Nixpkgs: "tor-browser"
-      # Moved to Nixpkgs: "vlc"
       "franz" # All in one messaging app - Because nixpkgs is BROKEN
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin

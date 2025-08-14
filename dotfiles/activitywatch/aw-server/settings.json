@@ -1,6 +1,6 @@
 {
     "initialTimestamp": "2025-04-29T11:33:42.133Z",
-    "startOfDay": "04:00",
+    "startOfDay": "00:00",
     "startOfWeek": "Monday",
     "durationDefault": 14400,
     "landingpage": "/home",

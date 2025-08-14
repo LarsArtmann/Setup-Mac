@@ -109,7 +109,7 @@
 1. **A2**: Complete netdata deployment (FOUNDATION)
 2. **A3**: Verify netdata web UI (PROOF OF LIFE)
 
-### High Impact Path (4% → 64% value)  
+### High Impact Path (4% → 64% value)
 3. **B1**: Research ntopng availability (FEASIBILITY)
 4. **A6**: Git commit working state (SAVE PROGRESS)
 
@@ -119,7 +119,7 @@
 
 ## Anti-Patterns to Avoid
 - ❌ **No documentation before working code**
-- ❌ **No Task agent claims without verification** 
+- ❌ **No Task agent claims without verification**
 - ❌ **No complex configurations before basic functionality**
 - ❌ **No interrupting deployments**
 - ❌ **No building on broken foundations**

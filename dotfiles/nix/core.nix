@@ -43,21 +43,21 @@ in {
       installCACerts = true;
     };
 
-    # Enhanced sudo configuration for better security
-    sudo = {
-      # Require password for wheel group (disable passwordless sudo)
-      wheelNeedsPassword = true;
-      # Additional sudo security options
-      extraConfig = ''
-        # Security enhancements for sudo
-        Defaults timestamp_timeout=5
-        Defaults lecture=always
-        Defaults logfile=/var/log/sudo.log
-        Defaults log_input, log_output
-        # Only wheel group members can use sudo (manual configuration)
-        %wheel ALL=(ALL) ALL
-      '';
-    };
+    # Enhanced sudo configuration for better security - temporarily disabled due to nix-darwin limitations
+    # sudo = {
+    #   # Require password for wheel group (disable passwordless sudo)
+    #   wheelNeedsPassword = true; # not available in nix-darwin
+    #   # Additional sudo security options
+    #   extraConfig = ''
+    #     # Security enhancements for sudo
+    #     Defaults timestamp_timeout=5
+    #     Defaults lecture=always
+    #     Defaults logfile=/var/log/sudo.log
+    #     Defaults log_input, log_output
+    #     # Only wheel group members can use sudo (manual configuration)
+    #     %wheel ALL=(ALL) ALL
+    #   '';
+    # };
   };
 
   # I think leaving this null means that MacOS will
@@ -71,10 +71,9 @@ in {
       experimental-features = "nix-command flakes";
 
       # Enhanced Nix settings for better performance and reliability
-      auto-optimise-store = true;
+      # auto-optimise-store = true; # DISABLED: Known to corrupt Nix Store, using nix.optimise.automatic instead
       builders-use-substitutes = true;
       connect-timeout = 5;
-      download-timeout = 60;
       fallback = true;
       http-connections = 25;
       keep-derivations = true;

@@ -3,9 +3,9 @@
 { pkgs, lib, inputs, ... }:
 
 {
-  # Import treefmt-nix module and configure formatters
+  # Import treefmt-nix flake module and configure formatters
   imports = [
-    inputs.treefmt-nix.darwinModules.default
+    inputs.treefmt-nix.flakeModule
   ];
 
   # Configure treefmt with comprehensive formatters
@@ -147,21 +147,4 @@
     yq-go                      # YAML processor
   ];
 
-  # Add convenient shell aliases for formatting
-  programs.fish.shellInit = lib.mkAfter ''
-    # treefmt aliases for convenient code formatting
-    alias fmt='treefmt'
-    alias fmt-check='treefmt --fail-on-change'
-    alias fmt-go='treefmt --formatters gofumpt'
-    alias fmt-js='treefmt --formatters prettier'
-    alias fmt-nix='treefmt --formatters nixfmt'
-    alias fmt-shell='treefmt --formatters shfmt'
-    alias fmt-all='treefmt --no-cache'
-    alias fmt-staged='git diff --cached --name-only | xargs treefmt'
-    alias fmt-ci='treefmt --ci'
-
-    # Additional formatting utilities
-    alias lint-shell='find . -name "*.sh" -not -path "./.*" | xargs shellcheck'
-    alias lint-yaml='find . -name "*.yml" -o -name "*.yaml" -not -path "./.*" | xargs yamllint'
-  '';
 }

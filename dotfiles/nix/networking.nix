@@ -2,11 +2,8 @@
 
   networking = {
     knownNetworkServices = [
-      "AX88179A"
-      "Pixel 6"
       "Wi-Fi"
       "Thunderbolt Bridge"
-      "Lars' Private Cloud VPN"
       "Tailscale"
     ];
 

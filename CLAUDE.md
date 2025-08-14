@@ -61,6 +61,12 @@ nix flake update                     # Update package sources
 ./shell-performance-benchmark.sh     # Comprehensive shell performance analysis
 just benchmark-shells                # Shell startup benchmarking
 just perf-benchmark                   # System performance monitoring
+
+# Network and system monitoring
+just netdata-start                   # Start system performance monitoring
+just ntopng-start                    # Start network traffic monitoring  
+just monitor-all                     # Start comprehensive monitoring
+just monitor-stop                    # Stop all monitoring services
 ```
 
 ### Development Tools
@@ -96,8 +102,14 @@ just test                           # Test Nix configuration
 ### Security Layer
 - **Objective-See Tools**: BlockBlock, Oversight, KnockKnock, DnD (via Homebrew)
 - **Pre-commit Hooks**: Gitleaks, code quality, security scanning
-- **Network Security**: Little Snitch, LuLu firewall
+- **Network Security**: Little Snitch, LuLu firewall, ntopng traffic analysis
 - **Encryption**: Age, Secretive SSH key management
+
+### Monitoring Infrastructure
+- **System Monitoring**: Netdata for real-time system performance tracking
+- **Network Analysis**: ntopng for detailed network traffic monitoring and security
+- **Performance Tracking**: JSON-based performance data with git correlation
+- **Resource Monitoring**: CPU, memory, disk, network interface statistics
 
 ## Development Workflow
 
@@ -218,12 +230,54 @@ nix doctor                    # Nix system health check
 
 ### Comprehensive Benchmarking
 - **Shell Performance**: Multi-shell startup time comparison
+- **System Monitoring**: Real-time CPU, memory, disk, and network monitoring via Netdata
+- **Network Analysis**: Deep packet inspection and traffic analysis via ntopng
 - **JSON Storage**: Historical data with git commit correlation
 - **Trend Analysis**: Automatic regression detection
 - **Alert System**: >20% degradation warnings
+
+### Monitoring Tools
+- **Netdata**: System performance monitoring at `http://localhost:19999`
+- **ntopng**: Network traffic analysis at `http://localhost:3000`
+- **Integration**: Both tools complement each other for comprehensive monitoring
 
 ### Data Storage
 - **Location**: `performance-data/shell-performance.json`
 - **Format**: Timestamped entries with git metadata
 - **Retention**: Unlimited history for trend analysis
 - **Access**: Query via jq or performance analysis scripts
+- **Netdata Data**: Real-time metrics stored in memory and optionally disk
+- **ntopng Data**: Network flows and traffic analysis with historical storage
+
+## Network and System Monitoring
+
+### Monitoring Setup Documentation
+- **Netdata Guide**: `dotfiles/nix/docs/netdata-setup-guide.md` - Comprehensive system monitoring setup
+- **ntopng Guide**: `dotfiles/nix/docs/ntopng-setup-guide.md` - Network traffic analysis configuration
+- **Comparison Matrix**: `dotfiles/nix/docs/monitoring-comparison-matrix.md` - Feature comparison and recommendations
+
+### Quick Monitoring Commands
+```bash
+# Start system monitoring
+just netdata-start                  # System performance monitoring
+netdata                            # Direct netdata startup
+curl http://localhost:19999         # Verify netdata is running
+
+# Start network monitoring  
+just ntopng-start                   # Network traffic monitoring
+sudo ntopng -i en0                 # Direct ntopng startup
+curl http://localhost:3000         # Verify ntopng is running
+
+# Comprehensive monitoring
+just monitor-all                   # Start both monitoring tools
+just monitor-stop                  # Stop all monitoring
+just monitor-status                # Check monitoring status
+just monitor-restart               # Restart all monitoring tools
+```
+
+### Monitoring Best Practices
+- **Continuous Monitoring**: Keep Netdata running during development for system awareness
+- **Selective Network Monitoring**: Use ntopng when network analysis is needed
+- **Resource Awareness**: Monitor the resource usage of monitoring tools themselves
+- **Security Focus**: Use ntopng for security analysis and threat detection
+- **Performance Correlation**: Correlate system metrics with development activities

@@ -1,5 +1,0 @@
-Backup created: Mon 14 Jul 2025 07:05:14 CEST
-Git commit: 4db0970abb6c3db083fbf31622528a37d2a047a9
-Git branch: master
-System: Darwin Lars-MacBook-Air.local 24.5.0 Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:26 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T8112 arm64
-Zsh version: zsh 5.9 (aarch64-apple-darwin24.5.0)

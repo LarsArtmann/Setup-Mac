@@ -285,7 +285,7 @@
         # Performance optimizations
         "NSGlobalDomain" = {
           # Reduce window resize animations
-          "NSWindowResizeTime" = 0.001;
+          "NSWindowResizeTime" = 0.025;
           # Increase window resize speed for Cocoa applications
           "NSDocumentRevisionsDebugMode" = true;
           # Disable Resume system-wide

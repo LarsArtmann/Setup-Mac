@@ -22,9 +22,3 @@
 @@||cloudflare.com^
 @@||jsdelivr.net^
 @@||unpkg.com^$domain=github.com|npmjs.com
-
-! Essential services
-@@||apple.com^
-@@||icloud.com^
-@@||microsoft.com^
-@@||office.com^
