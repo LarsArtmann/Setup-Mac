@@ -32,6 +32,9 @@ in
 
   environment = {
     # Enhanced environment configuration
+    # Configure available shells for nix-darwin user management
+    shells = [ pkgs.fish pkgs.zsh pkgs.bash ];
+    
     # Additional environment settings for robustness
     etc = {
       # Create additional configuration files if needed

@@ -29,10 +29,8 @@ in {
   security = {
     # PAM services with Touch ID authentication
     pam.services = {
-      # Enable Touch ID for sudo operations
+      # Enable Touch ID for sudo operations (local config that survives OS updates)
       sudo_local.touchIdAuth = true;
-      # Consider enabling for other services with caution:
-      # sudo.touchIdAuth = true;  # May interfere with some workflows
     };
 
     # Enhanced PKI (Public Key Infrastructure) settings

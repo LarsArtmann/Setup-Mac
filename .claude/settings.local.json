@@ -82,7 +82,10 @@
       "Bash(killall:*)",
       "Bash(nix flake show:*)",
       "Bash(adguardian:*)",
-      "Bash(pgrep:*)"
+      "Bash(pgrep:*)",
+      "Bash(security authorizationdb read:*)",
+      "Bash(dscl . -read /Users/larsartmann UserShell:*)",
+      "Bash(dscl:*)"
     ],
     "deny": []
   }
