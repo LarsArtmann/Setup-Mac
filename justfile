@@ -54,7 +54,7 @@ clean:
     @echo "Cleaning pnpm store..."
     pnpm store prune || true
     @echo "Cleaning go caches..."
-    go clean -cache -testcache -modcache
+    go clean -cache -testcache -modcache || true
     @echo "✅ Cleanup complete"
 
 # Deep clean using the paths from your cleanup file
