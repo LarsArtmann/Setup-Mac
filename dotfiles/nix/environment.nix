@@ -216,6 +216,7 @@ in
         sqlc # Generate type-safe Go code from SQL
         graphviz # Graph visualization tools
         mermaid-cli # Generate diagrams from text in a similar manner as markdown
+        d2 # Modern diagram scripting language
         yamllint # YAML linter
         tokei # Count code statistics
         firebase-tools # Firebase CLI
