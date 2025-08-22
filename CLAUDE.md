@@ -64,7 +64,7 @@ just perf-benchmark                   # System performance monitoring
 
 # Network and system monitoring
 just netdata-start                   # Start system performance monitoring
-just ntopng-start                    # Start network traffic monitoring  
+just ntopng-start                    # Start network traffic monitoring
 just monitor-all                     # Start comprehensive monitoring
 just monitor-stop                    # Stop all monitoring services
 ```
@@ -263,7 +263,7 @@ just netdata-start                  # System performance monitoring
 netdata                            # Direct netdata startup
 curl http://localhost:19999         # Verify netdata is running
 
-# Start network monitoring  
+# Start network monitoring
 just ntopng-start                   # Network traffic monitoring
 sudo ntopng -i en0                 # Direct ntopng startup
 curl http://localhost:3000         # Verify ntopng is running

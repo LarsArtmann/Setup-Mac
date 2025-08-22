@@ -1,8 +1,8 @@
 # Learnings: Network Monitoring Implementation Session
 
-**Date**: 2025-07-21T02:33+02:00  
-**Session Duration**: ~2.5 hours  
-**Objective**: Implement network monitoring with ntopng and netdata  
+**Date**: 2025-07-21T02:33+02:00
+**Session Duration**: ~2.5 hours
+**Objective**: Implement network monitoring with ntopng and netdata
 **Outcome**: Partial success with important process learnings
 
 ## Key Learnings

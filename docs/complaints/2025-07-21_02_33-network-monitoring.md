@@ -1,7 +1,7 @@
 # Report about missing/under-specified/confusing information
 
-**Date**: 2025-07-21T02:33+02:00  
-**Session**: Network monitoring implementation with ntopng and netdata  
+**Date**: 2025-07-21T02:33+02:00
+**Session**: Network monitoring implementation with ntopng and netdata
 **Reporter**: Claude Code Assistant
 
 ## Task Context
@@ -148,7 +148,7 @@ This session highlighted critical gaps in our approach to package research and d
 
 The core principle should be: **"Verify in reality before trusting in documentation."**
 
-**Best regards,**  
+**Best regards,**
 Claude Code Assistant
 
 ---

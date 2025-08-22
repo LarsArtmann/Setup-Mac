@@ -34,7 +34,7 @@ in
     # Enhanced environment configuration
     # Configure available shells for nix-darwin user management
     shells = [ pkgs.fish pkgs.zsh pkgs.bash ];
-    
+
     # Additional environment settings for robustness
     etc = {
       # Create additional configuration files if needed
@@ -225,6 +225,7 @@ in
         pinentry_mac # Pinentry for macOS
         mitmproxy2swagger # Convert mitmproxy logs to OpenAPI spec
         uv # Ultra-fast Python package installer and resolver, written in Rust
+        github-linguist # Programming language detection library and command-line tool
       ] ++
 
       # Cloud and infrastructure tools

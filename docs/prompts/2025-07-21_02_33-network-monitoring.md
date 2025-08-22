@@ -1,7 +1,7 @@
 # Reusable Prompt: Network Monitoring and Package Deployment
 
-**Created**: 2025-07-21T02:33+02:00  
-**Based on**: Network monitoring implementation session learnings  
+**Created**: 2025-07-21T02:33+02:00
+**Based on**: Network monitoring implementation session learnings
 **Use Cases**: Network monitoring setup, package deployment, system monitoring tools
 
 ## Core Prompt Template
@@ -11,7 +11,7 @@ I need to implement network monitoring capabilities on macOS with Nix configurat
 
 CRITICAL REQUIREMENTS:
 1. VERIFY FIRST: Always check package availability before configuration work
-2. SIMPLE FIRST: Try basic installation before complex integration  
+2. SIMPLE FIRST: Try basic installation before complex integration
 3. REALITY CHECK: Validate all suggestions with actual commands
 4. PLATFORM AWARE: Ensure macOS/Darwin compatibility for all packages
 
@@ -83,7 +83,7 @@ REQUIREMENTS:
 
 VERIFICATION PROTOCOL:
 1. Research phase: Check both nixpkgs and Homebrew availability
-2. Compatibility phase: Verify Darwin support explicitly  
+2. Compatibility phase: Verify Darwin support explicitly
 3. Testing phase: Proof-of-concept installation
 4. Integration phase: Add to declarative configuration
 5. Documentation phase: Working configuration with troubleshooting
@@ -129,7 +129,7 @@ RESEARCH PROTOCOL:
 
 CRITICAL VERIFICATION COMMANDS:
 nix search nixpkgs [PACKAGE]
-brew search [PACKAGE]  
+brew search [PACKAGE]
 [PACKAGE] --version    # After installation
 [PACKAGE] --help       # Basic functionality check
 
@@ -148,7 +148,7 @@ OUTPUT REQUIREMENTS:
 AVOID THESE APPROACHES:
 
 ❌ Trusting Task agent package research without verification
-❌ Creating comprehensive documentation before proving functionality  
+❌ Creating comprehensive documentation before proving functionality
 ❌ Attempting complex Nix integration before simple installation test
 ❌ Assuming Linux package configurations work on macOS
 ❌ Spending more time on documentation than implementation
@@ -174,7 +174,7 @@ AVOID THESE APPROACHES:
 - [ ] No system conflicts or configuration breaking
 - [ ] Working uninstall/rollback procedure documented
 
-### Standard Success  
+### Standard Success
 - [ ] All minimal success criteria met
 - [ ] Integration with existing configuration management
 - [ ] Service starts automatically if applicable
@@ -197,7 +197,7 @@ AVOID THESE APPROACHES:
 nix search nixpkgs <package>
 nix-env -qaP | grep <package>
 
-# Homebrew alternative research  
+# Homebrew alternative research
 brew search <package>
 brew info <package>
 
@@ -231,7 +231,7 @@ nix search nixpkgs tcpdump
 ## Template Usage Instructions
 
 1. **Choose appropriate variant** based on complexity and timeline requirements
-2. **Customize placeholders** with specific tool names and requirements  
+2. **Customize placeholders** with specific tool names and requirements
 3. **Follow verification protocol** strictly before implementation
 4. **Document outcomes** including failures and workarounds
 5. **Update this template** with new learnings and patterns
