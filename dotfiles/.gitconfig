@@ -48,5 +48,3 @@
 	autodetach = true
 	pruneexpire = 2 weeks ago
 
-[safe]
-	directory = /Users/larsartmann/GolandProjects/ast-state-analyzer
