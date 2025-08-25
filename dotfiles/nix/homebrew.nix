@@ -4,6 +4,7 @@
     taps = [
       # only needed for buildpacks/tap/pack: "buildpacks/tap"
       # only needed for depot/tap/depot: "depot/tap"
+      "fastrepl/hyprnote" # needed for hyprnote
       "humansignal/tap" # needed for label-studio
       # only needed for lightbend/brew/kalix": "lightbend/brew"
       "omissis/go-jsonschema" # Needed for my CV project
@@ -75,6 +76,7 @@
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
+      "hyprnote" # Note-taking app from fastrepl
       "orbstack" # A better Docker runner for macOS; Nixpkgs not available 2025-04-14
       "rustdesk" # Remote desktop and screen sharing
       "activitywatch" # Activity tracking
