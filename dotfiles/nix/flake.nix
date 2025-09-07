@@ -48,6 +48,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # comprehensive formatter collection (SSH)
+    treefmt-full-flake = {
+      url = "git+ssh://git@github.com/LarsArtmann/treefmt-full-flake.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # nix-ai-tools for AI development tools like crush
     nix-ai-tools = {
       url = "github:numtide/nix-ai-tools";
@@ -55,7 +61,7 @@
     };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, treefmt-full-flake, nix-ai-tools, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -65,7 +71,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools treefmt-full-flake; };
         modules = [
           # Core system configuration
           base

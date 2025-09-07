@@ -1,150 +1,176 @@
-# treefmt-nix Configuration
-# Unified code formatting for the project
-{ pkgs, lib, inputs, ... }:
+# treefmt-nix Configuration with Comprehensive Formatter Collection
+# Unified code formatting using treefmt-full-flake for comprehensive language support
+{ pkgs, lib, inputs, treefmt-full-flake, ... }:
 
 {
-  # Import treefmt-nix flake module and configure formatters
+  # Import treefmt-nix and comprehensive formatter collection
   imports = [
     inputs.treefmt-nix.flakeModule
+    treefmt-full-flake.flakeModule
   ];
 
-  # Configure treefmt with comprehensive formatters
-  treefmt = {
-    # Enable treefmt system-wide
-    enable = true;
-
-    # Project root directory
+  # Comprehensive formatter configuration using treefmt-full-flake
+  treefmtFlake = {
+    # Project configuration
     projectRootFile = "flake.nix";
 
-    # Configure formatters for different languages
-    programs = {
-      # Go formatting with gofumpt (enhanced formatter)
-      gofumpt = {
-        enable = true;
-        # gofumpt is stricter than gofmt, provides additional formatting rules
-      };
+    # Auto-detection settings for dynamic formatter selection
+    autoDetection = {
+      enable = true;
+      aggressive = false; # Conservative auto-detection
+      override = "merge"; # Merge auto-detected with explicit settings
+    };
 
-      # JavaScript/TypeScript formatting with prettier
-      prettier = {
+    # Comprehensive formatter configuration
+    formatters = {
+      # Nix formatting with deterministic nixfmt
+      nix = {
         enable = true;
-        # Configure prettier for consistent JS/TS/JSON/YAML/MD formatting
-        settings = {
-          tabWidth = 2;
-          singleQuote = true;
-          trailingComma = "es5";
-          printWidth = 100;
-          semi = true;
-          bracketSpacing = true;
-          arrowParens = "avoid";
-        };
-        # Include various web development file types
-        includes = [
-          "*.js"
-          "*.ts"
-          "*.jsx"
-          "*.tsx"
-          "*.json"
-          "*.yaml"
-          "*.yml"
-          "*.md"
-          "*.css"
-          "*.scss"
-          "*.html"
-        ];
-      };
-
-      # Nix formatting with nixfmt
-      nixfmt = {
-        enable = true;
-        # Use consistent 100-character width for Nix files
-        settings = {
-          width = 100;
+        formatter = "nixfmt-rfc-style"; # RFC-compliant formatting
+        linting = {
+          deadnix = true; # Dead code detection
+          statix = true; # Nix linting
         };
       };
 
-      # Shell script formatting with shfmt
-      shfmt = {
+      # Web development (JS/TS/CSS) with Biome
+      web = {
         enable = true;
-        # Configure shell formatting with 2-space indentation
-        settings = {
-          indent = 2;
-          case_indent = true;  # Indent case statements
-          space_redirects = true;  # Add space before redirects
+        formatter = "biome"; # Fast modern formatter
+        languages = {
+          javascript = true;
+          typescript = true;
+          css = true;
+          scss = true;
+          json = true;
+          html = false; # Enable if needed
+        };
+      };
+
+      # Python formatting and linting
+      python = {
+        enable = true;
+        formatters = {
+          black = true; # Code formatting
+          isort = true; # Import sorting
+          ruff = true; # Fast linting and formatting
+        };
+      };
+
+      # Shell script formatting and linting
+      shell = {
+        enable = true;
+        formatters = {
+          shfmt = true; # Shell script formatting
+          shellcheck = true; # Shell script linting
+        };
+      };
+
+      # Rust formatting
+      rust = {
+        enable = true;
+        formatters = {
+          rustfmt = true; # Rust code formatting
+        };
+      };
+
+      # YAML formatting
+      yaml = {
+        enable = true;
+        formatters = {
+          yamlfmt = true; # YAML formatting
+        };
+      };
+
+      # Markdown formatting
+      markdown = {
+        enable = true;
+        formatters = {
+          mdformat = true; # Markdown formatting
+        };
+      };
+
+      # JSON formatting
+      json = {
+        enable = true;
+        formatters = {
+          jsonfmt = true; # JSON formatting
+        };
+      };
+
+      # Miscellaneous formatters
+      misc = {
+        enable = true;
+        tools = {
+          buf = true; # Protocol Buffer formatting
+          taplo = true; # TOML formatting
+          just = true; # Justfile formatting
+          actionlint = true; # GitHub Actions linting
         };
       };
     };
 
-    # Global exclusions for treefmt
-    settings = {
-      global = {
-        excludes = [
-          # Lock files and dependencies
-          "*.lock"
-          "package-lock.json"
-          "yarn.lock"
-          "pnpm-lock.yaml"
-          "Cargo.lock"
-          "poetry.lock"
+    # Performance and behavior settings
+    behavior = {
+      performance = "balanced"; # fast/balanced/thorough
+      allowMissingFormatter = false;
+      enableDefaultExcludes = true;
+    };
 
-          # Build artifacts and dependencies
-          "node_modules/"
-          ".next/"
-          "dist/"
-          "build/"
-          "target/"
-          "vendor/"
-          ".cache/"
+    # Incremental formatting for performance (10-100x faster)
+    incremental = {
+      enable = true;
+      mode = "git"; # git/cache/auto
+      cache = "./.cache/treefmt";
+      gitBased = true;
+      performance = {
+        parallel = true; # Enable parallel processing
+        maxJobs = 4; # Maximum parallel jobs
+      };
+    };
 
-          # Version control and environment
-          ".git/"
-          ".direnv/"
-          ".env*"
-
-          # Nix build results
-          "result"
-          "result-*"
-
-          # Backups and temporary files
-          "backups/"
-          "*.tmp"
-          "*.bak"
-          "*.backup"
-
-          # Log files
-          "*.log"
-
-          # IDE and editor files
-          ".vscode/"
-          ".idea/"
-          "*.swp"
-          "*.swo"
-          "*~"
-
-          # macOS system files
-          ".DS_Store"
-          "._*"
-        ];
+    # Git integration settings
+    git = {
+      branch = "master"; # Compare against master branch
+      stagedOnly = false; # Format all changed files
+      sinceCommit = null; # Optional: format since specific commit
+      hooks = {
+        preCommit = false; # Set to true to install pre-commit hook
+        prePush = false; # Set to true to install pre-push hook
       };
     };
   };
 
-  # Install additional formatting and linting tools system-wide
+  # Install comprehensive formatting tools system-wide for persistence after 'just clean'
+  # These packages ensure formatters remain available even after nix-collect-garbage
   environment.systemPackages = with pkgs; [
-    # Core treefmt tool (provided by treefmt-nix)
-    # treefmt  # This is now handled by the treefmt-nix module
+    # Core formatting tools - CRITICAL for persistence
+    nixfmt-rfc-style          # Deterministic Nix formatter
+    biome                     # Modern JS/TS/CSS formatter and linter
+    black                     # Python code formatter
+    isort                     # Python import sorter
+    ruff                      # Fast Python linter and formatter
+    shfmt                     # Shell script formatter
+    shellcheck                # Shell script linter
+    rustfmt                   # Rust formatter
+    yamlfmt                   # YAML formatter
+    just                      # Justfile formatter
+    buf                       # Protocol Buffer formatter
+    taplo                     # TOML formatter
+    mdformat                  # Markdown formatter
+    actionlint                # GitHub Actions linter
 
-    # Additional development tools that complement treefmt
-    nodePackages.eslint        # JavaScript linting
-    shellcheck                 # Shell script linting
-    yamllint                   # YAML linting
+    # Essential development tools
+    nodePackages.eslint       # JavaScript linting (legacy support)
+    yamllint                  # YAML linting (additional validation)
+    alejandra                 # Alternative Nix formatter (backup)
+    deadnix                   # Dead Nix code detection
+    statix                    # Nix static analysis
 
-    # Alternative formatters (for manual use if needed)
-    alejandra                  # Alternative Nix formatter
-    biome                      # Modern JS/TS formatter and linter
-
-    # JSON/YAML processing tools
-    jq                         # JSON processor
-    yq-go                      # YAML processor
+    # Processing and utility tools
+    jq                        # JSON processor
+    yq-go                     # YAML processor
+    treefmt                   # Core treefmt binary
   ];
 
 }
