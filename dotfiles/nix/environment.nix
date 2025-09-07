@@ -203,6 +203,7 @@ in
         bun # JavaScript runtime and package manager
         pnpm_10 # Fast, disk space efficient package manager for JavaScript
         dotnetCorePackages.sdk_8_0 # .NET Core SDK
+        tailwindcss_4 # Utility-first CSS framework v4
 
         # Temporary disabled because of storage issues - and exiting installations via Toolbox
         #jetbrains.idea-ultimate
@@ -373,12 +374,6 @@ in
         jetbrains-mono
       ];
 
-    shells = with pkgs; [
-      bashInteractive
-      zsh
-      fish
-      #SOME SMALL TEST PANICKED: nushell
-    ];
     shellAliases = {
       l = "ls -laSh";
       t = "tree -h -L 2 -C --dirsfirst";
