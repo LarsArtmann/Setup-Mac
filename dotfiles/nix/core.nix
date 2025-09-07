@@ -79,7 +79,7 @@ in {
       log-lines = 25;
       max-free = 3000000000; # 3GB
       min-free = 1000000000; # 1GB
-      sandbox = true;
+      sandbox = "relaxed"; # Required for ttfautohint font building
       substituters = [
         "https://cache.nixos.org/"
         "https://nix-community.cachix.org"
