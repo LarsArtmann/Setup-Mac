@@ -85,7 +85,19 @@
       "Bash(pgrep:*)",
       "Bash(security authorizationdb read:*)",
       "Bash(dscl . -read /Users/larsartmann UserShell:*)",
-      "Bash(dscl:*)"
+      "Bash(dscl:*)",
+      "Bash(just test:*)",
+      "Bash(just switch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Read(//Users/larsartmann/projects/treefmt-full-flake/**)",
+      "Bash(nix flake update:*)",
+      "Bash(sudo launchctl unload:*)",
+      "Bash(sudo launchctl load:*)",
+      "Read(//nix/store/**)",
+      "Bash(sudo cp:*)",
+      "Bash(sudo sed:*)"
     ],
     "deny": []
   }
