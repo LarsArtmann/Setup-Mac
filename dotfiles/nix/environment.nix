@@ -369,9 +369,9 @@ in
         #SOME SMALL TEST PANICKED: nushell # Modern shell written in Rust
       ] ++
 
-      # Fonts
+      # Fonts - moved to homebrew to avoid ttfautohint sandbox issues
       [
-        jetbrains-mono
+        # jetbrains-mono  # Moved to homebrew casks for easier installation
       ];
 
     shellAliases = {
