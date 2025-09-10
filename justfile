@@ -55,6 +55,8 @@ clean:
     pnpm store prune || true
     @echo "Cleaning go caches..."
     go clean -cache -testcache -modcache || true
+    @echo "Cleaning Spotlight metadata..."
+    [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || true
     @echo "✅ Cleanup complete"
 
 # Deep clean using the paths from your cleanup file
