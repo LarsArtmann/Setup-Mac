@@ -43,9 +43,7 @@ update:
 clean:
     @echo "🧹 Cleaning up system..."
     @echo "Cleaning Nix generations that are older than 1 days..."
-    sudo nix-collect-garbage --delete-older-than 1d
-    @echo "Cleaning Nix store..."
-    nix-store --gc
+    sudo nix-collect-garbage -v --max-silent-time 15 --delete-older-than 1d
     @echo "Cleaning Homebrew..."
     brew autoremove
     brew cleanup --prune=all -s
