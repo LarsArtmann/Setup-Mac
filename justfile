@@ -39,25 +39,125 @@ update:
     cd dotfiles/nix && nix flake update
     @echo "✅ System updated"
 
-# Clean up caches and old packages
+# Clean up caches and old packages (comprehensive cleanup)
 clean:
-    @echo "🧹 Cleaning up system..."
-    @echo "Cleaning Nix generations that are older than 1 days..."
-    sudo nix-collect-garbage -v --max-silent-time 15 --delete-older-than 1d
-    @echo "Cleaning Homebrew..."
-    brew autoremove
-    brew cleanup --prune=all -s
-    @echo "Cleaning npm cache..."
-    npm cache clean --force || true
-    @echo "Cleaning pnpm store..."
-    pnpm store prune || true
-    @echo "Cleaning go caches..."
-    go clean -cache -testcache -modcache || true
-    @echo "Cleaning Spotlight metadata..."
-    [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || true
-    @echo "✅ Cleanup complete"
+    @echo "🧹 Starting comprehensive system cleanup..."
+    @echo ""
+    @echo "=== Nix Store Cleanup ==="
+    @echo "📊 Current store size:"
+    @du -sh /nix/store || echo "Could not measure store size"
+    @echo "🗑️  Cleaning Nix generations older than 1 day..."
+    @echo "  Note: Use 'sudo -S' if password prompt appears"
+    nix-collect-garbage -d --delete-older-than 1d || sudo -S nix-collect-garbage -d --delete-older-than 1d
+    @echo "⚡ Optimizing Nix store (deduplicating files)..."
+    @echo "  This may take several minutes for large stores..."
+    nix-store --optimize || sudo -S nix-store --optimize
+    @echo "🧹 Cleaning user Nix profiles..."
+    nix profile wipe-history --profile /Users/$(whoami)/.local/state/nix/profiles/profile || true
+    @echo ""
+    @echo "=== Package Manager Cleanup ==="
+    @echo "🍺 Cleaning Homebrew..."
+    brew autoremove || echo "  ⚠️  Homebrew autoremove failed or not needed"
+    brew cleanup --prune=all -s || echo "  ⚠️  Homebrew cleanup failed"
+    @echo "📦 Cleaning npm/pnpm caches..."
+    npm cache clean --force || echo "  ⚠️  npm cache clean failed (npm not installed?)"
+    pnpm store prune || echo "  ⚠️  pnpm store prune failed (pnpm not installed?)"
+    @echo "🐹 Cleaning Go caches..."
+    go clean -cache -testcache -modcache || echo "  ⚠️  Go cache clean failed (Go not installed?)"
+    @echo "🦀 Cleaning Rust/Cargo cache..."
+    cargo cache --autoclean || echo "  ⚠️  Cargo cache clean failed (cargo-cache not installed?)"
+    @echo "🔧 Cleaning build caches..."
+    rm -rf ~/.bun/install/cache || echo "  ⚠️  Bun cache not found"
+    rm -rf ~/.gradle/caches/* || echo "  ⚠️  Gradle cache not found"
+    rm -rf ~/.cache/puppeteer || echo "  ⚠️  Puppeteer cache not found"
+    rm -rf ~/.nuget/packages || echo "  ⚠️  NuGet cache not found"
+    @echo ""
+    @echo "=== System Cache Cleanup ==="
+    @echo "🔦 Cleaning Spotlight metadata..."
+    [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || echo "  ⚠️  Spotlight metadata not found"
+    @echo "🗂️  Cleaning system temp files..."
+    rm -rf /tmp/nix-build-* || echo "  ⚠️  No nix-build temp files found"
+    rm -rf /tmp/nix-shell-* || echo "  ⚠️  No nix-shell temp files found"
+    @echo "📱 Cleaning iOS simulators (if Xcode installed)..."
+    xcrun simctl delete unavailable 2>/dev/null || echo "  ⚠️  Xcode/simulators not found or no unavailable simulators"
+    @echo "🐳 Cleaning Docker (if installed)..."
+    docker system prune -af 2>/dev/null || echo "  ⚠️  Docker not installed or no containers to clean"
+    @echo ""
+    @echo "=== Final Results ==="
+    @echo "📊 New store size:"
+    @du -sh /nix/store || echo "Could not measure store size"
+    @echo "💽 Free disk space:"
+    @df -h / | tail -1 | awk '{print "  Available: " $4 " of " $2 " (" $5 " used)"}'
+    @echo ""
+    @echo "✅ Comprehensive cleanup complete!"
+    @echo "💡 Tip: Run 'just clean-aggressive' for nuclear cleanup options"
 
-# Deep clean using the paths from your cleanup file
+# Quick daily cleanup (fast, safe, no store optimization)
+clean-quick:
+    @echo "🚀 Quick daily cleanup..."
+    @echo "🍺 Cleaning Homebrew..."
+    brew autoremove && brew cleanup || echo "  ⚠️  Homebrew cleanup failed"
+    @echo "📦 Cleaning package managers..."
+    npm cache clean --force || echo "  ⚠️  npm not available"
+    pnpm store prune || echo "  ⚠️  pnpm not available"
+    go clean -cache || echo "  ⚠️  Go not available"
+    @echo "🗂️  Cleaning temp files..."
+    rm -rf /tmp/nix-build-* /tmp/nix-shell-* || echo "  ⚠️  No temp files found"
+    @echo "🐳 Cleaning Docker (light)..."
+    docker system prune -f 2>/dev/null || echo "  ⚠️  Docker not available"
+    @echo "✅ Quick cleanup done! (No Nix store changes)"
+
+# Aggressive cleanup - removes more data but might need reinstalls
+clean-aggressive:
+    @echo "⚠️  AGGRESSIVE CLEANUP MODE - This will remove more data!"
+    @echo "📋 This will clean:"
+    @echo "  - All Nix generations (not just 1+ days old)"
+    @echo "  - All user Nix profiles" 
+    @echo "  - All language version managers"
+    @echo "  - All development caches"
+    @echo "  - Docker images and containers"
+    @echo "  - iOS simulators and Xcode derived data"
+    @echo ""
+    @echo "🚨 Some tools may need reinstalling after this!"
+    @echo "Continue? (Ctrl+C to abort, Enter to proceed)"
+    @read
+    @echo ""
+    @echo "🧹 Starting aggressive cleanup..."
+    @echo ""
+    @echo "=== Nix Nuclear Option ==="
+    nix-collect-garbage -d || sudo -S nix-collect-garbage -d
+    nix profile wipe-history || true
+    nix-store --optimize || sudo -S nix-store --optimize
+    @echo ""
+    @echo "=== Language Managers ==="
+    @echo "🟢 Cleaning Node.js versions..."
+    rm -rf ~/.nvm/versions/node/* || true
+    @echo "🐍 Cleaning Python versions..."
+    rm -rf ~/.pyenv/versions/* || true  
+    @echo "💎 Cleaning Ruby versions..."
+    rm -rf ~/.rbenv/versions/* || true
+    @echo ""
+    @echo "=== Development Caches ==="
+    @echo "🏗️  Cleaning all build caches..."
+    rm -rf ~/.cache || true && mkdir -p ~/.cache
+    rm -rf ~/Library/Caches/CocoaPods || true
+    rm -rf ~/Library/Caches/Homebrew || true
+    rm -rf ~/Library/Developer/Xcode/DerivedData || true
+    @echo "🐳 Removing all Docker data..."
+    docker system prune -af --volumes 2>/dev/null || true
+    @echo "📱 Removing all iOS simulators..."
+    xcrun simctl delete all 2>/dev/null || true
+    @echo ""
+    @echo "=== Final Optimization ==="
+    @echo "📊 Final store size:"
+    @du -sh /nix/store || echo "Could not measure"
+    @echo "💾 Disk space recovered:"
+    @df -h / | tail -1 | awk '{print "  " $4 " available of " $2}'
+    @echo ""
+    @echo "✅ Aggressive cleanup complete!"
+    @echo "⚡ You may need to reinstall some development tools"
+
+# Deep clean using the paths from your cleanup file  
 deep-clean:
     @echo "🧹 Performing deep cleanup..."
     @echo "Cleaning build caches..."

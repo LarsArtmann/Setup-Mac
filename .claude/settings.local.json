@@ -105,7 +105,13 @@
       "Bash(nix why-depends:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
-      "Bash(just:*)"
+      "Bash(just:*)",
+      "Bash(nix path-info:*)",
+      "Bash(sudo darwin-rebuild:*)",
+      "Bash(find:*)",
+      "Bash(sudo rm:*)",
+      "Bash(nix-collect-garbage:*)",
+      "Bash(brew cleanup:*)"
     ],
     "deny": []
   }
