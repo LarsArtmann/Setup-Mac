@@ -137,6 +137,7 @@ in {
         "google-chrome" # 'unfree' licence
         "signal-desktop-bin" # 'agpl3Only free unfree'
         "castlabs-electron" # needed for tidal-hifi
+        "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
       ];
     };
   };

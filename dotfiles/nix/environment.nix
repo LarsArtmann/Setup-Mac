@@ -349,6 +349,7 @@ in
         # Media
         # vlc # Media player - temporarily disabled
         #BROKE because of 'valgrind-3.25.1' dependency: tidal-hifi # Web version of Tidal running in electron with hifi support
+        #TEMPORARILY DISABLED due to valgrind dependency issue: grayjay # Cross-platform application to stream and download content from various sources
 
         # Communication
         telegram-desktop # Messaging app

@@ -1,6 +1,7 @@
 {
   homebrew = {
     enable = true;
+    greedyCasks = true;
     taps = [
       # only needed for buildpacks/tap/pack: "buildpacks/tap"
       # only needed for depot/tap/depot: "depot/tap"

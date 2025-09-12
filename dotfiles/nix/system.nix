@@ -60,20 +60,21 @@
 
       dock = {
         autohide = true;
-        orientation = "bottom";
-        showhidden = false;
-        tilesize = 67;
+        orientation = "left";
+        showhidden = true;
+        tilesize = 48;
         show-recents = false;
-        show-process-indicators = true;
+        show-process-indicators = false;
         static-only = false;
         mru-spaces = true;
         wvous-br-corner = 14; # Hot corner: bottom right - Quick Note
+        persistent-apps = []; # Unpin all apps from dock
       };
       finder = {
         # File visibility and extensions
         AppleShowAllExtensions = true;        # Always show file extensions
         AppleShowAllFiles = true;             # Show hidden files
-        FXEnableExtensionChangeWarning = true; # Warn when changing file extensions
+        FXEnableExtensionChangeWarning = false; # Disable warning when changing file extensions
 
         # Window and view settings
         _FXShowPosixPathInTitle = true;       # Show full POSIX path in window title
@@ -88,10 +89,10 @@
 
         # Desktop and external media
         CreateDesktop = true;                 # Show icons on desktop
-        ShowExternalHardDrivesOnDesktop = true;  # Show external drives on desktop
+        ShowExternalHardDrivesOnDesktop = false; # Don't show external drives on desktop
         ShowHardDrivesOnDesktop = false;      # Don't show internal drives on desktop
-        ShowMountedServersOnDesktop = true;   # Show network volumes on desktop
-        ShowRemovableMediaOnDesktop = true;   # Show USB drives, etc. on desktop
+        ShowMountedServersOnDesktop = false;  # Don't show network volumes on desktop
+        ShowRemovableMediaOnDesktop = false;  # Don't show USB drives, etc. on desktop
 
         # Interface elements
         ShowPathbar = true;                   # Show path breadcrumbs (was false, changing for better navigation)
@@ -100,6 +101,15 @@
 
         # Cleanup settings
         FXRemoveOldTrashItems = false;        # Don't auto-remove items from trash after 30 days
+
+        # Quick Look settings
+        QLEnableTextSelection = true;         # Allow text selection in Quick Look
+
+        # Info panel settings
+        FXInfoPanesExpanded = {
+          MetaData = true;                    # Show metadata info panel expanded
+          Preview = false;                    # Don't show preview panel expanded
+        };
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
 
@@ -168,6 +178,7 @@
 
         # Window and workspace behavior
         AppleWindowTabbingMode = "always";    # Always prefer tabs in applications
+        NSDocumentSaveNewDocumentsToCloud = true; # Save to iCloud by default
 
         # Trackpad settings (if applicable)
         "com.apple.trackpad.scaling" = 1.0;   # Trackpad tracking speed (0.0-3.0)
@@ -268,6 +279,12 @@
           "IncludeDevelopMenu" = true;
           "WebKitDeveloperExtrasEnabledPreferenceKey" = true;
           "com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled" = true;
+          # Privacy settings
+          "UniversalSearchEnabled" = false;
+          "SuppressSearchSuggestions" = true;
+          "SendDoNotTrackHTTPHeader" = true;
+          # Security settings
+          "AutoOpenSafeDownloads" = false;
           # Disable auto-fill
           "AutoFillFromAddressBook" = false;
           "AutoFillPasswords" = false;
@@ -290,6 +307,20 @@
           "NSDocumentRevisionsDebugMode" = true;
           # Disable Resume system-wide
           "NSQuitAlwaysKeepsWindows" = false;
+        };
+
+        # System file management
+        "com.apple.desktopservices" = {
+          # Avoid creating .DS_Store files on external volumes
+          "DSDontWriteUSBStores" = true;
+          "DSDontWriteNetworkStores" = true;
+        };
+
+        # Privacy and advertising settings
+        "com.apple.AdLib" = {
+          "forceLimitAdTracking" = true;
+          "allowApplePersonalizedAdvertising" = false;
+          "allowIdentifierForAdvertising" = false;
         };
       };
     };

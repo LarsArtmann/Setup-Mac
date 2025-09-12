@@ -97,7 +97,15 @@
       "Bash(sudo launchctl load:*)",
       "Read(//nix/store/**)",
       "Bash(sudo cp:*)",
-      "Bash(sudo sed:*)"
+      "Bash(sudo sed:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(nix show-derivation:*)",
+      "Bash(nix why-depends:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(just:*)"
     ],
     "deny": []
   }
