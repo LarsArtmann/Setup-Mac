@@ -102,14 +102,14 @@
         # Cleanup settings
         FXRemoveOldTrashItems = false;        # Don't auto-remove items from trash after 30 days
 
-        # Quick Look settings
-        QLEnableTextSelection = true;         # Allow text selection in Quick Look
+        # Quick Look settings (QLEnableTextSelection deprecated in recent nix-darwin)
+        # QLEnableTextSelection = true;         # Allow text selection in Quick Look
 
-        # Info panel settings
-        FXInfoPanesExpanded = {
-          MetaData = true;                    # Show metadata info panel expanded
-          Preview = false;                    # Don't show preview panel expanded
-        };
+        # Info panel settings (FXInfoPanesExpanded deprecated in recent nix-darwin)
+        # FXInfoPanesExpanded = {
+        #   MetaData = true;                    # Show metadata info panel expanded
+        #   Preview = false;                    # Don't show preview panel expanded
+        # };
       };
       hitoolbox.AppleFnUsageType = "Change Input Source";
 

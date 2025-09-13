@@ -111,7 +111,10 @@
       "Bash(find:*)",
       "Bash(sudo rm:*)",
       "Bash(nix-collect-garbage:*)",
-      "Bash(brew cleanup:*)"
+      "Bash(brew cleanup:*)",
+      "Bash(echo $SHELL)",
+      "Bash(ps:*)",
+      "Bash(exec fish)"
     ],
     "deny": []
   }
