@@ -66,6 +66,11 @@
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
       };
+
+      # Custom packages overlay (2025 best practice: modular)
+      heliumOverlay = final: prev: {
+        helium = final.callPackage ./packages/helium.nix { };
+      };
     in
     {
       # Build darwin flake using:
@@ -73,6 +78,8 @@
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
         specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools treefmt-full-flake; };
         modules = [
+          # Apply custom packages overlay
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
           # Core system configuration
           base
 

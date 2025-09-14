@@ -24,7 +24,7 @@
       "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
       # rarely used: "lsusb"
       "mas"
-      "openssl@1.1" # Most likely not needed, for Sublime Text
+      # "openssl@1.1" # REMOVED: Deprecated upstream since 2024-10-24, breaks deployment
       # rarely used: "parallel"
       # rarely used: "rename"
       # rarely used: "sevenzip" # nix only has p7zip
@@ -39,8 +39,6 @@
       # rarely used: "android-commandlinetools"
       # rarely used: "android-platform-tools"
       # rarely used: "anydesk"
-      "cloudflare-warp"
-      "deepl" # No nix package found - 2025-02-15
       # "discord" # replaced by legcord
       # "docker" # switched to OrbStack - better performance and resource usage
       # Moved to Nixpkgs: "firefox"
@@ -59,7 +57,7 @@
       "blockblock" # Monitors persistence locations for malware
       "oversight" # Monitors microphone and webcam access
       "knockknock" # Shows what's persistently installed on your Mac
-      "dnd" # Alerts user when files/folders are added to critical locations
+      # "dnd" # REMOVED: Cask no longer exists in Homebrew, breaks deployment
       "macfuse"
       "macpass"
       # rarely used: "multimc"
@@ -75,7 +73,6 @@
       "spotify" # Music streaming service
       "sublime-text"
       # rarely used since it's not worth +96€ a year: "timing"
-      "franz" # All in one messaging app - Because nixpkgs is BROKEN
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
