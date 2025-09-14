@@ -91,3 +91,6 @@ result-*
 # macOS
 .DS_Store
 **/.DS_Store
+
+# Claude AI configuration
+.claude/
