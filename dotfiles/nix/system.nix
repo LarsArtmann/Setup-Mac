@@ -264,6 +264,32 @@
           "launchanim" = false;
         };
 
+        # Terminal.app configuration - ensure Fish shell is used
+        "com.apple.Terminal" = {
+          # Set startup window settings to Basic profile
+          "Startup Window Settings" = "Basic";
+          # Configure Basic profile to use Fish shell
+          "Window Settings" = {
+            "Basic" = {
+              "CommandString" = "/run/current-system/sw/bin/fish";
+              "RunCommandAsShell" = true;
+            };
+          };
+        };
+
+        # iTerm2 configuration - ensure Fish shell is used
+        "com.googlecode.iterm2" = {
+          # Configure default bookmark to use Fish shell
+          "New Bookmarks" = [
+            {
+              "Command" = "/run/current-system/sw/bin/fish";
+              "Custom Command" = "Custom Shell";
+              "Name" = "Default";
+              "Guid" = "274FECB6-1D34-4A45-A1F9-23DFA78BA94B";
+            }
+          ];
+        };
+
         # Screenshot enhancements
         "com.apple.screencapture" = {
           # Include mouse cursor in screenshots

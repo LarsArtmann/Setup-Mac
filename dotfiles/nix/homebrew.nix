@@ -66,7 +66,6 @@
       "obs-virtualcam"
       "obsidian"
       "openaudible"
-      "postman"
       "raycast"
       "responsively"
       "secretive"
@@ -96,7 +95,6 @@
       "Quick Camera" = 598853070;
       # rarely used: "Scaler" = 1612708557;
       # rarely used: "Sticky Notes" = 1150887374;
-      "TripMode" = 1513400665;
       "WireGuard" = 1451685025;
     };
     onActivation = {
