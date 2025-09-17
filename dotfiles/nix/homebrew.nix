@@ -79,6 +79,7 @@
       "orbstack" # A better Docker runner for macOS; Nixpkgs not available 2025-04-14
       "rustdesk" # Remote desktop and screen sharing
       "activitywatch" # Activity tracking
+      "comfyui" # Node-based image, video and audio generator
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;
