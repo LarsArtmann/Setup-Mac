@@ -68,7 +68,7 @@
         static-only = false;
         mru-spaces = true;
         wvous-br-corner = 14; # Hot corner: bottom right - Quick Note
-        persistent-apps = []; # Unpin all apps from dock
+        persistent-apps = [];
       };
       finder = {
         # File visibility and extensions
@@ -288,6 +288,8 @@
               "Guid" = "274FECB6-1D34-4A45-A1F9-23DFA78BA94B";
             }
           ];
+          # Note: iTerm2 respects system restoration when NSQuitAlwaysKeepsWindows=true
+          # and the Dock setting "Close windows when quitting an application" is disabled.
         };
 
         # Screenshot enhancements
@@ -331,8 +333,9 @@
           "NSWindowResizeTime" = 0.025;
           # Increase window resize speed for Cocoa applications
           "NSDocumentRevisionsDebugMode" = true;
-          # Disable Resume system-wide
-          "NSQuitAlwaysKeepsWindows" = false;
+          # System window restoration must be enabled for iTerm2 to restore windows.
+          # Disable System Settings > Desktop & Dock > "Close windows when quitting an application".
+          "NSQuitAlwaysKeepsWindows" = true;
         };
 
         # System file management
