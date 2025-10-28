@@ -1,4 +1,4 @@
-{ pkgs, lib, nix-ai-tools, ... }:
+{ pkgs, lib, ... }:
 
 let
   homeDir = "/Users/larsartmann";
@@ -160,58 +160,20 @@ in
 
     # List packages installed in system profile. To search by name, run:
     # $ nix-env -qaP | grep <PACKAGE_NAME>
-    systemPackages = with pkgs;
-      # Development tools
-      [
-        # Version control
+    systemPackages = with pkgs; [
+        # Essential tools only - for minimal working configuration
         git
-        git-lfs
-        git-town # Git workflow manager
-        github-cli
-        lazygit
-        pre-commit
+        vim
+        fish
+        starship
+        curl
+        wget
+        jq
+        tree
+      ] ++
 
-        # Build tools
-        gradle
-        maven
-        just # Task runner similar to make
-        devenv # Developer environments
-
-        # Programming languages and runtimes
-        go
-        templ # Go HTML template language and tool
-        go-tools # Go static analysis tools (staticcheck.dev)
-
-        # Go development tools
-        golangci-lint # Fast linters runner for Go
-        gofumpt # Stricter gofmt
-        gopls # Go language server
-        gotests # Generate Go tests
-        wire # Compile-time dependency injection for Go
-        mockgen # Generate mocks for Go interfaces
-        protoc-gen-go # Protocol buffer compiler for Go
-        buf # Modern protobuf toolchain
-        delve # Go debugger
-        gup # Auto-update Go binaries installed via 'go install'
-
-        jdk # Java Development Kit (JDK 21)
-        kotlin
-        nodejs # Node.js JavaScript runtime
-        ruby
-        # rust
-        rustup # Rust toolchain installer
-        bun # JavaScript runtime and package manager
-        pnpm_10 # Fast, disk space efficient package manager for JavaScript
-        dotnetCorePackages.sdk_8_0 # .NET Core SDK
-        tailwindcss_4 # Utility-first CSS framework v4
-
-        # Temporary disabled because of storage issues - and exiting installations via Toolbox
-        #jetbrains.idea-ultimate
-        #jetbrains.webstorm
-        #jetbrains.goland
-        #jetbrains.rider
-
-        # Development utilities
+      # Development utilities
+      [
         openapi-generator-cli # Generate API clients from OpenAPI specs
         # typespec # API specification language with rich features for the cloud - temporarily disabled due to build issues
         sqlc # Generate type-safe Go code from SQL

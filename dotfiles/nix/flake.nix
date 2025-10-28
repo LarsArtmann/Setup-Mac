@@ -2,11 +2,7 @@
   description = "Lars nix-darwin system flake";
 
   inputs = {
-    # GPGME 1.24.2 is currently broken in nixpkgs-unstable (marked as broken)
-    # GPGME 1.24.3 was released on May 19, 2025 to fix these issues
-    # Last nixpkgs update: Feb 20, 2025 (commit 5032ae4) - updated to 1.24.2
-    # No PR for 1.24.3 found yet - waiting for community update
-    # See: https://github.com/NixOS/nixpkgs/commits/master/pkgs/development/libraries/gpgme
+    # Use nixpkgs-unstable to match nix-darwin master
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
       url = "github:LnL7/nix-darwin/master";
@@ -48,20 +44,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # comprehensive formatter collection (SSH)
-    treefmt-full-flake = {
-      url = "git+ssh://git@github.com/LarsArtmann/treefmt-full-flake.git";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # comprehensive formatter collection (SSH) - temporarily disabled due to connectivity issues
+    # treefmt-full-flake = {
+    #   url = "git+ssh://git@github.com/LarsArtmann/treefmt-full-flake.git";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
-    # nix-ai-tools for AI development tools like crush
-    nix-ai-tools = {
-      url = "github:numtide/nix-ai-tools";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # nix-ai-tools for AI development tools like crush - temporarily disabled
+    # nix-ai-tools = {
+    #   url = "github:numtide/nix-ai-tools";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, treefmt-full-flake, nix-ai-tools, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -76,7 +72,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools treefmt-full-flake; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur; };
         modules = [
           # Apply custom packages overlay
           ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
