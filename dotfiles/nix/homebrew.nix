@@ -20,6 +20,7 @@
       # rarely used: "grpcurl"
       # rarely used: "hadolint"
       "huggingface-cli" # No nix package found - 2025-02-15
+      "gh" # GitHub CLI - essential for development workflow
       # Using JDK from Nixpkgs instead
       # "openjdk@11"
       "ki" # Kotlin Language Interactive Shell | No nix package found - 2025-02-15
