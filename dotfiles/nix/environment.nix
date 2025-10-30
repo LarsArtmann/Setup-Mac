@@ -189,6 +189,11 @@ in
         mitmproxy2swagger # Convert mitmproxy logs to OpenAPI spec
         uv # Ultra-fast Python package installer and resolver, written in Rust
         github-linguist # Programming language detection library and command-line tool
+
+        # Go development ecosystem
+        go # Go programming language compiler and tools
+        just # Just task runner for command-line workflows
+        gopls # Go language server protocol implementation
       ] ++
 
       # Cloud and infrastructure tools
