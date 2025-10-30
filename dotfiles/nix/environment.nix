@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 
 let
   homeDir = "/Users/larsartmann";
@@ -282,7 +282,7 @@ in
       [
         # DISABLED: temporary due to BROKEN build: ollama # Run LLMs locally
         code2prompt # Convert code to LLM prompts
-        # crush # NOW FROM nix-ai-tools for latest version
+        inputs.nix-ai-tools.packages.${pkgs.system}.crush # FROM nix-ai-tools for latest version
       ] ++
 
       # Database tools
