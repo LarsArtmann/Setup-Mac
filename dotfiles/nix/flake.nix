@@ -50,14 +50,14 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
-    # nix-ai-tools for AI development tools like crush - temporarily disabled
-    # nix-ai-tools = {
-    #   url = "github:numtide/nix-ai-tools";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    # nix-ai-tools for AI development tools like crush - ENABLED for latest crush
+    nix-ai-tools = {
+      url = "github:numtide/nix-ai-tools";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -72,7 +72,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools; };
         modules = [
           # Apply custom packages overlay
           ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })

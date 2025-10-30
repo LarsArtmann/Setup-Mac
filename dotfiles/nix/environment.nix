@@ -182,7 +182,7 @@ in
         d2 # Modern diagram scripting language
         yamllint # YAML linter
         tokei # Count code statistics
-        firebase-tools # Firebase CLI
+        #DIABLED due to unpack error:firebase-tools # Firebase CLI
         docker-buildx # Docker Buildx CLI plugin
         gnupg # GnuPG
         pinentry_mac # Pinentry for macOS
@@ -254,6 +254,7 @@ in
         # Nix utilities
         comma # Run commands without installing them
         nh # Nix helper tools
+        nil # Nix language server
 
         # Other utilities
         wget # File downloader
@@ -281,7 +282,7 @@ in
       [
         # DISABLED: temporary due to BROKEN build: ollama # Run LLMs locally
         code2prompt # Convert code to LLM prompts
-        nix-ai-tools.packages.${pkgs.system}.crush # AI coding agent by Charmbracelet
+        # crush # NOW FROM nix-ai-tools for latest version
       ] ++
 
       # Database tools

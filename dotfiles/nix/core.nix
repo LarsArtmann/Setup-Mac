@@ -138,6 +138,7 @@ in {
         "signal-desktop-bin" # 'agpl3Only free unfree'
         "castlabs-electron" # needed for tidal-hifi
         "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
+        "crush" # Package ‘crush-0.12.1’ has an unfree license (‘fsl11Mit’).
       ];
     };
   };
