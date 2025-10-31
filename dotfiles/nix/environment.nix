@@ -194,6 +194,7 @@ in
         go # Go programming language compiler and tools
         just # Just task runner for command-line workflows
         gopls # Go language server protocol implementation
+        git-town # Generic, high-level git support for git-flow workflows
       ] ++
 
       # Cloud and infrastructure tools
