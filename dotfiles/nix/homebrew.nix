@@ -83,6 +83,7 @@
       "rustdesk" # Remote desktop and screen sharing
       "activitywatch" # Activity tracking
       "comfyui" # Node-based image, video and audio generator
+      "godot" # Free and open source 2D and 3D game engine
     ];
     masApps = {
       # rarely used: "Amphetamine" = 937984704;
