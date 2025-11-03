@@ -134,7 +134,6 @@
           #     users.larsartmann = ./home.nix;
           #   };
       # Expose crush from nix-ai-tools as flake output
-      packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages..crush;
           # }
         ];
       };
