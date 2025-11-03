@@ -162,6 +162,8 @@ in
     # $ nix-env -qaP | grep <PACKAGE_NAME>
     systemPackages = with pkgs; [
         # Essential tools only - for minimal working configuration
+        # AI development tools from nix-ai-tools
+        inputs.nix-ai-tools.packages.${pkgs.system}.crush
         git
         vim
         fish

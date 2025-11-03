@@ -53,7 +53,9 @@
   };
 
   # Session path additions (user-specific paths)
-  home.sessionPath = [
+   home.sessionPath = [
+    "$HOME/.local/bin/crush"
+
     "$HOME/.local/bin"
     "$HOME/go/bin"
     "$HOME/.bun/bin"
