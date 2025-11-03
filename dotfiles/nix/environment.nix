@@ -44,7 +44,7 @@ in
     };
 
     # Set Darwin configuration path for explicit configuration management
-    # darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
+    darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
 
     variables = {
       # Core system settings
