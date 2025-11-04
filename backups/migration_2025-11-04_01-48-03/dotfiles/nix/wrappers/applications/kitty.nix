@@ -8,19 +8,19 @@ let
   kittyConfig = pkgs.writeText "kitty.conf" ''
     # 🐱 Optimized Kitty Configuration
     # Performance-optimized with developer-friendly settings
-    
+
     # Font settings
     font_family      JetBrains Mono
     font_size        14
     bold_font        JetBrains Mono Bold
     italic_font      JetBrains Mono Italic
     bold_italic_font JetBrains Mono Bold Italic
-    
+
     # Performance settings
     repaint_delay    10
     input_delay      3
     sync_to_monitor  yes
-    
+
     # Visual settings
     background_opacity         0.95
     window_padding_width       8
@@ -30,7 +30,7 @@ let
     foreground                 #f8f8f2
     background                 #282a36
     cursor                     #f8f8f2
-    
+
     # Color scheme - Dracula
     color0     #000000
     color1     #ff5555
@@ -48,22 +48,22 @@ let
     color13    #ff92df
     color14    #a4ffff
     color15    #ffffff
-    
+
     # Mouse settings
     mouse_hide_wait 3.0
     copy_on_select yes
-    
+
     # Shell integration
     shell_integration enabled
     enable_audio_bell no
-    
+
     # Performance optimizations
     tab_powerline_style round
     active_tab_foreground   #282a36
     active_tab_background   #f8f8f2
     inactive_tab_foreground #f8f8f2
     inactive_tab_background #6272a4
-    
+
     # Keyboard shortcuts
     map cmd+v        paste_from_clipboard
     map cmd+c        copy_to_clipboard
@@ -73,7 +73,7 @@ let
     map cmd+w        close_tab
     map cmd+q        close_window
     map cmd+enter    new_window
-    
+
     # Developer-friendly shortcuts
     map ctrl+shift+1 launch --location=hsplit --cwd=current
     map ctrl+shift+2 launch --location=vsplit --cwd=current
@@ -81,16 +81,16 @@ let
 in
 wrappers.wrapperModules.kitty.apply {
   inherit pkgs;
-  
+
   configFiles = {
     "config/kitty/kitty.conf" = kittyConfig;
   };
-  
+
   environment = {
     KITTY_CONFIG_DIRECTORY = "$(pwd)/.config/kitty";
     KITTY_CACHE_DIRECTORY = "$(pwd)/.cache/kitty";
   };
-  
+
   preHook = ''
     # Create kitty directories
     mkdir -p "$KITTY_CONFIG_DIRECTORY"

@@ -9,30 +9,30 @@ let
     let
       requiredVars = lib.filter (v: v.required) variables;
       providedVars = lib.attrNames variables;
-      
-      validateVariables = var: 
+
+      validateVariables = var:
         let
           isProvided = lib.any (pv: pv.name == var.name) providedVars;
           hasDefault = var.default != null;
         in isProvided || hasDefault;
-        
+
       allValid = lib.all validateVariables requiredVars;
       missingVars = lib.filter (v: !validateVariables v) requiredVars;
-      
+
       processTemplate = content: vars:
         let
           replaceVar = content: varName:
             let
               var = lib.findSingle (v: v.name == varName) vars;
               value = if var != null then var.default else "";
-            in 
+            in
               if builtins.isString content then
                 builtins.replaceStrings ["${${varName}}"] [value] content
               else content;
-              
+
           processedContent = lib.foldl' replaceVar content (lib.attrNames vars);
         in processedContent;
-        
+
     in {
       allValid = allValid;
       missingVars = missingVars;
@@ -284,10 +284,10 @@ let
         template = template.template;
         variables = template.variables;
       };
-      
+
       # Merge template defaults with wrapper config
       mergedConfig = lib.recursiveUpdate template.defaultConfig or {} wrapperConfig;
-      
+
       # Validate configuration against template
       validation = Validation.validateWrapper {
         name = wrapperConfig.name or "";
@@ -295,7 +295,7 @@ let
         type = templateType;
         config = mergedConfig;
       } "standard";
-      
+
       # Process template with variables
       processedTemplate = if validation.overall.valid then
         engine.process (builtins.readFile template.template) {
@@ -305,7 +305,7 @@ let
           additionalPackages = lib.concatStringsSep " " (map (p: lib.getName p) (wrapperConfig.additionalPackages or []));
         }
       else builtins.throw "Template validation failed: ${lib.concatStringsSep ", " (map (r: r.message) (lib.filter (r: !r.valid) validation.validationResults or []))}";
-      
+
     in {
       template = template;
       config = mergedConfig;

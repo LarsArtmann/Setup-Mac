@@ -7,7 +7,7 @@ wrappers.wrapperModules.bat.apply {
   inherit pkgs;
   theme = "gruvbox-dark";
   style = "numbers,changes,header";
-  
+
   # Additional bat configuration
   configFiles = {
     "config/bat/themes/gruvbox-dark.tmTheme" = pkgs.fetchurl {
@@ -15,7 +15,7 @@ wrappers.wrapperModules.bat.apply {
       sha256 = "sha256-1vk7v2kyqpx1nq7h16c8sf0d5az2kzhq65b7iy12jbjwrf2r1yf";
     };
   };
-  
+
   environment = {
     BAT_THEME = "gruvbox-dark";
     BAT_STYLE = "numbers,changes,header";

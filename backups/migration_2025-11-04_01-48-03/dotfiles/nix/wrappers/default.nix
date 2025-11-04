@@ -14,7 +14,7 @@ let
       exec "${lib.getBin package}/bin/${name}" "$@"
       ${postHook}
     '';
-  
+
   # Function to create a package with embedded config files
   wrapWithConfig = { name, package, configFiles ? {}, env ? {} }:
     let
@@ -25,25 +25,25 @@ let
       }) configFiles;
     in pkgs.runCommand "${name}-wrapped" { } ''
       mkdir -p $out/bin
-      
+
       # Create a wrapper script
       cat > $out/bin/${name} << EOF
       #!/bin/sh
       ${concatStringsSep "\n" (mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
-      
+
       # Ensure config directories exist
       ${concatStringsSep "\n" (mapAttrsToList (configPath: source: ''
         mkdir -p "$(dirname "$HOME/.${configPath}")"
         ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
       '') configFiles)}
-      
+
       # Run the original binary
       exec "${lib.getBin package}/bin/${name}" "\$@"
       EOF
-      
+
       chmod +x $out/bin/${name}
     '';
-  
+
   # Wrappers for specific applications
   batWrapper = wrapWithConfig {
     name = "bat";
@@ -60,7 +60,7 @@ let
       BAT_STYLE = "numbers,changes,header";
     };
   };
-  
+
   starshipWrapper = wrapWithConfig {
     name = "starship";
     package = pkgs.starship;
@@ -91,7 +91,7 @@ let
       STARSHIP_LOG = "error";
     };
   };
-  
+
   fishWrapper = wrapWithConfig {
     name = "fish";
     package = pkgs.fish;
@@ -100,18 +100,18 @@ let
         # 🐟 Optimized Fish Configuration
         set -U fish_greeting ""
         set -U fish_prompt_timeout 400
-        
+
         # Environment variables
         set -gx EDITOR "code --wait"
         set -gx VISUAL "code --wait"
         set -gx LANG en_US.UTF-8
-        
+
         # Go development
         set -gx GOPATH $HOME/go
         set -gx GOPROXY https://proxy.golang.org,direct
         set -gx GOSUMDB sum.golang.org
         set -gx PATH $GOPATH/bin $PATH
-        
+
         # Initialize starship if available
         if command -v starship >/dev/null
             starship init fish | source
@@ -133,7 +133,7 @@ in
       starshipWrapper
       fishWrapper
     ];
-    
+
     # Set wrapped tools as defaults
     environment.shellAliases = {
       cat = "bat";  # Use wrapped bat instead of cat

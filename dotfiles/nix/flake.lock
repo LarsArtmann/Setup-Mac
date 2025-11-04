@@ -441,7 +441,8 @@
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-nh-dev": "nixpkgs-nh-dev",
         "nur": "nur",
-        "treefmt-nix": "treefmt-nix_3"
+        "treefmt-nix": "treefmt-nix_3",
+        "wrappers": "wrappers"
       }
     },
     "stable": {
@@ -546,6 +547,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "wrappers": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761915343,
+        "narHash": "sha256-pEszVJ3mDjf2SGItyW6rQ6YB+l7XXK1uhuMprn6zVmk=",
+        "owner": "lassulus",
+        "repo": "wrappers",
+        "rev": "c33eda4514e5a952a45db52cff88af58b3106cc6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lassulus",
+        "repo": "wrappers",
         "type": "github"
       }
     }

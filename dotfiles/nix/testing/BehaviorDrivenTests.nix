@@ -13,27 +13,27 @@ let
           given = test.given or {};
           when = test.when or [];
           then = test.then or [];
-          
+
           # Execute test steps
           givenResult = lib.evalModules {
             modules = [{ inherit given; }];
             specialArgs = { inherit lib pkgs systemConfig; };
           };
-          
-          whenResult = lib.foldl' (acc: step: 
+
+          whenResult = lib.foldl' (acc: step:
             lib.evalModules {
               modules = [acc.config step];
               specialArgs = { inherit lib pkgs systemConfig; };
             }
           ) givenResult when;
-          
-          thenResult = lib.foldl' (acc: step: 
+
+          thenResult = lib.foldl' (acc: step:
             lib.evalModules {
               modules = [acc.config step];
               specialArgs = { inherit lib pkgs systemConfig; };
             }
           ) whenResult then;
-          
+
           # Validate test expectations
           validateExpectations = expectations:
             let
@@ -49,18 +49,18 @@ let
                   matches = matches;
                   passed = matches;
                 };
-                
+
               validatedExpectations = map validateExpectation expectations;
               allPassed = lib.all (exp: exp.passed) validatedExpectations;
               failedExpectations = lib.filter (exp: !exp.passed) validatedExpectations;
-              
+
             in {
               expectations = validatedExpectations;
               allPassed = allPassed;
               failedCount = builtins.length failedExpectations;
               failedExpectations = failedExpectations;
             };
-          
+
           testResult = {
             scenario = scenario;
             given = given;
@@ -70,13 +70,13 @@ let
             validation = validateExpectations test.expectations or [];
             passed = (validateExpectations test.expectations or []).allPassed;
           };
-          
+
         in testResult;
-        
+
       runResults = map runTest tests;
       passedTests = lib.filter (t: t.passed) runResults;
       failedTests = lib.filter (t: !t.passed) runResults;
-      
+
     in {
       tests = runResults;
       passed = passedTests;
@@ -345,30 +345,30 @@ let
         tests = WrapperSystemTests systemConfig;
         systemConfig = systemConfig;
       };
-      
+
       perfTests = BDDTestRunner {
         tests = PerformanceTests systemConfig;
         systemConfig = systemConfig;
       };
-      
+
       integrationTests = BDDTestRunner {
         tests = IntegrationTests systemConfig;
         systemConfig = systemConfig;
       };
-      
+
       allTestResults = [
         { name = "Wrapper System"; results = wrapperTests; }
         { name = "Performance"; results = perfTests; }
         { name = "Integration"; results = integrationTests; }
       ];
-      
+
       totalTests = wrapperTests.total + perfTests.total + integrationTests.total;
       totalPassed = (builtins.length wrapperTests.passed) + (builtins.length perfTests.passed) + (builtins.length integrationTests.passed);
       totalFailed = totalTests - totalPassed;
-      
+
       overallPassRate = totalPassed * 100.0 / totalTests;
       overallSuccess = totalFailed == 0;
-      
+
     in {
       testSuites = allTestResults;
       totalTests = totalTests;

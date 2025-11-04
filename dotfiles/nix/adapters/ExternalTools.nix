@@ -8,8 +8,8 @@ let
   AIAdapter = { aiTools }:
     let
       crush = aiTools.packages.${pkgs.system}.crush or null;
-      
-      validateAITool = tool: 
+
+      validateAITool = tool:
         let
           packageValid = tool != null && (tool ? outPath);
           version = if packageValid then lib.getVersion tool else "unavailable";
@@ -18,10 +18,10 @@ let
           version = version;
           name = "crush";
         };
-        
+
       validatedTools = map validateAITool [crush];
       allAvailable = lib.all (t: t.available) validatedTools;
-      
+
     in {
       tools = validatedTools;
       available = allAvailable;
@@ -34,12 +34,12 @@ let
     let
       available = treefmt ? flakeModule;
       version = treefmt.version or "unknown";
-      
+
       supportedFormatters = [
         "nix" "shell" "yaml" "json" "python" "rust" "toml"
       ];
-      
-      validateFormatter = formatter: 
+
+      validateFormatter = formatter:
         let
           package = pkgs."${formatter}fmt" or null;
           available = package != null && (package ? outPath);
@@ -48,10 +48,10 @@ let
           available = available;
           package = package;
         };
-        
+
       validatedFormatters = map validateFormatter supportedFormatters;
       availableFormatters = lib.filter (f: f.available) validatedFormatters;
-      
+
     in {
       available = available;
       version = version;
@@ -65,7 +65,7 @@ let
     let
       netdata = pkgs.netdata or null;
       adguardian = pkgs.adguardian or null;
-      
+
       validateMonitorTool = tool: name:
         let
           packageValid = tool != null && (tool ? outPath);
@@ -78,15 +78,15 @@ let
           autoStart = autoStart;
           type = "monitoring";
         };
-        
+
       validatedTools = [
         (validateMonitorTool netdata "netdata")
         (validateMonitorTool adguardian "adguardian")
       ];
-      
+
       availableTools = lib.filter (t: t.available) validatedTools;
       allAvailable = (builtins.length availableTools) >= 2;
-      
+
     in {
       tools = validatedTools;
       availableTools = availableTools;
@@ -99,7 +99,7 @@ let
     let
       homebrew = pkgs.homebrew or null;
       nix = pkgs.nix or null;
-      
+
       validatePackageTool = tool: name:
         let
           packageValid = tool != null && (tool ? outPath);
@@ -109,14 +109,14 @@ let
           available = packageValid;
           version = version;
         };
-        
+
       validatedTools = [
         (validatePackageTool homebrew "homebrew")
         (validatePackageTool nix "nix")
       ];
-      
+
       availableTools = lib.filter (t: t.available) validatedTools;
-      
+
     in {
       tools = validatedTools;
       availableTools = availableTools;
@@ -129,7 +129,7 @@ let
     let
       validateWithLevel = wrapper: level:
         Validation.validateWrapper wrapper level validationConfig;
-        
+
       validateAll = wrappers: level:
         let
           validationResults = map (wrapper: validateWithLevel wrapper level) wrappers;
@@ -142,7 +142,7 @@ let
           failedWrappers = failedValidations;
           level = level;
         };
-        
+
     in {
       validateWrapper = validateWithLevel;
       validateAll = validateAll;
@@ -157,7 +157,7 @@ let
           result = action;
           endTime = builtins.currentTime;
           duration = endTime - startTime;
-          
+
           performanceData = {
             wrapperName = wrapper.name;
             action = action.type or "unknown";
@@ -168,17 +168,17 @@ let
             memoryUsage = result.memoryUsage or 0;
             cpuUsage = result.cpuUsage or 0;
           };
-          
-          withinLimits = 
+
+          withinLimits =
             (result.memoryUsage or 0) <= (wrapper.performance.maxMemory or 512) &&
             duration <= (wrapper.performance.maxDuration or 30);
-          
+
         in {
           performance = performanceData;
           withinLimits = withinLimits;
           valid = result.success or true && withinLimits;
         };
-        
+
       trackAllPerformances = wrappers: action:
         let
           results = map (wrapper: trackPerformance wrapper action) wrappers;
@@ -189,15 +189,15 @@ let
           allValid = allValid;
           invalidPerformances = invalidPerformances;
         };
-        
+
     in {
       trackPerformance = trackPerformance;
       trackAllPerformances = trackAllPerformances;
     };
 
 in {
-  inherit 
-    AIAdapter TreefmtAdapter MonitoringAdapter 
-    PackageManagementAdapter ValidationWrapperAdapter 
+  inherit
+    AIAdapter TreefmtAdapter MonitoringAdapter
+    PackageManagementAdapter ValidationWrapperAdapter
     PerformanceMonitoringAdapter;
 }

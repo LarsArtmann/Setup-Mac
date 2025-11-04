@@ -33,7 +33,7 @@ let
       "wrap_width": 80
     }
   '';
-  
+
   # Package Control settings
   packageControlSettings = pkgs.writeText "Package Control.sublime-settings" ''
     {
@@ -52,7 +52,7 @@ let
       ]
     }
   '';
-  
+
   # macOS keymap
   osxKeymap = pkgs.writeText "Default (OSX).sublime-keymap" ''
     [
@@ -67,18 +67,18 @@ let
 in
 wrappers.wrapperModules.sublime-text.apply {
   inherit pkgs;
-  
+
   configFiles = {
     # Sublime Text settings
     "Library/Application Support/Sublime Text/Packages/User/Preferences.sublime-settings" = sublimePreferences;
     "Library/Application Support/Sublime Text/Packages/User/Package Control.sublime-settings" = packageControlSettings;
     "Library/Application Support/Sublime Text/Packages/User/Default (OSX).sublime-keymap" = osxKeymap;
   };
-  
+
   environment = {
     SUBLIME_SETTINGS = "$(pwd)/Library/Application Support/Sublime Text/Packages/User";
   };
-  
+
   # Package installation hook
   postHook = ''
     # Install required packages on first run
