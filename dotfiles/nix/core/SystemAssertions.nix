@@ -6,28 +6,28 @@
 let
   # System state validation assertions
   systemAssertions = [
-    (lib.assertMsg 
-      (config.environment.systemPackages != []) 
+    (lib.assertMsg
+      (config.environment.systemPackages != [])
       "System must have packages defined"
     )
-    (lib.assertMsg 
-      (all (pkg: pkg != null) config.environment.systemPackages) 
+    (lib.assertMsg
+      (all (pkg: pkg != null) config.environment.systemPackages)
       "All packages must be valid (no null values)"
     )
-    (lib.assertMsg 
-      (config.environment.shellAliases != {}) 
+    (lib.assertMsg
+      (config.environment.shellAliases != {})
       "Shell aliases must be defined"
     )
-    (lib.assertMsg 
-      (config.environment.variables != null) 
+    (lib.assertMsg
+      (config.environment.variables != null)
       "Environment variables must be defined"
     )
-    (lib.assertMsg 
-      (lib.versionAtLeast lib.version "2.4.0") 
+    (lib.assertMsg
+      (lib.versionAtLeast lib.version "2.4.0")
       "Nix version 2.4.0+ required for assertion features"
     )
   ];
-  
+
 in
 {
   # Apply assertions at system level

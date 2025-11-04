@@ -25,7 +25,7 @@ in
     sublimeTextWrapper."sublime-text"
     activitywatchWrapper.activitywatch
   ];
-  
+
   # Set wrapped tools as defaults
   environment.shellAliases = {
     cat = "bat";  # Use wrapped bat instead of cat

@@ -7,7 +7,7 @@ let
       builtins.trace "Validating wrapper configuration..."
       wrapper;
   };
-  
+
 in
 {
   inherit configAssertions;
