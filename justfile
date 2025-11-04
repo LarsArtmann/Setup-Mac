@@ -39,6 +39,38 @@ update:
     cd dotfiles/nix && nix flake update
     @echo "✅ System updated"
 
+# ActivityWatch Nix-managed auto-start configuration
+activitywatch-setup:
+    @echo "⚙️  Setting up ActivityWatch auto-start via Nix..."
+    ./scripts/nix-activitywatch-setup.sh
+    @echo "✅ ActivityWatch auto-start configured via Nix"
+
+# Verify ActivityWatch auto-start is working
+activitywatch-check:
+    @echo "🔍 Checking ActivityWatch auto-start status..."
+    @./scripts/nix-activitywatch-setup.sh --check
+
+# Remove manual ActivityWatch configuration (migrate to Nix)
+activitywatch-migrate:
+    @echo "🔄 Migrating ActivityWatch to Nix management..."
+    @./scripts/nix-activitywatch-setup.sh --cleanup
+    @echo "Applying Nix-managed configuration..."
+    @just activitywatch-setup
+    @echo "✅ Migration complete"
+
+# ActivityWatch commands
+activitywatch-start:
+    @echo "🚀 Starting ActivityWatch..."
+    @osascript -e 'tell application "ActivityWatch" to launch'
+    @sleep 3
+    @pgrep -f ActivityWatch > /dev/null && echo "✅ ActivityWatch started" || echo "❌ Failed to start"
+
+activitywatch-stop:
+    @echo "🛑 Stopping ActivityWatch..."
+    @pkill -f ActivityWatch || echo "  (ActivityWatch not running)"
+    @sleep 2
+    @pgrep -f ActivityWatch > /dev/null && echo "❌ ActivityWatch still running" || echo "✅ ActivityWatch stopped"
+
 # Clean up caches and old packages (comprehensive cleanup)
 clean:
     @echo "🧹 Starting comprehensive system cleanup..."
@@ -112,7 +144,7 @@ clean-aggressive:
     @echo "⚠️  AGGRESSIVE CLEANUP MODE - This will remove more data!"
     @echo "📋 This will clean:"
     @echo "  - All Nix generations (not just 1+ days old)"
-    @echo "  - All user Nix profiles" 
+    @echo "  - All user Nix profiles"
     @echo "  - All language version managers"
     @echo "  - All development caches"
     @echo "  - Docker images and containers"
@@ -133,7 +165,7 @@ clean-aggressive:
     @echo "🟢 Cleaning Node.js versions..."
     rm -rf ~/.nvm/versions/node/* || true
     @echo "🐍 Cleaning Python versions..."
-    rm -rf ~/.pyenv/versions/* || true  
+    rm -rf ~/.pyenv/versions/* || true
     @echo "💎 Cleaning Ruby versions..."
     rm -rf ~/.rbenv/versions/* || true
     @echo ""
@@ -157,7 +189,7 @@ clean-aggressive:
     @echo "✅ Aggressive cleanup complete!"
     @echo "⚡ You may need to reinstall some development tools"
 
-# Deep clean using the paths from your cleanup file  
+# Deep clean using the paths from your cleanup file
 deep-clean:
     @echo "🧹 Performing deep cleanup..."
     @echo "Cleaning build caches..."
@@ -207,18 +239,18 @@ backup:
     #!/usr/bin/env bash
     BACKUP_DIR="backups/$(date '+%Y-%m-%d_%H-%M-%S')"
     mkdir -p "$BACKUP_DIR"
-    
+
     # Backup entire dotfiles directory
     cp -r dotfiles "$BACKUP_DIR/"
-    
+
     # Backup justfile and manual-linking script
     cp justfile "$BACKUP_DIR/" || true
     cp manual-linking.sh "$BACKUP_DIR/" || true
-    
+
     # Backup current shell state
     mkdir -p "$BACKUP_DIR/shell_state"
     cp ~/.zcompdump* "$BACKUP_DIR/shell_state/" 2>/dev/null || true
-    
+
     # Create comprehensive backup info
     echo "Backup created: $(date)" > "$BACKUP_DIR/backup_info.txt"
     echo "Git commit: $(git rev-parse HEAD)" >> "$BACKUP_DIR/backup_info.txt"
@@ -226,7 +258,7 @@ backup:
     echo "System: $(uname -a)" >> "$BACKUP_DIR/backup_info.txt"
     echo "Zsh version: $(zsh --version)" >> "$BACKUP_DIR/backup_info.txt"
     echo "Shell startup time: $(time zsh -i -c exit 2>&1 | grep real)" >> "$BACKUP_DIR/backup_info.txt"
-    
+
     echo "✅ Backup created in $BACKUP_DIR"
 
 # Auto-backup before making changes (internal use)
@@ -255,27 +287,27 @@ restore BACKUP_NAME:
 	echo "❌ Backup not found: $BACKUP_PATH"
 	exit 1
 	fi
-	
+
 	# Create safety backup first
 	just auto-backup
-	
+
 	# Restore dotfiles
 	if [ -d "$BACKUP_PATH/dotfiles" ]; then
 	echo "Restoring dotfiles..."
 	cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
 	fi
-	
+
 	# Restore other files
 	if [ -f "$BACKUP_PATH/justfile" ]; then
 	echo "Restoring justfile..."
 	cp "$BACKUP_PATH/justfile" .
 	fi
-	
+
 	if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
 	echo "Restoring manual-linking.sh..."
 	cp "$BACKUP_PATH/manual-linking.sh" .
 	fi
-	
+
 	echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
 	echo "💡 Original state backed up automatically before restore."
 
@@ -293,13 +325,13 @@ rebuild-completions:
     #!/usr/bin/env bash
     CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
     mkdir -p "$CACHE_DIR"
-    
+
     # Remove old completion cache
     rm -f "$CACHE_DIR"/zcompdump-*
-    
+
     # Rebuild completions
     zsh -c "autoload -Uz compinit && compinit -d '$CACHE_DIR/zcompdump-$ZSH_VERSION'"
-    
+
     echo "✅ Completion cache rebuilt"
     echo "💡 Next shell startup will use the fresh cache"
 

@@ -55,13 +55,23 @@
       url = "github:numtide/nix-ai-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # lassulus/wrappers for advanced software wrapping system
+    wrappers = {
+      url = "github:lassulus/wrappers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, wrappers, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
       };
+
+      # System package set
+      system = "aarch64-darwin";
+      pkgs = nixpkgs.legacyPackages.${system};
 
       # Custom packages overlay (2025 best practice: modular)
       heliumOverlay = final: prev: {
@@ -72,7 +82,7 @@
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers; };
         modules = [
           # Apply custom packages overlay
           ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
