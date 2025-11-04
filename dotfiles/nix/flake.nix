@@ -90,6 +90,9 @@
           # Programs
           ./programs.nix
 
+          # ActivityWatch auto-start configuration
+          ./activitywatch.nix
+
           # NUR community packages - enabled with enhanced configuration
           ./nur.nix
 
@@ -133,10 +136,11 @@
           #     extraSpecialArgs = { inherit inputs; };
           #     users.larsartmann = ./home.nix;
           #   };
-      # Expose crush from nix-ai-tools as flake output
-      packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages..crush;
           # }
         ];
       };
+
+      # Expose crush from nix-ai-tools as flake output
+      packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages.${pkgs.system}.crush or null;
     };
 }
