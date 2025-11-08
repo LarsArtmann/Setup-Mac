@@ -34,9 +34,7 @@ let
     let
       license = pkg.meta.license or [];
       isUnfree = lib.any (l: (l.shortDescription or l) == "unfree") license;
-      isAllowed = lib.any (allowed =>
-        lib.any (l => lib.hasInfix allowed (l.shortDescription or l)) license
-      ) allowedLicenses;
+      isAllowed = lib.any (allowed: lib.any (l: lib.hasInfix allowed (l.shortDescription or l)) license) allowedLicenses;
     in
       if isUnfree then isAllowed
       else true
@@ -142,11 +140,11 @@ let
           actual = wrapperType;
         };
         license = {
-          valid = strictValidation ? (validateLicense system.allowedUnfreeLicenses package) : true;
+          valid = if strictValidation then (validateLicense system.allowedUnfreeLicenses package) else true;
           skipped = !strictValidation;
         };
         dependencies = {
-          valid = strictValidation ? ((validateDependencies system.packages package).allAvailable) : true;
+          valid = if strictValidation then ((validateDependencies system.packages package).allAvailable) else true;
           skipped = !strictValidation;
           missing = (validateDependencies system.packages package).missingDependencies;
           essentialMissing = (validateDependencies system.packages package).essentialMissing;

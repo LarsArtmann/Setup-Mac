@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, lib, inputs, nix-ai-tools, ... }:
 
 let
   homeDir = "/Users/larsartmann";
@@ -114,6 +114,9 @@ in
         jq
         yq-go
         just
+
+        # Go development tools
+        golangci-lint
 
         # AI development tools from nix-ai-tools
         crush

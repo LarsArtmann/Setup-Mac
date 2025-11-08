@@ -11,7 +11,7 @@ let
       "System must have packages defined"
     )
     (lib.assertMsg
-      (all (pkg: pkg != null) config.environment.systemPackages)
+      (lib.all (pkg: pkg != null) config.environment.systemPackages)
       "All packages must be valid (no null values)"
     )
     (lib.assertMsg
