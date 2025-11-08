@@ -96,6 +96,8 @@ clean:
     pnpm store prune || echo "  ⚠️  pnpm store prune failed (pnpm not installed?)"
     @echo "🐹 Cleaning Go caches..."
     go clean -cache -testcache -modcache || echo "  ⚠️  Go cache clean failed (Go not installed?)"
+    @echo "🗑️  Cleaning Go build cache folders..."
+    find /private/var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T -name "go-build*" -type d -print0 | xargs -0 trash 2>/dev/null || echo "  ⚠️  Go build cache folders not found or couldn't be removed"
     @echo "🦀 Cleaning Rust/Cargo cache..."
     cargo cache --autoclean || echo "  ⚠️  Cargo cache clean failed (cargo-cache not installed?)"
     @echo "🔧 Cleaning build caches..."
