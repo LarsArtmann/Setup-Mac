@@ -94,6 +94,9 @@ in
       LESS = "-R";  # Enable color output in less
       CLICOLOR = "1";  # Enable color output in ls
       LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd";  # Custom ls colors
+
+      # Add Go binaries to PATH
+      PATH = "${lib.makeBinPath config.environment.systemPackages}:/Users/larsartmann/go/bin";
     };
 
     # List packages installed in system profile. To search by name, run:
@@ -120,9 +123,31 @@ in
 
         # Go development tools
         golangci-lint
+        go
+        gopls
+
+        # Security and development tools
+        gitleaks
 
         # AI development tools from nix-ai-tools
         crush
+
+        # Terminal applications
+        iterm2
+
+        # Shell completion and performance
+        carapace
+
+        # Modern CLI alternatives for productivity
+        bottom
+        procs
+        sd
+        dust
+
+        # GNU utilities for macOS compatibility
+        coreutils
+        findutils
+        gnused
     ];
   };
 }

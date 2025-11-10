@@ -19,7 +19,7 @@
 [url "ssh://git@github.com/LarsArtmann"]
 	insteadOf = https://github.com/LarsArtmann
 [commit]
-	gpgSign = true
+	gpgsign = false
 [tag]
 	gpgsign = true
 [submodule]
