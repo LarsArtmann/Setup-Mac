@@ -16,8 +16,6 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
-[url "ssh://git@github.com/LarsArtmann"]
-	insteadOf = ssh://git@github.com/LarsArtmann/banned-libraries.git
 [commit]
 	gpgsign = true
 [tag]
@@ -63,5 +61,4 @@
 	set-parent = town set-parent
 	ship = town ship
 	sync = town sync
-[remote "origin"]
-	pushurl = 
+

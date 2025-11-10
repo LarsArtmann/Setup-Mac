@@ -3,7 +3,8 @@
 let
   # Import centralized path configuration
   userConfig = (import ./core/UserConfig.nix { inherit lib; });
-  pathConfig = (import ./core/PathConfig.nix { inherit lib; }) userConfig.defaultUser.username;
+  pathConfigModule = (import ./core/PathConfig.nix { inherit lib; });
+  pathConfig = pathConfigModule.mkPathConfig userConfig.defaultUser.username;
   homeDir = pathConfig.home;
 
   # Import crush from nix-ai-tools
@@ -155,6 +156,9 @@ in
         coreutils
         findutils
         gnused
+
+        # SSH client for secure connections
+        openssh
     ];
   };
 }

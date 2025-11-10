@@ -143,6 +143,3 @@ in {
     };
   };
 }
-
-    # SSH client for secure connections
-    openssh
