@@ -65,6 +65,6 @@ EOF
     # unfree = true;
     mainProgram = "helium";
     # Supported macOS versions
-    broken = stdenv.isDarwin && stdenv.system == "x86_64-darwin" && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.15";
+    broken = stdenv.isDarwin && stdenv.hostPlatform.system == "x86_64-darwin" && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.15";
   };
 }
