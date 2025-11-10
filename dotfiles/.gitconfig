@@ -33,7 +33,7 @@
 [push]
 	autoSetupRemote = true
 [gpg]
-	program = /run/current-system/sw/bin/gpg
+	program = /Users/larsartmann/.nix-profile/bin/gpg
 [git-town]
 	sync-perennial-strategy = rebase
 [pager]
