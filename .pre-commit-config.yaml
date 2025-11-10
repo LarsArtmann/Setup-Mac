@@ -29,7 +29,7 @@ repos:
     -   id: nix-check
         name: nix check
         entry: bash
-        args: [-c, 'cd dotfiles/nix && nix flake check --no-build']
+        args: [-c, 'cd . && nix flake check --no-build']
         language: system
         files: \.nix$
         pass_filenames: false
