@@ -1,0 +1,41 @@
+{
+  "Blend" : 0.40191605839416056,
+  "Tags" : [
+
+  ],
+  "Default Bookmark" : "No",
+  "Background Image Location" : "\/Users\/larsartmann\/Desktop\/Wallpapers\/chongqing-1.jpg",
+  "Command" : "\/run\/current-system\/sw\/bin\/fish",
+  "Visual Bell" : true,
+  "Scrollback Lines" : 1500,
+  "Jobs to Ignore" : [
+    "rlogin",
+    "ssh",
+    "slogin",
+    "telnet"
+  ],
+  "Vertical Spacing" : 0.90000000000000002,
+  "Name" : "Default",
+  "Terminal Type" : "xterm-new",
+  "Non Ascii Font" : "JetBrainsMono-Regular 14",
+  "Prompt Before Closing 2" : false,
+  "Blinking Cursor" : true,
+  "Columns" : 100,
+  "Load Shell Integration Automatically" : false,
+  "Blur" : true,
+  "Custom Command" : "Custom Shell",
+  "Normal Font" : "JetBrainsMono-Regular 14",
+  "Background Image Mode" : 2,
+  "Horizontal Spacing" : 1,
+  "Blur Radius" : 1.9679073660714288,
+  "Rows" : 100,
+  "Window Type" : 1,
+  "Transparency" : 0.25,
+  "Screen" : -1,
+  "Space" : 0,
+  "Mouse Reporting" : false,
+  "BM Growl" : true,
+  "Only The Default BG Color Uses Transparency" : false,
+  "Guid" : "274FECB6-1D34-4A45-A1F9-23DFA78BA94B",
+  "Set Local Environment Vars" : 1
+}

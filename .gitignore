@@ -94,3 +94,9 @@ result-*
 
 # Claude AI configuration
 .claude/
+
+# Crush AI database
+.crush/
+.crush.db*
+.crush/*.db*
+
