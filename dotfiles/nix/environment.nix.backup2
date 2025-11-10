@@ -125,7 +125,6 @@ in
         # Modern CLI productivity tools
         glow  # Render markdown on the CLI, with pizzazz
         bun    # Incredibly fast JavaScript runtime, bundler, transpiler and package manager
-        git-town  # High-level Git workflow management
 
         # Nix helper tools
         nh
