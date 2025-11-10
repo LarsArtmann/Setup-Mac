@@ -8,7 +8,7 @@ let
   homeDir = pathConfig.home;
 
   # Import crush from nix-ai-tools
-  inherit (nix-ai-tools.packages.${pkgs.system} or {}) crush;
+  inherit (nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}) crush;
 
   # Validation helpers
   validateHomeDir = dir:
@@ -143,6 +143,9 @@ in
 
         # Terminal applications
         iterm2
+
+        # Browsers
+        google-chrome
 
         # Shell completion and performance
         carapace

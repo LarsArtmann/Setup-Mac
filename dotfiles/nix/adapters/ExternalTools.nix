@@ -7,7 +7,7 @@ let
   # AI TOOLS ADAPTER - CLEAN ABSTRACTION
   AIAdapter = { aiTools }:
     let
-      crush = aiTools.packages.${pkgs.system}.crush or null;
+      crush = aiTools.packages.${pkgs.stdenv.hostPlatform.system}.crush or null;
 
       validateAITool = tool:
         let
