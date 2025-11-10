@@ -99,8 +99,8 @@ in
       CLICOLOR = "1";  # Enable color output in ls
       LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd";  # Custom ls colors
 
-      # Add Go binaries to PATH
-      PATH = "${lib.makeBinPath config.environment.systemPackages}:${homeDir}/go/bin";
+      # PATH configuration is handled by nix-homebrew automatically
+      # Manual PATH setting conflicts with nix-darwin's systemPath management
     };
 
     # List packages installed in system profile. To search by name, run:
@@ -149,6 +149,9 @@ in
 
         # Shell completion and performance
         carapace
+
+        # Go binaries from user environment
+        # Note: Go tools should be managed via systemPackages for proper PATH integration
 
         # Modern CLI alternatives for productivity
         bottom

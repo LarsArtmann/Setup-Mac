@@ -62,3 +62,5 @@
 	ship = town ship
 	sync = town sync
 
+[credential]
+	helper = store

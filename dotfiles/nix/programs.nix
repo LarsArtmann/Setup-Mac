@@ -43,6 +43,11 @@
         # PERFORMANCE: Disable greeting for faster startup
         set -g fish_greeting
 
+        # HOMEBREW INTEGRATION: Add Homebrew to PATH (critical for CLI tools)
+        if test -f /opt/homebrew/bin/brew
+            eval (/opt/homebrew/bin/brew shellenv)
+        end
+
         # COMPLETIONS: Universal completion engine (1000+ commands)
         carapace _carapace fish | source
 
