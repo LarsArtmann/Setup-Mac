@@ -69,9 +69,9 @@
         system.configurationRevision = self.rev or self.dirtyRev or null;
       };
 
-      # System package set
-      system = "aarch64-darwin";
-      pkgs = nixpkgs.legacyPackages.${system};
+      # System package set  
+      localSystem = "aarch64-darwin";
+      pkgs = nixpkgs.legacyPackages.${localSystem};
 
       # Custom packages overlay (2025 best practice: modular)
       heliumOverlay = final: prev: {
