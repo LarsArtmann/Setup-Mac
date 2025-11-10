@@ -1,6 +1,11 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }:
+let
+  # Import centralized user configuration
+  userConfig = (import ./core/UserConfig.nix { inherit lib; });
+
+in {
   system = {
-    primaryUser = "larsartmann";
+    primaryUser = userConfig.defaultUser.username;
     activationScripts = {
       # Consider switching to home-manager since this seems to be a user-specific configuration
       #   while it might be executed as root

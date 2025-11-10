@@ -1,7 +1,10 @@
 { config, pkgs, lib, inputs, nix-ai-tools, nixpkgs-nh-dev, ... }:
 
 let
-  homeDir = "/Users/larsartmann";
+  # Import centralized path configuration
+  userConfig = (import ./core/UserConfig.nix { inherit lib; });
+  pathConfig = (import ./core/PathConfig.nix { inherit lib; }) userConfig.defaultUser.username;
+  homeDir = pathConfig.home;
 
   # Import crush from nix-ai-tools
   inherit (nix-ai-tools.packages.${pkgs.system} or {}) crush;
@@ -96,7 +99,7 @@ in
       LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd";  # Custom ls colors
 
       # Add Go binaries to PATH
-      PATH = "${lib.makeBinPath config.environment.systemPackages}:/Users/larsartmann/go/bin";
+      PATH = "${lib.makeBinPath config.environment.systemPackages}:${homeDir}/go/bin";
     };
 
     # List packages installed in system profile. To search by name, run:

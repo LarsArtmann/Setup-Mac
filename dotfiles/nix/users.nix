@@ -1,10 +1,11 @@
 { pkgs, lib, ... }:
 let
-  # User configuration validation
-  username = "larsartmann";
+  # Import centralized user configuration
+  userConfig = (import ./core/UserConfig.nix { inherit lib; });
+  username = userConfig.defaultUser.username;
   userShell = pkgs.fish;
 
-  # Validate user configuration
+  # Validate user configuration using centralized validation
   validateUserShell = shell:
     if shell == null then
       throw "User shell cannot be null"

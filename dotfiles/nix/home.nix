@@ -1,11 +1,15 @@
 { config, pkgs, lib, ... }:
+let
+  # Import centralized user and path configuration
+  userConfig = (import ./core/UserConfig.nix { inherit lib; });
+  pathConfig = (import ./core/PathConfig.nix { inherit lib; }) userConfig.defaultUser.username;
 
-{
+in {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home = {
-    username = "larsartmann";
-    homeDirectory = "/Users/larsartmann";
+    username = userConfig.defaultUser.username;
+    homeDirectory = userConfig.defaultUser.homeDir;
     stateVersion = "25.05"; # Please read the comment before changing.
   };
 
@@ -20,7 +24,7 @@
       t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
   };
 
@@ -31,7 +35,7 @@
       t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
   };
 
@@ -42,7 +46,7 @@
       t = "tree -h -L 2 -C --dirsfirst";
       nixup = "darwin-rebuild switch";
       c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude /Users/larsartmann/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
+      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
     };
   };
 

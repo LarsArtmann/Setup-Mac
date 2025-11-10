@@ -47,13 +47,14 @@ let
   };
 
   # CENTRALIZED PATH CONFIGURATION - SINGLE SOURCE OF TRUTH
-  Paths = {
-    home = "/Users/larsartmann";
-    config = "/Users/larsartmann/.config/nix-darwin";
-    flake = "/Users/larsartmann/.config/nix-darwin/flake.nix";
-    dotfiles = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles";
-    nixConfig = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix";
-  };
+  # Using PathConfig module with dependency injection to avoid circular imports
+  Paths = let
+    # Extract username from UserConfig to avoid full circular dependency
+    userConfig = import ./UserConfig.nix { inherit lib; };
+    username = userConfig.defaultUser.username;
+    # Generate paths using PathConfig module
+    pathConfig = import ./PathConfig.nix { inherit lib; } username;
+  in pathConfig.defaultPaths;
 
   # STATE VALIDATION FUNCTIONS - TYPE-SAFE GUARANTEES
   validatePathConsistency = paths:
