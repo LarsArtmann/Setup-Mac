@@ -43,12 +43,12 @@ validate-report FILE="validation-report.md":
 # Nix system management
 build:
     @echo "🏗️ Building Nix configuration..."
-    darwin-rebuild build --flake .
+    darwin-rebuild build --flake ./
 
 switch:
     @echo "🔄 Switching to new Nix configuration..."
     just validate-strict
-    darwin-rebuild switch --flake .
+    darwin-rebuild switch --flake ./
 
 # Safe deployment with comprehensive validation
 deploy-safe:

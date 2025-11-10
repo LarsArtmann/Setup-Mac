@@ -29,14 +29,14 @@ link:
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
     @echo "🔄 Applying Nix configuration..."
-    nh darwin switch ./dotfiles/nix/
+    nh os switch ./
     @echo "✅ Nix configuration applied"
 
 # Update system and packages
 update:
     @echo "📦 Updating system packages..."
     @echo "Updating Nix flake..."
-    cd dotfiles/nix && nix flake update
+    nix flake update
     @echo "✅ System updated"
 
 # ActivityWatch Nix-managed auto-start configuration
@@ -352,7 +352,7 @@ info:
 # Test configuration without applying changes
 test:
     @echo "🧪 Testing Nix configuration..."
-    darwin-rebuild check --flake ./dotfiles/nix/
+    darwin-rebuild check --flake ./
     @echo "✅ Configuration test passed"
 
 # Show git status and recent commits
