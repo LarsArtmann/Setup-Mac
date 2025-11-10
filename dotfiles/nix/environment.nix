@@ -121,6 +121,10 @@ in
         yq-go
         just
 
+        # Modern CLI productivity tools
+        glow  # Render markdown on the CLI, with pizzazz
+        bun    # Incredibly fast JavaScript runtime, bundler, transpiler and package manager
+
         # Nix helper tools
         nh
 
