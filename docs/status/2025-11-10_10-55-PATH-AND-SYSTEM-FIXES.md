@@ -231,23 +231,6 @@ systemPackages = with pkgs; [
 ];
 ```
 
-#### **Fish Shell Configuration**
-```fish
-# CLEAN CONFIGURATION:
-set -gx PATH /run/current-system/sw/bin /usr/local/bin /usr/bin /bin /usr/sbin /sbin
-
-# Essential commands verification:
-function verify_commands
-    set commands nano open clear sudo git-town
-    for cmd in $commands
-        if command -v $cmd >/dev/null
-            echo "✅ $cmd: $(which $cmd)"
-        else
-            echo "❌ $cmd: NOT FOUND"
-        end
-    end
-end
-```
 
 ---
 
