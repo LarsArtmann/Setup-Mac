@@ -61,9 +61,6 @@ graph TD
     %% === CONFIGURATION MODULES ===
     pathFix[path-fix.nix<br/>🔧 PATH Fix<br/>PATH configuration fix]
     home[home.nix<br/>🏠 Home Manager<br/>User environment]
-    starshipConfig[starship-config.nix<br/>⭐ Starship Config<br/>Prompt configuration]
-    wrappersConfig[wrappers-config.nix<br/>🎁 Wrappers Config<br/>Wrapper system config]
-    activitywatchHome[activitywatch-home.nix<br/>👁️ ActivityWatch Home<br/>Home management]
 
     %% === ADAPTERS & EXTERNAL INTEGRATIONS ===
     externalTools[adapters/ExternalTools.nix<br/>🔌 External Tools<br/>External tool adapters]
@@ -178,9 +175,6 @@ graph TD
     %% === CONFIGURATION CROSS-REFERENCES ===
     home --> userConfig
     home --> pathConfig
-    starshipConfig --> programs
-    wrappersConfig --> wrappersMain
-    activitywatchHome --> activitywatch
 
     %% === STYLING ===
     classDef entryPoint fill:#4CAF50,stroke:#2E7D32,stroke-width:4px,color:#fff,font-weight:bold
@@ -196,7 +190,7 @@ graph TD
     class homebrew,nur,networking,users,activitywatch integration
     class wrappersMain,batWrapper,kittyWrapper,sublimeWrapper,awWrapper,fishWrapper,starshipWrapper wrapper
     class userConfig,pathConfig,validation,wrapperTemplate,state,types,typeSafety,moduleAssertions,systemAssertions,configAssertions validation
-    class helium,treefmt,tempEnv,pathFix,home,starshipConfig,wrappersConfig,activitywatchHome config
+    class helium,treefmt,tempEnv,pathFix,home config
     class nixpkgs,nixDarwin,homeManager,nixHomebrew,nurRepo,treefmtNix,nixAiTools,wrappersFlake,macAppUtil,externalTools,wrapperTemplates,cliTemplate,bddTests,errorManagement external
 ```
 
@@ -273,7 +267,7 @@ Level 7 (External): Input flakes and external integrations
 
 ## 📊 Statistics
 
-- **Total Nix Files**: 42
+- **Total Nix Files**: 39
 - **Core Framework Files**: 12
 - **Wrapper System Files**: 9
 - **External Integrations**: 8
