@@ -5,7 +5,7 @@
     # Use nixpkgs-unstable to match nix-darwin master
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/master";
+      url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -55,9 +55,15 @@
       url = "github:numtide/nix-ai-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # lassulus/wrappers for advanced software wrapping system
+    wrappers = {
+      url = "github:lassulus/wrappers";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, wrappers, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -65,14 +71,14 @@
 
       # Custom packages overlay (2025 best practice: modular)
       heliumOverlay = final: prev: {
-        helium = final.callPackage ./packages/helium.nix { };
+        helium = final.callPackage ./dotfiles/nix/packages/helium.nix { };
       };
     in
     {
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools; };
+        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers; };
         modules = [
           # Apply custom packages overlay
           ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
@@ -80,24 +86,27 @@
           base
 
 
-          ./core.nix
-          ./system.nix
+          ./dotfiles/nix/core.nix
+          ./dotfiles/nix/system.nix
 
           # Environment and packages
-          ./environment.nix
+          ./dotfiles/nix/environment.nix
           #./packages.nix
 
           # Programs
-          ./programs.nix
+          ./dotfiles/nix/programs.nix
+
+          # ActivityWatch auto-start configuration
+          ./dotfiles/nix/activitywatch.nix
 
           # NUR community packages - enabled with enhanced configuration
-          ./nur.nix
+          ./dotfiles/nix/nur.nix
 
           # Code formatting with treefmt - temporarily disabled due to compatibility issues
           # ./treefmt.nix
 
           # Homebrew integration
-          ./homebrew.nix
+          ./dotfiles/nix/homebrew.nix
           nix-homebrew.darwinModules.nix-homebrew
           {
             nix-homebrew = {
@@ -116,10 +125,10 @@
             };
           }
 
-          ./networking.nix
+          ./dotfiles/nix/networking.nix
 
           # User-specific configurations
-          ./users.nix
+          ./dotfiles/nix/users.nix
 
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
