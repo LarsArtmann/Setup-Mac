@@ -191,3 +191,125 @@ nix-collect-garbage -d
 # Check system health
 nix doctor
 ```
+
+## 🏗️ Architecture Overview
+
+This configuration uses a **type-safe, modular architecture** with the following components:
+
+### Core Type Safety System
+- **`core/Types.nix`**: Strong type definitions for all configurations
+- **`core/State.nix`**: Centralized single source of truth for paths and state
+- **`core/Validation.nix`**: Configuration validation and error prevention
+- **`core/TypeSafetySystem.nix`**: Unified type safety enforcement
+
+### Configuration Modules
+- **`environment.nix`**: Environment variables, shell aliases, and PATH configuration
+- **`programs.nix`**: User program configurations (shells, editors, tools)
+- **`system.nix`**: macOS defaults and system settings
+- **`core.nix`**: Core packages, security configurations, and system services
+
+### Build System
+- **`flake.nix`**: Nix flake for reproducible builds
+- **`justfile`**: Task runner with comprehensive commands
+- **`home.nix`**: Home Manager configuration entry point
+
+### Type Safety Features
+- **Compile-time validation**: All types checked at evaluation time
+- **Zero runtime errors**: Type system prevents configuration errors
+- **Centralized state**: Single source of truth eliminates inconsistencies
+- **Comprehensive testing**: Built-in validation and assertion framework
+
+
+## 🚀 Development Workflow
+
+### Using Just Commands
+The project uses **Just** as a task runner for all operations:
+
+```bash
+# Core commands
+just setup          # Complete fresh installation
+just switch         # Apply Nix configuration
+just build          # Build without applying
+just test           # Run all tests
+just clean          # Clean build artifacts
+
+# Development commands
+just dev-setup      # Development environment setup
+just docs           # Generate documentation
+just update         # Update all packages
+
+# Maintenance commands
+just backup         # Backup configurations
+just restore        # Restore from backup
+just health         # System health check
+```
+
+### Configuration Changes Workflow
+1. **Edit configuration files** in `dotfiles/nix/`
+2. **Validate with type safety**: `just type-check`
+3. **Apply changes**: `just switch`
+4. **Test functionality**: `just test`
+
+### Type Safety Development
+- **All configurations use strong types** from `core/Types.nix`
+- **Automatic validation** prevents runtime errors
+- **Compile-time type checking** ensures correctness
+- **Centralized state** eliminates inconsistencies
+
+
+## 🛠️ Troubleshooting
+
+### Common Issues & Solutions
+
+#### GPG Signing Not Working
+**Problem**: `gpg: command not found` or signing fails
+**Solution**:
+```bash
+# Install GPG via nix
+nix profile add nixpkgs#gnupg
+
+# Update gitconfig GPG path
+# Path should be: /Users/$USER/.nix-profile/bin/gpg
+```
+
+#### Build Errors
+**Problem**: `evaluation warning` or build failures
+**Solution**:
+```bash
+# Check configuration type safety
+just type-check
+
+# Clean and rebuild
+just clean && just switch
+
+# Check for deprecation warnings
+just build | grep -i warning
+```
+
+#### Package Not Found
+**Problem**: `error: package 'xyz' not found`
+**Solution**:
+```bash
+# Search nixpkgs
+nix search nixpkgs xyz
+
+# Check available packages
+nix-env -qaP | grep xyz
+```
+
+#### Path Issues
+**Problem**: Configuration file not found errors
+**Solution**:
+```bash
+# Verify path resolution
+just debug-paths
+
+# Check centralized state
+cat dotfiles/nix/core/State.nix
+```
+
+### Getting Help
+- **Check issues**: [GitHub Issues](https://github.com/LarsArtmann/Setup-Mac/issues)
+- **Review documentation**: [Development Guide](./docs/development/setup.md)
+- **Run diagnostics**: `just health`
+
