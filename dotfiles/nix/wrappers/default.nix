@@ -14,6 +14,10 @@ let
   fishWrapper = import ./shell/fish.nix { inherit pkgs lib; inherit (pkgs) writeShellScriptBin symlinkJoin makeWrapper; };
   starshipWrapper = import ./shell/starship.nix { inherit pkgs lib; inherit (pkgs) writeShellScriptBin symlinkJoin makeWrapper; };
 
+  # Enhanced dynamic library wrappers
+  dynamicLibsWrapper = import ./applications/dynamic-libs.nix { inherit pkgs lib; };
+  exampleWrappers = import ./applications/example-wrappers.nix { inherit pkgs lib; };
+
 in
 {
   # Core wrapper system configuration
@@ -24,10 +28,18 @@ in
     kittyWrapper.kitty
     sublimeTextWrapper."sublime-text"
     activitywatchWrapper.activitywatch
+
+    # Enhanced dynamic library wrappers (commented out - enable as needed)
+    # exampleWrappers.vscode
+    # exampleWrappers.docker
   ];
 
   # Set wrapped tools as defaults
   environment.shellAliases = {
     cat = "bat";  # Use wrapped bat instead of cat
   };
+
+  # Export dynamic library wrapper functions for use in other modules
+  _module.args.dynamicLibsWrapper = dynamicLibsWrapper;
+  _module.args.exampleWrappers = exampleWrappers;
 }
