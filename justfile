@@ -352,7 +352,7 @@ info:
 # Test configuration without applying changes
 test:
     @echo "🧪 Testing Nix configuration..."
-    darwin-rebuild check --flake ./
+    sudo darwin-rebuild check --flake ./
     @echo "✅ Configuration test passed"
 
 # Show git status and recent commits
