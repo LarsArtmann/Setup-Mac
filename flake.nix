@@ -96,6 +96,9 @@
           # Programs
           ./dotfiles/nix/programs.nix
 
+          # Enhanced wrapper system for dynamic library management
+          ./dotfiles/nix/wrappers/default.nix
+
           # ActivityWatch auto-start configuration
           ./dotfiles/nix/activitywatch.nix
 
