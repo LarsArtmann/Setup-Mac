@@ -166,6 +166,9 @@ in
 
         # SSH client for secure connections
         openssh
+
+        # Graph visualization tools
+        graphviz
     ];
   };
 }
