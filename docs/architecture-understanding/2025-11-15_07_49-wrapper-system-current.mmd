@@ -1,0 +1,87 @@
+graph TB
+    subgraph "Entry Point"
+        flake[flake.nix<br/>Main Entry]
+    end
+
+    subgraph "System Configuration"
+        flake --> darwin[darwinConfigurations]
+        darwin --> modules[Module Imports]
+        modules --> core[core.nix<br/>Nix Settings & Security]
+        modules --> env[environment.nix<br/>Packages & Shell]
+        modules --> prog[programs.nix<br/>Fish & Tools]
+        modules --> sys[system.nix<br/>macOS Settings]
+        modules --> brew[homebrew.nix<br/>Casks & Brews]
+        modules --> wrap[wrappers/default.nix<br/>Wrapper System]
+    end
+
+    subgraph "Package Management - HYBRID"
+        env --> nixpkgs[nixpkgs Packages<br/>CLI Tools]
+        brew --> homebrew[Homebrew<br/>GUI Apps]
+
+        nixpkgs --> batpkg[bat]
+        nixpkgs --> fishpkg[fish]
+        nixpkgs → starshippkg[starship]
+        nixpkgs --> kittypkg[kitty]
+        nixpkgs --> awpkg[activitywatch<br/>BROKEN: pynput]
+
+        homebrew --> sublime[sublime-text]
+        homebrew --> jetbrains[jetbrains-toolbox]
+        homebrew --> chrome[google-chrome]
+        homebrew --> lulu[lulu]
+        homebrew --> others[30+ other casks]
+    end
+
+    subgraph "Wrapper System - INCONSISTENT"
+        wrap --> batw[bat wrapper]
+        wrap --> fishw[fish wrapper]
+        wrap --> starshipw[starship wrapper]
+        wrap --> kittyw[kitty wrapper]
+        wrap -.disabled.-> sublimew[sublime-text wrapper<br/>DISABLED]
+        wrap --> aww[activitywatch wrapper<br/>BROKEN]
+
+        batw --> template[WrapperTemplate.nix<br/>CENTRALIZED]
+        fishw --> localfish[Local wrapWithConfig]
+        starshipw --> localstar[Local wrapWithConfig]
+        kittyw --> localkitty[Local wrapWithConfig]
+        aww --> localaw[Local wrapWithConfig]
+
+        template --> batpkg
+        localfish --> fishpkg
+        localstar --> starshippkg
+        localkitty --> kittypkg
+        localaw --> awpkg
+    end
+
+    subgraph "System Packages Output"
+        batw --> syspkg[environment.systemPackages]
+        fishw --> syspkg
+        starshipw --> syspkg
+        kittyw --> syspkg
+        aww -.broken.-> syspkg
+    end
+
+    subgraph "Shell Configuration"
+        prog --> fishconf[Fish Config<br/>programs.fish]
+        fishconf --> aliases[Shell Aliases]
+        fishconf --> abbrev[Abbreviations]
+        fishconf --> carapace[Carapace Completions]
+        fishconf --> starship[Starship Prompt]
+    end
+
+    subgraph "Build & Deployment"
+        just[justfile<br/>Task Runner] --> nhbuild[nh darwin switch]
+        just --> drbuild[darwin-rebuild switch]
+        nhbuild --> activation[System Activation]
+        drbuild --> activation
+        activation --> apps[/Applications]
+        activation --> binaries[/run/current-system/sw/bin]
+    end
+
+    style awpkg fill:#f99,stroke:#f00
+    style aww fill:#f99,stroke:#f00
+    style sublimew fill:#ccc,stroke:#999
+    style template fill:#9f9,stroke:#090
+    style localfish fill:#ff9,stroke:#990
+    style localstar fill:#ff9,stroke:#990
+    style localkitty fill:#ff9,stroke:#990
+    style localaw fill:#ff9,stroke:#990

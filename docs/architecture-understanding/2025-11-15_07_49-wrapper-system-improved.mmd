@@ -1,0 +1,104 @@
+graph TB
+    subgraph "Entry Point"
+        flake[flake.nix<br/>Main Entry]
+    end
+
+    subgraph "System Configuration - CLEAN MODULES"
+        flake --> darwin[darwinConfigurations]
+        darwin --> modules[Module Imports]
+        modules --> core[core.nix<br/>Nix Settings & Security]
+        modules --> env[environment.nix<br/>Packages ONLY]
+        modules --> prog[programs.nix<br/>Program Configs ONLY]
+        modules --> sys[system.nix<br/>macOS Settings]
+        modules --> brew[homebrew.nix<br/>MINIMAL Exceptions]
+    end
+
+    subgraph "Package Management - NIX FIRST"
+        env --> nixpkgs[nixpkgs Packages<br/>ALL CLI + Most GUI]
+
+        nixpkgs --> batpkg[bat]
+        nixpkgs --> fishpkg[fish]
+        nixpkgs --> starshippkg[starship]
+        nixpkgs --> kittypkg[kitty]
+        nixpkgs --> firefoxpkg[firefox-bin]
+        nixpkgs --> vscodepkg[vscode]
+        nixpkgs --> obsidianpkg[obsidian]
+
+        brew --> documented[DOCUMENTED Exceptions]
+        documented --> sublime[sublime-text<br/>WHY: Commercial, no Nix package]
+        documented --> jetbrains[jetbrains-toolbox<br/>WHY: Proprietary IDE manager]
+        documented --> spotify[spotify<br/>WHY: DRM restrictions]
+    end
+
+    subgraph "Wrapper System - CONSISTENT & SIMPLE"
+        env --> wrapgen[Wrapper Generator<br/>Simple Template Function]
+
+        wrapgen --> mkWrapper{mkSimpleWrapper<br/>Single Function}
+
+        mkWrapper --> batw[bat wrapper<br/>Theme: gruvbox-dark]
+        mkWrapper --> fishw[fish wrapper<br/>Config embedded]
+        mkWrapper --> starshipw[starship wrapper<br/>Prompt config]
+        mkWrapper --> kittyw[kitty wrapper<br/>Terminal config]
+
+        batw --> batpkg
+        fishw --> fishpkg
+        starshipw --> starshippkg
+        kittyw --> kittypkg
+    end
+
+    subgraph "Configuration Management - DECLARATIVE"
+        prog --> fishconf[Fish Configuration]
+        fishconf --> configfiles[Config Files as Nix Strings]
+
+        configfiles --> aliases[Shell Aliases]
+        configfiles --> abbrev[Abbreviations]
+        configfiles --> functions[Fish Functions]
+
+        fishconf --> integrations[Tool Integrations]
+        integrations --> carapace[Carapace Completions]
+        integrations --> starship[Starship Prompt]
+        integrations --> direnv[direnv Hooks]
+    end
+
+    subgraph "System Packages Output - ORGANIZED"
+        batw --> cli[CLI Tools Package Set]
+        fishw --> shells[Shell Package Set]
+        starshipw --> shells
+        kittyw --> gui[GUI Tools Package Set]
+
+        cli --> syspkg[environment.systemPackages]
+        shells --> syspkg
+        gui --> syspkg
+    end
+
+    subgraph "Build & Deployment - AUTOMATED"
+        just[justfile<br/>High-Level Commands] --> validate[Pre-flight Validation]
+        validate --> test[nix build --dry-run]
+        test --> deploy{Deployment Method}
+
+        deploy --> nhbuild[nh darwin switch<br/>PREFERRED: Faster]
+        deploy --> drbuild[darwin-rebuild switch<br/>FALLBACK]
+
+        nhbuild --> activation[System Activation]
+        drbuild --> activation
+
+        activation --> verify[Post-deployment Verification]
+        verify --> apps[/Applications]
+        verify --> binaries[/run/current-system/sw/bin]
+        verify --> health[Health Checks]
+    end
+
+    subgraph "Testing & Validation"
+        health --> runtime[Runtime Tests]
+        runtime --> perftest[Performance Benchmarks]
+        runtime --> functest[Functional Tests]
+        perftest --> baseline[Compare vs Baseline]
+        functest --> report[Test Report]
+    end
+
+    style mkWrapper fill:#9f9,stroke:#090
+    style validate fill:#9f9,stroke:#090
+    style verify fill:#9f9,stroke:#090
+    style documented fill:#9cf,stroke:#069
+    style nixpkgs fill:#9f9,stroke:#090
+    style brew fill:#fc9,stroke:#f90

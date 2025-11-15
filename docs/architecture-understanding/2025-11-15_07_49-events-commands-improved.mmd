@@ -1,0 +1,172 @@
+graph TB
+    subgraph "Unified Command Interface - justfile"
+        user[User] --> just{justfile<br/>Single Entry Point}
+
+        just --> lifecycle[Lifecycle Commands]
+        just --> maintenance[Maintenance Commands]
+        just --> validation[Validation Commands]
+        just --> monitoring[Monitoring Commands]
+
+        lifecycle --> setup[just setup<br/>Orchestrated Setup]
+        lifecycle --> switch[just switch<br/>With Pre-checks]
+        lifecycle --> rollback[just rollback<br/>Safe Revert]
+
+        maintenance --> clean[just clean<br/>Smart Cleanup]
+        maintenance --> update[just update<br/>With Changelog]
+        maintenance --> optimize[just optimize<br/>Performance Tune]
+
+        validation --> test[just test<br/>Full Validation]
+        validation --> check[just check<br/>Health Check]
+        validation --> verify[just verify<br/>Post-deploy Check]
+
+        monitoring --> status[just status<br/>System Status]
+        monitoring --> benchmark[just benchmark<br/>Performance Baseline]
+        monitoring --> report[just report<br/>Generate Report]
+    end
+
+    subgraph "Pre-flight Validation - Before Any Change"
+        switch --> preflight{Pre-flight Checks}
+        preflight --> checkgit[Git Status Clean?]
+        preflight --> checkdisk[Enough Disk Space?]
+        preflight --> checkbuild[Build Dry-Run Pass?]
+
+        checkgit -.fail.-> abort[Abort with Error]
+        checkdisk -.fail.-> abort
+        checkbuild -.fail.-> abort
+
+        checkbuild -.pass.-> proceed[Proceed to Build]
+    end
+
+    subgraph "Nix Build Pipeline - Structured Phases"
+        proceed --> eval[Evaluation Phase]
+        eval --> validateschema[Schema Validation]
+        validateschema --> loadmodules[Load Modules]
+        loadmodules --> checkdeps[Dependency Resolution]
+
+        checkdeps --> build[Build Phase]
+        build --> fetchsources[Fetch Sources]
+        fetchsources --> buildderivations[Build Derivations]
+        buildderivations --> testwrappers[Test Wrappers]
+
+        testwrappers --> activate[Activation Phase]
+    end
+
+    subgraph "Structured Activation Events - Ordered Execution"
+        activate --> phase1[Phase 1: System Prep]
+        phase1 --> backup[Backup Current Config]
+        phase1 --> cleanup[Cleanup Old State]
+
+        phase1 --> phase2[Phase 2: Core System]
+        phase2 --> nixactivate[Nix System Activation]
+        nixactivate --> binlinks[Create Binary Links]
+        nixactivate --> envvars[Set Environment Vars]
+
+        phase2 --> phase3[Phase 3: Applications]
+        phase3 --> brewsync[Homebrew Sync<br/>declarative only]
+        brewsync --> brewinst[Install Missing]
+        brewinst --> brewrem[Remove Extra]
+
+        phase3 --> phase4[Phase 4: User Config]
+        phase4 --> fileassoc[File Associations<br/>via duti]
+        phase4 --> defaults[macOS Defaults<br/>batched]
+        defaults --> register[Register Apps<br/>lsregister]
+
+        phase4 --> phase5[Phase 5: Verification]
+        phase5 --> healthcheck[Health Checks]
+        healthcheck --> smoketest[Smoke Tests]
+        smoketest --> report[Generate Report]
+    end
+
+    subgraph "Event Hooks - Pluggable System"
+        eval --> hooks{Hook Points}
+        hooks --> preevalc[pre-eval hook]
+        hooks --> posteval[post-eval hook]
+
+        build --> buildhooks{Build Hooks}
+        buildhooks --> prebuild[pre-build hook]
+        buildhooks --> postbuild[post-build hook]
+
+        activate --> acthooks{Activation Hooks}
+        acthooks --> preact[pre-activation hook]
+        acthooks --> postact[post-activation hook]
+        acthooks --> onfail[on-failure hook]
+
+        onfail --> rollbackauto[Auto-rollback]
+        postact --> notify[Notify Success]
+    end
+
+    subgraph "Git Integration - Automated Workflows"
+        user --> gitflow[Git Workflow]
+        gitflow --> commit[git commit]
+        commit --> prehooks{Pre-commit Hooks}
+
+        prehooks --> security[Security Checks]
+        security --> gitleaks[gitleaks]
+        security --> secretscan[Secret Scanning]
+
+        prehooks --> quality[Code Quality]
+        quality --> whitespace[Whitespace]
+        quality --> format[Code Formatting]
+
+        prehooks --> nixval[Nix Validation]
+        nixval --> nixcheck[nix check]
+        nixval --> dryrun[Build Dry-Run]
+
+        dryrun -.pass.-> commitok[Commit Allowed]
+        dryrun -.fail.-> commitfail[Commit Blocked]
+
+        commitok --> push[git push]
+        push --> ci{CI Pipeline?}
+        ci -.future.-> tests[Run Tests]
+        ci -.future.-> deploy[Auto-deploy?]
+    end
+
+    subgraph "Monitoring & Observability"
+        report --> metrics[Collect Metrics]
+        metrics --> buildtime[Build Duration]
+        metrics --> diskusage[Disk Usage]
+        metrics --> pkgcount[Package Count]
+
+        metrics --> store[Store in JSON]
+        store --> history[Historical Data]
+        history --> trends[Trend Analysis]
+        trends --> alerts[Alert on Regression]
+    end
+
+    subgraph "State Management - Versioned & Rollbackable"
+        activate --> statelog[State Change Log]
+        statelog --> generation[New Generation Created]
+        generation --> manifest[System Manifest]
+        manifest --> metadata[Metadata Stored]
+
+        metadata --> prev[Previous Generations]
+        prev --> gen1[Generation N-1]
+        prev --> gen2[Generation N-2]
+        prev --> gen3[Generation N-3]
+
+        rollback --> selectgen[Select Generation]
+        selectgen --> activate
+    end
+
+    subgraph "Automated Maintenance - Scheduled Events"
+        cron[System Scheduler] --> daily[Daily Tasks]
+        daily --> garbagec[Garbage Collection<br/>nix-collect-garbage]
+        daily --> brewupdate[Homebrew Update]
+        daily --> syscheck[System Health Check]
+
+        cron --> weekly[Weekly Tasks]
+        weekly --> optimize[Store Optimization<br/>nix-store --optimize]
+        weekly --> backup[Config Backup]
+
+        cron --> monthly[Monthly Tasks]
+        monthly --> audit[Security Audit]
+        monthly --> cleanup[Deep Cleanup]
+    end
+
+    style preflight fill:#9f9,stroke:#090
+    style phase5 fill:#9f9,stroke:#090
+    style commitok fill:#9f9,stroke:#090
+    style commitfail fill:#f99,stroke:#f00
+    style abort fill:#f99,stroke:#f00
+    style rollbackauto fill:#fc9,stroke:#f90
+    style hooks fill:#9cf,stroke:#069
