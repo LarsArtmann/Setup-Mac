@@ -1,0 +1,65 @@
+```mermaid
+graph TD
+    Start[Start v0.1.0] --> A[#129 ActivityWatch Decision]
+    
+    A --> B[#127 Fix Split Brains #1, #2, #4]
+    A -.establishes criteria.-> B
+    
+    B --> C[#126 Integrate Ghost Scripts]
+    C --> D[#127 Fix Split Brain #5]
+    D -.validation integrated.-> C
+    
+    C --> E[#122 Fix Testing Pipeline]
+    E --> F[#124 Type Safety Integration]
+    
+    F --> G[v0.1.0 Complete]
+    
+    style A fill:#f96,stroke:#333,stroke-width:4px,color:#000
+    style E fill:#f96,stroke:#333,stroke-width:2px,color:#000
+    style F fill:#9cf,stroke:#333,stroke-width:2px,color:#000
+    style G fill:#9f6,stroke:#333,stroke-width:4px,color:#000
+    
+    classDef blocker fill:#f96,stroke:#333,stroke-width:4px
+    classDef critical fill:#f96,stroke:#333,stroke-width:2px
+    classDef important fill:#9cf,stroke:#333,stroke-width:2px
+    
+    class A,E blocker
+    class B,C,D critical
+    class F important
+```
+
+## v0.1.0 Critical Path
+
+### Blockers (Must Complete First)
+1. **#129** - ActivityWatch Decision (5 min to 2 hours)
+   - User choice: Homebrew / Override / Python 3.12
+   - Unblocks ALL Nix deployments
+   
+2. **#122** - Fix Nix Testing Pipeline
+   - Required for validation
+
+### Critical Dependencies
+3. **#127** - Fix Split Brains (depends on #129 for criteria)
+   - Phase 1: Document cleanup, package criteria, build fallback
+   - Phase 2: Integrate validation (depends on #126)
+
+4. **#126** - Integrate Ghost Scripts (2 hours)
+   - Must complete BEFORE #127 Phase 2
+   - Must complete BEFORE #112 (folder restructuring)
+
+### Integration Work
+5. **#124** - Type Safety Integration (4-6 hours)
+   - Integrate Types.nix, State.nix, Validation.nix
+   - Assertion frameworks already built (#107-110)
+
+## Estimated Timeline
+
+**If Option A (Homebrew) chosen:**
+- Day 1: #129 (5 min) + #127 Phase 1 (1 hour) + #126 (2 hours) = 3 hours
+- Day 2: #127 Phase 2 (30 min) + #122 (2 hours) = 2.5 hours  
+- Day 3: #124 (4-6 hours) = 5 hours
+- **Total: 10.5 hours over 3 days**
+
+**If Option B/C chosen:**
+- Add 30 min to 2 hours to Day 1
+- **Total: 11-12.5 hours**
