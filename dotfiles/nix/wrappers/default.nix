@@ -29,8 +29,8 @@ in
     # sublimeTextWrapper."sublime-text"  # sublimetext4 is Linux-only (no Darwin support)
     # activitywatchWrapper.activitywatch  # python3.13-pynput dependency is broken
 
-    # Enhanced dynamic library wrappers (commented out - enable as needed)
-    # exampleWrappers.vscode
+    # Enhanced dynamic library wrappers (testing enabled)
+    exampleWrappers.vscode
     # exampleWrappers.docker
   ];
 
