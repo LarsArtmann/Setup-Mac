@@ -54,7 +54,7 @@
       # Fonts that require complex compilation in Nix
       "font-jetbrains-mono"
       "legcord" # lightweight Discord - nix package exist, but does not work on my MacOS version - 2025-04-28
-      "little-snitch"
+      # "little-snitch" # REMOVED: Proprietary network monitoring tool
       "lulu" # Open source firewall to block unknown outgoing connections - https://objective-see.org/products/lulu.html
       # Security tools from Objective-See
       "blockblock" # Monitors persistence locations for malware
