@@ -1,12 +1,12 @@
 # ActivityWatch Wrapper
 # Multi-service wrapper system for ActivityWatch with embedded configurations
 
-{ pkgs, lib }:
+{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
 
 let
   # Simple wrapper function for CLI tools
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
-    pkgs.writeShellScriptBin name ''
+    writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
 

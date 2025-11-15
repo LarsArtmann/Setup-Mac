@@ -1,12 +1,12 @@
 # Fish Shell Wrapper
 # Embedded Fish configuration with optimized performance
 
-{ pkgs, lib }:
+{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
 
 let
   # Simple wrapper function using writeShellScriptBin
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
-    pkgs.writeShellScriptBin name ''
+    writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
 

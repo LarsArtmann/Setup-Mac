@@ -5,27 +5,28 @@
 
 let
   # System state validation assertions
+  # Note: config.assertions expects { assertion = bool; message = str; } format
   systemAssertions = [
-    (lib.assertMsg
-      (config.environment.systemPackages != [])
-      "System must have packages defined"
-    )
-    (lib.assertMsg
-      (lib.all (pkg: pkg != null) config.environment.systemPackages)
-      "All packages must be valid (no null values)"
-    )
-    (lib.assertMsg
-      (config.environment.shellAliases != {})
-      "Shell aliases must be defined"
-    )
-    (lib.assertMsg
-      (config.environment.variables != null)
-      "Environment variables must be defined"
-    )
-    (lib.assertMsg
-      (lib.versionAtLeast lib.version "2.4.0")
-      "Nix version 2.4.0+ required for assertion features"
-    )
+    {
+      assertion = config.environment.systemPackages != [];
+      message = "System must have packages defined";
+    }
+    {
+      assertion = lib.all (pkg: pkg != null) config.environment.systemPackages;
+      message = "All packages must be valid (no null values)";
+    }
+    {
+      assertion = config.environment.shellAliases != {};
+      message = "Shell aliases must be defined";
+    }
+    {
+      assertion = config.environment.variables != null;
+      message = "Environment variables must be defined";
+    }
+    {
+      assertion = lib.versionAtLeast lib.version "2.4.0";
+      message = "Nix version 2.4.0+ required for assertion features";
+    }
   ];
 
 in

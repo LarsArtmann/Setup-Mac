@@ -1,11 +1,11 @@
 # State.nix - CENTRALIZED SINGLE SOURCE OF TRUTH
 # TYPE-SAFE STATE MANAGEMENT FOR ENTIRE SYSTEM
 
-{ lib, pkgs, ... }:
+{ lib, pkgs, UserConfig, PathConfig, ... }:
 
 let
   # TYPE DEFINITIONS - STRONG TYPE SAFETY ENFORCEMENT
-  PathConfig = lib.types.submodule {
+  PathConfigType = lib.types.submodule {
     options = {
       home = lib.mkOption {
         type = lib.types.path;
@@ -47,14 +47,13 @@ let
   };
 
   # CENTRALIZED PATH CONFIGURATION - SINGLE SOURCE OF TRUTH
-  # Using PathConfig module with dependency injection to avoid circular imports
+  # Using injected UserConfig and PathConfig to avoid circular imports
   Paths = let
-    # Extract username from UserConfig to avoid full circular dependency
-    userConfig = import ./UserConfig.nix { inherit lib; };
-    username = userConfig.defaultUser.username;
-    # Generate paths using PathConfig module
-    pathConfig = import ./PathConfig.nix { inherit lib; } username;
-  in pathConfig.defaultPaths;
+    # Use injected UserConfig instead of direct import
+    username = UserConfig.defaultUser.username;
+    # Use injected PathConfig instead of direct import
+    pathConfig = PathConfig.mkPathConfig username;
+  in pathConfig;
 
   # STATE VALIDATION FUNCTIONS - TYPE-SAFE GUARANTEES
   validatePathConsistency = paths:
@@ -102,6 +101,6 @@ let
     };
 
 in {
-  inherit PathConfig PackageConfig Paths;
+  inherit PathConfigType PackageConfig Paths;
   inherit validatePathConsistency validatePackageList;
 }

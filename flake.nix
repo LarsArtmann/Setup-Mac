@@ -73,12 +73,42 @@
       heliumOverlay = final: prev: {
         helium = final.callPackage ./dotfiles/nix/packages/helium.nix { };
       };
+
+      # Import lib for ghost system dependencies
+      lib = nixpkgs.lib;
+      pkgs = import nixpkgs { system = "aarch64-darwin"; };
+
+      # GHOST SYSTEMS INTEGRATION - Phase 1: Type Safety & Validation
+      # Pure libraries (no dependencies) - imported first
+      TypeAssertions = import ./dotfiles/nix/core/TypeAssertions.nix { inherit lib; };
+      ConfigAssertions = import ./dotfiles/nix/core/ConfigAssertions.nix { inherit lib; };
+      ModuleAssertions = import ./dotfiles/nix/core/ModuleAssertions.nix { inherit lib pkgs; };
+      Types = import ./dotfiles/nix/core/Types.nix { inherit lib pkgs; };
+
+      # Configuration dependencies for State.nix
+      UserConfig = import ./dotfiles/nix/core/UserConfig.nix { inherit lib; };
+      PathConfig = import ./dotfiles/nix/core/PathConfig.nix { inherit lib; };
+
+      # State management with injected dependencies (eliminates circular imports)
+      State = import ./dotfiles/nix/core/State.nix {
+        inherit lib pkgs UserConfig PathConfig;
+      };
+
+      # Validation system with full dependency chain
+      Validation = import ./dotfiles/nix/core/Validation.nix {
+        inherit lib pkgs State Types;
+      };
     in
     {
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Lars-MacBook-Air
       darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers; };
+        specialArgs = {
+          inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
+          # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
+          inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+          inherit UserConfig PathConfig State Validation;
+        };
         modules = [
           # Apply custom packages overlay
           ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
@@ -87,6 +117,11 @@
 
 
           ./dotfiles/nix/core.nix
+
+          # Ghost Systems - Type Safety & Assertion Frameworks (Phase 1 Integration)
+          ./dotfiles/nix/core/TypeSafetySystem.nix
+          ./dotfiles/nix/core/SystemAssertions.nix
+
           ./dotfiles/nix/system.nix
 
           # Environment and packages

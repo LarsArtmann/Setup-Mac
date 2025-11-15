@@ -1,12 +1,12 @@
 # Starship Prompt Wrapper
 # Embedded starship configuration for portable shell experience
 
-{ pkgs, lib }:
+{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
 
 let
   # Simple wrapper function using writeShellScriptBin
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
-    pkgs.writeShellScriptBin name ''
+    writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
 

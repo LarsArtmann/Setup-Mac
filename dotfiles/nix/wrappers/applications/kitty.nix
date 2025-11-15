@@ -1,12 +1,12 @@
 # Kitty Terminal Wrapper
 # GUI application wrapper with embedded configuration
 
-{ pkgs, lib }:
+{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
 
 let
   # Simple wrapper function for GUI applications
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
-    pkgs.writeShellScriptBin name ''
+    writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
 
