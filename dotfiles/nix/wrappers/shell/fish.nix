@@ -8,7 +8,7 @@ let
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
     writeShellScriptBin name ''
       ${preHook}
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=${v}") env)}
 
       # Ensure config directories exist
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (configPath: source: ''
@@ -109,8 +109,8 @@ let
       value = source;
     }) fishFunctions);
     env = {
-      SHELL = "${pkgs.fish}/bin/fish";
-      FISH_CONFIG_DIR = "$HOME/.config/fish";
+      SHELL = "\"${pkgs.fish}/bin/fish\"";
+      FISH_CONFIG_DIR = "\"$HOME/.config/fish\"";
     };
     preHook = ''
       # Create fish directories

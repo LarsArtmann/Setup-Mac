@@ -8,7 +8,7 @@ let
   wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
     writeShellScriptBin name ''
       ${preHook}
-      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
+      ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=${v}") env)}
 
       # Ensure config directories exist
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (configPath: source: ''
@@ -62,7 +62,7 @@ let
 
     [nix_shell]
     symbol = "❄️"
-    format = "via [$symbol$state( \($name\))]($style) "
+    format = "via [$symbol$state( \\($name\\))]($style) "
 
     [nodejs]
     format = "via [$symbol$version]($style) "
@@ -107,9 +107,9 @@ let
       "config/starship.toml" = starshipConfig;
     };
     env = {
-      STARSHIP_CONFIG = "$(pwd)/.config/starship.toml";
-      STARSHIP_CACHE = "$(pwd)/.cache/starship";
-      STARSHIP_LOG = "error";  # Reduce noise
+      STARSHIP_CONFIG = "\"$HOME/.config/starship.toml\"";
+      STARSHIP_CACHE = "\"$HOME/.cache/starship\"";
+      STARSHIP_LOG = "\"error\"";  # Reduce noise
     };
     preHook = ''
       # Create starship cache directory
