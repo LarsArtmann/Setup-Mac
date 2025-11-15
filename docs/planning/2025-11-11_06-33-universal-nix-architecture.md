@@ -1,10 +1,36 @@
 # 🌳 Universal Nix Configuration Architecture Proposal
 ### Platform-Agnostic: macOS (nix-darwin) + NixOS Ready
 
+---
+**⚠️ DOCUMENT STATUS: PROPOSAL - NOT IMPLEMENTED ⚠️**
+
+**Proposal Date:** 2025-11-11
+**Current State:** Architectural planning only (detailed blueprints)
+**Implementation Status:** 0% (not started - current system uses flat structure)
+**Implementation Decision:** Pending (see docs/learnings/2025-11-15_13-44-planning-vs-reality-gap-analysis.md)
+**Next Review:** After Option A/B/C decision made
+
+**IMPORTANT:** This document describes a PROPOSED architecture, not the CURRENT implementation.
+
+**Current Reality:**
+- Flat structure: `dotfiles/nix/*.nix` (1336 lines)
+- Darwin-only flake
+- No platform abstraction layer
+- No NixOS support yet
+
+**This Proposal Would Provide:**
+- Tree structure: `platforms/`, `lib/`, `profiles/`, `modules/`
+- Multi-platform flake (Darwin + NixOS)
+- Platform abstraction with 80%+ code reuse
+- 6-week implementation timeline (3 phases)
+
+**See Also:** docs/learnings/2025-11-15_13-44-planning-vs-reality-gap-analysis.md for gap analysis and options
+---
+
 **Date:** 2025-11-11
 **Version:** 1.0
 **Author:** Lars Artmann
-**Status:** Proposal
+**Status:** Proposal (Not Implemented)
 
 ---
 
