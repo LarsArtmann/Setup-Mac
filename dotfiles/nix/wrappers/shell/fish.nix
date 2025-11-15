@@ -110,7 +110,7 @@ let
     }) fishFunctions);
     env = {
       SHELL = "${pkgs.fish}/bin/fish";
-      FISH_CONFIG_DIR = "$(pwd)/.config/fish";
+      FISH_CONFIG_DIR = "$HOME/.config/fish";
     };
     preHook = ''
       # Create fish directories
