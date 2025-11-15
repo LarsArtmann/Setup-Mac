@@ -66,7 +66,7 @@
       # rarely used: "multimc"
       "notion"
       "obs"
-      "obs-virtualcam"
+      # "obs-virtualcam" # REMOVED: Discontinued upstream on 2024-12-16 - OBS has built-in virtual camera support since v26.0
       "obsidian"
       "openaudible"
       "raycast"
