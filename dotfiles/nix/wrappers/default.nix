@@ -29,8 +29,11 @@ in
     # sublimeTextWrapper."sublime-text"  # sublimetext4 is Linux-only (no Darwin support)
     # activitywatchWrapper.activitywatch  # python3.13-pynput dependency is broken
 
-    # Enhanced dynamic library wrappers (testing enabled)
-    exampleWrappers.vscode
+    # Enhanced dynamic library wrappers (JetBrains testing enabled)
+    # (exampleWrappers.jetbrains {
+    #   name = "intellij-idea-enhanced";
+    #   package = pkgs.jetbrains.idea-ultimate;
+    # })
     # exampleWrappers.docker
   ];
 
