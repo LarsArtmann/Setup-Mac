@@ -23,8 +23,8 @@ in
   # Core wrapper system configuration
   environment.systemPackages = with pkgs; [
     # batWrapper.bat  # WrapperTemplate build issue - TODO: fix
-    starshipWrapper.starship
-    fishWrapper.fish
+    # starshipWrapper.starship  # REMOVED: Conflicts with programs.fish.shellInit (starship init already configured)
+    # fishWrapper.fish  # REMOVED: Conflicts with programs.fish module in programs.nix - nix-darwin handles fish configuration
     kittyWrapper.kitty
     # sublimeTextWrapper."sublime-text"  # sublimetext4 is Linux-only (no Darwin support)
     # activitywatchWrapper.activitywatch  # python3.13-pynput dependency is broken
