@@ -23,7 +23,7 @@ in
   # Core wrapper system configuration
   environment.systemPackages = with pkgs; [
     # batWrapper.bat  # WrapperTemplate build issue - TODO: fix
-    # starshipWrapper.starship  # REMOVED: Conflicts with programs.fish.shellInit (starship init already configured)
+    starshipWrapper.starship  # NEEDED: Deploys starship.toml configuration (doesn't conflict - just manages config file)
     # fishWrapper.fish  # REMOVED: Conflicts with programs.fish module in programs.nix - nix-darwin handles fish configuration
     kittyWrapper.kitty
     # sublimeTextWrapper."sublime-text"  # sublimetext4 is Linux-only (no Darwin support)

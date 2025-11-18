@@ -70,7 +70,7 @@ let
     [python]
     format = "via [$symbol$pyenv_prefix]($style)python[$version]($style) "
 
-    [go]
+    [golang]
     format = "via [$symbol$version]($style) "
 
     [rust]
@@ -107,14 +107,11 @@ let
       "config/starship.toml" = starshipConfig;
     };
     env = {
-      STARSHIP_CONFIG = "\"$HOME/.config/starship.toml\"";
-      STARSHIP_CACHE = "\"$HOME/.cache/starship\"";
-      STARSHIP_LOG = "\"error\"";  # Reduce noise
+      STARSHIP_CONFIG = "$HOME/.config/starship.toml";
+      STARSHIP_CACHE = "$HOME/.cache/starship";
+      STARSHIP_LOG = "error";  # Reduce noise
     };
-    preHook = ''
-      # Create starship cache directory
-      mkdir -p "$STARSHIP_CACHE"
-    '';
+    # preHook removed: Starship creates its own cache directory, and preHook runs BEFORE env vars are set
   };
 
 in
