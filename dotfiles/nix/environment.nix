@@ -103,6 +103,16 @@ in
       # Manual PATH setting conflicts with nix-darwin's systemPath management
     };
 
+    # Add user-specific paths to system PATH
+    # This adds go/bin and other development tool directories
+    systemPath = [
+      "${homeDir}/go/bin"              # Go binaries (templ, air, etc.)
+      "${homeDir}/.local/bin"           # Local user binaries
+      "${homeDir}/.bun/bin"            # Bun runtime binaries
+      "${homeDir}/.turso"              # Turso CLI
+      "${homeDir}/.orbstack/bin"       # OrbStack CLI tools
+    ];
+
     # List packages installed in system profile. To search by name, run:
     # $ nix-env -qaP | grep <PACKAGE_NAME>
     systemPackages = with pkgs; [
