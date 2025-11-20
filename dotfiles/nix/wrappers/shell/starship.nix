@@ -26,6 +26,13 @@ let
     # 🚀 Optimized Starship Configuration
     # Embedded in wrapper for portability
 
+    # Disable line breaks to keep prompt on single line
+    format = "$all$character"
+    add_newline = false
+
+    [line_break]
+    disabled = true
+
     [character]
     success_symbol = "[➜](bold #50fa7b)"
     error_symbol = "[➜](bold #ff5555)"
