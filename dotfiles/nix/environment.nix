@@ -147,6 +147,7 @@ in
 
         # Security and development tools
         gitleaks
+        pre-commit
 
         # AI development tools from nix-ai-tools
         crush

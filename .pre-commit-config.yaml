@@ -13,19 +13,6 @@ repos:
         args: [-c, 'find . -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o -name "*.txt" -o -name "*.sh" -o -name "*.nix" | grep -v ".git" | xargs -I {} /run/current-system/sw/bin/sed -i "s/[[:space:]]*$//" "{}"']
         language: system
         pass_filenames: false
-    -   id: go-fmt
-        name: go fmt
-        entry: gofmt
-        args: [-l, -s, -w]
-        language: system
-        files: \.go$
-    -   id: go-lint
-        name: golangci-lint
-        entry: bash
-        args: [-c, 'cd better-claude-go && golangci-lint run']
-        language: system
-        files: \.go$
-        pass_filenames: false
     -   id: nix-check
         name: nix check
         entry: bash

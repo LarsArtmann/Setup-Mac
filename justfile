@@ -819,6 +819,7 @@ help:
     @echo "  benchmark      - Benchmark shell startup performance"
     @echo "  debug          - Debug shell startup with verbose logging"
     @echo "  health         - Health check for shell and dev environment"
+    @echo "  health-dashboard - Comprehensive system health dashboard"
     @echo ""
     @echo "Go Development Tools:"
     @echo "  go-lint               - Run golangci-lint on Go code"
@@ -900,3 +901,8 @@ migrate-to-wrappers:
 deployment-verify:
     @echo "✅ Verifying wrapper deployment..."
     @./scripts/deployment-verify.sh
+
+# Comprehensive system health dashboard
+health-dashboard:
+    @echo "🏥 Launching comprehensive health dashboard..."
+    @./scripts/health-dashboard.sh
