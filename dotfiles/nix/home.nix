@@ -67,4 +67,9 @@ in {
     "$HOME/.orbstack/bin"
     "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
   ];
+
+  # Import custom modules
+  imports = [
+    ./modules/ghost-wallpaper.nix
+  ];
 }
