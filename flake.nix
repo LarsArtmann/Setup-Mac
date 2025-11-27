@@ -171,17 +171,16 @@
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
 
-          # Home Manager integration - temporarily disabled to migrate configs
-          # home-manager.darwinModules.home-manager
-          # {
-          #   home-manager = {
-          #     useGlobalPkgs = true;
-          #     useUserPackages = true;
-          #     extraSpecialArgs = { inherit inputs; };
-          #     users.larsartmann = ./home.nix;
-          #   };
-      # Expose crush from nix-ai-tools as flake output
-          # }
+          # Home Manager integration - re-enabled for user configuration
+          home-manager.darwinModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs; };
+              users.larsartmann = ./dotfiles/nix/home.nix;
+            };
+          }
         ];
       };
     };

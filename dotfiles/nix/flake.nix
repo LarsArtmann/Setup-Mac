@@ -137,16 +137,16 @@
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
 
-          # Home Manager integration - temporarily disabled to migrate configs
-          # home-manager.darwinModules.home-manager
-          # {
-          #   home-manager = {
-          #     useGlobalPkgs = true;
-          #     useUserPackages = true;
-          #     extraSpecialArgs = { inherit inputs; };
-          #     users.larsartmann = ./home.nix;
-          #   };
-          # }
+          # Home Manager integration - enabled for ghost-btop-wallpaper
+          home-manager.darwinModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = { inherit inputs; };
+              users.larsartmann = ./home.nix;
+            };
+          }
         ];
       };
 

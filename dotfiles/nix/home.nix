@@ -72,4 +72,11 @@ in {
   imports = [
     ./modules/ghost-wallpaper.nix
   ];
+
+  # Enable Ghost Btop Wallpaper
+  programs.ghost-btop-wallpaper = {
+    enable = true;
+    updateRate = 2000;
+    backgroundOpacity = "0.0";
+  };
 }
