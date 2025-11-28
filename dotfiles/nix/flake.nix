@@ -134,19 +134,23 @@
           # User-specific configurations
           ./users.nix
 
+          # Ghost Btop Wallpaper - TEMPORARILY DISABLED FOR DEBUGGING
+          # ./ghost-btop-wallpaper.nix
+          # ./btop-wallpaper-config.nix
+
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
 
-          # Home Manager integration - enabled for ghost-btop-wallpaper
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.larsartmann = ./minimal-home.nix;  # Temporary test
-            };
-          }
+          # Home Manager integration - DISABLED - ALTERNATIVE APPROACH NEEDED
+          # home-manager.darwinModules.home-manager
+          # {
+          #   home-manager = {
+          #     useGlobalPkgs = true;
+          #     useUserPackages = true;
+          #     extraSpecialArgs = { inherit inputs; };
+          #     users.larsartmann = ./debug-home.nix;
+          #   };
+          # }
         ];
       };
 
