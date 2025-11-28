@@ -144,7 +144,7 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               extraSpecialArgs = { inherit inputs; };
-              users.larsartmann = ./home.nix;
+              users.larsartmann = ./minimal-home.nix;  # Temporary test
             };
           }
         ];
