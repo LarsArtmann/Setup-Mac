@@ -41,7 +41,7 @@ in
       confirm_os_window_close 0
     '';
 
-    # Step 2: Launch script
+    # Step 2: Launch script and macOS support
     home.packages = [
       (pkgs.writeShellScriptBin "launch-btop-bg" ''
         # Check if already running to prevent duplicates on reload
@@ -58,6 +58,31 @@ in
           --title "System Monitor Wallpaper" \
           --hold \
           ${pkgs.btop}/bin/btop --utf-force
+      '')
+
+      (pkgs.writeShellScriptBin "setup-btop-wallpaper-macos" ''
+        # Check if SketchyBar is available
+        if command -v sketchybar >/dev/null 2>&1; then
+          echo "🍎 Setting up btop wallpaper for macOS with SketchyBar..."
+
+          # Start the ghost btop if not already running
+          launch-btop-bg
+
+          # Wait a moment for the window to appear
+          sleep 2
+
+          # Use SketchyBar to position and style the window
+          # Note: This requires SketchyBar with window management capabilities
+          sketchybar --query bar | grep -q "btop-bg" && {
+            echo "✅ btop wallpaper configured for macOS"
+          } || {
+            echo "⚠️  SketchyBar window management not available"
+          }
+        else
+          echo "🔴 SketchyBar not found. Install SketchyBar for macOS integration."
+          echo "📋 To use without SketchyBar, manually start with: launch-btop-bg"
+          echo "💡 Then use your preferred window manager to set it as desktop background"
+        fi
       '')
     ];
 
@@ -100,32 +125,7 @@ in
     };
 
     # Step 5: macOS support via SketchyBar (if available)
-    home.packages = with pkgs; [
-      (pkgs.writeShellScriptBin "setup-btop-wallpaper-macos" ''
-        # Check if SketchyBar is available
-        if command -v sketchybar >/dev/null 2>&1; then
-          echo "🍎 Setting up btop wallpaper for macOS with SketchyBar..."
-
-          # Start the ghost btop if not already running
-          launch-btop-bg
-
-          # Wait a moment for the window to appear
-          sleep 2
-
-          # Use SketchyBar to position and style the window
-          # Note: This requires SketchyBar with window management capabilities
-          sketchybar --query bar | grep -q "btop-bg" && {
-            echo "✅ btop wallpaper configured for macOS"
-          } || {
-            echo "⚠️  SketchyBar window management not available"
-          }
-        else
-          echo "🔴 SketchyBar not found. Install SketchyBar for macOS integration."
-          echo "📋 To use without SketchyBar, manually start with: launch-btop-bg"
-          echo "💡 Then use your preferred window manager to set it as desktop background"
-        fi
-      '')
-    ];
+    # Note: macOS setup script is included in home.packages above
 
     # Step 6: macOS auto-start (if requested)
     launchd.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.enable && pkgs.stdenv.isDarwin) {
