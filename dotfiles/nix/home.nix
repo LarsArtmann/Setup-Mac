@@ -9,46 +9,17 @@ in {
   # paths it should manage.
   home = {
     username = userConfig.defaultUser.username;
-    homeDirectory = userConfig.defaultUser.homeDir;
+    # homeDirectory will be determined automatically by Home Manager
     stateVersion = "25.05"; # Please read the comment before changing.
   };
 
   # Enable Home Manager to manage itself
   programs.home-manager.enable = true;
 
-  # Shell configuration with aliases migrated from environment.nix
-  programs.bash = {
-    enable = true;
-    shellAliases = {
-      l = "ls -laSh";
-      t = "tree -h -L 2 -C --dirsfirst";
-      nixup = "darwin-rebuild switch";
-      c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
-    };
-  };
-
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      l = "ls -laSh";
-      t = "tree -h -L 2 -C --dirsfirst";
-      nixup = "darwin-rebuild switch";
-      c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
-    };
-  };
-
-  programs.fish = {
-    enable = true;
-    shellAliases = {
-      l = "ls -laSh";
-      t = "tree -h -L 2 -C --dirsfirst";
-      nixup = "darwin-rebuild switch";
-      c2p = "code2prompt . --output=code2prompt.md --tokens";
-      diskStealer = "ncdu -x --exclude ${pathConfig.home}/Library/CloudStorage/GoogleDrive-lartyhd@gmail.com/";
-    };
-  };
+  # Shell configuration temporarily disabled to isolate Home Manager issues
+  # programs.bash.enable = false;
+  # programs.zsh.enable = false;
+  # programs.fish.enable = false;
 
   # Session variables that make sense to be user-specific (migrated from environment.nix)
   home.sessionVariables = {
