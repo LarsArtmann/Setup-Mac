@@ -3,44 +3,44 @@
 
   inputs = {
     # Use nixpkgs-unstable to match nix-darwin master
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "git+ssh://git@github.com/NixOS/nixpkgs?ref=nixpkgs-unstable";
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/master";
+      url = "git+ssh://git@github.com/LnL7/nix-darwin?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "git+ssh://git@github.com/nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nixpkgs-nh-dev = {
-      url = "github:viperML/nh/master";
+      url = "git+ssh://git@github.com/viperML/nh?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    nix-homebrew.url = "git+ssh://git@github.com/zhaofengli-wip/nix-homebrew";
     # Optional: Declarative tap management
     homebrew-core = {
-      url = "github:homebrew/homebrew-core";
+      url = "git+ssh://git@github.com/homebrew/homebrew-core";
       flake = false;
     };
     homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
+      url = "git+ssh://git@github.com/homebrew/homebrew-cask";
       flake = false;
     };
-    colmena.url = "github:zhaofengli/colmena";
-    mac-app-util.url = "github:hraban/mac-app-util";
+    colmena.url = "git+ssh://git@github.com/zhaofengli/colmena";
+    mac-app-util.url = "git+ssh://git@github.com/hraban/mac-app-util";
 
     # Nix User Repository for community packages
     nur = {
-      url = "github:nix-community/NUR";
+      url = "git+ssh://git@github.com/nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # treefmt-nix for unified code formatting
     treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
+      url = "git+ssh://git@github.com/numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -52,13 +52,13 @@
 
     # nix-ai-tools for AI development tools like crush - ENABLED for latest crush
     nix-ai-tools = {
-      url = "github:numtide/nix-ai-tools";
+      url = "git+ssh://git@github.com/numtide/nix-ai-tools";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # lassulus/wrappers for advanced software wrapping system
     wrappers = {
-      url = "github:lassulus/wrappers";
+      url = "git+ssh://git@github.com/lassulus/wrappers";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -183,5 +183,8 @@
           }
         ];
       };
+
+      # Expose crush from nix-ai-tools as flake output
+      packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages.${pkgs.system}.crush or null;
     };
 }

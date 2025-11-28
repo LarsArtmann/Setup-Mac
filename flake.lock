@@ -65,15 +65,15 @@
       "locked": {
         "lastModified": 1762034856,
         "narHash": "sha256-QVey3iP3UEoiFVXgypyjTvCrsIlA4ecx6Acaz5C8/PQ=",
-        "owner": "zhaofengli",
-        "repo": "colmena",
+        "ref": "refs/heads/main",
         "rev": "349b035a5027f23d88eeb3bc41085d7ee29f18ed",
-        "type": "github"
+        "revCount": 630,
+        "type": "git",
+        "url": "ssh://git@github.com/zhaofengli/colmena"
       },
       "original": {
-        "owner": "zhaofengli",
-        "repo": "colmena",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/zhaofengli/colmena"
       }
     },
     "flake-compat": {
@@ -172,49 +172,49 @@
         ]
       },
       "locked": {
-        "lastModified": 1764194569,
-        "narHash": "sha256-iUM9ktarEzThkayyZrzQ7oycPshAY2XRQqVKz0xX/L0=",
-        "owner": "nix-community",
-        "repo": "home-manager",
-        "rev": "9651819d75f6c7ffaf8a9227490ac704f29659f0",
-        "type": "github"
+        "lastModified": 1764304195,
+        "narHash": "sha256-bO7FN/bF6gG7TlZpKAZjO3VvfsLaPFkefeUfJJ7F/7w=",
+        "ref": "refs/heads/master",
+        "rev": "86ff0ef506c209bb397849706e85cc3a913cb577",
+        "revCount": 5839,
+        "type": "git",
+        "url": "ssh://git@github.com/nix-community/home-manager"
       },
       "original": {
-        "owner": "nix-community",
-        "repo": "home-manager",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/nix-community/home-manager"
       }
     },
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1764221847,
-        "narHash": "sha256-KO0TRjr1dfj3FYFfayLKC1tZ2TfRtfrgXAO1OCqTC4E=",
-        "owner": "homebrew",
-        "repo": "homebrew-cask",
-        "rev": "aa6169ec304db7a44c7b194c1099aa8886946cb4",
-        "type": "github"
+        "lastModified": 1764306097,
+        "narHash": "sha256-W52XOrbopGuyMr4Rl8GjerHC0Si8jPDoyFoMCRKWb78=",
+        "ref": "refs/heads/main",
+        "rev": "082b10aa9d1ae58d47b297c246ab6fdafae58fca",
+        "revCount": 368900,
+        "type": "git",
+        "url": "ssh://git@github.com/homebrew/homebrew-cask"
       },
       "original": {
-        "owner": "homebrew",
-        "repo": "homebrew-cask",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/homebrew/homebrew-cask"
       }
     },
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1764229716,
-        "narHash": "sha256-Ftqa5/CxX/k533cXkWDG9f1t6A5ULLyR8B0Y+q5yRCk=",
-        "owner": "homebrew",
-        "repo": "homebrew-core",
-        "rev": "91e81a51cf7ebeeb55198b1fbf609657fe9d915f",
-        "type": "github"
+        "lastModified": 1764300754,
+        "narHash": "sha256-HDI9VIAqHhgVTX4Vsird5p6y64Nup1PgsdtlHwByhis=",
+        "ref": "refs/heads/main",
+        "rev": "21d39ada4607555b55e8f002407fa56f906adf30",
+        "revCount": 721463,
+        "type": "git",
+        "url": "ssh://git@github.com/homebrew/homebrew-core"
       },
       "original": {
-        "owner": "homebrew",
-        "repo": "homebrew-core",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/homebrew/homebrew-core"
       }
     },
     "mac-app-util": {
@@ -229,15 +229,15 @@
       "locked": {
         "lastModified": 1756057867,
         "narHash": "sha256-ziR5eQGqRWhW8tf8r0TIplaqNt+HXu1G1X41LUr4IYo=",
-        "owner": "hraban",
-        "repo": "mac-app-util",
+        "ref": "refs/heads/master",
         "rev": "8414fa1e2cb775b17793104a9095aabeeada63ef",
-        "type": "github"
+        "revCount": 83,
+        "type": "git",
+        "url": "ssh://git@github.com/hraban/mac-app-util"
       },
       "original": {
-        "owner": "hraban",
-        "repo": "mac-app-util",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/hraban/mac-app-util"
       }
     },
     "nix-ai-tools": {
@@ -249,17 +249,17 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1764212628,
-        "narHash": "sha256-e5pt4pq3M2DANUGA1Uz+SXzJrNI8JNB9JnlyYQCktCg=",
-        "owner": "numtide",
-        "repo": "nix-ai-tools",
-        "rev": "e28400d56889815c7b47ee435bbf9d2ed87d3f31",
-        "type": "github"
+        "lastModified": 1764297690,
+        "narHash": "sha256-V784bD26OaYzDPuIUoXqxv7njM+ML9UM/J3rkEqyw8U=",
+        "ref": "refs/heads/main",
+        "rev": "5db8b4f9ffba05c6daf3bb06a3a85f89aef79735",
+        "revCount": 1738,
+        "type": "git",
+        "url": "ssh://git@github.com/numtide/nix-ai-tools"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "nix-ai-tools",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/numtide/nix-ai-tools"
       }
     },
     "nix-darwin": {
@@ -271,16 +271,16 @@
       "locked": {
         "lastModified": 1764161084,
         "narHash": "sha256-HN84sByg9FhJnojkGGDSrcjcbeioFWoNXfuyYfJ1kBE=",
-        "owner": "nix-darwin",
-        "repo": "nix-darwin",
+        "ref": "master",
         "rev": "e95de00a471d07435e0527ff4db092c84998698e",
-        "type": "github"
+        "revCount": 2287,
+        "type": "git",
+        "url": "ssh://git@github.com/LnL7/nix-darwin"
       },
       "original": {
-        "owner": "nix-darwin",
         "ref": "master",
-        "repo": "nix-darwin",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/LnL7/nix-darwin"
       }
     },
     "nix-github-actions": {
@@ -311,15 +311,15 @@
       "locked": {
         "lastModified": 1761927470,
         "narHash": "sha256-KsFDGRGD8j1R6TvJ4HkebKsh3HXLY0XazanLrhO3wqE=",
-        "owner": "zhaofengli-wip",
-        "repo": "nix-homebrew",
+        "ref": "refs/heads/main",
         "rev": "3cae36b3a17b09a66435291619dce8cf2c4728ca",
-        "type": "github"
+        "revCount": 109,
+        "type": "git",
+        "url": "ssh://git@github.com/zhaofengli-wip/nix-homebrew"
       },
       "original": {
-        "owner": "zhaofengli-wip",
-        "repo": "nix-homebrew",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/zhaofengli-wip/nix-homebrew"
       }
     },
     "nixpkgs": {
@@ -345,18 +345,18 @@
         ]
       },
       "locked": {
-        "lastModified": 1764040987,
-        "narHash": "sha256-wfblFbfAKtddjUAkGq2dOMX2o0ruIS+HZ5a8EfokZl4=",
-        "owner": "viperML",
-        "repo": "nh",
-        "rev": "47374db9bc89fabec665daf0c0903d400c10ef84",
-        "type": "github"
+        "lastModified": 1764241545,
+        "narHash": "sha256-fLyNx9BhG1H4GclsEyVuctHdVPfb9Vle461jgo/EuJo=",
+        "ref": "master",
+        "rev": "76db5466c8dd57a53ca557dbe3ea7dbd22c07f00",
+        "revCount": 853,
+        "type": "git",
+        "url": "ssh://git@github.com/viperML/nh"
       },
       "original": {
-        "owner": "viperML",
         "ref": "master",
-        "repo": "nh",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/viperML/nh"
       }
     },
     "nixpkgs_2": {
@@ -393,18 +393,18 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1764167966,
-        "narHash": "sha256-nXv6xb7cq+XpjBYIjWEGTLCqQetxJu6zvVlrqHMsCOA=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "5c46f3bd98147c8d82366df95bbef2cab3a967ea",
-        "type": "github"
+        "lastModified": 1764230294,
+        "narHash": "sha256-Z63xl5Scj3Y/zRBPAWq1eT68n2wBWGCIEF4waZ0bQBE=",
+        "ref": "nixpkgs-unstable",
+        "rev": "0d59e0290eefe0f12512043842d7096c4070f30e",
+        "revCount": 903204,
+        "type": "git",
+        "url": "ssh://git@github.com/NixOS/nixpkgs"
       },
       "original": {
-        "owner": "NixOS",
         "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/NixOS/nixpkgs"
       }
     },
     "nur": {
@@ -415,17 +415,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1764229608,
-        "narHash": "sha256-6yeBa80jFWzz+wvdsxRB7O/eSjskkv+dYn1yy8z5eSU=",
-        "owner": "nix-community",
-        "repo": "NUR",
-        "rev": "c88b4122f4f10b3c05f440928715936ab8515682",
-        "type": "github"
+        "lastModified": 1764313051,
+        "narHash": "sha256-rVp6akomez+u4jDFoBbtnvk1o3i1Zb65MgoLdf99UVA=",
+        "ref": "refs/heads/main",
+        "rev": "146f7518bbfbbf7dbe766efbfbdd4092d5ca4646",
+        "revCount": 36669,
+        "type": "git",
+        "url": "ssh://git@github.com/nix-community/NUR"
       },
       "original": {
-        "owner": "nix-community",
-        "repo": "NUR",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/nix-community/NUR"
       }
     },
     "root": {
@@ -539,15 +539,15 @@
       "locked": {
         "lastModified": 1762938485,
         "narHash": "sha256-AlEObg0syDl+Spi4LsZIBrjw+snSVU4T8MOeuZJUJjM=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
+        "ref": "refs/heads/main",
         "rev": "5b4ee75aeefd1e2d5a1cc43cf6ba65eba75e83e4",
-        "type": "github"
+        "revCount": 505,
+        "type": "git",
+        "url": "ssh://git@github.com/numtide/treefmt-nix"
       },
       "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/numtide/treefmt-nix"
       }
     },
     "wrappers": {
@@ -557,17 +557,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1763526891,
-        "narHash": "sha256-7BJv2Sg4XunqYpUgT1ktw2cXCRz7J7UeTY24lFkIBeo=",
-        "owner": "lassulus",
-        "repo": "wrappers",
-        "rev": "58bc6dbd30d885d23d812b3c519c6768b72aa232",
-        "type": "github"
+        "lastModified": 1764236287,
+        "narHash": "sha256-9EYObPW9dt4ibaykB8g2hHGdFspzUBGudNumQhlRWxU=",
+        "ref": "refs/heads/main",
+        "rev": "3b03445309c8133a6880eb465cf2bd5c10e2bcca",
+        "revCount": 102,
+        "type": "git",
+        "url": "ssh://git@github.com/lassulus/wrappers"
       },
       "original": {
-        "owner": "lassulus",
-        "repo": "wrappers",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/lassulus/wrappers"
       }
     }
   },
