@@ -171,16 +171,29 @@
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
 
-          # Home Manager integration - re-enabled for user configuration
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.larsartmann = ./dotfiles/nix/home.nix;
-            };
-          }
+          # Home Manager integration - TEMPORARILY DISABLED for debugging
+          # home-manager.darwinModules.home-manager
+          # {
+          #   home-manager = {
+          #     useGlobalPkgs = true;
+          #     useUserPackages = true;
+          #     extraSpecialArgs = {
+          #       inherit inputs;
+          #       inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+          #       inherit UserConfig PathConfig State Validation;
+          #     };
+          #     users.larsartmann = {
+          #       home = {
+          #         username = "larsartmann";
+          #         homeDirectory = "/Users/larsartmann";
+          #         stateVersion = "25.05";
+          #       };
+          #       imports = [
+          #         ./dotfiles/nix/home.nix
+          #       ];
+          #     };
+          #   };
+          # }
         ];
       };
 
