@@ -5,14 +5,6 @@ let
   pathConfig = (import ./core/PathConfig.nix { inherit lib; }) userConfig.defaultUser.username;
 
 in {
-  # Home Manager needs a bit of information about you and the
-  # paths it should manage.
-  home = {
-    username = userConfig.defaultUser.username;
-    homeDirectory = userConfig.defaultUser.homeDir;  # Explicitly set from UserConfig
-    stateVersion = "25.05"; # Please read the comment before changing.
-  };
-
   # Enable Home Manager to manage itself
   programs.home-manager.enable = true;
 
