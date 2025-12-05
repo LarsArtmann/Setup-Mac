@@ -199,5 +199,17 @@
 
       # Expose crush from nix-ai-tools as flake output
       packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages.${pkgs.system}.crush or null;
+
+      # NixOS Configuration for GMKtec AMD Ryzen™ AI Max+ 395
+      # Build using:
+      # $ nixos-rebuild switch --flake .#evo-x2
+      nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit inputs; };
+        modules = [
+          ./dotfiles/nixos/configuration.nix
+          # Optional: Add home-manager here if you want to manage home dir with it on NixOS too
+        ];
+      };
     };
 }

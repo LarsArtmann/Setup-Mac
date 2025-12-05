@@ -25,6 +25,8 @@ let
 
 in
 {
+  imports = [ ../common/packages.nix ];
+
   # Enhanced environment configuration with validation
   assertions = [
     {
@@ -116,41 +118,7 @@ in
     # List packages installed in system profile. To search by name, run:
     # $ nix-env -qaP | grep <PACKAGE_NAME>
     systemPackages = with pkgs; [
-        # Essential tools only - for minimal working configuration
-        git
-        vim
-        fish
-        starship
-        curl
-        wget
-        tree
-        ripgrep
-        fd
-        eza
-        bat
-        jq
-        yq-go
-        just
-
-        # Modern CLI productivity tools
-        glow  # Render markdown on the CLI, with pizzazz
-        bun    # Incredibly fast JavaScript runtime, bundler, transpiler and package manager
-        git-town  # High-level Git workflow management
-
-        # Nix helper tools
-        nh
-
-        # Go development tools
-        golangci-lint
-        go
-        gopls
-
-        # Security and development tools
-        gitleaks
-        pre-commit
-
-        # AI development tools from nix-ai-tools
-        crush
+        # Note: Core development tools are imported from ../common/packages.nix
 
         # Terminal applications
         iterm2
@@ -158,28 +126,10 @@ in
         # Browsers
         google-chrome
 
-        # Shell completion and performance
-        carapace
-
-        # Go binaries from user environment
-        # Note: Go tools should be managed via systemPackages for proper PATH integration
-
-        # Modern CLI alternatives for productivity
-        bottom
-        procs
-        sd
-        dust
-
         # GNU utilities for macOS compatibility
         coreutils
         findutils
         gnused
-
-        # SSH client for secure connections
-        openssh
-
-        # Graph visualization tools
-        graphviz
     ];
   };
 }
