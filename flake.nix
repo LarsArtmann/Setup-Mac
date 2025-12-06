@@ -77,10 +77,10 @@
       # Import lib for ghost system dependencies
       lib = nixpkgs.lib;
       pkgs = import nixpkgs { system = "aarch64-darwin"; stdenv.hostPlatform.system = "aarch64-darwin"; };
-      
+
       # Cross-compilation packages for x86_64-linux
-      pkgsCross = import nixpkgs { 
-        system = "aarch64-darwin"; 
+      pkgsCross = import nixpkgs {
+        system = "aarch64-darwin";
         crossSystem = "x86_64-linux";
         config.allowUnsupportedSystem = true;
       };
