@@ -187,7 +187,7 @@
                 home = {
                   username = "larsartmann";
                   homeDirectory = "/Users/larsartmann";
-                  stateVersion = "25.05";
+                  stateVersion = "25.11";
                 };
                 imports = [
                   ./dotfiles/nix/home.nix
@@ -229,7 +229,7 @@
                 home = {
                   username = "lars";
                   homeDirectory = "/home/lars";
-                  stateVersion = "25.05";
+                  stateVersion = "25.11";
                 };
                 imports = [
                   ./dotfiles/nixos/home.nix
