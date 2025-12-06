@@ -20,6 +20,9 @@
   networking.hostName = "evo-x2"; # Machine name
   networking.networkmanager.enable = true;
 
+  # Enable OpenSSH daemon (optional, for remote management)
+  services.openssh.enable = true;
+
   # Set your time zone.
   time.timeZone = "Europe/Berlin"; # Adjust as needed
 
@@ -69,6 +72,7 @@
     isNormalUser = true;
     description = "Lars";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
+    # INFO: Set password manually with `passwd lars` after installation
     shell = pkgs.fish;
     packages = with pkgs; [
       firefox
