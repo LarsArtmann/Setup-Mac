@@ -77,6 +77,13 @@
       # Import lib for ghost system dependencies
       lib = nixpkgs.lib;
       pkgs = import nixpkgs { system = "aarch64-darwin"; stdenv.hostPlatform.system = "aarch64-darwin"; };
+      
+      # Cross-compilation packages for x86_64-linux
+      pkgsCross = import nixpkgs { 
+        system = "aarch64-darwin"; 
+        crossSystem = "x86_64-linux";
+        config.allowUnsupportedSystem = true;
+      };
 
       # GHOST SYSTEMS INTEGRATION - Phase 1: Type Safety & Validation
       # Pure libraries (no dependencies) - imported first
@@ -203,9 +210,10 @@
 
       # NixOS Configuration for GMKtec AMD Ryzen™ AI Max+ 395
       # Build using:
-      # $ nixos-rebuild switch --flake .#evo-x2
+      # $ nix build .#nixosConfigurations.evo-x2.config.system.build.toplevel
       nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        pkgs = pkgsCross;
         specialArgs = {
           inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
           # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
