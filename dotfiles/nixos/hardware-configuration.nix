@@ -10,8 +10,11 @@
 
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  boot.kernelModules = [ "kvm-amd" "mt7925e" "r8125" ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ r8125 ];
+
+  # Enable non-free firmware for WiFi/Bluetooth
+  hardware.enableRedistributableFirmware = true;
 
   fileSystems."/" =
     { device = "/dev/disk/by-label/nixos";
