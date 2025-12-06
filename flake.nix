@@ -229,7 +229,7 @@
                 home = {
                   username = "lars";
                   homeDirectory = "/home/lars";
-                  stateVersion = "24.05";
+                  stateVersion = "25.05";
                 };
                 imports = [
                   ./dotfiles/nixos/home.nix
