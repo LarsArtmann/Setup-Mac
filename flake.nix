@@ -76,7 +76,7 @@
 
       # Import lib for ghost system dependencies
       lib = nixpkgs.lib;
-      pkgs = import nixpkgs { system = "aarch64-darwin"; };
+      pkgs = import nixpkgs { system = "aarch64-darwin"; stdenv.hostPlatform.system = "aarch64-darwin"; };
 
       # GHOST SYSTEMS INTEGRATION - Phase 1: Type Safety & Validation
       # Pure libraries (no dependencies) - imported first
@@ -198,7 +198,7 @@
       };
 
       # Expose crush from nix-ai-tools as flake output
-      packages.${pkgs.system}.crush = inputs.nix-ai-tools.packages.${pkgs.system}.crush or null;
+      packages.${pkgs.stdenv.hostPlatform.system}.crush = inputs.nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system}.crush or null;
 
       # NixOS Configuration for GMKtec AMD Ryzen™ AI Max+ 395
       # Build using:
