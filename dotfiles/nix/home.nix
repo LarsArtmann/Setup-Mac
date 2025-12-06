@@ -1,45 +1,39 @@
-{ config, pkgs, lib, ... }:
-let
-  # Import centralized user and path configuration
-  userConfig = (import ./core/UserConfig.nix { inherit lib; });
-  pathConfig = (import ./core/PathConfig.nix { inherit lib; }) userConfig.defaultUser.username;
+{ config, pkgs, lib, TypeAssertions, ConfigAssertions, ModuleAssertions, Types, UserConfig, PathConfig, State, Validation, ... }:
 
-in {
-  # Enable Home Manager to manage itself
-  programs.home-manager.enable = true;
+{
+  imports = [
+    ../common/home.nix
+    ./modules/ghost-wallpaper.nix
+  ];
 
-  # Shell configuration temporarily disabled to isolate Home Manager issues
-  # programs.bash.enable = false;
-  # programs.zsh.enable = false;
-  # programs.fish.enable = false;
-
-  # Session variables that make sense to be user-specific (migrated from environment.nix)
+  # macOS-specific session variables
   home.sessionVariables = {
-    EDITOR = "nano";
-    LANG = "en_GB.UTF-8";
+    LANG = lib.mkForce "en_GB.UTF-8"; # Keep UK English for macOS
   };
 
-  # Session path additions (user-specific paths)
-   home.sessionPath = [
+  # macOS-specific path additions
+  home.sessionPath = [
     "$HOME/.local/bin/crush"
-
-    "$HOME/.local/bin"
-    "$HOME/go/bin"
-    "$HOME/.bun/bin"
     "$HOME/.turso"
     "$HOME/.orbstack/bin"
     "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
   ];
 
-  # Import custom modules
-  imports = [
-    ./modules/ghost-wallpaper.nix
-  ];
-
-  # Enable Ghost Btop Wallpaper
+  # Enable Ghost Btop Wallpaper (macOS specific for now?)
   programs.ghost-btop-wallpaper = {
     enable = true;
     updateRate = 2000;
     backgroundOpacity = "0.0";
   };
+
+  # Ghost Systems integration
+  # Note: State.nix and other Ghost System modules are available via specialArgs
+
+  # Basic assertion to verify Ghost Systems injection
+  assertions = [
+    {
+      assertion = TypeAssertions != null;
+      message = "Ghost Systems TypeAssertions not injected!";
+    }
+  ];
 }

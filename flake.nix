@@ -171,29 +171,30 @@
           # mac-app-util for Spotlight integration
           mac-app-util.darwinModules.default
 
-          # Home Manager integration - TEMPORARILY DISABLED for debugging
-          # home-manager.darwinModules.home-manager
-          # {
-          #   home-manager = {
-          #     useGlobalPkgs = true;
-          #     useUserPackages = true;
-          #     extraSpecialArgs = {
-          #       inherit inputs;
-          #       inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-          #       inherit UserConfig PathConfig State Validation;
-          #     };
-          #     users.larsartmann = {
-          #       home = {
-          #         username = "larsartmann";
-          #         homeDirectory = "/Users/larsartmann";
-          #         stateVersion = "25.05";
-          #       };
-          #       imports = [
-          #         ./dotfiles/nix/home.nix
-          #       ];
-          #     };
-          #   };
-          # }
+          # Home Manager integration - ENABLED
+          home-manager.darwinModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = {
+                inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
+                # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
+                inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+                inherit UserConfig PathConfig State Validation;
+              };
+              users.larsartmann = {
+                home = {
+                  username = "larsartmann";
+                  homeDirectory = "/Users/larsartmann";
+                  stateVersion = "25.05";
+                };
+                imports = [
+                  ./dotfiles/nix/home.nix
+                ];
+              };
+            };
+          }
         ];
       };
 
@@ -205,10 +206,37 @@
       # $ nixos-rebuild switch --flake .#evo-x2
       nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit inputs; };
+        specialArgs = {
+          inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
+          # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
+          inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+          inherit UserConfig PathConfig State Validation;
+        };
         modules = [
           ./dotfiles/nixos/configuration.nix
-          # Optional: Add home-manager here if you want to manage home dir with it on NixOS too
+          # Home Manager integration
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              extraSpecialArgs = {
+                inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
+                inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+                inherit UserConfig PathConfig State Validation;
+              };
+              users.lars = {
+                home = {
+                  username = "lars";
+                  homeDirectory = "/home/lars";
+                  stateVersion = "24.05";
+                };
+                imports = [
+                  ./dotfiles/nixos/home.nix
+                ];
+              };
+            };
+          }
         ];
       };
     };

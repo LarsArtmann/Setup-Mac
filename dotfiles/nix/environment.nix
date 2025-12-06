@@ -125,6 +125,7 @@ in
 
         # Browsers
         google-chrome
+        helium
 
         # GNU utilities for macOS compatibility
         coreutils
