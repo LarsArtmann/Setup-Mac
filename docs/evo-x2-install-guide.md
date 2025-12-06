@@ -5,8 +5,8 @@ This guide describes how to install the `evo-x2` NixOS configuration onto the GM
 ## Prerequisites
 
 1.  **USB Stick**: Minimum 4GB.
-2.  **NixOS ISO**: Download the [latest graphical ISO (GNOME recommended)](https://nixos.org/download.html#nixos-iso).
-    - We use the `unstable` channel in the flake, so a recent ISO is preferred.
+2.  **NixOS ISO**: **CRITICAL**: Use the [Latest Unstable GNOME ISO](https://channels.nixos.org/nixos-unstable/latest-nixos-gnome-x86_64-linux.iso).
+    - **Why?** The EVO-X2 requires a very recent Linux kernel (6.10+) for WiFi/Ethernet support. Stable 24.05 (Kernel 6.6) may NOT work.
 3.  **Network**: Wired Ethernet (preferred) or WiFi credentials.
 
 ## Step 1: Create Bootable USB
