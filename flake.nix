@@ -78,10 +78,9 @@
       lib = nixpkgs.lib;
       pkgs = import nixpkgs { system = "aarch64-darwin"; stdenv.hostPlatform.system = "aarch64-darwin"; };
 
-      # Cross-compilation packages for x86_64-linux
+      # Cross-compilation packages for x86_64-linux - FIXED PROPERLY
       pkgsCross = import nixpkgs {
-        system = "aarch64-darwin";
-        crossSystem = "x86_64-linux";
+        system = "x86_64-linux";
         config.allowUnsupportedSystem = true;
         config.allowUnfree = true;
       };
@@ -219,10 +218,36 @@
           inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
           # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
           inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-          inherit UserConfig PathConfig State Validation;
+          inherit UserConfig PathConfig State;
+          # Validation removed - has Darwin-specific code
+          # inherit Validation;
         };
         modules = [
+          # Apply custom packages overlay
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
+
+          # Core system configuration
+          base
+
+          # Essential system packages - NO platform contamination
+          ({ pkgs, ... }: {
+            environment.systemPackages = with pkgs; [
+              # Essential tools
+              git vim fish starship curl wget tree ripgrep fd eza bat jq yq-go just
+              # Security tools
+              gitleaks pre-commit openssh
+              # Development tools
+              go gopls golangci-lint bun nh
+              # Monitoring tools
+              bottom procs
+              # Utilities
+              sd dust coreutils findutils gnused graphviz
+            ];
+          })
+
+          # NixOS system configuration
           ./dotfiles/nixos/configuration.nix
+
           # Home Manager integration
           home-manager.nixosModules.home-manager
           {
@@ -232,7 +257,7 @@
               extraSpecialArgs = {
                 inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
                 inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-                inherit UserConfig PathConfig State Validation;
+                inherit UserConfig PathConfig State;
               };
               users.lars = {
                 home = {
