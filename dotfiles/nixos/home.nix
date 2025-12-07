@@ -3,6 +3,7 @@
 {
   imports = [
     ../common/home.nix
+    ../../platforms/nixos/desktop/hyprland.nix
   ];
 
   # NixOS-specific session variables
@@ -17,14 +18,9 @@
   home.packages = with pkgs; [
     # GUI Tools
     pavucontrol # Audio control
-    wl-clipboard # Clipboard
-    wofi # Launcher (Existing)
-    rofi # Launcher (Requested substitute - wayland merged)
-    waybar # Status bar
-    dunst # Notification daemon
+    rofi # Launcher (Secondary)
 
     # System Tools
-    libnotify
     xdg-utils
   ];
 

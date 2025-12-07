@@ -151,11 +151,7 @@
     ];
     packages = with pkgs; [
       firefox
-      # Add desktop-specific packages here (that you don't want on Mac)
-      pavucontrol # Audio control
-      wl-clipboard # Clipboard for Wayland
-      wofi # Application launcher
-      waybar # Status bar
+      # Desktop packages are now managed via Home Manager (see platforms/nixos/desktop/hyprland.nix)
     ];
   };
 
