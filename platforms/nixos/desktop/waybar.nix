@@ -105,13 +105,15 @@
         border: none;
         border-radius: 0;
         font-family: "JetBrainsMono Nerd Font";
-        font-size: 13px;
+        font-size: 16px;
         min-height: 0;
+        margin: 8px 0px;
       }
 
       window#waybar {
         background: rgba(43, 48, 59, 0.95);
         color: white;
+        font-size: 16px;
       }
 
       #workspaces button {
