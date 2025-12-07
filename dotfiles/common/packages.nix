@@ -17,6 +17,7 @@
     just
 
     # Modern CLI productivity tools
+    fzf
     glow
     bun
     git-town
