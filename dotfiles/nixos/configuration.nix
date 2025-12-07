@@ -87,8 +87,7 @@
   # Enable Fish shell system-wide
   programs.fish.enable = true;
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+
 
   # AMD GPU Support (Critical for Ryzen AI Max+)
   services.xserver.videoDrivers = [ "amdgpu" ];

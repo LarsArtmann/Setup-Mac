@@ -83,6 +83,7 @@
         system = "aarch64-darwin";
         crossSystem = "x86_64-linux";
         config.allowUnsupportedSystem = true;
+        config.allowUnfree = true;
       };
 
       # GHOST SYSTEMS INTEGRATION - Phase 1: Type Safety & Validation
