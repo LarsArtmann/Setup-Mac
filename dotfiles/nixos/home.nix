@@ -63,7 +63,10 @@
       aw-watcher-afk = {
         package = pkgs.activitywatch;
       };
-      # Window watcher is omitted to disable it (incompatible with Wayland/Hyprland)
+      # Enable Wayland window watcher (compatible with Hyprland)
+      aw-watcher-window-wayland = {
+        package = pkgs.aw-watcher-window-wayland;
+      };
     };
   };
 
