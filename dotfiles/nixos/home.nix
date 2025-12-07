@@ -57,7 +57,14 @@
   # ActivityWatch (Time Tracking)
   services.activitywatch = {
     enable = true;
-    package = pkgs.activitywatch; # Explicitly set package to ensure it exists
+    package = pkgs.activitywatch;
+    watchers = {
+      # Enable AFK watcher
+      aw-watcher-afk = {
+        package = pkgs.activitywatch;
+      };
+      # Window watcher is omitted to disable it (incompatible with Wayland/Hyprland)
+    };
   };
 
   # XDG Directories (Linux specific)
