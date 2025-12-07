@@ -61,9 +61,21 @@
       url = "git+ssh://git@github.com/lassulus/wrappers";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Hyprland for cutting edge window management
+    hyprland = {
+      url = "git+ssh://git@github.com/hyprwm/Hyprland";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Hyprland Plugins
+    hyprland-plugins = {
+      url = "git+ssh://git@github.com/hyprwm/hyprland-plugins";
+      inputs.hyprland.follows = "hyprland";
+    };
   };
 
-  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, wrappers, ... }@inputs:
+  outputs = { self, nix-darwin, nixpkgs, nix-homebrew, nixpkgs-nh-dev, home-manager, mac-app-util, nur, treefmt-nix, nix-ai-tools, wrappers, hyprland, hyprland-plugins, ... }@inputs:
     let
       base = {
         system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -72,6 +84,12 @@
       # Custom packages overlay (2025 best practice: modular)
       heliumOverlay = final: prev: {
         helium = final.callPackage ./dotfiles/nix/packages/helium.nix { };
+      };
+
+      # Hyprland overlay to ensure lock-step versions
+      hyprlandOverlay = final: prev: {
+        hyprland = hyprland.packages.${prev.system}.hyprland;
+        hyprlandPlugins = hyprland-plugins.packages.${prev.system};
       };
 
       # Import lib for ghost system dependencies
@@ -224,7 +242,7 @@
         };
         modules = [
           # Apply custom packages overlay
-          ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay ]; })
+          ({ config, pkgs, ... }: { nixpkgs.overlays = [ heliumOverlay hyprlandOverlay ]; })
 
           # Core system configuration
           base

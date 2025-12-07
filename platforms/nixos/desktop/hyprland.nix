@@ -1,6 +1,10 @@
 { pkgs, ... }:
 
 {
+  imports = [
+    ./waybar.nix
+  ];
+
   # Enable Hyprland via Home Manager
   wayland.windowManager.hyprland = {
     enable = true;
