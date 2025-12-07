@@ -24,8 +24,64 @@
   networking.hostName = "evo-x2"; # Machine name
   networking.networkmanager.enable = true;
 
-  # Enable OpenSSH daemon (optional, for remote management)
-  services.openssh.enable = true;
+  # Enable OpenSSH daemon with hardening
+  services.openssh = {
+    enable = true;
+    settings = {
+      # Basic hardening
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+      PermitEmptyPasswords = false;
+
+      # Key-based authentication only
+      PubkeyAuthentication = true;
+      AuthorizedKeysFile = ".ssh/authorized_keys";
+
+      # Security settings
+      Protocol = 2;
+      X11Forwarding = false;
+      AllowTcpForwarding = false;
+      PermitTunnel = false;
+
+      # Access control
+      AllowUsers = [ "lars" ]; # Only allow lars user
+
+      # Connection limits
+      MaxAuthTries = 3;
+      MaxSessions = 2;
+      ClientAliveInterval = 300; # 5 minutes
+      ClientAliveCountMax = 2;
+
+      # Strong cryptographic settings
+      Ciphers = [
+        "chacha20-poly1305@openssh.com"
+        "aes256-gcm@openssh.com"
+        "aes128-gcm@openssh.com"
+        "aes256-ctr"
+        "aes192-ctr"
+        "aes128-ctr"
+      ];
+
+
+
+      KexAlgorithms = [
+        "curve25519-sha256@libssh.org"
+        "diffie-hellman-group16-sha512"
+        "diffie-hellman-group18-sha512"
+        "diffie-hellman-group14-sha256"
+      ];
+
+      # Logging
+      LogLevel = "VERBOSE";
+
+      # Banner
+      Banner = "/etc/ssh/banner";
+    };
+
+    # Enable fail2ban integration for SSH protection
+    openFirewall = true;
+    ports = [ 22 ];
+  };
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin"; # Adjust as needed
@@ -36,9 +92,14 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the GNOME Desktop Environment (as backup/login manager)
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
+  # Enable SDDM (Simple Desktop Display Manager) with Wayland support
+  # Replaces heavier GDM/GNOME setup
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+  # services.displayManager.gdm.enable = true;
+  # services.desktopManager.gnome.enable = true;
 
   # Enable Hyprland
   programs.hyprland = {
@@ -71,13 +132,23 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
+  # SSH Banner
+  environment.etc."ssh/banner".source = ./ssh-banner;
+
   # User account
   users.users.lars = {
     isNormalUser = true;
     description = "Lars";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
     # INFO: Set password manually with `passwd lars` after installation
+    # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
     shell = pkgs.fish;
+    openssh.authorizedKeys.keys = [
+      # IMPORTANT: Replace this placeholder with your actual SSH public key!
+      # You can add multiple keys - one per line
+      # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-comment"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPlbcK0pvybFGNvQWDVxHmMZkjUHXa9JcnPcKWSZWE8 lars@MacBook-Air.local"
+    ];
     packages = with pkgs; [
       firefox
       # Add desktop-specific packages here (that you don't want on Mac)
