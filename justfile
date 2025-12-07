@@ -906,3 +906,47 @@ deployment-verify:
 health-dashboard:
     @echo "🏥 Launching comprehensive health dashboard..."
     @./scripts/health-dashboard.sh
+
+# Tmux configuration and session management
+tmux-setup:
+    @echo "🔧 Setting up tmux configuration..."
+    sudo nixos-rebuild switch --flake .#evo-x2 || darwin-rebuild switch --flake .#Lars-MacBook-Air
+    @echo "✅ Tmux configuration applied"
+
+tmux-dev:
+    @echo "🚀 Starting Setup-Mac development session..."
+    tmux has-session -t Setup-Mac && tmux attach-session -t Setup-Mac || \
+    tmux new-session -d -s Setup-Mac -n just "cd ~/Desktop/Setup-Mac && just" \; \
+                   new-window -d -n nvim "cd ~/Desktop/Setup-Mac && nvim" \; \
+                   new-window -d -n shell "cd ~/Desktop/Setup-Mac" \; \
+                   select-window -t 0
+    tmux attach-session -t Setup-Mac
+
+tmux-attach:
+    @echo "📋 Attaching to Setup-Mac session..."
+    tmux attach-session -t Setup-Mac || tmux new-session -s Setup-Mac
+
+tmux-sessions:
+    @echo "📋 Active tmux sessions:"
+    @tmux list-sessions || echo "No active sessions"
+
+tmux-kill:
+    @echo "💀 Killing all tmux sessions..."
+    tmux kill-server
+    @echo "✅ All tmux sessions killed"
+
+tmux-save:
+    @echo "💾 Saving tmux sessions..."
+    tmux run-shell "tmux save-session"
+    @echo "✅ Tmux sessions saved"
+
+tmux-restore:
+    @echo "🔄 Restoring tmux sessions..."
+    tmux run-shell "tmux restore-session"
+    @echo "✅ Tmux sessions restored"
+
+tmux-status:
+    @echo "📊 Tmux status:"
+    @echo "  Server: $(tmux server-info 2>/dev/null | head -1 || echo 'Not running')"
+    @echo "  Sessions: $(tmux list-sessions 2>/dev/null | wc -l || echo '0')"
+    @echo "  Config: $HOME/.config/tmux/tmux.conf"

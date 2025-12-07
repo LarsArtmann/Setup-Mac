@@ -3,6 +3,7 @@
 {
   imports = [
     ../common/home.nix
+    ../programs/tmux.nix
     ./modules/ghost-wallpaper.nix
   ];
 
