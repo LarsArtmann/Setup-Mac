@@ -259,11 +259,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1765082550,
-        "narHash": "sha256-EF08uH714D8fV4Em/6S7XjYPp9/CHORJPP65DMle36w=",
+        "lastModified": 1765148614,
+        "narHash": "sha256-76OWOXgfRhEC2JmE+KbxRg5Zap2A7+h10LseyIQK1Ok=",
         "ref": "refs/heads/main",
-        "rev": "26e8b3d52619acfa3509c7107dd1791798a068ac",
-        "revCount": 371356,
+        "rev": "fec79d2714e718f81391ca48f5655e3a813eafa4",
+        "revCount": 371448,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-cask"
       },
@@ -275,11 +275,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1765081701,
-        "narHash": "sha256-Q3T0o/kCKsTvqkS3PbkbqhkOGjmVHOYb1pmSHXiiIrU=",
+        "lastModified": 1765148795,
+        "narHash": "sha256-egd9SToy2wF1ksq8JhfdbmN5D4iADM8f5vWiQkCv5ss=",
         "ref": "refs/heads/main",
-        "rev": "7a0bf798e88a14e24a4b9d008f8ee6f96b200a89",
-        "revCount": 725306,
+        "rev": "a9f969c41caf61936508386c3e491186d8af505b",
+        "revCount": 725491,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-core"
       },
@@ -671,11 +671,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1765075548,
-        "narHash": "sha256-lkNykREVQDlvZg5zLwFG/jTcKJTapX5dg64D84cN7m8=",
+        "lastModified": 1765146731,
+        "narHash": "sha256-VHwljC6L2nmDigts9Lu0dZyhogGvAVNtlFutF/PQhz8=",
         "ref": "refs/heads/main",
-        "rev": "22f4a113cde2d4212480114e004cfe1d7a92e6b8",
-        "revCount": 1955,
+        "rev": "b6f6693bc2b970af3d2220845d13009c63faad2f",
+        "revCount": 1964,
         "type": "git",
         "url": "ssh://git@github.com/numtide/nix-ai-tools"
       },
@@ -837,11 +837,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765080463,
-        "narHash": "sha256-soihKvEkiYrhaOpWvnwt8L5mSSsCddQDUSuHQAZNpDg=",
+        "lastModified": 1765147601,
+        "narHash": "sha256-9qGarRFWYk4IeQ/tvMlWh8cyWvc9EorZ8Kc12qn57cI=",
         "ref": "refs/heads/main",
-        "rev": "5d0a66ab861f884c0ba585e654534e9c77430dba",
-        "revCount": 36994,
+        "rev": "65b4324762922ac4eefcf4eefafa6798ef77912c",
+        "revCount": 37015,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/NUR"
       },
