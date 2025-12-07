@@ -54,6 +54,12 @@
     };
   };
 
+  # ActivityWatch (Time Tracking)
+  services.activitywatch = {
+    enable = true;
+    package = pkgs.activitywatch; # Explicitly set package to ensure it exists
+  };
+
   # XDG Directories (Linux specific)
   xdg.enable = true;
   xdg.userDirs = {
