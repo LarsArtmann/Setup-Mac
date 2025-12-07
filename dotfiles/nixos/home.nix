@@ -18,13 +18,41 @@
     # GUI Tools
     pavucontrol # Audio control
     wl-clipboard # Clipboard
-    wofi # Launcher
+    wofi # Launcher (Existing)
+    rofi # Launcher (Requested substitute - wayland merged)
     waybar # Status bar
+    dunst # Notification daemon
 
     # System Tools
     libnotify
     xdg-utils
   ];
+
+  # Fish Shell Configuration
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      l = "ls -laSh";
+      t = "tree -h -L 2 -C --dirsfirst";
+      # NixOS specific aliases
+      nixup = "sudo nixos-rebuild switch --flake .";
+      nixbuild = "nixos-rebuild build --flake .";
+      nixcheck = "nixos-rebuild check --flake .";
+    };
+    interactiveShellInit = ''
+      set -g fish_greeting
+    '';
+  };
+
+  # Starship Prompt
+  programs.starship = {
+    enable = true;
+    enableFishIntegration = true;
+    settings = {
+      add_newline = false;
+      format = "$all$character";
+    };
+  };
 
   # XDG Directories (Linux specific)
   xdg.enable = true;

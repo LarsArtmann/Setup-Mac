@@ -12,9 +12,13 @@
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 20; # Limit to 20 generations to prevent /boot full
   boot.loader.efi.canTouchEfiVariables = true;
   # Use latest kernel for Ryzen AI Max+ support
   boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Enable ZRAM for better memory management
+  zramSwap.enable = true;
 
   # Networking
   networking.hostName = "evo-x2"; # Machine name
@@ -95,8 +99,17 @@
     enable = true;
     enable32Bit = true;
     # Note: amdvlk has been deprecated, RADV is now the default driver
-    # OpenCL support can be added with rocm-packages if needed
+    # OpenCL support via ROCm
+    extraPackages = [
+      pkgs.rocmPackages.clr.icd
+    ];
   };
+
+  # Fonts
+  fonts.packages = with pkgs; [
+    nerd-fonts.jetbrains-mono
+    jetbrains-mono
+  ];
 
   # Experimental features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

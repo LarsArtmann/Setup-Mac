@@ -10,13 +10,18 @@
 
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "sdhci_pci" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  # Restore critical network drivers (Realtek 2.5G Ethernet + MediaTek WiFi)
+  boot.kernelModules = [ "kvm-amd" "mt7925e" "r8125" ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ r8125 ];
+
+  # Required for WiFi/Bluetooth hardware
+  hardware.enableRedistributableFirmware = true;
 
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/0b629b65-a1b7-40df-a7dc-9ea5e0b04959";
       fsType = "btrfs";
-      options = [ "subvol=@" ];
+      # Optimized for SSD: transparent compression + reduce write wear
+      options = [ "subvol=@" "compress=zstd" "noatime" ];
     };
 
   fileSystems."/boot" =
