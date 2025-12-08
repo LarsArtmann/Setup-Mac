@@ -101,11 +101,50 @@
   # services.displayManager.gdm.enable = true;
   # services.desktopManager.gnome.enable = true;
 
-  # Enable Hyprland
+  # Enable Hyprland with proper configuration
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+    # Ensure the portal package is properly set
+    portalPackage = pkgs.xdg-desktop-portal-hyprland;
+    # Use UWSM for improved systemd support (recommended)
+    withUWSM = true;
+    # Set systemd path for proper application launching
+    systemd.setPath.enable = true;
   };
+
+  # Enable polkit for authentication
+  security.polkit.enable = true;
+
+  # Add polkit GNOME authentication agent service
+  systemd.user.services.polkit-gnome-authentication-agent-1 = {
+    description = "polkit-gnome-authentication-agent-1";
+    wantedBy = [ "graphical-session.target" ];
+    wants = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+      Restart = "on-failure";
+      RestartSec = 1;
+      TimeoutStopSec = 10;
+    };
+  };
+
+  # XDG Desktop Portals configuration
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-hyprland
+    ];
+    configPackages = [
+      pkgs.xdg-desktop-portal-hyprland
+    ];
+  };
+
+  # Enable D-Bus for portal communication
+  services.dbus.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -129,8 +168,28 @@
     #jack.enable = true;
   };
 
+  # Add essential system packages for Hyprland
+  environment.systemPackages = with pkgs; [
+    # Authentication and portal support
+    polkit_gnome
+    xdg-desktop-portal-hyprland
+    xdg-desktop-portal-gtk
+    xdg-utils
+    # Qt Wayland support (required by some applications)
+    qt5.qtwayland
+    qt6.qtwayland
+    # Desktop integration
+    dconf
+    glib
+    # Authentication helper
+    gnome-keyring
+  ];
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
+
+  # Enable dconf for settings management
+  programs.dconf.enable = true;
 
   # SSH Banner
   environment.etc."ssh/banner".source = ./ssh-banner;
@@ -139,7 +198,7 @@
   users.users.lars = {
     isNormalUser = true;
     description = "Lars";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" "audio" ];
     # INFO: Set password manually with `passwd lars` after installation
     # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
     shell = pkgs.fish;
