@@ -6,7 +6,6 @@
     enable = true;
     clock24 = true;
     baseIndex = 1;
-    paneBaseIndex = 1;
     sensibleOnTop = true;
     mouse = true;
     terminal = "screen-256color";
@@ -14,11 +13,8 @@
     escapeTime = 0;
 
     plugins = with pkgs; [
-      tmuxPlugins.tmux-sensible
-      tmuxPlugins.tmux-resurrect
-      tmuxPlugins.tmux-yank
-      tmuxPlugins.tmux-pain-control
-      tmuxPlugins.tmux-copy-mode
+      tmuxPlugins.resurrect
+      tmuxPlugins.yank
     ];
 
     extraConfig = ''

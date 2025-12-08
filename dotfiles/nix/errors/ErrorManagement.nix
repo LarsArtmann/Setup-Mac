@@ -223,6 +223,7 @@ let
             true # Would execute platform check
           else
             true # Default to true for demonstration
+        ;
         in {
           action = action;
           success = recoveryResult;
@@ -230,7 +231,6 @@ let
         };
 
       recoveryResults = map executeRecoveryAction recoveryActions;
-      anyRecoverySuccessful = lib.any (r: r.success) recoveryResults;
 
       # Log error
       logError =

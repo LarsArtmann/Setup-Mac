@@ -122,7 +122,7 @@ in {
 
   nixpkgs = {
     # The platform the configuration will be used on.
-    stdenv.hostPlatform.system = "aarch64-darwin";
+    hostPlatform = lib.systems.examples.aarch64-darwin;
     config = {
       allowUnsupportedSystem = true;
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [

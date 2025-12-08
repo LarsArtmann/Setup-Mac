@@ -1,7 +1,7 @@
 # CLI Tool Wrapper Template
 # TYPE-SAFE CLI TOOL WRAPPER GENERATION
 
-{ pkgs, lib, config, ... }:
+{ pkgs, lib, stdenv, config, ... }:
 
 let
   packageName = config.packageName or "unknown";
@@ -53,7 +53,7 @@ let
 
 in lib.mkIf validateInputs.allValid {
   # Create wrapper package
-  stdenv.mkDerivation {
+  wrapperPackage = stdenv.mkDerivation {
     name = "${wrapperName}-wrapper";
     version = lib.getVersion basePackage;
 
@@ -114,7 +114,7 @@ in lib.mkIf validateInputs.allValid {
       templateType = "cli-tool";
       wrapperName = wrapperName;
       basePackage = packageName;
-      description = description;
+      toolDescription = description;
       additionalPackages = map (p: lib.getName p) additionalPackages;
       aliasName = aliasName;
 
@@ -128,5 +128,5 @@ in lib.mkIf validateInputs.allValid {
         cache = config.cache or true;
       };
     };
-  }
+  };
 }

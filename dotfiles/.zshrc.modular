@@ -16,3 +16,4 @@ unset __conda_setup
 
 export PATH="$HOME/go/bin:$PATH"
 export PATH="/opt/homebrew/bin:$PATH"
+GODEBUG=cacheconfirm=1

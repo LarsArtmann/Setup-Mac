@@ -18,10 +18,10 @@
 
     # Additional community packages can be added here as needed
     # Browse available packages: https://nur.nix-community.org/
-  ] ++ lib.optionals pkgs.stdenv.isLinux [
+  ] ++ lib.optional pkgs.stdenv.isLinux [
     # Linux-specific community packages from NUR
     # Add Linux-specific NUR packages here
-  ] ++ lib.optionals pkgs.stdenv.isDarwin [
+  ] ++ lib.optional pkgs.stdenv.isDarwin [
     # macOS-specific community packages from NUR
     # Add Darwin-specific NUR packages here
   ];
