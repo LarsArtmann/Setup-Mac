@@ -131,15 +131,11 @@
     };
   };
 
-  # XDG Desktop Portals configuration
+  # XDG Desktop Portals configuration (Hyprland module will set up the basic ones)
   xdg.portal = {
     enable = true;
     extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-hyprland
-    ];
-    configPackages = [
-      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk  # For file picker support
     ];
   };
 
@@ -172,14 +168,11 @@
   environment.systemPackages = with pkgs; [
     # Authentication and portal support
     polkit_gnome
-    xdg-desktop-portal-hyprland
-    xdg-desktop-portal-gtk
     xdg-utils
     # Qt Wayland support (required by some applications)
     qt5.qtwayland
     qt6.qtwayland
     # Desktop integration
-    dconf
     glib
     # Authentication helper
     gnome-keyring
