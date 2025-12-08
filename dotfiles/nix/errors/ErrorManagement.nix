@@ -232,6 +232,8 @@ let
 
       recoveryResults = map executeRecoveryAction recoveryActions;
 
+      anyRecoverySuccessful = lib.any (result: result.success) recoveryResults;
+
       # Log error
       logError =
         let
@@ -267,7 +269,7 @@ let
       collectError = error: ErrorHandler {
         errorType = error.type;
         errorCode = error.code;
-        context = error.context or {};
+        context = error.context // {};
         systemConfig = systemConfig;
       };
 
@@ -340,7 +342,7 @@ let
           errorCount = builtins.length errors;
           criticalCount = builtins.length (lib.filter (e: e.error.severity == "critical") errors);
 
-          alertThresholds = thresholds or {
+          alertThresholds = thresholds // {
             criticalThreshold = 1;
             totalThreshold = 5;
           };
@@ -368,7 +370,7 @@ let
 
     in {
       monitor = monitorErrors;
-      thresholds = thresholds or {
+      thresholds = thresholds // {
         criticalThreshold = 1;
         totalThreshold = 5;
       };

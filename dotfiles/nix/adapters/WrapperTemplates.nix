@@ -27,7 +27,7 @@ let
               value = if var != null then var.default else "";
             in
               if builtins.isString content then
-                builtins.replaceStrings ["${${varName}}"] [value] content
+                builtins.replaceStrings ["\${${varName}}"] [value] content
               else content;
 
           processedContent = lib.foldl' replaceVar content (lib.attrNames vars);

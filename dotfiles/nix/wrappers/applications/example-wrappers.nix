@@ -67,10 +67,10 @@ let
     };
     preHook = ''
       # Check if binary exists and offer download if not
-      if [ ! -f "${binaryPath}" ]; then
-        echo "Custom tool not found at ${binaryPath}"
+      if [ ! -f "/usr/local/bin/custom-tool" ]; then
+        echo "Custom tool not found at /usr/local/bin/custom-tool"
         echo "Download from: https://example.com/custom-tool"
-        echo "Then place it at ${binaryPath}"
+        echo "Then place it at /usr/local/bin/custom-tool"
         exit 1
       fi
     '';
