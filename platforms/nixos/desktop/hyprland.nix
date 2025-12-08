@@ -101,6 +101,17 @@
 
       misc = {
         force_default_wallpaper = 0;
+        # Performance optimizations
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+        mouse_refocus = false;
+        new_window_takes_over_fullscreen = true;
+      };
+
+      # Rendering optimizations for AMD GPUs
+      render = {
+        explicit_sync = true;
+        direct_scanout = true;
       };
 
       bind = [
@@ -168,5 +179,8 @@
     wl-clipboard # Clipboard support
     hyprpaper # Wallpaper
     btop # System monitor (used for background)
+    # Additional monitoring tools
+    nvtop # GPU/process monitor
+    radeontop # AMD GPU specific monitor
   ];
 }

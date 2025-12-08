@@ -17,6 +17,14 @@
   # Use latest kernel for Ryzen AI Max+ support
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # AMD GPU optimization kernel parameters
+  boot.kernelParams = [
+    "amdgpu.ppfeaturemask=0xfffd7fff"  # Enable all GPU features
+    "amdgpu.deepfl=1"                  # Enable deep frequency control
+    "amd_pstate=guided"                # Performance mode for AMD CPUs
+    "processor.max_cstate=1"           # C-state optimization
+  ];
+
   # Enable ZRAM for better memory management
   zramSwap.enable = true;
 
@@ -176,7 +184,25 @@
     glib
     # Authentication helper
     gnome-keyring
+    # AMD GPU monitoring and control
+    amdgpu_top     # GPU monitoring tool
+    corectrl       # AMD CPU control
+    vulkan-tools   # Vulkan utilities
+    mesa-demos     # GPU testing tools
   ];
+
+  # AMD GPU performance environment variables
+  environment.sessionVariables = {
+    # Graphics driver settings
+    __GLX_VENDOR_LIBRARY_NAME = "mesa";
+    LIBVA_DRIVER_NAME = "radeonsi";
+    AMD_VULKAN_ICD = "RADV";
+    # Wayland/Hyprland specific
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
+    # Performance optimization
+    MESA_VK_WSI_PRESENT_MODE = "fifo";
+  };
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
@@ -219,8 +245,11 @@
     enable32Bit = true;
     # Note: amdvlk has been deprecated, RADV is now the default driver
     # OpenCL support via ROCm
-    extraPackages = [
-      pkgs.rocmPackages.clr.icd
+    extraPackages = with pkgs; [
+      rocmPackages.clr.icd  # OpenCL support
+      # amdvlk removed - RADV is now the default AMD Vulkan driver
+      libva                 # Video acceleration API
+      libvdpau-va-gl       # VDPAU backend for video acceleration
     ];
   };
 
