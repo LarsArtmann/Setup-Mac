@@ -56,6 +56,10 @@ let
 
     # Graph visualization
     graphviz
+
+    # Task management
+    taskwarrior3
+    timewarrior
   ];
 
   # Development tools (platform-agnostic)

@@ -16,7 +16,7 @@
 
     # Recommended settings for best experience
     systemd.enable = true;
-    xwayland.enable = true;
+    xwayland.enable = true;  # ESSENTIAL for X11 application compatibility
 
     settings = {
       "$mod" = "SUPER";
@@ -177,7 +177,7 @@
     dunst # Notifications
     libnotify # Notification library
     wl-clipboard # Clipboard support
-    hyprpaper # Wallpaper
+    hyprpaper # Wallpaper (official tool, lower overhead than swww)
     btop # System monitor (used for background)
     # Additional monitoring tools
     nvtop # GPU/process monitor

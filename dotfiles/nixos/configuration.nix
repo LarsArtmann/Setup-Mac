@@ -112,7 +112,7 @@
   # Enable Hyprland with proper configuration
   programs.hyprland = {
     enable = true;
-    xwayland.enable = true;
+    xwayland.enable = true;  # ESSENTIAL for X11 application compatibility
     # Ensure the portal package is properly set
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
     # Use UWSM for improved systemd support (recommended)
