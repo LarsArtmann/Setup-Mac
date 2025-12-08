@@ -88,17 +88,20 @@
 
       # Hyprland overlay to ensure lock-step versions
       hyprlandOverlay = final: prev: {
-        hyprland = hyprland.packages.${prev.system}.hyprland;
-        hyprlandPlugins = hyprland-plugins.packages.${prev.system};
+        hyprland = hyprland.packages.${prev.stdenv.hostPlatform.system}.hyprland;
+        hyprlandPlugins = hyprland-plugins.packages.${prev.stdenv.hostPlatform.system};
       };
 
       # Import lib for ghost system dependencies
       lib = nixpkgs.lib;
-      pkgs = import nixpkgs { system = "aarch64-darwin"; stdenv.hostPlatform.system = "aarch64-darwin"; };
+      pkgs = import nixpkgs {
+        localSystem.system = "aarch64-darwin";
+        stdenv.hostPlatform.system = "aarch64-darwin";
+      };
 
       # Cross-compilation packages for x86_64-linux - FIXED PROPERLY
       pkgsCross = import nixpkgs {
-        system = "x86_64-linux";
+        localSystem.system = "x86_64-linux";
         config.allowUnsupportedSystem = true;
         config.allowUnfree = true;
       };

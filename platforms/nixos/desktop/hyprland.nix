@@ -23,7 +23,7 @@
       "$terminal" = "kitty";
       "$menu" = "rofi -show drun -show-icons";
 
-      monitor = ",preferred,auto,2";
+      monitor = "preferred,auto,2";
 
       exec-once = [
         "waybar"
