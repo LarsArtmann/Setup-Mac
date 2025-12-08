@@ -74,6 +74,10 @@ let
 
     # Nix helper tools
     nh
+
+    # Wallpaper management tools
+    swww  # Simple Wayland Wallpaper for animated wallpapers
+    imagemagick  # Image manipulation for wallpaper management
   ];
 
   # AI tools (conditionally added)

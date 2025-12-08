@@ -177,7 +177,9 @@
     dunst # Notifications
     libnotify # Notification library
     wl-clipboard # Clipboard support
-    hyprpaper # Wallpaper
+    hyprpaper # Wallpaper (official tool, lower overhead)
+    swww # Animated wallpapers (for cool transitions)
+    imagemagick # Image manipulation for wallpaper management
     btop # System monitor (used for background)
     # Additional monitoring tools
     nvtopPackages.amd # AMD GPU/process monitor
