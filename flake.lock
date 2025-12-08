@@ -243,11 +243,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1764998300,
-        "narHash": "sha256-fZatn/KLfHLDXnF0wy7JxXqGaZmGDTVufT4o/AOlj44=",
+        "lastModified": 1765172714,
+        "narHash": "sha256-/cjofqGxSWpRj2XJM+Bd5VUgWDkBWSxxO//HE+zOHMY=",
         "ref": "refs/heads/master",
-        "rev": "27a6182347ccae90a88231ae0dc5dfa7d15815bb",
-        "revCount": 5888,
+        "rev": "a7887340779d5e70ef68012f3823568ee59eaa30",
+        "revCount": 5892,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/home-manager"
       },
@@ -259,11 +259,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1765148614,
-        "narHash": "sha256-76OWOXgfRhEC2JmE+KbxRg5Zap2A7+h10LseyIQK1Ok=",
+        "lastModified": 1765177584,
+        "narHash": "sha256-DBMVPiu5VmlbDrwMCvfV6NvEekovUgDOFICeblH1hxA=",
         "ref": "refs/heads/main",
-        "rev": "fec79d2714e718f81391ca48f5655e3a813eafa4",
-        "revCount": 371448,
+        "rev": "ff354755830634ddfc5735a2f93ce17b57cd12e3",
+        "revCount": 371513,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-cask"
       },
@@ -275,11 +275,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1765148795,
-        "narHash": "sha256-egd9SToy2wF1ksq8JhfdbmN5D4iADM8f5vWiQkCv5ss=",
+        "lastModified": 1765176073,
+        "narHash": "sha256-sIy6+pJgRZ8B9Ut+iMDnCI/KNhJE3nF39MvK/tvD0z8=",
         "ref": "refs/heads/main",
-        "rev": "a9f969c41caf61936508386c3e491186d8af505b",
-        "revCount": 725491,
+        "rev": "e90f78726244236a45a34f84fcde79098c1c54c5",
+        "revCount": 725582,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-core"
       },
@@ -671,11 +671,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1765146731,
-        "narHash": "sha256-VHwljC6L2nmDigts9Lu0dZyhogGvAVNtlFutF/PQhz8=",
+        "lastModified": 1765161881,
+        "narHash": "sha256-Jt1l7ydplENTI7ODXhgN0qNB4+elnCqiP32qwTWx6oc=",
         "ref": "refs/heads/main",
-        "rev": "b6f6693bc2b970af3d2220845d13009c63faad2f",
-        "revCount": 1964,
+        "rev": "f1e2b17a33d1a5f111104d5c8d5c361996a0a44c",
+        "revCount": 1970,
         "type": "git",
         "url": "ssh://git@github.com/numtide/nix-ai-tools"
       },
@@ -837,11 +837,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765147601,
-        "narHash": "sha256-9qGarRFWYk4IeQ/tvMlWh8cyWvc9EorZ8Kc12qn57cI=",
+        "lastModified": 1765180093,
+        "narHash": "sha256-tTEBQGhyZ4fQOF1jcZ+xWhl6aGIhYBaurxDgWYDqr00=",
         "ref": "refs/heads/main",
-        "rev": "65b4324762922ac4eefcf4eefafa6798ef77912c",
-        "revCount": 37015,
+        "rev": "6ac81bb996f1bd65c750f803b86f20d935bdc9a7",
+        "revCount": 37028,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/NUR"
       },
