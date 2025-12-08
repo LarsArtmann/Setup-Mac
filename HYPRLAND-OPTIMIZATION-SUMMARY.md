@@ -88,8 +88,8 @@ render = {
 home.packages = with pkgs; [
   # ... (previous packages)
   # Additional monitoring tools
-  nvtop       # GPU/process monitor
-  radeontop   # AMD GPU specific monitor
+  nvtopPackages.amd  # AMD GPU/process monitor
+  radeontop           # AMD GPU specific monitor
 ];
 ```
 
@@ -122,7 +122,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 # Real-time GPU monitoring
 amdgpu_top
 
-# GPU process monitoring
+# GPU process monitoring (AMD specific)
 nvtop
 
 # AMD GPU specific monitoring
