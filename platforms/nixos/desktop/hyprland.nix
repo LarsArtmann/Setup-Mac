@@ -180,7 +180,7 @@
     hyprpaper # Wallpaper (official tool, lower overhead than swww)
     btop # System monitor (used for background)
     # Additional monitoring tools
-    nvtop # GPU/process monitor
+    nvtopPackages.amd # AMD GPU/process monitor
     radeontop # AMD GPU specific monitor
   ];
 }
