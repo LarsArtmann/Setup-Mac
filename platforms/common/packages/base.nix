@@ -72,6 +72,9 @@ let
     gopls
     golangci-lint
 
+    # Infrastructure as Code
+    terraform  # Infrastructure as Code tool from HashiCorp
+
     # Nix helper tools
     nh
 

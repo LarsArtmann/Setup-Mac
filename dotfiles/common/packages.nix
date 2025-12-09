@@ -30,6 +30,9 @@
     go
     gopls
 
+    # Infrastructure as Code
+    terraform
+
     # Security and development tools
     gitleaks
     pre-commit

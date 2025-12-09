@@ -205,6 +205,7 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              backupFileExtension = "backup";  # Backup existing files before overwriting
               extraSpecialArgs = {
                 inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
                 # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
@@ -258,7 +259,7 @@
               # Security tools
               gitleaks pre-commit openssh
               # Development tools
-              go gopls golangci-lint bun nh
+              go gopls golangci-lint terraform bun nh
               # Monitoring tools
               bottom procs
               # Utilities
