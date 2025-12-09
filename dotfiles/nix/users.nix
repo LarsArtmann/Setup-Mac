@@ -31,8 +31,7 @@ in {
     # Note: defaultUserShell option does not exist in nix-darwin
     users.${username} = {
       shell = validateUserShell userShell;
-      # Additional user configuration options:
-      # home = "/Users/${username}";
+      home = "/Users/${username}";
       # uid = 501;  # Specify if needed for consistency
       # description = "Lars Artmann";
     };
