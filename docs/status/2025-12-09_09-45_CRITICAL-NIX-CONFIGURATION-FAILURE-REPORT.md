@@ -1,9 +1,9 @@
 # 🚨 CRITICAL STATUS REPORT: Nix Configuration Failure - homeDirectory NULL Issue
 
-**Date:** 2025-12-09  
-**Time:** 09:45 CET  
-**Status:** 🚨 CRITICAL - BUILD SYSTEM COMPLETELY BROKEN  
-**Impact:** BLOCKS ALL NIX CONFIGURATION CHANGES  
+**Date:** 2025-12-09
+**Time:** 09:45 CET
+**Status:** 🚨 CRITICAL - BUILD SYSTEM COMPLETELY BROKEN
+**Impact:** BLOCKS ALL NIX CONFIGURATION CHANGES
 
 ---
 
@@ -13,7 +13,7 @@ The Setup-Mac Nix configuration system is **COMPLETELY BROKEN** due to a critica
 
 **Root Cause**: A cross-platform configuration contamination where NixOS-specific settings are affecting macOS builds.
 
-**Immediate Impact**: 
+**Immediate Impact**:
 - ❌ Cannot apply any configuration changes
 - ❌ System updates blocked
 - ❌ Development environment changes impossible
@@ -30,9 +30,9 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ```
 
 ### Key Findings
-✅ **CORRECT CONFIG EXISTS**: `flake.nix:217` properly sets `homeDirectory = "/Users/larsartmann"`  
-❌ **CONFLICTING CONFIG**: NixOS `nixos/common.nix` (file doesn't exist locally) sets `homeDirectory = null`  
-🔥 **CROSS-PLATFORM LEAK**: NixOS configuration contaminating macOS build  
+✅ **CORRECT CONFIG EXISTS**: `flake.nix:217` properly sets `homeDirectory = "/Users/larsartmann"`
+❌ **CONFLICTING CONFIG**: NixOS `nixos/common.nix` (file doesn't exist locally) sets `homeDirectory = null`
+🔥 **CROSS-PLATFORM LEAK**: NixOS configuration contaminating macOS build
 
 ### Configuration Analysis
 
@@ -72,15 +72,15 @@ users.larsartmann = {
 ## 🔧 INVESTIGATION PERFORMED
 
 ### Completed Analysis
-✅ **Configuration Files Verified**: All local configs are correct  
-✅ **Import Chains Checked**: No direct NixOS imports in macOS config  
-✅ **Platform Isolation Reviewed**: Proper platform-specific modules in place  
-✅ **Version Compatibility Checked**: Home manager versions appear compatible  
+✅ **Configuration Files Verified**: All local configs are correct
+✅ **Import Chains Checked**: No direct NixOS imports in macOS config
+✅ **Platform Isolation Reviewed**: Proper platform-specific modules in place
+✅ **Version Compatibility Checked**: Home manager versions appear compatible
 
 ### Missing Information
-❌ **Nix Store Analysis**: Not yet investigated cached configurations  
-❌ **Import Dependency Graph**: Not yet traced full import chain  
-❌ **Cache State**: Not yet checked for corrupted entries  
+❌ **Nix Store Analysis**: Not yet investigated cached configurations
+❌ **Import Dependency Graph**: Not yet traced full import chain
+❌ **Cache State**: Not yet checked for corrupted entries
 
 ---
 
@@ -184,6 +184,6 @@ users.larsartmann = {
 
 ---
 
-**Status Report Prepared By:** Crush AI Assistant  
-**Next Update:** After fix implementation or within 24 hours  
+**Status Report Prepared By:** Crush AI Assistant
+**Next Update:** After fix implementation or within 24 hours
 **Urgency:** 🚨 CRITICAL - REQUIRES IMMEDIATE ATTENTION

@@ -131,6 +131,8 @@ in
         coreutils
         findutils
         gnused
-    ];
+
+        # AI tools - crush from nix-ai-tools
+    ] ++ lib.optional (crush != null) crush;
   };
 }
