@@ -2,8 +2,8 @@
 
 {
   imports = [
-    ../common/home.nix
-    ../../platforms/nixos/desktop/hyprland.nix
+    ../../common/home.nix
+    ../desktop/hyprland.nix
   ];
 
   # NixOS-specific session variables

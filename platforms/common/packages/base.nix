@@ -2,7 +2,8 @@
 
 let
   # Import crush from nix-ai-tools if available
-  crush = nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush" or null;
+  # crush = nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush" or null;
+  crush = null; # Temporarily disabled due to build error (returning set instead of package)
 
   # Essential CLI tools that work across platforms
   essentialPackages = with pkgs; [
@@ -86,7 +87,8 @@ let
   # AI tools (conditionally added)
   aiPackages = lib.optional (crush != null) crush;
 
-in {
+in
+{
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ aiPackages;
 }

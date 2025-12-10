@@ -251,25 +251,11 @@
           # Core system configuration
           base
 
-          # Essential system packages including AI tools
-          ({ pkgs, inputs, nix-ai-tools, lib, ... }: {
-            environment.systemPackages = with pkgs; [
-              # Essential tools
-              git vim fish starship curl wget tree ripgrep fd eza bat jq yq-go just
-              # Security tools
-              gitleaks pre-commit openssh
-              # Development tools
-              go gopls golangci-lint terraform bun nh
-              # Monitoring tools
-              bottom procs
-              # Utilities
-              sd dust coreutils findutils gnused graphviz
-            ] ++ lib.optional (nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush" or null != null)
-               (nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system}."crush");
-          })
+      # Cross-platform base packages
+          ./platforms/common/packages/base.nix
 
           # NixOS system configuration
-          ./dotfiles/nixos/configuration.nix
+          ./platforms/nixos/system/configuration.nix
 
           # Home Manager integration
           home-manager.nixosModules.home-manager
@@ -289,7 +275,7 @@
                   stateVersion = "25.11";
                 };
                 imports = [
-                  ./dotfiles/nixos/home.nix
+                  ./platforms/nixos/users/home.nix
                 ];
               };
             };
