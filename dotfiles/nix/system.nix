@@ -739,7 +739,7 @@ in {
                         "remove empty components" = false;
                       };
                     };
-                  };
+                  }
                   {
                     "class" = "iTermStatusBarMemoryUtilizationComponent";
                     "configuration" = {
@@ -760,7 +760,7 @@ in {
                         "remove empty components" = false;
                       };
                     };
-                  };
+                  }
                   {
                     "class" = "iTermStatusBarNetworkUtilizationComponent";
                     "configuration" = {
