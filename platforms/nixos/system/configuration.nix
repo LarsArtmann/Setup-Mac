@@ -4,9 +4,9 @@
   imports =
     [
       # Import common packages shared with macOS
-      ../common/packages.nix
+      ../../common/packages/base.nix
       # Include hardware configuration (will be generated on the machine)
-      ./hardware-configuration.nix
+      ../hardware/hardware-configuration.nix
     ];
 
 
@@ -217,7 +217,7 @@
   programs.dconf.enable = true;
 
   # SSH Banner
-  environment.etc."ssh/banner".source = ./ssh-banner;
+  environment.etc."ssh/banner".source = ../users/ssh-banner;
 
   # User account
   users.users.lars = {
