@@ -282,15 +282,47 @@ in {
           };
         };
 
-        # iTerm2 configuration - ensure Fish shell is used
+        # iTerm2 configuration - comprehensive settings from JSON profile
         "com.googlecode.iterm2" = {
-          # Configure default bookmark to use Fish shell
+          # Configure default bookmark with all settings from JSON profile
           "New Bookmarks" = [
             {
+              # Basic Terminal Settings
+              "Columns" = 100;
+              "Rows" = 100;
               "Command" = "/run/current-system/sw/bin/fish";
               "Custom Command" = "Custom Shell";
               "Name" = "Default";
               "Guid" = "274FECB6-1D34-4A45-A1F9-23DFA78BA94B";
+              "Terminal Type" = "xterm-256color";
+              "Window Type" = 1;
+              "Scrollback Lines" = 1500;
+              "Space" = 0;
+
+              # Appearance & Visual Settings
+              "Blinking Cursor" = true;
+              "Cursor Type" = 1;
+              "Show Status Bar" = true;
+              "Visual Bell" = true;
+              "Transparency" = 0;
+              "Blur" = true;
+              "Blur Radius" = 1.9679073660714288;
+              "Blend" = 0.12961906934306569;
+              "Initial Use Transparency" = true;
+              "Only The Default BG Color Uses Transparency" = false;
+              "Background Image Mode" = 2;
+              "Use Separate Colors for Light and Dark Mode" = true;
+
+              # Font Settings
+              "Normal Font" = "Monaco 14";
+              "Non Ascii Font" = "JetBrainsMono-Regular 14";
+              "ASCII Anti Aliased" = false;
+              "Use Non-ASCII Font" = false;
+              "Horizontal Spacing" = 1;
+              "Vertical Spacing" = 1;
+              "Thin Strokes" = 4;
+              "Draw Powerline Glyphs" = true;
+              "ASCII Ligatures" = false;
             }
           ];
           # Note: iTerm2 respects system restoration when NSQuitAlwaysKeepsWindows=true

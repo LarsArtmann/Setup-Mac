@@ -259,11 +259,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1765278589,
-        "narHash": "sha256-pQ+ObONQTob/5pTudAvkUbbfMhrGpRzWdwQptXjSvL0=",
+        "lastModified": 1765329473,
+        "narHash": "sha256-ZowCqVpq/eN1uLtUoeVw+GaEFnPwOJPQkc1oD14U/KM=",
         "ref": "refs/heads/main",
-        "rev": "3c32d8099b9a015945d3d7fb15d8dc8edd499269",
-        "revCount": 371919,
+        "rev": "c7311975c09928bb2d3599eada8c6b41a0d5ea0d",
+        "revCount": 372162,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-cask"
       },
@@ -275,11 +275,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1765277712,
-        "narHash": "sha256-tw39yDgWCg/ROW522Sl5tytuevfiiqIwyII9nCHP1zo=",
+        "lastModified": 1765329201,
+        "narHash": "sha256-q1SxvCpbw9Yg3lYV5RPadN695ljxb904G/mdD8Y0gQs=",
         "ref": "refs/heads/main",
-        "rev": "0ec23428ccaf2acfb625786fb599d85f4a942589",
-        "revCount": 726117,
+        "rev": "7a8fc020d44aad53eff80b3c9fdd0ca9ed47de82",
+        "revCount": 726403,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-core"
       },
@@ -365,11 +365,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1765234193,
-        "narHash": "sha256-DsURvH9UZbaPvpLR1LctCymxRJIsznUOGcS5J7z9St4=",
+        "lastModified": 1765319435,
+        "narHash": "sha256-9EU73XoTJNYiflVFDeplxE6BhAVg4TGPdiB4vbdJmXQ=",
         "ref": "refs/heads/main",
-        "rev": "efe665b4558370af6e89921c487cd92890183961",
-        "revCount": 6700,
+        "rev": "f58c80fd3942034d58934ec4e4d93bfcfa3c786e",
+        "revCount": 6702,
         "type": "git",
         "url": "ssh://git@github.com/hyprwm/Hyprland"
       },
@@ -671,11 +671,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1765248239,
-        "narHash": "sha256-/dbYXqibtXkPCvEijOgtAGJZ61lix0z71AfbJNYiZIk=",
+        "lastModified": 1765301613,
+        "narHash": "sha256-+J6VoLj0J+yKmjubnAShgTDch+GJfwZjPMuPSJ9dLYA=",
         "ref": "refs/heads/main",
-        "rev": "fb4cc378d1fc58f879d15b1f3b603ff1ff12f19c",
-        "revCount": 1998,
+        "rev": "2b33f1004752fb3bbed4ef90af49d137bd76ad37",
+        "revCount": 2014,
         "type": "git",
         "url": "ssh://git@github.com/numtide/nix-ai-tools"
       },
@@ -815,11 +815,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1764947035,
-        "narHash": "sha256-EYHSjVM4Ox4lvCXUMiKKs2vETUSL5mx+J2FfutM7T9w=",
+        "lastModified": 1765270179,
+        "narHash": "sha256-g2a4MhRKu4ymR4xwo+I+auTknXt/+j37Lnf0Mvfl1rE=",
         "ref": "nixpkgs-unstable",
-        "rev": "a672be65651c80d3f592a89b3945466584a22069",
-        "revCount": 906997,
+        "rev": "677fbe97984e7af3175b6c121f3c39ee5c8d62c9",
+        "revCount": 909321,
         "type": "git",
         "url": "ssh://git@github.com/NixOS/nixpkgs"
       },
@@ -837,11 +837,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765276001,
-        "narHash": "sha256-QK7UkjuTpgneQuDApQah3FZUMBV1/yon96/EuSiMnUQ=",
+        "lastModified": 1765329419,
+        "narHash": "sha256-EZa5+sqK+7wnCt7Jf+tdZGoeJeLvtsVaWInU6CWWlmw=",
         "ref": "refs/heads/main",
-        "rev": "5c48d6a94595f9a9a76baede98cd1203ab2caf43",
-        "revCount": 37069,
+        "rev": "2a09e802cf49e04d8cf504412fd9b1fc9c4b1bc4",
+        "revCount": 37083,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/NUR"
       },
