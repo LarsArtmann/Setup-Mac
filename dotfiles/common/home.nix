@@ -25,7 +25,7 @@
     };
     zsh = {
       enable = true;
-      dotDir = ".config/zsh";
+      dotDir = "${config.xdg.configHome}/zsh";
     };
     fish.enable = true;
   };
