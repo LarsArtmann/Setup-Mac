@@ -149,7 +149,7 @@
 
           # Ghost Systems - Type Safety & Assertion Frameworks (Phase 1 Integration)
           # Temporarily disabled due to parameter passing issues
-          # ./dotfiles/nix/core/TypeSafetySystem.nix
+          # ./dotfiles/nix/core/ConfigurationAssertions.nix
           # ./dotfiles/nix/core/SystemAssertions.nix
 
           ./dotfiles/nix/system.nix
