@@ -871,5 +871,4 @@ in {
     #      `system.stateVersion` ≥ 6.
     stateVersion = 6;
   };
-  };
 }

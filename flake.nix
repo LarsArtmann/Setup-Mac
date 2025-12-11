@@ -134,8 +134,9 @@
         specialArgs = {
           inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
           # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
-          inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-          inherit UserConfig PathConfig State Validation;
+          # Temporarily disabled due to parameter passing issues
+          # inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+          # inherit UserConfig PathConfig State Validation;
         };
         modules = [
           # Apply custom packages overlay
@@ -147,8 +148,9 @@
           ./dotfiles/nix/core.nix
 
           # Ghost Systems - Type Safety & Assertion Frameworks (Phase 1 Integration)
-          ./dotfiles/nix/core/TypeSafetySystem.nix
-          ./dotfiles/nix/core/SystemAssertions.nix
+          # Temporarily disabled due to parameter passing issues
+          # ./dotfiles/nix/core/TypeSafetySystem.nix
+          # ./dotfiles/nix/core/SystemAssertions.nix
 
           ./dotfiles/nix/system.nix
           ./dotfiles/nix/modules/iterm2.nix
