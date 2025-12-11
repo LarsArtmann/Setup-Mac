@@ -16,7 +16,7 @@ repos:
     -   id: nix-check
         name: nix check
         entry: bash
-        args: [-c, 'cd . && nix flake check --no-build']
+        args: [-c, 'cd . && just check-nix-syntax']
         language: system
         files: \.nix$
         pass_filenames: false

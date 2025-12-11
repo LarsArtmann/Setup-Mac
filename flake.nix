@@ -151,6 +151,7 @@
           ./dotfiles/nix/core/SystemAssertions.nix
 
           ./dotfiles/nix/system.nix
+          ./dotfiles/nix/modules/iterm2.nix
 
           # Environment and packages
           ./dotfiles/nix/environment.nix
