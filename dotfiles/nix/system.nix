@@ -245,11 +245,14 @@ in {
 
       # Custom User Defaults removed - deprecated nix-darwin option
 
+    };
+
+    # Keyboard configuration at system level (not under defaults)
     keyboard = {
+      enableKeyMapping = true;
       nonUS = {
         remapTilde = false;
       };
-      enableKeyMapping = true;
       remapCapsLockToControl = false;
       remapCapsLockToEscape = true;
       swapLeftCommandAndLeftAlt = false;
@@ -279,6 +282,5 @@ in {
     #      `"/etc/nix-darwin/configuration.nix"` by default when
     #      `system.stateVersion` ≥ 6.
     stateVersion = 6;
-  };
   };
 }
