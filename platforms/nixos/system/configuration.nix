@@ -33,10 +33,8 @@
     # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
     shell = pkgs.fish;
     openssh.authorizedKeys.keys = [
-      # IMPORTANT: Replace this placeholder with your actual SSH public key!
-      # You can add multiple keys - one per line
-      # "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-key-comment"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPlbcK0pvybFGNvQWDVxHmMZkjUHXa9JcnPcKWSZWE8 lars@MacBook-Air.local"
+      # MacBook SSH key - matches git@lars.software
+      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCf94DAHsLLwuc9CMlAZE2GGlp84BR2IG9LoAcBGCR1orOQgkx2lvvQZXnLkwGR+8C8wqjSLM05KeI4v7Fig+AaoRomWQHESqMESXgJmoS87oP3BwOCCxFcQJonPwLSamsHRKdDvEPwQYN82C91cPW4VL0ZCxsqAATZotK5945YVPaL/WUjUlE9n4NTuO6JF8yw28QgO9QzWvqSywWPD1tZp3S3CpVluCKqgzn3CTusJpbcAbbvMGN2BzeUW/wyLguOn/64OaxlXFR45hv/OmS3NEoQ/1suHErMNrRu3EJ68LBliC6OEGAVkImtEBMn/hlTEi3L2w4XDiAiax7zvOUB4TPD2SdJ/1yVQVmjkyizpIhtEc0lkvdguf8kzHrPBSJOMwQrUPLxesUUmhJWqqxJVHdnKhhtINxxJ3q3ejZ1+X5p0MspGpKqtPUdq+nl2Gn3Rf5qcHtnhoLKIeN7whHN/+PHaN1AZkX/eFyIR+O3bZtQZPTHJWn+mCoRpYW60b0= git@lars.software"
     ];
     packages = with pkgs; [
       firefox
