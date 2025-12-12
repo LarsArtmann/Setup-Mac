@@ -61,6 +61,8 @@
 	set-parent = town set-parent
 	ship = town ship
 	sync = town sync
+	down = town down
+	up = town up
 
 [credential]
 	helper = store
