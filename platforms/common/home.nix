@@ -1,4 +1,4 @@
-{ config, pkgs, lib, TypeAssertions, ConfigAssertions, ModuleAssertions, Types, UserConfig, PathConfig, State, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # Common home configuration for all platforms
@@ -56,11 +56,5 @@
     };
   };
 
-  # Ghost Systems integration verification
-  assertions = [
-    {
-      assertion = TypeAssertions != null;
-      message = "Ghost Systems TypeAssertions not injected!";
-    }
-  ];
+
 }

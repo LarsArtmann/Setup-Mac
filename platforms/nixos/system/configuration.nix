@@ -19,9 +19,12 @@
   environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
 
   # Boot configuration - required for system bootability
+  # Using simple GRUB configuration for now to avoid conflicts
   boot.loader.grub = {
     enable = true;
-    device = "/dev/sda";  # Placeholder - would be set to actual disk on target system
+    device = "/dev/sda";  # Will need to be updated for actual hardware
+    efiSupport = true;
+    efiInstallAsRemovable = true;
   };
 
   # User account

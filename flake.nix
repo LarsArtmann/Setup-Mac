@@ -266,8 +266,9 @@
               useUserPackages = true;
               extraSpecialArgs = {
                 inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
-                inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-                inherit UserConfig PathConfig State;
+                # Ghost Systems - Type Safety & Validation (Temporarily disabled for timeout debugging)
+                # inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+                # inherit UserConfig PathConfig State;
               };
               users.lars = {
                 home = {

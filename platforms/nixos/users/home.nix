@@ -1,9 +1,9 @@
-{ config, pkgs, lib, TypeAssertions, ConfigAssertions, ModuleAssertions, Types, UserConfig, PathConfig, State, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
     ../../common/home.nix
-    ../desktop/hyprland.nix
+    # ../desktop/hyprland.nix  # TEMPORARILY DISABLED
   ];
 
   # NixOS-specific session variables
@@ -73,11 +73,5 @@
     createDirectories = true;
   };
 
-  # Ghost Systems integration verification
-  assertions = [
-    {
-      assertion = TypeAssertions != null;
-      message = "Ghost Systems TypeAssertions not injected!";
-    }
-  ];
+
 }
