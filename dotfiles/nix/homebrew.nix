@@ -78,7 +78,7 @@
       "whatsapp"
       "openzfs" # Nixpkgs not available for darwin
       "headlamp" # Kubernetes dashboard; Nixpkgs not available 2025-03-26
-      "hyprnote" # Note-taking app from fastrepl
+      # "fastrepl/hyprnote/hyprnote@nightly" # Note-taking app from fastrepl - temporarily disabled due to broken download
       "orbstack" # A better Docker runner for macOS; Nixpkgs not available 2025-04-14
       "rustdesk" # Remote desktop and screen sharing
       "activitywatch" # Activity tracking
@@ -103,7 +103,7 @@
       "WireGuard" = 1451685025;
     };
     onActivation = {
-      autoUpdate = true;
+      autoUpdate = false; # Disable auto-update to avoid hyprnote issue
       upgrade = true;
       cleanup = "zap";
     };
