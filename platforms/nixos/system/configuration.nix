@@ -4,18 +4,25 @@
   imports = [
     # Import common packages shared with macOS
     ../../common/packages/base.nix
-    # Import extracted modules
-    ./boot.nix
-    ./networking.nix
-    ../services/ssh.nix
-    ../hardware/amd-gpu.nix
-    ../desktop/hyprland-system.nix
-    # Include hardware configuration (will be generated on the machine)
+    # Include hardware configuration - essential for NixOS to boot
     ../hardware/hardware-configuration.nix
+    # TEMPORARILY COMMENTED OUT FOR TIMEOUT DEBUGGING
+    # ./boot.nix
+    # ./networking.nix
+    # ../services/ssh.nix
+    # ../hardware/amd-gpu.nix
+    # ../desktop/hyprland-system.nix
   ];
 
 
-  # SSH Banner - imported from users module
+  # Fix for Home Manager + xdg.portal integration
+  environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
+
+  # Boot configuration - required for system bootability
+  boot.loader.grub = {
+    enable = true;
+    device = "/dev/sda";  # Placeholder - would be set to actual disk on target system
+  };
 
   # User account
   users.users.lars = {
