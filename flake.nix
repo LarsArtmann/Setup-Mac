@@ -153,7 +153,6 @@
           # ./dotfiles/nix/core/SystemAssertions.nix
 
           ./dotfiles/nix/system.nix
-          ./dotfiles/nix/modules/iterm2.nix
 
           # Environment and packages
           ./dotfiles/nix/environment.nix
@@ -223,6 +222,7 @@
                 };
                 imports = [
                   ./dotfiles/nix/home.nix
+                  ./dotfiles/nix/modules/iterm2.nix
                 ];
               };
             };
@@ -241,11 +241,9 @@
         pkgs = pkgsCross;
         specialArgs = {
           inherit inputs nixpkgs-nh-dev nur nix-ai-tools wrappers;
-          # Ghost Systems - Type Safety & Validation (Phase 1 Integration)
-          inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
-          inherit UserConfig PathConfig State;
-          # Validation removed - has Darwin-specific code
-          # inherit Validation;
+          # Ghost Systems - Type Safety & Validation (Temporarily disabled for timeout debugging)
+          # inherit TypeAssertions ConfigAssertions ModuleAssertions Types;
+          # inherit UserConfig PathConfig State;
         };
         modules = [
           # Apply custom packages overlay
