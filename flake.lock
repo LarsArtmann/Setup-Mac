@@ -243,11 +243,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765217760,
-        "narHash": "sha256-BVVyAodLcAD8KOtR3yCStBHSE0WAH/xQWH9f0qsxbmk=",
+        "lastModified": 1765480374,
+        "narHash": "sha256-HlbvQAqLx7WqZFFQZ8nu5UUJAVlXiV/kqKbyueA8srw=",
         "ref": "refs/heads/master",
-        "rev": "e5b1f87841810fc24772bf4389f9793702000c9b",
-        "revCount": 5894,
+        "rev": "39cb677ed9e908e90478aa9fe5f3383dfc1a63f3",
+        "revCount": 5903,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/home-manager"
       },
@@ -259,11 +259,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1765329473,
-        "narHash": "sha256-ZowCqVpq/eN1uLtUoeVw+GaEFnPwOJPQkc1oD14U/KM=",
+        "lastModified": 1765591907,
+        "narHash": "sha256-aUUxkJXV22n5mHo+BeDpPnS0K2f/+doTtR8uh62dqS8=",
         "ref": "refs/heads/main",
-        "rev": "c7311975c09928bb2d3599eada8c6b41a0d5ea0d",
-        "revCount": 372162,
+        "rev": "a1605ca5a8ade1b5e126d38b37b75b55fb953dec",
+        "revCount": 373217,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-cask"
       },
@@ -275,11 +275,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1765329201,
-        "narHash": "sha256-q1SxvCpbw9Yg3lYV5RPadN695ljxb904G/mdD8Y0gQs=",
+        "lastModified": 1765596889,
+        "narHash": "sha256-/gEF6lNn615Jp5OgsXUYStQf3vvq4UwKgQfgN9Oi0Is=",
         "ref": "refs/heads/main",
-        "rev": "7a8fc020d44aad53eff80b3c9fdd0ca9ed47de82",
-        "revCount": 726403,
+        "rev": "50a3e91c895a5608a4b4e3773d6713c53a2acd3d",
+        "revCount": 727848,
         "type": "git",
         "url": "ssh://git@github.com/homebrew/homebrew-core"
       },
@@ -365,11 +365,11 @@
         "xdph": "xdph"
       },
       "locked": {
-        "lastModified": 1765319435,
-        "narHash": "sha256-9EU73XoTJNYiflVFDeplxE6BhAVg4TGPdiB4vbdJmXQ=",
+        "lastModified": 1765543676,
+        "narHash": "sha256-2qaLZ7kqerWXIZpICR/6lkR0J/EEwiS/uYkdhUXv8Sw=",
         "ref": "refs/heads/main",
-        "rev": "f58c80fd3942034d58934ec4e4d93bfcfa3c786e",
-        "revCount": 6702,
+        "rev": "69db0bcae640410b6c587cb0ffd0c89bc8166ff0",
+        "revCount": 6711,
         "type": "git",
         "url": "ssh://git@github.com/hyprwm/Hyprland"
       },
@@ -671,11 +671,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1765301613,
-        "narHash": "sha256-+J6VoLj0J+yKmjubnAShgTDch+GJfwZjPMuPSJ9dLYA=",
+        "lastModified": 1765594737,
+        "narHash": "sha256-9r+CxptJlqTdREkSHA1pxc3oZYnpgYNkAymkQLB0R8w=",
         "ref": "refs/heads/main",
-        "rev": "2b33f1004752fb3bbed4ef90af49d137bd76ad37",
-        "revCount": 2014,
+        "rev": "fb30f7dd63c0c7227c4b80a4dbfb6765f4b9a900",
+        "revCount": 2148,
         "type": "git",
         "url": "ssh://git@github.com/numtide/nix-ai-tools"
       },
@@ -815,11 +815,11 @@
     },
     "nixpkgs_4": {
       "locked": {
-        "lastModified": 1765270179,
-        "narHash": "sha256-g2a4MhRKu4ymR4xwo+I+auTknXt/+j37Lnf0Mvfl1rE=",
+        "lastModified": 1765425892,
+        "narHash": "sha256-jlQpSkg2sK6IJVzTQBDyRxQZgKADC2HKMRfGCSgNMHo=",
         "ref": "nixpkgs-unstable",
-        "rev": "677fbe97984e7af3175b6c121f3c39ee5c8d62c9",
-        "revCount": 909321,
+        "rev": "5d6bdbddb4695a62f0d00a3620b37a15275a5093",
+        "revCount": 910211,
         "type": "git",
         "url": "ssh://git@github.com/NixOS/nixpkgs"
       },
@@ -837,11 +837,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765329419,
-        "narHash": "sha256-EZa5+sqK+7wnCt7Jf+tdZGoeJeLvtsVaWInU6CWWlmw=",
+        "lastModified": 1765608261,
+        "narHash": "sha256-ajZLi6E2UxKz1OtY0H2+kop87tdNFpOJFCVNwlFSWFw=",
         "ref": "refs/heads/main",
-        "rev": "2a09e802cf49e04d8cf504412fd9b1fc9c4b1bc4",
-        "revCount": 37083,
+        "rev": "ffa5fa7396c4ffc0ca963747d1ff09b8bcbfaf33",
+        "revCount": 37193,
         "type": "git",
         "url": "ssh://git@github.com/nix-community/NUR"
       },
