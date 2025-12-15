@@ -13,10 +13,6 @@
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-
-  # Fonts
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    jetbrains-mono
-  ];
+  # Note: Fonts are now handled by hyprland-system.nix
+  # to avoid duplication and maintain consistency
 }

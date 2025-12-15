@@ -8,9 +8,9 @@
     ../hardware/hardware-configuration.nix
     # TEMPORARILY COMMENTED OUT FOR TIMEOUT DEBUGGING
     ./boot.nix
-    # ./networking.nix
-    # ../services/ssh.nix
-    # ../hardware/amd-gpu.nix
+    ./networking.nix
+    ../services/ssh.nix
+    ../hardware/amd-gpu.nix
     # ../desktop/hyprland-system.nix
   ];
 
@@ -46,11 +46,8 @@
 
   # AMD GPU Support - imported from hardware module
 
-  # Fonts
-  fonts.packages = with pkgs; [
-    nerd-fonts.jetbrains-mono
-    jetbrains-mono
-  ];
+  # Font configuration is now handled by hyprland-system.nix
+  # to avoid duplication and maintain consistency
 
   # Experimental features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
