@@ -7,7 +7,7 @@
     # Include hardware configuration - essential for NixOS to boot
     ../hardware/hardware-configuration.nix
     # TEMPORARILY COMMENTED OUT FOR TIMEOUT DEBUGGING
-    # ./boot.nix
+    ./boot.nix
     # ./networking.nix
     # ../services/ssh.nix
     # ../hardware/amd-gpu.nix
@@ -18,14 +18,8 @@
   # Fix for Home Manager + xdg.portal integration
   environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
 
-  # Boot configuration - required for system bootability
-  # Using simple GRUB configuration for now to avoid conflicts
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/sda";  # Will need to be updated for actual hardware
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-  };
+  # Boot configuration is now handled by ./boot.nix module
+  # which provides systemd-boot with proper nvme and Ryzen AI Max+ support
 
   # User account
   users.users.lars = {
