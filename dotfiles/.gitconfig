@@ -9,7 +9,7 @@
 	packedGitWindowSize = 512m
 	pager = cat
 	quotePath = false
-	editor = nano
+	editor = code --wait
 	excludesfile = /Users/larsartmann/.gitignore_global
 [filter "lfs"]
 	clean = git-lfs clean -- %f
