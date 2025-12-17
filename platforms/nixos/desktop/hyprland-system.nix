@@ -41,6 +41,9 @@
     };
   };
 
+  # Add Swaylock PAM service for screen locking
+  security.pam.services.swaylock = {};
+
   # XDG Desktop Portals configuration (Hyprland module will set up the basic ones)
   xdg.portal = {
     enable = true;

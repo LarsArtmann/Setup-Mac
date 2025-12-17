@@ -15,7 +15,7 @@
     ];
 
     # Recommended settings for best experience
-    systemd.enable = true;
+    systemd.enable = false;  # CRITICAL: Disable when using UWSM at system level
     xwayland.enable = true;
 
     settings = {
@@ -170,19 +170,41 @@
 
   # Essential packages for this config
   home.packages = with pkgs; [
+    # Terminal & Core Tools
     kitty # Terminal
     kdePackages.dolphin # File manager
     rofi # App launcher (wayland support included)
+
+    # Hyprland Ecosystem - Essential tools
+    hyprpaper # Wallpaper utility (official)
+    hyprlock # GPU-accelerated screen lock
+    hypridle # Idle daemon for automatic lock/suspend
+    hyprpicker # Color picker
+    hyprsunset # Blue light filter
+    hyprpolkitagent # Modern polkit agent for Hyprland
+
+    # Status Bar & Notifications
     waybar # Status bar
     dunst # Notifications
     libnotify # Notification library
+
+    # Clipboard & Utilities
     wl-clipboard # Clipboard support
-    hyprpaper # Wallpaper (official tool, lower overhead)
-    swww # Animated wallpapers (for cool transitions)
+    cliphist # Clipboard history
+
+    # Animated wallpapers (optional but cool)
+    swww # Animated wallpapers with transitions
     imagemagick # Image manipulation for wallpaper management
+
+    # System Monitoring
     btop # System monitor (used for background)
-    # Additional monitoring tools
     nvtopPackages.amd # AMD GPU/process monitor
     radeontop # AMD GPU specific monitor
+    amdgpu_top # Advanced AMD GPU monitoring
+
+    # Additional useful tools
+    pavucontrol # Audio control GUI
+    xdg-utils # XDG utilities
+    gnome-keyring # Keyring for passwords
   ];
 }

@@ -3,7 +3,7 @@
 {
   imports = [
     ../../common/home.nix
-    # ../desktop/hyprland.nix  # TEMPORARILY DISABLED
+    ../desktop/hyprland.nix  # RE-ENABLED for desktop functionality
   ];
 
   # NixOS-specific session variables

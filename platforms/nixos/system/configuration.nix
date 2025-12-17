@@ -52,6 +52,12 @@
   # Experimental features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  # Binary cache for Hyprland - CRITICAL for fast builds
+  nix.settings = {
+    substituters = ["https://hyprland.cachix.org"];
+    trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+  };
+
   # System state version
   system.stateVersion = "25.11";
 }

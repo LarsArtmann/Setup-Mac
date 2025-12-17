@@ -81,7 +81,7 @@ done
 
 echo -e "\n${YELLOW}4. Checking Environment Variables${NC}"
 # Check important environment variables
-for var in "LIBVA_DRIVER_NAME=radeonsi" "AMD_VULKAN_ICD=RADV" "WLR_RENDERER_ALLOW_SOFTWARE=1"; do
+for var in "LIBVA_DRIVER_NAME=radeonsi" "AMD_VULKAN_ICD=RADV" "MESA_VK_WSI_PRESENT_MODE=fifo"; do
     var_name=$(echo $var | cut -d= -f1)
     var_value=$(echo $var | cut -d= -f2)
 
@@ -104,11 +104,25 @@ else
     check_status 1 "Hyprland package not found"
 fi
 
+# Check if Cachix binary cache is configured
+if grep -q "hyprland.cachix.org" /etc/nix/nix.conf 2>/dev/null; then
+    check_status 0 "Hyprland Cachix binary cache configured"
+else
+    warning "Hyprland Cachix binary cache not configured - builds will be slow"
+fi
+
 # Check if Home Manager configuration includes Hyprland
 if [ -d ~/.config/hypr ]; then
     check_status 0 "Hyprland user configuration found in ~/.config/hypr"
 else
     warning "Hyprland user configuration not found in ~/.config/hypr"
+fi
+
+# Check for UWSM configuration
+if systemctl --user is-active uwsm@wayland.service &>/dev/null; then
+    check_status 0 "UWSM service is active (recommended)"
+else
+    info "UWSM service not active - checking at system boot"
 fi
 
 echo -e "\n${YELLOW}6. Checking Monitoring Tools${NC}"

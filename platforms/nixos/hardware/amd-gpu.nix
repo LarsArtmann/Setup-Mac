@@ -6,6 +6,9 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
+    # Use unstable Mesa for better performance with latest Hyprland
+    package = pkgs-unstable.mesa;
+    package32 = pkgs-unstable.pkgsi686Linux.mesa;
     # Note: amdvlk has been deprecated, RADV is now the default driver
     # OpenCL support via ROCm
     extraPackages = with pkgs; [
@@ -22,11 +25,11 @@
     __GLX_VENDOR_LIBRARY_NAME = "mesa";
     LIBVA_DRIVER_NAME = "radeonsi";
     AMD_VULKAN_ICD = "RADV";
-    # Wayland/Hyprland specific
-    WLR_RENDERER_ALLOW_SOFTWARE = "1";
-    WLR_NO_HARDWARE_CURSORS = "1";
     # Performance optimization
     MESA_VK_WSI_PRESENT_MODE = "fifo";
+    # Remove problematic variables that can cause issues with modern Hyprland
+    # WLR_RENDERER_ALLOW_SOFTWARE = "1";  # Only for debugging
+    # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
   };
 
   # Add essential system packages for AMD GPU
