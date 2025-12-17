@@ -6,12 +6,12 @@
     ../../common/packages/base.nix
     # Include hardware configuration - essential for NixOS to boot
     ../hardware/hardware-configuration.nix
-    # TEMPORARILY COMMENTED OUT FOR TIMEOUT DEBUGGING
+    # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
     ./boot.nix
     ./networking.nix
     ../services/ssh.nix
     ../hardware/amd-gpu.nix
-    # ../desktop/hyprland-system.nix
+    ../desktop/hyprland-system.nix
   ];
 
 
