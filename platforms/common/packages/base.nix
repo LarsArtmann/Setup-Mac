@@ -17,6 +17,9 @@ let
     # Essential editors
     vim
 
+    # Terminal emulator
+    alacritty-graphics
+
     # Shells and prompts
     fish
     starship
