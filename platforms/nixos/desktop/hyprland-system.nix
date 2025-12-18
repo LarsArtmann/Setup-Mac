@@ -9,7 +9,7 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    theme = pkgs.sddm-sugar-dark;
+    theme = "sddm-sugar-dark";
   };
 
   # Enable Hyprland with proper configuration
