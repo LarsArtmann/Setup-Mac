@@ -21,8 +21,9 @@
   outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        # Import custom modules for program management (will be added back when working)
-        # ./flakes/modules.nix
+        # Import custom modules for program management
+        # ./flakes/modules.nix  # Temporarily disabled due to flakeModules export issue
+        # ./flakes/integration.nix  # Temporarily disabled due to dependency
       ];
 
       systems = [ "aarch64-darwin" "x86_64-linux" ];
