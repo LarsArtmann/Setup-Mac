@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, helium, ... }:
 
 {
   imports = [
@@ -28,15 +28,15 @@
       # Fallback if above doesn't work:
       # monitor = "preferred,auto,2,transform,1"  # 2x scale + normal orientation
 
-      exec = [
+      exec-once = [
         "waybar"
         "dunst"
         "wl-paste --watch cliphist store"
         # Desktop consoles setup
-        "kitty --class btop-bg --hold -e btop"                    # System monitor
-        "kitty --class htop-bg --hold -e htop"                    # Process monitor
-        "kitty --class logs-bg --hold -e journalctl -f"           # System logs
-        "kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf" # Config editor
+        "${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop"                    # System monitor
+        "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop"                    # Process monitor
+        "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"           # System logs
+        "${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf" # Config editor
       ];
 
       # Hyprwinwrap plugin configuration
@@ -155,7 +155,7 @@
         "$mod, R, exec, $menu"
         "$mod, N, exec, dolphin"
         "$mod, E, exec, dolphin" # File manager (should probably ensure one is installed)
-        "$mod, B, exec, firefox" # Browser
+        "$mod, B, exec, ${helium.packages.x86_64-linux.default}/bin/helium" # Browser
         "$mod, D, exec, $menu -show run" # Run command
 
         # WINDOW MANAGEMENT
