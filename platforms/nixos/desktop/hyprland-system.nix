@@ -9,6 +9,7 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
+    theme = pkgs.sddm-sugar-dark;
   };
 
   # Enable Hyprland with proper configuration
@@ -75,6 +76,8 @@
 
   # Add essential system packages for Hyprland
   environment.systemPackages = with pkgs; [
+    # SDDM theme for beautiful login screen
+    sddm-sugar-dark
     # Authentication and portal support
     polkit_gnome
     xdg-utils

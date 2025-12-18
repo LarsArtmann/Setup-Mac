@@ -15,7 +15,7 @@
     ];
 
     # Recommended settings for best experience
-    systemd.enable = false;  # CRITICAL: Disable when using UWSM at system level
+    systemd.enable = true;  # Try enabling for better keybinding support
     xwayland.enable = true;
 
     settings = {
@@ -23,7 +23,10 @@
       "$terminal" = "kitty";
       "$menu" = "rofi -show drun -show-icons";
 
-      monitor = "preferred,auto,2";
+      # For TV display - 200% scaling
+      monitor = "HDMI-A-1,preferred,auto,2"  # Adjust HDMI-A-1 to actual output
+      # Fallback if above doesn't work:
+      # monitor = "preferred,auto,2,transform,1"  # 2x scale + normal orientation
 
       exec-once = [
         "waybar"
