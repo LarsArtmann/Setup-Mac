@@ -220,10 +220,10 @@ check:
 # Fast Nix syntax validation
 check-nix-syntax:
     @echo "🔍 Checking Nix syntax..."
-    nix-instantiate --eval --show-trace dotfiles/nix/system.nix
-    nix-instantiate --eval --show-trace dotfiles/nix/core.nix
-    nix-instantiate --eval --show-trace dotfiles/nix/core/ConfigurationAssertions.nix
-    nix-instantiate --eval --show-trace dotfiles/nix/core/SystemAssertions.nix
+    nix-instantiate --eval --show-trace platforms/nix/system.nix
+    nix-instantiate --eval --show-trace platforms/nix/core.nix
+    nix-instantiate --eval --show-trace platforms/nix/core/ConfigurationAssertions.nix
+    nix-instantiate --eval --show-trace platforms/nix/core/SystemAssertions.nix
     @echo "✅ Nix syntax validation complete"
 
 # Format code using treefmt
