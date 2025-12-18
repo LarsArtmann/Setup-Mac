@@ -16,9 +16,12 @@
 
     # Add flake-parts for modular architecture
     flake-parts.url = "github:hercules-ci/flake-parts";
+
+    # Add Helium browser flake for Linux
+    helium.url = "github:amaanq/helium-flake";
   };
 
-  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, ... }:
+  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, helium, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "aarch64-darwin" "x86_64-linux" ];
 
@@ -136,6 +139,7 @@
           specialArgs = {
             inherit (inputs.self) inputs;
             nix-ai-tools = {};
+            inherit helium;
           };
           modules = [
             # Core Darwin configuration with Ghost Systems integration
@@ -149,6 +153,7 @@
           specialArgs = {
             inherit (inputs.self) inputs;
             nix-ai-tools = {};
+            inherit helium;
           };
           modules = [
             # Core system configuration
