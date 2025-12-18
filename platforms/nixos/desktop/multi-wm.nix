@@ -26,63 +26,15 @@
   # LabWC - Openbox-inspired floating window manager
   programs.labwc = {
     enable = true;
-    config = {
-      # Basic LabWC configuration
-      theme = {
-        name = "Adwaita-dark";
-        fontName = "sans";
-        fontSize = 11;
-      };
-      keyboard = {
-        keybind = [
-          # Basic keybinds
-          {
-            key = "A-Tab";
-            action = "NextWindow";
-          }
-          {
-            key = "A-F4";
-            action = "Close";
-          }
-          {
-            key = "A-Return";
-            action = "Execute";
-            command = "foot";
-          }
-          {
-            key = "A-space";
-            action = "ShowMenu";
-            command = "root-menu";
-          }
-        ];
-      };
-      mouse = {
-        defaultAction = "Move";
-        context = [
-          {
-            name = "Root";
-            action = "ShowMenu";
-            command = "root-menu";
-          }
-          {
-            name = "TitleBar";
-            action = "Focus";
-          }
-        ];
-      };
-    };
   };
 
   # Awesome - Dynamic window manager with Lua scripting
-  programs.awesome = {
+  services.xserver.windowManager.awesome = {
     enable = true;
     luaModules = with pkgs.luaPackages; [
       lgi
     ];
   };
-
-  # X11 Window Manager for Awesome (since Awesome is X11-based)
-  services.xserver.windowManager.awesome.enable = true;
 
   # Additional packages needed for all window managers
   environment.systemPackages = with pkgs; [
