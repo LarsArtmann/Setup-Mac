@@ -1,7 +1,7 @@
 { pkgs, lib, ... }:
 let
   # Import centralized user configuration
-  userConfig = import ../../common/core/core/UserConfig.nix { inherit lib; };
+  userConfig = import ../../common/core/UserConfig.nix { inherit lib; };
 in {
   system = {
     primaryUser = userConfig.defaultUser.username;

@@ -135,7 +135,8 @@
         };
 
         "backlight" = {
-          device = "intel_backlight";
+          # Remove intel_backlight for AMD systems
+          # device = "intel_backlight";
           format = "{icon} {percent}%";
           format-icons = ["🌑" "🌒" "🌓" "🌔" "🌕"];
           on-scroll-up = "brightnessctl set +1%";

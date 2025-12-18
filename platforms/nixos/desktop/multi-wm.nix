@@ -47,8 +47,8 @@
     # Screen lockers
     swaylock
 
-    # Status bars
-    waybar
+    # Status bars - REMOVED to avoid conflicts with Home Manager
+    # waybar # Already configured in Home Manager waybar.nix
 
     # File manager
     kdePackages.dolphin

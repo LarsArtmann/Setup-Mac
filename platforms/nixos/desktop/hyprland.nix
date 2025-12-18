@@ -271,6 +271,7 @@
   home.packages = with pkgs; [
     # Terminal & Core Tools
     kitty # Terminal
+    ghostty # Modern terminal emulator
     kdePackages.dolphin # File manager
     rofi # App launcher (wayland support included)
 

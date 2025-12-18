@@ -1,9 +1,9 @@
 { pkgs, lib, inputs, nix-ai-tools, ... }:
 
 let
-  # Import crush from nix-ai-tools if available
-  # crush = nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush" or null;
-  crush = null; # Temporarily disabled due to build error (returning set instead of package)
+  # Import crush from nixpkgs instead of nix-ai-tools
+  # nix-ai-tools is not properly configured as a flake input
+  crush = pkgs.crush or null;
 
   # Import custom packages
   helium-pkg = import ./helium.nix { inherit lib pkgs; };
@@ -82,9 +82,10 @@ let
     # Nix helper tools
     nh
 
-    # Wallpaper management tools
-    swww  # Simple Wayland Wallpaper for animated wallpapers
+    # Wallpaper management tools (Linux-only)
     imagemagick  # Image manipulation for wallpaper management
+  ] ++ lib.optionals stdenv.isLinux [
+    swww  # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
   ];
 
   # GUI Applications (platform-specific)
