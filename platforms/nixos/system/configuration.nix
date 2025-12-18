@@ -59,6 +59,18 @@
     trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
   };
 
+  # Enable font configuration and install Nerd Fonts
+  fonts.packages = with pkgs; [
+    # Nerd Fonts
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  ];
+
+  fonts.fontconfig.defaultFonts = {
+    monospace = [ "JetBrainsMono Nerd Font" ];
+    sansSerif = [ "DejaVu Sans" ];
+    serif = [ "DejaVu Serif" ];
+  };
+
   # System state version
   system.stateVersion = "25.11";
 }

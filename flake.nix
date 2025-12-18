@@ -158,6 +158,14 @@
               nixpkgs.config.allowUnfree = true;
             }
 
+            # Import Home Manager module for NixOS
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.lars = import ./platforms/nixos/users/home.nix;
+            }
+
             # Import the existing NixOS configuration
             ./platforms/nixos/system/configuration.nix
           ];

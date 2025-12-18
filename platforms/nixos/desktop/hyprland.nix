@@ -28,7 +28,7 @@
       # Fallback if above doesn't work:
       # monitor = "preferred,auto,2,transform,1"  # 2x scale + normal orientation
 
-      exec-once = [
+      exec = [
         "waybar"
         "dunst"
         "wl-paste --watch cliphist store"
