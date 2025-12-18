@@ -46,8 +46,11 @@
   };
 
   # Enable D-Bus for portal communication
-  services.dbus.enable = true;
-  # Note: UWSM sets dbus.implementation = "broker" - let it handle this
+  services.dbus = {
+    enable = true;
+    # Use dbus-broker for better Wayland support (UWSM preferred)
+    implementation = "broker";
+  };
 
   # Configure keymap in X11
   services.xserver.xkb = {

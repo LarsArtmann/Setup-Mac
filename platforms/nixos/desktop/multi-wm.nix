@@ -76,26 +76,13 @@
     wl-clipboard
   ];
 
-  # Enable D-Bus for all window managers
-  services.dbus.enable = true;
+  # D-Bus is enabled in hyprland-system.nix to avoid duplication
 
   # Enable polkit for authentication
   security.polkit.enable = true;
 
-  # Add polkit GNOME authentication agent service (shared)
-  systemd.user.services.polkit-gnome-authentication-agent-1 = {
-    description = "polkit-gnome-authentication-agent-1";
-    wantedBy = [ "graphical-session.target" ];
-    wants = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-      Restart = "on-failure";
-      RestartSec = 1;
-      TimeoutStopSec = 10;
-    };
-  };
+  # Polkit authentication agent handled by system-level services
+  # Removed manual user service to avoid conflicts with UWSM
 
   # XDG Desktop Portals configuration (works with all WMs)
   xdg.portal = {
