@@ -14,11 +14,14 @@
 
         modules-left = [
           "hyprland/workspaces"
+          "hyprland/submap"
           "hyprland/window"
         ];
 
         modules-center = [
+          "idle_inhibitor"
           "clock"
+          "custom/media"
         ];
 
         modules-right = [
@@ -27,8 +30,11 @@
           "cpu"
           "memory"
           "temperature"
+          "backlight"
           "battery"
+          "custom/clipboard"
           "tray"
+          "custom/power"
         ];
 
         # Modules configuration
@@ -36,11 +42,30 @@
           disable-scroll = true;
           all-outputs = true;
           format = "{name}";
+          format-icons = {
+            persistent = "";
+            default = "";
+            urgent = "";
+            active = "󰮯";
+          };
+        };
+
+        "hyprland/submap" = {
+          format = "<span style='italic'> {}</span>";
+        };
+
+        "idle_inhibitor" = {
+          format = "{icon}";
+          format-icons = {
+            activated = "";
+            deactivated = "";
+          };
         };
 
         "clock" = {
+          format = "<span>󰥔</span> {:%H:%M}";
+          format-alt = "<span>󰃭</span> {:%Y-%m-%d}";
           tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          format-alt = "{:%Y-%m-%d}";
         };
 
         "cpu" = {
@@ -97,73 +122,152 @@
           };
           on-click = "pavucontrol";
         };
+
+        "custom/media" = {
+          format = "{icon} {}";
+          format-icons = {
+            DEFAULT = "🎵";
+            spotify = "";
+          };
+          exec = "playerctl metadata --format '{{artist}} - {{title}}' || echo 'Nothing playing'";
+          interval = 5;
+          tooltip = false;
+        };
+
+        "backlight" = {
+          device = "intel_backlight";
+          format = "{icon} {percent}%";
+          format-icons = ["🌑" "🌒" "🌓" "🌔" "🌕"];
+          on-scroll-up = "brightnessctl set +1%";
+          on-scroll-down = "brightnessctl set 1%-";
+        };
+
+        "custom/clipboard" = {
+          format = "📋 {}";
+          exec = "cliphist list | head -1 | cut -d'\t' -f2- || echo 'Empty'";
+          interval = 5;
+          tooltip = false;
+          on-click = "cliphist list | rofi -dmenu -p 'Clipboard:' | cliphist decode | wl-copy";
+        };
+
+        "custom/power" = {
+          format = "⏻";
+          on-click = "wlogout";
+          tooltip = "Power menu";
+        };
       };
     };
 
     style = ''
       * {
         border: none;
-        border-radius: 0;
+        border-radius: 8px;
         font-family: "JetBrainsMono Nerd Font";
-        font-size: 16px;
+        font-size: 14px;
         min-height: 0;
-        margin: 8px 0px;
+        margin: 4px 2px;
+        padding: 0 8px;
       }
 
       window#waybar {
-        background: rgba(43, 48, 59, 0.95);
-        color: white;
-        font-size: 16px;
+        background: rgba(26, 27, 38, 0.8);
+        color: #cdd6f4;
+        border-radius: 12px;
+        border: 1px solid rgba(137, 180, 250, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
       }
 
       #workspaces button {
-        padding: 0 5px;
+        padding: 0 8px;
         background-color: transparent;
-        color: white;
+        color: #bac2de;
+        border-radius: 8px;
+        transition: all 0.3s ease;
       }
 
       #workspaces button:hover {
-        background: rgba(0, 0, 0, 0.2);
-        box-shadow: inherit;
-        text-shadow: inherit;
+        background: rgba(137, 180, 250, 0.2);
+        color: #cdd6f4;
+        transform: scale(1.05);
       }
 
       #workspaces button.active {
-        background-color: #64727D;
-        box-shadow: inset 0 -3px #ffffff;
+        background: linear-gradient(45deg, #89b4fa, #b4befe);
+        color: #1e1e2e;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(137, 180, 250, 0.4);
       }
 
+      #workspaces button.persistent {
+        color: #6c7086;
+        font-weight: normal;
+      }
+
+      #workspaces button.urgent {
+        background: rgba(243, 139, 168, 0.3);
+        color: #f38ba8;
+      }
+
+      #custom-media,
+      #idle_inhibitor,
+      #submap,
       #clock,
       #battery,
+      #backlight,
       #cpu,
       #memory,
       #temperature,
       #network,
       #pulseaudio,
-      #tray,
-      #mode {
-        padding: 0 10px;
+      #custom-clipboard,
+      #custom-power,
+      #tray {
+        padding: 0 12px;
         margin: 0 4px;
-        color: white;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+
+      #custom-media {
+        background: rgba(166, 227, 233, 0.15);
+        color: #94e2d5;
+      }
+
+      #idle_inhibitor {
+        background: rgba(245, 224, 220, 0.15);
+        color: #f5e0dc;
+      }
+
+      #submap {
+        background: rgba(203, 166, 247, 0.15);
+        color: #cba6f7;
       }
 
       #clock {
-        background-color: #64727D;
+        background: linear-gradient(45deg, #89b4fa, #b4befe);
+        color: #1e1e2e;
+        font-weight: bold;
       }
 
       #battery {
-        background-color: #ffffff;
-        color: #000000;
+        background: rgba(250, 179, 135, 0.15);
+        color: #fab387;
+      }
+
+      #backlight {
+        background: rgba(249, 226, 175, 0.15);
+        color: #f9e2af;
       }
 
       #battery.charging, #battery.plugged {
-        color: #ffffff;
-        background-color: #26A65B;
+        color: #a6e3a1;
+        background: rgba(166, 227, 161, 0.15);
       }
 
       #battery.critical:not(.charging) {
-        background-color: #F53C3C;
-        color: #ffffff;
+        background: rgba(243, 139, 168, 0.3);
+        color: #f38ba8;
         animation-name: blink;
         animation-duration: 0.5s;
         animation-timing-function: linear;
@@ -173,36 +277,60 @@
 
       @keyframes blink {
         to {
-          background-color: #ffffff;
-          color: #000000;
+          background: rgba(243, 139, 168, 0.6);
         }
       }
 
       #cpu {
-        background-color: #2ecc71;
-        color: #000000;
+        background: rgba(166, 227, 161, 0.15);
+        color: #a6e3a1;
       }
 
       #memory {
-        background-color: #9b59b6;
+        background: rgba(203, 166, 247, 0.15);
+        color: #cba6f7;
       }
 
       #temperature {
-        background-color: #f0932b;
+        background: rgba(250, 179, 135, 0.15);
+        color: #fab387;
       }
 
       #network {
-        background-color: #2980b9;
+        background: rgba(137, 180, 250, 0.15);
+        color: #89b4fa;
       }
 
       #pulseaudio {
-        background-color: #f1c40f;
-        color: #000000;
+        background: rgba(249, 226, 175, 0.15);
+        color: #f9e2af;
       }
 
       #pulseaudio.muted {
-        background-color: #90b1b1;
-        color: #2a5c45;
+        background: rgba(108, 112, 134, 0.15);
+        color: #6c7086;
+      }
+
+      #custom-clipboard {
+        background: rgba(243, 139, 168, 0.15);
+        color: #f38ba8;
+        font-size: 12px;
+      }
+
+      #custom-power {
+        background: rgba(243, 139, 168, 0.15);
+        color: #f38ba8;
+        padding: 0 8px;
+      }
+
+      #custom-power:hover {
+        background: rgba(243, 139, 168, 0.3);
+      }
+
+      #tray {
+        background: rgba(180, 190, 254, 0.15);
+        color: #b4befe;
+        padding: 0 8px;
       }
     '';
   };

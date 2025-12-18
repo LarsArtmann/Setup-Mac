@@ -29,8 +29,11 @@
         "waybar"
         "dunst"
         "wl-paste --watch cliphist store"
-        # Btop as desktop background
-        "kitty --class btop-bg --hold -e btop"
+        # Desktop consoles setup
+        "kitty --class btop-bg --hold -e btop"                    # System monitor
+        "kitty --class htop-bg --hold -e htop"                    # Process monitor
+        "kitty --class logs-bg --hold -e journalctl -f"           # System logs
+        "kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf" # Config editor
       ];
 
       # Hyprwinwrap plugin configuration
@@ -41,7 +44,7 @@
       };
 
       windowrulev2 = [
-        # Configure btop as a pseudo-wallpaper
+        # Btop system monitor
         "float,class:^(btop-bg)$"
         "fullscreen,class:^(btop-bg)$"
         "noanim,class:^(btop-bg)$"
@@ -49,6 +52,33 @@
         "noblur,class:^(btop-bg)$"
         "noshadow,class:^(btop-bg)$"
         "noborder,class:^(btop-bg)$"
+
+        # Htop process monitor
+        "float,class:^(htop-bg)$"
+        "nofocus,class:^(htop-bg)$"
+        "noblur,class:^(htop-bg)$"
+        "noshadow,class:^(htop-bg)$"
+        "noborder,class:^(htop-bg)$"
+        "size 800 600,class:^(htop-bg)$"
+        "move 100 100,class:^(htop-bg)$"
+
+        # System logs
+        "float,class:^(logs-bg)$"
+        "nofocus,class:^(logs-bg)$"
+        "noblur,class:^(logs-bg)$"
+        "noshadow,class:^(logs-bg)$"
+        "noborder,class:^(logs-bg)$"
+        "size 800 600,class:^(logs-bg)$"
+        "move 920 100,class:^(logs-bg)$"
+
+        # Config editor
+        "float,class:^(nvim-bg)$"
+        "nofocus,class:^(nvim-bg)$"
+        "noblur,class:^(nvim-bg)$"
+        "noshadow,class:^(nvim-bg)$"
+        "noborder,class:^(nvim-bg)$"
+        "size 800 600,class:^(nvim-bg)$"
+        "move 100 720,class:^(nvim-bg)$"
       ];
 
       general = {
@@ -115,23 +145,46 @@
       };
 
       bind = [
+        # APPLICATION LAUNCHING
         "$mod, Q, exec, $terminal"
-        "$mod, C, killactive,"
-        "$mod, M, exit,"
-        "$mod, E, exec, dolphin" # File manager (should probably ensure one is installed)
-        "$mod, V, togglefloating,"
+        "$mod, Return, exec, $terminal"
+        "$mod, Space, exec, $menu"
         "$mod, R, exec, $menu"
+        "$mod, N, exec, dolphin"
+        "$mod, E, exec, dolphin" # File manager (should probably ensure one is installed)
+        "$mod, B, exec, firefox" # Browser
+        "$mod, D, exec, $menu -show run" # Run command
+
+        # WINDOW MANAGEMENT
+        "$mod, C, killactive,"
+        "$mod, V, togglefloating,"
+        "$mod, F, fullscreen,"
+        "$mod, M, fullscreen, 1" # Maximize
         "$mod, P, pseudo," # dwindle
         "$mod, J, togglesplit," # dwindle
-        "$mod, F, fullscreen,"
+        "$mod, T, togglefloating,"
 
-        # Move focus with mod + arrow keys
+        # FOCUS NAVIGATION
         "$mod, left, movefocus, l"
         "$mod, right, movefocus, r"
         "$mod, up, movefocus, u"
         "$mod, down, movefocus, d"
+        "$mod, H, movefocus, l"
+        "$mod, L, movefocus, r"
+        "$mod, K, movefocus, u"
+        "$mod, J, movefocus, d"
 
-        # Switch workspaces with mod + [0-9]
+        # WINDOW MOVEMENT
+        "$mod SHIFT, left, movewindow, l"
+        "$mod SHIFT, right, movewindow, r"
+        "$mod SHIFT, up, movewindow, u"
+        "$mod SHIFT, down, movewindow, d"
+        "$mod SHIFT, H, movewindow, l"
+        "$mod SHIFT, L, movewindow, r"
+        "$mod SHIFT, K, movewindow, u"
+        "$mod SHIFT, J, movewindow, d"
+
+        # WORKSPACES
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
         "$mod, 3, workspace, 3"
@@ -143,7 +196,7 @@
         "$mod, 9, workspace, 9"
         "$mod, 0, workspace, 10"
 
-        # Move active window to a workspace with mod + SHIFT + [0-9]
+        # MOVE TO WORKSPACE
         "$mod SHIFT, 1, movetoworkspace, 1"
         "$mod SHIFT, 2, movetoworkspace, 2"
         "$mod SHIFT, 3, movetoworkspace, 3"
@@ -155,9 +208,52 @@
         "$mod SHIFT, 9, movetoworkspace, 9"
         "$mod SHIFT, 0, movetoworkspace, 10"
 
-        # Scroll through existing workspaces with mod + scroll
+        # MOVE WITH WINDOW TO WORKSPACE
+        "ALT SHIFT, 1, movetoworkspacesilent, 1"
+        "ALT SHIFT, 2, movetoworkspacesilent, 2"
+        "ALT SHIFT, 3, movetoworkspacesilent, 3"
+        "ALT SHIFT, 4, movetoworkspacesilent, 4"
+        "ALT SHIFT, 5, movetoworkspacesilent, 5"
+        "ALT SHIFT, 6, movetoworkspacesilent, 6"
+        "ALT SHIFT, 7, movetoworkspacesilent, 7"
+        "ALT SHIFT, 8, movetoworkspacesilent, 8"
+        "ALT SHIFT, 9, movetoworkspacesilent, 9"
+        "ALT SHIFT, 0, movetoworkspacesilent, 10"
+
+        # SPECIAL WORKSPACE
+        "$mod, S, togglespecialworkspace, magic"
+        "$mod SHIFT, S, movetoworkspace, special:magic"
+
+        # SCROLL THROUGH WORKSPACES
         "$mod, mouse_down, workspace, e+1"
         "$mod, mouse_up, workspace, e-1"
+
+        # SYSTEM CONTROLS
+        "$mod, Escape, exec, hyprlock" # Lock screen
+        "$mod, X, exec, wlogout" # Power menu
+        "$mod SHIFT, R, reload" # Reload config
+        "$mod SHIFT, E, exec, wlogout" # Power menu
+        "$mod, Print, exec, grimblast copy area" # Screenshot area
+        "$mod SHIFT, Print, exec, grimblast copy screen" # Screenshot screen
+        "$mod CTRL, Print, exec, grimblast copy window" # Screenshot window
+
+        # AUDIO CONTROLS
+        ", XF86AudioRaiseVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%"
+        ", XF86AudioLowerVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ -5%"
+        ", XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle"
+        ", XF86AudioPlay, exec, playerctl play-pause"
+        ", XF86AudioNext, exec, playerctl next"
+        ", XF86AudioPrev, exec, playerctl previous"
+
+        # SCREEN BRIGHTNESS
+        ", XF86MonBrightnessUp, exec, brightnessctl set +5%"
+        ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+
+        # DESKTOP TERMINALS TOGGLE (placeholders - need implementation)
+        "$mod, F1, exec, hyprctl dispatch focuswindow ^btop-bg$"
+        "$mod, F2, exec, hyprctl dispatch focuswindow ^htop-bg$"
+        "$mod, F3, exec, hyprctl dispatch focuswindow ^logs-bg$"
+        "$mod, F4, exec, hyprctl dispatch focuswindow ^nvim-bg$"
       ];
 
       bindm = [
@@ -206,5 +302,17 @@
     pavucontrol # Audio control GUI
     xdg-utils # XDG utilities
     gnome-keyring # Keyring for passwords
+
+    # Enhanced tools for superb setup
+    wlogout # Modern logout menu
+    grimblast # Enhanced screenshot utility (requires grim and slurp)
+    grim # Screenshot tool
+    slurp # Area selection tool
+    playerctl # Media player control
+    brightnessctl # Brightness control
+
+    # Modern alternatives for desktop terminals
+    htop # Process monitor
+    neovim # Text editor
   ];
 }
