@@ -29,14 +29,14 @@
       # monitor = "preferred,auto,2,transform,1"  # 2x scale + normal orientation
 
       exec-once = [
-        "waybar"
-        "dunst"
-        "wl-paste --watch cliphist store"
+        ''waybar''
+        ''dunst''
+        ''wl-paste --watch cliphist store''
         # Desktop consoles setup
-        "${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop"                    # System monitor
-        "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop"                    # Process monitor
-        "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"           # System logs
-        "${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf" # Config editor
+        ''${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop''                    # System monitor
+        ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop''                    # Process monitor
+        ''${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f''           # System logs
+        ''${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf'' # Config editor
       ];
 
       # Hyprwinwrap plugin configuration
