@@ -4,7 +4,7 @@
   system = {
     # Set system state version for nix-darwin
     stateVersion = 6;
-    
+
     defaults = {
       # Global macOS settings
       NSGlobalDomain = {
