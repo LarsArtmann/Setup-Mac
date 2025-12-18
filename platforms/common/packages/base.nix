@@ -5,6 +5,9 @@ let
   # crush = nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush" or null;
   crush = null; # Temporarily disabled due to build error (returning set instead of package)
 
+  # Import custom packages
+  helium-pkg = import ./helium.nix { inherit lib pkgs; };
+
   # Essential CLI tools that work across platforms
   essentialPackages = with pkgs; [
     # Version control
@@ -84,11 +87,19 @@ let
     imagemagick  # Image manipulation for wallpaper management
   ];
 
+  # GUI Applications (platform-specific)
+  guiPackages = with pkgs; lib.optionals stdenv.isDarwin [
+    # Import Helium browser
+    (import ./helium.nix { inherit lib pkgs; })
+  ] ++ lib.optionals (stdenv.isDarwin && config.allowUnfree or false) [
+    google-chrome  # Chrome browser (unfree)
+  ];
+
   # AI tools (conditionally added)
   aiPackages = lib.optional (crush != null) crush;
 
 in
 {
   # System packages list
-  environment.systemPackages = essentialPackages ++ developmentPackages ++ aiPackages;
+  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages;
 }

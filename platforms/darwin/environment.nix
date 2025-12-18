@@ -12,7 +12,7 @@
 
   # Darwin-specific packages
   environment.systemPackages = with pkgs; [
-    # Note: Google Chrome removed due to unfree license issues
-    # iterm2  # Managed through nix-darwin directly
+    # Additional macOS-specific system packages can go here
+    # Chrome and Helium are now managed through common/packages/base.nix
   ];
 }

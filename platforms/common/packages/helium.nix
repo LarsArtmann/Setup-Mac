@@ -1,23 +1,21 @@
 { lib
-, stdenv
-, fetchurl
-, undmg
+, pkgs
 }:
 
-stdenv.mkDerivation rec {
+pkgs.stdenv.mkDerivation rec {
   pname = "helium";
   version = "0.4.5.1";
 
   # Architecture-specific source handling (2025 best practice)
-  src = fetchurl {
-    url = "https://github.com/imputnet/helium-macos/releases/download/${version}/helium_${version}_${if stdenv.isAarch64 then "arm64" else "x86_64"}-macos.dmg";
-    sha256 = if stdenv.isAarch64
+  src = pkgs.fetchurl {
+    url = "https://github.com/imputnet/helium-macos/releases/download/${version}/helium_${version}_${if pkgs.stdenv.isAarch64 then "arm64" else "x86_64"}-macos.dmg";
+    sha256 = if pkgs.stdenv.isAarch64
       then "sha256-Psfn+FnT+jw460t6rKcxq7iuNbeo3usgfDtgUwCBbiY=" # ARM64 hash
       else "sha256-md+/IHgTX8jLIxi8FaBbODG5SiLv76SOpuYCxfP1t90="; # x86_64 hash
   };
 
   # Build inputs (2025 best practice: explicit dependencies)
-  nativeBuildInputs = [ undmg ];
+  nativeBuildInputs = with pkgs; [ undmg ];
 
   # Best practice: explicit source root
   sourceRoot = ".";
@@ -65,6 +63,6 @@ EOF
     # unfree = true;
     mainProgram = "helium";
     # Supported macOS versions
-    broken = stdenv.isDarwin && stdenv.hostPlatform.system == "x86_64-darwin" && lib.versionOlder stdenv.hostPlatform.darwinMinVersion "10.15";
+    broken = pkgs.stdenv.isDarwin && pkgs.stdenv.hostPlatform.system == "x86_64-darwin" && lib.versionOlder pkgs.stdenv.hostPlatform.darwinMinVersion "10.15";
   };
 }
