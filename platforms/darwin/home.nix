@@ -35,8 +35,7 @@
 
   # Darwin-specific packages
   home.packages = with pkgs; [
-    # macOS-specific tools
-    iterm2
-    google-chrome
+    # Note: Google Chrome and iTerm2 removed due to unfree/license issues
+    # These will be managed through system packages or Homebrew
   ];
 }

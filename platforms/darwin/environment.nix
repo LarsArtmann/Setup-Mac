@@ -12,8 +12,7 @@
 
   # Darwin-specific packages
   environment.systemPackages = with pkgs; [
-    iterm2
-    google-chrome
-    # Homebrew managed packages are referenced but not installed here
+    # Note: Google Chrome removed due to unfree license issues
+    # iterm2  # Managed through nix-darwin directly
   ];
 }

@@ -28,11 +28,13 @@
       darwin-pkgs = import nixpkgs {
         localSystem.system = "aarch64-darwin";
         stdenv.hostPlatform.system = "aarch64-darwin";
+        config.allowUnfree = true;  # Allow unfree packages like Google Chrome
       };
 
       linux-pkgs = import nixpkgs {
         localSystem.system = "x86_64-linux";
         stdenv.hostPlatform.system = "x86_64-linux";
+        config.allowUnfree = true;  # Allow unfree packages
       };
     in
     {
@@ -45,8 +47,8 @@
           nix-ai-tools = {};  # Placeholder for now - can be added later
         };
         modules = [
-          # Test minimal configuration first
-          ./platforms/darwin/test-darwin.nix
+          # Core Darwin configuration with Ghost Systems integration
+          ./platforms/darwin/darwin.nix
         ];
       };
 
