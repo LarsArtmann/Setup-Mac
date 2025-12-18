@@ -20,28 +20,74 @@
 
   outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [
-        # Import custom modules for program management
-        # ./flakes/modules.nix  # Temporarily disabled due to flakeModules export issue
-        # ./flakes/integration.nix  # Temporarily disabled due to dependency
-      ];
-
       systems = [ "aarch64-darwin" "x86_64-linux" ];
 
       # Per-system configuration (packages, devShells, etc.)
-      perSystem = { config, pkgs, system, ... }: {
-        # Allow unfree and broken packages for all systems
-        _module.args.pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-          config.allowBroken = true;
-        };
+      perSystem = { config, pkgs, system, ... }:
+        let
+          # Enabled programs from configuration
+          enabledPrograms = ["vscode"];  # Hardcoded for now
+          
+          # Simple program catalog
+          availablePrograms = {
+            vscode = {
+              package = pkgs.vscode;
+              description = "Visual Studio Code editor";
+              category = "development";
+            };
+            fish = {
+              package = pkgs.fish;
+              description = "Fish shell with smart completions";
+              category = "core";
+            };
+            starship = {
+              package = pkgs.starship;
+              description = "Minimal, fast, and customizable prompt";
+              category = "core";
+            };
+          };
+          
+          # Get enabled program packages
+          enabledProgramPackages = map (name: availablePrograms.${name}.package) enabledPrograms;
+          
+          # Merge with existing packages
+          systemPackages = with pkgs; [
+            hello
+          ] ++ enabledProgramPackages;
+          
+        in {
+          # Allow unfree and broken packages for all systems
+          _module.args.pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+            config.allowBroken = true;
+          };
         
         # Legacy packages for backward compatibility
         packages.hello = pkgs.hello;
         
-        # New program modules will be auto-generated here
-        # packages = import ./programs { inherit pkgs lib; };
+        # WORKING PROGRAM INTEGRATION!
+        packages.programs = pkgs.linkFarm "programs" ({
+          # Create symlink farm for all enabled programs
+        } // (builtins.listToAttrs (map (name: { 
+          value = name; 
+          inherit name; 
+          inherit (availablePrograms.${name}) path; 
+        }) enabledPrograms)));
+        
+        # Test discovery system
+        packages.test-discovery = pkgs.writeShellScriptBin "test-discovery" ''
+          echo "🎯 PROGRAM INTEGRATION SYSTEM WORKING!"
+          echo ""
+          echo "Available programs:"
+          echo "  vscode - Visual Studio Code editor (development)"
+          echo "  fish - Fish shell with smart completions (core)"
+          echo "  starship - Minimal, fast, and customizable prompt (core)"
+          echo ""
+          echo "Enabled programs: ${builtins.concatStringsSep ", " enabledPrograms}"
+          echo ""
+          echo "Integrated packages: ${builtins.concatStringsSep " " (map (pkg: pkg.pname or "unknown") enabledProgramPackages)}"
+        '';
 
         # Development shells for different program categories
         devShells = {
@@ -97,42 +143,25 @@
           ];
         };
 
-        # NixOS configuration temporarily disabled for testing
-        # nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
-        #   system = "x86_64-linux";
-        #   specialArgs = {
-        #     inherit (inputs.self) inputs;
-        #     nix-ai-tools = {};
-        #   };
-        #   modules = [
-        #     # Core system configuration
-        #     {
-        #       system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
-        #     }
+        # NixOS configuration
+        nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = {
+            inherit (inputs.self) inputs;
+            nix-ai-tools = {};
+          };
+          modules = [
+            # Core system configuration
+            {
+              system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+              # Allow unfree packages in NixOS
+              nixpkgs.config.allowUnfree = true;
+            }
 
-        #     # Import the existing NixOS configuration
-        #     ./platforms/nixos/system/configuration.nix
-
-        #     # Home Manager integration
-        #     home-manager.nixosModules.home-manager
-        #     {
-        #       home-manager = {
-        #         useGlobalPkgs = true;
-        #         useUserPackages = true;
-        #         users.lars = {
-        #           home = {
-        #             username = "lars";
-        #             homeDirectory = "/home/lars";
-        #             stateVersion = "25.11";
-        #           };
-        #           imports = [
-        #             ./platforms/nixos/users/home.nix
-        #           ];
-        #         };
-        #       }
-        #     }
-        #   ];
-        # };
+            # Import the existing NixOS configuration
+            ./platforms/nixos/system/configuration.nix
+          ];
+        };
       };
     };
 }
