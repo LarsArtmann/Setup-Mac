@@ -27,7 +27,7 @@
         let
           # Enabled programs from configuration
           enabledPrograms = ["vscode"];  # Hardcoded for now
-          
+
           # Simple program catalog
           availablePrograms = {
             vscode = {
@@ -46,15 +46,15 @@
               category = "core";
             };
           };
-          
+
           # Get enabled program packages
           enabledProgramPackages = map (name: availablePrograms.${name}.package) enabledPrograms;
-          
+
           # Merge with existing packages
           systemPackages = with pkgs; [
             hello
           ] ++ enabledProgramPackages;
-          
+
         in {
           # Allow unfree and broken packages for all systems
           _module.args.pkgs = import nixpkgs {
@@ -62,19 +62,19 @@
             config.allowUnfree = true;
             config.allowBroken = true;
           };
-        
+
         # Legacy packages for backward compatibility
         packages.hello = pkgs.hello;
-        
+
         # WORKING PROGRAM INTEGRATION!
         packages.programs = pkgs.linkFarm "programs" ({
           # Create symlink farm for all enabled programs
-        } // (builtins.listToAttrs (map (name: { 
-          value = name; 
-          inherit name; 
-          inherit (availablePrograms.${name}) path; 
+        } // (builtins.listToAttrs (map (name: {
+          value = name;
+          inherit name;
+          inherit (availablePrograms.${name}) path;
         }) enabledPrograms)));
-        
+
         # Test discovery system
         packages.test-discovery = pkgs.writeShellScriptBin "test-discovery" ''
           echo "🎯 PROGRAM INTEGRATION SYSTEM WORKING!"

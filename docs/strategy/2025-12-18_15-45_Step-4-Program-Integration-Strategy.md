@@ -40,7 +40,7 @@ The program module system is architecturally perfect but **completely disconnect
 perSystem = { config, pkgs, system, ... }: {
   # Import and integrate programs
   programs = import ./programs { inherit lib pkgs config; };
-  
+
   # Merge with existing system packages
   environment.systemPackages = pkgs.hello ++ programs.packages;
 }
@@ -135,20 +135,20 @@ programs = {
       category = "development";
       platforms = ["aarch64-darwin" "x86_64-linux"];
     };
-    
+
     fish = {
       package = pkgs.fish;
       description = "Fish shell";
       category = "core";
       platforms = ["aarch64-darwin" "x86_64-linux"];
     };
-    
+
     # Add more programs...
   };
-  
+
   # Get enabled programs from config
-  getEnabledPrograms = enabledPrograms: 
-    lib.filterAttrs (name: program: 
+  getEnabledPrograms = enabledPrograms:
+    lib.filterAttrs (name: program:
       lib.elem name enabledPrograms
     ) listPrograms;
 }
@@ -159,18 +159,18 @@ programs = {
 perSystem = { config, pkgs, system, ... }: {
   # Import program discovery
   programsDiscovery = import ./programs/discovery.nix { inherit lib pkgs config; };
-  
+
   # Default enabled programs (from configuration)
   enabledPrograms = ["vscode"];  # Start with VS Code
-  
+
   # Get available programs
   availablePrograms = programsDiscovery.listPrograms;
-  
+
   # Get enabled program configs
   enabledConfigs = programsDiscovery.getEnabledPrograms enabledPrograms;
-  
+
   # Merge packages into system
-  environment.systemPackages = [pkgs.hello] ++ 
+  environment.systemPackages = [pkgs.hello] ++
     (lib.mapAttrsToList (name: config: config.package) enabledConfigs);
 }
 ```
@@ -222,7 +222,7 @@ perSystem = { config, pkgs, system, ... }: {
 perSystem = { config, pkgs, system, ... }: {
   # CLI packages
   packages.setup-mac-cli = cli.setupMacCli;
-  
+
   # Apps for CLI
   apps.programs-list = {
     type = "app";
@@ -248,7 +248,7 @@ perSystem = { config, pkgs, system, ... }: {
       default = [];
       description = "List of enabled program modules";
     };
-    
+
     settings = lib.mkOption {
       type = lib.types.attrsOf lib.types.attrs;
       default = {};
@@ -263,7 +263,7 @@ perSystem = { config, pkgs, system, ... }: {
 perSystem = { config, pkgs, ... }: {
   # Configuration management
   programsConfig = import ../flakes/config.nix { inherit lib; };
-  
+
   # Merge program settings
   setup-mac.programs = {
     enable = ["vscode"];
@@ -294,7 +294,7 @@ perSystem = { config, pkgs, ... }: {
       in builtins.attrNames programs.listPrograms
     ' > $out
   '';
-  
+
   # Test integration
   integration-test = pkgs.runCommand "test-integration" ''
     # Test that VS Code appears in packages

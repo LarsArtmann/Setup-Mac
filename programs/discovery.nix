@@ -13,7 +13,7 @@
       platforms = ["aarch64-darwin" "x86_64-linux"];
       module = ./development/editors/vscode.nix;
     };
-    
+
     fish = {
       package = pkgs.fish;
       description = "Fish shell with smart completions";
@@ -22,7 +22,7 @@
       # Simple configuration (no external module yet)
       module = null;
     };
-    
+
     starship = {
       package = pkgs.starship;
       description = "Minimal, fast, and customizable prompt";
@@ -30,7 +30,7 @@
       platforms = ["aarch64-darwin" "x86_64-linux"];
       module = null;
     };
-    
+
     git = {
       package = pkgs.git;
       description = "Distributed version control system";
@@ -39,7 +39,7 @@
       module = null;
     };
   };
-  
+
   # Helper to get enabled program configurations
   getEnabledPrograms = enabledPrograms:
     let
@@ -48,14 +48,14 @@
       filterFunc = name: config: lib.hasAttr name enabledProgramSet;
     in
     lib.filterAttrs filterFunc availablePrograms;
-  
+
   # Helper to get packages from enabled programs
   getEnabledPackages = enabledPrograms:
     let
       enabledConfigs = getEnabledPrograms enabledPrograms;
     in
     lib.mapAttrsToList (name: config: config.package) enabledConfigs;
-  
+
   # Helper to get program module imports
   getEnabledModules = enabledPrograms:
     let
@@ -63,7 +63,7 @@
       hasModule = name: config: config.module != null;
     in
     lib.filterAttrs (name: config: hasModule name config) enabledConfigs;
-  
+
   # List all programs with details
   listPrograms = format:
     let
@@ -73,7 +73,7 @@
         inherit (config.category);
         inherit (config.platforms);
       }) availablePrograms;
-      
+
       formatLine = program:
         if format == "simple" then
           "  ${program.name} - ${program.description} (${program.category})"
