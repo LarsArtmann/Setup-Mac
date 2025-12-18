@@ -133,7 +133,7 @@ test_package_availability() {
     log "Running package availability test..."
 
     # Extract package names from configurations
-    local packages=$(grep -h "pkgs\." dotfiles/nixos/configuration.nix dotfiles/common/packages.nix 2>/dev/null | \
+    local packages=$(grep -h "pkgs\." platforms/nixos/system/configuration.nix platforms/common/packages/base.nix 2>/dev/null | \
                     grep -o "pkgs\.[a-zA-Z0-9_\-]*" | sort -u | sed 's/pkgs\.//' || true)
 
     local missing_packages=0
@@ -180,11 +180,12 @@ test_config_structure() {
     # Check required files
     local required_files=(
         "flake.nix"
-        "dotfiles/nixos/configuration.nix"
-        "dotfiles/nixos/hardware-configuration.nix"
-        "dotfiles/nix/core.nix"
-        "dotfiles/common/home.nix"
-        "dotfiles/common/packages.nix"
+        "platforms/nixos/system/configuration.nix"
+        "platforms/nixos/hardware/hardware-configuration.nix"
+        "platforms/darwin/nix/settings.nix"
+        "platforms/common/home-base.nix"
+        "platforms/common/packages/base.nix"
+        "platforms/darwin/darwin.nix"
     )
 
     for file in "${required_files[@]}"; do

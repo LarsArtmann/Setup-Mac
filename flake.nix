@@ -45,55 +45,8 @@
           nix-ai-tools = {};  # Placeholder for now - can be added later
         };
         modules = [
-          # Core system configuration
-          base
-
-          ({ pkgs, ... }: {
-            # Basic packages for development
-            environment.systemPackages = with pkgs; [
-              hello
-              git
-              neovim
-              tmux
-              curl
-            ];
-            system.stateVersion = 5;
-
-            # Shells
-            programs.zsh.enable = true;
-            programs.bash.enable = true;
-
-            # Home Manager integration
-            users.users.larsartmann = {
-              home = "/Users/larsartmann";
-              shell = pkgs.zsh;
-            };
-          })
-
-          # Home Manager integration
-          home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              users.larsartmann = {
-                home = {
-                  username = "larsartmann";
-                  homeDirectory = "/Users/larsartmann";
-                  stateVersion = "25.11";
-                };
-                programs = {
-                  zsh = {
-                    enable = true;
-                    shellAliases = {
-                      ll = "ls -la";
-                      update = "darwin-rebuild switch --flake .#Lars-MacBook-Air";
-                    };
-                  };
-                };
-              };
-            };
-          }
+          # Test minimal configuration first
+          ./platforms/darwin/test-darwin.nix
         ];
       };
 

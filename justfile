@@ -220,10 +220,10 @@ check:
 # Fast Nix syntax validation
 check-nix-syntax:
     @echo "🔍 Checking Nix syntax..."
-    nix-instantiate --eval --show-trace platforms/nix/system.nix
-    nix-instantiate --eval --show-trace platforms/nix/core.nix
-    nix-instantiate --eval --show-trace platforms/nix/core/ConfigurationAssertions.nix
-    nix-instantiate --eval --show-trace platforms/nix/core/SystemAssertions.nix
+    nix-instantiate --eval --show-trace platforms/darwin/default.nix
+    nix-instantiate --eval --show-trace platforms/darwin/home.nix
+    nix-instantiate --eval --show-trace platforms/nixos/users/home.nix
+    nix-instantiate --eval --show-trace platforms/common/home-base.nix
     @echo "✅ Nix syntax validation complete"
 
 # Format code using treefmt
@@ -251,8 +251,9 @@ backup:
     BACKUP_DIR="backups/$(date '+%Y-%m-%d_%H-%M-%S')"
     mkdir -p "$BACKUP_DIR"
 
-    # Backup entire dotfiles directory
-    cp -r dotfiles "$BACKUP_DIR/"
+    # Backup entire directories platform structure
+    cp -r platforms "$BACKUP_DIR/"
+    cp -r dotfiles "$BACKUP_DIR/"  # Keep dotfiles for historical reference
 
     # Backup justfile and manual-linking script
     cp justfile "$BACKUP_DIR/" || true
@@ -278,6 +279,7 @@ auto-backup:
     #!/usr/bin/env bash
     BACKUP_DIR="backups/auto_$(date '+%Y-%m-%d_%H-%M-%S')"
     mkdir -p "$BACKUP_DIR"
+    cp -r platforms "$BACKUP_DIR/"
     cp -r dotfiles "$BACKUP_DIR/"
     cp justfile "$BACKUP_DIR/" 2>/dev/null || true
     echo "$(date): Auto-backup before changes" > "$BACKUP_DIR/backup_info.txt"

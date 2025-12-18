@@ -41,7 +41,6 @@ This repository provides a complete, reproducible development environment for ma
    just switch             # Apply configuration changes
 
    # Or manual commands
-   cd dotfiles/nix
    darwin-rebuild switch --flake .#Lars-MacBook-Air
    ```
 
@@ -98,7 +97,7 @@ just health         # System health check
 ```
 
 ### Configuration Changes Workflow
-1. **Edit configuration files** in `dotfiles/nix/` (macOS) or `dotfiles/nixos/` (NixOS)
+1. **Edit configuration files** in `platforms/darwin/` (macOS) or `platforms/nixos/` (NixOS)
 2. **Validate with type safety**: `just test`
 3. **Apply changes**: `just switch`
 4. **Test functionality**: `just health`

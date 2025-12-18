@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../../common/home.nix
+    ../../common/home-base.nix
     ../desktop/hyprland.nix  # RE-ENABLED for desktop functionality
   ];
 

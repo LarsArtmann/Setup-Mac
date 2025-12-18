@@ -408,8 +408,8 @@ run_update() {
     log_info "Running system updates..."
 
     # Update Nix flake
-    if [[ -f "$PROJECT_DIR/dotfiles/nix/flake.nix" ]]; then
-        execute_command "cd $PROJECT_DIR/dotfiles/nix && nix flake update" "Updating Nix flake"
+    if [[ -f "$PROJECT_DIR/flake.nix" ]]; then
+        execute_command "cd $PROJECT_DIR && nix flake update" "Updating Nix flake"
     fi
 
     # Update Homebrew
