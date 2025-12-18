@@ -12,6 +12,7 @@
     ../services/ssh.nix
     ../hardware/amd-gpu.nix
     ../desktop/hyprland-system.nix
+    ../desktop/multi-wm.nix
   ];
 
 

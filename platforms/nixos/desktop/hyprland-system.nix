@@ -4,12 +4,16 @@
   # Enable X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable SDDM (Simple Desktop Display Manager) with Wayland support
+  # Enable SDDM (Simple Desktop Display Manager) with X11 support
   # Replaces heavier GDM/GNOME setup
+  # Note: Wayland disabled for stability with AMD GPU
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = true;
-    theme = "sddm-sugar-dark";
+    wayland.enable = false;  # Disabled for AMD GPU stability
+    theme = "sugar-dark";
+    enableHidpi = true;
+    autoNumlock = true;
+    extraPackages = [ pkgs.sddm-sugar-dark ];
   };
 
   # Enable Hyprland with proper configuration
@@ -27,20 +31,8 @@
   # Enable polkit for authentication
   security.polkit.enable = true;
 
-  # Add polkit GNOME authentication agent service
-  systemd.user.services.polkit-gnome-authentication-agent-1 = {
-    description = "polkit-gnome-authentication-agent-1";
-    wantedBy = [ "graphical-session.target" ];
-    wants = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "simple";
-      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-      Restart = "on-failure";
-      RestartSec = 1;
-      TimeoutStopSec = 10;
-    };
-  };
+  # Note: polkit-gnome authentication agent handled by system-level services
+  # Removing manual user service to avoid conflicts
 
   # Add Swaylock PAM service for screen locking
   security.pam.services.swaylock = {};
@@ -55,6 +47,7 @@
 
   # Enable D-Bus for portal communication
   services.dbus.enable = true;
+  # Note: UWSM sets dbus.implementation = "broker" - let it handle this
 
   # Configure keymap in X11
   services.xserver.xkb = {
