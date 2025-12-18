@@ -7,8 +7,8 @@
     enable = true;
     enable32Bit = true;
     # Use unstable Mesa for better performance with latest Hyprland
-    package = pkgs-unstable.mesa;
-    package32 = pkgs-unstable.pkgsi686Linux.mesa;
+    package = pkgs.mesa;
+    package32 = pkgs.pkgsi686Linux.mesa;
     # Note: amdvlk has been deprecated, RADV is now the default driver
     # OpenCL support via ROCm
     extraPackages = with pkgs; [
