@@ -26,6 +26,22 @@
     };
   };
 
+  # Enable CRUSH AI assistant
+  programs.crush = {
+    enable = true;
+    settings = {
+      options = {
+        context_paths = [
+          "$HOME/.config/crush/AGENTS.md"
+          "AGENTS.md"
+          "CRUSH.md"
+        ];
+        tui = { compact_mode = true; };
+        debug = false;
+      };
+    };
+  };
+
   # Darwin-specific home configuration
   home.sessionVariables = {
     # Add macOS-specific environment variables

@@ -19,9 +19,12 @@
 
     # Add Helium browser flake for Linux
     helium.url = "github:amaanq/helium-flake";
+    
+    # Add NUR (Nix User Repository) for CRUSH
+    nur.url = "github:nix-community/NUR";
   };
 
-  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, helium, ... }:
+  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, helium, nur, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "aarch64-darwin" "x86_64-linux" ];
 
@@ -140,10 +143,13 @@
             inherit (inputs.self) inputs;
             nix-ai-tools = {};
             inherit helium;
+            inherit nur;
           };
           modules = [
             # Core Darwin configuration with Ghost Systems integration
             ./platforms/darwin/darwin.nix
+            nur.modules.home-manager.default
+            nur.repos.charmbracelet.modules.crush
           ];
         };
 
@@ -154,6 +160,7 @@
             inherit (inputs.self) inputs;
             nix-ai-tools = {};
             inherit helium;
+            inherit nur;
           };
           modules = [
             # Core system configuration
@@ -165,6 +172,8 @@
 
             # Import Home Manager module for NixOS
             home-manager.nixosModules.home-manager
+            nur.modules.nixos.default
+            nur.repos.charmbracelet.modules.crush
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;

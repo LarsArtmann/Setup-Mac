@@ -59,6 +59,22 @@
     trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
   };
 
+  # Enable CRUSH AI assistant
+  programs.crush = {
+    enable = true;
+    settings = {
+      options = {
+        context_paths = [
+          "$HOME/.config/crush/AGENTS.md"
+          "AGENTS.md"
+          "CRUSH.md"
+        ];
+        tui = { compact_mode = true; };
+        debug = false;
+      };
+    };
+  };
+
   # Enable font configuration and install Nerd Fonts
   fonts.packages = with pkgs; [
     # Nerd Fonts

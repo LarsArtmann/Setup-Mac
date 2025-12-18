@@ -155,7 +155,7 @@
         "$mod, R, exec, $menu"
         "$mod, N, exec, dolphin"
         "$mod, E, exec, dolphin" # File manager (should probably ensure one is installed)
-        "$mod, B, exec, ${helium.packages.x86_64-linux.default}/bin/helium" # Browser
+        "$mod, B, exec, ${helium.packages.${pkgs.system}.default}/bin/helium" # Browser
         "$mod, D, exec, $menu -show run" # Run command
 
         # WINDOW MANAGEMENT
@@ -318,5 +318,8 @@
     # Modern alternatives for desktop terminals
     htop # Process monitor
     neovim # Text editor
+
+    # Privacy-focused browser
+    helium.packages.${pkgs.system}.default # Helium browser
   ];
 }
