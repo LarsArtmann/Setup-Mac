@@ -31,7 +31,6 @@ in {
   # Common Fish shell configuration
   programs.fish = {
     enable = true;
-    useBabelfish = true;  # Bash/POSIX compatibility
     
     # Merge common and platform-specific aliases
     shellAliases = commonAliases // platformAliases;
