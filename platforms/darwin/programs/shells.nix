@@ -3,7 +3,6 @@
   # Fish shell configuration (cross-platform)
   programs.fish = {
     enable = true;
-    useBabelfish = true;  # Bash/POSIX compatibility
     shellAliases = {
       # Essential shortcuts only
       l = "ls -laSh";
