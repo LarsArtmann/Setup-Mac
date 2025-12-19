@@ -1,9 +1,10 @@
-{ pkgs, lib, inputs, nix-ai-tools, ... }:
+{ pkgs, lib, inputs, llm-agents, ... }:
 
 let
-  # Import crush from nixpkgs instead of nix-ai-tools
-  # nix-ai-tools is not properly configured as a flake input
-  crush = pkgs.crush or null;
+  # Import crush from llm-agents packages
+  # llm-agents provides CRUSH AI tool through its packages
+  system = pkgs.stdenv.hostPlatform.system;
+  crush = llm-agents.packages.${system}.crush or pkgs.crush or null;
 
   # Import custom packages
   helium-pkg = import ./helium.nix { inherit lib pkgs; };
@@ -95,7 +96,7 @@ let
   guiPackages = with pkgs; lib.optionals stdenv.isDarwin [
     # Import Helium browser
     (import ./helium.nix { inherit lib pkgs; })
-  ] ++ lib.optionals (stdenv.isDarwin && config.allowUnfree or false) [
+  ] ++ lib.optionals stdenv.isDarwin [
     google-chrome  # Chrome browser (unfree)
   ];
 
