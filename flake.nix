@@ -157,7 +157,6 @@
           modules = [
             # Core Darwin configuration with Ghost Systems integration
             ./platforms/darwin/darwin.nix
-            nur.modules.home-manager.default
             
             # CRUSH is now installed via perSystem packages
           ];
@@ -191,6 +190,8 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
+                backupFileExtension = "backup";
+                overwriteBackup = true;
                 users.lars = import ./platforms/nixos/users/home.nix;
               };
               
