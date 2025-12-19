@@ -29,7 +29,7 @@ link:
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
     @echo "🔄 Applying Nix configuration..."
-    nh darwin switch ./
+    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
     @echo "✅ Nix configuration applied"
 
 # Update system and packages
@@ -363,13 +363,13 @@ info:
 # Test configuration without applying changes
 test:
     @echo "🧪 Testing Nix configuration..."
-    sudo darwin-rebuild check --flake ./
+    sudo /run/current-system/sw/bin/darwin-rebuild check --flake ./
     @echo "✅ Configuration test passed"
 
 # Fast test - syntax validation only (skips heavy packages)
 test-fast:
     @echo "🚀 Fast testing Nix configuration (syntax only)..."
-    nix flake check --no-build
+    nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Fast configuration test passed"
 
 # Show git status and recent commits

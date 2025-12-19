@@ -3,6 +3,7 @@
   imports = [
     ./default.nix
     ./environment.nix
+    ./nix/settings.nix
     ../common/packages/base.nix
   ];
 
