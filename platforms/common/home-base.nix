@@ -30,6 +30,9 @@
     };
   };
 
+  # Home Manager version for compatibility
+  home.stateVersion = "24.05";
+
   # Shared session variables, path, and packages
   home = {
     sessionVariables = {

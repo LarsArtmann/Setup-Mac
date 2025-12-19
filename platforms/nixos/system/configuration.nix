@@ -64,11 +64,11 @@
   # Enable font configuration and install Nerd Fonts
   fonts.packages = with pkgs; [
     # Nerd Fonts
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+    pkgs.jetbrains-mono
   ];
 
   fonts.fontconfig.defaultFonts = {
-    monospace = [ "JetBrainsMono Nerd Font" ];
+    monospace = [ "JetBrains Mono" ];
     sansSerif = [ "DejaVu Sans" ];
     serif = [ "DejaVu Serif" ];
   };
