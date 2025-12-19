@@ -80,12 +80,7 @@
     ];
   };
 
-  # Enable D-Bus for portal communication
-  services.dbus = {
-    enable = true;
-    # Use dbus-broker for better Wayland support (UWSM preferred)
-    implementation = "broker";
-  };
+
 
 
 
