@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   # Enable OpenSSH daemon with hardening

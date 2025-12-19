@@ -166,9 +166,9 @@ in
           # Convert service definitions to systemd format
           mapAttrs' (serviceName: serviceConfig:
             lib.nameValuePair "${name}-${serviceName}" {
-              description = serviceConfig.description;
-              wantedBy = serviceConfig.wantedBy;
-              after = serviceConfig.after;
+              inherit (serviceConfig) description;
+              inherit (serviceConfig) wantedBy;
+              inherit (serviceConfig) after;
               serviceConfig = {
                 ExecStart = serviceConfig.execStart;
                 Restart = "always";

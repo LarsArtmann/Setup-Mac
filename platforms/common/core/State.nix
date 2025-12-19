@@ -50,7 +50,7 @@ let
   # Using injected UserConfig and PathConfig to avoid circular imports
   Paths = let
     # Use injected UserConfig instead of direct import
-    username = UserConfig.defaultUser.username;
+    inherit (UserConfig.defaultUser) username;
     # Use injected PathConfig instead of direct import
     pathConfig = PathConfig.mkPathConfig username;
   in pathConfig;
@@ -77,8 +77,8 @@ let
 
     in {
       allValid = allPathsExist;
-      missingPaths = missingPaths;
-      validationResults = validationResults;
+      inherit missingPaths;
+      inherit validationResults;
     };
 
   validatePackageList = packages:
@@ -96,7 +96,7 @@ let
 
     in {
       packages = validatedPackages;
-      essentialAvailable = essentialAvailable;
+      inherit essentialAvailable;
       totalValid = lib.all (p: p.available) validatedPackages;
     };
 

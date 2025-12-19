@@ -28,10 +28,10 @@ let
               "";
 
         in {
-          errorCount = errorCount;
-          criticalCount = criticalCount;
-          shouldAlert = shouldAlert;
-          alertMessage = alertMessage;
+          inherit errorCount;
+          inherit criticalCount;
+          inherit shouldAlert;
+          inherit alertMessage;
           thresholdsMet = {
             criticalThreshold = criticalCount >= alertThresholds.criticalThreshold;
             totalThreshold = errorCount >= alertThresholds.totalThreshold;

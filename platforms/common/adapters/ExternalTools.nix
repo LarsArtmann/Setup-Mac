@@ -15,7 +15,7 @@ let
           version = if packageValid then lib.getVersion tool else "unavailable";
         in {
           available = packageValid;
-          version = version;
+          inherit version;
           name = "crush";
         };
 
@@ -45,16 +45,16 @@ let
           available = package != null && (package ? outPath);
         in {
           name = formatter;
-          available = available;
-          package = package;
+          inherit available;
+          inherit package;
         };
 
       validatedFormatters = map validateFormatter supportedFormatters;
       availableFormatters = lib.filter (f: f.available) validatedFormatters;
 
     in {
-      available = available;
-      version = version;
+      inherit available;
+      inherit version;
       formatters = validatedFormatters;
       workingFormatters = availableFormatters;
       coverage = lib.floor ((builtins.length availableFormatters) * 100.0 / (builtins.length supportedFormatters));
@@ -72,10 +72,10 @@ let
           version = if packageValid then lib.getVersion tool else "unavailable";
           autoStart = config.autoStart or false;
         in {
-          name = name;
+          inherit name;
           available = packageValid;
-          version = version;
-          autoStart = autoStart;
+          inherit version;
+          inherit autoStart;
           type = "monitoring";
         };
 
@@ -89,8 +89,8 @@ let
 
     in {
       tools = validatedTools;
-      availableTools = availableTools;
-      allAvailable = allAvailable;
+      inherit availableTools;
+      inherit allAvailable;
       status = if allAvailable then "fully-functional" else "partial";
     };
 
@@ -105,9 +105,9 @@ let
           packageValid = tool != null && (tool ? outPath);
           version = if packageValid then lib.getVersion tool else "unavailable";
         in {
-          name = name;
+          inherit name;
           available = packageValid;
-          version = version;
+          inherit version;
         };
 
       validatedTools = [
@@ -119,7 +119,7 @@ let
 
     in {
       tools = validatedTools;
-      availableTools = availableTools;
+      inherit availableTools;
       totalTools = builtins.length validatedTools;
       workingTools = builtins.length availableTools;
     };
@@ -137,15 +137,15 @@ let
           failedValidations = lib.filter (r: !r.overall.valid) validationResults;
         in {
           wrappers = validationResults;
-          allValid = allValid;
+          inherit allValid;
           failedCount = builtins.length failedValidations;
           failedWrappers = failedValidations;
-          level = level;
+          inherit level;
         };
 
     in {
       validateWrapper = validateWithLevel;
-      validateAll = validateAll;
+      inherit validateAll;
     };
 
   # PERFORMANCE MONITORING ADAPTER - CLEAN ABSTRACTION
@@ -161,9 +161,9 @@ let
           performanceData = {
             wrapperName = wrapper.name;
             action = action.type or "unknown";
-            duration = duration;
-            startTime = startTime;
-            endTime = endTime;
+            inherit duration;
+            inherit startTime;
+            inherit endTime;
             success = result.success or true;
             memoryUsage = result.memoryUsage or 0;
             cpuUsage = result.cpuUsage or 0;
@@ -175,7 +175,7 @@ let
 
         in {
           performance = performanceData;
-          withinLimits = withinLimits;
+          inherit withinLimits;
           valid = result.success or true && withinLimits;
         };
 
@@ -185,14 +185,14 @@ let
           allValid = lib.all (r: r.valid) results;
           invalidPerformances = lib.filter (r: !r.valid) results;
         in {
-          results = results;
-          allValid = allValid;
-          invalidPerformances = invalidPerformances;
+          inherit results;
+          inherit allValid;
+          inherit invalidPerformances;
         };
 
     in {
-      trackPerformance = trackPerformance;
-      trackAllPerformances = trackAllPerformances;
+      inherit trackPerformance;
+      inherit trackAllPerformances;
     };
 
 in {

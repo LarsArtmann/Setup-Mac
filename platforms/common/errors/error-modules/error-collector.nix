@@ -12,7 +12,7 @@ let
         errorType = error.type;
         errorCode = error.code;
         context = error.context // {};
-        systemConfig = systemConfig;
+        inherit systemConfig;
       };
 
       collectedErrors = map collectError errors;

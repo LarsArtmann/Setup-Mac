@@ -34,8 +34,8 @@ let
         in processedContent;
 
     in {
-      allValid = allValid;
-      missingVars = missingVars;
+      inherit allValid;
+      inherit missingVars;
       process = processTemplate;
     };
 
@@ -281,8 +281,8 @@ let
     let
       template = TemplateRegistry.${templateType} or (builtins.throw "Unknown template type: ${templateType}");
       engine = TemplateEngine {
-        template = template.template;
-        variables = template.variables;
+        inherit (template) template;
+        inherit (template) variables;
       };
 
       # Merge template defaults with wrapper config
@@ -307,9 +307,9 @@ let
       else builtins.throw "Template validation failed: ${lib.concatStringsSep ", " (map (r: r.message) (lib.filter (r: !r.valid) validation.validationResults or []))}";
 
     in {
-      template = template;
+      inherit template;
       config = mergedConfig;
-      validation = validation;
+      inherit validation;
       generated = processedTemplate;
       success = validation.overall.valid;
     };
@@ -322,8 +322,8 @@ let
       failed = lib.filter (r: !r.success) results;
     in {
       wrappers = results;
-      successful = successful;
-      failed = failed;
+      inherit successful;
+      inherit failed;
       successRate = (builtins.length successful) * 100.0 / (builtins.length results);
     };
 

@@ -49,7 +49,7 @@ let
     in {
       allAvailable = (builtins.length missingDeps) == 0;
       missingDependencies = missingDeps;
-      essentialMissing = essentialMissing;
+      inherit essentialMissing;
     };
 
   # CONFIGURATION VALIDATION - TYPE-SAFE
@@ -60,9 +60,9 @@ let
       invalidFields = lib.filter (field: config ? field && !(wrapper.config.validFields or {} ? field)) (lib.attrNames config);
     in {
       allPresent = (builtins.length missingFields) == 0;
-      missingFields = missingFields;
+      inherit missingFields;
       allValid = (builtins.length invalidFields) == 0;
-      invalidFields = invalidFields;
+      inherit invalidFields;
     };
 
   # PERFORMANCE VALIDATION - TYPE-SAFE
@@ -81,7 +81,7 @@ let
   # COMPREHENSIVE VALIDATION PIPELINE
   validateWrapper = wrapper: level: system:
     let
-      package = wrapper.package;
+      inherit (wrapper) package;
       wrapperType = wrapper.type or "cli-tool";
       platform = wrapper.platform or "all";
 
@@ -144,10 +144,10 @@ let
           skipped = !strictValidation;
         };
         dependencies = {
-          valid = if strictValidation then ((validateDependencies system.packages package).allAvailable) else true;
+          valid = if strictValidation then (validateDependencies system.packages package).allAvailable else true;
           skipped = !strictValidation;
           missing = (validateDependencies system.packages package).missingDependencies;
-          essentialMissing = (validateDependencies system.packages package).essentialMissing;
+          inherit ((validateDependencies system.packages package)) essentialMissing;
         };
         config = {
           valid = configValid;
@@ -158,7 +158,7 @@ let
           skipped = !strictValidation;
         };
         overall = overallValid;
-        level = level;
+        inherit level;
       };
 
     in validationResults;

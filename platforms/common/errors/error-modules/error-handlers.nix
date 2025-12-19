@@ -11,17 +11,17 @@ let
         ErrorDefinitions.${errorType}.${errorCode} or
         ErrorDefinitions.build.compilation_failed; # Default fallback
 
-      severity = errorDef.severity;
-      autoRetry = errorDef.autoRetry;
-      rollbackable = errorDef.rollbackable;
-      notifyUser = errorDef.notifyUser;
-      logLevel = errorDef.logLevel;
-      recoveryActions = errorDef.recoveryActions;
+      inherit (errorDef) severity;
+      inherit (errorDef) autoRetry;
+      inherit (errorDef) rollbackable;
+      inherit (errorDef) notifyUser;
+      inherit (errorDef) logLevel;
+      inherit (errorDef) recoveryActions;
 
       # Context enrichment
       enrichedContext = context // {
         timestamp = builtins.currentTime;
-        systemConfig = systemConfig;
+        inherit systemConfig;
         errorDefinition = errorDef;
         recoveryAttempted = false;
       };
@@ -51,7 +51,7 @@ let
             true # Default to true for demonstration
           ;
         in {
-          action = action;
+          inherit action;
           success = recoveryResult;
           timestamp = builtins.currentTime;
         };
@@ -68,7 +68,7 @@ let
         in {
           timestamp = builtins.currentTime;
           level = logLevelStr;
-          message = message;
+          inherit message;
           context = enrichedContext;
           recovery = recoveryResults;
         };
@@ -77,14 +77,14 @@ let
       error = {
         type = errorType;
         code = errorCode;
-        severity = severity;
-        autoRetry = autoRetry;
-        rollbackable = rollbackable;
-        notifyUser = notifyUser;
+        inherit severity;
+        inherit autoRetry;
+        inherit rollbackable;
+        inherit notifyUser;
         context = enrichedContext;
         message = generateErrorMessage;
         recoveryActions = recoveryResults;
-        anyRecoverySuccessful = anyRecoverySuccessful;
+        inherit anyRecoverySuccessful;
       };
       log = logError;
     };

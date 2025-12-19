@@ -78,14 +78,14 @@ in lib.mkIf validateInputs.allValid {
 
       # Wrap with makeWrapper for proper PATH handling
       wrapProgram $out/bin/${wrapperName} \
-        --prefix PATH : "${lib.makeBinPath (additionalPackages)}" \
+        --prefix PATH : "${lib.makeBinPath additionalPackages}" \
         --set WRAPPER_NAME "${wrapperName}" \
         --set WRAPPER_PACKAGE "${packageName}" \
         --set WRAPPER_DESCRIPTION "${description}"
 
       ${lib.optionalString (aliasName != "") ''
       wrapProgram $out/bin/${aliasName} \
-        --prefix PATH : "${lib.makeBinPath (additionalPackages)}" \
+        --prefix PATH : "${lib.makeBinPath additionalPackages}" \
         --set WRAPPER_NAME "${aliasName}" \
         --set WRAPPER_PACKAGE "${packageName}" \
         --set WRAPPER_DESCRIPTION "${description}"
@@ -112,11 +112,11 @@ in lib.mkIf validateInputs.allValid {
 
       # Template-specific metadata
       templateType = "cli-tool";
-      wrapperName = wrapperName;
+      inherit wrapperName;
       basePackage = packageName;
       toolDescription = description;
       additionalPackages = map (p: lib.getName p) additionalPackages;
-      aliasName = aliasName;
+      inherit aliasName;
 
       sourceProvenance = with sourceTypes; [ binaryNativeCode ];
       mainProgram = wrapperName;
