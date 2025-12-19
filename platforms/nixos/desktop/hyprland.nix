@@ -24,9 +24,9 @@
       "$menu" = "rofi -show drun -show-icons";
 
       # For TV display - 200% scaling
-      monitor = "HDMI-A-1,preferred,auto,2"  # Adjust HDMI-A-1 to actual output
+      monitor = "HDMI-A-1,preferred,auto,2";  # Adjust HDMI-A-1 to actual output
       # Fallback if above doesn't work:
-      # monitor = "preferred,auto,2,transform,1"  # 2x scale + normal orientation
+      # monitor = "preferred,auto,2,transform,1";  # 2x scale + normal orientation
 
       exec-once = [
         ''waybar''
