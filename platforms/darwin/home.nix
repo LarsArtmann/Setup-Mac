@@ -8,7 +8,7 @@
   programs.fish.shellAliases = {
     ll = "ls -la";
     update = "darwin-rebuild switch --flake .#Lars-MacBook-Air";
-  } // (programs.fish.shellAliases or {});
+  };
 
   # Darwin-specific home configuration
   home.sessionVariables = {

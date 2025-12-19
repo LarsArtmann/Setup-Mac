@@ -12,7 +12,15 @@
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
-  } // (home.sessionVariables or {});
+  };
+
+  # NixOS-specific Fish shell overrides
+  programs.fish.shellAliases = {
+    # NixOS specific aliases
+    nixup = "sudo nixos-rebuild switch --flake .";
+    nixbuild = "nixos-rebuild build --flake .";
+    nixcheck = "nixos-rebuild check --flake .";
+  };
 
   # NixOS-specific packages
   home.packages = with pkgs; [
@@ -23,14 +31,6 @@
     # System Tools
     xdg-utils
   ];
-
-  # NixOS-specific Fish shell overrides
-  programs.fish.shellAliases = {
-    # NixOS specific aliases
-    nixup = "sudo nixos-rebuild switch --flake .";
-    nixbuild = "nixos-rebuild build --flake .";
-    nixcheck = "nixos-rebuild check --flake .";
-  } // (programs.fish.shellAliases or {});
 
   # XDG Directories (Linux specific)
   xdg.enable = true;
