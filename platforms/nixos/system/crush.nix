@@ -1,14 +1,13 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, nur, ... }:
 
 {
-  imports = 
-    # Import CRUSH module from NUR - only available after overlay is applied
-    lib.optionals (lib.hasAttr "nur" pkgs && lib.hasAttr "repos" pkgs.nur && lib.hasAttr "charmbracelet" pkgs.nur.repos) [
-      pkgs.nur.repos.charmbracelet.modules.crush
-    ];
+  imports = [
+    # Import CRUSH module from NUR - passed as parameter from flake.nix
+    nur.repos.charmbracelet.modules.crush
+  ];
 
-  # Enable CRUSH AI assistant if module was imported
-  programs.crush = lib.mkIf (lib.hasAttr "nur" pkgs && lib.hasAttr "repos" pkgs.nur && lib.hasAttr "charmbracelet" pkgs.nur.repos) {
+  # Enable CRUSH AI assistant
+  programs.crush = {
     enable = true;
     settings = {
       options = {
@@ -22,9 +21,4 @@
       };
     };
   };
-  
-  # Add warning if NUR is not available
-  warnings = lib.mkIf !(lib.hasAttr "nur" pkgs && lib.hasAttr "repos" pkgs.nur && lib.hasAttr "charmbracelet" pkgs.nur.repos) [
-    "NUR (nix-user-repository) is not available - CRUSH module cannot be loaded"
-  ];
 }

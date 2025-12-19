@@ -20,19 +20,25 @@
     # Add Helium browser flake for Linux
     helium.url = "github:amaanq/helium-flake";
     
-    # Add NUR (Nix User Repository) for CRUSH
+    # Add NUR (Nix User Repository) for other packages
     nur.url = "github:nix-community/NUR";
+    
+    # Add llm-agents.nix for CRUSH and other AI tools
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, helium, nur, ... }:
+  outputs = inputs@{ flake-parts, nix-darwin, nixpkgs, home-manager, helium, nur, llm-agents, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "aarch64-darwin" "x86_64-linux" ];
 
       # Per-system configuration (packages, devShells, etc.)
       perSystem = { config, pkgs, system, ... }:
         let
-          # Enabled programs from configuration
-          enabledPrograms = ["vscode"];  # Hardcoded for now
+          # Import llm-agents packages
+          llm-agents-packages = inputs.llm-agents.packages.${system};
+          
+          # Enabled programs from configuration - NO HARDCODED PROGRAMS
+          enabledPrograms = [];  # User should explicitly enable programs
 
           # Simple program catalog
           availablePrograms = {
@@ -56,9 +62,10 @@
           # Get enabled program packages
           enabledProgramPackages = map (name: availablePrograms.${name}.package) enabledPrograms;
 
-          # Merge with existing packages
+          # Merge with existing packages including llm-agents
           systemPackages = with pkgs; [
             hello
+            llm-agents-packages.crush
           ] ++ enabledProgramPackages;
 
         in {
@@ -143,7 +150,7 @@
           system = "aarch64-darwin";
           specialArgs = {
             inherit (inputs.self) inputs;
-            nix-ai-tools = {};
+            llm-agents = inputs.llm-agents;
             inherit helium;
             inherit nur;
           };
@@ -151,7 +158,8 @@
             # Core Darwin configuration with Ghost Systems integration
             ./platforms/darwin/darwin.nix
             nur.modules.home-manager.default
-            nur.repos.charmbracelet.modules.crush
+            
+            # CRUSH is now installed via perSystem packages
           ];
         };
 
@@ -160,7 +168,7 @@
           system = "x86_64-linux";
           specialArgs = {
             inherit (inputs.self) inputs;
-            nix-ai-tools = {};
+            llm-agents = inputs.llm-agents;
             inherit helium;
             inherit nur;
           };
@@ -171,7 +179,7 @@
               # Allow unfree packages in NixOS
               nixpkgs.config.allowUnfree = true;
               
-              # CRITICAL: Add NUR overlay to make nur.repos available
+              # Add NUR overlay to make nur.repos available
               nixpkgs.overlays = [ nur.overlays.default ];
             }
 
@@ -179,14 +187,14 @@
             home-manager.nixosModules.home-manager
             nur.modules.nixos.default
             
-            # CRUSH module moved to after overlay is applied
-            # nur.repos.charmbracelet.modules.crush will be imported in configuration.nix
             {
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 users.lars = import ./platforms/nixos/users/home.nix;
               };
+              
+              # CRUSH is installed via perSystem packages
             }
 
             # Import the existing NixOS configuration

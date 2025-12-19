@@ -5,7 +5,7 @@
   imports = [
     ./programs/fish.nix
     ./programs/starship.nix
-    ./programs/crush.nix
+    # ./programs/crush.nix  # REMOVED - crush is now installed as package, not module
     ./programs/activitywatch.nix
     ./programs/tmux.nix
   ];

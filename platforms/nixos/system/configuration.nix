@@ -13,7 +13,6 @@
     ../hardware/amd-gpu.nix
     ../desktop/hyprland-system.nix
     ../desktop/multi-wm.nix
-    ./crush.nix  # Import CRUSH module that uses NUR
   ];
 
 
