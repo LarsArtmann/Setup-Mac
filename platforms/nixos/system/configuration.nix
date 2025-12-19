@@ -13,6 +13,7 @@
     ../hardware/amd-gpu.nix
     ../desktop/hyprland-system.nix
     ../desktop/multi-wm.nix
+    ./crush.nix  # Import CRUSH module that uses NUR
   ];
 
 
@@ -59,21 +60,7 @@
     trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
   };
 
-  # Enable CRUSH AI assistant
-  programs.crush = {
-    enable = true;
-    settings = {
-      options = {
-        context_paths = [
-          "$HOME/.config/crush/AGENTS.md"
-          "AGENTS.md"
-          "CRUSH.md"
-        ];
-        tui = { compact_mode = true; };
-        debug = false;
-      };
-    };
-  };
+  # CRUSH AI assistant is now handled by crush.nix module
 
   # Enable font configuration and install Nerd Fonts
   fonts.packages = with pkgs; [

@@ -178,7 +178,9 @@
             # Import Home Manager module for NixOS
             home-manager.nixosModules.home-manager
             nur.modules.nixos.default
-            nur.repos.charmbracelet.modules.crush
+            
+            # CRUSH module moved to after overlay is applied
+            # nur.repos.charmbracelet.modules.crush will be imported in configuration.nix
             {
               home-manager = {
                 useGlobalPkgs = true;
