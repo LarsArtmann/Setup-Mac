@@ -1,19 +1,49 @@
 { pkgs, ... }:
 
 {
-  # Enable X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable SDDM (Simple Desktop Display Manager) with X11 support
-  # Replaces heavier GDM/GNOME setup
-  # Note: Wayland disabled for stability with AMD GPU
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = false;  # Disabled for AMD GPU stability
-    theme = "sugar-dark";
-    enableHidpi = true;
-    autoNumlock = true;
-    extraPackages = [ pkgs.sddm-sugar-dark ];
+  services = {
+    # Enable X11 windowing system.
+    xserver = {
+      enable = true;
+      
+      # Configure keymap in X11
+      xkb = {
+        layout = "us";
+        variant = "";
+      };
+    };
+    
+    # Enable SDDM (Simple Desktop Display Manager) with X11 support
+    # Replaces heavier GDM/GNOME setup
+    # Note: Wayland disabled for stability with AMD GPU
+    displayManager.sddm = {
+      enable = true;
+      wayland.enable = false;  # Disabled for AMD GPU stability
+      theme = "sugar-dark";
+      enableHidpi = true;
+      autoNumlock = true;
+      extraPackages = [ pkgs.sddm-sugar-dark ];
+    };
+    
+    # Enable D-Bus for portal communication
+    dbus = {
+      enable = true;
+      # Use dbus-broker for better Wayland support (UWSM preferred)
+      implementation = "broker";
+    };
+    
+    # Enable sound with pipewire.
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+      # If you want to use JACK applications, uncomment this
+      #jack.enable = true;
+    };
+    
+    # Pulseaudio disabled (conflicts with pipewire)
+    pulseaudio.enable = false;
   };
 
   # Enable Hyprland with proper configuration
@@ -28,14 +58,19 @@
     systemd.setPath.enable = true;
   };
 
-  # Enable polkit for authentication
-  security.polkit.enable = true;
-
+  security = {
+    # Enable polkit for authentication
+    polkit.enable = true;
+    
+    # Add Swaylock PAM service for screen locking
+    pam.services.swaylock = {};
+    
+    # Realtime scheduling for audio
+    rtkit.enable = true;
+  };
+  
   # Note: polkit-gnome authentication agent handled by system-level services
   # Removing manual user service to avoid conflicts
-
-  # Add Swaylock PAM service for screen locking
-  security.pam.services.swaylock = {};
 
   # XDG Desktop Portals configuration (Hyprland module will set up the basic ones)
   xdg.portal = {
@@ -52,23 +87,7 @@
     implementation = "broker";
   };
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
 
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-  };
 
   # Add essential system packages for Hyprland
   environment.systemPackages = with pkgs; [

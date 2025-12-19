@@ -4,43 +4,11 @@
     ../common/home-base.nix
   ];
 
-  # Fish Shell Configuration (Darwin-specific)
-  programs.fish = {
-    enable = true;
-    shellAliases = {
-      ll = "ls -la";
-      update = "darwin-rebuild switch --flake .#Lars-MacBook-Air";
-    };
-    interactiveShellInit = ''
-      set -g fish_greeting
-    '';
-  };
-
-  # Starship Prompt (Darwin-specific)
-  programs.starship = {
-    enable = true;
-    enableFishIntegration = true;
-    settings = {
-      add_newline = false;
-      format = "$all$character";
-    };
-  };
-
-  # Enable CRUSH AI assistant
-  programs.crush = {
-    enable = true;
-    settings = {
-      options = {
-        context_paths = [
-          "$HOME/.config/crush/AGENTS.md"
-          "AGENTS.md"
-          "CRUSH.md"
-        ];
-        tui = { compact_mode = true; };
-        debug = false;
-      };
-    };
-  };
+  # Darwin-specific Fish shell overrides
+  programs.fish.shellAliases = {
+    ll = "ls -la";
+    update = "darwin-rebuild switch --flake .#Lars-MacBook-Air";
+  } // (programs.fish.shellAliases or {});
 
   # Darwin-specific home configuration
   home.sessionVariables = {

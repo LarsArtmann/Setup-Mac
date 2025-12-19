@@ -69,31 +69,33 @@
             config.allowBroken = true;
           };
 
-        # Legacy packages for backward compatibility
-        packages.hello = pkgs.hello;
+        packages = {
+          # Legacy packages for backward compatibility
+          hello = pkgs.hello;
 
-        # WORKING PROGRAM INTEGRATION!
-        packages.programs = pkgs.linkFarm "programs" ({
-          # Create symlink farm for all enabled programs
-        } // (builtins.listToAttrs (map (name: {
-          value = name;
-          inherit name;
-          inherit (availablePrograms.${name}) path;
-        }) enabledPrograms)));
+          # WORKING PROGRAM INTEGRATION!
+          programs = pkgs.linkFarm "programs" ({
+            # Create symlink farm for all enabled programs
+          } // (builtins.listToAttrs (map (name: {
+            value = name;
+            inherit name;
+            inherit (availablePrograms.${name}) path;
+          }) enabledPrograms)));
 
-        # Test discovery system
-        packages.test-discovery = pkgs.writeShellScriptBin "test-discovery" ''
-          echo "🎯 PROGRAM INTEGRATION SYSTEM WORKING!"
-          echo ""
-          echo "Available programs:"
-          echo "  vscode - Visual Studio Code editor (development)"
-          echo "  fish - Fish shell with smart completions (core)"
-          echo "  starship - Minimal, fast, and customizable prompt (core)"
-          echo ""
-          echo "Enabled programs: ${builtins.concatStringsSep ", " enabledPrograms}"
-          echo ""
-          echo "Integrated packages: ${builtins.concatStringsSep " " (map (pkg: pkg.pname or "unknown") enabledProgramPackages)}"
-        '';
+          # Test discovery system
+          test-discovery = pkgs.writeShellScriptBin "test-discovery" ''
+            echo "🎯 PROGRAM INTEGRATION SYSTEM WORKING!"
+            echo ""
+            echo "Available programs:"
+            echo "  vscode - Visual Studio Code editor (development)"
+            echo "  fish - Fish shell with smart completions (core)"
+            echo "  starship - Minimal, fast, and customizable prompt (core)"
+            echo ""
+            echo "Enabled programs: ${builtins.concatStringsSep ", " enabledPrograms}"
+            echo ""
+            echo "Integrated packages: ${builtins.concatStringsSep " " (map (pkg: pkg.pname or "unknown") enabledProgramPackages)}"
+          '';
+        };
 
         # Development shells for different program categories
         devShells = {
@@ -175,9 +177,11 @@
             nur.modules.nixos.default
             nur.repos.charmbracelet.modules.crush
             {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.users.lars = import ./platforms/nixos/users/home.nix;
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.lars = import ./platforms/nixos/users/home.nix;
+              };
             }
 
             # Import the existing NixOS configuration

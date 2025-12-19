@@ -1,6 +1,15 @@
 { config, pkgs, lib, ... }:
 
 {
+  # Import common program configurations
+  imports = [
+    ./programs/fish.nix
+    ./programs/starship.nix
+    ./programs/crush.nix
+    ./programs/activitywatch.nix
+    ./programs/tmux.nix
+  ];
+
   # Enable Home Manager to manage itself
   programs.home-manager.enable = true;
 
@@ -21,28 +30,30 @@
     };
   };
 
-  # Shared session variables
-  home.sessionVariables = {
-    EDITOR = "nano";
-    LANG = "en_US.UTF-8";
+  # Shared session variables, path, and packages
+  home = {
+    sessionVariables = {
+      EDITOR = "nano";
+      LANG = "en_US.UTF-8";
+    };
+
+    # User PATH additions
+    sessionPath = [
+      "$HOME/.local/bin"
+      "$HOME/go/bin"
+      "$HOME/.bun/bin"
+    ];
+
+    # Core cross-platform packages
+    packages = with pkgs; [
+      git
+      curl
+      wget
+      ripgrep
+      fd
+      bat
+      jq
+      starship
+    ];
   };
-
-  # User PATH additions
-  home.sessionPath = [
-    "$HOME/.local/bin"
-    "$HOME/go/bin"
-    "$HOME/.bun/bin"
-  ];
-
-  # Core cross-platform packages
-  home.packages = with pkgs; [
-    git
-    curl
-    wget
-    ripgrep
-    fd
-    bat
-    jq
-    starship
-  ];
 }

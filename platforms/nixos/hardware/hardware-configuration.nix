@@ -8,11 +8,15 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "sdhci_pci" ];
-  boot.initrd.kernelModules = [ ];
-  # Restore critical network drivers (Realtek 2.5G Ethernet + MediaTek WiFi)
-  boot.kernelModules = [ "kvm-amd" "mt7925e" "r8125" ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ r8125 ];
+  boot = {
+    initrd = {
+      availableKernelModules = [ "nvme" "xhci_pci" "thunderbolt" "usbhid" "sdhci_pci" ];
+      kernelModules = [ ];
+    };
+    # Restore critical network drivers (Realtek 2.5G Ethernet + MediaTek WiFi)
+    kernelModules = [ "kvm-amd" "mt7925e" "r8125" ];
+    extraModulePackages = with config.boot.kernelPackages; [ r8125 ];
+  };
 
   # Required for WiFi/Bluetooth hardware
   hardware.enableRedistributableFirmware = true;
