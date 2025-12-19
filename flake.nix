@@ -170,6 +170,9 @@
               system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
               # Allow unfree packages in NixOS
               nixpkgs.config.allowUnfree = true;
+              
+              # CRITICAL: Add NUR overlay to make nur.repos available
+              nixpkgs.overlays = [ nur.overlays.default ];
             }
 
             # Import Home Manager module for NixOS
