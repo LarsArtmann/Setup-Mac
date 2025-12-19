@@ -2,6 +2,7 @@
 {
   imports = [
     ../common/home-base.nix
+    ./modules/iterm2.nix
   ];
 
   # Darwin-specific Fish shell overrides
