@@ -8,13 +8,13 @@ let
   validateDarwin = pkg:
     let
       platforms = pkg.meta.platforms or ["all"];
-      isDarwin = lib.any (p: lib.hasPrefix "darwin" p) platforms;
+      isDarwin = lib.any (p: lib.hasSuffix "darwin" p) platforms;
     in isDarwin || (builtins.trace "⚠️  ${lib.getName pkg}: Not compatible with Darwin platform" false);
 
   validateLinux = pkg:
     let
       platforms = pkg.meta.platforms or ["all"];
-      isLinux = lib.any (p: lib.hasPrefix "linux" p) platforms;
+      isLinux = lib.any (p: lib.hasSuffix "linux" p) platforms;
     in isLinux || (builtins.trace "⚠️  ${lib.getName pkg}: Not compatible with Linux platform" false);
 
   validateAarch64 = pkg:
@@ -76,6 +76,41 @@ let
       memoryValid = isMemoryWithinLimit;
       memoryUsage = "${toString actualMemory}MB / ${toString maxMemory}MB";
       memoryExcess = if actualMemory > maxMemory then "${toString (actualMemory - maxMemory)}MB over limit" else "within limits";
+    };
+
+  # VALIDATE CROSS-PLATFORM PACKAGE - TYPE-SAFE
+  validateCrossPlatformPackage = pkg: system:
+    let
+      isCrossPlatform = lib.any (p: lib.hasSuffix "darwin" p) (pkg.meta.platforms or []) &&
+                      lib.any (p: lib.hasSuffix "linux" p) (pkg.meta.platforms or []);
+      
+      # Check if package supports current system
+      supportsCurrentSystem = if system.isDarwin then
+        lib.any (p: lib.hasSuffix "darwin" p) (pkg.meta.platforms or [])
+      else if system.isLinux then
+        lib.any (p: lib.hasSuffix "linux" p) (pkg.meta.platforms or [])
+      else false;
+      
+      # Check architecture support
+      currentArch = if system.isAarch64 then "aarch64" else if system.isx86_64 then "x86_64" else "unknown";
+      archSupported = lib.any (p: lib.hasPrefix currentArch p) (pkg.meta.platforms or []);
+      
+      # Check passthru attributes for cross-platform packages
+      hasValidPassthru = pkg ? passthru && 
+        pkg.passthru ? platform && 
+        pkg.passthru ? arch;
+      
+      # Validate binary path exists
+      hasValidBinaryPath = pkg ? passthru && pkg.passthru ? binaryPath;
+      
+    in {
+      isCrossPlatform = isCrossPlatform;
+      supportsCurrentSystem = supportsCurrentSystem;
+      currentArch = currentArch;
+      archSupported = archSupported;
+      hasValidPassthru = hasValidPassthru;
+      hasValidBinaryPath = hasValidBinaryPath;
+      valid = supportsCurrentSystem && archSupported && hasValidPassthru && hasValidBinaryPath;
     };
 
   # COMPREHENSIVE VALIDATION PIPELINE
@@ -167,5 +202,5 @@ in {
   inherit
     validateDarwin validateLinux validateAarch64 validateX86_64
     validateLicense validateDependencies validateConfig validatePerformance
-    validateWrapper;
+    validateWrapper validateCrossPlatformPackage;
 }

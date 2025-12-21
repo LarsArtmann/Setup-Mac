@@ -93,12 +93,12 @@ let
     swww  # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
   ];
 
-  # GUI Applications (platform-specific)
-  guiPackages = with pkgs; lib.optionals stdenv.isDarwin [
-    # Import Helium browser
+  # GUI Applications (cross-platform)
+  guiPackages = with pkgs; [
+    # Import Helium browser (cross-platform)
     (import ./helium.nix { inherit lib pkgs; })
   ] ++ lib.optionals stdenv.isDarwin [
-    google-chrome  # Chrome browser (unfree)
+    google-chrome  # Chrome browser (unfree, macOS only)
   ];
 
   # AI tools (conditionally added)
