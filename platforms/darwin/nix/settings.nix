@@ -14,7 +14,6 @@
       "/System/Library/Frameworks"
       "/System/Library/PrivateFrameworks" 
       "/usr/lib"
-      "/usr/include"
       "/bin/sh"
       "/bin/bash"
       "/bin/csh"
