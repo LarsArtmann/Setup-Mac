@@ -4,14 +4,14 @@
 
 pkgs.stdenv.mkDerivation rec {
   pname = "helium";
-  version = "0.4.5.1";
+  version = "0.7.6.1";
 
   # Architecture-specific source handling (2025 best practice)
   src = pkgs.fetchurl {
     url = "https://github.com/imputnet/helium-macos/releases/download/${version}/helium_${version}_${if pkgs.stdenv.isAarch64 then "arm64" else "x86_64"}-macos.dmg";
     sha256 = if pkgs.stdenv.isAarch64
-      then "sha256-Psfn+FnT+jw460t6rKcxq7iuNbeo3usgfDtgUwCBbiY=" # ARM64 hash
-      else "sha256-md+/IHgTX8jLIxi8FaBbODG5SiLv76SOpuYCxfP1t90="; # x86_64 hash
+      then "sha256-f35ecf26fdde1d8cd85222e65b1b670553a553fe964b9435d8a2945503703808" # ARM64 hash
+      else "sha256-81030f17fddc05fe18797cd9561b565a9478813b5e2e3cd38fe2b7b0ebb83914"; # x86_64 hash
   };
 
   # Build inputs (2025 best practice: explicit dependencies)
@@ -50,7 +50,7 @@ EOF
       that prioritizes privacy and user experience. It aims to provide an
       honest, comfortable, privacy-respecting, and non-invasive browsing experience.
     '';
-    homepage = "https://github.com/imputnet/helium-chromium";
+    homepage = "https://helium.computer";
     downloadPage = "https://github.com/imputnet/helium-macos/releases";
     changelog = "https://github.com/imputnet/helium-macos/releases/tag/${version}";
     license = licenses.gpl3Only;
