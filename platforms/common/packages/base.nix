@@ -25,6 +25,7 @@ let
     # Shells and prompts
     fish
     starship
+    carapace
 
     # File operations and browsing
     curl
