@@ -17,6 +17,7 @@ let
 
     # Essential editors
     vim
+    micro-full
 
     # Terminal emulator
     alacritty-graphics
