@@ -293,36 +293,36 @@ list-backups:
 
 # Restore from a backup
 restore BACKUP_NAME:
-	@echo "🔄 Restoring from backup: {{BACKUP_NAME}}"
-	#!/usr/bin/env bash
-	BACKUP_PATH="backups/{{BACKUP_NAME}}"
-	if [ ! -d "$BACKUP_PATH" ]; then
-	echo "❌ Backup not found: $BACKUP_PATH"
-	exit 1
-	fi
+    @echo "🔄 Restoring from backup: {{ BACKUP_NAME }}"
+    #!/usr/bin/env bash
+    BACKUP_PATH="backups/{{ BACKUP_NAME }}"
+    if [ ! -d "$BACKUP_PATH" ]; then
+    echo "❌ Backup not found: $BACKUP_PATH"
+    exit 1
+    fi
 
-	# Create safety backup first
-	just auto-backup
+    # Create safety backup first
+    just auto-backup
 
-	# Restore dotfiles
-	if [ -d "$BACKUP_PATH/dotfiles" ]; then
-	echo "Restoring dotfiles..."
-	cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
-	fi
+    # Restore dotfiles
+    if [ -d "$BACKUP_PATH/dotfiles" ]; then
+    echo "Restoring dotfiles..."
+    cp -r "$BACKUP_PATH/dotfiles"/* dotfiles/
+    fi
 
-	# Restore other files
-	if [ -f "$BACKUP_PATH/justfile" ]; then
-	echo "Restoring justfile..."
-	cp "$BACKUP_PATH/justfile" .
-	fi
+    # Restore other files
+    if [ -f "$BACKUP_PATH/justfile" ]; then
+    echo "Restoring justfile..."
+    cp "$BACKUP_PATH/justfile" .
+    fi
 
-	if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
-	echo "Restoring manual-linking.sh..."
-	cp "$BACKUP_PATH/manual-linking.sh" .
-	fi
+    if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
+    echo "Restoring manual-linking.sh..."
+    cp "$BACKUP_PATH/manual-linking.sh" .
+    fi
 
-	echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
-	echo "💡 Original state backed up automatically before restore."
+    echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
+    echo "💡 Original state backed up automatically before restore."
 
 # Clean old backups (keep last 10)
 clean-backups:
@@ -480,8 +480,8 @@ perf-benchmark:
 
 # Generate performance report
 perf-report DAYS="7":
-    @echo "📈 Generating performance report ({{DAYS}} days)..."
-    ./scripts/performance-monitor.sh report {{DAYS}}
+    @echo "📈 Generating performance report ({{ DAYS }} days)..."
+    ./scripts/performance-monitor.sh report {{ DAYS }}
     @echo "✅ Performance report generated"
 
 # Show performance alerts
@@ -493,7 +493,7 @@ perf-alerts:
 # Clear performance cache
 perf-cache-clear PATTERN="*":
     @echo "🧹 Clearing performance cache..."
-    ./scripts/performance-monitor.sh cache-clear {{PATTERN}}
+    ./scripts/performance-monitor.sh cache-clear {{ PATTERN }}
     @echo "✅ Performance cache cleared"
 
 # Network and System Monitoring
@@ -657,68 +657,68 @@ health:
 # Run Go linter with golangci-lint on current directory
 go-lint *ARGS="./...":
     @echo "🔍 Running Go linters..."
-    golangci-lint run {{ARGS}}
+    golangci-lint run {{ ARGS }}
     @echo "✅ Go linting complete"
 
 # Format Go code with gofumpt (stricter than gofmt)
 go-format *ARGS=".":
     @echo "🎨 Formatting Go code with gofumpt..."
-    gofumpt -l -w {{ARGS}}
+    gofumpt -l -w {{ ARGS }}
     @echo "✅ Go code formatted"
 
 # Generate Go tests for a package using gotests
 go-gen-tests package *ARGS="":
-    @echo "🧪 Generating Go tests for package: {{package}}"
-    gotests -all -w {{ARGS}} {{package}}
+    @echo "🧪 Generating Go tests for package: {{ package }}"
+    gotests -all -w {{ ARGS }} {{ package }}
     @echo "✅ Go tests generated"
 
 # Generate mocks for Go interfaces using mockgen
 go-gen-mocks source destination *ARGS="":
     @echo "🎭 Generating Go mocks..."
-    mockgen -source={{source}} -destination={{destination}} {{ARGS}}
+    mockgen -source={{ source }} -destination={{ destination }} {{ ARGS }}
     @echo "✅ Go mocks generated"
 
 # Generate wire dependency injection code
 go-wire *ARGS="":
     @echo "🔌 Generating wire dependency injection..."
-    wire {{ARGS}}
+    wire {{ ARGS }}
     @echo "✅ Wire generation complete"
 
 # Start Go debugger (delve) for a Go binary
 go-debug binary *ARGS="":
-    @echo "🐛 Starting Go debugger for: {{binary}}"
-    dlv exec {{binary}} {{ARGS}}
+    @echo "🐛 Starting Go debugger for: {{ binary }}"
+    dlv exec {{ binary }} {{ ARGS }}
 
 # Start Go debugger for tests
 go-debug-test package *ARGS="":
-    @echo "🐛 Starting Go debugger for tests in: {{package}}"
-    dlv test {{package}} {{ARGS}}
+    @echo "🐛 Starting Go debugger for tests in: {{ package }}"
+    dlv test {{ package }} {{ ARGS }}
 
 # Run gopls language server check on current directory
 go-check *ARGS=".":
     @echo "🔍 Running gopls check..."
-    gopls check {{ARGS}}
+    gopls check {{ ARGS }}
     @echo "✅ Gopls check complete"
 
 # Generate protobuf Go code using buf
 go-proto-gen *ARGS="":
     @echo "🔧 Generating protobuf Go code..."
-    buf generate {{ARGS}}
+    buf generate {{ ARGS }}
     @echo "✅ Protobuf generation complete"
 
 # Lint protobuf files using buf
 go-proto-lint *ARGS="":
     @echo "🔍 Linting protobuf files..."
-    buf lint {{ARGS}}
+    buf lint {{ ARGS }}
     @echo "✅ Protobuf linting complete"
 
 # Full Go development workflow - format, lint, test, build
 go-dev package="./...":
     @echo "🛠️  Running full Go development workflow..."
     @just go-format
-    @just go-lint {{package}}
-    go test {{package}}
-    go build {{package}}
+    @just go-lint {{ package }}
+    go test {{ package }}
+    go build {{ package }}
     @echo "✅ Go development workflow complete"
 
 # Auto-update all Go binaries using gup (recommended)
@@ -790,32 +790,32 @@ go-tools-version:
 
 # Configure Claude AI settings using the Go tool
 claude-config profile="personal" *ARGS="":
-    @echo "🤖 Configuring Claude AI with profile: {{profile}}"
-    better-claude configure --profile {{profile}} {{ARGS}}
+    @echo "🤖 Configuring Claude AI with profile: {{ profile }}"
+    better-claude configure --profile {{ profile }} {{ ARGS }}
     @echo "✅ Claude configuration complete"
 
 # Configure Claude AI with backup (recommended for production)
 claude-config-safe profile="personal" *ARGS="":
-    @echo "🤖 Configuring Claude AI with profile: {{profile}} (with backup)"
-    better-claude configure --profile {{profile}} --backup {{ARGS}}
+    @echo "🤖 Configuring Claude AI with profile: {{ profile }} (with backup)"
+    better-claude configure --profile {{ profile }} --backup {{ ARGS }}
     @echo "✅ Claude configuration complete with backup"
 
 # Create a backup of current Claude configuration
 claude-backup profile="personal":
-    @echo "💾 Creating Claude configuration backup for profile: {{profile}}"
-    better-claude backup --profile {{profile}}
+    @echo "💾 Creating Claude configuration backup for profile: {{ profile }}"
+    better-claude backup --profile {{ profile }}
     @echo "✅ Backup complete"
 
 # Restore Claude configuration from backup
 claude-restore backup_file:
-    @echo "🔄 Restoring Claude configuration from: {{backup_file}}"
-    better-claude restore {{backup_file}}
+    @echo "🔄 Restoring Claude configuration from: {{ backup_file }}"
+    better-claude restore {{ backup_file }}
     @echo "✅ Restore complete"
 
 # Test Claude configuration (dry-run mode)
 claude-test profile="personal":
-    @echo "🧪 Testing Claude configuration for profile: {{profile}} (dry-run)"
-    better-claude configure --profile {{profile}} --dry-run
+    @echo "🧪 Testing Claude configuration for profile: {{ profile }} (dry-run)"
+    better-claude configure --profile {{ profile }} --dry-run
     @echo "✅ Test complete - no changes made"
 
 # Show help with detailed descriptions
@@ -891,7 +891,7 @@ help:
     @echo ""
     @echo "Run 'just <command>' to execute any task."
 
-# Wrapper Management Commands  
+# Wrapper Management Commands
 # =========================
 
 # Validate wrapper syntax and structure
