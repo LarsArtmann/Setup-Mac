@@ -16,10 +16,7 @@
       "/usr/lib"
       "/bin/sh"
       "/bin/bash"
-      "/bin/csh"
-      "/bin/tcsh"
       "/bin/zsh"
-      "/bin/ksh"
     ];
   };
 }
