@@ -33,6 +33,8 @@
           "backlight"
           "battery"
           "custom/clipboard"
+          "custom/ai"
+          "custom/security"
           "tray"
           "custom/power"
         ];
@@ -71,10 +73,14 @@
         "cpu" = {
           format = "{usage}% ";
           tooltip = false;
+          interval = 2;
+          min-length = 6;
         };
 
         "memory" = {
           format = "{}% ";
+          interval = 3;
+          min-length = 6;
         };
 
         "temperature" = {
@@ -143,12 +149,25 @@
           on-scroll-down = "brightnessctl set 1%-";
         };
 
+        "custom/security" = {
+          format = "🛡️ {}";
+          exec = "~/.config/waybar/security-status.sh";
+          interval = 30;
+          tooltip = "Security Status";
+          on-click = "alacritty -e sudo lynis audit system";
+        };
+
         "custom/clipboard" = {
           format = "📋 {}";
-          exec = "cliphist list | head -1 | cut -d'\t' -f2- || echo 'Empty'";
+          exec = pkgs.writeShellScript "waybar-clipboard" ''
+            CLIP_CONTENT=$(${pkgs.cliphist}/bin/cliphist list | head -1 | ${pkgs.gawk}/bin/awk -F'\t' '{print $2}' || echo "Empty")
+            echo "$CLIP_CONTENT"
+          '';
           interval = 5;
           tooltip = false;
-          on-click = "cliphist list | rofi -dmenu -p 'Clipboard:' | cliphist decode | wl-copy";
+          on-click = pkgs.writeShellScript "waybar-clipboard-menu" ''
+            ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
+          '';
         };
 
         "custom/power" = {
@@ -162,42 +181,44 @@
     style = ''
       * {
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         font-family: "JetBrainsMono Nerd Font";
-        font-size: 14px;
+        font-size: 13px;
         min-height: 0;
-        margin: 4px 2px;
-        padding: 0 8px;
+        margin: 2px 1px;
+        padding: 0 6px;
+        transition: all 0.15s ease;
       }
 
       window#waybar {
-        background: rgba(26, 27, 38, 0.8);
+        background: rgba(26, 27, 38, 0.85);
         color: #cdd6f4;
-        border-radius: 12px;
-        border: 1px solid rgba(137, 180, 250, 0.2);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
+        border-radius: 8px;
+        border: 1px solid rgba(137, 180, 250, 0.15);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(8px);
       }
 
       #workspaces button {
-        padding: 0 8px;
+        padding: 0 6px;
         background-color: transparent;
         color: #bac2de;
-        border-radius: 8px;
-        transition: all 0.3s ease;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-weight: 500;
       }
 
       #workspaces button:hover {
-        background: rgba(137, 180, 250, 0.2);
+        background: rgba(137, 180, 250, 0.15);
         color: #cdd6f4;
-        transform: scale(1.05);
+        transform: scale(1.02);
       }
 
       #workspaces button.active {
         background: linear-gradient(45deg, #89b4fa, #b4befe);
         color: #1e1e2e;
         font-weight: bold;
-        box-shadow: 0 2px 8px rgba(137, 180, 250, 0.4);
+        box-shadow: 0 1px 4px rgba(137, 180, 250, 0.3);
       }
 
       #workspaces button.persistent {
@@ -221,13 +242,15 @@
       #temperature,
       #network,
       #pulseaudio,
+      #custom-ai,
+      #custom-security,
       #custom-clipboard,
       #custom-power,
       #tray {
-        padding: 0 12px;
-        margin: 0 4px;
-        border-radius: 8px;
-        transition: all 0.2s ease;
+        padding: 0 8px;
+        margin: 0 2px;
+        border-radius: 6px;
+        transition: all 0.15s ease;
       }
 
       #custom-media {
@@ -316,6 +339,18 @@
         background: rgba(243, 139, 168, 0.15);
         color: #f38ba8;
         font-size: 12px;
+      }
+
+      #custom-ai {
+        background: rgba(166, 227, 233, 0.15);
+        color: #94e2d5;
+        font-weight: bold;
+      }
+
+      #custom-security {
+        background: rgba(166, 227, 161, 0.15);
+        color: #a6e3a1;
+        font-weight: bold;
       }
 
       #custom-power {

@@ -93,29 +93,39 @@
         layout = "dwindle";
       };
 
+      # MEMORY & PERFORMANCE OPTIMIZED DECORATION
       decoration = {
-        rounding = 10;
+        rounding = 8;  # Reduced from 10 for performance
         blur = {
           enabled = true;
-          size = 3;
+          size = 2;  # Reduced from 3
           passes = 1;
+          noise = 0.0117;
+          contrast = 0.8916;
+          brightness = 0.8172;
+          ignore_opacity = true;
+          new_optimizations = true;  # Enable new blur optimizations
+          xray = true;  # X-ray blur for better performance
         };
-        # drop_shadow = true; # Deprecated in newer Hyprland
-        # shadow_range = 4;
-        # shadow_render_power = 3;
-        # "col.shadow" = "rgba(1a1a1aee)";
+        drop_shadow = {
+          enabled = false;  # Disabled for maximum performance
+        };
       };
 
+      # OPTIMIZED ANIMATIONS - BALANCED PERFORMANCE & SMOOTHNESS
       animations = {
         enabled = true;
-        bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
+        # Optimized bezier for smooth but fast animations
+        bezier = "myBezier, 0.25, 0.46, 0.45, 0.94";
+        # Reduced animation count and speed for better performance
         animation = [
-          "windows, 1, 7, myBezier"
-          "windowsOut, 1, 7, default, popin 80%"
-          "border, 1, 10, default"
-          "borderangle, 1, 8, default"
-          "fade, 1, 7, default"
-          "workspaces, 1, 6, default"
+          "windows, 1, 3, myBezier, slide"
+          "windowsOut, 1, 2, default, popin 90%"
+          "border, 1, 5, default"
+          "borderangle, 1, 6, default"
+          "fade, 1, 3, default"
+          "workspaces, 1, 4, default, slidefadevert"
+          "specialWorkspace, 1, 4, default, slidefadevert"
         ];
       };
 
@@ -132,19 +142,45 @@
         workspace_swipe = true;
       };
 
+      # PERFORMANCE OPTIMIZATIONS
       misc = {
         force_default_wallpaper = 0;
-        # Performance optimizations
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
         mouse_refocus = false;
         new_window_takes_over_fullscreen = true;
+        animate_manual_resizes = false;
+        animate_mouse_windowdragging = false;
+        enable_swallow = false;
+        swallow_regex = "";
+        focus_on_activate = true;
+        no_direct_scanout = false;
+        disable_hyprland_qtutils_workaround = false;
+        mouse_move_enables_dpms = false;
+        key_press_enables_dpms = false;
+        always_follow_on_dnd = true;
+        layers_hog_keyboard_focus = true;
       };
 
-      # Rendering optimizations for AMD GPUs
+      # RENDERING OPTIMIZATIONS - MAXIMUM PERFORMANCE
       render = {
         explicit_sync = true;
         direct_scanout = true;
+        expand_undersized_textures = true;
+        ignore_performance_warnings = true;
+        vrr = 2;
+        vfr = true;
+        allow_tearing = false;
+      };
+
+      # DEBUG & PERFORMANCE MONITORING
+      debug = {
+        disable_logs = false;
+        disable_time = false;
+        overlay = false;
+        damage_blink = false;
+        errors = false;
+        disable_vrr = false;
       };
 
       bind = [
@@ -314,6 +350,86 @@
     slurp # Area selection tool
     playerctl # Media player control
     brightnessctl # Brightness control
+
+    # LOCAL AI SETUP - vLLM + Ollama for Ryzen AI Max+ 395
+    # AMD ROCm for GPU acceleration
+    rocmPackages.rocm-runtime
+    rocmPackages.rocblas
+    rocmPackages.hipblas
+    rocmPackages.rocrand
+    
+    # Python AI packages
+    (python311.withPackages (ps: with ps; [
+      vllm  # For advanced inference
+      ollama  # For model management
+      torch  # PyTorch with ROCm support
+      transformers  # Hugging Face models
+      accelerate  # Hardware acceleration
+    ]))
+    
+    # Ollama for easy model management
+    ollama
+    
+    # OCR Tools
+    tesseract  # OCR engine
+    tesseract4  # Better OCR
+    poppler-utils  # PDF utilities for OCR
+    
+    # Model quantization and optimization
+    llama-cpp
+    
+    # AI monitoring and tools
+    nvtopPackages.amd  # GPU monitoring
+    
+    # SECURITY MONITORING TOOLS
+    # Network & Connection Monitoring
+    nethogs # Network process monitoring
+    iftop # Network bandwidth monitoring
+    iptraf-ng # IP traffic monitoring
+    bmon # Network bandwidth monitor
+    netsniff-ng # Network packet capture
+    wireshark # Network protocol analyzer
+    aircrack-ng # WiFi security testing
+    
+    # System Security Monitoring
+    lynis # Security auditing tool
+    aide # File integrity monitoring
+    osquery # OS monitoring & security analytics
+    fail2ban # Intrusion prevention
+    
+    # Authentication & Access Control
+    pamtester # PAM testing
+    openssl # Cryptographic toolkit
+    gnupg # Encryption & signing
+    pass # Password manager
+    
+    # Process & File Monitoring
+    lsof # List open files
+    strace # System call tracer
+    inotify-tools # File system monitoring
+    iotop # I/O monitoring
+    perf # Performance analysis
+    
+    # Log Analysis & Security
+    goaccess # Web log analyzer
+    ccze # Log colorizer
+    
+    # Privacy & Anonymity
+    tor-browser # Anonymous browsing
+    openvpn # VPN client
+    wireguard-tools # Modern VPN
+    
+    # Vulnerability Assessment
+    nmap # Network scanning
+    masscan # Fast port scanner
+    sqlmap # SQL injection testing
+    nikto # Web server scanner
+    nuclei # Fast vulnerability scanner
+    
+    # Incident Response
+    sleuthkit # Forensic toolkit
+    wireshark-cli # Command-line packet analysis
+    tcpdump # Packet capture
 
     # Modern alternatives for desktop terminals
     htop # Process monitor
