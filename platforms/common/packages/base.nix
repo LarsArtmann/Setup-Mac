@@ -70,6 +70,9 @@ let
     # Task management
     taskwarrior3
     timewarrior
+
+    # Clipboard management
+    cliphist  # Clipboard history manager for Wayland
   ];
 
   # Development tools (platform-agnostic)
