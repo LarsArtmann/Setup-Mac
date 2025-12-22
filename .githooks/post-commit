@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Post-commit hook for automated actions
+
+set -euo pipefail
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+log_info() {
+    echo -e "${BLUE}[POST-COMMIT]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+# Function to suggest next steps
+suggest_next_steps() {
+    local current_time=$(date +%H:%M)
+    log_info "📝 Consider next steps:"
+    echo -e "${GREEN}  • Test deployment: sudo nixos-rebuild switch${NC}"
+    echo -e "${GREEN}  • Run benchmarks: ./scripts/performance-test.sh${NC}"
+    echo -e "${GREEN}  • Validate AI services: systemctl status ollama${NC}"
+}
+
+# Function to create quick summary
+create_commit_summary() {
+    local commit_hash=$(git rev-parse --short HEAD)
+    local commit_subject=$(git log -1 --pretty=%s)
+    
+    log_info "📊 Latest commit: $commit_hash"
+    log_success "Message: $commit_subject"
+}
+
+# Function to check if we should run tests
+should_run_tests() {
+    # Only run automated tests every 3 commits to avoid overhead
+    local commit_count=$(git rev-list --count HEAD~10..HEAD)
+    [ $((commit_count % 3)) -eq 0 ]
+}
+
+# Main execution
+main() {
+    log_info "🚀 Post-commit actions at $(date +%H:%M)"
+    
+    # Create commit summary
+    create_commit_summary
+    
+    # Suggest next steps
+    suggest_next_steps
+    
+    # Check if we should trigger automated tests
+    if should_run_tests; then
+        log_info "🧪 This would be a good time to run full test suite"
+    else
+        log_info "⏭ Skipping automated tests (every 3rd commit)"
+    fi
+}
+
+main "$@"
