@@ -123,7 +123,6 @@
         PermitEmptyPasswords = false;
         ChallengeResponseAuthentication = false;
         UsePAM = true;
-        PrintMotds = false;
         AcceptEnv = "LANG LC_*";
         Subsystem = "sftp /run/current-system/sw/libexec/sftp-server";
         Banner = "/etc/ssh/banner";
