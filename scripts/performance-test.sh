@@ -39,7 +39,13 @@ echo "Kernel: $(uname -r)"
 echo "CPU: $(grep 'model name' /proc/cpuinfo | head -1 | cut -d':' -f2 | xargs)"
 echo "Memory: $(free -h | grep '^Mem:' | awk '{print $2}')"
 echo "Disk: $(df -h / | tail -1 | awk '{print $2}')"
-echo "GPU: $(lspci | grep -i vga | cut -d':' -f3 | xargs)"
+echo "GPU: Checking GPU availability..."
+if command -v lspci >/dev/null 2>&1; then
+    GPU_INFO=$(lspci | grep -i vga | head -1 2>/dev/null || echo "No GPU detected")
+    echo "GPU: $GPU_INFO"
+else
+    echo "GPU: lspci command not available"
+fi
 
 # GPU Performance Test
 echo -e "\n${BLUE}=== GPU PERFORMANCE TEST ===${NC}"
