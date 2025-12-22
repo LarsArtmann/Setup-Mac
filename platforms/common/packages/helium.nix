@@ -22,10 +22,10 @@ pkgs.stdenv.mkDerivation rec {
     }
   else if isLinux then
     pkgs.fetchurl {
-      url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}_${if isAarch64 then "arm64" else "x86_64"}_linux.tar.xz";
+      url = "https://github.com/imputnet/helium-linux/releases/download/${version}/helium-${version}-${if isAarch64 then "arm64" else "x86_64"}_linux.tar.xz";
       sha256 = if isAarch64
-        then "sha256-1fasgax0d74nlxziqwh10x5xh25p82gnq9dh5qll2wc14hc98jmn" # ARM64 Linux hash
-        else "sha256-12z2zhbchyq0jzhld57inkaxfwm2z8gxkamnnwcvlw96qqr0rga4"; # x86_64 Linux hash
+        then "sha256-jJGb5R089O5kSuKkio40vtxZgr+7Pxl3WKHVNn7G1HI=" # ARM64 Linux hash
+        else "sha256-RL0MMsYmcboZt7aq2R/6onLX1bTxlEbhlwB7yBb84os="; # x86_64 Linux hash
     }
   else
     throw "Unsupported platform: ${system}";
@@ -34,7 +34,7 @@ pkgs.stdenv.mkDerivation rec {
   nativeBuildInputs = with pkgs; 
     [ makeWrapper copyDesktopItems ] ++
     lib.optionals isDarwin [ undmg ] ++
-    lib.optionals isLinux [ autoPatchelfHook ];
+    lib.optionals isLinux [ autoPatchelfHook qt6.wrapQtAppsHook ];
 
   # Platform-specific runtime dependencies
   buildInputs = with pkgs;
@@ -87,16 +87,13 @@ pkgs.stdenv.mkDerivation rec {
   
   # Ignore missing Qt libraries that might be bundled
   autoPatchelfIgnoreMissingDeps = lib.optionals isLinux [
-    "libQt6Core.so.6"
-    "libQt6Gui.so.6"
-    "libQt6Widgets.so.6"
     "libQt5Core.so.5"
     "libQt5Gui.so.5"
     "libQt5Widgets.so.5"
   ];
 
-  # Don't wrap Qt apps automatically on Linux
-  dontWrapQtApps = true;
+  # Don't wrap Qt apps automatically on Linux (let qt6.wrapQtAppsHook handle it)
+  # dontWrapQtApps = true;
 
   # Platform-specific installation
   installPhase = ''
@@ -113,10 +110,16 @@ pkgs.stdenv.mkDerivation rec {
     '' else if isLinux then ''
       # Linux installation
       mkdir -p $out/opt/helium $out/bin
-      cp -r * $out/opt/helium/
+      cp -r helium-0.7.6.1-x86_64_linux/* $out/opt/helium/
+      
+      # Debug: List files to see what we actually have
+      ls -la $out/opt/helium/ || true
+      
+      # Ensure binary is executable
+      chmod +x $out/opt/helium/chrome-wrapper
       
       # Create CLI wrapper for Linux with Wayland support
-      makeWrapper "$out/opt/helium/chrome" $out/bin/helium \
+      makeWrapper "$out/opt/helium/chrome-wrapper" $out/bin/helium \
         --prefix LD_LIBRARY_PATH : "${pkgs.lib.makeLibraryPath (with pkgs; [
           libGL
           libvdpau
