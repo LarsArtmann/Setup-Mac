@@ -187,12 +187,10 @@
     python311Packages.pillow
     python311Packages.opencv4
     python311Packages.pytesseract
-    python311Packages.easyocr
     python311Packages.optimum
     python311Packages.peft
     python311Packages.tokenizers
     python311Packages.tensorboard
-    python311Packages.wandb
     
     # Model management and serving
     ollama  # Model server
