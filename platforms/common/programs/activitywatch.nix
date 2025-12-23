@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   # ActivityWatch Configuration (Cross-Platform)
   services.activitywatch = {
     enable = true;

@@ -1,6 +1,5 @@
 # Test minimal Darwin configuration
-{ pkgs, lib, ... }:
-{
+{pkgs, ...}: {
   # Basic system configuration
   system.stateVersion = 5;
 

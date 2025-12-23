@@ -1,12 +1,5 @@
 # 🚀 Core Type Safety System
-{ lib, pkgs, config, ... }:
-
-let
-  # Import assertion frameworks
-  typeAssertions = import ./TypeAssertions.nix { inherit lib; };
-
-in
-{
+{config, ...}: {
   # Apply type safety to current configuration
   config = {
     assertions = [

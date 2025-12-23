@@ -1,6 +1,4 @@
-{ lib, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # Common security settings (platform-agnostic)
   security = {
     # Enhanced PKI (Public Key Infrastructure) settings

@@ -1,18 +1,4 @@
-{ lib, pkgs, ... }:
-
-let
-  # Validation helpers for robust configuration
-  validateUser = user:
-    if user == null || user == "" then
-      throw "User cannot be null or empty"
-    else user;
-
-  validatePath = path:
-    if path == null || path == "" then
-      throw "Path cannot be null or empty"
-    else path;
-
-in {
+{lib, ...}: {
   # Common Nix settings (platform-agnostic)
   nix = {
     enable = true;
@@ -45,14 +31,21 @@ in {
     # Enhanced garbage collection
     gc = {
       automatic = true;
-      interval = { Hour = 2; Minute = 30; }; # Run at 2:30 AM
+      interval = {
+        Hour = 2;
+        Minute = 30;
+      }; # Run at 2:30 AM
       options = "--delete-older-than 7d --max-freed 5G";
     };
 
     # Enhanced store optimization
     optimise = {
       automatic = true;
-      interval = { Weekday = 7; Hour = 3; Minute = 0; }; # Weekly on Sunday at 3 AM
+      interval = {
+        Weekday = 7;
+        Hour = 3;
+        Minute = 0;
+      }; # Weekly on Sunday at 3 AM
     };
 
     # Additional Nix configuration for robustness
@@ -74,19 +67,20 @@ in {
   nixpkgs = {
     config = {
       allowUnsupportedSystem = true;
-      allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-        "vault" # 'bsl11' licence
-        "terraform" # 'bsl11' licence
-        "cursor" # 'unfree'
-        "idea-ultimate" # 'unfree' licence
-        "webstorm" # 'unfree' licence
-        "goland" # 'unfree' licence
-        "rider" # 'unfree' licence
-        "google-chrome" # 'unfree' licence
-        "signal-desktop-bin" # 'agpl3Only free unfree'
-        "castlabs-electron" # needed for tidal-hifi
-        "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
-      ];
+      allowUnfreePredicate = pkg:
+        builtins.elem (lib.getName pkg) [
+          "vault" # 'bsl11' licence
+          "terraform" # 'bsl11' licence
+          "cursor" # 'unfree'
+          "idea-ultimate" # 'unfree' licence
+          "webstorm" # 'unfree' licence
+          "goland" # 'unfree' licence
+          "rider" # 'unfree' licence
+          "google-chrome" # 'unfree' licence
+          "signal-desktop-bin" # 'agpl3Only free unfree'
+          "castlabs-electron" # needed for tidal-hifi
+          "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
+        ];
     };
   };
 

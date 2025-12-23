@@ -1,10 +1,7 @@
 # User Configuration Module
 # Centralized single source of truth for all user-specific configuration
 # Eliminates split-brain user configuration across multiple files
-
-{ lib, ... }:
-
-let
+{lib, ...}: let
   # Type definitions for user configuration
   UserType = lib.types.submodule {
     options = {
@@ -43,7 +40,6 @@ let
       };
     };
   };
-
 in {
   # Export types for external use
   inherit UserType;
@@ -67,10 +63,9 @@ in {
   # Validation functions
   validateUserConfig = user:
     lib.assertions.assertionMsg
-      (lib.hasPrefix "/Users/" user.homeDir)
-      "homeDir must be under /Users directory"
-    &&
-    lib.assertions.assertionMsg
-      (lib.hasPrefix "/Users/" user.configDir)
-      "configDir must be under /Users directory";
+    (lib.hasPrefix "/Users/" user.homeDir)
+    "homeDir must be under /Users directory"
+    && lib.assertions.assertionMsg
+    (lib.hasPrefix "/Users/" user.configDir)
+    "configDir must be under /Users directory";
 }

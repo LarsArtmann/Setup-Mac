@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-let
+_: let
   # Common aliases that work across platforms
   commonAliases = {
     # Essential shortcuts
@@ -26,15 +24,14 @@ let
 
   # Platform-specific initialization (to be overridden by platform configs)
   platformInit = "";
-
 in {
   # Common Fish shell configuration
   programs.fish = {
     enable = true;
-    
+
     # Merge common and platform-specific aliases
     shellAliases = commonAliases // platformAliases;
-    
+
     # Merge common and platform-specific initialization
     interactiveShellInit = commonInit + platformInit;
   };

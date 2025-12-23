@@ -1,7 +1,10 @@
-{ pkgs, lib, ... }:
-let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   # Import centralized user configuration
-  userConfig = import ../../common/core/UserConfig.nix { inherit lib; };
+  userConfig = import ../../common/core/UserConfig.nix {inherit lib;};
 in {
   system = {
     primaryUser = userConfig.defaultUser.username;
@@ -26,15 +29,15 @@ in {
 
         echo "Updating Spotlight index for Nix applications..."
         mdimport "/Applications/Nix Apps"
-        
+
         # Reset TCC permissions gracefully - fail silently if not allowed
         echo "Skipping TCC reset to avoid build failure - requires Full Disk Access"
         # tccutil reset SystemPolicyAppBundles 2>/dev/null || echo "TCC reset skipped - requires Full Disk Access"
       '';
     };
 
-  # Completely disable all system checks to prevent TCC reset
-  checks = lib.mkForce {};
+    # Completely disable all system checks to prevent TCC reset
+    checks = lib.mkForce {};
   };
 
   # Enhanced Security Configuration for Darwin

@@ -1,9 +1,6 @@
 # Error Definitions Module
 # Centralized error definitions dictionary
-
-{ lib, ... }:
-
-let
+_: let
   # CENTRALIZED ERROR DEFINITIONS
   ErrorDefinitions = {
     validation = {
@@ -129,7 +126,6 @@ let
       };
     };
   };
-
 in {
   inherit ErrorDefinitions;
 }

@@ -1,5 +1,4 @@
-{ pkgs, lib, ... }:
-{
+_: {
   # Fish shell configuration (cross-platform)
   programs.fish = {
     enable = true;

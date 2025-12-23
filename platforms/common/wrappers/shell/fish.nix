@@ -1,20 +1,29 @@
 # Fish Shell Wrapper
 # Embedded Fish configuration with optimized performance
-
-{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
-
-let
+{
+  pkgs,
+  lib,
+  writeShellScriptBin,
+}: let
   # Simple wrapper function using writeShellScriptBin
-  wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
+  wrapWithConfig = {
+    name,
+    package,
+    configFiles ? {},
+    env ? {},
+    preHook ? "",
+    postHook ? "",
+  }:
     writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=${v}") env)}
 
       # Ensure config directories exist
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (configPath: source: ''
-        mkdir -p "$(dirname "$HOME/.${configPath}")"
-        ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
-      '') configFiles)}
+          mkdir -p "$(dirname "$HOME/.${configPath}")"
+          ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
+        '')
+        configFiles)}
 
       # Run the original binary
       exec "${lib.getBin package}/bin/${name}" "$@"
@@ -102,12 +111,15 @@ let
   fishWrapper = wrapWithConfig {
     name = "fish";
     package = pkgs.fish;
-    configFiles = {
-      "config/fish/config.fish" = fishConfig;
-    } // (lib.mapAttrs' (name: source: {
-      name = "config/fish/functions/${name}";
-      value = source;
-    }) fishFunctions);
+    configFiles =
+      {
+        "config/fish/config.fish" = fishConfig;
+      }
+      // (lib.mapAttrs' (name: source: {
+          name = "config/fish/functions/${name}";
+          value = source;
+        })
+        fishFunctions);
     env = {
       SHELL = "\"${pkgs.fish}/bin/fish\"";
       FISH_CONFIG_DIR = "\"$HOME/.config/fish\"";
@@ -117,9 +129,7 @@ let
       mkdir -p "$FISH_CONFIG_DIR"/{functions,completions,conf.d}
     '';
   };
-
-in
-{
+in {
   # Export the wrapper for use in system packages
   fish = fishWrapper;
 }

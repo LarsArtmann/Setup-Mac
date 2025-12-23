@@ -1,17 +1,23 @@
 # Error Types Module
 # Type definitions and categories for error management
-
-{ lib, ... }:
-
-let
+{lib, ...}: let
   # ERROR TYPE DEFINITIONS - TYPE-SAFE ERROR CATEGORIES
   ErrorType = lib.types.enum [
-    "validation" "build" "runtime" "configuration"
-    "external" "performance" "dependency" "platform"
-    "license" "filesystem" "network" "rollback"
+    "validation"
+    "build"
+    "runtime"
+    "configuration"
+    "external"
+    "performance"
+    "dependency"
+    "platform"
+    "license"
+    "filesystem"
+    "network"
+    "rollback"
   ];
 
-  ErrorSeverity = lib.types.enum [ "critical" "high" "medium" "low" "info" ];
+  ErrorSeverity = lib.types.enum ["critical" "high" "medium" "low" "info"];
 
   ErrorCategory = lib.types.submodule {
     options = {
@@ -40,7 +46,7 @@ let
         description = "Notify user of this error";
       };
       logLevel = lib.mkOption {
-        type = lib.types.enum [ "error" "warn" "info" "debug" ];
+        type = lib.types.enum ["error" "warn" "info" "debug"];
         default = "error";
         description = "Log level for this error";
       };
@@ -51,7 +57,6 @@ let
       };
     };
   };
-
 in {
   inherit ErrorType ErrorSeverity ErrorCategory;
 }

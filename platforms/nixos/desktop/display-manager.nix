@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   # Enable X11 windowing system
   services.xserver = {
     enable = true;
@@ -17,10 +15,10 @@
   # Note: Wayland disabled for stability with AMD GPU
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = false;  # Disabled for AMD GPU stability
+    wayland.enable = false; # Disabled for AMD GPU stability
     theme = "sugar-dark";
     enableHidpi = true;
     autoNumlock = true;
-    extraPackages = [ pkgs.sddm-sugar-dark ];
+    extraPackages = [pkgs.sddm-sugar-dark];
   };
 }

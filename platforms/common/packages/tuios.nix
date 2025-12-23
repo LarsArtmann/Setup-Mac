@@ -1,5 +1,8 @@
-{ pkgs, lib, fetchFromGitHub }:
-
+{
+  pkgs,
+  lib,
+  fetchFromGitHub,
+}:
 pkgs.buildGoModule rec {
   pname = "tuios";
   version = "0.3.4";
@@ -26,6 +29,6 @@ pkgs.buildGoModule rec {
     license = licenses.mit;
     mainProgram = "tuios";
     platforms = platforms.unix;
-    maintainers = with maintainers; [ ];
+    maintainers = with maintainers; [];
   };
 }

@@ -1,6 +1,4 @@
-_:
-
-{
+_: {
   # Enable OpenSSH daemon with hardening
   services.openssh = {
     enable = true;
@@ -21,7 +19,7 @@ _:
       PermitTunnel = false;
 
       # Access control
-      AllowUsers = [ "lars" ]; # Only allow lars user
+      AllowUsers = ["lars"]; # Only allow lars user
 
       # Connection limits
       MaxAuthTries = 3;
@@ -55,7 +53,7 @@ _:
 
     # Enable fail2ban integration for SSH protection
     openFirewall = true;
-    ports = [ 22 ];
+    ports = [22];
   };
 
   # SSH Banner

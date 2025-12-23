@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }:
-{
+{pkgs, ...}: {
   imports = [
     ../common/home-base.nix
     ./modules/iterm2.nix

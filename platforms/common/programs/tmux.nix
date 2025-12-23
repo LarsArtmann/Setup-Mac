@@ -1,7 +1,5 @@
 # 📋 TMUX CONFIGURATION FOR SETUP-MAC
-
-{ pkgs, config, ... }:
-{
+{pkgs, ...}: {
   programs.tmux = {
     enable = true;
     clock24 = true;

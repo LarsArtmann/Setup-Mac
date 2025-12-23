@@ -1,20 +1,29 @@
 # Starship Prompt Wrapper
 # Embedded starship configuration for portable shell experience
-
-{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
-
-let
+{
+  pkgs,
+  lib,
+  writeShellScriptBin,
+}: let
   # Simple wrapper function using writeShellScriptBin
-  wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
+  wrapWithConfig = {
+    name,
+    package,
+    configFiles ? {},
+    env ? {},
+    preHook ? "",
+    postHook ? "",
+  }:
     writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=${v}") env)}
 
       # Ensure config directories exist
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (configPath: source: ''
-        mkdir -p "$(dirname "$HOME/.${configPath}")"
-        ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
-      '') configFiles)}
+          mkdir -p "$(dirname "$HOME/.${configPath}")"
+          ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
+        '')
+        configFiles)}
 
       # Run the original binary
       exec "${lib.getBin package}/bin/${name}" "$@"
@@ -116,13 +125,11 @@ let
     env = {
       STARSHIP_CONFIG = "$HOME/.config/starship.toml";
       STARSHIP_CACHE = "$HOME/.cache/starship";
-      STARSHIP_LOG = "error";  # Reduce noise
+      STARSHIP_LOG = "error"; # Reduce noise
     };
     # preHook removed: Starship creates its own cache directory, and preHook runs BEFORE env vars are set
   };
-
-in
-{
+in {
   # Export wrapper for use in system packages
   starship = starshipWrapper;
 }

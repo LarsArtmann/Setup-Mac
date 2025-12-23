@@ -1,9 +1,11 @@
 # State.nix - CENTRALIZED SINGLE SOURCE OF TRUTH
 # TYPE-SAFE STATE MANAGEMENT FOR ENTIRE SYSTEM
-
-{ lib, pkgs, UserConfig, PathConfig, ... }:
-
-let
+{
+  lib,
+  UserConfig,
+  PathConfig,
+  ...
+}: let
   # TYPE DEFINITIONS - STRONG TYPE SAFETY ENFORCEMENT
   PathConfigType = lib.types.submodule {
     options = {
@@ -53,53 +55,64 @@ let
     inherit (UserConfig.defaultUser) username;
     # Use injected PathConfig instead of direct import
     pathConfig = PathConfig.mkPathConfig username;
-  in pathConfig;
+  in
+    pathConfig;
 
   # STATE VALIDATION FUNCTIONS - TYPE-SAFE GUARANTEES
-  validatePathConsistency = paths:
-    let
-      homeExists = lib.pathExists paths.home;
-      configExists = lib.pathExists paths.config;
-      flakeExists = lib.pathExists paths.flake;
-      dotfilesExists = lib.pathExists paths.dotfiles;
-      nixConfigExists = lib.pathExists paths.nixConfig;
+  validatePathConsistency = paths: let
+    homeExists = lib.pathExists paths.home;
+    configExists = lib.pathExists paths.config;
+    flakeExists = lib.pathExists paths.flake;
+    dotfilesExists = lib.pathExists paths.dotfiles;
+    nixConfigExists = lib.pathExists paths.nixConfig;
 
-      validationResults = [
-        { path = "home"; exists = homeExists; }
-        { path = "config"; exists = configExists; }
-        { path = "flake"; exists = flakeExists; }
-        { path = "dotfiles"; exists = dotfilesExists; }
-        { path = "nixConfig"; exists = nixConfigExists; }
-      ];
+    validationResults = [
+      {
+        path = "home";
+        exists = homeExists;
+      }
+      {
+        path = "config";
+        exists = configExists;
+      }
+      {
+        path = "flake";
+        exists = flakeExists;
+      }
+      {
+        path = "dotfiles";
+        exists = dotfilesExists;
+      }
+      {
+        path = "nixConfig";
+        exists = nixConfigExists;
+      }
+    ];
 
-      allPathsExist = lib.all (r: r.exists) validationResults;
-      missingPaths = lib.filter (r: !r.exists) validationResults;
+    allPathsExist = lib.all (r: r.exists) validationResults;
+    missingPaths = lib.filter (r: !r.exists) validationResults;
+  in {
+    allValid = allPathsExist;
+    inherit missingPaths;
+    inherit validationResults;
+  };
 
-    in {
-      allValid = allPathsExist;
-      inherit missingPaths;
-      inherit validationResults;
+  validatePackageList = packages: let
+    validatePackage = pkg: {
+      name = lib.getName pkg;
+      version = lib.getVersion pkg;
+      available = (pkg ? outPath) && pkg ? meta;
+      platforms = pkg.meta.platforms or ["all"];
+      essential = (pkg.config or {}).essential or false;
     };
 
-  validatePackageList = packages:
-    let
-      validatePackage = pkg: {
-        name = lib.getName pkg;
-        version = lib.getVersion pkg;
-        available = (pkg ? outPath) && pkg ? meta;
-        platforms = pkg.meta.platforms or ["all"];
-        essential = (pkg.config or {}).essential or false;
-      };
-
-      validatedPackages = map validatePackage packages;
-      essentialAvailable = lib.all (p: p.available) (lib.filter (p: p.essential) validatedPackages);
-
-    in {
-      packages = validatedPackages;
-      inherit essentialAvailable;
-      totalValid = lib.all (p: p.available) validatedPackages;
-    };
-
+    validatedPackages = map validatePackage packages;
+    essentialAvailable = lib.all (p: p.available) (lib.filter (p: p.essential) validatedPackages);
+  in {
+    packages = validatedPackages;
+    inherit essentialAvailable;
+    totalValid = lib.all (p: p.available) validatedPackages;
+  };
 in {
   inherit PathConfigType PackageConfig Paths;
   inherit validatePathConsistency validatePackageList;

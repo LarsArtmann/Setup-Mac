@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # Enable sound with pipewire
   services.pipewire = {
     enable = true;

@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   imports = [
     ./waybar.nix
   ];
@@ -15,7 +13,7 @@
     ];
 
     # Recommended settings for best experience
-    systemd.enable = true;  # Try enabling for better keybinding support
+    systemd.enable = true; # Try enabling for better keybinding support
     xwayland.enable = true;
 
     settings = {
@@ -24,7 +22,7 @@
       "$menu" = "rofi -show drun -show-icons";
 
       # For TV display - 200% scaling
-      monitor = "HDMI-A-1,preferred,auto,2";  # Adjust HDMI-A-1 to actual output
+      monitor = "HDMI-A-1,preferred,auto,2"; # Adjust HDMI-A-1 to actual output
       # Fallback if above doesn't work:
       # monitor = "preferred,auto,2,transform,1";  # 2x scale + normal orientation
 
@@ -33,9 +31,9 @@
         ''dunst''
         ''wl-paste --watch cliphist store''
         # Desktop consoles setup
-        ''${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop''                    # System monitor
-        ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop''                    # Process monitor
-        ''${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f''           # System logs
+        ''${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop'' # System monitor
+        ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop'' # Process monitor
+        ''${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f'' # System logs
         ''${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf'' # Config editor
       ];
 
@@ -95,20 +93,20 @@
 
       # MEMORY & PERFORMANCE OPTIMIZED DECORATION
       decoration = {
-        rounding = 8;  # Reduced from 10 for performance
+        rounding = 8; # Reduced from 10 for performance
         blur = {
           enabled = true;
-          size = 2;  # Reduced from 3
+          size = 2; # Reduced from 3
           passes = 1;
           noise = 0.0117;
           contrast = 0.8916;
           brightness = 0.8172;
           ignore_opacity = true;
-          new_optimizations = true;  # Enable new blur optimizations
-          xray = true;  # X-ray blur for better performance
+          new_optimizations = true; # Enable new blur optimizations
+          xray = true; # X-ray blur for better performance
         };
         drop_shadow = {
-          enabled = false;  # Disabled for maximum performance
+          enabled = false; # Disabled for maximum performance
         };
       };
 

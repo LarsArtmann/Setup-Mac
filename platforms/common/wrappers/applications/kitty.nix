@@ -1,20 +1,29 @@
 # Kitty Terminal Wrapper
 # GUI application wrapper with embedded configuration
-
-{ pkgs, lib, writeShellScriptBin, symlinkJoin, makeWrapper }:
-
-let
+{
+  pkgs,
+  lib,
+  writeShellScriptBin,
+}: let
   # Simple wrapper function for GUI applications
-  wrapWithConfig = { name, package, configFiles ? {}, env ? {}, preHook ? "", postHook ? "" }:
+  wrapWithConfig = {
+    name,
+    package,
+    configFiles ? {},
+    env ? {},
+    preHook ? "",
+    postHook ? "",
+  }:
     writeShellScriptBin name ''
       ${preHook}
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (k: v: "export ${k}=\"${v}\"") env)}
 
       # Ensure config directories exist
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (configPath: source: ''
-        mkdir -p "$(dirname "$HOME/.${configPath}")"
-        ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
-      '') configFiles)}
+          mkdir -p "$(dirname "$HOME/.${configPath}")"
+          ln -sf "${source}" "$HOME/.${configPath}" 2>/dev/null || true
+        '')
+        configFiles)}
 
       # Run the original binary
       exec "${lib.getBin package}/Applications/${name}.app/Contents/MacOS/${name}" "$@"
@@ -113,9 +122,7 @@ let
       mkdir -p "$KITTY_CACHE_DIRECTORY"
     '';
   };
-
-in
-{
+in {
   # Export the wrapper for use in system packages
   kitty = kittyWrapper;
 }

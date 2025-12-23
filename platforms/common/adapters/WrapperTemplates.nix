@@ -1,43 +1,45 @@
 # WrapperTemplates.nix - TEMPLATE SYSTEM FOR WRAPPER GENERATION
 # AUTOMATED TEMPLATE-BASED WRAPPER CREATION
-
-{ lib, pkgs, State, Types, Validation, ... }:
-
-let
+{
+  lib,
+  pkgs,
+  Validation,
+  ...
+}: let
   # TEMPLATE ENGINE - TYPE-SAFE TEMPLATE PROCESSING
-  TemplateEngine = { template, variables }:
-    let
-      requiredVars = lib.filter (v: v.required) variables;
-      providedVars = lib.attrNames variables;
+  TemplateEngine = {variables}: let
+    requiredVars = lib.filter (v: v.required) variables;
+    providedVars = lib.attrNames variables;
 
-      validateVariables = var:
-        let
-          isProvided = lib.any (pv: pv.name == var.name) providedVars;
-          hasDefault = var.default != null;
-        in isProvided || hasDefault;
+    validateVariables = var: let
+      isProvided = lib.any (pv: pv.name == var.name) providedVars;
+      hasDefault = var.default != null;
+    in
+      isProvided || hasDefault;
 
-      allValid = lib.all validateVariables requiredVars;
-      missingVars = lib.filter (v: !validateVariables v) requiredVars;
+    allValid = lib.all validateVariables requiredVars;
+    missingVars = lib.filter (v: !validateVariables v) requiredVars;
 
-      processTemplate = content: vars:
-        let
-          replaceVar = content: varName:
-            let
-              var = lib.findSingle (v: v.name == varName) vars;
-              value = if var != null then var.default else "";
-            in
-              if builtins.isString content then
-                builtins.replaceStrings ["\${${varName}}"] [value] content
-              else content;
+    processTemplate = content: vars: let
+      replaceVar = content: varName: let
+        var = lib.findSingle (v: v.name == varName) vars;
+        value =
+          if var != null
+          then var.default
+          else "";
+      in
+        if builtins.isString content
+        then builtins.replaceStrings ["\${${varName}}"] [value] content
+        else content;
 
-          processedContent = lib.foldl' replaceVar content (lib.attrNames vars);
-        in processedContent;
-
-    in {
-      inherit allValid;
-      inherit missingVars;
-      process = processTemplate;
-    };
+      processedContent = lib.foldl' replaceVar content (lib.attrNames vars);
+    in
+      processedContent;
+  in {
+    inherit allValid;
+    inherit missingVars;
+    process = processTemplate;
+  };
 
   # TEMPLATE GENERATORS - TYPE-SAFE TEMPLATES
 
@@ -277,27 +279,28 @@ let
   };
 
   # Template Generation Functions
-  generateWrapper = templateType: wrapperConfig:
-    let
-      template = TemplateRegistry.${templateType} or (builtins.throw "Unknown template type: ${templateType}");
-      engine = TemplateEngine {
-        inherit (template) template;
-        inherit (template) variables;
-      };
+  generateWrapper = templateType: wrapperConfig: let
+    template = TemplateRegistry.${templateType} or (builtins.throw "Unknown template type: ${templateType}");
+    engine = TemplateEngine {
+      inherit (template) template;
+      inherit (template) variables;
+    };
 
-      # Merge template defaults with wrapper config
-      mergedConfig = lib.recursiveUpdate template.defaultConfig or {} wrapperConfig;
+    # Merge template defaults with wrapper config
+    mergedConfig = lib.recursiveUpdate template.defaultConfig or {} wrapperConfig;
 
-      # Validate configuration against template
-      validation = Validation.validateWrapper {
-        name = wrapperConfig.name or "";
-        package = wrapperConfig.package or null;
-        type = templateType;
-        config = mergedConfig;
-      } "standard";
+    # Validate configuration against template
+    validation = Validation.validateWrapper {
+      name = wrapperConfig.name or "";
+      package = wrapperConfig.package or null;
+      type = templateType;
+      config = mergedConfig;
+    } "standard";
 
-      # Process template with variables
-      processedTemplate = if validation.overall.valid then
+    # Process template with variables
+    processedTemplate =
+      if validation.overall.valid
+      then
         engine.process (builtins.readFile template.template) {
           packageName = lib.getName (wrapperConfig.package or pkgs.hello);
           wrapperName = wrapperConfig.name or "unknown";
@@ -305,28 +308,25 @@ let
           additionalPackages = lib.concatStringsSep " " (map (p: lib.getName p) (wrapperConfig.additionalPackages or []));
         }
       else builtins.throw "Template validation failed: ${lib.concatStringsSep ", " (map (r: r.message) (lib.filter (r: !r.valid) validation.validationResults or []))}";
+  in {
+    inherit template;
+    config = mergedConfig;
+    inherit validation;
+    generated = processedTemplate;
+    success = validation.overall.valid;
+  };
 
-    in {
-      inherit template;
-      config = mergedConfig;
-      inherit validation;
-      generated = processedTemplate;
-      success = validation.overall.valid;
-    };
-
-  generateAllWrappers = wrapperConfigs:
-    let
-      generateSingle = config: generateWrapper config.type config;
-      results = map generateSingle wrapperConfigs;
-      successful = lib.filter (r: r.success) results;
-      failed = lib.filter (r: !r.success) results;
-    in {
-      wrappers = results;
-      inherit successful;
-      inherit failed;
-      successRate = (builtins.length successful) * 100.0 / (builtins.length results);
-    };
-
+  generateAllWrappers = wrapperConfigs: let
+    generateSingle = config: generateWrapper config.type config;
+    results = map generateSingle wrapperConfigs;
+    successful = lib.filter (r: r.success) results;
+    failed = lib.filter (r: !r.success) results;
+  in {
+    wrappers = results;
+    inherit successful;
+    inherit failed;
+    successRate = (builtins.length successful) * 100.0 / (builtins.length results);
+  };
 in {
   inherit TemplateEngine TemplateRegistry generateWrapper generateAllWrappers;
 }

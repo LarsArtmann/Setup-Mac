@@ -1,5 +1,4 @@
-{ pkgs, lib, ... }:
-{
+{...}: {
   # Import Darwin-specific system configurations
   imports = [
     ./system/defaults.nix

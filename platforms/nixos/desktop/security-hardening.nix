@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   # Enable comprehensive security monitoring
   security = {
     # Enable polkit for authentication
@@ -41,50 +39,50 @@
     gnome-keyring
 
     # Authentication & Access Control
-    pamtester  # PAM testing
-    openssl  # Cryptographic toolkit
-    gnupg  # Encryption & signing
-    pass  # Password manager
+    pamtester # PAM testing
+    openssl # Cryptographic toolkit
+    gnupg # Encryption & signing
+    pass # Password manager
 
     # Network & Connection Monitoring
-    iptraf-ng  # IP traffic monitoring
-    bmon  # Network bandwidth monitor
-    netsniff-ng  # Network packet capture
-    wireshark  # Network protocol analyzer (GUI)
-    aircrack-ng  # WiFi security testing
+    iptraf-ng # IP traffic monitoring
+    bmon # Network bandwidth monitor
+    netsniff-ng # Network packet capture
+    wireshark # Network protocol analyzer (GUI)
+    aircrack-ng # WiFi security testing
 
     # System Security Monitoring
-    aide  # File integrity monitoring
-    osquery  # OS monitoring & security analytics
+    aide # File integrity monitoring
+    osquery # OS monitoring & security analytics
 
     # Process & File Monitoring
-    lsof  # List open files
-    inotify-tools  # File system monitoring
-    iotop  # I/O monitoring
-    perf  # Performance analysis
+    lsof # List open files
+    inotify-tools # File system monitoring
+    iotop # I/O monitoring
+    perf # Performance analysis
 
     # Log Analysis & Security
-    goaccess  # Web log analyzer
-    ccze  # Log colorizer
+    goaccess # Web log analyzer
+    ccze # Log colorizer
 
     # Privacy & Anonymity
-    tor-browser  # Anonymous browsing
-    openvpn  # VPN client
-    wireguard-tools  # Modern VPN
+    tor-browser # Anonymous browsing
+    openvpn # VPN client
+    wireguard-tools # Modern VPN
 
     # Vulnerability Assessment
-    masscan  # Fast port scanner
-    sqlmap  # SQL injection testing
-    nikto  # Web server scanner
-    nuclei  # Fast vulnerability scanner
+    masscan # Fast port scanner
+    sqlmap # SQL injection testing
+    nikto # Web server scanner
+    nuclei # Fast vulnerability scanner
 
     # Incident Response
-    sleuthkit  # Forensic toolkit
-    tcpdump  # Packet capture
+    sleuthkit # Forensic toolkit
+    tcpdump # Packet capture
 
     # Security tools (existing)
-    wireshark-cli  # Packet analysis (CLI)
-    nmap  # Network scanning
-    lynis  # Security auditing
+    wireshark-cli # Packet analysis (CLI)
+    nmap # Network scanning
+    lynis # Security auditing
   ];
 }

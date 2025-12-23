@@ -1,6 +1,8 @@
-{ pkgs, lib, ... }:
-
-let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   # Common development environment variables (platform-agnostic)
   commonEnvVars = {
     # Core system settings
@@ -21,19 +23,18 @@ let
 
     # Build and deployment optimization
     NIXPKGS_ALLOW_UNFREE = "1";
-    NIXPKGS_ALLOW_BROKEN = "0";  # Strict: No broken packages
+    NIXPKGS_ALLOW_BROKEN = "0"; # Strict: No broken packages
     NIXPKGS_ALLOW_INSECURE = "0"; # Strict: No insecure packages
 
     # Additional environment variables
     PAGER = "less";
-    LESS = "-R";  # Enable color output in less
-    CLICOLOR = "1";  # Enable color output in ls
-    LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd";  # Custom ls colors
+    LESS = "-R"; # Enable color output in less
+    CLICOLOR = "1"; # Enable color output in ls
+    LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd"; # Custom ls colors
   };
-
 in {
   # Shell configuration (platform-agnostic)
-  environment.shells = with pkgs; [ fish zsh bash ];
+  environment.shells = with pkgs; [fish zsh bash];
 
   # Environment variables
   environment.variables = commonEnvVars;

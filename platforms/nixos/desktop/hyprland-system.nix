@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # Note: polkit-gnome authentication agent handled by system-level services
   # Removing manual user service to avoid conflicts
 

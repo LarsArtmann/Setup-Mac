@@ -1,17 +1,27 @@
 # ErrorManagement.nix - CENTRALIZED ERROR MANAGEMENT SYSTEM
 # TYPE-SAFE ERROR HANDLING WITH COMPREHENSIVE COVERAGE
-
-{ lib, pkgs, State, Types, Validation, ... }:
-
-let
+{
+  lib,
+  pkgs,
+  ...
+}: let
   # ERROR TYPE DEFINITIONS - TYPE-SAFE ERROR CATEGORIES
   ErrorType = lib.types.enum [
-    "validation" "build" "runtime" "configuration"
-    "external" "performance" "dependency" "platform"
-    "license" "filesystem" "network" "rollback"
+    "validation"
+    "build"
+    "runtime"
+    "configuration"
+    "external"
+    "performance"
+    "dependency"
+    "platform"
+    "license"
+    "filesystem"
+    "network"
+    "rollback"
   ];
 
-  ErrorSeverity = lib.types.enum [ "critical" "high" "medium" "low" "info" ];
+  ErrorSeverity = lib.types.enum ["critical" "high" "medium" "low" "info"];
 
   ErrorCategory = lib.types.submodule {
     options = {
@@ -40,7 +50,7 @@ let
         description = "Notify user of this error";
       };
       logLevel = lib.mkOption {
-        type = lib.types.enum [ "error" "warn" "info" "debug" ];
+        type = lib.types.enum ["error" "warn" "info" "debug"];
         default = "error";
         description = "Log level for this error";
       };
@@ -179,203 +189,229 @@ let
   };
 
   # ERROR HANDLERS - TYPE-SAFE ERROR MANAGEMENT
-  ErrorHandler = { errorType, errorCode, context, systemConfig }:
-    let
-      errorDef =
-        ErrorDefinitions.${errorType}.${errorCode} or
+  ErrorHandler = {
+    errorType,
+    errorCode,
+    context,
+    systemConfig,
+  }: let
+    errorDef =
+      ErrorDefinitions.${errorType}.${errorCode} or
         ErrorDefinitions.build.compilation_failed; # Default fallback
 
-      inherit (errorDef) severity;
-      inherit (errorDef) autoRetry;
-      inherit (errorDef) rollbackable;
-      inherit (errorDef) notifyUser;
-      inherit (errorDef) logLevel;
-      inherit (errorDef) recoveryActions;
+    inherit (errorDef) severity;
+    inherit (errorDef) autoRetry;
+    inherit (errorDef) rollbackable;
+    inherit (errorDef) notifyUser;
+    inherit (errorDef) logLevel;
+    inherit (errorDef) recoveryActions;
 
-      # Context enrichment
-      enrichedContext = context // {
+    # Context enrichment
+    enrichedContext =
+      context
+      // {
         timestamp = builtins.currentTime;
         inherit systemConfig;
         errorDefinition = errorDef;
         recoveryAttempted = false;
       };
 
-      # Error message generation
-      generateErrorMessage =
-        let
-          baseMessage = "Error ${errorType}:${errorCode}";
-          contextMessage = if builtins.isContext context then
-            lib.concatStringsSep ", " (map (name: "${name}=${builtins.toString context.${name}}") (builtins.attrNames context))
-          else "";
-          severityMessage = "[${severity}]";
-        in "${severityMessage} ${baseMessage}${if contextMessage != "" then " - ${contextMessage}" else ""}";
+    # Error message generation
+    generateErrorMessage = let
+      baseMessage = "Error ${errorType}:${errorCode}";
+      contextMessage =
+        if builtins.isContext context
+        then lib.concatStringsSep ", " (map (name: "${name}=${builtins.toString context.${name}}") (builtins.attrNames context))
+        else "";
+      severityMessage = "[${severity}]";
+    in "${severityMessage} ${baseMessage}${
+      if contextMessage != ""
+      then " - ${contextMessage}"
+      else ""
+    }";
 
-      # Recovery action execution
-      executeRecoveryAction = action:
-        let
-          recoveryResult = if action == "check_package_name" then
-            lib.hasAttr (context.packageName or "") pkgs
-          else if action == "clean_build" then
-            true # Would execute actual clean build
-          else if action == "retry_build" then
-            true # Would execute retry
-          else if action == "check_platform" then
-            true # Would execute platform check
-          else
-            true # Default to true for demonstration
+    # Recovery action execution
+    executeRecoveryAction = action: let
+      recoveryResult =
+        if action == "check_package_name"
+        then lib.hasAttr (context.packageName or "") pkgs
+        else if action == "clean_build"
+        then true # Would execute actual clean build
+        else if action == "retry_build"
+        then true # Would execute retry
+        else if action == "check_platform"
+        then true # Would execute platform check
+        else true
+        # Default to true for demonstration
         ;
-        in {
-          inherit action;
-          success = recoveryResult;
-          timestamp = builtins.currentTime;
-        };
-
-      recoveryResults = map executeRecoveryAction recoveryActions;
-
-      anyRecoverySuccessful = lib.any (result: result.success) recoveryResults;
-
-      # Log error
-      logError =
-        let
-          logLevelStr = logLevel;
-          message = generateErrorMessage;
-        in {
-          timestamp = builtins.currentTime;
-          level = logLevelStr;
-          inherit message;
-          context = enrichedContext;
-          recovery = recoveryResults;
-        };
-
     in {
-      error = {
-        type = errorType;
-        code = errorCode;
-        inherit severity;
-        inherit autoRetry;
-        inherit rollbackable;
-        inherit notifyUser;
-        context = enrichedContext;
-        message = generateErrorMessage;
-        recoveryActions = recoveryResults;
-        inherit anyRecoverySuccessful;
-      };
-      log = logError;
+      inherit action;
+      success = recoveryResult;
+      timestamp = builtins.currentTime;
     };
 
+    recoveryResults = map executeRecoveryAction recoveryActions;
+
+    anyRecoverySuccessful = lib.any (result: result.success) recoveryResults;
+
+    # Log error
+    logError = let
+      logLevelStr = logLevel;
+      message = generateErrorMessage;
+    in {
+      timestamp = builtins.currentTime;
+      level = logLevelStr;
+      inherit message;
+      context = enrichedContext;
+      recovery = recoveryResults;
+    };
+  in {
+    error = {
+      type = errorType;
+      code = errorCode;
+      inherit severity;
+      inherit autoRetry;
+      inherit rollbackable;
+      inherit notifyUser;
+      context = enrichedContext;
+      message = generateErrorMessage;
+      recoveryActions = recoveryResults;
+      inherit anyRecoverySuccessful;
+    };
+    log = logError;
+  };
+
   # ERROR COLLECTION AND REPORTING
-  ErrorCollector = { errors, systemConfig }:
-    let
-      collectError = error: ErrorHandler {
+  ErrorCollector = {
+    errors,
+    systemConfig,
+  }: let
+    collectError = error:
+      ErrorHandler {
         errorType = error.type;
         errorCode = error.code;
         context = error.context // {};
         inherit systemConfig;
       };
 
-      collectedErrors = map collectError errors;
+    collectedErrors = map collectError errors;
 
-      # Error analysis
-      errorAnalysis = {
-        totalErrors = builtins.length collectedErrors;
-        criticalErrors = lib.filter (e: e.error.severity == "critical") collectedErrors;
-        highErrors = lib.filter (e: e.error.severity == "high") collectedErrors;
-        mediumErrors = lib.filter (e: e.error.severity == "medium") collectedErrors;
-        lowErrors = lib.filter (e: e.error.severity == "low") collectedErrors;
-        infoErrors = lib.filter (e: e.error.severity == "info") collectedErrors;
+    # Error analysis
+    errorAnalysis = {
+      totalErrors = builtins.length collectedErrors;
+      criticalErrors = lib.filter (e: e.error.severity == "critical") collectedErrors;
+      highErrors = lib.filter (e: e.error.severity == "high") collectedErrors;
+      mediumErrors = lib.filter (e: e.error.severity == "medium") collectedErrors;
+      lowErrors = lib.filter (e: e.error.severity == "low") collectedErrors;
+      infoErrors = lib.filter (e: e.error.severity == "info") collectedErrors;
 
-        recoverySuccessfulErrors = lib.filter (e: e.error.anyRecoverySuccessful) collectedErrors;
-        recoveryFailedErrors = lib.filter (e: !e.error.anyRecoverySuccessful) collectedErrors;
+      recoverySuccessfulErrors = lib.filter (e: e.error.anyRecoverySuccessful) collectedErrors;
+      recoveryFailedErrors = lib.filter (e: !e.error.anyRecoverySuccessful) collectedErrors;
 
-        autoRetryErrors = lib.filter (e: e.error.autoRetry) collectedErrors;
-        rollbackableErrors = lib.filter (e: e.error.rollbackable) collectedErrors;
-      };
-
-      # Error reporting
-      generateReport =
-        let
-          analysis = errorAnalysis;
-          report = ''
-            # System Error Report
-            Generated: ${builtins.toString builtins.currentTime}
-
-            ## Summary
-            - Total Errors: ${builtins.toString analysis.totalErrors}
-            - Critical: ${builtins.toString (builtins.length analysis.criticalErrors)}
-            - High: ${builtins.toString (builtins.length analysis.highErrors)}
-            - Medium: ${builtins.toString (builtins.length analysis.mediumErrors)}
-            - Low: ${builtins.toString (builtins.length analysis.lowErrors)}
-            - Info: ${builtins.toString (builtins.length analysis.infoErrors)}
-
-            ## Recovery Analysis
-            - Recovery Successful: ${builtins.toString (builtins.length analysis.recoverySuccessfulErrors)}
-            - Recovery Failed: ${builtins.toString (builtins.length analysis.recoveryFailedErrors)}
-            - Recovery Success Rate: ${builtins.toString (if analysis.totalErrors > 0 then (builtins.length analysis.recoverySuccessfulErrors) * 100.0 / analysis.totalErrors else 100.0)}%
-
-            ## Detailed Errors
-            ${lib.concatStringsSep "\n\n" (map (error: ''
-              ### ${error.error.type}:${error.error.code}
-              - Severity: ${error.error.severity}
-              - Message: ${error.error.message}
-              - Auto Retry: ${if error.error.autoRetry then "Yes" else "No"}
-              - Rollbackable: ${if error.error.rollbackable then "Yes" else "No"}
-              - Recovery Actions: ${lib.concatStringsSep ", " error.error.recoveryActions}
-              - Recovery Success: ${if error.error.anyRecoverySuccessful then "Yes" else "No"}
-
-              Context:
-              ${lib.concatStringsSep "\n" (map (name: "  - ${name}: ${builtins.toString error.error.context.${name}}") (builtins.attrNames error.error.context))}
-            '') collectedErrors)}
-          '';
-        in report;
-
-    in {
-      errors = collectedErrors;
-      analysis = errorAnalysis;
-      report = generateReport;
+      autoRetryErrors = lib.filter (e: e.error.autoRetry) collectedErrors;
+      rollbackableErrors = lib.filter (e: e.error.rollbackable) collectedErrors;
     };
 
+    # Error reporting
+    generateReport = let
+      analysis = errorAnalysis;
+      report = ''
+        # System Error Report
+        Generated: ${builtins.toString builtins.currentTime}
+
+        ## Summary
+        - Total Errors: ${builtins.toString analysis.totalErrors}
+        - Critical: ${builtins.toString (builtins.length analysis.criticalErrors)}
+        - High: ${builtins.toString (builtins.length analysis.highErrors)}
+        - Medium: ${builtins.toString (builtins.length analysis.mediumErrors)}
+        - Low: ${builtins.toString (builtins.length analysis.lowErrors)}
+        - Info: ${builtins.toString (builtins.length analysis.infoErrors)}
+
+        ## Recovery Analysis
+        - Recovery Successful: ${builtins.toString (builtins.length analysis.recoverySuccessfulErrors)}
+        - Recovery Failed: ${builtins.toString (builtins.length analysis.recoveryFailedErrors)}
+        - Recovery Success Rate: ${builtins.toString (
+          if analysis.totalErrors > 0
+          then (builtins.length analysis.recoverySuccessfulErrors) * 100.0 / analysis.totalErrors
+          else 100.0
+        )}%
+
+        ## Detailed Errors
+        ${lib.concatStringsSep "\n\n" (map (error: ''
+            ### ${error.error.type}:${error.error.code}
+            - Severity: ${error.error.severity}
+            - Message: ${error.error.message}
+            - Auto Retry: ${
+              if error.error.autoRetry
+              then "Yes"
+              else "No"
+            }
+            - Rollbackable: ${
+              if error.error.rollbackable
+              then "Yes"
+              else "No"
+            }
+            - Recovery Actions: ${lib.concatStringsSep ", " error.error.recoveryActions}
+            - Recovery Success: ${
+              if error.error.anyRecoverySuccessful
+              then "Yes"
+              else "No"
+            }
+
+            Context:
+            ${lib.concatStringsSep "\n" (map (name: "  - ${name}: ${builtins.toString error.error.context.${name}}") (builtins.attrNames error.error.context))}
+          '')
+          collectedErrors)}
+      '';
+    in
+      report;
+  in {
+    errors = collectedErrors;
+    analysis = errorAnalysis;
+    report = generateReport;
+  };
+
   # MONITORING AND ALERTING
-  ErrorMonitor = { config, thresholds }:
-    let
-      monitorErrors = errors:
-        let
-          errorCount = builtins.length errors;
-          criticalCount = builtins.length (lib.filter (e: e.error.severity == "critical") errors);
+  ErrorMonitor = {thresholds}: let
+    monitorErrors = errors: let
+      errorCount = builtins.length errors;
+      criticalCount = builtins.length (lib.filter (e: e.error.severity == "critical") errors);
 
-          alertThresholds = thresholds // {
-            criticalThreshold = 1;
-            totalThreshold = 5;
-          };
-
-          shouldAlert =
-            criticalCount >= alertThresholds.criticalThreshold ||
-            errorCount >= alertThresholds.totalThreshold;
-
-          alertMessage =
-            if shouldAlert then
-              "🚨 System Alert: ${builtins.toString criticalCount} critical, ${builtins.toString errorCount} total errors detected"
-            else
-              "";
-
-        in {
-          inherit errorCount;
-          inherit criticalCount;
-          inherit shouldAlert;
-          inherit alertMessage;
-          thresholdsMet = {
-            criticalThreshold = criticalCount >= alertThresholds.criticalThreshold;
-            totalThreshold = errorCount >= alertThresholds.totalThreshold;
-          };
+      alertThresholds =
+        thresholds
+        // {
+          criticalThreshold = 1;
+          totalThreshold = 5;
         };
 
+      shouldAlert =
+        criticalCount
+        >= alertThresholds.criticalThreshold
+        || errorCount >= alertThresholds.totalThreshold;
+
+      alertMessage =
+        if shouldAlert
+        then "🚨 System Alert: ${builtins.toString criticalCount} critical, ${builtins.toString errorCount} total errors detected"
+        else "";
     in {
-      monitor = monitorErrors;
-      thresholds = thresholds // {
+      inherit errorCount;
+      inherit criticalCount;
+      inherit shouldAlert;
+      inherit alertMessage;
+      thresholdsMet = {
+        criticalThreshold = criticalCount >= alertThresholds.criticalThreshold;
+        totalThreshold = errorCount >= alertThresholds.totalThreshold;
+      };
+    };
+  in {
+    monitor = monitorErrors;
+    thresholds =
+      thresholds
+      // {
         criticalThreshold = 1;
         totalThreshold = 5;
       };
-    };
-
+  };
 in {
   inherit ErrorType ErrorSeverity ErrorCategory ErrorDefinitions;
   inherit ErrorHandler ErrorCollector ErrorMonitor;

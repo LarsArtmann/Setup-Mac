@@ -1,11 +1,15 @@
 # Example Wrappers for Common Non-Nix Applications
 # Demonstrating advanced dynamic library management patterns
-
-{ pkgs, lib }:
-
-let
-  inherit (import ./dynamic-libs.nix { inherit pkgs lib; })
-    wrapCliTool wrapGuiApp wrapDownloadedBinary;
+{
+  pkgs,
+  lib,
+}: let
+  inherit
+    (import ./dynamic-libs.nix {inherit pkgs lib;})
+    wrapCliTool
+    wrapGuiApp
+    wrapDownloadedBinary
+    ;
 
   # Example 1: VS Code with enhanced library support
   vscodeWrapper = wrapGuiApp {
@@ -77,17 +81,23 @@ let
   };
 
   # Example 4: JetBrains IDEs (complex macOS applications)
-  jetbrainsWrapper = { name, package, additionalLibs ? [] }:
+  jetbrainsWrapper = {
+    name,
+    package,
+    additionalLibs ? [],
+  }:
     wrapGuiApp {
       inherit name package;
-      dynamicLibs = with pkgs; [
-        jdk11
-        coreutils
-        bash
-        gnugrep
-        findutils
-        git
-      ] ++ additionalLibs;
+      dynamicLibs = with pkgs;
+        [
+          jdk11
+          coreutils
+          bash
+          gnugrep
+          findutils
+          git
+        ]
+        ++ additionalLibs;
       environment = {
         # JetBrains specific environment
         _JAVA_AWT_WM_NONREPARENTING = "1";
@@ -109,7 +119,11 @@ let
     };
 
   # Example 5: Gaming or creative applications
-  creativeAppWrapper = { name, package, requiredFrameworks ? [] }:
+  creativeAppWrapper = {
+    name,
+    package,
+    requiredFrameworks ? [],
+  }:
     wrapGuiApp {
       inherit name package;
       dynamicLibs = with pkgs; [
@@ -125,10 +139,12 @@ let
         VDPAU_DRIVER = "auto";
         __GL_THREADED_OPTIMIZATIONS = "1";
       };
-      libSearchPaths = [
-        "/System/Library/Frameworks"
-        "/Library/Frameworks"
-      ] ++ requiredFrameworks;
+      libSearchPaths =
+        [
+          "/System/Library/Frameworks"
+          "/Library/Frameworks"
+        ]
+        ++ requiredFrameworks;
       patchInstallNames = true;
       preHook = ''
         # Check for required frameworks
@@ -141,15 +157,21 @@ let
     };
 
   # Example 6: Database tools with complex dependencies
-  databaseWrapper = { name, package, clientLibs ? [] }:
+  databaseWrapper = {
+    name,
+    package,
+    clientLibs ? [],
+  }:
     wrapCliTool {
       inherit name package;
-      dynamicLibs = with pkgs; [
-        openssl
-        readline
-        libpq
-        sqlite
-      ] ++ clientLibs;
+      dynamicLibs = with pkgs;
+        [
+          openssl
+          readline
+          libpq
+          sqlite
+        ]
+        ++ clientLibs;
       environment = {
         # Database environment
         PAGER = "less";
@@ -168,7 +190,6 @@ let
         fi
       '';
     };
-
 in {
   vscode = vscodeWrapper;
   docker = dockerWrapper;

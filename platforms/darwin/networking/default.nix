@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # Darwin-specific networking configuration
   # This is primarily handled through the networking.nix at root level
 

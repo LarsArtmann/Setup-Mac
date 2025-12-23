@@ -1,9 +1,7 @@
-{ config, pkgs, lib, ... }:
-
-{
+{pkgs, ...}: {
   imports = [
     ../../common/home-base.nix
-    ../desktop/hyprland.nix  # RE-ENABLED for desktop functionality
+    ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
   ];
 
   # NixOS-specific session variables
@@ -38,6 +36,4 @@
     enable = true;
     createDirectories = true;
   };
-
-
 }

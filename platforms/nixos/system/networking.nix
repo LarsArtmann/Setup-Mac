@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+_: {
   # Networking configuration
   networking.hostName = "evo-x2"; # Machine name
   networking.networkmanager.enable = true;

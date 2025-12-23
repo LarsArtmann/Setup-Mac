@@ -1,10 +1,7 @@
 # Path Configuration Module
 # Centralized path management with type safety
 # Eliminates hardcoded path fragmentation across the system
-
-{ lib, ... }:
-
-let
+{lib, ...}: let
   # Path type definitions with validation
   PathType = lib.types.submodule {
     options = {
@@ -55,7 +52,6 @@ let
     core = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/core";
     wrappers = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/wrappers";
   };
-
 in {
   # Export types for external use
   inherit PathType;

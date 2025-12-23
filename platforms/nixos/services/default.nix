@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # NixOS-specific services configuration
   # This is a placeholder that will be expanded when NixOS deployment begins
 

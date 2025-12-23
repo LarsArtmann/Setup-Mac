@@ -1,7 +1,6 @@
-{ pkgs, lib, ... }:
-{
+{pkgs, ...}: {
   # Import common environment variables
-  imports = [ ../common/environment/variables.nix ];
+  imports = [../common/environment/variables.nix];
 
   # Darwin-specific environment variables
   environment.variables = {

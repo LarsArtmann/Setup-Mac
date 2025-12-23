@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # Starship Prompt Configuration (Cross-Platform)
   programs.starship = {
     enable = true;

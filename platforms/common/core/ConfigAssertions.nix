@@ -1,14 +1,10 @@
 # 🔧 Configuration Validation Assertions Framework
-{ lib }:
-
-let
+_: let
   configAssertions = {
     validateWrapperConfig = wrapper:
       builtins.trace "Validating wrapper configuration..."
       wrapper;
   };
-
-in
-{
+in {
   inherit configAssertions;
 }

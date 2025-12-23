@@ -1,6 +1,8 @@
-{ config, pkgs, lib, ... }:
-
 {
+  config,
+  pkgs,
+  ...
+}: {
   # Import common program configurations
   imports = [
     ./programs/fish.nix

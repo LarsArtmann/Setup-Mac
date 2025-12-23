@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   # Enable multiple window managers alongside Hyprland
   # This allows switching between different WMs at SDDM login screen
 
@@ -84,6 +82,4 @@
     # Clipboard
     wl-clipboard
   ];
-
-
 }

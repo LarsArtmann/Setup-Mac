@@ -1,9 +1,6 @@
 # iTerm2 Configuration Module
 # Extracted from system.nix for modular architecture
-
-{ config, pkgs, lib, ... }:
-
-{
+_: {
   # iTerm2 configuration extracted from monolithic system.nix
   # This module contains the complete iTerm2 Status Bar Layout configuration
   # from lines 720-862 of system.nix

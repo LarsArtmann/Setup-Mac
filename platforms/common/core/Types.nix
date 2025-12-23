@@ -1,19 +1,17 @@
 # Types.nix - TYPE SYSTEM ARCHITECTURE
 # STRONG TYPE SAFETY FOR ALL CONFIGURATION COMPONENTS
-
-{ lib, pkgs, ... }:
-
-let
+{lib, ...}: let
   # CORE TYPE DEFINITIONS - TYPE SAFETY ENFORCEMENT
-  WrapperType = lib.types.enum [ "cli-tool" "gui-app" "shell" "service" "dev-env" ];
+  WrapperType = lib.types.enum ["cli-tool" "gui-app" "shell" "service" "dev-env"];
 
-  ValidationLevel = lib.types.enum [ "none" "standard" "strict" ];
+  ValidationLevel = lib.types.enum ["none" "standard" "strict"];
 
-  Platform = lib.types.enum [ "all" "darwin" "linux" "aarch64-darwin" "x86_64-darwin" ];
+  Platform = lib.types.enum ["all" "darwin" "linux" "aarch64-darwin" "x86_64-darwin"];
 
-  PackageValidator = lib.types.functionTo (lib.types.package // {
-    description = "Function to validate package compatibility";
-  });
+  PackageValidator = lib.types.functionTo (lib.types.package
+    // {
+      description = "Function to validate package compatibility";
+    });
 
   # CONFIGURATION TYPE DEFINITIONS - TYPE GUARANTEES
   WrapperConfig = lib.types.submodule {
@@ -119,7 +117,7 @@ let
               description = "Variable name";
             };
             type = lib.mkOption {
-              type = lib.types.enum [ "str" "path" "package" "bool" "int" "list" ];
+              type = lib.types.enum ["str" "path" "package" "bool" "int" "list"];
               description = "Variable type";
             };
             required = lib.mkOption {
@@ -247,7 +245,6 @@ let
       };
     };
   };
-
 in {
   inherit WrapperType ValidationLevel Platform WrapperConfig TemplateConfig ValidationRule SystemState;
 }

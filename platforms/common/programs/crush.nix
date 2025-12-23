@@ -1,6 +1,4 @@
-{ pkgs, lib, ... }:
-
-{
+_: {
   # Enable CRUSH AI assistant (Cross-Platform)
   programs.crush = {
     enable = true;
@@ -11,7 +9,7 @@
           "AGENTS.md"
           "CRUSH.md"
         ];
-        tui = { compact_mode = true; };
+        tui = {compact_mode = true;};
         debug = false;
       };
     };

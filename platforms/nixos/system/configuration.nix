@@ -1,6 +1,4 @@
-{ config, pkgs, ... }:
-
-{
+{pkgs, ...}: {
   imports = [
     # Import common packages shared with macOS
     ../../common/packages/base.nix
@@ -22,9 +20,8 @@
     ../desktop/multi-wm.nix
   ];
 
-
   # Fix for Home Manager + xdg.portal integration
-  environment.pathsToLink = [ "/share/applications" "/share/xdg-desktop-portal" ];
+  environment.pathsToLink = ["/share/applications" "/share/xdg-desktop-portal"];
 
   # Boot configuration is now handled by ./boot.nix module
   # which provides systemd-boot with proper nvme and Ryzen AI Max+ support
@@ -33,7 +30,7 @@
   users.users.lars = {
     isNormalUser = true;
     description = "Lars";
-    extraGroups = [ "networkmanager" "wheel" "docker" "input" "video" "audio" ];
+    extraGroups = ["networkmanager" "wheel" "docker" "input" "video" "audio"];
     # INFO: Set password manually with `passwd lars` after installation
     # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
     shell = pkgs.fish;
@@ -50,15 +47,13 @@
   # Enable Fish shell system-wide
   programs.fish.enable = true;
 
-
-
   # AMD GPU Support - imported from hardware module
 
   # Font configuration is now handled by hyprland-system.nix
   # to avoid duplication and maintain consistency
 
   # Experimental features
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = ["nix-command" "flakes"];
 
   # Binary caches - cache.nixos.org FIRST for standard packages, then Hyprland
   nix.settings = {
@@ -78,9 +73,9 @@
   ];
 
   fonts.fontconfig.defaultFonts = {
-    monospace = [ "JetBrains Mono" ];
-    sansSerif = [ "DejaVu Sans" ];
-    serif = [ "DejaVu Serif" ];
+    monospace = ["JetBrains Mono"];
+    sansSerif = ["DejaVu Sans"];
+    serif = ["DejaVu Serif"];
   };
 
   # System state version

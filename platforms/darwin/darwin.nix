@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }:
-{
+{lib, ...}: {
   imports = [
     ./default.nix
     ./environment.nix
@@ -11,5 +10,5 @@
   nixpkgs.config.allowUnfree = true;
 
   # Allow terraform (unfree package)
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "terraform" ];
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
 }

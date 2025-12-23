@@ -1,11 +1,12 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
-
-let
-  cfg = config.programs.ghost-btop-wallpaper;
-in
 {
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
+  cfg = config.programs.ghost-btop-wallpaper;
+in {
   options.programs.ghost-btop-wallpaper = {
     enable = mkEnableOption "Ghost Window btop wallpaper (authentic btop)";
 
@@ -102,7 +103,7 @@ in
     wayland.windowManager.hyprland = mkIf config.wayland.windowManager.hyprland.enable {
       settings = {
         # Auto-start the ghost script
-        exec-once = [ "launch-btop-bg" ];
+        exec-once = ["launch-btop-bg"];
 
         # Ghost window rules
         windowrulev2 = [
@@ -132,7 +133,7 @@ in
       enable = true;
       config = {
         Label = "com.user.btop-wallpaper";
-        ProgramArguments = [ "${pkgs.bash}/bin/bash" "-c" "launch-btop-bg" ];
+        ProgramArguments = ["${pkgs.bash}/bin/bash" "-c" "launch-btop-bg"];
         RunAtLoad = true;
         KeepAlive = false;
         StandardOutPath = "${config.home.homeDirectory}/.local/share/btop-wallpaper.log";
