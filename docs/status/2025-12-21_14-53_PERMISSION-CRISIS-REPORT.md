@@ -1,8 +1,8 @@
 # 🚨 CRITICAL STATUS REPORT - SETUP-MAC PERMISSION CRISIS
 
-**Date:** December 21, 2025 - 14:53 CET  
-**Report ID:** 2025-12-21_14-53_PERMISSION-CRISIS-REPORT  
-**Severity:** 🔴 **CRITICAL** - SYSTEM-WIDE PERMISSION FAILURE  
+**Date:** December 21, 2025 - 14:53 CET
+**Report ID:** 2025-12-21_14-53_PERMISSION-CRISIS-REPORT
+**Severity:** 🔴 **CRITICAL** - SYSTEM-WIDE PERMISSION FAILURE
 **Working Directory:** `/Users/larsartmann/Desktop/Setup-Mac`
 
 ---
@@ -13,7 +13,7 @@
 
 The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file system access is completely blocked despite having proper file ownership and admin privileges. This is a **complete work stoppage** - no configuration changes, file modifications, or system rebuilds are possible.
 
-**IMMEDIATE IMPACT:** 
+**IMMEDIATE IMPACT:**
 - ❌ Cannot read or modify any Nix configuration files
 - ❌ Cannot add iTerm2 configuration (user request)
 - ❌ Cannot continue system rebuild process
@@ -61,7 +61,7 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file s
 
 1. **TCC Resolution Attempts** - 🔄 **FAILED MULTIPLE TIMES**
    - lib.mkForce {} approach: FAILED
-   - System check removal: FAILED  
+   - System check removal: FAILED
    - Commenting out TCC references: FAILED
    - **ROOT CAUSE:** Hard-coded nix-darwin behavior cannot be bypassed
 
@@ -119,7 +119,7 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file s
 
 2. **Grant Terminal Application App Management:**
    ```
-   System Settings → Privacy & Security → App Management → Add Terminal.app  
+   System Settings → Privacy & Security → App Management → Add Terminal.app
    ```
 
 3. **Restart Terminal Application** (critical for permissions to take effect)
@@ -135,7 +135,7 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file s
 2. **Locate Configuration Files:**
    ```bash
    find . -path "*/darwin/*" -name "*.nix"
-   find . -path "*/common/*" -name "*.nix"  
+   find . -path "*/common/*" -name "*.nix"
    find . -name "flake.nix"
    ```
 
@@ -158,7 +158,7 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file s
 
 ### **Recovery Time Estimates:**
 - **Permission Fix:** 5-15 minutes (manual GUI intervention)
-- **File System Verification:** 2-5 minutes  
+- **File System Verification:** 2-5 minutes
 - **iTerm2 Configuration Addition:** 10-20 minutes
 - **System Rebuild Test:** 5-10 minutes
 - **Full Recovery:** 30-60 minutes total
@@ -176,7 +176,7 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** where file s
 
 ### **EMERGENCY ACTIONS (Must Complete First):**
 1. **GRANT FULL DISK ACCESS** to terminal application
-2. **GRANT APP MANAGEMENT** permission to terminal application  
+2. **GRANT APP MANAGEMENT** permission to terminal application
 3. **RESTART TERMINAL** to activate permissions
 4. **VERIFY FILE ACCESS** with simple ls/find commands
 
@@ -255,13 +255,13 @@ The Setup-Mac project is in a **CRITICAL PERMISSION FAILURE STATE** with **0% fu
 
 **Resolution requires manual GUI intervention** to grant Full Disk Access and App Management permissions to the terminal application. Once resolved, the recovery path is straightforward and should restore full functionality within 30-60 minutes.
 
-**Status:** 🔴 **CRITICAL - USER ACTION REQUIRED**  
-**Next Step:** **GRANT TCC PERMISSIONS IMMEDIATELY**  
+**Status:** 🔴 **CRITICAL - USER ACTION REQUIRED**
+**Next Step:** **GRANT TCC PERMISSIONS IMMEDIATELY**
 **Estimated Recovery Time:** 30-60 minutes after permission fix
 
 ---
 
 *Report generated during critical system failure state. All actions blocked until TCC permissions are resolved.*
 
-**Last Updated:** December 21, 2025 - 14:53 CET  
+**Last Updated:** December 21, 2025 - 14:53 CET
 **Next Review:** Immediately after permission resolution

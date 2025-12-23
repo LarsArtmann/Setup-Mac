@@ -1,15 +1,15 @@
 # Program modules entry point
 # Imports and exports all isolated program modules
-
-{ lib, pkgs }:
-
-let
+{
+  lib,
+  pkgs,
+}: let
   # Import all program modules
   programModules = {
     # Development programs
     development = {
       editors = {
-        vscode = import ./development/editors/vscode.nix { inherit lib config pkgs; };
+        vscode = import ./development/editors/vscode.nix {inherit lib config pkgs;};
         # Future editors can be added here:
         # sublime = import ./development/editors/sublime.nix { inherit lib config pkgs; };
         # vim = import ./development/editors/vim.nix { inherit lib config pkgs; };
@@ -73,35 +73,38 @@ let
   };
 
   # Flatten all program modules into a single attribute set
-  flattenPrograms = { prefix ? "", modules }:
-    let
-      # Helper function to recursively flatten nested modules
-      flatten = attrs:
-        let
-          # Process each attribute
-          processed = mapAttrs (name: value:
-            if value ? options && value ? config then
+  flattenPrograms = {
+    prefix ? "",
+    modules,
+  }: let
+    # Helper function to recursively flatten nested modules
+    flatten = attrs: let
+      # Process each attribute
+      processed =
+        mapAttrs (
+          name: value:
+            if value ? options && value ? config
+            then
               # This is a NixOS module, keep it as-is
-              { "${prefix}${name}" = value; }
-            else if isAttrs value then
+              {"${prefix}${name}" = value;}
+            else if isAttrs value
+            then
               # This is a nested structure, recurse
               flatten value
-            else
-              {}
-          ) attrs;
+            else {}
+        )
+        attrs;
 
-          # Merge all the processed results
-          merged = foldl' (acc: elem: acc // elem) {} (attrValues processed);
-        in
-        merged;
+      # Merge all the processed results
+      merged = foldl' (acc: elem: acc // elem) {} (attrValues processed);
     in
+      merged;
+  in
     flatten modules;
 
   # Get all available programs
-  allPrograms = flattenPrograms { modules = programModules; };
-
-in
-{
+  allPrograms = flattenPrograms {modules = programModules;};
+in {
   # Export all program modules
   inherit programModules allPrograms;
 
@@ -109,12 +112,13 @@ in
   getProgram = name: allPrograms."${name}" or (throw "Unknown program: ${name}");
 
   # Function to get all programs in a category
-  getProgramsByCategory = category:
-    let
-      categoryPath = lib.splitString "." category;
-      result = lib.attrsetByPath categoryPath programModules;
-    in
-    if result != null then result else throw "Unknown category: ${category}";
+  getProgramsByCategory = category: let
+    categoryPath = lib.splitString "." category;
+    result = lib.attrsetByPath categoryPath programModules;
+  in
+    if result != null
+    then result
+    else throw "Unknown category: ${category}";
 
   # Function to get all program names
   listPrograms = attrNames allPrograms;
@@ -122,68 +126,73 @@ in
   # Function to get all categories
   listCategories = let
     # Recursively find all category paths
-    findCategories = prefix: attrs:
-      let
-        categories = mapAttrsToList (name: value:
-          if value ? options && value ? config then
-            []  # This is a program, not a category
-          else if isAttrs value then
-            [ "${prefix}${name}" ] ++ findCategories "${prefix}${name}." value
-          else
-            []
-        ) attrs;
-      in
+    findCategories = prefix: attrs: let
+      categories =
+        mapAttrsToList (
+          name: value:
+            if value ? options && value ? config
+            then [] # This is a program, not a category
+            else if isAttrs value
+            then ["${prefix}${name}"] ++ findCategories "${prefix}${name}." value
+            else []
+        )
+        attrs;
+    in
       flatten categories;
   in
-  findCategories "" programModules;
+    findCategories "" programModules;
 
   # Generate packages from enabled programs
-  generatePackages = enabledPrograms:
-    let
-      # For each enabled program, generate package definitions
-      programPackages = mapAttrs (name: programConfig:
+  generatePackages = enabledPrograms: let
+    # For each enabled program, generate package definitions
+    programPackages =
+      mapAttrs (
+        name: programConfig:
         # This would create the actual package based on the program configuration
         # For now, return the primary package if available
-        if programConfig ? package && programConfig.package != null then
-          programConfig.package
-        else if name == "vscode" then
-          pkgs.vscode
-        else
-          null
-      ) enabledPrograms;
+          if programConfig ? package && programConfig.package != null
+          then programConfig.package
+          else if name == "vscode"
+          then pkgs.vscode
+          else null
+      )
+      enabledPrograms;
 
-      # Filter out null values
-      validPackages = filterAttrs (n: v: v != null) programPackages;
-    in
+    # Filter out null values
+    validPackages = filterAttrs (n: v: v != null) programPackages;
+  in
     validPackages;
 
   # Generate systemd services from enabled programs
-  generateServices = enabledPrograms:
-    let
-      # For each enabled program, generate service definitions
-      programServices = mapAttrs (name: programConfig:
-        if programConfig ? services && programConfig.services.enable then
-          # Convert service definitions to systemd format
-          mapAttrs' (serviceName: serviceConfig:
-            lib.nameValuePair "${name}-${serviceName}" {
-              inherit (serviceConfig) description;
-              inherit (serviceConfig) wantedBy;
-              inherit (serviceConfig) after;
-              serviceConfig = {
-                ExecStart = serviceConfig.execStart;
-                Restart = "always";
-                User = serviceConfig.user;
-                Environment = lib.mapAttrsToList (k: v: "${k}=${v}") serviceConfig.environment;
-              };
-            }
-          ) (filterAttrs (n: v: v.enable) programConfig.services.definitions)
-        else
-          {}
-      ) enabledPrograms;
+  generateServices = enabledPrograms: let
+    # For each enabled program, generate service definitions
+    programServices =
+      mapAttrs (
+        name: programConfig:
+          if programConfig ? services && programConfig.services.enable
+          then
+            # Convert service definitions to systemd format
+            mapAttrs' (
+              serviceName: serviceConfig:
+                lib.nameValuePair "${name}-${serviceName}" {
+                  inherit (serviceConfig) description;
+                  inherit (serviceConfig) wantedBy;
+                  inherit (serviceConfig) after;
+                  serviceConfig = {
+                    ExecStart = serviceConfig.execStart;
+                    Restart = "always";
+                    User = serviceConfig.user;
+                    Environment = lib.mapAttrsToList (k: v: "${k}=${v}") serviceConfig.environment;
+                  };
+                }
+            ) (filterAttrs (n: v: v.enable) programConfig.services.definitions)
+          else {}
+      )
+      enabledPrograms;
 
-      # Merge all service definitions
-      allServices = foldl' (acc: services: acc // services) {} (attrValues programServices);
-    in
+    # Merge all service definitions
+    allServices = foldl' (acc: services: acc // services) {} (attrValues programServices);
+  in
     allServices;
 
   # Export as both modules and utilities

@@ -30,7 +30,7 @@ log_error() {
 # Function to test Ollama configuration
 test_ollama_config() {
     log_info "Testing Ollama service configuration..."
-    
+
     # Check if ollama-rocm package is available
     if command -v nix >/dev/null 2>&1; then
         if nix eval --apply 'builtins.hasAttr "ollama-rocm" (import <nixpkgs> {})' 2>/dev/null; then
@@ -46,10 +46,10 @@ test_ollama_config() {
 # Function to test GPU acceleration setup
 test_gpu_acceleration() {
     log_info "Testing GPU acceleration configuration..."
-    
+
     # Check ROCm environment variables
     local rocm_vars=("HIP_VISIBLE_DEVICES" "ROCM_PATH" "HSA_OVERRIDE_GFX_VERSION" "PYTORCH_ROCM_ARCH")
-    
+
     for var in "${rocm_vars[@]}"; do
         if [ -n "${!var:-}" ]; then
             log_success "$var configured: ${!var}"
@@ -57,10 +57,10 @@ test_gpu_acceleration() {
             log_warning "$var not configured or empty"
         fi
     done
-    
+
     # Check ROCm packages availability
     local rocm_packages=("rocm-runtime" "rocblas" "hipblas" "rocm-smi")
-    
+
     for pkg in "${rocm_packages[@]}"; do
         log_success "ROCm package: $pkg"
     done
@@ -69,17 +69,17 @@ test_gpu_acceleration() {
 # Function to test AI model support
 test_ai_models() {
     log_info "Testing AI model support configuration..."
-    
+
     # Check DeepSeek model availability markers
     local deepseek_markers=("deepseek-coder" "transformers" "tokenizers" "vllm")
-    
+
     for marker in "${deepseek_markers[@]}"; do
         log_success "DeepSeek support: $marker"
     done
-    
+
     # Check OCR capabilities
     local ocr_packages=("pillow" "opencv4" "pytesseract" "easyocr")
-    
+
     for pkg in "${ocr_packages[@]}"; do
         log_success "OCR capability: $pkg"
     done
@@ -88,17 +88,17 @@ test_ai_models() {
 # Function to test service integration
 test_service_integration() {
     log_info "Testing service integration..."
-    
+
     # Check if required Python packages are specified
     local python_packages=("torch" "torchvision" "accelerate" "diffusers")
-    
+
     for pkg in "${python_packages[@]}"; do
         log_success "PyTorch ecosystem: $pkg"
     done
-    
+
     # Check monitoring tools
     local monitoring_tools=("tensorboard" "wandb")
-    
+
     for tool in "${monitoring_tools[@]}"; do
         log_success "AI monitoring: $tool"
     done
@@ -107,7 +107,7 @@ test_service_integration() {
 # Function to validate port configuration
 test_ports() {
     log_info "Testing AI service port configuration..."
-    
+
     # Ollama default port
     if [ "11434" -eq "11434" ]; then
         log_success "Ollama port: 11434 (standard)"
@@ -133,7 +133,7 @@ suggest_model_download() {
 main() {
     log_info "🤖 AI INTEGRATION VALIDATION STARTING..."
     echo ""
-    
+
     # Run all validation checks
     test_ollama_config
     echo ""
@@ -145,11 +145,11 @@ main() {
     echo ""
     test_ports
     echo ""
-    
+
     # Provide deployment suggestions
     suggest_model_download
     echo ""
-    
+
     log_success "🎉 AI integration validation complete!"
     echo -e "${BLUE}Next step: Test with 'sudo nixos-rebuild switch'${NC}"
 }

@@ -26,7 +26,7 @@ log_warning() {
 # Function to suggest Hyprland optimizations
 suggest_hyprland_optimization() {
     log_info "Suggesting Hyprland optimizations for AMD AI Max+ 395..."
-    
+
     echo -e "${GREEN}## HYPERLAND PERFORMANCE TUNING${NC}"
     echo ""
     echo -e "${BLUE}For AMD Ryzen AI Max+ 395 with RDNA3:${NC}"
@@ -35,7 +35,7 @@ suggest_hyprland_optimization() {
     echo "• GPU acceleration: Video transcoding on GPU"
     echo "• Monitor refresh: High performance mode"
     echo ""
-    
+
     echo -e "${YELLOW}Additional optimizations to consider:${NC}"
     echo "• max_fps: 240 (for competitive gaming)"
     echo "• no_direct_scanout: false (can improve compatibility)"
@@ -46,7 +46,7 @@ suggest_hyprland_optimization() {
 # Function to suggest system optimizations
 suggest_system_optimization() {
     log_info "Suggesting system optimizations for AI workloads..."
-    
+
     echo -e "${GREEN}## SYSTEM PERFORMANCE TUNING${NC}"
     echo ""
     echo -e "${BLUE}For AI/ML workloads with ROCm:${NC}"
@@ -55,7 +55,7 @@ suggest_system_optimization() {
     echo "• CPU: Use performance governor for AI tasks"
     echo "• I/O: NVMe settings tuned for large models"
     echo ""
-    
+
     echo -e "${YELLOW}Additional optimizations to consider:${NC}"
     echo "• Kernel: 5.15+ for better ROCm support"
     echo "• Power: Set to performance mode during training"
@@ -66,7 +66,7 @@ suggest_system_optimization() {
 # Function to suggest AI optimizations
 suggest_ai_optimization() {
     log_info "Suggesting AI service optimizations..."
-    
+
     echo -e "${GREEN}## AI WORKLOAD OPTIMIZATION${NC}"
     echo ""
     echo -e "${BLUE}For DeepSeek + Ollama deployment:${NC}"
@@ -75,7 +75,7 @@ suggest_ai_optimization() {
     echo "• GPU: ROCm acceleration enabled"
     echo "• Memory: VRAM allocation optimized"
     echo ""
-    
+
     echo -e "${YELLOW}Performance tips:${NC}"
     echo "• Model quantization: Use q4/q8 for faster inference"
     echo "• Batch inference: Process multiple requests together"
@@ -87,7 +87,7 @@ suggest_ai_optimization() {
 # Function to suggest security optimizations
 suggest_security_optimization() {
     log_info "Suggesting security optimizations..."
-    
+
     echo -e "${GREEN}## SECURITY PERFORMANCE TUNING${NC}"
     echo ""
     echo -e "${BLUE}For production security monitoring:${NC}"
@@ -96,7 +96,7 @@ suggest_security_optimization() {
     echo "• Lynis: Regular security auditing"
     echo "• AIDE: File integrity monitoring"
     echo ""
-    
+
     echo -e "${YELLOW}Monitoring recommendations:${NC}"
     echo "• Logs: Rotate daily, keep 30 days"
     echo "• Alerts: Configure email/webhook notifications"
@@ -108,7 +108,7 @@ suggest_security_optimization() {
 # Function to create deployment checklist
 create_deployment_checklist() {
     log_info "Creating deployment optimization checklist..."
-    
+
     echo -e "${GREEN}## DEPLOYMENT OPTIMIZATION CHECKLIST${NC}"
     echo ""
     echo -e "${BLUE}Pre-deployment verification:${NC}"
@@ -120,7 +120,7 @@ create_deployment_checklist() {
     echo "□ AI services configured"
     echo "□ Security tools enabled"
     echo ""
-    
+
     echo -e "${BLUE}Post-deployment validation:${NC}"
     echo "□ System boots successfully"
     echo "□ Hyprland starts correctly"
@@ -130,7 +130,7 @@ create_deployment_checklist() {
     echo "□ Security monitoring active"
     echo "□ Performance benchmarks run"
     echo ""
-    
+
     echo -e "${BLUE}Performance verification:${NC}"
     echo "□ Hyprland FPS > 144"
     echo "□ GPU memory utilization > 50%"
@@ -142,7 +142,7 @@ create_deployment_checklist() {
 # Function to suggest release strategy
 suggest_release_strategy() {
     log_info "Suggesting release and versioning strategy..."
-    
+
     echo -e "${GREEN}## RELEASE STRATEGY${NC}"
     echo ""
     echo -e "${BLUE}Versioning:${NC}"
@@ -151,14 +151,14 @@ suggest_release_strategy() {
     echo "• v1.2: Security hardening"
     echo "• v2.0: AI model updates"
     echo ""
-    
+
     echo -e "${BLUE}Tagging:${NC}"
     echo "• git tag v1.0 optimized-baseline"
     echo "• git tag v1.1 performance-tuned"
     echo "• git tag v1.2 security-hardened"
     echo "• git push origin --tags"
     echo ""
-    
+
     echo -e "${BLUE}Release notes:${NC}"
     echo "• Document all optimizations made"
     echo "• Include benchmark results"
@@ -171,7 +171,7 @@ suggest_release_strategy() {
 main() {
     log_info "🚀 SYSTEM OPTIMIZATION ANALYSIS STARTING..."
     echo ""
-    
+
     # Provide optimization suggestions
     suggest_hyprland_optimization
     suggest_system_optimization
@@ -180,7 +180,7 @@ main() {
     create_deployment_checklist
     suggest_release_strategy
     echo ""
-    
+
     log_success "🎉 System optimization analysis complete!"
     echo -e "${BLUE}Ready for optimized deployment!${NC}"
 }

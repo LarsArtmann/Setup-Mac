@@ -42,7 +42,7 @@ This repository provides a complete, reproducible development environment for ma
 
    # Or manual commands
    darwin-rebuild switch --flake .#Lars-MacBook-Air
-   
+
    # Note: Do NOT use 'nh darwin switch' - it has issues with temporary files
    # See docs/troubleshooting/nh-darwin-switch-issue.md for details
    ```

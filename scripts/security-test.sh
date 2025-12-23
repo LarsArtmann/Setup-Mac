@@ -30,10 +30,10 @@ log_error() {
 # Function to test security service configuration
 test_security_services() {
     log_info "Testing security service configuration..."
-    
+
     # Check fail2ban configuration
     local security_services=("fail2ban" "clamav" "apparmor" "openssh")
-    
+
     for service in "${security_services[@]}"; do
         if [ -n "${service}" ]; then
             log_success "Security service: $service configured"
@@ -46,24 +46,24 @@ test_security_services() {
 # Function to test security tools availability
 test_security_tools() {
     log_info "Testing security tools configuration..."
-    
+
     # Network security tools
     local network_security=("nmap" "wireshark-cli" "nethogs" "iftop")
-    
+
     for tool in "${network_security[@]}"; do
         log_success "Network security: $tool"
     done
-    
+
     # System security tools
     local system_security=("lynis" "aide" "osquery")
-    
+
     for tool in "${system_security[@]}"; do
         log_success "System security: $tool"
     done
-    
+
     # Privacy/Anonymity tools
     local privacy_tools=("tor-browser" "aircrack-ng" "john")
-    
+
     for tool in "${privacy_tools[@]}"; do
         log_success "Privacy/anonymity: $tool"
     done
@@ -72,14 +72,14 @@ test_security_tools() {
 # Function to test SSH hardening
 test_ssh_security() {
     log_info "Testing SSH security configuration..."
-    
+
     # SSH security settings
     local ssh_settings=("PasswordAuthentication=false" "PermitRootLogin=no" "X11Forwarding=false")
-    
+
     for setting in "${ssh_settings[@]}"; do
         log_success "SSH hardening: $setting"
     done
-    
+
     # SSH banner configuration
     log_success "SSH banner: Configured"
     log_success "SSH banner: Legal warning text"
@@ -88,21 +88,21 @@ test_ssh_security() {
 # Function to test firewall configuration
 test_firewall() {
     log_info "Testing firewall configuration..."
-    
+
     # Check if firewall is configured
     local firewall_ports=("22" "11434")
-    
+
     for port in "${firewall_ports[@]}"; do
         log_success "Firewall: Port $port configured"
     done
-    
+
     log_success "Firewall: fail2ban integration enabled"
 }
 
 # Function to test file integrity monitoring
 test_file_integrity() {
     log_info "Testing file integrity monitoring..."
-    
+
     # AIDE configuration
     log_success "File integrity: AIDE monitoring"
     log_success "File integrity: hash database tracking"
@@ -112,14 +112,14 @@ test_file_integrity() {
 # Function to test audit and logging
 test_audit_logging() {
     log_info "Testing audit and logging configuration..."
-    
+
     # System audit tools
     local audit_tools=("strace" "ltrace" "procps")
-    
+
     for tool in "${audit_tools[@]}"; do
         log_success "System audit: $tool"
     done
-    
+
     # Security auditing
     log_success "Security audit: lynis scanner"
     log_success "Security audit: comprehensive reporting"
@@ -129,13 +129,13 @@ test_audit_logging() {
 # Function to test intrusion prevention
 test_intrusion_prevention() {
     log_info "Testing intrusion prevention systems..."
-    
+
     # Fail2ban configuration
     log_success "Intrusion prevention: fail2ban active"
     log_success "Intrusion prevention: SSH protection"
     log_success "Intrusion prevention: Brute force detection"
     log_success "Intrusion prevention: IP banning"
-    
+
     # ClamAV antivirus
     log_success "Malware prevention: ClamAV daemon"
     log_success "Malware prevention: Database updates"
@@ -166,7 +166,7 @@ suggest_verification() {
 main() {
     log_info "🔒 SECURITY MONITORING VALIDATION STARTING..."
     echo ""
-    
+
     # Run all validation checks
     test_security_services
     echo ""
@@ -182,11 +182,11 @@ main() {
     echo ""
     test_intrusion_prevention
     echo ""
-    
+
     # Provide verification suggestions
     suggest_verification
     echo ""
-    
+
     log_success "🎉 Security monitoring validation complete!"
     echo -e "${BLUE}Next step: Deploy with 'sudo nixos-rebuild switch'${NC}"
 }

@@ -51,7 +51,7 @@ fi
 echo -e "\n${BLUE}=== GPU PERFORMANCE TEST ===${NC}"
 if command -v rocminfo &> /dev/null; then
     log_result "ROCm GPU detected: $(rocminfo | grep 'Device Name' | head -1 | cut -d':' -f2 | xargs)"
-    
+
     # Test GPU memory bandwidth
     if command -v rocm-bandwidth-test &> /dev/null; then
         log_info "Testing GPU memory bandwidth..."
@@ -101,7 +101,7 @@ if command -v fio &> /dev/null; then
     # Simple read/write test
     READ_SPEED=$(fio --name=randread --rw=randread --bs=4k --size=512M --numjobs=4 --direct=1 --output-format=json | jq -r '.jobs[0].read.bw')
     WRITE_SPEED=$(fio --name=randwrite --rw=randwrite --bs=4k --size=512M --numjobs=4 --direct=1 --output-format=json | jq -r '.jobs[0].write.bw')
-    
+
     log_result "Disk Read Speed: $READ_SPEED MiB/sec"
     log_result "Disk Write Speed: $WRITE_SPEED MiB/sec"
 else
@@ -128,14 +128,14 @@ fi
 echo -e "\n${BLUE}=== HYPERLAND PERFORMANCE TEST ===${NC}"
 if pgrep -x "Hyprland" > /dev/null; then
     log_result "Hyprland is running"
-    
+
     # Test Wayland performance with glmark2 if available
     if command -v glmark2-wayland &> /dev/null; then
         log_info "Testing Wayland graphics performance..."
         # Run glmark2 in background to not block
         timeout 10s glmark2-wayland --fullscreen --run-frames 300 > /dev/null 2>&1 && log_result "Wayland graphics test: Passed" || log_warning "Wayland graphics test: Failed or incomplete"
     fi
-    
+
     # Check Hyprland-specific features
     if hyprctl monitors > /dev/null 2>&1; then
         MONITOR_COUNT=$(hyprctl monitors | grep -c "Monitor")
@@ -153,7 +153,7 @@ log_info "Testing AI performance..."
 if command -v ollama &> /dev/null; then
     if pgrep -x "ollama" > /dev/null; then
         log_result "Ollama service is running"
-        
+
         # Test model inference speed (small model test)
         log_info "Testing model inference speed..."
         # This would require a model to be downloaded first

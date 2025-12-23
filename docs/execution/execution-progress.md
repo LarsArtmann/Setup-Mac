@@ -6,7 +6,7 @@ Started: Sun Dec 21 15:27:31 CET 2025
 
 ### Phase 1: Critical Path (51% Impact)
 
-- [x] T1: Resolve macOS TCC Permissions 
+- [x] T1: Resolve macOS TCC Permissions
 - [x] T2: Deploy to evo-x2 Hardware
 - [x] T3: Create Hardware Compatibility Report
 

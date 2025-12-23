@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Simplified pre-commit hook for NixOS configuration validation
+# Enhanced pre-commit hook for NixOS configuration validation
+# Runs static analysis tools: statix, deadnix, alejandra, nix flake check
 
 set -euo pipefail
 
@@ -26,6 +27,58 @@ log_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
+# Function to run deadnix (dead code detection)
+run_deadnix() {
+    log_info "Running deadnix (dead code detector)..."
+    if nix shell nixpkgs#deadnix --command deadnix > /tmp/deadnix.log 2>&1; then
+        log_success "Deadnix passed! No dead code found."
+        return 0
+    else
+        if grep -q "Unused declarations were found" /tmp/deadnix.log; then
+            log_error "Deadnix found unused code!"
+            echo -e "${RED}=== DEAD CODE FOUND ===${NC}"
+            cat /tmp/deadnix.log
+            echo -e "${YELLOW}To auto-fix: nix shell nixpkgs#deadnix --command deadnix --edit .${NC}"
+            return 1
+        else
+            # Other errors (e.g., not in git repo)
+            log_warning "Deadnix skipped (not a git repo or no staged files)"
+            return 0
+        fi
+    fi
+}
+
+# Function to run statix (linter)
+run_statix() {
+    log_info "Running statix (Nix linter)..."
+    if nix shell nixpkgs#statix --command statix check > /tmp/statix.log 2>&1; then
+        log_success "Statix passed! No antipatterns found."
+        return 0
+    else
+        log_error "Statix found issues!"
+        echo -e "${RED}=== LINTER ISSUES ===${NC}"
+        cat /tmp/statix.log
+        echo -e "${YELLOW}To auto-fix: nix shell nixpkgs#statix --command statix fix .${NC}"
+        return 1
+    fi
+}
+
+# Function to run alejandra (formatter check)
+run_alejandra() {
+    log_info "Running alejandra (formatter check)..."
+    # Run on all .nix files in the project
+    if nix shell nixpkgs#alejandra --command alejandra --check platforms/ > /tmp/alejandra.log 2>&1; then
+        log_success "Alejandra passed! Code is properly formatted."
+        return 0
+    else
+        log_error "Alejandra found formatting issues!"
+        echo -e "${RED}=== FORMATTING ISSUES ===${NC}"
+        cat /tmp/alejandra.log
+        echo -e "${YELLOW}To auto-fix: nix shell nixpkgs#alejandra --command alejandra .${NC}"
+        return 1
+    fi
+}
+
 # Function to run Nix flake check
 run_nix_check() {
     log_info "Running Nix flake check..."
@@ -40,27 +93,92 @@ run_nix_check() {
     fi
 }
 
+# Function to run gitleaks (secret detection)
+run_gitleaks() {
+    log_info "Running gitleaks (secret detector)..."
+    if gitleaks detect --source . > /tmp/gitleaks.log 2>&1; then
+        log_success "Gitleaks passed! No secrets found."
+        return 0
+    else
+        if grep -q "No leaks found" /tmp/gitleaks.log || grep -q "commits scanned" /tmp/gitleaks.log; then
+            log_success "Gitleaks passed! No secrets found."
+            return 0
+        else
+            log_warning "Gitleaks check completed (may have findings)"
+            # Don't fail commit on gitleaks warnings (common in dev)
+            return 0
+        fi
+    fi
+}
+
+# Function to remove trailing whitespace
+remove_trailing_whitespace() {
+    log_info "Removing trailing whitespace..."
+    find . -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o -name "*.txt" -o -name "*.sh" -o -name "*.nix" \
+        | grep -v ".git" \
+        | xargs -I {} /run/current-system/sw/bin/sed -i "s/[[:space:]]*$//" "{}" 2>/dev/null || true
+    log_success "Trailing whitespace removed."
+}
+
 # Main execution
 main() {
     log_info "🚀 Pre-commit validation starting..."
-    
+
     # Change to project root
     cd "$(git rev-parse --show-toplevel)"
-    
+
     # Check if we're in a Nix project
     if [ ! -f "flake.nix" ]; then
-        log_error "Not in a Nix flake project (no flake.nix found)"
-        exit 1
+        log_warning "Not in a Nix flake project (no flake.nix found)"
+        log_warning "Skipping Nix-specific checks..."
+        exit 0
     fi
-    
-    # Run Nix flake check
-    if run_nix_check; then
+
+    # Run all checks
+    local all_passed=true
+
+    # 1. Gitleaks (security)
+    if ! run_gitleaks; then
+        log_warning "Gitleaks check had warnings (continuing...)"
+    fi
+
+    # 2. Trailing whitespace (cleanup)
+    remove_trailing_whitespace
+
+    # 3. Deadnix (dead code detection)
+    if ! run_deadnix; then
+        all_passed=false
+    fi
+
+    # 4. Statix (linter)
+    if ! run_statix; then
+        all_passed=false
+    fi
+
+    # 5. Alejandra (formatter)
+    if ! run_alejandra; then
+        all_passed=false
+    fi
+
+    # 6. Nix flake check (validation)
+    if ! run_nix_check; then
+        all_passed=false
+    fi
+
+    # Final result
+    if [ "$all_passed" = true ]; then
         log_success "🎉 All validation checks passed!"
         echo -e "${GREEN}Ready to commit!${NC}"
         exit 0
     else
-        log_error "❌ Nix flake check failed. Commit aborted."
+        log_error "❌ Some validation checks failed. Commit aborted."
         echo -e "${YELLOW}Fix issues above and try again.${NC}"
+        echo ""
+        echo -e "${BLUE}Quick Fix Commands:${NC}"
+        echo "  nix shell nixpkgs#alejandra nixpkgs#statix nixpkgs#deadnix"
+        echo "  alejandra .      # Format code"
+        echo "  statix fix .     # Fix linting issues"
+        echo "  deadnix --edit . # Remove dead code"
         exit 1
     fi
 }

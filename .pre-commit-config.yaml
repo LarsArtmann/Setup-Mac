@@ -1,22 +1,80 @@
+# Nix Pre-commit Hooks Configuration
+# Runs static analysis and linting on every commit
+
 repos:
--   repo: local
+  # Local hooks (system commands)
+  - repo: local
     hooks:
-    -   id: gitleaks
+      # Security: Detect leaked secrets
+      - id: gitleaks
         name: gitleaks
         entry: gitleaks
         args: [detect, --source, .]
         language: system
         pass_filenames: false
-    -   id: trailing-whitespace
+
+      # Format: Remove trailing whitespace
+      - id: trailing-whitespace
         name: Remove trailing whitespace
         entry: bash
         args: [-c, 'find . -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o -name "*.txt" -o -name "*.sh" -o -name "*.nix" | grep -v ".git" | xargs -I {} /run/current-system/sw/bin/sed -i "s/[[:space:]]*$//" "{}"']
         language: system
         pass_filenames: false
-    -   id: nix-check
-        name: nix check
+
+      # Nix: Dead code detection
+      - id: deadnix
+        name: deadnix (dead code detector)
+        entry: bash
+        args: [-c, 'nix shell nixpkgs#deadnix --command deadnix']
+        language: system
+        files: \.nix$
+        pass_filenames: true
+
+      # Nix: Linter and antipattern detection
+      - id: statix
+        name: statix (Nix linter)
+        entry: bash
+        args: [-c, 'nix shell nixpkgs#statix --command statix check']
+        language: system
+        files: \.nix$
+        pass_filenames: true
+
+      # Nix: Code formatting check
+      - id: alejandra
+        name: alejandra (Nix formatter)
+        entry: bash
+        args: [-c, 'nix shell nixpkgs#alejandra --command alejandra --check']
+        language: system
+        files: \.nix$
+        pass_filenames: true
+
+      # Nix: Syntax and build validation
+      - id: nix-check
+        name: nix check (flake validation)
         entry: bash
         args: [-c, 'cd . && just check-nix-syntax']
         language: system
         files: \.nix$
         pass_filenames: false
+
+# Hook Execution Order:
+# 1. gitleaks           - Security check
+# 2. trailing-whitespace - Cleanup formatting
+# 3. deadnix           - Detect dead code
+# 4. statix            - Lint and detect antipatterns
+# 5. alejandra         - Check code formatting
+# 6. nix-check         - Validate syntax and build
+#
+# Tools Used:
+# - gitleaks  (secret detection)
+# - deadnix   (dead code detection)
+# - statix    (linter, 20+ rules)
+# - alejandra (code formatter)
+# - just       (task runner)
+#
+# All hooks use `--check` mode to enforce standards.
+# To auto-fix issues manually, run:
+#   nix shell nixpkgs#alejandra nixpkgs#statix nixpkgs#deadnix
+#   alejandra .      # auto-format
+#   statix fix .     # auto-fix linting
+#   deadnix --edit . # remove dead code

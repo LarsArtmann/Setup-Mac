@@ -1,8 +1,8 @@
 # nix-darwin Configuration Status Report
 
-**Date:** 2025-12-19 20:47  
-**Project:** Setup-Mac nix-darwin + NixOS Cross-Platform Configuration  
-**Status:** 🟡 PARTIALLY FUNCTIONAL - BLOCKED BY TCC PERMISSIONS  
+**Date:** 2025-12-19 20:47
+**Project:** Setup-Mac nix-darwin + NixOS Cross-Platform Configuration
+**Status:** 🟡 PARTIALLY FUNCTIONAL - BLOCKED BY TCC PERMISSIONS
 
 ---
 
@@ -10,7 +10,7 @@
 
 This report documents the current state of the Setup-Mac nix-darwin configuration system. We have successfully resolved 65% of critical configuration issues but are completely blocked by nix-darwin's hard-coded TCC (Transparency, Consent, and Control) permission reset behavior.
 
-**Key Achievement:** All Nix experimental features, sandbox configuration, and build syntax are now perfectly functional.  
+**Key Achievement:** All Nix experimental features, sandbox configuration, and build syntax are now perfectly functional.
 **Critical Blocker:** nix-darwin's automatic `tccutil reset SystemPolicyAppBundles` cannot be disabled through configuration.
 
 ---
@@ -137,7 +137,7 @@ nix.settings.experimental-features = "nix-command flakes";
 # platforms/darwin/darwin.nix
 imports = [
   ./default.nix
-  ./environment.nix  
+  ./environment.nix
   ./nix/settings.nix        # ← Added this critical import
   ../common/packages/base.nix
 ];
@@ -307,9 +307,9 @@ system.checks = {};
 
 ---
 
-**Report Generated:** 2025-12-19 20:47  
-**Next Review:** After permission resolution  
-**Status:** 🟡 AWAITING PERMISSION RESOLUTION  
+**Report Generated:** 2025-12-19 20:47
+**Next Review:** After permission resolution
+**Status:** 🟡 AWAITING PERMISSION RESOLUTION
 
 ---
 
