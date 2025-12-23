@@ -38,7 +38,6 @@
     python311Packages.bitsandbytes
     python311Packages.pillow
     python311Packages.opencv4
-    python311Packages.pytesseract
     python311Packages.optimum
     python311Packages.peft
     python311Packages.tokenizers

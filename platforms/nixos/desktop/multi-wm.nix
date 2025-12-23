@@ -39,32 +39,13 @@
           lgi
         ];
       };
-      
+
       # Configure keymap in X11 (for X11-based WMs)
       xkb = {
         layout = "us";
         variant = "";
       };
     };
-    
-    # Enable sound with pipewire (shared across all WMs)
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
-    
-    # Pulseaudio disabled (conflicts with pipewire)
-    pulseaudio.enable = false;
-  };
-  
-  security = {
-    # Enable polkit for authentication
-    polkit.enable = true;
-    
-    # Realtime scheduling for audio
-    rtkit.enable = true;
   };
 
   # Additional packages needed for all window managers
@@ -107,22 +88,5 @@
     wl-clipboard
   ];
 
-  # D-Bus is enabled in hyprland-system.nix to avoid duplication
 
-
-
-  # Polkit authentication agent handled by system-level services
-  # Removed manual user service to avoid conflicts with UWSM
-
-  # XDG Desktop Portals configuration (works with all WMs)
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk  # For file picker support
-      pkgs.xdg-desktop-portal-wlr  # For wlroots-based WMs
-    ];
-  };
-
-  # Enable dconf for settings management
-  programs.dconf.enable = true;
 }
