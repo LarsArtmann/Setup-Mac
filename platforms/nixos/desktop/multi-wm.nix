@@ -71,11 +71,8 @@
     # Background settings
     swaybg
 
-    # Authentication agents
-    polkit_gnome
-
-    # XDG utilities
-    xdg-utils
+    # Authentication agents and XDG utilities moved to security-hardening.nix
+    # - polkit_gnome, xdg-utils
 
     # Audio utilities
     pavucontrol

@@ -27,13 +27,14 @@
     # Model management and serving
     ollama  # Model server
     llama-cpp  # Alternative inference
+    vllm  # High-performance inference server
 
     # OCR tools
-    tesseract  # OCR engine
-    tesseract4  # Better OCR
+    tesseract4  # Better OCR (includes tesseract binary)
     poppler-utils  # PDF utilities
 
     # Development tools for AI
     jupyter  # Interactive development
+    python311  # Python for AI/ML development
   ];
 }

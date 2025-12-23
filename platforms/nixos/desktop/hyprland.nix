@@ -308,7 +308,7 @@
     # Terminal & Core Tools
     kitty # Terminal
     ghostty # Modern terminal emulator
-    kdePackages.dolphin # File manager
+    # kdePackages.dolphin moved to multi-wm.nix (available system-wide)
     rofi # App launcher (wayland support included)
 
     # Hyprland Ecosystem - Essential tools
@@ -325,112 +325,33 @@
     libnotify # Notification library
 
     # Clipboard & Utilities
-    wl-clipboard # Clipboard support
+    # wl-clipboard moved to multi-wm.nix (available system-wide)
     cliphist # Clipboard history
 
     # Animated wallpapers (optional but cool)
     swww # Animated wallpapers with transitions
     imagemagick # Image manipulation for wallpaper management
 
-    # System Monitoring
-    btop # System monitor (used for background)
-    nvtopPackages.amd # AMD GPU/process monitor
-    radeontop # AMD GPU specific monitor
-    amdgpu_top # Advanced AMD GPU monitoring
+    # System Monitoring (GPU tools for Hyprland background terminals)
+    radeontop # AMD GPU specific monitor (CLI, lightweight)
+    amdgpu_top # Advanced AMD GPU monitoring (CLI, lightweight)
+    # btop, nvtopPackages.amd moved to monitoring.nix
 
     # Additional useful tools
-    pavucontrol # Audio control GUI
-    xdg-utils # XDG utilities
-    gnome-keyring # Keyring for passwords
+    # pavucontrol, grim, slurp moved to multi-wm.nix (available system-wide)
 
     # Enhanced tools for superb setup
     wlogout # Modern logout menu
-    grimblast # Enhanced screenshot utility (requires grim and slurp)
-    grim # Screenshot tool
-    slurp # Area selection tool
+    grimblast # Enhanced screenshot utility (requires grim and slurp from multi-wm.nix)
     playerctl # Media player control
     brightnessctl # Brightness control
 
-    # LOCAL AI SETUP - vLLM + Ollama for Ryzen AI Max+ 395
-    # AMD ROCm for GPU acceleration
-    rocmPackages.rocm-runtime
-    rocmPackages.rocblas
-    rocmPackages.hipblas
-    rocmPackages.rocrand
-    
-    # Python AI packages
-    python311
-
-    # Standard nixpkgs packages (CLI tools, not Python libraries)
-    ollama  # Model server CLI
-    vllm  # Inference server CLI
-    
-    # OCR Tools
-    tesseract  # OCR engine
-    tesseract4  # Better OCR
-    poppler-utils  # PDF utilities for OCR
-    
-    # Model quantization and optimization
-    llama-cpp
-    
-    # AI monitoring and tools
-    nvtopPackages.amd  # GPU monitoring
-    
-    # SECURITY MONITORING TOOLS
-    # Network & Connection Monitoring
-    nethogs # Network process monitoring
-    iftop # Network bandwidth monitoring
-    iptraf-ng # IP traffic monitoring
-    bmon # Network bandwidth monitor
-    netsniff-ng # Network packet capture
-    wireshark # Network protocol analyzer
-    aircrack-ng # WiFi security testing
-    
-    # System Security Monitoring
-    lynis # Security auditing tool
-    aide # File integrity monitoring
-    osquery # OS monitoring & security analytics
-    fail2ban # Intrusion prevention
-    
-    # Authentication & Access Control
-    pamtester # PAM testing
-    openssl # Cryptographic toolkit
-    gnupg # Encryption & signing
-    pass # Password manager
-    
-    # Process & File Monitoring
-    lsof # List open files
-    strace # System call tracer
-    inotify-tools # File system monitoring
-    iotop # I/O monitoring
-    perf # Performance analysis
-    
-    # Log Analysis & Security
-    goaccess # Web log analyzer
-    ccze # Log colorizer
-    
-    # Privacy & Anonymity
-    tor-browser # Anonymous browsing
-    openvpn # VPN client
-    wireguard-tools # Modern VPN
-    
-    # Vulnerability Assessment
-    nmap # Network scanning
-    masscan # Fast port scanner
-    sqlmap # SQL injection testing
-    nikto # Web server scanner
-    nuclei # Fast vulnerability scanner
-    
-    # Incident Response
-    sleuthkit # Forensic toolkit
-    wireshark-cli # Command-line packet analysis
-    tcpdump # Packet capture
-
-    # Modern alternatives for desktop terminals
-    htop # Process monitor
-    neovim # Text editor
-
-    # Privacy-focused browser
-    firefox # Standard browser
+    # AI/ML tools moved to ai-stack.nix to avoid duplication
+    # - ROCm packages, python311, ollama, vllm, llama-cpp, tesseract4, poppler-utils, nvtop
+    # Security & monitoring tools moved to dedicated modules:
+    # - security-hardening.nix (security tools)
+    # - monitoring.nix (performance monitoring tools)
+    # Common desktop utilities moved to multi-wm.nix:
+    # - kdePackages.dolphin, pavucontrol, grim, slurp, wl-clipboard
   ];
 }
