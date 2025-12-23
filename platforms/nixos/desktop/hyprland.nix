@@ -359,16 +359,11 @@
     rocmPackages.rocrand
     
     # Python AI packages
-    (python311.withPackages (ps: with ps; [
-      vllm  # For advanced inference
-      ollama  # For model management
-      torch  # PyTorch with ROCm support
-      transformers  # Hugging Face models
-      accelerate  # Hardware acceleration
-    ]))
-    
-    # Ollama for easy model management
-    ollama
+    python311
+
+    # Standard nixpkgs packages (CLI tools, not Python libraries)
+    ollama  # Model server CLI
+    vllm  # Inference server CLI
     
     # OCR Tools
     tesseract  # OCR engine

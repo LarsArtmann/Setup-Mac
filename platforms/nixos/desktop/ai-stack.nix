@@ -24,25 +24,6 @@
 
   # AI/ML tools and libraries
   environment.systemPackages = with pkgs; [
-    # Core AI/ML packages
-    python311
-    python311Packages.vllm
-    python311Packages.ollama
-    python311Packages.torch
-    python311Packages.torchvision
-    python311Packages.torchaudio
-    python311Packages.transformers
-    python311Packages.diffusers
-    python311Packages.accelerate
-    python311Packages.datasets
-    python311Packages.bitsandbytes
-    python311Packages.pillow
-    python311Packages.opencv4
-    python311Packages.optimum
-    python311Packages.peft
-    python311Packages.tokenizers
-    python311Packages.tensorboard
-
     # Model management and serving
     ollama  # Model server
     llama-cpp  # Alternative inference

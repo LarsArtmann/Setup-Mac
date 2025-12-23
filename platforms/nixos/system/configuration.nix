@@ -60,10 +60,13 @@
   # Experimental features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Binary cache for Hyprland - CRITICAL for fast builds
+  # Binary caches - cache.nixos.org FIRST for standard packages, then Hyprland
   nix.settings = {
-    substituters = ["https://hyprland.cachix.org"];
-    trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+    substituters = ["https://cache.nixos.org" "https://hyprland.cachix.org"];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+    ];
   };
 
   # CRUSH AI assistant is now handled by crush.nix module
