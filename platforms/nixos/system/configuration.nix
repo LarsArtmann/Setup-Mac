@@ -11,7 +11,14 @@
     ./networking.nix
     ../services/ssh.nix
     ../hardware/amd-gpu.nix
+    # Desktop modules - reorganized for better separation of concerns
     ../desktop/hyprland-system.nix
+    ../desktop/display-manager.nix
+    ../desktop/audio.nix
+    ../desktop/hyprland-config.nix
+    ../desktop/security-hardening.nix
+    ../desktop/ai-stack.nix
+    ../desktop/monitoring.nix
     ../desktop/multi-wm.nix
   ];
 
