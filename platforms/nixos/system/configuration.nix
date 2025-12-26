@@ -12,7 +12,7 @@
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
     # Desktop modules - reorganized for better separation of concerns
-    ../desktop/hyprland-system.nix
+    # Note: hyprland-system.nix was split into separate modules (commit 5174b9b)
     ../desktop/display-manager.nix
     ../desktop/audio.nix
     ../desktop/hyprland-config.nix

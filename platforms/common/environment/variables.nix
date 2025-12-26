@@ -6,7 +6,7 @@
   # Common development environment variables (platform-agnostic)
   commonEnvVars = {
     # Core system settings
-    EDITOR = "nano";
+    EDITOR = "micro"; # micro-full is installed in base.nix
     LANG = "en_GB.UTF-8";
 
     # Optimize NIX_PATH for better performance

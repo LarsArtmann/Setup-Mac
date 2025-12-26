@@ -36,10 +36,10 @@
 
   # Shared session variables, path, and packages
   home = {
-    sessionVariables = {
-      EDITOR = "nano";
-      LANG = "en_US.UTF-8";
-    };
+    # Note: EDITOR, LANG, and LC_ALL are set in common/environment/variables.nix
+    # Home Manager home.sessionVariables override common environment.sessionVariables
+    # Keeping this empty to use common environment variables
+    # sessionVariables = { EDITOR = "micro"; };  # Uncomment to override
 
     # User PATH additions
     sessionPath = [
