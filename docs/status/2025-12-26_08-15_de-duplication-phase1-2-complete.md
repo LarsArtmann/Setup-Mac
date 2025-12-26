@@ -421,3 +421,97 @@ Successfully eliminated critical duplications, fixed Fish shell configuration, a
 *Prepared by: Crush AI Assistant*
 *Phase Status: 1 & 2 COMPLETE, 3 & 4 SKIPPED*
 *Overall Health: STABLE AND IMPROVED*
+
+---
+
+## ⚠️ CRITICAL CORRECTION (2025-12-26 17:40 CET)
+
+### Task 1.3: AI Variables Scope - INCORRECT INITIAL IMPLEMENTATION
+
+**Problem Identified:**
+- Initial implementation moved AI variables to `home.sessionVariables` (user-level)
+- This is **INCORRECT** for Ollama service running as system service
+- System-level systemd services **CANNOT** see user-level environment variables
+- **CRITICAL IMPACT:** GPU acceleration would be completely broken if deployed to NixOS
+
+**Research Findings:**
+- See `docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`
+- Systemd service environment variable inheritance is isolated
+- User-level variables only visible to user sessions and user systemd services
+- System services require service-level variables
+
+**Correction Applied (2025-12-26 17:40 CET):**
+
+**Status:** ✅ FIXED - Service-level configuration
+**Correct Changes:**
+- Removed ALL AI variables from `home.sessionVariables` in `platforms/nixos/users/home.nix`
+- Added ALL AI variables to `services.ollama.environmentVariables` in `platforms/nixos/desktop/ai-stack.nix`
+- Used `rocmOverrideGfx` option instead of manual `HSA_OVERRIDE_GFX_VERSION`
+- Added performance tuning: `OLLAMA_FLASH_ATTENTION`, `OLLAMA_NUM_PARALLEL`
+
+**Corrected Files:**
+- `platforms/nixos/users/home.nix`: Removed AI variables
+- `platforms/nixos/desktop/ai-stack.nix`: Added AI variables to service
+
+**Final Impact:**
+- ✅ Variables in service-level scope (correct NixOS pattern)
+- ✅ Ollama system service will have GPU access
+- ✅ Variables scoped to service only (no global pollution)
+- ✅ Follows NixOS best practices
+
+**Commit:** `ffa5685` - "fix(ollama): move GPU variables to service-level configuration"
+
+**Related Documentation:**
+- `docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`
+- `docs/planning/2025-12-26_17-40_pareto-focused-execution-plan.md`
+
+**Task 1.3 Status:** ⚠️ COMPLETED BUT LATER CORRECTED (see above)
+
+---
+
+---
+
+## ⚠️ CRITICAL CORRECTION (2025-12-26 17:40 CET)
+
+### Task 1.3: AI Variables Scope - INCORRECT INITIAL IMPLEMENTATION
+
+**Problem Identified:**
+- Initial implementation moved AI variables to `home.sessionVariables` (user-level)
+- This is **INCORRECT** for Ollama service running as system service
+- System-level systemd services **CANNOT** see user-level environment variables
+- **CRITICAL IMPACT:** GPU acceleration would be completely broken if deployed to NixOS
+
+**Research Findings:**
+- See `docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`
+- Systemd service environment variable inheritance is isolated
+- User-level variables only visible to user sessions and user systemd services
+- System services require service-level variables
+
+**Correction Applied (2025-12-26 17:40 CET):**
+
+**Status:** ✅ FIXED - Service-level configuration
+**Correct Changes:**
+- Removed ALL AI variables from `home.sessionVariables`
+- Added ALL AI variables to `services.ollama.environmentVariables`
+- Used `rocmOverrideGfx` option instead of manual `HSA_OVERRIDE_GFX_VERSION`
+
+**Corrected Files:**
+- `platforms/nixos/users/home.nix`: Removed AI variables
+- `platforms/nixos/desktop/ai-stack.nix`: Added AI variables to service
+
+**Final Impact:**
+- ✅ Variables in service-level scope (correct NixOS pattern)
+- ✅ Ollama system service will have GPU access
+- ✅ Variables scoped to service only (no global pollution)
+- ✅ Added performance tuning: OLLAMA_FLASH_ATTENTION, OLLAMA_NUM_PARALLEL
+
+**Commit:** `ffa5685` - "fix(ollama): move GPU variables to service-level configuration"
+
+**Related Documentation:**
+- `docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`
+- `docs/planning/2025-12-26_17-40_pareto-focused-execution-plan.md`
+
+**Task 1.3 Status:** ⚠️ COMPLETED BUT LATER CORRECTED (see above)
+
+---
+
