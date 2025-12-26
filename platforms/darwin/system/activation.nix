@@ -36,16 +36,12 @@ in {
       '';
     };
 
+    ## TODO: below looks sus!
     # Completely disable all system checks to prevent TCC reset
     checks = lib.mkForce {};
   };
 
-  # Enhanced Security Configuration for Darwin
-  security.pam.services = {
-    # Enable Touch ID for sudo operations (Darwin-specific)
-    sudo_local.touchIdAuth = true;
-  };
-
+  ## TODO: Why is this not in the platforms/darwin/environment.nix?
   # Set Darwin configuration path (Darwin-specific)
   environment.darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
 }

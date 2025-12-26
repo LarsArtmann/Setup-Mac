@@ -7,7 +7,6 @@
   imports = [
     ./programs/fish.nix
     ./programs/starship.nix
-    # ./programs/crush.nix  # REMOVED - crush is now installed as package, not module
     ./programs/activitywatch.nix
     ./programs/tmux.nix
   ];
@@ -49,16 +48,9 @@
       "$HOME/.bun/bin"
     ];
 
-    # Core cross-platform packages
+    # Core cross-platform packages (only packages NOT in base.nix)
     packages = with pkgs; [
-      git
-      curl
-      wget
-      ripgrep
-      fd
-      bat
-      jq
-      starship
+      # Git, curl, wget, ripgrep, fd, bat, jq, starship are in base.nix
     ];
   };
 }

@@ -1,3 +1,5 @@
+## TODO: very much not a fan of this file at all! It should be all moved into the other config files and then deleted.
+
 # Test minimal Darwin configuration
 {pkgs, ...}: {
   # Basic system configuration
@@ -6,7 +8,6 @@
   # Basic packages
   environment.systemPackages = with pkgs; [
     git
-    neovim
   ];
 
   # Enable shells

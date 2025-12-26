@@ -10,6 +10,7 @@ _: {
       nixbuild = "darwin-rebuild build --flake .";
       nixcheck = "darwin-rebuild check --flake .";
     };
+    ## TODO: Is there any way to make these safer, e.g. at least make sure carapace,starship and co are properly installed via nix!?
     shellInit = ''
       # PERFORMANCE: Disable greeting for faster startup
       set -g fish_greeting

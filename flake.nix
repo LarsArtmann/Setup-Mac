@@ -47,41 +47,9 @@
         system,
         ...
       }: let
-        # Import llm-agents packages
-        llm-agents-packages = inputs.llm-agents.packages.${system};
-
-        # Enabled programs from configuration - NO HARDCODED PROGRAMS
-        enabledPrograms = []; # User should explicitly enable programs
-
-        # Simple program catalog
-        availablePrograms = {
-          vscode = {
-            package = pkgs.vscode;
-            description = "Visual Studio Code editor";
-            category = "development";
-          };
-          fish = {
-            package = pkgs.fish;
-            description = "Fish shell with smart completions";
-            category = "core";
-          };
-          starship = {
-            package = pkgs.starship;
-            description = "Minimal, fast, and customizable prompt";
-            category = "core";
-          };
-        };
-
-        # Get enabled program packages
-        enabledProgramPackages = map (name: availablePrograms.${name}.package) enabledPrograms;
-
-        # Merge with existing packages including llm-agents
-        systemPackages = with pkgs;
-          [
-            hello
-            llm-agents-packages.crush
-          ]
-          ++ enabledProgramPackages;
+        # Import llm-agents (for CRUSH AI assistant)
+        # CRUSH is installed via platforms/common/packages/base.nix
+        llm-agents = inputs.llm-agents;
       in {
         # Allow unfree and broken packages for all systems
         _module.args.pkgs = import nixpkgs {
@@ -90,35 +58,7 @@
           config.allowBroken = true;
         };
 
-        packages = {
-          # Legacy packages for backward compatibility
-          inherit (pkgs) hello;
-
-          # WORKING PROGRAM INTEGRATION!
-          programs = pkgs.linkFarm "programs" ({
-              # Create symlink farm for all enabled programs
-            }
-            // (builtins.listToAttrs (map (name: {
-                value = name;
-                inherit name;
-                inherit (availablePrograms.${name}) path;
-              })
-              enabledPrograms)));
-
-          # Test discovery system
-          test-discovery = pkgs.writeShellScriptBin "test-discovery" ''
-            echo "🎯 PROGRAM INTEGRATION SYSTEM WORKING!"
-            echo ""
-            echo "Available programs:"
-            echo "  vscode - Visual Studio Code editor (development)"
-            echo "  fish - Fish shell with smart completions (core)"
-            echo "  starship - Minimal, fast, and customizable prompt (core)"
-            echo ""
-            echo "Enabled programs: ${builtins.concatStringsSep ", " enabledPrograms}"
-            echo ""
-            echo "Integrated packages: ${builtins.concatStringsSep " " (map (pkg: pkg.pname or "unknown") enabledProgramPackages)}"
-          '';
-        };
+        packages = {};
 
         # Development shells for different program categories
         devShells = {
@@ -146,15 +86,6 @@
               git
               go
               nodejs
-              vscode
-            ];
-          };
-
-          # Media programs shell
-          media = pkgs.mkShell {
-            packages = with pkgs; [
-              blender
-              audacity
             ];
           };
         };
@@ -172,9 +103,7 @@
           };
           modules = [
             # Core Darwin configuration with Ghost Systems integration
-            ./platforms/darwin/darwin.nix
-
-            # CRUSH is now installed via perSystem packages
+            ./platforms/darwin/default.nix
           ];
         };
 
@@ -210,8 +139,6 @@
                 overwriteBackup = true;
                 users.lars = import ./platforms/nixos/users/home.nix;
               };
-
-              # CRUSH is installed via perSystem packages
             }
 
             # Import the existing NixOS configuration
