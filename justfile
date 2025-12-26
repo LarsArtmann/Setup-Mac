@@ -894,31 +894,6 @@ help:
 # Wrapper Management Commands
 # =========================
 
-# Validate wrapper syntax and structure
-validate-wrappers:
-    @echo "🔍 Validating wrapper syntax..."
-    @./scripts/validate-wrappers.sh
-
-# Test wrapper functionality and integration
-test-wrappers:
-    @echo "🧪 Testing wrapper functionality..."
-    @./scripts/test-wrappers.sh
-
-# List all available wrappers
-list-wrappers:
-    @echo "📋 Listing available wrappers..."
-    @./scripts/list-wrappers.sh
-
-# Migrate traditional dotfiles to wrapper system
-migrate-to-wrappers:
-    @echo "🔄 Migrating to wrapper system..."
-    @./scripts/migrate-to-wrappers.sh
-
-# Deployment verification for wrapper system
-deployment-verify:
-    @echo "✅ Verifying wrapper deployment..."
-    @./scripts/deployment-verify.sh
-
 # Comprehensive system health dashboard
 health-dashboard:
     @echo "🏥 Launching comprehensive health dashboard..."
