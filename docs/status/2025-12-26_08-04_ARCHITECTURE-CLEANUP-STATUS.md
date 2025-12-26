@@ -1,8 +1,8 @@
 # 🎯 SETUP-MAC COMPREHENSIVE STATUS REPORT
 
-**Date:** 2025-12-26  
-**Time:** 08:04 CET  
-**Report Type:** Post-Cleanup Architecture Assessment  
+**Date:** 2025-12-26
+**Time:** 08:04 CET
+**Report Type:** Post-Cleanup Architecture Assessment
 **Git Commit:** 18e49ac - "refactor: remove experimental code and consolidate darwin architecture"
 
 ---
@@ -20,7 +20,7 @@
 
 ### Critical Findings
 - 🔴 **1,074 lines** of wrappers code - NEVER IMPORTED
-- 🔴 **542 lines** of adapters code - NEVER IMPORTED  
+- 🔴 **542 lines** of adapters code - NEVER IMPORTED
 - 🔴 **1,210 lines** of Ghost Systems - 90% DEAD
 - 🟡 **3 duplicate configurations** (ActivityWatch, Fish, Starship)
 - 🟡 **10 TODO comments** needing resolution
@@ -38,7 +38,7 @@
 ## ✅ A) FULLY DONE (100%)
 
 ### 1. Experimental Program Catalog System Removal
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** REMOVED 298 LINES of broken/experimental code
 
 **Changes Made:**
@@ -63,7 +63,7 @@
 ---
 
 ### 2. Darwin Architecture Consolidation
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** RESOLVED dual entry points, ELIMINATED confusion
 
 **Changes Made:**
@@ -92,7 +92,7 @@
 ---
 
 ### 3. Unused DevShells Cleanup
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** REDUCED devShells from 4 to 3, removed unused tools
 
 **Changes Made:**
@@ -113,7 +113,7 @@
 ---
 
 ### 4. Duplicate Package Removal
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** ELIMINATED duplication across system and home
 
 **Changes Made:**
@@ -138,7 +138,7 @@
 ---
 
 ### 5. Dead File Cleanup
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** REMOVED 6 FILES, 720 LINES TOTAL
 
 **Files Deleted:**
@@ -158,7 +158,7 @@
 ---
 
 ### 6. Security Configuration Extraction
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** BETTER separation of concerns
 
 **Changes Made:**
@@ -180,7 +180,7 @@
 ---
 
 ### 7. File Rename for Clarity
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** BETTER naming conventions
 
 **Changes Made:**
@@ -196,7 +196,7 @@
 ---
 
 ### 8. Comment and Documentation Cleanup
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** FIXED all misleading comments
 
 **Changes Made:**
@@ -218,7 +218,7 @@
 ---
 
 ### 9. Flake Verification
-**Status:** ✅ COMPLETE  
+**Status:** ✅ COMPLETE
 **Impact:** CONFIGURATION VALIDATED
 
 **Changes Made:**
@@ -244,7 +244,7 @@
 ## ⚠️ B) PARTIALLY DONE (30-80%)
 
 ### 1. Darwin Environment Configuration
-**Status:** ⚠️ PARTIAL (80% done)  
+**Status:** ⚠️ PARTIAL (80% done)
 **Issue:** TODOs in environment variables
 
 **Current State:**
@@ -277,7 +277,7 @@ environment.systemPackages = with pkgs; [
 ---
 
 ### 2. Type Safety Framework (Ghost Systems)
-**Status:** ⚠️ PARTIAL (10% used, 90% dead)  
+**Status:** ⚠️ PARTIAL (10% used, 90% dead)
 **Issue:** Massive framework barely used, 1,210 lines
 
 **Current State:**
@@ -333,7 +333,7 @@ But then... it was NEVER INTEGRATED. Just exists in the codebase, doing nothing.
 ---
 
 ### 3. Darwin Test Configuration
-**Status:** ⚠️ PARTIAL (needs cleanup)  
+**Status:** ⚠️ PARTIAL (needs cleanup)
 **Issue:** `test-darwin.nix` should be merged/deleted
 
 **Current State:**
@@ -370,7 +370,7 @@ But then... it was NEVER INTEGRATED. Just exists in the codebase, doing nothing.
 ---
 
 ### 4. Shell Aliases Safety
-**Status:** ⚠️ PARTIAL (needs improvement)  
+**Status:** ⚠️ PARTIAL (needs improvement)
 **Issue:** Fish aliases in `programs/shells.nix` lack dependency checks
 
 **Current State:**
@@ -417,7 +417,7 @@ shellInit = ''
 ---
 
 ### 5. Darwin Activation Configuration
-**Status:** ⚠️ PARTIAL (2 TODOs)  
+**Status:** ⚠️ PARTIAL (2 TODOs)
 **Issue:** 2 suspicious patterns identified
 
 **Current State:**
@@ -482,7 +482,7 @@ in {
 ---
 
 ### 6. Nixpkgs Configuration Location
-**Status:** ⚠️ PARTIAL (needs decision)  
+**Status:** ⚠️ PARTIAL (needs decision)
 **Issue:** Darwin-specific nixpkgs config location
 
 **Current State:**
@@ -529,8 +529,8 @@ in {
 ## 🚫 C) NOT STARTED (0%)
 
 ### 1. Wrappers Directory Dead Code
-**Status:** 🚫 NOT STARTED  
-**Impact:** 1,074 LINES of completely dead code  
+**Status:** 🚫 NOT STARTED
+**Impact:** 1,074 LINES of completely dead code
 **Risk:** Maintenance confusion, wasted repository space
 
 **Dead Code Structure:**
@@ -628,8 +628,8 @@ wrapWithConfig = {
 ---
 
 ### 2. Adapters Directory Dead Code
-**Status:** 🚫 NOT STARTED  
-**Impact:** 542 LINES of completely dead code  
+**Status:** 🚫 NOT STARTED
+**Impact:** 542 LINES of completely dead code
 **Risk:** Maintenance confusion, false sense of capability
 
 **Dead Code Structure:**
@@ -683,8 +683,8 @@ Based on code inspection:
 ---
 
 ### 3. Duplicate ActivityWatch Configuration
-**Status:** 🚫 NOT STARTED  
-**Impact:** Confusion about canonical configuration  
+**Status:** 🚫 NOT STARTED
+**Impact:** Confusion about canonical configuration
 **Risk:** Multiple configs may diverge
 
 **Three Config Locations:**
@@ -768,8 +768,8 @@ dotfiles/activitywatch/
 ---
 
 ### 4. Scripts Integration
-**Status:** 🚫 NOT STARTED  
-**Impact:** 11,468 lines of imperative scripts outside Nix  
+**Status:** 🚫 NOT STARTED
+**Impact:** 11,468 lines of imperative scripts outside Nix
 **Risk:** Imperative vs Declarative conflict
 
 **Scripts Overview:**
@@ -846,8 +846,8 @@ scripts/ (11,468 lines total)
 ---
 
 ### 5. Dotfiles Directory Purpose
-**Status:** 🚫 NOT STARTED  
-**Impact:** Unclear purpose, potential conflict with Nix  
+**Status:** 🚫 NOT STARTED
+**Impact:** Unclear purpose, potential conflict with Nix
 **Risk:** Duplicate configurations, confusion
 
 **Current Structure:**
@@ -915,8 +915,8 @@ dotfiles/ (mixed Nix and traditional dotfiles)
 ---
 
 ### 6. Ghost Systems Framework Decision
-**Status:** 🚫 NOT STARTED  
-**Impact:** 1,210 lines of Ghost Systems code, 10% used  
+**Status:** 🚫 NOT STARTED
+**Impact:** 1,210 lines of Ghost Systems code, 10% used
 **Risk:** Architecture direction decision pending
 
 **Ghost Systems Framework (1,210 lines):**
@@ -1027,8 +1027,8 @@ We need to choose one of three paths (see Top #1 Question below):
 ---
 
 ### 7. Cross-Platform Configuration Sharing
-**Status:** 🚫 NOT STARTED  
-**Impact:** No shared configuration between Darwin and NixOS  
+**Status:** 🚫 NOT STARTED
+**Impact:** No shared configuration between Darwin and NixOS
 **Risk:** Duplication, platform drift
 
 **Current State:**
@@ -1117,7 +1117,7 @@ platforms/common/
 
 ## 💥 D) TOTALLY FUCKED UP (0%)
 
-**Status:** ✅ NO MAJOR ISSUES  
+**Status:** ✅ NO MAJOR ISSUES
 **Impact:** NONE - All critical issues resolved in recent commit
 
 ---
@@ -1743,46 +1743,46 @@ These are NOT "totally fucked up" but still need attention:
 ### 🔥 CRITICAL (Do This Week)
 
 #### 1. **Remove Wrappers Directory**
-**Impact:** 1,074 lines of dead code gone  
-**Effort:** 2 hours  
-**Action:** Delete `platforms/common/wrappers/` entirely  
-**Why:** Never imported, completely unreachable, massive dead code block  
+**Impact:** 1,074 lines of dead code gone
+**Effort:** 2 hours
+**Action:** Delete `platforms/common/wrappers/` entirely
+**Why:** Never imported, completely unreachable, massive dead code block
 **Priority:** CRITICAL
 
 ---
 
 #### 2. **Remove Adapters Directory**
-**Impact:** 542 lines of dead code gone  
-**Effort:** 1 hour  
-**Action:** Delete `platforms/common/adapters/` entirely  
-**Why:** Never imported, completely unreachable, false capability  
+**Impact:** 542 lines of dead code gone
+**Effort:** 1 hour
+**Action:** Delete `platforms/common/adapters/` entirely
+**Why:** Never imported, completely unreachable, false capability
 **Priority:** CRITICAL
 
 ---
 
 #### 3. **Decide on Ghost Systems Framework**
-**Impact:** Resolve 1,210 lines of partial framework  
-**Effort:** 2-20 hours (depends on decision)  
-**Action:** See Top #1 Question below - choose A, B, or C  
-**Why:** Fundamental architectural direction decision  
+**Impact:** Resolve 1,210 lines of partial framework
+**Effort:** 2-20 hours (depends on decision)
+**Action:** See Top #1 Question below - choose A, B, or C
+**Why:** Fundamental architectural direction decision
 **Priority:** CRITICAL
 
 ---
 
 #### 4. **Consolidate ActivityWatch Configuration**
-**Impact:** Single source of truth for AW  
-**Effort:** 2-3 hours  
-**Action:** Choose Nix module, remove wrappers+scripts  
-**Why:** 3 config locations causing confusion  
+**Impact:** Single source of truth for AW
+**Effort:** 2-3 hours
+**Action:** Choose Nix module, remove wrappers+scripts
+**Why:** 3 config locations causing confusion
 **Priority:** CRITICAL
 
 ---
 
 #### 5. **Remove test-darwin.nix**
-**Impact:** Clean up temporary file  
-**Effort:** 30 minutes  
-**Action:** Merge content, delete file  
-**Why:** TODO comment asks for deletion  
+**Impact:** Clean up temporary file
+**Effort:** 30 minutes
+**Action:** Merge content, delete file
+**Why:** TODO comment asks for deletion
 **Priority:** CRITICAL
 
 ---
@@ -1790,91 +1790,91 @@ These are NOT "totally fucked up" but still need attention:
 ### 🟡 HIGH PRIORITY (Do This Month)
 
 #### 6. **Decide: Wrappers vs Programs Approach**
-**Impact:** Single configuration methodology  
-**Effort:** 4 hours  
-**Action:** Choose programs pattern, delete wrappers  
-**Why:** Need single approach, not two competing  
+**Impact:** Single configuration methodology
+**Effort:** 4 hours
+**Action:** Choose programs pattern, delete wrappers
+**Why:** Need single approach, not two competing
 **Priority:** HIGH
 
 ---
 
 #### 7. **Move nixpkgs Configs to Common/**
-**Impact:** Shared unfree settings  
-**Effort:** 2 hours  
-**Action:** Create `platforms/common/nixpkgs.nix`  
-**Why:** TODO comment asks for this, reduce duplication  
+**Impact:** Shared unfree settings
+**Effort:** 2 hours
+**Action:** Create `platforms/common/nixpkgs.nix`
+**Why:** TODO comment asks for this, reduce duplication
 **Priority:** HIGH
 
 ---
 
 #### 8. **Review and Fix System Checks**
-**Impact:** Address suspicious pattern  
-**Effort:** 2 hours  
-**Action:** Evaluate `checks = lib.mkForce {}`, find safer approach  
-**Why:** TODO: "below looks sus!", dangerous pattern  
+**Impact:** Address suspicious pattern
+**Effort:** 2 hours
+**Action:** Evaluate `checks = lib.mkForce {}`, find safer approach
+**Why:** TODO: "below looks sus!", dangerous pattern
 **Priority:** HIGH
 
 ---
 
 #### 9. **Consolidate Dotfiles with Nix**
-**Impact:** Choose single management approach  
-**Effort:** 4-6 hours  
-**Action:** Audit, decide (A/B/C), implement, test  
-**Why:** Unclear purpose, potential conflicts  
+**Impact:** Choose single management approach
+**Effort:** 4-6 hours
+**Action:** Audit, decide (A/B/C), implement, test
+**Why:** Unclear purpose, potential conflicts
 **Priority:** HIGH
 
 ---
 
 #### 10. **Create Shared System Configurations**
-**Impact:** Cross-platform system settings  
-**Effort:** 6-8 hours  
-**Action:** Create `platforms/common/system/`, migrate configs  
-**Why:** Reduce duplication, prevent drift  
+**Impact:** Cross-platform system settings
+**Effort:** 6-8 hours
+**Action:** Create `platforms/common/system/`, migrate configs
+**Why:** Reduce duplication, prevent drift
 **Priority:** HIGH
 
 ---
 
 #### 11. **Convert ActivityWatch Scripts to Nix**
-**Impact:** Declarative AW configuration  
-**Effort:** 2 hours  
-**Action:** Migrate scripts to Nix module, delete scripts  
-**Why:** Imperative vs declarative conflict  
+**Impact:** Declarative AW configuration
+**Effort:** 2 hours
+**Action:** Migrate scripts to Nix module, delete scripts
+**Why:** Imperative vs declarative conflict
 **Priority:** HIGH
 
 ---
 
 #### 12. **Convert Wallpaper Scripts to Nix**
-**Impact:** Declarative wallpaper configuration  
-**Effort:** 3 hours  
-**Action:** Migrate scripts to Nix module  
-**Why:** Complex setup should be declarative  
+**Impact:** Declarative wallpaper configuration
+**Effort:** 3 hours
+**Action:** Migrate scripts to Nix module
+**Why:** Complex setup should be declarative
 **Priority:** HIGH
 
 ---
 
 #### 13. **Consolidate Starship Configuration**
-**Impact:** Single Starship config location  
-**Effort:** 1 hour  
-**Action:** Keep programs, delete wrappers+dotfiles  
-**Why:** 3 config locations, wrappers dead  
+**Impact:** Single Starship config location
+**Effort:** 1 hour
+**Action:** Keep programs, delete wrappers+dotfiles
+**Why:** 3 config locations, wrappers dead
 **Priority:** HIGH
 
 ---
 
 #### 14. **Consolidate Fish Configuration**
-**Impact:** Single Fish config location  
-**Effort:** 2 hours  
-**Action:** Keep programs, delete wrappers, add safety checks  
-**Why:** 2 config locations, wrappers dead, TODO asks  
+**Impact:** Single Fish config location
+**Effort:** 2 hours
+**Action:** Keep programs, delete wrappers, add safety checks
+**Why:** 2 config locations, wrappers dead, TODO asks
 **Priority:** HIGH
 
 ---
 
 #### 15. **Convert Sublime Scripts to Nix**
-**Impact:** Declarative Sublime configuration  
-**Effort:** 2 hours  
-**Action:** Migrate to Nix or delete if unused  
-**Why:** Sync script seems unnecessary  
+**Impact:** Declarative Sublime configuration
+**Effort:** 2 hours
+**Action:** Migrate to Nix or delete if unused
+**Why:** Sync script seems unnecessary
 **Priority:** HIGH
 
 ---
@@ -1882,91 +1882,91 @@ These are NOT "totally fucked up" but still need attention:
 ### 🟢 MEDIUM PRIORITY (Do This Quarter)
 
 #### 16. **Create Shared Security Module**
-**Impact:** Common security configurations  
-**Effort:** 3 hours  
-**Action:** Create `platforms/common/security.nix`  
-**Why:** Shared best practices, reduced duplication  
+**Impact:** Common security configurations
+**Effort:** 3 hours
+**Action:** Create `platforms/common/security.nix`
+**Why:** Shared best practices, reduced duplication
 **Priority:** MEDIUM
 
 ---
 
 #### 17. **Create Shared Networking Module**
-**Impact:** Common networking configurations  
-**Effort:** 3 hours  
-**Action:** Create `platforms/common/networking.nix`  
-**Why:** Shared utilities, DNS configs  
+**Impact:** Common networking configurations
+**Effort:** 3 hours
+**Action:** Create `platforms/common/networking.nix`
+**Why:** Shared utilities, DNS configs
 **Priority:** MEDIUM
 
 ---
 
 #### 18. **Fix Shell Alias Safety**
-**Impact:** Prevent broken aliases  
-**Effort:** 1 hour  
-**Action:** Add validation to Fish aliases  
-**Why:** TODO asks, prevent broken commands  
+**Impact:** Prevent broken aliases
+**Effort:** 1 hour
+**Action:** Add validation to Fish aliases
+**Why:** TODO asks, prevent broken commands
 **Priority:** MEDIUM
 
 ---
 
 #### 19. **Clarify BROWSER Variable**
-**Impact:** Clear browser configuration  
-**Effort:** 30 minutes  
-**Action:** Decide Chrome vs Helium, update  
-**Why:** TODO asks, remove ambiguity  
+**Impact:** Clear browser configuration
+**Effort:** 30 minutes
+**Action:** Decide Chrome vs Helium, update
+**Why:** TODO asks, remove ambiguity
 **Priority:** MEDIUM
 
 ---
 
 #### 20. **Clarify TERMINAL Variable**
-**Impact:** Clear terminal configuration  
-**Effort:** 30 minutes  
-**Action:** Decide env var vs module, implement  
-**Why:** TODO asks, remove ambiguity  
+**Impact:** Clear terminal configuration
+**Effort:** 30 minutes
+**Action:** Decide env var vs module, implement
+**Why:** TODO asks, remove ambiguity
 **Priority:** MEDIUM
 
 ---
 
 #### 21. **Merge DevShells**
-**Impact:** Simplify development workflow  
-**Effort:** 1 hour  
-**Action:** Merge default+system-config  
-**Why:** Reduce from 3 to 2 devShells  
+**Impact:** Simplify development workflow
+**Effort:** 1 hour
+**Action:** Merge default+system-config
+**Why:** Reduce from 3 to 2 devShells
 **Priority:** MEDIUM
 
 ---
 
 #### 22. **Review and Clean Up TODO Comments**
-**Impact:** Resolve 10 TODO comments  
-**Effort:** 4 hours  
-**Action:** Address each TODO, remove comments  
-**Why:** Reduce technical debt, better clarity  
+**Impact:** Resolve 10 TODO comments
+**Effort:** 4 hours
+**Action:** Address each TODO, remove comments
+**Why:** Reduce technical debt, better clarity
 **Priority:** MEDIUM
 
 ---
 
 #### 23. **Fix environment.darwinConfig Location**
-**Impact:** Better organization  
-**Effort:** 30 minutes  
-**Action:** Move to environment.nix if appropriate  
-**Why:** TODO asks, better structure  
+**Impact:** Better organization
+**Effort:** 30 minutes
+**Action:** Move to environment.nix if appropriate
+**Why:** TODO asks, better structure
 **Priority:** MEDIUM
 
 ---
 
 #### 24. **Document Architecture Decisions**
-**Impact:** Better onboarding and maintenance  
-**Effort:** 4 hours  
-**Action:** Create ARCHITECTURE.md documentation  
-**Why:** Onboarding, maintenance, rationale  
+**Impact:** Better onboarding and maintenance
+**Effort:** 4 hours
+**Action:** Create ARCHITECTURE.md documentation
+**Why:** Onboarding, maintenance, rationale
 **Priority:** MEDIUM
 
 ---
 
 #### 25. **Create Migration Guide**
-**Impact:** Documentation for breaking changes  
-**Effort:** 2 hours  
-**Action:** Document changes, migration steps, rollback  
-**Why:** Breaking changes, user-friendly migrations  
+**Impact:** Documentation for breaking changes
+**Effort:** 2 hours
+**Action:** Document changes, migration steps, rollback
+**Why:** Breaking changes, user-friendly migrations
 **Priority:** MEDIUM
 
 ---
@@ -1974,36 +1974,36 @@ These are NOT "totally fucked up" but still need attention:
 ### 🔵 LOW PRIORITY (Do This Year)
 
 #### 26. **Create Getting Started Guide**
-**Impact:** Easier to get started  
-**Effort:** 3 hours  
+**Impact:** Easier to get started
+**Effort:** 3 hours
 **Priority:** LOW
 
 ---
 
 #### 27. **Add Integration Tests**
-**Impact:** Ensure critical modules work  
-**Effort:** 8 hours  
+**Impact:** Ensure critical modules work
+**Effort:** 8 hours
 **Priority:** LOW
 
 ---
 
 #### 28. **Performance Benchmarking**
-**Impact:** Baseline current state  
-**Effort:** 2 hours  
+**Impact:** Baseline current state
+**Effort:** 2 hours
 **Priority:** LOW
 
 ---
 
 #### 29. **Automate Script Cleanup**
-**Impact:** Identify dead scripts  
-**Effort:** 2 hours  
+**Impact:** Identify dead scripts
+**Effort:** 2 hours
 **Priority:** LOW
 
 ---
 
 #### 30. **Security Audit**
-**Impact:** Verify security configurations  
-**Effort:** 4 hours  
+**Impact:** Verify security configurations
+**Effort:** 4 hours
 **Priority:** LOW
 
 ---
@@ -2503,6 +2503,6 @@ If everything works without Ghost Systems, why do we need it?
 
 **End of Comprehensive Status Report**
 
-*Generated: 2025-12-26 08:04 CET*  
-*Report Author: Crush AI Assistant*  
+*Generated: 2025-12-26 08:04 CET*
+*Report Author: Crush AI Assistant*
 *Project: Setup-Mac - Cross-Platform Nix Configuration*

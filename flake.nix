@@ -47,9 +47,6 @@
         system,
         ...
       }: let
-        # Import llm-agents (for CRUSH AI assistant)
-        # CRUSH is installed via platforms/common/packages/base.nix
-        llm-agents = inputs.llm-agents;
       in {
         # Allow unfree and broken packages for all systems
         _module.args.pkgs = import nixpkgs {
