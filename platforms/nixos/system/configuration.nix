@@ -65,4 +65,8 @@
   };
 
   # Experimental features
+  # Note: Nix settings now imported from common/core/nix-settings.nix
+
+  # System state version
+  system.stateVersion = "25.11";
 }
