@@ -23,11 +23,11 @@
   # NixOS-specific packages
   home.packages = with pkgs; [
     # GUI Tools
-    pavucontrol # Audio control
-    rofi # Launcher (Secondary)
+    pavucontrol # Audio control (user-level access for audio settings)
 
     # System Tools
-    xdg-utils
+    # Note: rofi moved to multi-wm.nix for system-wide availability
+    # Note: xdg-utils moved to base.nix for cross-platform consistency
   ];
 
   # XDG Directories (Linux specific)

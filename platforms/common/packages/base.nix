@@ -76,6 +76,9 @@
 
     # Clipboard management
     cliphist # Clipboard history manager for Wayland
+
+    # Desktop integration (cross-platform)
+    xdg-utils # XDG desktop utilities for both platforms
   ];
 
   # Development tools (platform-agnostic)

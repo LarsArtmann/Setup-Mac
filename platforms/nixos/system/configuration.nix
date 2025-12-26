@@ -53,11 +53,8 @@
   # AMD GPU Support - imported from hardware module
   #
   # Font configuration (cross-platform)
-  fonts.packages = with pkgs; [
-    # Monospace fonts
-    jetbrains-mono
-  ];
-
+  # Note: Font packages are now imported from common/packages/fonts.nix
+  # to avoid duplication across platforms
   fonts.fontconfig.defaultFonts = {
     monospace = ["JetBrains Mono"];
     sansSerif = ["DejaVu Sans"];

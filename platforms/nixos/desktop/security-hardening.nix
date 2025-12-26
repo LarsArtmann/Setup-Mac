@@ -35,7 +35,7 @@
   environment.systemPackages = with pkgs; [
     # Authentication and portal support
     polkit_gnome
-    xdg-utils
+    # Note: xdg-utils moved to base.nix for cross-platform consistency
     gnome-keyring
 
     # Authentication & Access Control
