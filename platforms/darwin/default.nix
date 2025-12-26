@@ -10,6 +10,7 @@
     ./system/settings.nix
     ./environment.nix
     ../common/packages/base.nix
+    ../common/packages/fonts.nix
   ];
 
   ## TODO: Should we move these nixpkgs configs to ../common/?
@@ -17,10 +18,5 @@
   nixpkgs.config = {
     allowUnfree = true;
     allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
-  };
-
-  # Font configuration (cross-platform)
-  fonts = {
-    packages = [pkgs.jetbrains-mono];
   };
 }
