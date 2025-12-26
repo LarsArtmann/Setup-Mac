@@ -1,10 +1,6 @@
 # Import common Fish configuration with platform-specific overrides
 {lib, ...}: {
-  imports = [
-    ../../common/programs/fish.nix
-    ../../common/programs/starship.nix
-    ../../common/programs/tmux.nix
-  ];
+  imports = [../../common/programs/fish.nix];
 
   # Override platform aliases with Darwin-specific ones
   programs.fish.shellAliases = lib.mkAfter {

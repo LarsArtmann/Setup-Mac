@@ -73,7 +73,4 @@
       bind -n WheelDownPane if-shell -F -t "#{pane_in_mode}" "send -M" "copy-mode -e"
     '';
   };
-
-  # Ensure tmux-resurrect directory exists
-  home.file.".local/share/tmux/resurrect/.keep".text = "";
 }
