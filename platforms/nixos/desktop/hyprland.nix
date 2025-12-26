@@ -307,7 +307,7 @@
     kitty # Terminal
     ghostty # Modern terminal emulator
     # kdePackages.dolphin moved to multi-wm.nix (available system-wide)
-    rofi # App launcher (wayland support included)
+    # rofi moved to multi-wm.nix (available system-wide)
 
     # Hyprland Ecosystem - Essential tools
     hyprpaper # Wallpaper utility (official)
@@ -318,21 +318,21 @@
     hyprpolkitagent # Modern polkit agent for Hyprland
 
     # Status Bar & Notifications
-    waybar # Status bar
+    # waybar moved to multi-wm.nix (available system-wide)
     dunst # Notifications
     libnotify # Notification library
 
     # Clipboard & Utilities
     # wl-clipboard moved to multi-wm.nix (available system-wide)
-    cliphist # Clipboard history
+    # cliphist moved to base.nix (available system-wide)
 
     # Animated wallpapers (optional but cool)
-    swww # Animated wallpapers with transitions
-    imagemagick # Image manipulation for wallpaper management
+    # swww moved to base.nix (available system-wide)
+    # imagemagick moved to base.nix (available system-wide)
 
     # System Monitoring (GPU tools for Hyprland background terminals)
-    radeontop # AMD GPU specific monitor (CLI, lightweight)
-    amdgpu_top # Advanced AMD GPU monitoring (CLI, lightweight)
+    # radeontop moved to monitoring.nix (available system-wide)
+    # amdgpu_top moved to hardware/amd-gpu.nix (available system-wide)
     # btop, nvtopPackages.amd moved to monitoring.nix
 
     # Additional useful tools

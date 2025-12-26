@@ -56,6 +56,7 @@
     # System monitoring
     bottom
     procs
+    btop
 
     # File utilities
     sd # Modern find and replace
