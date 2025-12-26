@@ -1,7 +1,7 @@
-{config, pkgs, ...}: {
+{config, pkgs, lib, ...}: {
   # Import common Home Manager modules
   imports = [
-    ../../common/home-base.nix
+    ../common/home-base.nix
   ];
 
   # Darwin-specific Home Manager overrides

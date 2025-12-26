@@ -1,4 +1,4 @@
-{lib, pkgs, ...}: {
+{lib, pkgs, config, ...}: {
   # Import Darwin-specific system configurations
   imports = [
     ./networking/default.nix
@@ -17,5 +17,11 @@
   nixpkgs.config = {
     allowUnfree = true;
     allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
+  };
+
+  # Define users for Home Manager (workaround for nix-darwin/common.nix import issue)
+  users.users.lars = {
+    name = "lars";
+    home = "/Users/lars";
   };
 }

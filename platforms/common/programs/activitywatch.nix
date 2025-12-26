@@ -1,7 +1,8 @@
-{pkgs, ...}: {
-  # ActivityWatch Configuration (Cross-Platform)
+{pkgs, config, ...}: {
+  # ActivityWatch Configuration (Linux only - NixOS)
+  # ActivityWatch does not support Darwin (macOS) - only Linux platforms
   services.activitywatch = {
-    enable = true;
+    enable = pkgs.stdenv.isLinux;
     package = pkgs.activitywatch;
     watchers = {
       # Enable AFK watcher (works on both platforms)
