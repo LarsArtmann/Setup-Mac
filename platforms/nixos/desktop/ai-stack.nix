@@ -1,12 +1,8 @@
 {pkgs, ...}: {
   # AMD ROCm configuration for AI acceleration
   # Note: GPU hardware is configured in ../hardware/amd-gpu.nix
-  environment.variables = {
-    HIP_VISIBLE_DEVICES = "0";
-    ROCM_PATH = "${pkgs.rocmPackages.rocm-runtime}";
-    HSA_OVERRIDE_GFX_VERSION = "11.0.0"; # For RDNA3
-    PYTORCH_ROCM_ARCH = "gfx1100"; # For Ryzen AI Max+ 395
-  };
+  # Note: AI environment variables moved to Home Manager (user-level)
+  # (for Ollama service running as user)
 
   # Ollama service for AI models
   services.ollama = {

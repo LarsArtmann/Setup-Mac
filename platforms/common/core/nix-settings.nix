@@ -20,33 +20,20 @@
       substituters = [
         "https://cache.nixos.org/"
         "https://nix-community.cachix.org"
+        "https://hyprland.cachix.org"
       ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
         "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       ];
       warn-dirty = false;
     };
 
-    # Enhanced garbage collection
-    gc = {
-      automatic = true;
-      interval = {
-        Hour = 2;
-        Minute = 30;
-      }; # Run at 2:30 AM
-      options = "--delete-older-than 7d --max-freed 5G";
-    };
-
-    # Enhanced store optimization
-    optimise = {
-      automatic = true;
-      interval = {
-        Weekday = 7;
-        Hour = 3;
-        Minute = 0;
-      }; # Weekly on Sunday at 3 AM
-    };
+    # Note: Garbage collection and optimization handled via systemd timers
+    # Automatic GC: nix-collect-garbage -d
+    # Manual optimization: nix-store --optimize
+    # These can be automated via systemd timers if needed
 
     # Additional Nix configuration for robustness
     checkConfig = true;
@@ -84,6 +71,8 @@
     };
   };
 
-  # Time zone configuration (platform-agnostic)
-  time.timeZone = null; # Let system manage based on location
+  # Note: Time zone configuration is platform-specific
+  # NixOS: platforms/nixos/system/networking.nix
+  # Darwin: Use system location services
+  # (Do not set here to avoid conflicts)
 }

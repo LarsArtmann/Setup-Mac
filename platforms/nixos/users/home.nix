@@ -10,6 +10,12 @@
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
+
+    # AI/ML environment variables (user-level for Ollama service)
+    HIP_VISIBLE_DEVICES = "0";
+    ROCM_PATH = "${pkgs.rocmPackages.rocm-runtime}";
+    HSA_OVERRIDE_GFX_VERSION = "11.0.0";
+    PYTORCH_ROCM_ARCH = "gfx1100";
   };
 
   # NixOS-specific Fish shell overrides

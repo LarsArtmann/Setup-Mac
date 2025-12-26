@@ -9,6 +9,8 @@
     ./networking.nix
     ../services/ssh.nix
     ../hardware/amd-gpu.nix
+    # Import common Nix settings for consistent configuration
+    ../../common/core/nix-settings.nix
     # Desktop modules - reorganized for better separation of concerns
     ../desktop/hyprland-system.nix
     ../desktop/display-manager.nix
@@ -48,28 +50,12 @@
   programs.fish.enable = true;
 
   # AMD GPU Support - imported from hardware module
-
-  # Font configuration is now handled by hyprland-system.nix
-  # to avoid duplication and maintain consistency
-
-  # Experimental features
-  nix.settings.experimental-features = ["nix-command" "flakes"];
-
-  # Binary caches - cache.nixos.org FIRST for standard packages, then Hyprland
-  nix.settings = {
-    substituters = ["https://cache.nixos.org" "https://hyprland.cachix.org"];
-    trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-    ];
-  };
-
-  # CRUSH AI assistant is now handled by crush.nix module
-
-  # Enable font configuration and install Nerd Fonts
+  # AMD GPU Support - imported from hardware module
+  #
+  # Font configuration (cross-platform)
   fonts.packages = with pkgs; [
-    # Nerd Fonts
-    pkgs.jetbrains-mono
+    # Monospace fonts
+    jetbrains-mono
   ];
 
   fonts.fontconfig.defaultFonts = {
@@ -78,6 +64,5 @@
     serif = ["DejaVu Serif"];
   };
 
-  # System state version
-  system.stateVersion = "25.11";
+  # Experimental features
 }

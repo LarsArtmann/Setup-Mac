@@ -18,4 +18,9 @@
     allowUnfree = true;
     allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
   };
+
+  # Font configuration (cross-platform)
+  fonts = {
+    packages = [pkgs.jetbrains-mono];
+  };
 }

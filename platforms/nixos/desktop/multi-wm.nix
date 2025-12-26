@@ -71,9 +71,9 @@
 
     # Authentication agents and XDG utilities moved to security-hardening.nix
     # - polkit_gnome, xdg-utils
-
-    # Audio utilities
-    pavucontrol
+    #
+    # Note: pavucontrol moved to home.nix (user-level access)
+    # (Audio utilities are user-accessible, not system-specific)
 
     # Screenshot tools
     grim
