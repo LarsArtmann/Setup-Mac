@@ -3,7 +3,6 @@
   imports = [
     ./networking/default.nix
     ./nix/settings.nix
-    ./programs/shells.nix
     ./security/pam.nix
     ./services/default.nix
     ./system/activation.nix

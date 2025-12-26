@@ -99,6 +99,20 @@
             inherit nur;
           };
           modules = [
+            # Import Home Manager module for Darwin
+            inputs.home-manager.darwinModules.home-manager
+
+            {
+              # Home Manager configuration
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = "backup";
+                overwriteBackup = true;
+                users.lars = import ./platforms/darwin/home.nix;
+              };
+            }
+
             # Core Darwin configuration with Ghost Systems integration
             ./platforms/darwin/default.nix
           ];
