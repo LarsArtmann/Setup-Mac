@@ -372,6 +372,51 @@ test-fast:
     nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Fast configuration test passed"
 
+# Deploy Home Manager configuration (same as switch, but named for clarity)
+deploy:
+    @echo "🚀 Deploying Home Manager configuration..."
+    @echo "ℹ️  Note: This requires sudo access"
+    @echo "ℹ️  Note: Open new terminal after deployment for shell changes to take effect"
+    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
+    @echo "✅ Home Manager deployment complete!"
+    @echo ""
+    @echo "🔄 Next steps:"
+    @echo "  1. Open new terminal window (required for shell changes)"
+    @echo "  2. Run: just verify"
+    @echo "  3. Run: just test"
+
+# Verify Home Manager installation and configuration
+verify:
+    @echo "🧪 Verifying Home Manager integration..."
+    ./scripts/test-home-manager.sh
+
+# Validate import paths and module structure
+validate: check-syntax check-imports
+    @echo "✅ All validation checks passed"
+
+check-syntax:
+    @echo "🔍 Checking syntax..."
+    nix --extra-experimental-features "nix-command flakes" flake check --no-build
+
+check-imports:
+    @echo "🔍 Checking import paths..."
+    @find platforms -name "*.nix" -exec grep -l "import" {} \;
+    @echo "✅ Import paths checked"
+
+# Rollback to previous generation
+rollback:
+    @echo "↩️  Rolling back to previous generation..."
+    @echo "ℹ️  Note: This requires sudo access"
+    sudo /run/current-system/sw/bin/darwin-rebuild switch --rollback
+    @echo "✅ Rollback complete!"
+    @echo ""
+    @echo "ℹ️  Note: Open new terminal window for shell changes to take effect"
+
+# List available generations
+list-generations:
+    @echo "📋 Listing available generations..."
+    /run/current-system/sw/bin/darwin-rebuild --list-generations
+
 # Show git status and recent commits
 status:
     @echo "📊 Repository Status"
