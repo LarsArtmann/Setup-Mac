@@ -29,19 +29,11 @@ in {
 
         echo "Updating Spotlight index for Nix applications..."
         mdimport "/Applications/Nix Apps"
-
-        # Reset TCC permissions gracefully - fail silently if not allowed
-        echo "Skipping TCC reset to avoid build failure - requires Full Disk Access"
-        # tccutil reset SystemPolicyAppBundles 2>/dev/null || echo "TCC reset skipped - requires Full Disk Access"
       '';
     };
-
-    ## TODO: below looks sus!
-    # Completely disable all system checks to prevent TCC reset
-    checks = lib.mkForce {};
   };
 
-  ## TODO: Why is this not in the platforms/darwin/environment.nix?
+  ## TODO: Why is this not in platforms/darwin/environment.nix?
   # Set Darwin configuration path (Darwin-specific)
   environment.darwinConfig = "$HOME/.nixpkgs/darwin-configuration.nix";
 }

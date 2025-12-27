@@ -18,7 +18,6 @@
     git-town # High-level Git workflow management
 
     # Essential editors
-    vim
     micro-full
 
     # Terminal emulator

@@ -8,14 +8,19 @@
     sandbox = true;
 
     # Add Darwin-specific paths to sandbox for compatibility
+    # FIXED: Added missing critical paths for builds to work correctly
     extra-sandbox-paths = [
-      "/dev"
-      "/System/Library/Frameworks"
-      "/System/Library/PrivateFrameworks"
-      "/usr/lib"
-      "/bin/sh"
-      "/bin/bash"
-      "/bin/zsh"
+      "/dev"                      # Device access (optional but useful)
+      "/System/Library/Frameworks"   # Core frameworks (Cocoa, Foundation, etc.)
+      "/System/Library/PrivateFrameworks"  # Private frameworks
+      "/usr/lib"                 # System libraries
+      "/bin/sh"                  # Shell interpreter
+      "/bin/bash"                # Bash interpreter
+      "/bin/zsh"                 # Zsh interpreter
+      "/private/tmp"             # Temporary build files (CRITICAL)
+      "/private/var/tmp"         # Persistent temp storage (CRITICAL)
+      "/usr/bin/env"             # Environment utility (CRITICAL)
+      # TODO: Do we need /var/?
     ];
   };
 }
