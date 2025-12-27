@@ -436,12 +436,6 @@ dev:
     @just test
     @echo "✅ Development checks complete"
 
-# Emergency rollback to previous generation
-rollback:
-    @echo "⚠️  Rolling back to previous generation..."
-    darwin-rebuild rollback
-    @echo "✅ Rollback complete"
-
 # Create private environment file for secrets
 env-private:
     @echo "🔒 Creating private environment file..."
