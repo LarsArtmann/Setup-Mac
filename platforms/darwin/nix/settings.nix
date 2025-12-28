@@ -11,7 +11,7 @@
     # COMPREHENSIVE: Based on research from 50+ nix-darwin configurations
     # Source: docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md
     # FIX: Removed /usr/include (doesn't exist on modern macOS aarch64-darwin)
-    # Development headers are in Xcode SDK at /Library/Developer/CommandLineTools/SDKs/
+    # FIX: Added Xcode SDK include path (required for building macOS packages)
     extra-sandbox-paths = [
       # === CORE SYSTEM PATHS (Essential for all builds) ===
       "/System/Library/Frameworks"       # Core frameworks (Cocoa, Foundation, AppKit, etc.)
@@ -19,6 +19,11 @@
       "/usr/lib"                        # System libraries (libSystem.B.dylib, etc.)
       # "/usr/include"  <-- REMOVED: Doesn't exist on modern macOS (causes build failures)
       "/usr/bin/env"                     # Environment utility (required by many build systems)
+
+      # === XCODE SDK PATHS (Required for macOS package builds) ===
+      "/Library/Developer/CommandLineTools" # Xcode Command Line Tools
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include" # System headers for C/C++ packages
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib" # System libraries
 
       # === TEMPORARY DIRECTORIES (Critical for builds) ===
       "/private/tmp"                     # Temporary build files
@@ -29,16 +34,12 @@
       "/bin/bash"                        # Bash shell
       "/bin/zsh"                         # Zsh shell (macOS default)
 
-      # === DEVELOPMENT TOOLS (Optional but recommended) ===
-      "/Library/Developer/CommandLineTools" # Xcode Command Line Tools (required for some native builds)
-      "/usr/local/lib"                    # Homebrew libraries (for mixed Nix/Homebrew setups)
-
       # === DESKTOP APPLICATIONS (For GUI apps and Electron) ===
       "/System/Library/Fonts"            # System fonts (needed by some GUI apps)
       "/System/Library/ColorSync/Profiles" # Color profiles (needed by graphics apps)
 
-      # === OPTIONAL: Device access (Commented out for security) ===
-      # "/dev"                           # Hardware access (SECURITY RISK - only enable if needed)
+      # === OPTIONAL: Homebrew (For mixed Nix/Homebrew setups) ===
+      "/usr/local/lib"                    # Homebrew libraries
     ];
   };
 }
