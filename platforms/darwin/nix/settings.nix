@@ -1,4 +1,4 @@
-{...}: {
+{ lib, ... }: {
   # Use common Nix settings - eliminate duplication
   imports = [../../common/core/nix-settings.nix];
 
@@ -8,7 +8,7 @@
     sandbox = false;
 
     # Allow impure host dependencies for macOS SDK access
-    # FIX: Add SDK paths as impureHostDeps to allow packages to access system headers
+    # FIX: Add SDK paths to allow packages to access system headers
     # This is required for packages that need /usr/include but it doesn't exist on modern macOS
     impureHostDeps = [
       "/Library/Developer/CommandLineTools"
@@ -46,6 +46,11 @@
 
       # === OPTIONAL: Homebrew (For mixed Nix/Homebrew setups) ===
       "/usr/local/lib"                    # Homebrew libraries
-    ] ++ impureHostDeps;
+
+      # === XCODE SDK PATHS (Required for macOS package builds) ===
+      "/Library/Developer/CommandLineTools" # Xcode Command Line Tools
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include" # System headers for C/C++ packages
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib" # System libraries
+    ];
   };
 }
