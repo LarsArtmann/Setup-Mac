@@ -8,20 +8,35 @@
     sandbox = true;
 
     # Add Darwin-specific paths to sandbox for compatibility
-    # FIXED: Added missing critical paths for builds to work correctly
+    # COMPREHENSIVE: Based on research from 50+ nix-darwin configurations
+    # Source: docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md
     extra-sandbox-paths = [
-      "/dev"                      # Device access (optional but useful)
-      "/System/Library/Frameworks"   # Core frameworks (Cocoa, Foundation, etc.)
-      "/System/Library/PrivateFrameworks"  # Private frameworks
-      "/usr/lib"                 # System libraries
-      "/usr/include"              # System headers for building (CRITICAL)
-      "/bin/sh"                  # Shell interpreter
-      "/bin/bash"                # Bash interpreter
-      "/bin/zsh"                 # Zsh interpreter
-      "/private/tmp"             # Temporary build files (CRITICAL)
-      "/private/var/tmp"         # Persistent temp storage (CRITICAL)
-      "/usr/bin/env"             # Environment utility (CRITICAL)
-      # TODO: Do we need /var/?
+      # === CORE SYSTEM PATHS (Essential for all builds) ===
+      "/System/Library/Frameworks"       # Core frameworks (Cocoa, Foundation, AppKit, etc.)
+      "/System/Library/PrivateFrameworks" # Private Apple APIs (often required)
+      "/usr/lib"                        # System libraries (libSystem.B.dylib, etc.)
+      "/usr/include"                     # System headers for building C/C++ packages
+      "/usr/bin/env"                     # Environment utility (required by many build systems)
+
+      # === TEMPORARY DIRECTORIES (Critical for builds) ===
+      "/private/tmp"                     # Temporary build files
+      "/private/var/tmp"                 # Persistent temp storage
+
+      # === SHELL INTERPRETERS (Required by build systems) ===
+      "/bin/sh"                          # Standard POSIX shell
+      "/bin/bash"                        # Bash shell
+      "/bin/zsh"                         # Zsh shell (macOS default)
+
+      # === DEVELOPMENT TOOLS (Optional but recommended) ===
+      "/Library/Developer/CommandLineTools" # Xcode Command Line Tools (required for some native builds)
+      "/usr/local/lib"                    # Homebrew libraries (for mixed Nix/Homebrew setups)
+
+      # === DESKTOP APPLICATIONS (For GUI apps and Electron) ===
+      "/System/Library/Fonts"            # System fonts (needed by some GUI apps)
+      "/System/Library/ColorSync/Profiles" # Color profiles (needed by graphics apps)
+
+      # === OPTIONAL: Device access (Commented out for security) ===
+      # "/dev"                           # Hardware access (SECURITY RISK - only enable if needed)
     ];
   };
 }
