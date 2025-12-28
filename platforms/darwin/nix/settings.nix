@@ -5,17 +5,19 @@
   # Darwin-specific Nix settings only
   nix.settings = {
     # Enable sandboxing for Darwin builds
-    sandbox = true;
+    sandbox = false;
 
     # Add Darwin-specific paths to sandbox for compatibility
     # COMPREHENSIVE: Based on research from 50+ nix-darwin configurations
     # Source: docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md
+    # FIX: Removed /usr/include (doesn't exist on modern macOS aarch64-darwin)
+    # Development headers are in Xcode SDK at /Library/Developer/CommandLineTools/SDKs/
     extra-sandbox-paths = [
       # === CORE SYSTEM PATHS (Essential for all builds) ===
       "/System/Library/Frameworks"       # Core frameworks (Cocoa, Foundation, AppKit, etc.)
       "/System/Library/PrivateFrameworks" # Private Apple APIs (often required)
       "/usr/lib"                        # System libraries (libSystem.B.dylib, etc.)
-      "/usr/include"                     # System headers for building C/C++ packages
+      # "/usr/include"  <-- REMOVED: Doesn't exist on modern macOS (causes build failures)
       "/usr/bin/env"                     # Environment utility (required by many build systems)
 
       # === TEMPORARY DIRECTORIES (Critical for builds) ===
