@@ -14,6 +14,7 @@
       "/System/Library/Frameworks"   # Core frameworks (Cocoa, Foundation, etc.)
       "/System/Library/PrivateFrameworks"  # Private frameworks
       "/usr/lib"                 # System libraries
+      "/usr/include"              # System headers for building (CRITICAL)
       "/bin/sh"                  # Shell interpreter
       "/bin/bash"                # Bash interpreter
       "/bin/zsh"                 # Zsh interpreter
