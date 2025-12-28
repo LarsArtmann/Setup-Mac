@@ -18,7 +18,7 @@
     git-town # High-level Git workflow management
 
     # Essential editors
-    micro-full
+    # micro-full # TEMP DISABLED: Wrapper may cause Wayland evaluation on Darwin
 
     # Terminal emulator
     alacritty-graphics
