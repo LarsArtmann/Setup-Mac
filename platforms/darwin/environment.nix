@@ -14,6 +14,9 @@
     # Additional macOS-specific system packages can go here
     # Chrome and Helium are now managed through common/packages/base.nix
 
-    iterm2 ## TODO: <-- should we move this to the dedicated iterm2 config?
+    # iterm2 ## TEMPORARILY DISABLED: Build fails with /usr/include error on macOS Sequoia
+    # Issue: error: getting attributes of required path '/usr/include': No such file or directory
+    # Root cause: iTerm2 derivation requires /usr/include which doesn't exist on modern macOS
+    # Status: Waiting for nixpkgs fix or alternative installation method
   ];
 }

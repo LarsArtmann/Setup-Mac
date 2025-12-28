@@ -7,6 +7,17 @@
     # Enable sandboxing for Darwin builds
     sandbox = false;
 
+    # Allow impure host dependencies for macOS SDK access
+    # FIX: Add SDK paths as impureHostDeps to allow packages to access system headers
+    # This is required for packages that need /usr/include but it doesn't exist on modern macOS
+    impureHostDeps = [
+      "/Library/Developer/CommandLineTools"
+      "/Library/Developer/CommandLineTools/SDKs"
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
+      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
+    ];
+
     # Add Darwin-specific paths to sandbox for compatibility
     # COMPREHENSIVE: Based on research from 50+ nix-darwin configurations
     # Source: docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md
@@ -19,11 +30,6 @@
       "/usr/lib"                        # System libraries (libSystem.B.dylib, etc.)
       # "/usr/include"  <-- REMOVED: Doesn't exist on modern macOS (causes build failures)
       "/usr/bin/env"                     # Environment utility (required by many build systems)
-
-      # === XCODE SDK PATHS (Required for macOS package builds) ===
-      "/Library/Developer/CommandLineTools" # Xcode Command Line Tools
-      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include" # System headers for C/C++ packages
-      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib" # System libraries
 
       # === TEMPORARY DIRECTORIES (Critical for builds) ===
       "/private/tmp"                     # Temporary build files
@@ -40,6 +46,6 @@
 
       # === OPTIONAL: Homebrew (For mixed Nix/Homebrew setups) ===
       "/usr/local/lib"                    # Homebrew libraries
-    ];
+    ] ++ impureHostDeps;
   };
 }
