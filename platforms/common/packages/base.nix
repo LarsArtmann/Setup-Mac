@@ -107,8 +107,11 @@
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
     [
-      # Import Helium browser (cross-platform)
-      (import ./helium.nix {inherit lib pkgs;})
+      # Import platform-specific Helium browser
+      (if stdenv.isDarwin
+       then (import ./helium-darwin.nix {inherit lib pkgs;})
+       else (import ./helium-linux.nix {inherit lib pkgs;})
+      )
     ]
     ++ lib.optionals stdenv.isDarwin [
       google-chrome # Chrome browser (unfree, macOS only)

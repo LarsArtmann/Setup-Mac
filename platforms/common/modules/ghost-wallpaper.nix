@@ -99,8 +99,8 @@ in {
       check_temp = True
     '';
 
-    # Step 4: Window manager configuration
-    wayland.windowManager.hyprland = mkIf config.wayland.windowManager.hyprland.enable {
+    # Step 4: Window manager configuration (Linux only - Hyprland doesn't exist on macOS)
+    wayland.windowManager.hyprland = mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
       settings = {
         # Auto-start the ghost script
         exec-once = ["launch-btop-bg"];
