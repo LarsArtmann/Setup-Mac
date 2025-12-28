@@ -74,7 +74,7 @@
     timewarrior
 
     # Clipboard management
-    cliphist # Clipboard history manager for Wayland
+    # cliphist # TEMP DISABLED: May depend on Wayland packages that fail on Darwin
 
     # Desktop integration (cross-platform)
     xdg-utils # XDG desktop utilities for both platforms
