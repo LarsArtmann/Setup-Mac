@@ -107,14 +107,15 @@
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
     [
+      # TEMP DISABLED: Testing if GUI packages cause wayland evaluation error
       # Import platform-specific Helium browser
-      (if stdenv.isDarwin
-       then (import ./helium-darwin.nix {inherit lib pkgs;})
-       else (import ./helium-linux.nix {inherit lib pkgs;})
-      )
+      # (if stdenv.isDarwin
+      #  then (import ./helium-darwin.nix {inherit lib pkgs;})
+      #  else (import ./helium-linux.nix {inherit lib pkgs;})
+      # )
     ]
     ++ lib.optionals stdenv.isDarwin [
-      google-chrome # Chrome browser (unfree, macOS only)
+      # google-chrome # TEMP DISABLED: Testing if this causes issues
     ];
 
   # AI tools (conditionally added)
