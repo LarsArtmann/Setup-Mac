@@ -20,8 +20,8 @@
   };
 
   # Define users for Home Manager (workaround for nix-darwin/common.nix import issue)
-  users.users.lars = {
-    name = "lars";
-    home = "/Users/lars";
+  users.users.larsartmann = {
+    name = "larsartmann";
+    home = "/Users/larsartmann";
   };
 }

@@ -52,7 +52,7 @@
         _module.args.pkgs = import nixpkgs {
           inherit system;
           config.allowUnfree = true;
-          config.allowBroken = true;
+          config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
         };
 
         packages = {};
@@ -63,26 +63,9 @@
             packages = with pkgs; [
               git
               nixfmt
-              shellcheck
-            ];
-          };
-
-          # System configuration development shell
-          system-config = pkgs.mkShell {
-            packages = with pkgs; [
-              git
-              nixfmt
+              deadnix
               shellcheck
               just # Task runner
-            ];
-          };
-
-          # Development programs shell
-          development = pkgs.mkShell {
-            packages = with pkgs; [
-              git
-              go
-              nodejs
             ];
           };
         };
@@ -102,6 +85,7 @@
             # Import Home Manager module for Darwin
             inputs.home-manager.darwinModules.home-manager
 
+            ## TODO: Why can't this be in it's how file?
             {
               # Home Manager configuration
               home-manager = {
@@ -109,7 +93,7 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.lars = import ./platforms/darwin/home.nix;
+                users.larsartmann = import ./platforms/darwin/home.nix;
               };
             }
 
