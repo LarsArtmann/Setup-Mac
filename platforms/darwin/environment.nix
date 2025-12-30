@@ -9,11 +9,7 @@
     TERMINAL = "iTerm2"; ## TODO: <-- should we move this to the dedicated iterm2 config?
   };
 
-  # Darwin-specific packages
-  environment.systemPackages = with pkgs; [
-    # Additional macOS-specific system packages can go here
-    # Chrome and Helium are now managed through common/packages/base.nix
-
-    iterm2
-  ];
+  # Darwin-specific packages - NOTE: iterm2 now in common/packages/base.nix
+  # (platform-scoped with lib.optionals stdenv.isDarwin)
+  # No additional system packages needed here
 }

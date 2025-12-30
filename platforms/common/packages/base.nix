@@ -116,6 +116,7 @@
     ]
     ++ lib.optionals stdenv.isDarwin [
       google-chrome
+      iterm2
     ];
 
   # AI tools (conditionally added)
