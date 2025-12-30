@@ -1,4 +1,9 @@
-{lib, pkgs, config, ...}: {
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}: {
   # Import Darwin-specific system configurations
   imports = [
     ./networking/default.nix

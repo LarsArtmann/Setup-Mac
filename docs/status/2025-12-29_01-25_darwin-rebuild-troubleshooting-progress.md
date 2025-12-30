@@ -1,8 +1,8 @@
 # Nix Darwin Rebuild Troubleshooting Status
 
-**Date**: 2025-12-29 01:25 UTC  
-**System**: macOS Sequoia (aarch64-darwin)  
-**Nix Version**: 2.31.2  
+**Date**: 2025-12-29 01:25 UTC
+**System**: macOS Sequoia (aarch64-darwin)
+**Nix Version**: 2.31.2
 **Configuration**: nix-darwin flake-based
 
 ---
@@ -284,7 +284,7 @@
 - Build evaluation now works (was failing before with Wayland errors) ✅
 - Build process starts and runs for several minutes ✅
 - But it still fails with "builder failed with exit code 1" ❌
-- **We don't know what's actually failing**: 
+- **We don't know what's actually failing**:
   - Is it compilation error?
   - Is it linking error?
   - Is it missing dependency?
@@ -364,5 +364,5 @@ find /nix/var/log/nix -name "*.log" -exec tail -100 {} \;
 
 ---
 
-**Report Generated**: 2025-12-29 01:25 UTC  
+**Report Generated**: 2025-12-29 01:25 UTC
 **Status**: 🟡 IN PROGRESS - Awaiting build error diagnosis

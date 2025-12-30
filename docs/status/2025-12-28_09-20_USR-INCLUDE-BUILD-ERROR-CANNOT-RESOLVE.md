@@ -1,6 +1,6 @@
 # /usr/include BUILD ERROR - CANNOT RESOLVE WITH STANDARD APPROACHES
 
-**Date:** 2025-12-28 09:20:32 CET  
+**Date:** 2025-12-28 09:20:32 CET
 **Status:** 🔴 CRITICAL - Build failures persist despite exhaustive debugging
 
 ---
@@ -46,20 +46,20 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ## 💪 ATTEMPTS TO FIX (ALL FAILED)
 
 ### Attempt 1: Create `/usr/include`
-**Command:** `sudo mkdir -p /usr/include`  
-**Result:** ❌ "Operation not permitted"  
+**Command:** `sudo mkdir -p /usr/include`
+**Result:** ❌ "Operation not permitted"
 **Reason:** System Integrity Protection (SIP) blocks creation
 
 ### Attempt 2: Remove `/usr/include` from Configuration
-**File:** `platforms/darwin/nix/settings.nix`  
-**Action:** Removed line 18 (`"/usr/include"`)  
-**Result:** ❌ Error persists  
+**File:** `platforms/darwin/nix/settings.nix`
+**Action:** Removed line 18 (`"/usr/include"`)
+**Result:** ❌ Error persists
 **Why:** Coming from somewhere else, not our configuration files
 
 ### Attempt 3: Add Xcode SDK Paths to Configuration
-**File:** `platforms/darwin/nix/settings.nix`  
-**Action:** Added SDK paths to `extra-sandbox-paths`  
-**Result:** ❌ Error persists  
+**File:** `platforms/darwin/nix/settings.nix`
+**Action:** Added SDK paths to `extra-sandbox-paths`
+**Result:** ❌ Error persists
 **Paths Added:**
 ```nix
 "/Library/Developer/CommandLineTools"
@@ -68,31 +68,31 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ```
 
 ### Attempt 4: Update nixpkgs
-**Command:** `nix flake update nixpkgs`  
+**Command:** `nix flake update nixpkgs`
 **Result:** ❌ Error persists
 
 ### Attempt 5: Restart Nix Daemon
-**Command:** Tried restart  
+**Command:** Tried restart
 **Result:** ❌ Cannot restart through this interface
 
 ### Attempt 6: Try Building with `--impure` Flag
-**Command:** `nix build nixpkgs#iterm2 --no-link --impure`  
+**Command:** `nix build nixpkgs#iterm2 --no-link --impure`
 **Result:** ❌ Error persists
 
 ### Attempt 7: Check Derivation for `/usr/include` References
-**Command:** `nix show-derivation nixpkgs#iterm2 | grep -i "usr/include"`  
+**Command:** `nix show-derivation nixpkgs#iterm2 | grep -i "usr/include"`
 **Result:** ❌ No references found in derivation
 
 ### Attempt 8: Check All Configuration Files
-**Action:** Searched entire project for `/usr/include` references  
+**Action:** Searched entire project for `/usr/include` references
 **Result:** ❌ Only commented references found, no active ones
 
 ### Attempt 9: Check Global Nix Configuration
-**Files:** `~/.config/nix/nix.conf`, `/etc/nix/nix.conf`  
+**Files:** `~/.config/nix/nix.conf`, `/etc/nix/nix.conf`
 **Result:** ❌ No `/usr/include` references found
 
 ### Attempt 10: Test Simple Package Build
-**Command:** `nix build nixpkgs#hello --no-link`  
+**Command:** `nix build nixpkgs#hello --no-link`
 **Result:** ✅ Succeeds (Nix works for simple packages)
 
 ---
@@ -122,15 +122,15 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 1. **Nixpkgs Derivation Issue** (HIGH PROBABILITY)
    - iTerm2 or its dependencies might have `/usr/include` hard-coded
    - Could be a platform-specific issue in nixpkgs
-   
+
 2. **Cached Nix State** (MEDIUM PROBABILITY)
    - Nix daemon or store might have cached configuration
    - Old `/usr/include` references might be in cache
-   
+
 3. **Nix Internal Issue** (MEDIUM PROBABILITY)
    - Nix 2.31.2 might have bug with macOS aarch64
    - Build environment setup might be looking at wrong path
-   
+
 4. **Unknown Configuration** (LOW PROBABILITY)
    - There might be a configuration file we haven't found
    - Could be in Nix store or daemon state
@@ -300,7 +300,7 @@ Created:
 
 ---
 
-**Status Report Generated:** 2025-12-28 09:20:32 CET  
-**Context:** Cannot resolve /usr/include build error with standard debugging  
-**Status:** CRITICAL - External research/community help needed  
+**Status Report Generated:** 2025-12-28 09:20:32 CET
+**Context:** Cannot resolve /usr/include build error with standard debugging
+**Status:** CRITICAL - External research/community help needed
 **Recommendation:** Search online using provided queries or use alternative installation methods

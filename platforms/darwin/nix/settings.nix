@@ -1,4 +1,4 @@
-{ lib, ... }: {
+{lib, ...}: {
   # TEMP: Disable common module import to avoid sandbox merging conflicts
   # TODO: Refactor to properly override sandbox setting
   # imports = [../../common/core/nix-settings.nix];
@@ -22,11 +22,11 @@
     substituters = [
       "https://nix-community.cachix.org"
       "https://hyprland.cachix.org"
-    ];  # NOTE: cache.nixos.org is included by default, don't duplicate
+    ]; # NOTE: cache.nixos.org is included by default, don't duplicate
     trusted-public-keys = [
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-    ];  # NOTE: cache.nixos.org key is included by default, don't duplicate
+    ]; # NOTE: cache.nixos.org key is included by default, don't duplicate
     warn-dirty = false;
   };
 }

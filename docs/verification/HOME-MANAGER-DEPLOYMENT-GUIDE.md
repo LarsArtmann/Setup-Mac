@@ -82,7 +82,7 @@ starship --version
   (Starship with icons, colors, and git integration)
 
 ❌ NOT like this:
-~ 
+~
   (Default Fish prompt without Starship)
 ```
 

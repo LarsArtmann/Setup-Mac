@@ -9,20 +9,45 @@
 
     # System audit daemon for comprehensive logging
     auditd.enable = true;
+    auditd.settings = {
+      log_group = "auditd";
+    };
+
+    # Audit rules configuration
+    audit = {
+      enable = true;
+      rules = [
+        # Monitor critical system files
+        "-w /etc/passwd -p wa -k identity"
+        "-w /etc/shadow -p wa -k identity"
+        "-w /etc/group -p wa -k identity"
+        "-w /etc/sudoers -p wa -k sudo_changes"
+
+        # Monitor SSH configuration
+        "-w /etc/ssh/sshd_config -p wa -k sshd_config"
+
+        # Monitor network configuration changes
+        "-a always,exit -F arch=b64 -S sethostname -S setdomainname -k network"
+        "-a always,exit -F arch=b32 -S sethostname -S setdomainname -k network"
+      ];
+    };
 
     # AppArmor for mandatory access control
     apparmor.enable = true;
   };
 
-  # Enable D-Bus for portal communication
-  services.dbus = {
-    enable = true;
-    # Use dbus-broker for better Wayland support (UWSM preferred)
-    implementation = "broker";
-  };
-
   # Security services (SSH is configured separately in ../services/ssh.nix)
   services = {
+    # Enable D-Bus for portal communication
+    dbus = {
+      enable = true;
+      # Use dbus-broker for better Wayland support (UWSM preferred)
+      implementation = "broker";
+    };
+
+    # Enable audit log forwarding to journald
+    journald.audit = true;
+
     # Fail2ban for intrusion prevention
     fail2ban.enable = true;
 
@@ -30,6 +55,9 @@
     clamav.daemon.enable = true;
     clamav.updater.enable = true;
   };
+
+  # Create auditd group for log management
+  users.groups.auditd = {};
 
   # Security tools
   environment.systemPackages = with pkgs; [

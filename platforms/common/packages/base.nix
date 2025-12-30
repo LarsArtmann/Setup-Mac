@@ -12,74 +12,76 @@
   # Import custom packages
 
   # Essential CLI tools that work across platforms
-  essentialPackages = with pkgs; [
-    # Version control
-    git
-    git-town # High-level Git workflow management
+  essentialPackages = with pkgs;
+    [
+      # Version control
+      git
+      git-town # High-level Git workflow management
 
-    # Essential editors
-    micro
+      # Essential editors
+      micro
 
-    # Terminal emulator
-    alacritty-graphics
+      # Terminal emulator
+      alacritty-graphics
 
-    # Shells and prompts
-    fish
-    starship
-    carapace
+      # Shells and prompts
+      fish
+      starship
+      carapace
 
-    # File operations and browsing
-    curl
-    wget
-    tree
-    ripgrep
-    fd
-    eza
-    bat
+      # File operations and browsing
+      curl
+      wget
+      tree
+      ripgrep
+      fd
+      eza
+      bat
 
-    # Data manipulation
-    jq
-    yq-go
+      # Data manipulation
+      jq
+      yq-go
 
-    # Task runner
-    just
+      # Task runner
+      just
 
-    # Security tools
-    gitleaks
-    pre-commit
-    openssh
+      # Security tools
+      gitleaks
+      pre-commit
+      openssh
 
-    # Modern CLI productivity tools
-    glow # Render markdown on the CLI, with pizzazz
+      # Modern CLI productivity tools
+      glow # Render markdown on the CLI, with pizzazz
 
-    # System monitoring
-    bottom
-    procs
-    btop
+      # System monitoring
+      bottom
+      procs
+      btop
 
-    # File utilities
-    sd # Modern find and replace
-    dust # Modern du
+      # File utilities
+      sd # Modern find and replace
+      dust # Modern du
 
-    # GNU utilities (cross-platform)
-    coreutils
-    findutils
-    gnused
+      # GNU utilities (cross-platform)
+      coreutils
+      findutils
+      gnused
 
-    # Graph visualization
-    graphviz
+      # Graph visualization
+      graphviz
 
-    # Task management
-    taskwarrior3
-    timewarrior
+      # Task management
+      taskwarrior3
+      timewarrior
 
-    # Clipboard management (Linux-only, Wayland)
-    # cliphist # Not available on Darwin (Linux-only package)
-    # Desktop integration (cross-platform)
-    xdg-utils # XDG desktop utilities for both platforms
-  ] ++ lib.optionals stdenv.isLinux [
-    cliphist # Wayland clipboard history for Linux
-  ];
+      # Clipboard management (Linux-only, Wayland)
+      # cliphist # Not available on Darwin (Linux-only package)
+      # Desktop integration (cross-platform)
+      xdg-utils # XDG desktop utilities for both platforms
+    ]
+    ++ lib.optionals stdenv.isLinux [
+      cliphist # Wayland clipboard history for Linux
+    ];
 
   # Development tools (platform-agnostic)
   developmentPackages = with pkgs;
@@ -109,9 +111,10 @@
   guiPackages = with pkgs;
     [
       # Import platform-specific Helium browser
-      (if stdenv.isDarwin
-       then (import ./helium-darwin.nix {inherit lib pkgs;})
-       else (import ./helium-linux.nix {inherit lib pkgs;})
+      (
+        if stdenv.isDarwin
+        then (import ./helium-darwin.nix {inherit lib pkgs;})
+        else (import ./helium-linux.nix {inherit lib pkgs;})
       )
     ]
     ++ lib.optionals stdenv.isDarwin [

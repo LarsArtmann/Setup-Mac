@@ -1,4 +1,8 @@
-{ config, pkgs, ... }: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   # Enhanced Security Configuration for Darwin
   security.pam = {
     services = {

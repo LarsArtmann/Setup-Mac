@@ -11,10 +11,10 @@ in
 
     src = pkgs.fetchurl {
       url = "https://github.com/imputnet/helium-macos/releases/download/${version}/helium_${version}_${
-            if isAarch64
-            then "arm64"
-            else "x86_64"
-          }-macos.dmg";
+        if isAarch64
+        then "arm64"
+        else "x86_64"
+      }-macos.dmg";
       sha256 =
         if isAarch64
         then "sha256-f35ecf26fdde1d8cd85222e65b1b670553a553fe964b9435d8a2945503703808"
@@ -43,7 +43,10 @@ in
     passthru = {
       binaryPath = "Applications/Helium.app/Contents/MacOS/Helium";
       platform = "darwin";
-      arch = if isAarch64 then "arm64" else "x86_64";
+      arch =
+        if isAarch64
+        then "arm64"
+        else "x86_64";
     };
 
     meta = with lib; {

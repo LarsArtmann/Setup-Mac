@@ -1,6 +1,9 @@
 # Minimal test configuration to isolate the issue
-{config, pkgs, ...}:
 {
+  config,
+  pkgs,
+  ...
+}: {
   # Only essential imports
   imports = [
     ./environment.nix

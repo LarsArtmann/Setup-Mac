@@ -46,8 +46,7 @@
         pkgs,
         system,
         ...
-      }: let
-      in {
+      }: {
         # Allow unfree and broken packages for all systems
         _module.args.pkgs = import nixpkgs {
           inherit system;

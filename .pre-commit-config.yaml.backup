@@ -1,0 +1,22 @@
+repos:
+-   repo: local
+    hooks:
+    -   id: gitleaks
+        name: gitleaks
+        entry: gitleaks
+        args: [detect, --source, .]
+        language: system
+        pass_filenames: false
+    -   id: trailing-whitespace
+        name: Remove trailing whitespace
+        entry: bash
+        args: [-c, 'find . -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o -name "*.txt" -o -name "*.sh" -o -name "*.nix" | grep -v ".git" | xargs -I {} /run/current-system/sw/bin/sed -i "s/[[:space:]]*$//" "{}"']
+        language: system
+        pass_filenames: false
+    -   id: nix-check
+        name: nix check
+        entry: bash
+        args: [-c, 'cd . && just check-nix-syntax']
+        language: system
+        files: \.nix$
+        pass_filenames: false

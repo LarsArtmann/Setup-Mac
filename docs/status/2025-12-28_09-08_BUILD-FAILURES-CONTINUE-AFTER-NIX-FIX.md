@@ -1,6 +1,6 @@
 # BUILD FAILURES CONTINUE AFTER NIX FIX
 
-**Date:** 2025-12-28 09:08:41 CET  
+**Date:** 2025-12-28 09:08:41 CET
 **Status:** ⚠️ CONCERNING - Builds still failing despite Nix version fix
 
 ---
@@ -61,8 +61,8 @@
 ## 🤔 POSSIBLE CAUSES OF CONTINUED FAILURES
 
 ### 1. Configuration Issue Introduced Since Dec 21
-**Likelihood:** MEDIUM  
-**Evidence:** 
+**Likelihood:** MEDIUM
+**Evidence:**
 - Last successful build was Dec 21
 - Multiple changes made Dec 23-28
 - Changes include: iTerm2 recovery, sandbox paths, Nix settings
@@ -79,7 +79,7 @@
 - `users.users.lars` configuration issue
 
 ### 2. Nix-Darwin Internal Issue
-**Likelihood:** LOW  
+**Likelihood:** LOW
 **Evidence:**
 - Nix version is now correct (2.31.2)
 - nix doctor passes without warnings
@@ -91,7 +91,7 @@
 - Build process hang
 
 ### 3. System/Permission Issue
-**Likelihood:** LOW-MEDIUM  
+**Likelihood:** LOW-MEDIUM
 **Evidence:**
 - Commands run with sudo
 - System profile is now correct
@@ -332,7 +332,7 @@ The Nix version mismatch is fixed, but builds are still failing. We need to syst
 
 ---
 
-**Status Report Generated:** 2025-12-28 09:08:41 CET  
-**Context:** Build failures continue after Nix version fix  
-**Status:** CONCERNING - Need systematic debugging  
+**Status Report Generated:** 2025-12-28 09:08:41 CET
+**Context:** Build failures continue after Nix version fix
+**Status:** CONCERNING - Need systematic debugging
 **Next Action:** Isolate root cause of continued build failures

@@ -1,6 +1,6 @@
 # COMPREHENSIVE SYSTEM DIAGNOSTICS AND FIX PLAN
 
-**Date:** 2025-12-28 08:26:36 CET  
+**Date:** 2025-12-28 08:26:36 CET
 **Purpose:** Full system status report and fix plan for Nix/Darwin issues
 
 ---
@@ -89,7 +89,7 @@ Binary file /Users/larsartmann/.cache/nix/fetcher-cache-v4.sqlite matches
 Binary file /Users/larsartmann/.cache/nix/gitv3/.../objects/pack/pack-*.pack matches
 ```
 
-**Impact:** 
+**Impact:**
 - SQLite database errors during evaluation
 - "SQLite database is busy" errors
 - Silent build failures
@@ -162,7 +162,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```bash
    # Remove old system profile
    sudo rm -f /nix/var/nix/profiles/default
-   
+
    # Recreate pointing to current system's nix
    sudo ln -sf /run/current-system/sw/bin/nix /nix/var/nix/profiles/default/bin/nix
    ```
@@ -173,7 +173,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    # Should now show: nix (Nix) <new version>
    ```
 
-**Expected Outcome:** 
+**Expected Outcome:**
 - System-wide profile uses correct Nix version
 - `nix doctor` passes without "multiple versions" warning
 - Commands no longer fail silently
@@ -188,7 +188,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```bash
    # Old manifest file
    sudo rm -f /nix/store/<hash>-env-manifest.nix
-   
+
    # Root's user environment (might need to delete profile)
    sudo rm -f /nix/var/nix/profiles/per-user/root/profile-2-link
    ```
@@ -377,7 +377,7 @@ find /nix/store -maxdepth 4 -name "nix" -type f -perm -111
 # Check system profile Nix version
 /nix/var/nix/profiles/default/bin/nix --version
 
-# Check current system Nix version  
+# Check current system Nix version
 /run/current-system/sw/bin/nix --version
 
 # Run diagnostics
@@ -465,6 +465,6 @@ You'll know everything is fixed when:
 
 ---
 
-**Report Generated:** 2025-12-28 08:26:36 CET  
-**Session Context:** Comprehensive system diagnostics and fix plan for Nix/Darwin version conflicts  
+**Report Generated:** 2025-12-28 08:26:36 CET
+**Session Context:** Comprehensive system diagnostics and fix plan for Nix/Darwin version conflicts
 **Next Action:** Execute Phase 1: Fix Nix Version Mismatch
