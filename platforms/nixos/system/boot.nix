@@ -11,11 +11,6 @@
     # Use latest kernel for Ryzen AI Max+ support
     kernelPackages = pkgs.linuxPackages_latest;
 
-    # Essential kernel modules
-    kernelModules = [
-      "audit" # Security audit system
-    ];
-
     # AMD GPU optimization kernel parameters
     kernelParams = [
       "amdgpu.ppfeaturemask=0xfffd7fff" # Enable all GPU features
