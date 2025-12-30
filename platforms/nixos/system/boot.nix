@@ -4,7 +4,7 @@
     # Systemd boot configuration
     loader = {
       systemd-boot.enable = true;
-      systemd-boot.configurationLimit = 20; # Limit to 20 generations to prevent /boot full
+      systemd-boot.configurationLimit = 50; # Limit to 50 generations to prevent /boot full
       efi.canTouchEfiVariables = true;
     };
 
