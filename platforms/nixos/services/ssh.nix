@@ -19,7 +19,7 @@ _: {
       PermitTunnel = false;
 
       # Access control
-      AllowUsers = ["lars"]; # Only allow lars user
+      AllowUsers = ["lars" "art"]; # Only allow lars user
 
       # Connection limits
       MaxAuthTries = 3;
