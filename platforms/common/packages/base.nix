@@ -18,7 +18,7 @@
     git-town # High-level Git workflow management
 
     # Essential editors
-    # micro-full # TEMP DISABLED: Wrapper may cause Wayland evaluation on Darwin
+    micro
 
     # Terminal emulator
     alacritty-graphics
@@ -73,11 +73,12 @@
     taskwarrior3
     timewarrior
 
-    # Clipboard management
-    # cliphist # TEMP DISABLED: May depend on Wayland packages that fail on Darwin
-
+    # Clipboard management (Linux-only, Wayland)
+    # cliphist # Not available on Darwin (Linux-only package)
     # Desktop integration (cross-platform)
     xdg-utils # XDG desktop utilities for both platforms
+  ] ++ lib.optionals stdenv.isLinux [
+    cliphist # Wayland clipboard history for Linux
   ];
 
   # Development tools (platform-agnostic)
@@ -107,15 +108,14 @@
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
     [
-      # TEMP DISABLED: Testing if GUI packages cause wayland evaluation error
       # Import platform-specific Helium browser
-      # (if stdenv.isDarwin
-      #  then (import ./helium-darwin.nix {inherit lib pkgs;})
-      #  else (import ./helium-linux.nix {inherit lib pkgs;})
-      # )
+      (if stdenv.isDarwin
+       then (import ./helium-darwin.nix {inherit lib pkgs;})
+       else (import ./helium-linux.nix {inherit lib pkgs;})
+      )
     ]
     ++ lib.optionals stdenv.isDarwin [
-      # google-chrome # TEMP DISABLED: Testing if this causes issues
+      google-chrome
     ];
 
   # AI tools (conditionally added)
