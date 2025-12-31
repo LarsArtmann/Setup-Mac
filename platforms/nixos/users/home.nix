@@ -2,7 +2,15 @@
   imports = [
     ../../common/home-base.nix
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
+    ../../common/modules/ghost-wallpaper.nix
   ];
+
+  # Enable ghost btop wallpaper
+  programs.ghost-btop-wallpaper = {
+    enable = true;
+    updateRate = 2000;
+    backgroundOpacity = "0.0";
+  };
 
   # NixOS-specific session variables
   home.sessionVariables = {

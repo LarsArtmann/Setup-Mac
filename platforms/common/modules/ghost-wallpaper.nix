@@ -110,15 +110,14 @@ in {
           # GEOMETRY & POSITIONING
           "fullscreen, class:^(btop-bg)$"
           "float, class:^(btop-bg)$"
-          "maximize, class:^(btop-bg)$"
 
-          # LAYERING (The Secret Sauce)
-          "keepbelow, class:^(btop-bg)$"
+          # STYLING
           "noborder, class:^(btop-bg)$"
           "noshadow, class:^(btop-bg)$"
 
           # INTERACTION
           "noinitialfocus, class:^(btop-bg)$"
+          "nofocus, class:^(btop-bg)$"
           "noanim, class:^(btop-bg)$"
           "pin, class:^(btop-bg)$"
         ];

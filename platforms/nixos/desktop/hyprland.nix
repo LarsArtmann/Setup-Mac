@@ -31,7 +31,7 @@
         ''dunst''
         ''wl-paste --watch cliphist store''
         # Desktop consoles setup
-        ''${pkgs.kitty}/bin/kitty --class btop-bg --hold -e btop'' # System monitor
+        # Note: btop-bg is now handled by ghost-btop-wallpaper module
         ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop'' # Process monitor
         ''${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f'' # System logs
         ''${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf'' # Config editor
@@ -46,13 +46,7 @@
 
       windowrulev2 = [
         # Btop system monitor
-        "float,class:^(btop-bg)$"
-        "fullscreen,class:^(btop-bg)$"
-        "noanim,class:^(btop-bg)$"
-        "nofocus,class:^(btop-bg)$"
-        "noblur,class:^(btop-bg)$"
-        "noshadow,class:^(btop-bg)$"
-        "noborder,class:^(btop-bg)$"
+        # Note: btop-bg window rules now handled by ghost-btop-wallpaper module
 
         # Htop process monitor
         "float,class:^(htop-bg)$"
