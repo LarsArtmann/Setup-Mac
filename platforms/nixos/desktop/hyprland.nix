@@ -162,6 +162,7 @@
       # DEBUG & PERFORMANCE MONITORING
       debug = {
         disable_logs = false;
+        disable_time = false;
         overlay = false;
         damage_blink = false;
       };
