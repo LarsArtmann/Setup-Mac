@@ -153,7 +153,7 @@
         swallow_regex = "";
         focus_on_activate = true;
         no_direct_scanout = false;
-        disable_hyprland_qtutils_workaround = false;
+        disable_hyprland_guiutils_workaround = false;
         mouse_move_enables_dpms = false;
         key_press_enables_dpms = false;
         always_follow_on_dnd = true;
