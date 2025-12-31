@@ -100,11 +100,23 @@
       # Nix helper tools
       nh
 
+      # Benchmarking
+      geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities
+
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
     ]
     ++ lib.optionals stdenv.isLinux [
       swww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
+    ];
+
+  # Linux-specific utilities
+  linuxUtilities = with pkgs;
+    lib.optionals stdenv.isLinux [
+      # Media streaming
+      fcast-client # FCast Client Terminal, media streaming client
+      fcast-receiver # FCast Receiver, media streaming receiver
+      ffcast # Run commands on rectangular screen regions
     ];
 
   # GUI Applications (cross-platform)
@@ -126,5 +138,5 @@
   aiPackages = lib.optional (crush != null) crush;
 in {
   # System packages list
-  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages;
+  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
 }
