@@ -145,15 +145,6 @@
         force_default_wallpaper = 0;
         disable_hyprland_logo = true;
         disable_splash_rendering = true;
-        mouse_refocus = false;
-        new_window_takes_over_fullscreen = true;
-        animate_manual_resizes = false;
-        animate_mouse_windowdragging = false;
-        enable_swallow = false;
-        swallow_regex = "";
-        focus_on_activate = true;
-        no_direct_scanout = false;
-        disable_hyprland_guiutils_workaround = false;
         mouse_move_enables_dpms = false;
         key_press_enables_dpms = false;
         always_follow_on_dnd = true;
@@ -162,19 +153,15 @@
 
       # RENDERING OPTIMIZATIONS - MAXIMUM PERFORMANCE
       render = {
-        explicit_sync = true;
         direct_scanout = true;
         expand_undersized_textures = true;
-        ignore_performance_warnings = true;
         vrr = 2;
         vfr = true;
-        allow_tearing = false;
       };
 
       # DEBUG & PERFORMANCE MONITORING
       debug = {
         disable_logs = false;
-        disable_time = false;
         overlay = false;
         damage_blink = false;
       };
