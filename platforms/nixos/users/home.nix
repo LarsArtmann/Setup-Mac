@@ -2,14 +2,16 @@
   imports = [
     ../../common/home-base.nix
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
-    ../../common/modules/ghost-wallpaper.nix
+    ../../common/modules/hyprland-animated-wallpaper.nix
   ];
 
-  # Enable ghost btop wallpaper
-  programs.ghost-btop-wallpaper = {
+  # Enable animated wallpaper with swww
+  programs.hyprland-animated-wallpaper = {
     enable = true;
-    updateRate = 2000;
-    backgroundOpacity = "0.0";
+    updateInterval = 30; # Change wallpaper every 30 seconds
+    transitionType = "random"; # Random transition direction
+    transitionStep = 90; # Faster transition
+    transitionDuration = 3; # 3 second transition
   };
 
   # NixOS-specific session variables
