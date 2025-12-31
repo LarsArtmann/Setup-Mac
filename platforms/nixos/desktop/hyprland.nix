@@ -105,9 +105,6 @@
           new_optimizations = true; # Enable new blur optimizations
           xray = true; # X-ray blur for better performance
         };
-        drop_shadow = {
-          enabled = false; # Disabled for maximum performance
-        };
       };
 
       # OPTIMIZED ANIMATIONS - BALANCED PERFORMANCE & SMOOTHNESS
@@ -136,10 +133,6 @@
         # new_is_master = true; # Deprecated in newer Hyprland
       };
 
-      gestures = {
-        workspace_swipe = true;
-      };
-
       # PERFORMANCE OPTIMIZATIONS
       misc = {
         force_default_wallpaper = 0;
@@ -149,14 +142,6 @@
         key_press_enables_dpms = false;
         always_follow_on_dnd = true;
         layers_hog_keyboard_focus = true;
-      };
-
-      # RENDERING OPTIMIZATIONS - MAXIMUM PERFORMANCE
-      render = {
-        direct_scanout = true;
-        expand_undersized_textures = true;
-        vrr = 2;
-        vfr = true;
       };
 
       # DEBUG & PERFORMANCE MONITORING
@@ -254,7 +239,7 @@
         # SYSTEM CONTROLS
         "$mod, Escape, exec, hyprlock" # Lock screen
         "$mod, X, exec, wlogout" # Power menu
-        "$mod SHIFT, R, reload" # Reload config
+        "$mod SHIFT, R, exec, hyprctl reload" # Reload config
         "$mod SHIFT, E, exec, wlogout" # Power menu
         "$mod, Print, exec, grimblast copy area" # Screenshot area
         "$mod SHIFT, Print, exec, grimblast copy screen" # Screenshot screen
