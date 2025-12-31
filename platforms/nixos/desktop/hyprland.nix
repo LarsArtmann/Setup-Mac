@@ -177,8 +177,6 @@
         disable_time = false;
         overlay = false;
         damage_blink = false;
-        errors = false;
-        disable_vrr = false;
       };
 
       bind = [
