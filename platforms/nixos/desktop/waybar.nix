@@ -194,7 +194,6 @@
         border-radius: 8px;
         border: 1px solid rgba(137, 180, 250, 0.15);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-        backdrop-filter: blur(8px);
       }
 
       #workspaces button {
@@ -209,7 +208,6 @@
       #workspaces button:hover {
         background: rgba(137, 180, 250, 0.15);
         color: #cdd6f4;
-        transform: scale(1.02);
       }
 
       #workspaces button.active {
@@ -290,17 +288,6 @@
       #battery.critical:not(.charging) {
         background: rgba(243, 139, 168, 0.3);
         color: #f38ba8;
-        animation-name: blink;
-        animation-duration: 0.5s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-direction: alternate;
-      }
-
-      @keyframes blink {
-        to {
-          background: rgba(243, 139, 168, 0.6);
-        }
       }
 
       #cpu {

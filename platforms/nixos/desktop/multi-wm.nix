@@ -53,6 +53,7 @@
 
     # Application launcher for all WMs
     wofi
+    rofi
 
     # Screen lockers
     swaylock
