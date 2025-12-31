@@ -34,6 +34,7 @@
   home.packages = with pkgs; [
     # GUI Tools
     pavucontrol # Audio control (user-level access for audio settings)
+    signal-desktop # Secure messaging application
 
     # System Tools
     # Note: rofi moved to multi-wm.nix for system-wide availability
