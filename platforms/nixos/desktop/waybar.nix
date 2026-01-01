@@ -31,7 +31,6 @@
           "backlight"
           "battery"
           "custom/clipboard"
-          "custom/ai"
           "custom/security"
           "tray"
           "custom/power"
@@ -238,7 +237,6 @@
       #temperature,
       #network,
       #pulseaudio,
-      #custom-ai,
       #custom-security,
       #custom-clipboard,
       #custom-power,
@@ -324,12 +322,6 @@
         background: rgba(243, 139, 168, 0.15);
         color: #f38ba8;
         font-size: 12px;
-      }
-
-      #custom-ai {
-        background: rgba(166, 227, 233, 0.15);
-        color: #94e2d5;
-        font-weight: bold;
       }
 
       #custom-security {
