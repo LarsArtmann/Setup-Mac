@@ -22,7 +22,7 @@
       "$menu" = "rofi -show drun -show-icons";
 
       # For TV display - 200% scaling
-      monitor = "HDMI-A-1,preferred,auto,2"; # Adjust HDMI-A-1 to actual output
+      monitor = "HDMI-A-1,preferred,auto,1.25"; # 125% scaling for TV display (reduced from 200% for workspace stability)
       # Fallback if above doesn't work:
       # monitor = "preferred,auto,2,transform,1";  # 2x scale + normal orientation
 
@@ -45,10 +45,33 @@
       };
 
       windowrulev2 = [
-        # Btop system monitor
-        # Note: btop-bg window rules now handled by ghost-btop-wallpaper module
+        # Terminal windows on workspace 1
+        "workspace 1,class:^(kitty)$"
+        "workspace 1,class^(ghostty)$"
+        "workspace 1,class^(alacritty)$"
 
-        # Htop process monitor
+        # Browser windows on workspace 2
+        "workspace 2,class:^(firefox)$"
+        "workspace 2,class^(chromium)$"
+        "workspace 2,class^(brave)$"
+
+        # File manager on workspace 3
+        "workspace 3,class:^(dolphin)$"
+        "workspace 3,class:^(thunar)$"
+        "workspace 3,class:^(nautilus)$"
+
+        # Editor windows on workspace 4
+        "workspace 4,class:^(nvim)$"
+        "workspace 4,class:^(code)$"
+        "workspace 4,class:^(codium)$"
+
+        # Communication apps on workspace 5
+        "workspace 5,class:^(signal)$"
+        "workspace 5,class:^(discord)$"
+        "workspace 5,class:^(Element)$"
+        "workspace 5,class:^(TelegramDesktop)$"
+
+        # Background consoles (keep visible on all workspaces)
         "float,class:^(htop-bg)$"
         "nofocus,class:^(htop-bg)$"
         "noblur,class:^(htop-bg)$"
@@ -113,8 +136,8 @@
           "border, 1, 5, default"
           "borderangle, 1, 6, default"
           "fade, 1, 3, default"
-          "workspaces, 1, 4, default, slidefadevert"
-          "specialWorkspace, 1, 4, default, slidefadevert"
+          "workspaces, 1, 0.5, default, slidefadevert" # Faster switching (0.5s instead of 4s)
+          "specialWorkspace, 1, 0.5, default, slidefadevert" # Faster switching (0.5s instead of 4s)
         ];
       };
 
