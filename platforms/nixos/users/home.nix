@@ -20,6 +20,9 @@
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
+
+    # Cursor size (larger for better visibility)
+    XCURSOR_SIZE = "32";
   };
 
   # NixOS-specific Fish shell overrides
@@ -36,6 +39,10 @@
     pavucontrol # Audio control (user-level access for audio settings)
     signal-desktop # Secure messaging application
 
+    # Cursor themes
+    adwaita-icon-theme
+    hicolor-icon-theme
+
     # System Tools
     # Note: rofi moved to multi-wm.nix for system-wide availability
     # Note: xdg-utils moved to base.nix for cross-platform consistency
@@ -46,5 +53,18 @@
   xdg.userDirs = {
     enable = true;
     createDirectories = true;
+  };
+
+  # GTK settings for cursor size and theme
+  gtk = {
+    enable = true;
+    cursorTheme = {
+      name = "Adwaita";
+      size = 32;
+    };
+    font = {
+      name = "Sans";
+      size = 11;
+    };
   };
 }
