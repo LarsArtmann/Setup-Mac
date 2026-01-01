@@ -7,7 +7,7 @@
     sensibleOnTop = true;
     mouse = true;
     terminal = "screen-256color";
-    historyLimit = 100000;
+    historyLimit = 10000;
     escapeTime = 0;
 
     plugins = with pkgs; [
