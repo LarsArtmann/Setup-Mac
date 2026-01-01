@@ -5,8 +5,9 @@ _: {
     alsa.enable = true;
     alsa.support32Bit = true;
     pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
+    # JACK audio support for professional audio applications
+    # Provides low-latency audio processing and audio app interconnection
+    jack.enable = true;
   };
 
   # Pulseaudio disabled (conflicts with pipewire)
