@@ -21,8 +21,8 @@
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
 
-    # Cursor size (larger for better visibility)
-    XCURSOR_SIZE = "32";
+    # Cursor size (extra large for TV display)
+    XCURSOR_SIZE = "48";
   };
 
   # NixOS-specific Fish shell overrides
@@ -60,7 +60,7 @@
     enable = true;
     cursorTheme = {
       name = "Adwaita";
-      size = 32;
+      size = 48;
     };
     font = {
       name = "Sans";
