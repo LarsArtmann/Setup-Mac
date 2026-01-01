@@ -3,13 +3,7 @@ _: {
   networking = {
     hostName = "evo-x2"; # Machine name
     networkmanager.enable = true;
-
-    # Force IPv4 resolution for binary caches (IPv6 is unreachable)
-    extraHosts = ''
-      151.101.1.91 cache.nixos.org
-      172.67.74.194 nix-community.cachix.org
-      172.67.74.194 hyprland.cachix.org
-    '';
+    enableIPv6 = false; # IPv6 is unreachable, disable entirely
   };
 
   # Set your time zone.
