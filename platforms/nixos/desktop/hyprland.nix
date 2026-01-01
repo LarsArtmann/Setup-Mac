@@ -47,12 +47,12 @@
       windowrulev2 = [
         # Terminal windows on workspace 1
         "workspace 1,class:^(kitty)$"
-        "workspace 1,class^(ghostty)$"
-        "workspace 1,class^(alacritty)$"
+        "workspace 1,class:^(ghostty)$"
+        "workspace 1,class:^(alacritty)$"
 
         # Browser windows on workspace 2
         "workspace 2,class:^(firefox)$"
-        "workspace 2,class^(chromium)$"
+        "workspace 2,class:^(chromium)$"
         "workspace 2,class:^(helium)$"
 
         # File manager on workspace 3

@@ -1,13 +1,12 @@
 {pkgs, ...}: {
   programs.waybar = {
     enable = true;
-    systemd.enable = true;
 
     settings = {
       mainBar = {
         layer = "top";
         position = "top";
-        height = 30;
+        height = 41;
         spacing = 4;
 
         modules-left = [
@@ -41,6 +40,7 @@
           disable-scroll = true;
           all-outputs = true;
           format = "{name}";
+          swap-icon-label = false;
           format-icons = {
             persistent = "";
             default = "";
@@ -127,7 +127,7 @@
         };
 
         "custom/media" = {
-          format = "{icon} {}";
+          format = "{icon} {text}";
           format-icons = {
             DEFAULT = "🎵";
             spotify = "";
