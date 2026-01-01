@@ -11,6 +11,7 @@
     ../services/ssh.nix
     ../services/default.nix
     ../hardware/amd-gpu.nix
+    ../hardware/bluetooth.nix
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
     # Desktop modules - reorganized for better separation of concerns
