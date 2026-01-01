@@ -53,7 +53,7 @@
         # Browser windows on workspace 2
         "workspace 2,class:^(firefox)$"
         "workspace 2,class^(chromium)$"
-        "workspace 2,class^(brave)$"
+        "workspace 2,class:^(helium)$"
 
         # File manager on workspace 3
         "workspace 3,class:^(dolphin)$"

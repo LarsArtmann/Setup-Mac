@@ -7,6 +7,7 @@
     # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
     ./boot.nix
     ./networking.nix
+    ./snapshots.nix # BTRFS snapshots with Timeshift
     ../services/ssh.nix
     ../services/default.nix
     ../hardware/amd-gpu.nix
