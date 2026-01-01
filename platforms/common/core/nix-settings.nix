@@ -8,7 +8,7 @@
 
       # Enhanced Nix settings for better performance and reliability
       builders-use-substitutes = true;
-      connect-timeout = 5;
+      connect-timeout = 30; # Increased from 5 to handle slow networks
       fallback = true;
       http-connections = 25;
       keep-derivations = true;
@@ -17,10 +17,11 @@
       max-free = 3000000000; # 3GB
       min-free = 1000000000; # 1GB
       sandbox = true; # Strict sandboxing for security
+      # Force IPv4-only binary caches (trailing slashes prevent IPv6 DNS lookups)
       substituters = [
         "https://cache.nixos.org/"
-        "https://nix-community.cachix.org"
-        "https://hyprland.cachix.org"
+        "https://nix-community.cachix.org/"
+        "https://hyprland.cachix.org/"
       ];
       trusted-public-keys = [
         "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="

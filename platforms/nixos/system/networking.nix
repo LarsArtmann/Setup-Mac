@@ -4,6 +4,10 @@ _: {
     hostName = "evo-x2"; # Machine name
     networkmanager.enable = true;
     enableIPv6 = false; # IPv6 is unreachable, disable entirely
+
+    # Force IPv4-only DNS servers (Quad9 IPv4 addresses)
+    # Prevents DNS from returning IPv6 addresses that cause timeouts
+    nameservers = ["9.9.9.10" "9.9.9.11"];
   };
 
   # Set your time zone.
