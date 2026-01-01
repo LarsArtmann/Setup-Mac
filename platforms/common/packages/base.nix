@@ -117,6 +117,7 @@
       fcast-client # FCast Client Terminal, media streaming client
       fcast-receiver # FCast Receiver, media streaming receiver
       ffcast # Run commands on rectangular screen regions
+      castnow # Command-line Chromecast player for Google Cast devices
     ];
 
   # GUI Applications (cross-platform)
