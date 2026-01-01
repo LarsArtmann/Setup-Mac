@@ -57,5 +57,9 @@ _: {
   };
 
   # SSH Banner
-  environment.etc."ssh/banner".source = ../users/ssh-banner;
+  environment.etc."ssh/banner".text = ''
+    ╔══════════════════════════════════════════╗
+    ║  AUTHORIZED ACCESS ONLY - All activity logged ║
+    ╚══════════════════════════════════════════╝
+  '';
 }
