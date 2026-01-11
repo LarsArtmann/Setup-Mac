@@ -1,6 +1,48 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: let
+  # Import Hyprland type safety framework
+  hyprlandTypes = import ../../../common/core/HyprlandTypes.nix {inherit lib;};
+
+  # Validate Hyprland configuration at evaluation time
+  hyprlandConfig = {
+    variables = {
+      "$mod" = "SUPER";
+      "$terminal" = "kitty";
+      "$menu" = "rofi -show drun -show-icons";
+    };
+    monitor = "HDMI-A-1,preferred,auto,1.25";
+    workspaces = [
+      "1, name:💻 Dev"
+      "2, name:🌐 Web"
+      "3, name:📁 Files"
+      "4, name:📝 Edit"
+      "5, name:💬 Chat"
+      "6, name:🔧 Tools"
+      "7, name:🎮 Games"
+      "8, name:🎵 Media"
+      "9, name:📊 Mon"
+      "10, name:🌟 Misc"
+    ];
+  };
+
+  validationResult = hyprlandTypes.validateHyprlandConfig hyprlandConfig;
+in {
   imports = [
     ./waybar.nix
+    ./polkit.nix
+  ];
+
+  # Type safety assertions - fail early if configuration is invalid
+  assertions = [
+    {
+      assertion = validationResult.valid;
+      message = lib.concatStringsSep "\n" (
+        ["❌ Hyprland configuration validation failed:"] ++ validationResult.errorMessages
+      );
+    }
   ];
 
   # Enable Hyprland via Home Manager
@@ -26,12 +68,26 @@
       # Fallback if above doesn't work:
       # monitor = "preferred,auto,2,transform,1";  # 2x scale + normal orientation
 
+      # Workspace naming for better organization
+      workspace = [
+        "1, name:💻 Dev"
+        "2, name:🌐 Web"
+        "3, name:📁 Files"
+        "4, name:📝 Edit"
+        "5, name:💬 Chat"
+        "6, name:🔧 Tools"
+        "7, name:🎮 Games"
+        "8, name:🎵 Media"
+        "9, name:📊 Mon"
+        "10, name:🌟 Misc"
+      ];
+
       exec-once = [
         ''waybar''
         ''dunst''
+        ''systemctl --user start polkit-gnome-authentication-agent-1''
         ''wl-paste --watch cliphist store''
         # Desktop consoles setup
-        # Note: btop-bg is now handled by ghost-btop-wallpaper module
         ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop'' # Process monitor
         ''${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f'' # System logs
         ''${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf'' # Config editor
@@ -68,8 +124,20 @@
         # Communication apps on workspace 5
         "workspace 5,class:^(signal)$"
         "workspace 5,class:^(discord)$"
-        "workspace 5,class:^(Element)$"
-        "workspace 5,class:^(TelegramDesktop)$"
+
+        # Dialogs should float
+        "float, title:^(Open File|Save As|Choose File)"
+
+        # Picture-in-Picture
+        "float, title:^(Picture-in-Picture)"
+        "pin, title:^(Picture-in-Picture)"
+
+        # System dialogs
+        "float, class:^(nm-connection-editor|blueman-manager|pavucontrol)$"
+        "center, class:^(nm-connection-editor|blueman-manager|pavucontrol)$"
+
+        # No blur for terminals (performance)
+        "noblur, class:^(kitty|ghostty|alacritty)$"
 
         # Background consoles (keep visible on all workspaces)
         "float,class:^(htop-bg)$"
@@ -151,6 +219,12 @@
       };
 
       # PERFORMANCE OPTIMIZATIONS
+      render = {
+        direct_scanout = 1; # Reduced latency
+        explicit_sync = 1; # Better frame timing
+        new_render_scheduling = true; # Smoother animations
+      };
+
       misc = {
         force_default_wallpaper = 0;
         disable_hyprland_logo = true;
@@ -159,6 +233,17 @@
         key_press_enables_dpms = false;
         always_follow_on_dnd = true;
         layers_hog_keyboard_focus = true;
+        vrr = 1; # Variable refresh rate
+        vfr = true; # Variable frame rate
+        animate_manual_resizes = false; # Responsive resizing
+        animate_mouse_windowdragging = false; # Responsive dragging
+        render_ahead_of_time = true; # Pre-render frames
+      };
+
+      input = {
+        follow_mouse = 1; # Better focus behavior
+        repeat_delay = 250; # Keyboard repeat
+        repeat_rate = 40; # Faster repeat rate
       };
 
       # DEBUG & PERFORMANCE MONITORING
@@ -274,11 +359,19 @@
         ", XF86MonBrightnessUp, exec, brightnessctl set +5%"
         ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
 
-        # DESKTOP TERMINALS TOGGLE (placeholders - need implementation)
+        # DESKTOP TERMINALS TOGGLE
         "$mod, F1, exec, hyprctl dispatch focuswindow ^btop-bg$"
         "$mod, F2, exec, hyprctl dispatch focuswindow ^htop-bg$"
         "$mod, F3, exec, hyprctl dispatch focuswindow ^logs-bg$"
         "$mod, F4, exec, hyprctl dispatch focuswindow ^nvim-bg$"
+
+        # Development tool shortcuts
+        "$mod, G, exec, gitui"
+        "$mod, H, exec, btop"
+        "$mod, A, exec, nvim ~/todo.md"
+
+        # Clipboard history
+        "$mod, V, exec, cliphist list | rofi -dmenu -p 'Clipboard:' | cliphist decode | wl-copy"
       ];
 
       bindm = [

@@ -29,8 +29,8 @@
           "temperature"
           "backlight"
           "battery"
+          "custom/sudo"
           "custom/clipboard"
-          "custom/security"
           "tray"
           "custom/power"
         ];
@@ -132,7 +132,7 @@
             DEFAULT = "🎵";
             spotify = "";
           };
-          exec = "playerctl metadata --format '{{artist}} - {{title}}' || echo 'Nothing playing'";
+          exec = "playerctl metadata --format '{artist} - {title}' || echo 'Nothing playing'";
           interval = 5;
           tooltip = false;
         };
@@ -146,12 +146,37 @@
           on-scroll-down = "brightnessctl set 1%-";
         };
 
-        "custom/security" = {
-          format = "🛡️ {}";
-          exec = "~/.config/waybar/security-status.sh";
-          interval = 30;
-          tooltip = "Security Status";
-          on-click = "alacritty -e sudo lynis audit system";
+        # Security status module disabled - script not implemented
+        # "custom/security" = {
+        #   format = "🛡️ {}";
+        #   exec = "~/.config/waybar/security-status.sh";
+        #   interval = 30;
+        #   tooltip = "Security Status";
+        #   on-click = "alacritty -e sudo lynis audit system";
+        # };
+
+        "custom/sudo" = {
+          format = "{}";
+          exec = pkgs.writeShellScript "waybar-sudo-status" ''
+            if pgrep -x sudo >/dev/null 2>&1; then
+              echo "⚠️"
+            else
+              echo ""
+            fi
+          '';
+          interval = 2;
+          tooltip = true;
+          tooltip-format = "Sudo status: {}";
+          on-click = pkgs.writeShellScript "waybar-sudo-reset" ''
+            # Check if sudo timestamp exists
+            if sudo -n true 2>/dev/null; then
+              # Timestamp exists, invalidate it
+              sudo -k
+              notify-send "Sudo" "Sudo timestamp cleared"
+            else
+              notify-send "Sudo" "No active sudo session"
+            fi
+          '';
         };
 
         "custom/clipboard" = {
