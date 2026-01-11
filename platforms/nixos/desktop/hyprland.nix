@@ -32,7 +32,6 @@
 in {
   imports = [
     ./waybar.nix
-    ./polkit.nix
   ];
 
   # Type safety assertions - fail early if configuration is invalid
@@ -85,7 +84,6 @@ in {
       exec-once = [
         ''waybar''
         ''dunst''
-        ''systemctl --user start polkit-gnome-authentication-agent-1''
         ''wl-paste --watch cliphist store''
         # Desktop consoles setup
         ''${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop'' # Process monitor
@@ -396,7 +394,6 @@ in {
     hypridle # Idle daemon for automatic lock/suspend
     hyprpicker # Color picker
     hyprsunset # Blue light filter
-    hyprpolkitagent # Modern polkit agent for Hyprland
 
     # Status Bar & Notifications
     # waybar moved to multi-wm.nix (available system-wide)
