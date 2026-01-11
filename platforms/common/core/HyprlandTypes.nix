@@ -1,6 +1,107 @@
 # Ghost Systems: Hyprland Type Safety Module
 # Comprehensive type definitions and validation for Hyprland configuration
-{lib}: {
+{lib}: let
+  # ---------------------------------------------------------------------------
+  # Validation Functions (defined first, used by other helpers)
+  # ---------------------------------------------------------------------------
+  # Validate Hyprland configuration syntax and semantics
+  validateHyprlandConfig = config: let
+    # Extract relevant config sections
+    variables = config.variables or {};
+    monitors = lib.toList (config.monitor or []);
+    workspaces = config.workspaces or [];
+
+    # Check for required variables
+    requiredVars = ["$mod"];
+    missingVars = lib.filter (var: !builtins.hasAttr var variables) requiredVars;
+
+    # Validate monitor format: name,resolution,position,scale
+    validMonitorFormat = monitor: let
+      parts = lib.splitString "," monitor;
+    in
+      builtins.length parts >= 3;
+
+    invalidMonitors = lib.filter (m: !validMonitorFormat m) monitors;
+
+    # Validate workspace format: id[,name:Name]
+    validWorkspaceFormat = workspace: let
+      parts = lib.splitString "," workspace;
+      idStr = builtins.head parts;
+    in
+      builtins.match "^[0-9]+" idStr != null;
+
+    invalidWorkspaces = lib.filter (w: !validWorkspaceFormat w) workspaces;
+
+    # Validate bezier curve format: name,x1,y1,x2,y2
+    validBezierFormat = bezier: let
+      parts = lib.splitString "," bezier;
+    in
+      builtins.length parts
+      == 5
+      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 1) != null
+      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 2) != null
+      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 3) != null
+      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 4) != null;
+
+    bezier = (config.animations or {}).bezier or "";
+    bezierValid = bezier == "" || validBezierFormat bezier;
+  in {
+    # Overall validity
+    valid =
+      builtins.length missingVars
+      == 0
+      && builtins.length invalidMonitors == 0
+      && builtins.length invalidWorkspaces == 0
+      && bezierValid;
+
+    # Detailed error information
+    errors = {
+      missingVars =
+        if builtins.length missingVars > 0
+        then "Missing required variables: ${builtins.toJSON missingVars}"
+        else null;
+
+      invalidMonitors =
+        if builtins.length invalidMonitors > 0
+        then "Invalid monitor format: ${builtins.toJSON invalidMonitors}"
+        else null;
+
+      invalidWorkspaces =
+        if builtins.length invalidWorkspaces > 0
+        then "Invalid workspace format: ${builtins.toJSON invalidWorkspaces}"
+        else null;
+
+      invalidBezier =
+        if !bezierValid
+        then "Invalid bezier format: ${bezier}"
+        else null;
+    };
+
+    # Human-readable error messages
+    errorMessages = lib.filter (msg: msg != null) [
+      (
+        if builtins.length missingVars > 0
+        then "❌ Missing required variables: ${lib.concatStringsSep ", " missingVars}"
+        else null
+      )
+      (
+        if builtins.length invalidMonitors > 0
+        then "❌ Invalid monitor format: ${lib.concatStringsSep ", " invalidMonitors}"
+        else null
+      )
+      (
+        if builtins.length invalidWorkspaces > 0
+        then "❌ Invalid workspace format: ${lib.concatStringsSep ", " invalidWorkspaces}"
+        else null
+      )
+      (
+        if !bezierValid
+        then "❌ Invalid bezier curve format"
+        else null
+      )
+    ];
+  };
+in {
   # ---------------------------------------------------------------------------
   # Type Definitions
   # ---------------------------------------------------------------------------
@@ -216,110 +317,9 @@
   };
 
   # ---------------------------------------------------------------------------
-  # Validation Functions
-  # ---------------------------------------------------------------------------
-
-  # Validate Hyprland configuration syntax and semantics
-  validateHyprlandConfig = config: let
-    # Extract relevant config sections
-    variables = config.variables or {};
-    monitors = lib.toList (config.monitor or []);
-    workspaces = config.workspaces or [];
-
-    # Check for required variables
-    requiredVars = ["$mod"];
-    missingVars = lib.filter (var: !variables ? var) requiredVars;
-
-    # Validate monitor format: name,resolution,position,scale
-    validMonitorFormat = monitor: let
-      parts = lib.splitString "," monitor;
-    in
-      builtins.length parts >= 3;
-
-    invalidMonitors = lib.filter (m: !validMonitorFormat m) monitors;
-
-    # Validate workspace format: id[,name:Name]
-    validWorkspaceFormat = workspace: let
-      parts = lib.splitString "," workspace;
-      idStr = builtins.head parts;
-    in
-      builtins.match "^[0-9]+" idStr != null;
-
-    invalidWorkspaces = lib.filter (w: !validWorkspaceFormat w) workspaces;
-
-    # Validate bezier curve format: name,x1,y1,x2,y2
-    validBezierFormat = bezier: let
-      parts = lib.splitString "," bezier;
-    in
-      builtins.length parts
-      == 5
-      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 1) != null
-      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 2) != null
-      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 3) != null
-      && builtins.match "^[0-9\\.]+$" (builtins.elemAt parts 4) != null;
-
-    bezier = (config.animations or {}).bezier or "";
-    bezierValid = bezier == "" || validBezierFormat bezier;
-  in {
-    # Overall validity
-    valid =
-      builtins.length missingVars
-      == 0
-      && builtins.length invalidMonitors == 0
-      && builtins.length invalidWorkspaces == 0
-      && bezierValid;
-
-    # Detailed error information
-    errors = {
-      missingVars =
-        if builtins.length missingVars > 0
-        then "Missing required variables: ${builtins.toJSON missingVars}"
-        else null;
-
-      invalidMonitors =
-        if builtins.length invalidMonitors > 0
-        then "Invalid monitor format: ${builtins.toJSON invalidMonitors}"
-        else null;
-
-      invalidWorkspaces =
-        if builtins.length invalidWorkspaces > 0
-        then "Invalid workspace format: ${builtins.toJSON invalidWorkspaces}"
-        else null;
-
-      invalidBezier =
-        if !bezierValid
-        then "Invalid bezier format: ${bezier}"
-        else null;
-    };
-
-    # Human-readable error messages
-    errorMessages = lib.filter (msg: msg != null) [
-      (
-        if builtins.length missingVars > 0
-        then "❌ Missing required variables: ${lib.concatStringsSep ", " missingVars}"
-        else null
-      )
-      (
-        if builtins.length invalidMonitors > 0
-        then "❌ Invalid monitor format: ${lib.concatStringsSep ", " invalidMonitors}"
-        else null
-      )
-      (
-        if builtins.length invalidWorkspaces > 0
-        then "❌ Invalid workspace format: ${lib.concatStringsSep ", " invalidWorkspaces}"
-        else null
-      )
-      (
-        if !bezierValid
-        then "❌ Invalid bezier curve format"
-        else null
-      )
-    ];
-  };
-
-  # ---------------------------------------------------------------------------
   # Type-Safe Helper Functions
   # ---------------------------------------------------------------------------
+  inherit validateHyprlandConfig;
 
   # Create a type-safe keybinding
   mkKeybinding = mod: key: action: let

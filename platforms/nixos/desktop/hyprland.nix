@@ -4,7 +4,7 @@
   ...
 }: let
   # Import Hyprland type safety framework
-  hyprlandTypes = import ../../../common/core/HyprlandTypes.nix {inherit lib;};
+  hyprlandTypes = import ../../common/core/HyprlandTypes.nix {inherit lib;};
 
   # Validate Hyprland configuration at evaluation time
   hyprlandConfig = {
