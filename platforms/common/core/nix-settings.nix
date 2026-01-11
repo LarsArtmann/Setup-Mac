@@ -8,9 +8,9 @@
 
       # Enhanced Nix settings for better performance and reliability
       builders-use-substitutes = true;
-      connect-timeout = 30; # Increased from 5 to handle slow networks
+      connect-timeout = 60; # Increased to 60s to handle DNS timeouts
       fallback = true;
-      http-connections = 25;
+      http-connections = 10; # Reduced to avoid "Too many open files" errors
       keep-derivations = true;
       keep-outputs = true;
       log-lines = 25;

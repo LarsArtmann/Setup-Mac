@@ -5,10 +5,13 @@ _: {
     networkmanager.enable = true;
     enableIPv6 = false; # IPv6 is unreachable, disable entirely
 
-    # Force IPv4-only DNS servers (Quad9 IPv4 addresses)
-    # Prevents DNS from returning IPv6 addresses that cause timeouts
+    # DNS configuration
     nameservers = ["9.9.9.10" "9.9.9.11"];
   };
+
+  # Configure NetworkManager DNS settings
+  # This ensures Quad9 DNS is used instead of router's DNS
+  networking.networkmanager.dns = "none"; # Disable automatic DNS handling
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin"; # Adjust as needed
