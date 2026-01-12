@@ -9,7 +9,7 @@ default:
 setup:
     @echo "🚀 Setting up macOS configuration..."
     @just ssh-setup
-    @just link
+    @echo "ℹ️  Dotfiles are now managed by Home Manager (manual linking deprecated)"
     @just switch
     @just pre-commit-install
     @echo "✅ Setup complete! Your macOS configuration is ready."
@@ -20,11 +20,12 @@ ssh-setup:
     mkdir -p ~/.ssh/sockets
     @echo "✅ SSH directories created"
 
-# Link configuration files using the manual linking script
+# Link configuration files (deprecated - now managed by Home Manager)
 link:
-    @echo "🔗 Linking dotfiles..."
-    ./manual-linking.sh
-    @echo "✅ Dotfiles linked"
+    @echo "ℹ️  Manual dotfile linking is deprecated"
+    @echo "ℹ️  All dotfiles are now managed declaratively via Home Manager"
+    @echo "ℹ️  To apply configuration changes, run: just switch"
+    @echo "✅ No manual linking needed"
 
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
@@ -46,24 +47,25 @@ update:
     nix flake update
     @echo "✅ System updated"
 
-# ActivityWatch Nix-managed auto-start configuration
+# ActivityWatch auto-start configuration (now managed by Nix)
 activitywatch-setup:
-    @echo "⚙️  Setting up ActivityWatch auto-start via Nix..."
-    ./scripts/nix-activitywatch-setup.sh
-    @echo "✅ ActivityWatch auto-start configured via Nix"
+    @echo "⚙️  ActivityWatch auto-start is now managed declaratively via Nix"
+    @echo "ℹ️  Configuration: platforms/darwin/services/launchagents.nix"
+    @echo "ℹ️  To apply changes, run: just switch"
+    @echo "✅ No manual setup needed"
 
 # Verify ActivityWatch auto-start is working
 activitywatch-check:
     @echo "🔍 Checking ActivityWatch auto-start status..."
-    @./scripts/nix-activitywatch-setup.sh --check
+    @echo "ℹ️  LaunchAgent: net.activitywatch.ActivityWatch"
+    @echo "ℹ️  Logs: /tmp/net.activitywatch.ActivityWatch.*.log"
+    @launchctl list | grep -i activitywatch || echo "⚠️  ActivityWatch not found in launchctl list"
 
-# Remove manual ActivityWatch configuration (migrate to Nix)
+# ActivityWatch migration complete (now fully managed by Nix)
 activitywatch-migrate:
-    @echo "🔄 Migrating ActivityWatch to Nix management..."
-    @./scripts/nix-activitywatch-setup.sh --cleanup
-    @echo "Applying Nix-managed configuration..."
-    @just activitywatch-setup
-    @echo "✅ Migration complete"
+    @echo "✅ ActivityWatch is already fully managed by Nix"
+    @echo "ℹ️  Configuration: platforms/darwin/services/launchagents.nix"
+    @echo "ℹ️  Manual setup script deprecated"
 
 # ActivityWatch commands
 activitywatch-start:
@@ -323,13 +325,9 @@ restore BACKUP_NAME:
     cp "$BACKUP_PATH/justfile" .
     fi
 
-    if [ -f "$BACKUP_PATH/manual-linking.sh" ]; then
-    echo "Restoring manual-linking.sh..."
-    cp "$BACKUP_PATH/manual-linking.sh" .
-    fi
-
-    echo "✅ Restore complete. Run 'just link' and 'just switch' to apply changes."
+    echo "✅ Restore complete. Run 'just switch' to apply changes."
     echo "💡 Original state backed up automatically before restore."
+    echo "ℹ️  Note: Manual dotfile linking is deprecated; use Home Manager configs"
 
 # Clean old backups (keep last 10)
 clean-backups:
@@ -991,27 +989,13 @@ tmux-status:
     @echo "  Config: $HOME/.config/tmux/tmux.conf"
 
 # Show dependency graph statistics
-dep-graph-stats:
-
-# =========================
-# NIX CONFIGURATION VISUALIZATION
-# =========================
-
-# Generate Nix configuration dependency graph (Darwin)
-dep-graph:
-    @echo "📊 Generating Nix dependency graph for Darwin..."
-    @echo "  This may take a moment to analyze system dependencies..."
-    @mkdir -p docs/architecture
-    @nix eval .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --raw 2>&1 | \
-        xargs nix run github:craigmbooth/nix-visualize -- \
-        --output docs/architecture/Setup-Mac-Darwin.svg \
-        --no-verbose
-    @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-Darwin.svg"
-    @ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print "   Size: " $5}'
+# 2. Manual documentation (docs/nix-call-graph.md)
+# 3. Alternative tools (e.g., nix-tree for store queries)
 
 # Generate Nix configuration dependency graph (NixOS)
-dep-graph-nixos:
+dep-graph:
     @echo "📊 Generating Nix dependency graph for NixOS..."
+    @echo "  This may take a moment to analyze system dependencies..."
     @mkdir -p docs/architecture
     @nix eval .#nixosConfigurations.evo-x2.config.system.build.toplevel --raw 2>&1 | \
         xargs nix run github:craigmbooth/nix-visualize -- \
@@ -1020,77 +1004,15 @@ dep-graph-nixos:
     @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-NixOS.svg"
     @ls -lh docs/architecture/Setup-Mac-NixOS.svg | awk '{print "   Size: " $5}'
 
-# Generate dependency graph with PNG output
-dep-graph-png:
-    @echo "📊 Generating Nix dependency graph (PNG)..."
-    @mkdir -p docs/architecture
-    @nix eval .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --raw 2>&1 | \
-        xargs nix run github:craigmbooth/nix-visualize -- \
-        --output docs/architecture/Setup-Mac-Darwin.png \
-        --no-verbose
-    @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-Darwin.png"
-
-# Generate all dependency graphs (both platforms, all formats)
-dep-graph-all:
-    @echo "📊 Generating all Nix dependency graphs..."
-    @echo ""
-    @echo "=== Darwin Graphs ==="
-    @just dep-graph
-    @just dep-graph-png
-    @echo ""
-    @echo "=== NixOS Graphs ==="
-    @just dep-graph-nixos
-    @echo ""
-    @echo "✅ All dependency graphs generated in docs/architecture/"
-    @ls -lh docs/architecture/Setup-Mac-*.{svg,png} 2>/dev/null | awk '{print "   " $9 ": " $5}'
-
-# Generate high-quality SVG with verbose output (for debugging)
-dep-graph-verbose:
-    @echo "📊 Generating Nix dependency graph (verbose mode)..."
-    @mkdir -p docs/architecture
-    @nix eval .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --raw 2>&1 | \
-        xargs nix run github:craigmbooth/nix-visualize -- \
-        --output docs/architecture/Setup-Mac-Darwin-verbose.svg \
-        --verbose
-    @echo "✅ Verbose dependency graph generated"
-
-# View generated dependency graph in default browser
-dep-graph-view:
-    @echo "👀 Opening dependency graph..."
-    @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
-        open docs/architecture/Setup-Mac-Darwin.svg; \
-    elif [ -f docs/architecture/Setup-Mac-Darwin.png ]; then \
-        open docs/architecture/Setup-Mac-Darwin.png; \
-    elif [ -f docs/architecture/Setup-Mac-NixOS.svg ]; then \
-        open docs/architecture/Setup-Mac-NixOS.svg; \
-    else \
-        echo "❌ No dependency graph found. Run 'just dep-graph' first."; \
-    fi
-
-# Clean generated dependency graphs
-dep-graph-clean:
-    @echo "🧹 Cleaning dependency graphs..."
-    @rm -f docs/architecture/Setup-Mac-*.{svg,png}
-    @rm -f docs/architecture/*.svg
-    @rm -f docs/architecture/*.png
-    @echo "✅ Dependency graphs cleaned"
-
-# Update and view dependency graphs (quick workflow)
-dep-graph-update:
-    @echo "🔄 Updating dependency graphs..."
-    @just dep-graph
-    @echo ""
-    @echo "👀 Opening in browser..."
-    @sleep 1
-    @just dep-graph-view
-
+# Show dependency graph statistics
+dep-graph-stats:
     @echo "📊 Dependency graph statistics:"
     @echo ""
-    @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
-        echo "Darwin SVG: $(ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print $5}')"; \
-    fi
     @if [ -f docs/architecture/Setup-Mac-NixOS.svg ]; then \
         echo "NixOS SVG: $(ls -lh docs/architecture/Setup-Mac-NixOS.svg | awk '{print $5}')"; \
+    fi
+    @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
+        echo "Darwin SVG: $(ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print $5}')"; \
     fi
     @echo ""
     @echo "Files in docs/architecture/:"
