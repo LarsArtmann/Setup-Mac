@@ -521,6 +521,54 @@ nix-store --optimize
 
 ---
 
+## Implementation Progress
+
+### 2026-01-12 Updates
+
+**✅ Completed Fixes:**
+
+1. **LaunchAgent Migration (Issue #2 - CRITICAL)**
+   - ✅ Fixed: Changed `launchd.userAgents` → `environment.userLaunchAgents` in `platforms/darwin/services/launchagents.nix`
+   - ✅ Fixed: Corrected module structure to use plist XML text instead of config attributes
+   - ✅ Test: Configuration test passed successfully (`just test`)
+   - ✅ Status: Ready for `just switch` to apply changes
+
+   **Technical Details:**
+   - Original file used incorrect `launchd.userAgents` option (doesn't exist in nix-darwin)
+   - Corrected to `environment.userLaunchAgents` with proper plist XML structure
+   - Added proper user home directory handling via `config.users.users.larsartmann.home`
+   - Using proper XDG-compliant log paths: `${userHome}/.local/share/activitywatch/`
+
+2. **Locale Configuration for Git**
+   - ✅ Found: English locale settings already configured in `platforms/common/programs/fish.nix`
+   - ✅ Settings: `LANG=en_US.UTF-8`, `LC_ALL=en_US.UTF-8`, `LC_CTYPE=en_US.UTF-8`
+   - ⏳ Status: Will take effect after `just switch` (applies Home Manager changes)
+   - 📝 Note: Current shell has German locale from macOS system settings (AppleLanguages: en-DE, de-DE, zh-Hant-DE)
+
+**🔄 Work in Progress:**
+
+None currently - both critical fixes completed.
+
+**📋 Pending (from original report):**
+
+**Critical (P0):**
+- ⏳ Manual dotfiles linking still using `scripts/manual-linking.sh`
+- ⏳ LaunchAgent bash script `scripts/nix-activitywatch-setup.sh` still exists (can be removed after switch)
+- ⏳ Hardcoded system paths in multiple scripts
+
+**High Priority (P1):**
+- ⏳ Homebrew packages that should be in Nix
+- ⏳ Complex bash scripts duplicating Nix capabilities
+- ⏳ Scattered environment variable configuration
+
+**Next Immediate Actions:**
+1. Run `just switch` to apply LaunchAgent and locale fixes
+2. Test ActivityWatch auto-start after switch
+3. Remove obsolete `scripts/nix-activitywatch-setup.sh` (backup first)
+4. Begin Phase 2 of migration plan (High Priority issues)
+
+---
+
 ## Next Steps
 
 1. **Review this report** with team/stakeholders
@@ -534,4 +582,4 @@ nix-store --optimize
 
 **Report Generated:** 2026-01-12
 **Analyst:** AI Architecture Review
-**Status:** Ready for Review
+**Status:** In Progress - Critical Issue #2 Fixed, Ready for Apply

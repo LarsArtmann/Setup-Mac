@@ -53,6 +53,10 @@ in {
       export GPG_TTY=$(tty)
       export GH_PAGER=""
 
+      # Go
+      export GOPATH="$HOME/go"
+      export PATH="$GOPATH/bin:$PATH"
+
       # Source private environment variables (not tracked in git)
       if [[ -f ~/.env.private ]]; then
         source ~/.env.private
