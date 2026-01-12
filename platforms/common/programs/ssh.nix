@@ -26,8 +26,6 @@ let
       controlPersist = "600";
       extraOptions = {
         TCPKeepAlive = "yes";
-      } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-        UseKeychain = "no";
       };
     };
   };

@@ -69,11 +69,11 @@
         "utils": "utils"
       },
       "locked": {
-        "lastModified": 1767924473,
-        "narHash": "sha256-wAdFsUgGMf2taG9rO0LYTb7aFfGNcx0CcIbvniS0ywk=",
+        "lastModified": 1768212236,
+        "narHash": "sha256-XeWkfBJAHz99s2nCuZDNKrgw9c+29/vM8qNIGz0Wx1s=",
         "owner": "vikingnope",
         "repo": "helium-browser-nix-flake",
-        "rev": "05cc00fbd4e072c3837df9d0cbf1de9f5636198b",
+        "rev": "ade648a3f08f185464d4043d74605c96c87a4bfb",
         "type": "github"
       },
       "original": {
@@ -211,11 +211,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1768210399,
-        "narHash": "sha256-DA2DRxxhh+EG0unjiw3M9boQZuQ5FzbK+FZ+s5pt82k=",
+        "lastModified": 1768211092,
+        "narHash": "sha256-lPIRDezbO5MKmKoguRBbl7Tlu6z8f3qnRrvrT2Km1sI=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "5f9e4856a52e50880264b00e2b243d73a2189202",
+        "rev": "f518886c84b886748910627ea4bcc1c36663d6f0",
         "type": "github"
       },
       "original": {
