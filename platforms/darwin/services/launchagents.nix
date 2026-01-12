@@ -6,8 +6,8 @@
 in {
   # LaunchAgents for user-level services
   # Replaces scripts/nix-activitywatch-setup.sh with declarative Nix configuration
-  # Using nix-darwin launchd.agents option
-  launchd.agents = {
+  # Using nix-darwin launchd.userAgents option (WORKING PATTERN)
+  launchd.userAgents = {
     # ActivityWatch auto-start service
     # NOTE: If ActivityWatch is installed via Homebrew, path remains /Applications/ActivityWatch.app
     # TODO: Migrate ActivityWatch to Nix package when available (currently only in unstable)
