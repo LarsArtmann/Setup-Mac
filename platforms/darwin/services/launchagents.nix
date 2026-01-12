@@ -1,37 +1,35 @@
 # LaunchAgent Management for macOS (nix-darwin)
 # Declarative service management to replace imperative bash scripts
-{config, pkgs, lib, ...}: {
+{config, pkgs, lib, ...}: with lib; let
+  # ActivityWatch path (Homebrew installation)
+  activityWatchPath = "/Applications/ActivityWatch.app/Contents/MacOS/ActivityWatch";
+  # User home directory (from nix-darwin users option)
+  userHome = config.users.users.larsartmann.home or "/Users/larsartmann";
+in {
   # LaunchAgents for user-level services
   # Replaces scripts/nix-activitywatch-setup.sh with declarative Nix configuration
-  launchd.userAgents = {
-    # ActivityWatch auto-start service
-    # NOTE: If ActivityWatch is installed via Homebrew, the path remains /Applications/ActivityWatch.app
-    # TODO: Migrate ActivityWatch to Nix package when available (currently only in unstable)
-    "net.activitywatch.ActivityWatch" = {
-      enable = true;  # Set to false to disable
-      config = {
-        # Program path to ActivityWatch
-        # Using Homebrew-installed app for now
-        # To migrate to Nix: use "${pkgs.activitywatch}/bin/aw-qt" when available
-        ProgramArguments = [
-          "/Applications/ActivityWatch.app/Contents/MacOS/ActivityWatch"
-          "--background"
-        ];
+  # Using nix-darwin launchd.agents option structure
+  launchd.agents.activitywatch = mkIf (pkgs.stdenv.isDarwin) {
+    enable = true;
+    Label = "net.activitywatch.ActivityWatch";
 
-        # Service configuration
-        RunAtLoad = true;
-        KeepAlive = {
-          SuccessfulExit = false;
-        };
-        ProcessType = "Background";
+    # Program path to ActivityWatch
+    # NOTE: Using Homebrew-installed app for now
+    # TODO: Migrate to Nix package when available (currently only in unstable)
+    ProgramArguments = [activityWatchPath "--background"];
 
-        # Working directory
-        WorkingDirectory = "/Users/larsartmann";
-
-        # Logging (optional, useful for debugging)
-        StandardOutPath = "/tmp/net.activitywatch.ActivityWatch.stdout.log";
-        StandardErrorPath = "/tmp/net.activitywatch.ActivityWatch.stderr.log";
-      };
+    # Service configuration
+    RunAtLoad = true;
+    KeepAlive = {
+      SuccessfulExit = false;
     };
+    ProcessType = "Background";
+
+    # Working directory
+    WorkingDirectory = userHome;
+
+    # Logging (optional, useful for debugging)
+    StandardOutPath = "${userHome}/.local/share/activitywatch/stdout.log";
+    StandardErrorPath = "${userHome}/.local/share/activitywatch/stderr.log";
   };
 }
