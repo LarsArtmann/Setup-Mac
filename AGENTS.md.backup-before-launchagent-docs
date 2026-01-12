@@ -158,24 +158,11 @@ users.users.lars = {
 **Note**: This may be a Home Manager architecture issue. Consider reporting if causes problems in future versions.
 
 ##### ActivityWatch Platform Support
+**Issue**: ActivityWatch only supports Linux platforms, not Darwin (macOS).
 
-**Linux**:
-- **Configuration**: Managed via `platforms/common/programs/activitywatch.nix`
-- **Status**: ✅ Working - Conditional build (`pkgs.stdenv.isLinux`)
+**Workaround**: Made conditional - `enable = pkgs.stdenv.isLinux` in `platforms/common/programs/activitywatch.nix`.
 
-**macOS (Darwin)**:
-- **Configuration**: Managed via `platforms/darwin/services/launchagents.nix`
-- **LaunchAgent**: `net.activitywatch.ActivityWatch` (auto-start)
-- **Status**: ✅ Working - Declarative LaunchAgent management
-- **Control**: Use `just activitywatch-start` / `just activitywatch-stop` for manual control
-- **Logs**: `~/.local/share/activitywatch/stdout.log` and `stderr.log`
-
-**Migration Status**:
-- ✅ Bash scripts removed (`scripts/nix-activitywatch-setup.sh`)
-- ✅ Manual setup deprecated
-- ✅ Fully Nix-managed (no imperative configuration)
-
-**Status**: ✅ FIXED - Both platforms fully supported via Nix
+**Status**: ✅ FIXED - Build succeeds on both platforms
 
 #### Home Manager Configuration Workflow
 
@@ -316,25 +303,6 @@ just rollback           # Emergency rollback to previous generation
 ```
 
 ### Go Development (Primary Language)
-
-**Tool Management:**
-All Go development tools are managed via Nix packages (defined in `platforms/common/packages/base.nix`):
-- **gopls**: Go language server
-- **golangci-lint**: Go linter
-- **gofumpt**: Stricter gofmt
-- **gotests**: Generate Go tests
-- **mockgen**: Mocking framework
-- **protoc-gen-go**: Protocol buffer support
-- **buf**: Protocol buffer toolchain
-- **delve**: Go debugger
-- **gup**: Go binary updater
-
-**Migration Status:**
-- ✅ Migrated to Nix packages (90% success rate)
-- ✅ No `go install` required (except wire - not in Nixpkgs)
-- ✅ Declarative tool management via `platforms/common/packages/base.nix`
-- ✅ Atomic updates via `just update && just switch`
-
 ```bash
 # Core Go workflow
 just go-dev             # Format, lint, test, build (complete)
