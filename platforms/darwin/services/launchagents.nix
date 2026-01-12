@@ -9,7 +9,7 @@ in {
   # Using nix-darwin environment.userLaunchAgents option
   environment.userLaunchAgents = {
     # ActivityWatch auto-start service
-    # NOTE: If ActivityWatch is installed via Homebrew, path remains /Applications/ActivityWatch.app
+    # NOTE: Binary is aw-qt, not ActivityWatch (Homebrew-installed app bundle)
     # TODO: Migrate ActivityWatch to Nix package when available (currently only in unstable)
     "net.activitywatch.ActivityWatch.plist" = {
       enable = true;  # Set to false to disable
@@ -22,7 +22,7 @@ in {
             <string>net.activitywatch.ActivityWatch</string>
             <key>ProgramArguments</key>
             <array>
-                <string>/Applications/ActivityWatch.app/Contents/MacOS/ActivityWatch</string>
+                <string>/Applications/ActivityWatch.app/Contents/MacOS/aw-qt</string>
                 <string>--background</string>
             </array>
             <key>RunAtLoad</key>
