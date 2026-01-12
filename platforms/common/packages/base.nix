@@ -95,6 +95,13 @@
       go
       gopls
       golangci-lint
+      gofumpt
+      gotests
+      mockgen
+      protoc-gen-go
+      buf
+      delve
+      gup
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp
