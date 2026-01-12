@@ -12,6 +12,7 @@
     ./programs/starship.nix
     ./programs/activitywatch.nix
     ./programs/tmux.nix
+    ./programs/git.nix
   ];
 
   # Enable Home Manager to manage itself
