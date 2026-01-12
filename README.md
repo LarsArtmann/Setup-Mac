@@ -493,6 +493,42 @@ This configuration uses a **type-safe, modular architecture** with the following
 - **Comprehensive testing**: Built-in validation and assertion framework
 
 
+
+### Dependency Visualization
+- **nix-visualize**: Automated Nix dependency graph generation
+- **`just dep-graph`**: Generate system dependency visualizations
+- **`docs/architecture/Setup-Mac-Darwin.svg`**: Current dependency graph (471 packages)
+- **`docs/architecture/nix-visualize-integration.md`**: Complete integration guide
+
+**Quick Start:**
+
+```bash
+# Generate and view dependency graph
+just dep-graph-update
+```
+
+**Output:**
+- System dependency graph showing all 471 packages
+- 1,233 dependency relationships
+- 19 levels of dependency depth
+- Available in SVG and PNG formats
+
+**Usage:**
+```bash
+# Generate Darwin graph
+just dep-graph
+
+# Generate NixOS graph
+just dep-graph-nixos
+
+# View in browser
+just dep-graph-view
+
+# Generate all formats
+just dep-graph-all
+```
+
+**Documentation:** See `docs/architecture/nix-visualize-integration.md` for complete guide
 ## 🚀 Development Workflow
 
 ### Using Just Commands

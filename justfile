@@ -989,3 +989,17 @@ tmux-status:
     @echo "  Server: $(tmux server-info 2>/dev/null | head -1 || echo 'Not running')"
     @echo "  Sessions: $(tmux list-sessions 2>/dev/null | wc -l || echo '0')"
     @echo "  Config: $HOME/.config/tmux/tmux.conf"
+
+# Show dependency graph statistics
+dep-graph-stats:
+    @echo "📊 Dependency graph statistics:"
+    @echo ""
+    @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
+        echo "Darwin SVG: $(ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print $5}')"; \
+    fi
+    @if [ -f docs/architecture/Setup-Mac-NixOS.svg ]; then \
+        echo "NixOS SVG: $(ls -lh docs/architecture/Setup-Mac-NixOS.svg | awk '{print $5}')"; \
+    fi
+    @echo ""
+    @echo "Files in docs/architecture/:"
+    @ls -1 docs/architecture/ 2>/dev/null | wc -l | awk '{print "   Total: " $1 " files"}'
