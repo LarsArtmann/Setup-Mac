@@ -43,6 +43,10 @@ in {
   programs.ssh = {
     enable = true;
 
+    # Disable default config to prevent deprecation warning
+    # We manually set all values we need
+    enableDefaultConfig = false;
+
     # Include platform-specific config files (macOS-only)
     includes = platformIncludes;
 
