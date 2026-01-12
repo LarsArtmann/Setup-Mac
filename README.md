@@ -267,7 +267,7 @@ For detailed information:
 After installation, you'll have access to 100+ development tools including:
 
 **Languages & Runtimes:**
-- Go (with templ, sqlc, go-tools)
+- Go (Nix-managed: gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup + templ, sqlc, go-tools)
 - Node.js, Bun, pnpm
 - Java (JDK 21), Kotlin
 - .NET Core SDK, Ruby, Rust
