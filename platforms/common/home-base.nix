@@ -6,6 +6,7 @@
     ./programs/fish.nix
     ./programs/zsh.nix
     ./programs/bash.nix
+    ./programs/nushell.nix
 
     # Other program configurations
     ./programs/ssh.nix
