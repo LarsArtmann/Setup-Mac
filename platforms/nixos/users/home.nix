@@ -2,7 +2,7 @@
   imports = [
     ../../common/home-base.nix
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
-    ../../common/modules/hyprland-animated-wallpaper.nix
+    ../modules/hyprland-animated-wallpaper.nix
   ];
 
   # Enable animated wallpaper with swww
