@@ -4,7 +4,7 @@
   ...
 }: let
   # TODO: Import Hyprland type safety framework (currently disabled due to path resolution issues)
-  # hyprlandTypes = import ../../common/core/HyprlandTypes.nix {inherit lib;};
+  # hyprlandTypes = import ../core/HyprlandTypes.nix {inherit lib;};
   # Validate Hyprland configuration at evaluation time
   hyprlandConfig = {
     variables = {
