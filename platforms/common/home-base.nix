@@ -14,6 +14,7 @@
     ./programs/activitywatch.nix
     ./programs/tmux.nix
     ./programs/git.nix
+    ./programs/fzf.nix
   ];
 
   # Enable Home Manager to manage itself
