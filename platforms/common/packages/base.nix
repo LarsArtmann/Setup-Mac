@@ -124,7 +124,7 @@
       # Import platform-specific Helium browser
       (
         if stdenv.isDarwin
-        then (import ./helium-darwin.nix {inherit lib pkgs;})
+        then (import ../../darwin/packages/helium.nix {inherit lib pkgs;})
         else (import ./helium-linux.nix {inherit lib pkgs;})
       )
     ]
