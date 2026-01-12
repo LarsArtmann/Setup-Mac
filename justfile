@@ -1014,6 +1014,96 @@ dep-graph-stats:
     @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
         echo "Darwin SVG: $(ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print $5}')"; \
     fi
+    @if [ -f docs/architecture/Setup-Mac-Darwin.png ]; then \
+        echo "Darwin PNG: $(ls -lh docs/architecture/Setup-Mac-Darwin.png | awk '{print $5}')"; \
+    fi
     @echo ""
     @echo "Files in docs/architecture/:"
     @ls -1 docs/architecture/ 2>/dev/null | wc -l | awk '{print "   Total: " $1 " files"}'
+
+# Generate Darwin dependency graph (nix-darwin)
+dep-graph-darwin:
+    @echo "📊 Generating Nix dependency graph for Darwin..."
+    @echo "  This may take a moment to analyze system dependencies..."
+    @mkdir -p docs/architecture
+    @nix run github:craigmbooth/nix-visualize -- \
+        --output docs/architecture/Setup-Mac-Darwin.svg \
+        --no-verbose \
+        /run/current-system
+    @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-Darwin.svg"
+    @ls -lh docs/architecture/Setup-Mac-Darwin.svg | awk '{print "   Size: " $5}'
+
+# Generate dependency graph with PNG output
+dep-graph-png:
+    @echo "📊 Generating Nix dependency graph (PNG)..."
+    @mkdir -p docs/architecture
+    @nix run github:craigmbooth/nix-visualize -- \
+        --output docs/architecture/Setup-Mac-Darwin.png \
+        --no-verbose \
+        /run/current-system
+    @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-Darwin.png"
+    @ls -lh docs/architecture/Setup-Mac-Darwin.png | awk '{print "   Size: " $5}'
+
+# Generate dependency graph with DOT format
+dep-graph-dot:
+    @echo "📊 Generating Nix dependency graph (DOT)..."
+    @mkdir -p docs/architecture
+    @nix run github:craigmbooth/nix-visualize -- \
+        --output docs/architecture/Setup-Mac-Darwin.dot \
+        --no-verbose \
+        /run/current-system
+    @echo "✅ Dependency graph generated: docs/architecture/Setup-Mac-Darwin.dot"
+    @ls -lh docs/architecture/Setup-Mac-Darwin.dot | awk '{print "   Size: " $5}'
+
+# Generate all dependency graphs (Darwin only)
+dep-graph-all:
+    @echo "📊 Generating all Nix dependency graphs..."
+    @echo ""
+    @echo "=== Darwin Graphs ==="
+    @just dep-graph-darwin
+    @just dep-graph-png
+    @echo ""
+    @echo "✅ All dependency graphs generated in docs/architecture/"
+    @ls -lh docs/architecture/Setup-Mac-Darwin*.{svg,png,dot} 2>/dev/null | awk '{print "   " $9 ": " $5}'
+
+# Generate high-quality SVG with verbose output (for debugging)
+dep-graph-verbose:
+    @echo "📊 Generating Nix dependency graph (verbose mode)..."
+    @mkdir -p docs/architecture
+    @nix run github:craigmbooth/nix-visualize -- \
+        --output docs/architecture/Setup-Mac-Darwin-verbose.svg \
+        --verbose \
+        /run/current-system
+    @echo "✅ Verbose dependency graph generated"
+    @ls -lh docs/architecture/Setup-Mac-Darwin-verbose.svg | awk '{print "   Size: " $5}'
+
+# View generated dependency graph in default browser
+dep-graph-view:
+    @echo "👀 Opening dependency graph..."
+    @if [ -f docs/architecture/Setup-Mac-Darwin.svg ]; then \
+        open docs/architecture/Setup-Mac-Darwin.svg; \
+    elif [ -f docs/architecture/Setup-Mac-Darwin.png ]; then \
+        open docs/architecture/Setup-Mac-Darwin.png; \
+    elif [ -f docs/architecture/Setup-Mac-NixOS.svg ]; then \
+        open docs/architecture/Setup-Mac-NixOS.svg; \
+    else \
+        echo "❌ No dependency graph found. Run 'just dep-graph-darwin' first."; \
+    fi
+
+# Clean generated dependency graphs
+dep-graph-clean:
+    @echo "🧹 Cleaning dependency graphs..."
+    @rm -f docs/architecture/Setup-Mac-*.{svg,png,dot}
+    @rm -f docs/architecture/*.svg
+    @rm -f docs/architecture/*.png
+    @rm -f docs/architecture/*.dot
+    @echo "✅ Dependency graphs cleaned"
+
+# Update and view dependency graphs (quick workflow)
+dep-graph-update:
+    @echo "🔄 Updating dependency graphs..."
+    @just dep-graph-darwin
+    @echo ""
+    @echo "👀 Opening in browser..."
+    @sleep 1
+    @just dep-graph-view
