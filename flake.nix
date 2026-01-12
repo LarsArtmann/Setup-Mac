@@ -28,6 +28,12 @@
         url = "github:vikingnope/helium-browser-nix-flake";
         inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Add nix-visualize for Nix configuration visualization
+    nix-visualize = {
+        url = "github:craigmbooth/nix-visualize";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -38,6 +44,7 @@
     helium,
     nur,
     llm-agents,
+    nix-visualize,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -82,6 +89,7 @@
             inherit (inputs) llm-agents;
             inherit helium;
             inherit nur;
+            inherit nix-visualize;
           };
           modules = [
             # Import Home Manager module for Darwin
@@ -112,6 +120,7 @@
             inherit (inputs) llm-agents;
             inherit helium;
             inherit nur;
+            inherit nix-visualize;
           };
           modules = [
             # Core system configuration
