@@ -29,7 +29,7 @@ link:
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
     @echo "🔄 Applying Nix configuration..."
-    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
+    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./ --print-build-logs
     @echo "✅ Nix configuration applied"
 
 # Update system and packages
