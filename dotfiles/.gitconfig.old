@@ -1,0 +1,73 @@
+[user]
+	name = Lars Artmann
+	email = git@lars.software
+	signingkey = 76687BB69B36BFB1B1C58FA878B4350389C71333
+[core]
+	autocrlf = input
+	compression = 9
+	packedGitLimit = 512m
+	packedGitWindowSize = 512m
+	pager = cat
+	quotePath = false
+	editor = code --wait
+	excludesfile = /Users/larsartmann/.gitignore_global
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[submodule]
+	fetchJobs = 8
+[http]
+	postBuffer = 524288000
+[ssh]
+	multiplexing = true
+[pull]
+	rebase = true
+[push]
+	autoSetupRemote = true
+[gpg]
+	program = /run/current-system/sw/bin/gpg
+[git-town]
+	sync-perennial-strategy = rebase
+[pager]
+	diff = bat
+[init]
+	defaultBranch = master
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[gc]
+	auto = 6700
+	autopacklimit = 50
+	autodetach = true
+	pruneexpire = 2 weeks ago
+
+[alias]
+	append = town append
+	compress = town compress
+	contribute = town contribute
+	diff-parent = town diff-parent
+	hack = town hack
+	observe = town observe
+	park = town park
+	prepend = town prepend
+	propose = town propose
+	rename = town rename
+	repo = town repo
+	set-parent = town set-parent
+	ship = town ship
+	sync = town sync
+	down = town down
+	up = town up
+
+[credential]
+	helper = store
+[coderabbit]
+	machineId = cli/98a25a4615614fc5ae0c8a2718076dca
+[safe]
+	directory = /Users/larsartmann/projects/todo-list-ai
+	directory = /Users/larsartmann/projects
