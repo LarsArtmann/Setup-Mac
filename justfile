@@ -370,6 +370,7 @@ info:
 # Test configuration without applying changes
 test:
     @echo "🧪 Testing Nix configuration..."
+    nix --extra-experimental-features "nix-command flakes" flake check --all-systems
     sudo /run/current-system/sw/bin/darwin-rebuild check --flake ./
     @echo "✅ Configuration test passed"
 
