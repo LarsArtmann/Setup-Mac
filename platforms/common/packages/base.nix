@@ -100,14 +100,12 @@
       # Nix helper tools
       nh
 
-      # Benchmarking
-      geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities
-
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
     ]
     ++ lib.optionals stdenv.isLinux [
       swww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
+      geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities (Linux-only)
     ];
 
   # Linux-specific utilities
