@@ -2,6 +2,7 @@
 {lib, ...}: {
   imports = [
     ../../common/programs/fish.nix
+    ../../common/programs/bash.nix  # Added for Bash parity
   ];
 
   # Override Fish aliases with Darwin-specific ones
@@ -14,6 +15,14 @@
 
   # Override Zsh aliases with Darwin-specific ones
   programs.zsh.shellAliases = lib.mkAfter {
+    # Darwin-specific aliases
+    nixup = "darwin-rebuild switch --flake .";
+    nixbuild = "darwin-rebuild build --flake .";
+    nixcheck = "darwin-rebuild check --flake .";
+  };
+
+  # Override Bash aliases with Darwin-specific ones (FIX: Added for parity)
+  programs.bash.shellAliases = lib.mkAfter {
     # Darwin-specific aliases
     nixup = "darwin-rebuild switch --flake .";
     nixbuild = "darwin-rebuild build --flake .";
@@ -66,6 +75,19 @@
     # COMPLETIONS: Universal completion engine (1000+ commands)
     if command -v carapace >/dev/null 2>&1; then
       source <(carapace _carapace zsh)
+    fi
+  '';
+
+  # Darwin-specific Bash shell initialization (FIX: Added for parity)
+  programs.bash.initExtra = lib.mkAfter ''
+    # Homebrew integration (Darwin-specific)
+    if [ -f /opt/homebrew/bin/brew ]; then
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
+
+    # COMPLETIONS: Universal completion engine (1000+ commands)
+    if command -v carapace >/dev/null 2>&1; then
+      source <(carapace _carapace bash)
     fi
   '';
 }
