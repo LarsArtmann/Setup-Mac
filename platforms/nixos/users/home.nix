@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ../../common/home-base.nix
+    ../programs/shells.nix  # NixOS shell configuration
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
     ../modules/hyprland-animated-wallpaper.nix
   ];
@@ -23,14 +24,6 @@
 
     # Cursor size (extra large for TV display)
     XCURSOR_SIZE = "48";
-  };
-
-  # NixOS-specific Fish shell overrides
-  programs.fish.shellAliases = {
-    # NixOS specific aliases
-    nixup = "sudo nixos-rebuild switch --flake .";
-    nixbuild = "nixos-rebuild build --flake .";
-    nixcheck = "nixos-rebuild check --flake .";
   };
 
   # NixOS-specific packages
