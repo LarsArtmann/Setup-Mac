@@ -1,15 +1,14 @@
 # Fish shell configuration
-{config, lib, ...}: {
+{config, lib, ...}: let
+  # Import shared aliases from shell-aliases.nix
+  commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
+in {
   # Common Fish shell configuration
   programs.fish = {
     enable = true;
 
-    # Common aliases (platform-specific added via lib.mkAfter in platform configs)
-    shellAliases = {
-      # Essential shortcuts
-      l = "ls -laSh";
-      t = "tree -h -L 2 -C --dirsfirst";
-    };
+    # Use shared aliases (no duplication!)
+    shellAliases = commonAliases;
 
     # Common Fish shell initialization
     interactiveShellInit = ''
