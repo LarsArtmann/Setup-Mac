@@ -922,6 +922,12 @@ doc-update-readme:
     @mv README.md.new README.md
     @echo "✅ README.md updated successfully"
 
+# Update Go section in "What You Get" to mention Nix packages
+doc-update-go-what-you-get:
+    @echo "📝 Updating 'What You Get' Go section..."
+    @perl -i -pe 's/Go \(with templ, sqlc, go-tools\)/Go (Nix-managed: gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup + templ, sqlc, go-tools)/ if $. == 270' README.md
+    @echo "✅ 'What You Get' Go section updated"
+
 # Wrapper Management Commands
 # =========================
 
