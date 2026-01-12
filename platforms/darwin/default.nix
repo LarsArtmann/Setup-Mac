@@ -2,6 +2,7 @@
   lib,
   pkgs,
   config,
+  helium,
   ...
 }: {
   # Import Darwin-specific system configurations

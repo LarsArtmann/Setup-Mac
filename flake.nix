@@ -17,14 +17,17 @@
     # Add flake-parts for modular architecture
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    # Add Helium browser flake for Linux
-    helium.url = "github:amaanq/helium-flake";
-
     # Add NUR (Nix User Repository) for other packages
     nur.url = "github:nix-community/NUR";
 
     # Add llm-agents.nix for CRUSH and other AI tools
     llm-agents.url = "github:numtide/llm-agents.nix";
+
+    # Helium Browser
+    helium = {
+        url = "github:vikingnope/helium-browser-nix-flake";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
