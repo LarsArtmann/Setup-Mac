@@ -911,6 +911,17 @@ help:
     @echo ""
     @echo "Run 'just <command>' to execute any task."
 
+# Documentation Management Commands
+# ================================
+
+# Update README.md with Nix-managed tools section
+doc-update-readme:
+    @echo "📝 Updating README.md with Nix-managed tools section..."
+    @printf '%s\n\n### Nix-Managed Development Tools\n\nAll development tools are managed through Nix packages, providing:\n- **Reproducible Builds**: Same tool versions across all machines\n- **Atomic Updates**: Managed via `just update && just switch`\n- **Declarative Configuration**: Tools defined in Nix, not installed imperatively\n- **Easy Rollback**: Revert to previous tool versions instantly\n\n**Go Development Stack:**\nAll Go tools (gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup) are installed via Nix packages defined in `platforms/common/packages/base.nix`.\n\nTo view available Go tools:\n```bash\njust go-tools-version    # Show all Go tool versions\njust go-dev             # Full Go development workflow\n```\n\n**ActivityWatch (macOS):**\nActivityWatch auto-start is managed declaratively via Nix LaunchAgent configuration in `platforms/darwin/services/launchagents.nix`. No manual setup scripts required.\n' "$(head -n 289 README.md)" > README.md.new
+    @tail -n +290 README.md >> README.md.new
+    @mv README.md.new README.md
+    @echo "✅ README.md updated successfully"
+
 # Wrapper Management Commands
 # =========================
 

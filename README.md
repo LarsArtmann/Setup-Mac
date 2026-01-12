@@ -287,6 +287,25 @@ After installation, you'll have access to 100+ development tools including:
 
 See the [complete setup guide](./docs/development/setup.md) for details.
 
+### Nix-Managed Development Tools
+
+All development tools are managed through Nix packages, providing:
+- **Reproducible Builds**: Same tool versions across all machines
+- **Atomic Updates**: Managed via `just update && just switch`
+- **Declarative Configuration**: Tools defined in Nix, not installed imperatively
+- **Easy Rollback**: Revert to previous tool versions instantly
+
+**Go Development Stack:**
+All Go tools (gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup) are installed via Nix packages defined in `platforms/common/packages/base.nix`.
+
+To view available Go tools:
+```bash
+just go-tools-version    # Show all Go tool versions
+just go-dev             # Full Go development workflow
+```
+
+**ActivityWatch (macOS):**
+ActivityWatch auto-start is managed declaratively via Nix LaunchAgent configuration in `platforms/darwin/services/launchagents.nix`. No manual setup scripts required.
 ## 🚀 Development Workflow
 
 ### Using Just Commands (Preferred)
