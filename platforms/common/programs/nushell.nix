@@ -53,8 +53,5 @@
       # - nixup: Use darwin-rebuild/nixos-rebuild via shell aliases
       # - diskStealer: Use ncdu directly
     '';
-
-    # Environment variables file
-    envVarFile.text = "";
   };
 }
