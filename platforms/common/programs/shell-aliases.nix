@@ -1,6 +1,5 @@
 # Shared shell aliases (Fish, Zsh, Bash)
 # Define once, use across all shells
-
 _: {
   # Common aliases for all shells
   # Home Manager's shellAliases option will handle shell-specific translation
