@@ -28,9 +28,16 @@ link:
 
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
-    @echo "🔄 Applying Nix configuration..."
+    echo "🔄 Applying Nix configuration..."
     sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./ --print-build-logs
-    @echo "✅ Nix configuration applied"
+    echo "✅ Nix configuration applied"
+
+# Update Nix itself using nix upgrade-nix (works without switch)
+update-nix:
+    echo "🔄 Updating Nix package manager..."
+    nix upgrade-nix
+    echo "✅ Nix updated to $(nix --version | cut -d' ' -f3)"
+    echo "⚠️  Run 'just switch' to rebuild system with new Nix version"
 
 # Update system and packages
 update:
