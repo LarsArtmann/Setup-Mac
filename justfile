@@ -264,9 +264,8 @@ backup:
     cp -r platforms "$BACKUP_DIR/"
     cp -r dotfiles "$BACKUP_DIR/"  # Keep dotfiles for historical reference
 
-    # Backup justfile and manual-linking script
+    # Backup justfile (manual-linking.sh removed - now managed by Home Manager)
     cp justfile "$BACKUP_DIR/" || true
-    cp manual-linking.sh "$BACKUP_DIR/" || true
 
     # Backup current shell state
     mkdir -p "$BACKUP_DIR/shell_state"
