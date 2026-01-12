@@ -26,16 +26,34 @@
 
   # NixOS-specific Fish shell initialization
   programs.fish.shellInit = lib.mkAfter ''
+    # Nix path setup (NixOS-specific)
+    # Required for system packages and Home Manager-managed binaries
+    if type -q fish_add_path
+        fish_add_path --prepend --global /run/current-system/sw/bin
+        fish_add_path --prepend --global /etc/profiles/per-user/$USER/bin
+    else
+        if not contains /run/current-system/sw/bin $fish_user_paths
+            set --global fish_user_paths /run/current-system/sw/bin $fish_user_paths
+        end
+        if not contains /etc/profiles/per-user/$USER/bin $fish_user_paths
+            set --global fish_user_paths /etc/profiles/per-user/$USER/bin $fish_user_paths
+        end
+    end
+
     # NixOS-specific completions
     if test -d /etc/profiles/per-user/$USER/share/nixos/completions
         set -g fish_complete_path /etc/profiles/per-user/$USER/share/nixos/completions $fish_complete_path
     end
 
     # COMPLETIONS: Universal completion engine (1000+ commands)
-    carapace _carapace fish | source
+    if command -v carapace >/dev/null 2>&1
+        carapace _carapace fish | source
+    end
 
     # PROMPT: Beautiful Starship prompt with 400ms timeout protection
-    starship init fish | source
+    if command -v starship >/dev/null 2>&1
+        starship init fish | source
+    end
 
     # Additional Fish-specific optimizations
     set -g fish_autosuggestion_enabled 1
