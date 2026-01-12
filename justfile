@@ -47,27 +47,7 @@ update:
     nix flake update
     @echo "✅ System updated"
 
-# ActivityWatch auto-start configuration (now managed by Nix)
-activitywatch-setup:
-    @echo "⚙️  ActivityWatch auto-start is now managed declaratively via Nix"
-    @echo "ℹ️  Configuration: platforms/darwin/services/launchagents.nix"
-    @echo "ℹ️  To apply changes, run: just switch"
-    @echo "✅ No manual setup needed"
-
-# Verify ActivityWatch auto-start is working
-activitywatch-check:
-    @echo "🔍 Checking ActivityWatch auto-start status..."
-    @echo "ℹ️  LaunchAgent: net.activitywatch.ActivityWatch"
-    @echo "ℹ️  Logs: /tmp/net.activitywatch.ActivityWatch.*.log"
-    @launchctl list | grep -i activitywatch || echo "⚠️  ActivityWatch not found in launchctl list"
-
-# ActivityWatch migration complete (now fully managed by Nix)
-activitywatch-migrate:
-    @echo "✅ ActivityWatch is already fully managed by Nix"
-    @echo "ℹ️  Configuration: platforms/darwin/services/launchagents.nix"
-    @echo "ℹ️  Manual setup script deprecated"
-
-# ActivityWatch commands
+# ActivityWatch manual control commands
 activitywatch-start:
     @echo "🚀 Starting ActivityWatch..."
     @osascript -e 'tell application "ActivityWatch" to launch'
@@ -797,25 +777,22 @@ go-import-config:
 
 # Update Go tools (manual method using go install)
 go-update-tools-manual:
-    @echo "🔄 Manually updating Go development tools..."
-    go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
-    go install mvdan.cc/gofumpt@latest
-    go install golang.org/x/tools/gopls@latest
-    go install github.com/cweill/gotests/gotests@latest
+    @echo "⚙️  Go development tools are now managed by Nix packages"
+    @echo "ℹ️  Location: platforms/common/packages/base.nix"
+    @echo "ℹ️  To update tools: just update && just switch"
+    @echo "ℹ️  Note: wire not in Nixpkgs, still uses 'go install'"
+    @echo ""
+    @echo "🔄 Updating wire (not in Nixpkgs)..."
     go install github.com/google/wire/cmd/wire@latest
-    go install go.uber.org/mock/mockgen@latest
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-    go install github.com/bufbuild/buf/cmd/buf@latest
-    go install github.com/go-delve/delve/cmd/dlv@latest
-    go install github.com/nao1215/gup@latest
-    @echo "✅ Go tools updated manually"
+    @echo "✅ Go tools (except wire) updated via Nix"
 
-# Complete Go setup - install core tools and export config
+# Complete Go setup (now Nix-managed)
 go-setup:
-    @echo "🛠️  Setting up complete Go development environment..."
-    @just go-update-tools-manual
-    @just go-export-config
-    @echo "✅ Go development environment setup complete"
+    @echo "🛠️  Go development tools are now managed by Nix"
+    @echo "ℹ️  Location: platforms/common/packages/base.nix"
+    @echo "ℹ️  To install tools: just switch"
+    @echo "ℹ️  To update tools: just update && just switch"
+    @echo "✅ Go development environment setup via Nix"
 
 # Show Go tools versions
 go-tools-version:
@@ -882,12 +859,12 @@ help:
     @echo "  health         - Health check for shell and dev environment"
     @echo "  health-dashboard - Comprehensive system health dashboard"
     @echo ""
-    @echo "Go Development Tools:"
+    @echo "Go Development Tools (Nix-managed):"
     @echo "  go-lint               - Run golangci-lint on Go code"
     @echo "  go-format             - Format Go code with gofumpt"
     @echo "  go-gen-tests          - Generate Go tests with gotests"
     @echo "  go-gen-mocks          - Generate Go mocks with mockgen"
-    @echo "  go-wire               - Generate wire dependency injection"
+    @echo "  go-wire               - Generate wire dependency injection (go install)"
     @echo "  go-debug              - Start Go debugger (delve) for binary"
     @echo "  go-debug-test         - Start Go debugger for tests"
     @echo "  go-check              - Run gopls language server check"
@@ -899,8 +876,8 @@ help:
     @echo "  go-list-binaries      - List all Go binaries"
     @echo "  go-export-config      - Export Go binary config to gup.conf"
     @echo "  go-import-config      - Import Go binaries from gup.conf"
-    @echo "  go-update-tools-manual - Update tools manually with go install"
-    @echo "  go-setup              - Complete Go development environment setup"
+    @echo "  go-update-tools-manual - Update wire (not in Nixpkgs) with go install"
+    @echo "  go-setup              - Show Go tool management information"
     @echo "  go-tools-version      - Show versions of all Go tools"
     @echo ""
     @echo "Maintenance:"
@@ -929,7 +906,6 @@ help:
     @echo ""
     @echo "Utilities:"
     @echo "  info           - Show system information"
-    @echo "  link           - Link dotfiles manually"
     @echo "  ssh-setup      - Create SSH directories"
     @echo "  rollback       - Emergency rollback to previous generation"
     @echo ""
