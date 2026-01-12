@@ -97,6 +97,7 @@
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp
+      google-cloud-sdk # Google Cloud SDK for cloud management
 
       # Nix helper tools
       nh

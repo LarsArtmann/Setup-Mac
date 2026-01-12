@@ -6,6 +6,8 @@
   # Import common program configurations
   imports = [
     ./programs/fish.nix
+    ./programs/zsh.nix
+    ./programs/ssh.nix
     ./programs/starship.nix
     ./programs/activitywatch.nix
     ./programs/tmux.nix
@@ -24,10 +26,6 @@
       initExtra = ''
         export GH_PAGER=""
       '';
-    };
-    zsh = {
-      enable = true;
-      dotDir = "${config.xdg.configHome}/zsh";
     };
   };
 
