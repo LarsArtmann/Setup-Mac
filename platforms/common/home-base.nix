@@ -15,6 +15,7 @@
     ./programs/tmux.nix
     ./programs/git.nix
     ./programs/fzf.nix
+    ./programs/pre-commit.nix
   ];
 
   # Enable Home Manager to manage itself
