@@ -1,0 +1,22 @@
+# Bash shell configuration
+{config, ...}: let
+  # Import shared aliases from shell-aliases.nix
+  commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
+in {
+  # Common Bash shell configuration
+  programs.bash = {
+    enable = true;
+
+    # Use shared aliases (no duplication!)
+    shellAliases = commonAliases;
+
+    # Bash-specific configuration
+    profileExtra = ''
+      export GOPRIVATE=github.com/LarsArtmann/*
+    '';
+
+    initExtra = ''
+      export GH_PAGER=""
+    '';
+  };
+}
