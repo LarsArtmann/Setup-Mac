@@ -2,25 +2,6 @@
 {config, lib, ...}: let
   # Import shared aliases from shell-aliases.nix
   commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
-
-  # Expected common aliases
-  expectedAliases = ["l" "t" "gs" "gd" "ga" "gc" "gp" "gl"];
-
-  # Type assertions
-  assertions = [
-    {
-      assertion = lib.isAttrs commonAliases;
-      message = "programs.fish.shellAliases: Must be an attribute set";
-    }
-    {
-      assertion = lib.length (lib.attrNames commonAliases) == lib.length expectedAliases;
-      message = "programs.fish.shellAliases: Must have exactly ${toString (lib.length expectedAliases)} aliases, found ${toString (lib.length (lib.attrNames commonAliases))}";
-    }
-    {
-      assertion = lib.all (name: lib.hasAttr name commonAliases) expectedAliases;
-      message = "programs.fish.shellAliases: All expected aliases must be defined (l, t, gs, gd, ga, gc, gp, gl)";
-    }
-  ];
 in {
   # Common Fish shell configuration
   programs.fish = {
@@ -31,6 +12,11 @@ in {
 
     # Common Fish shell initialization
     interactiveShellInit = ''
+      # LOCALE: Set English locale for git and other tools
+      set -gx LANG en_US.UTF-8
+      set -gx LC_ALL en_US.UTF-8
+      set -gx LC_CTYPE en_US.UTF-8
+
       # PERFORMANCE: Disable greeting for faster startup
       set -g fish_greeting
 
