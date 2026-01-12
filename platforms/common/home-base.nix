@@ -5,8 +5,11 @@
 }: {
   # Import common program configurations
   imports = [
+    # Shell configurations (shared aliases, no duplication!)
     ./programs/fish.nix
     ./programs/zsh.nix
+
+    # Other program configurations
     ./programs/ssh.nix
     ./programs/starship.nix
     ./programs/activitywatch.nix

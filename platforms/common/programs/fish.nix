@@ -1,4 +1,5 @@
-_: {
+# Fish shell configuration
+{config, lib, ...}: {
   # Common Fish shell configuration
   programs.fish = {
     enable = true;

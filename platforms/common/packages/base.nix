@@ -48,6 +48,7 @@
 
       # Security tools
       gitleaks
+      gnupg
       pre-commit
       openssh
 

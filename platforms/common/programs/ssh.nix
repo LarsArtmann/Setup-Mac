@@ -30,7 +30,21 @@ let
     };
   };
 
-  # Additional macOS-specific SSH configuration
+  # Default SSH configuration values (replaces enableDefaultConfig)
+  defaultMatchBlocks = {
+    "*" = {
+      forwardAgent = lib.mkDefault false;
+      addKeysToAgent = lib.mkDefault "no";
+      compression = lib.mkDefault false;
+      serverAliveInterval = lib.mkDefault 0;
+      serverAliveCountMax = lib.mkDefault 3;
+      hashKnownHosts = lib.mkDefault false;
+      userKnownHostsFile = lib.mkDefault "~/.ssh/known_hosts";
+      controlMaster = lib.mkDefault "no";
+      controlPath = lib.mkDefault "~/.ssh/master-%r@%n:%p";
+      controlPersist = lib.mkDefault "no";
+    };
+  };
   darwinMatchBlocks = {
     # macOS-only: Secretive integration (commented in original, keeping reference)
     "secretive-example" = lib.mkIf pkgs.stdenv.isDarwin {
@@ -50,7 +64,11 @@ in {
     # Include platform-specific config files (macOS-only)
     includes = platformIncludes;
 
-    # Merge cross-platform and platform-specific match blocks
-    matchBlocks = commonMatchBlocks;
+    # Merge default, cross-platform, and platform-specific match blocks
+    matchBlocks = lib.mkMerge [
+      defaultMatchBlocks
+      commonMatchBlocks
+      darwinMatchBlocks
+    ];
   };
 }

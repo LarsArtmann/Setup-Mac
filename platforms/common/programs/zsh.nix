@@ -1,3 +1,4 @@
+# Zsh shell configuration
 {config, ...}: {
   # Common Zsh shell configuration
   programs.zsh = {
