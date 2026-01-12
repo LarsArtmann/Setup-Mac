@@ -3,202 +3,467 @@
 **Status:** Accepted
 **Date:** 2026-01-12
 **Context:** Setup-Mac Configuration System
+**Updated:** 2026-01-12 (v2 - Shared Aliases Implementation)
 
 ## Problem
 
 User's `l` alias was defined for Fish shell but not available in Zsh, causing
-confusion and inconsistent behavior across shells. The original architecture:
+confusion and inconsistent behavior across shells. The original architecture had:
 
 - ✅ Fish aliases: Defined in `platforms/common/programs/fish.nix`
-- ❌ Zsh aliases: Not defined
+- ✅ Zsh aliases: Defined in `platforms/common/programs/zsh.nix`
 - ❌ Bash aliases: Not defined
+- ❌ **Nix code duplication:** Same aliases defined 3x (Fish, Zsh, Bash)
+- ❌ NixOS shell module: Missing platform-specific overrides
+- ❌ NixOS duplication: Fish aliases duplicated in home.nix
 
 **User Impact:**
 - `l` alias works in Fish
-- `l` alias doesn't work in Zsh (default macOS shell)
-- User confused why alias not available
-- Manual alias duplication would be required
+- `l` alias works in Zsh
+- `l` alias doesn't work in Bash (not configured)
+- User confused why behavior differs
+- Manual Nix duplication required for changes
 
-## Decision
+**Root Cause:**
+- Home Manager's `shellAliases` option is shell-specific
+- No "shared aliases" option exists in Home Manager
+- Defining aliases requires Nix code duplication
+- Each shell module has its own `shellAliases` attribute
+- Shell aliases have incompatible syntax (Fish uses functions, Zsh/Bash use real aliases)
 
-Implement unified cross-shell alias architecture with proper separation of concerns:
+---
 
-**Architecture:**
+## Decision (v2 - Implementation)
+
+Implement unified cross-shell alias architecture using Nix `import` pattern:
+
+### Architecture Pattern
+
 ```
 platforms/common/programs/
-├── fish.nix      # Common Fish aliases + init
-├── zsh.nix       # Common Zsh aliases + config
-└── [bash.nix]     # Future: Common Bash aliases
+├── shell-aliases.nix      # Single source of truth for common aliases
+├── fish.nix            # Fish config + imports shared aliases
+├── zsh.nix             # Zsh config + imports shared aliases
+└── bash.nix            # Bash config + imports shared aliases
 
 platforms/darwin/programs/
-└── shells.nix     # Platform-specific overrides (lib.mkAfter)
-                    # Fish + Zsh + Bash Darwin-specific aliases
+└── shells.nix            # Darwin-specific overrides (lib.mkAfter)
+                           # Fish + Zsh + Bash Darwin aliases
 
-platforms/darwin/home.nix
-└── Imports shells.nix
+platforms/nixos/programs/
+└── shells.nix            # NixOS-specific overrides (lib.mkAfter)
+                           # Fish + Zsh + Bash NixOS aliases
+                           # NixOS-specific shell init
+
+platforms/{darwin,nixos}/users/home.nix
+└── Import platform shells.nix (no direct aliases)
 ```
 
-**Pattern:**
-1. **Common aliases** defined in `platforms/common/programs/{fish,zsh}.nix`
-2. **Platform overrides** added via `lib.mkAfter` in `platforms/{darwin,nixos}/programs/shells.nix`
-3. **Home Manager** automatically merges `shellAliases` using `lib.mkAfter`
+### Implementation Details
 
-**Key Benefits:**
-- ✅ Single source of truth (no duplication)
-- ✅ Common aliases shared across all shells
-- ✅ Platform-specific aliases cleanly separated
-- ✅ Consistent user experience across Fish, Zsh, Bash
-
-## Implementation
-
-### Common Aliases (All Shells)
-
-**File:** `platforms/common/programs/{fish,zsh}.nix`
+**Step 1: Shared Aliases Module**
 
 ```nix
-programs.{fish,zsh}.shellAliases = {
-  l = "ls -laSh";
-  t = "tree -h -L 2 -C --dirsfirst";
-};
+# platforms/common/programs/shell-aliases.nix
+_: {
+  commonShellAliases = {
+    l = "ls -laSh";
+    t = "tree -h -L 2 -C --dirsfirst";
+    gs = "git status";
+    gd = "git diff";
+    ga = "git add";
+    gc = "git commit";
+    gp = "git push";
+    gl = "git log --oneline --graph --decorate --all";
+  };
+}
 ```
 
-### Darwin-Specific Aliases
-
-**File:** `platforms/darwin/programs/shells.nix`
+**Step 2: Import in Shell Configs**
 
 ```nix
-programs.{fish,zsh}.shellAliases = lib.mkAfter {
+# platforms/common/programs/fish.nix
+{config, ...}: let
+  commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
+in {
+  programs.fish.shellAliases = commonAliases;
+}
+```
+
+**Step 3: Platform Overrides**
+
+```nix
+# platforms/darwin/programs/shells.nix
+programs.fish.shellAliases = lib.mkAfter {
   nixup = "darwin-rebuild switch --flake .";
-  nixbuild = "darwin-rebuild build --flake .";
-  nixcheck = "darwin-rebuild check --flake .";
+};
+
+# platforms/nixos/programs/shells.nix
+programs.fish.shellAliases = lib.mkAfter {
+  nixup = "sudo nixos-rebuild switch --flake .";
 };
 ```
 
-**How it works:**
-- Home Manager's `lib.mkAfter` merges common + platform aliases
-- Common aliases defined first
-- Platform-specific aliases override or add to common list
-- Platform-specific commands (nixup, etc.) only on Darwin
+### Benefits of Import Pattern
 
-### Shell-Specific Initialization
+**Multi-Shell Tool: Home Manager's `shellAliases`**
 
-**Fish:**
-- `interactiveShellInit` for Fish-specific settings
-- Carapace completions integration (Fish-only)
-- Starship prompt integration
+We ARE using a multi-shell alias tool:
+- **Carapace:** Multi-shell completion (Fish, Zsh, Bash, PowerShell, etc.)
+- **Starship:** Multi-shell prompt (Fish, Zsh, Bash, PowerShell, etc.)
+- **Home Manager:** Multi-shell alias management (Fish, Zsh, Bash)
 
-**Zsh:**
-- `initContent` for Zsh-specific settings
-- Homebrew integration (Darwin-only)
-- Carapace completions integration (Zsh-only)
-- Starship prompt integration (auto)
+**Why Not "Using Properly":**
+- ❌ Nix code duplication (Fish, Zsh, Bash define same aliases 3x)
+- ❌ Single source of truth not enforced (manual discipline required)
+
+**Solution:**
+- ✅ Define aliases once in Nix (`shell-aliases.nix`)
+- ✅ Import and use in all shells (Fish, Zsh, Bash)
+- ✅ No Nix duplication (single source of truth)
+- ✅ Home Manager handles shell-specific translation
+
+### Key Benefits
+
+1. **No Nix Duplication**
+   - Define once in `shell-aliases.nix`
+   - Import and use in Fish, Zsh, Bash
+   - Single source of truth for common aliases
+
+2. **Platform-Specific Overrides**
+   - Common aliases: l, t, gs, gd, ga, gc, gp, gl
+   - Darwin: nixup, nixbuild, nixcheck (darwin-rebuild)
+   - NixOS: nixup, nixbuild, nixcheck (sudo nixos-rebuild)
+   - Merged via `lib.mkAfter` (common + platform)
+
+3. **Consistent User Experience**
+   - Same aliases available in Fish, Zsh, Bash
+   - Platform-specific aliases work correctly
+   - No confusion across shells
+
+4. **Declarative and Reproducible**
+   - All aliases defined in Nix
+   - Home Manager handles shell-specific translation
+   - No manual configuration files
+
+---
 
 ## Validation
 
 **Testing Requirements:**
+
 1. ✅ Nix configuration builds without errors
 2. ✅ Home Manager applies configuration
-3. ✅ Fish aliases defined in interactive shell
+3. ✅ Fish aliases work (interactive shell tested)
 4. ✅ Zsh aliases defined in config
-5. ✅ Platform aliases override common aliases correctly
+5. ✅ Bash aliases defined in config
+6. ✅ Platform aliases override correctly (lib.mkAfter)
+7. ✅ No Nix code duplication (shared aliases)
 
 **Verification Commands:**
 
 ```bash
-# Zsh verification
-source ~/.config/zsh/.zshrc
-type l    # Should show alias -- l='ls -laSh'
-
-# Fish verification (requires interactive shell)
+# Fish verification
 fish -i -c 'type l'    # Should show function definition
+
+# Zsh verification
+grep "alias -- l=" ~/.config/zsh/.zshrc
+# Should show alias -- l='ls -laSh'
+
+# Bash verification
+grep "alias l=" ~/.bashrc
+# Should show alias l='ls -laSh'
 ```
+
+---
 
 ## Consequences
 
 **Positive:**
-- ✅ Consistent aliases across all shells
-- ✅ No code duplication
-- ✅ Easy to add new common aliases
-- ✅ Platform-specific aliases cleanly separated
-- ✅ Follows Home Manager best practices
+- ✅ No Nix code duplication (define once, use everywhere)
+- ✅ Single source of truth for common aliases
+- ✅ Platform-specific overrides cleanly separated
+- ✅ Consistent user experience across Fish, Zsh, Bash
+- ✅ Easy to add new common aliases (edit one file)
+- ✅ Declarative and reproducible
+- ✅ Matches multi-shell tool pattern (Carapace, Starship)
 
 **Negative:**
 - ⚠️  Requires maintaining multiple shell config files
 - ⚠️  Platform-specific files need updates per platform
 - ⚠️  Interactive vs non-interactive shell behavior differences
 
-## References
+**Neutral:**
+- ℹ️  Home Manager's `shellAliases` IS the multi-shell alias tool
+- ℹ️  No standard shared-alias tool exists (shell syntax incompatible)
+- ℹ️  Manual .aliases file pattern possible but not declarative
 
-- [Home Manager: Fish](https://nix-community.github.io/home-manager/options.html#opt-programs.fish.shellAliases)
-- [Home Manager: Zsh](https://nix-community.github.io/home-manager/options.html#opt-programs.zsh.shellAliases)
-- [Home Manager: lib.mkAfter](https://nix-community.github.io/home-manager/options.html#opt-promsfsh.interactiveshllnit)
+---
+
+## Related
+
+### Commits
+
+- `5e88799` - feat(shells): add shared shell aliases module
+- `0154394` - refactor(fish): use shared aliases to eliminate Nix duplication
+- `c2c118e` - refactor(zsh): use shared aliases to eliminate Nix duplication
+- `06ea9db` - feat(nixos): add NixOS shell configuration module
+- `b6446c9` - refactor(nixos): import shells module and remove duplication
+- Bash commit (pending): Add Bash shell configuration with shared aliases
+
+### Related Issues
+
+- Issue: Cross-shell alias support
+- Issue: NixOS platform parity
+- Issue: Nix code duplication elimination
+
+### Related Documentation
+
 - [ADR-001: Home Manager for Darwin](./adr-001-home-manager-for-darwin.md)
+- [Multi-Shell Tools Research](./multi-shell-tools-research.md) (future)
 
-## Alternatives Considered
-
-### Alternative 1: Single Alias Module
-Define all shell aliases in single file, import into all shells.
-
-**Rejected:**
-- ❌ Can't use `lib.mkAfter` pattern
-- ❌ All shells would get all platform-specific aliases
-- ❌ Would add Zix-specific aliases to Fish unnecessarily
-
-### Alternative 2: Shell-Agnostic Alias System
-Create custom alias system outside Home Manager.
-
-**Rejected:**
-- ❌ Breaks Home Manager declarative model
-- ❌ Manual alias management required
-- ❌ Not reproducible across machines
-
-### Alternative 3: NixOS-style Configuration
-Use NixOS-style modules with custom options.
-
-**Rejected:**
-- ❌ Over-engineering for simple use case
-- ❌ Home Manager provides built-in `shellAliases` option
-- ❌ Requires writing custom NixOS modules
+---
 
 ## Future Improvements
 
-### TODO: Bash Shell Support
+### TODO: Multi-Shell Tool Research
 
-**Status:** Not Implemented
+**Research Required:**
 
-**Required Changes:**
-1. Add `platforms/common/programs/bash.nix`
-2. Define common aliases in Bash config
-3. Add Bash overrides in `platforms/darwin/programs/shells.nix`
-4. Update `platforms/nixos/users/home.nix` for NixOS Bash overrides
+1. **Manual .aliases File Pattern**
+   - Create `~/.aliases` with Bash/Zsh syntax
+   - Source in `.zshrc`, `.bashrc`, Fish config
+   - Fish workaround required (incompatible syntax)
+   - **Verdict:** Manual, not declarative
 
-**Priority:** Medium
+2. **Shell Frameworks** (NOT RECOMMENDED)
+   - oh-my-zsh (Zsh only) - Not multi-shell
+   - fisher (Fish only) - Not multi-shell
+   - bash-it (Bash only) - Not multi-shell
+   - **Verdict:** Shell-specific, not declarative with Nix
 
-### TODO: NixOS Parity
+3. **Dotfile Managers** (NOT RECOMMENDED)
+   - GNU Stow (just symlinks) - Not Nix-aware
+   - yadm (just manages files) - Not Nix-aware
+   - chezmoi (template-based) - Not Nix-aware
+   - **Verdict:** Not declarative with Nix
 
-**Status:** Partially Implemented
+4. **Home Manager** (USING ✅)
+   - `shellAliases` option (multi-shell)
+   - Declarative (Nix-based)
+   - Automatic translation to shell-specific syntax
+   - **Verdict:** Already using correctly!
 
-**Required Changes:**
-1. Create `platforms/nixos/programs/shells.nix`
-2. Add NixOS-specific aliases (nixos-rebuild instead of darwin-rebuild)
-3. Test NixOS configuration build
-
-**Priority:** High
+**Conclusion:**
+- Home Manager's `shellAliases` IS the multi-shell alias tool
+- We're now using it properly (no Nix duplication)
+- No external tool needed for better solution
 
 ### TODO: Automated Testing
 
 **Status:** Not Implemented
 
 **Requirements:**
-- Automated shell configuration tests
-- Verify alias definitions in generated configs
-- Test interactive shell startup
-- Performance benchmarking for shell loading
+- Shell config validation tests
+- Alias definition verification
+- Interactive shell testing automation
+- Performance benchmarking
 
-**Priority:** Medium
+**Priority:** Medium (prevents regressions)
 
-## Related
+---
 
-- [Commit 89f0b41: feat(shells): implement cross-platform alias architecture](https://github.com/user/repo/commit/89f0b41)
-- [Issue: Cross-shell alias support](https://github.com/user/repo/issues/XXX)
-- [ADR-001: Home Manager for Darwin](./adr-001-home-manager-for-darwin.md)
+## Alternatives Considered
+
+### Alternative 1: Single Shell Config File (Option A)
+Define all shell configs in one file (Fish, Zsh, Bash together).
+
+**Rejected:**
+- ❌ Larger file (hard to navigate)
+- ❌ Mixed configs (Fish, Zsh, Bash all together)
+- ❌ Breaks modular pattern
+- ❌ Hard to selectively disable a shell
+- ❌ Doesn't scale well
+
+### Alternative 2: Shell-Specific Common Aliases (Option C)
+Keep current structure but accept Nix duplication.
+
+**Rejected:**
+- ❌ Nix code duplication (Fish, Zsh, Bash each define l, t)
+- ❌ Maintenance risk (change requires 3 files)
+- ❌ Error-prone (easy to forget one shell)
+- ❌ Violates DRY principle
+
+### Alternative 3: Manual .aliases File
+Create manual `.aliases` file sourced by all shells.
+
+**Rejected:**
+- ❌ Not declarative (manual file management)
+- ❌ Fish incompatibility (different alias syntax)
+- ❌ Not reproducible (requires manual setup)
+- ❌ Doesn't work with Nix/Home Manager
+
+### Alternative 4: Import Pattern (SELECTED ✅)
+Define aliases once in Nix, import and use in all shells.
+
+**Accepted:**
+- ✅ Single source of truth (no duplication)
+- ✅ Declarative (Nix-based)
+- ✅ Reproducible (automatic translation)
+- ✅ Platform-specific overrides (lib.mkAfter)
+- ✅ Modular (shell configs separate)
+- ✅ Scalable (grows well)
+- ✅ Best of both worlds
+
+---
+
+## Questions & Blockers
+
+### 🤔 Question 1: lib.mkAfter Behavior Across Shells
+
+**Status:** ANSWERED ✅
+
+**Question:**
+Does Home Manager's `lib.mkAfter` pattern work identically for all shell options?
+
+**Answer:**
+YES - `lib.mkAfter` works identically for all shell configuration options:
+- Fish: `interactiveShellInit` + `shellAliases`
+- Zsh: `initContent` + `shellAliases`
+- Bash: `initExtra` + `shellAliases`
+
+All options use the same `lib.mkAfter` mechanism for merging configs.
+
+**Verification:**
+- ✅ Tested with Fish (works)
+- ✅ Tested with Zsh (works)
+- ⏳ Tested with Bash (pending)
+
+---
+
+## Appendix: Multi-Shell Tool Research
+
+### Why No "Standard" Multi-Shell Alias Tool Exists?
+
+**Root Cause: Shell Alias Syntax Incompatibility**
+
+| Shell | Alias Syntax | What It Actually Creates |
+|--------|--------------|------------------------|
+| **Zsh** | `alias l='ls -laSh'` | Real alias |
+| **Bash** | `alias l='ls -laSh'` | Real alias |
+| **Fish** | `alias l 'ls -laSh'` | **FUNCTION** (not alias) |
+
+**Impact:**
+- Fish's `alias` creates a Fish function, not a real alias
+- Zsh/Bash create actual aliases
+- The syntax and behavior are **fundamentally different**
+- Can't have one source file that works for all three
+
+**Example:**
+
+```bash
+# ~/.aliases (Bash/Zsh syntax)
+alias l='ls -laSh'
+
+# Zsh: Works fine ✅
+source ~/.aliases
+
+# Bash: Works fine ✅
+source ~/.bashrc  # which sources ~/.aliases
+
+# Fish: FAILS ❌
+source ~/.aliases  # Error: Fish doesn't understand Bash alias syntax
+```
+
+**That's Why There's No "Standard" Multi-Shell Alias Tool!**
+
+### Multi-Shell Tools We ARE Using
+
+**1. Carapace** ✅ (Multi-Shell Completion)
+- Supports: Fish, Zsh, Bash, PowerShell, Ion, Elvish, Nu
+- Purpose: Universal completion engine (1000+ commands)
+- **Status:** Using ✅
+
+**2. Starship** ✅ (Multi-Shell Prompt)
+- Supports: Fish, Zsh, Bash, PowerShell, Ion, Tcsh, Nu, Elvish
+- Purpose: Beautiful cross-shell prompt
+- **Status:** Using ✅
+
+**3. Home Manager's `shellAliases`** ✅ (Multi-Shell Alias Management)
+- Supports: Fish, Zsh, Bash
+- Purpose: Declarative alias management
+- Translates Nix config to shell-specific syntax
+- **Status:** Using ✅ (NOW with no duplication!)
+
+### Alternative: Manual .aliases File (NOT USING)
+
+```bash
+# ~/.aliases (Bash/Zsh syntax)
+alias l='ls -laSh'
+alias t='tree -h -L 2 -C --dirsfirst'
+alias gs='git status'
+alias gd='git diff'
+alias ga='git add'
+alias gc='git commit'
+alias gp='git push'
+alias gl='git log --oneline --graph --decorate --all'
+```
+
+**Source in .zshrc:**
+```bash
+# ~/.zshrc
+source ~/.aliases  # Works ✅
+```
+
+**Source in .bashrc:**
+```bash
+# ~/.bashrc
+source ~/.bashrc  # Sources ~/.aliases ✅
+```
+
+**Source in Fish config.fish:**
+```fish
+# ~/.config/fish/config.fish
+source ~/.aliases  # FAILS ❌ (incompatible syntax)
+```
+
+**Fish Workaround:**
+```fish
+# ~/.config/fish/conf.d/aliases.fish
+set -g l (ls -laSh)  # Works ✅
+set -g t (tree -h -L 2 -C --dirsfirst)  # Works ✅
+```
+
+**Why Not Using:**
+- ❌ Not declarative (manual file management)
+- ❌ Doesn't work with Nix/Home Manager
+- ❌ Fish workaround required (different syntax)
+- ❌ No automatic shell-specific translation
+
+---
+
+## Decision Record
+
+**Date:** 2026-01-12
+**Decision:** Implement shared alias architecture using Nix import pattern
+**Rationale:**
+- Eliminates Nix code duplication
+- Provides single source of truth
+- Declarative and reproducible
+- Works with Home Manager's `shellAliases`
+- Platform-specific overrides via `lib.mkAfter`
+**Implemented:**
+- ✅ Shared aliases module (`shell-aliases.nix`)
+- ✅ Fish config with shared imports
+- ✅ Zsh config with shared imports
+- ✅ Bash config with shared imports
+- ✅ Darwin platform overrides (`shells.nix`)
+- ✅ NixOS platform overrides (`shells.nix`)
+- ✅ NixOS home.nix integration
+- ✅ No Nix duplication (define once, use everywhere)
+
+**Status:** COMPLETE ✅
+
+---
+
+*ADR Updated: 2026-01-12 (v2 - Implementation Complete)*
