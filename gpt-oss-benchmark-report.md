@@ -19,13 +19,13 @@
 
 ### Test 1: 256 Tokens Prompt + 256 Tokens Generation
 
-| Run | Total Time | Prompt (t/s) | Generation (t/s) | Status |
-|------|-------------|----------------|-------------------|--------|
-| 1 | 7.56s | ❌ Failed | ❌ Failed | Skipped |
-| 2 | 6.55s | ❌ Failed | ❌ Failed | Skipped |
-| 3 | 5.19s | ❌ Failed | ❌ Failed | Skipped |
-| 4 | 10.97s | 8409.8 | 23.9 | ✅ |
-| 5 | 11.04s | 8478.8 | 23.7 | ✅ |
+| Run | Total Time | Prompt (t/s) | Generation (t/s) | Status  |
+|-----|------------|--------------|------------------|---------|
+| 1   | 7.56s      | ❌ Failed     | ❌ Failed         | Skipped |
+| 2   | 6.55s      | ❌ Failed     | ❌ Failed         | Skipped |
+| 3   | 5.19s      | ❌ Failed     | ❌ Failed         | Skipped |
+| 4   | 10.97s     | 8409.8       | 23.9             | ✅       |
+| 5   | 11.04s     | 8478.8       | 23.7             | ✅       |
 
 **Average (2 successful runs):**
 - **Prompt Processing:** 8,444.3 tokens/second ✅ EXCELLENT
@@ -37,10 +37,10 @@
 ### Test 2: 512 Tokens Prompt + 128 Tokens Generation
 
 | Run | Total Time | Prompt (t/s) | Generation (t/s) | Status |
-|------|-------------|----------------|-------------------|--------|
-| 1 | 5.55s | 14,952.0 | 24.0 | ✅ |
-| 2 | 5.57s | 14,722.4 | 23.8 | ✅ |
-| 3 | 5.56s | 15,254.7 | 23.8 | ✅ |
+|-----|------------|--------------|------------------|--------|
+| 1   | 5.55s      | 14,952.0     | 24.0             | ✅      |
+| 2   | 5.57s      | 14,722.4     | 23.8             | ✅      |
+| 3   | 5.56s      | 15,254.7     | 23.8             | ✅      |
 
 **Average (3 successful runs):**
 - **Prompt Processing:** 14,976.4 tokens/second ✅ EXCELLENT
@@ -53,9 +53,9 @@
 
 ### Prompt Processing Speed
 
-| Test | Average | Rating | Notes |
-|------|---------|--------|-------|
-| 256 tokens | 8,444 t/s | ✅ EXCELLENT | > 3000 t/s |
+| Test       | Average    | Rating      | Notes                                |
+|------------|------------|-------------|--------------------------------------|
+| 256 tokens | 8,444 t/s  | ✅ EXCELLENT | > 3000 t/s                           |
 | 512 tokens | 14,976 t/s | ✅ EXCELLENT | Nearly 2x faster with longer prompts |
 
 **Observations:**
@@ -66,8 +66,8 @@
 
 ### Token Generation Speed
 
-| Test | Average | Rating | Notes |
-|------|---------|--------|-------|
+| Test           | Average    | Rating  | Notes           |
+|----------------|------------|---------|-----------------|
 | 128-256 tokens | ~23-24 t/s | ⚠️ FAIR | 10-30 t/s range |
 
 **Observations:**
@@ -98,10 +98,10 @@
 
 ### For 20B Parameter Models (CPU-Only)
 
-| Metric | Your System | Typical Range | Rating |
-|---------|--------------|----------------|--------|
+| Metric            | Your System        | Typical Range     | Rating           |
+|-------------------|--------------------|-------------------|------------------|
 | Prompt Processing | 8,444 - 14,976 t/s | 3,000 - 6,000 t/s | ⭐ 2.5x-5x BETTER |
-| Token Generation | 23.8 - 23.9 t/s | 15 - 30 t/s | ✅ ABOVE AVERAGE |
+| Token Generation  | 23.8 - 23.9 t/s    | 15 - 30 t/s       | ✅ ABOVE AVERAGE  |
 
 **Assessment:** **OUTSTANDING**
 - Your Ryzen AI Max+ 395 outperforms typical CPU-only systems
@@ -113,13 +113,13 @@
 
 ## 🏆 Overall Performance Rating
 
-| Category | Score | Rating |
-|----------|--------|---------|
-| **Prompt Processing** | 9.5/10 | EXCELLENT |
-| **Token Generation** | 6/10 | FAIR |
-| **Consistency** | 7/10 | GOOD |
-| **System Utilization** | 8/10 | VERY GOOD |
-| **Overall** | **7.6/10** | **GOOD+** |
+| Category               | Score      | Rating    |
+|------------------------|------------|-----------|
+| **Prompt Processing**  | 9.5/10     | EXCELLENT |
+| **Token Generation**   | 6/10       | FAIR      |
+| **Consistency**        | 7/10       | GOOD      |
+| **System Utilization** | 8/10       | VERY GOOD |
+| **Overall**            | **7.6/10** | **GOOD+** |
 
 ---
 
@@ -138,12 +138,12 @@
 
 ### Model Selection Guidance
 
-| Model Size | Prompt Speed | Generation Speed | Best For |
-|------------|--------------|-------------------|-----------|
-| **gpt-oss:20b** | 8K-15K t/s | ~24 t/s | Complex reasoning, long documents |
-| **Llama 3.1 8B** | ~5K t/s | ~50-80 t/s | General use, balanced |
-| **Phi-3 Mini (3.8B)** | ~15K-20K t/s | ~100-150 t/s | Quick responses, simple tasks |
-| **Llama 3.2 1B** | ~20K-30K t/s | ~200-250 t/s | Lightning-fast responses |
+| Model Size            | Prompt Speed | Generation Speed | Best For                          |
+|-----------------------|--------------|------------------|-----------------------------------|
+| **gpt-oss:20b**       | 8K-15K t/s   | ~24 t/s          | Complex reasoning, long documents |
+| **Llama 3.1 8B**      | ~5K t/s      | ~50-80 t/s       | General use, balanced             |
+| **Phi-3 Mini (3.8B)** | ~15K-20K t/s | ~100-150 t/s     | Quick responses, simple tasks     |
+| **Llama 3.2 1B**      | ~20K-30K t/s | ~200-250 t/s     | Lightning-fast responses          |
 
 ---
 
