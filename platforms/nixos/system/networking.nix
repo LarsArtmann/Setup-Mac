@@ -15,11 +15,9 @@ _: {
       enable = true;
       persistent = true; # Keep DHCP lease across reboots
       extraConfig = ''
-        # Ignore router DNS
-        nooption routers
+        # Let NixOS networking.nameservers manage DNS
+        # This allows Technitium DNS (127.0.0.1) or Quad9 to be set via config
         nooption domain_name_servers
-        # Use static Quad9 DNS
-        static domain_name_servers=9.9.9.10 9.9.9.11
         # Disable IPv6 completely
         noipv6
         noipv6rs
