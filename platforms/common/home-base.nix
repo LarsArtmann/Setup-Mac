@@ -50,6 +50,8 @@
   home.sessionPath = [
     # Go binaries (must use same path as GOPATH variable)
     "${config.home.homeDirectory}/go/bin"
+    # Traditional Unix paths for manually installed tools
+    "/usr/local/bin"
   ];
 
   # Home Manager version for compatibility

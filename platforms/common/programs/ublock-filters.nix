@@ -203,12 +203,20 @@ Nix only manages filter lists, not the extension itself.
         ];
         StartCalendarInterval = [
           {
-            Hour = builtins.substring 0 2 cfg.updateInterval;
-            Minute = builtins.substring 3 5 cfg.updateInterval;
+            Hour = let
+              hourStr = builtins.substring 0 2 cfg.updateInterval;
+            in
+              if hourStr == "09" then 9
+              else lib.toInt hourStr;
+            Minute = let
+              minuteStr = builtins.substring 3 5 cfg.updateInterval;
+            in
+              if minuteStr == "09" then 9
+              else lib.toInt minuteStr;
           }
         ];
-        StandardOutPath = "$HOME/Library/Logs/ublock-update.log";
-        StandardErrorPath = "$HOME/Library/Logs/ublock-update-error.log";
+        StandardOutPath = config.home.homeDirectory + "/Library/Logs/ublock-update.log";
+        StandardErrorPath = config.home.homeDirectory + "/Library/Logs/ublock-update-error.log";
       };
     };
 
