@@ -1,9 +1,12 @@
-{pkgs, ...}: {
+{pkgs, lib, config, ...}: let
+  # Import Hyprland type safety module
+  hyprlandTypes = import ../core/HyprlandTypes.nix {inherit lib;};
+in {
   imports = [
     ./waybar.nix
   ];
 
-  # Type-safe Hyprland configuration (Home Manager built-in types)
+  # Type-safe Hyprland configuration with custom validation
   wayland.windowManager.hyprland = {
     enable = true;
 
@@ -148,7 +151,6 @@
         "wl-paste --watch cliphist store"
         "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop"
         "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"
-        "${pkgs.kitty}/bin/kitty --class nvim-bg --hold -e nvim ~/.config/hypr/hyprland.conf"
       ];
 
       # Keybindings
@@ -240,7 +242,9 @@
         "$mod, G, exec, gitui"
         "$mod, H, exec, btop"
         "$mod, A, exec, nvim ~/todo.md"
-        "$mod, V, exec, cliphist list | rofi -dmenu -p 'Clipboard:' | cliphist decode | wl-copy"
+        "$mod, O, exec, ${pkgs.writeShellScriptBin "clipboard-menu" ''
+          ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
+        ''}/bin/clipboard-menu"
       ];
 
       bindm = [
@@ -294,5 +298,32 @@
     grimblast
     playerctl
     brightnessctl
+  ];
+
+  # Type safety assertions - catch config errors at build time using HyprlandTypes validation
+  config.assertions = let
+    settings = config.wayland.windowManager.hyprland.settings;
+
+    # Build config object for validation
+    hyprlandConfig = {
+      variables = {
+        "$mod" = settings."$mod";
+        "$terminal" = settings."$terminal";
+        "$menu" = settings."$menu";
+      };
+      monitor = settings.monitor;
+      workspaces = settings.workspace;
+      windowRules = settings.windowrulev2;
+      keybindings = settings.bind;
+      mouseBindings = settings.bindm;
+    };
+
+    # Validate using HyprlandTypes
+    validation = hyprlandTypes.validateHyprlandConfig hyprlandConfig;
+  in [
+    {
+      assertion = validation.valid;
+      message = lib.concatStringsSep "\n" validation.errorMessages;
+    }
   ];
 }
