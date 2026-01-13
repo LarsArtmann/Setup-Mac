@@ -6,7 +6,6 @@
   gcc,
   glib,
   zlib,
-  pkgs,
 }:
 stdenv.mkDerivation rec {
   pname = "geekbench-ai";

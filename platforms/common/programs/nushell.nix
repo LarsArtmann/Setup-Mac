@@ -1,6 +1,6 @@
 # Nushell shell configuration (Cross-Platform)
 # Migrated from dotfiles/.config/nushell/
-{config, ...}: {
+_: {
   programs.nushell = {
     enable = true;
 

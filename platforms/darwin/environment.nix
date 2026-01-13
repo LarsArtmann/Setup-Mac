@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{...}: {
   # Import common environment variables module
   # Note: Common variables are applied via Nix module system
   # Darwin-specific additions below are merged with commonEnvVars

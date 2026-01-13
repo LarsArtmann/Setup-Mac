@@ -25,14 +25,14 @@
 
     # Helium Browser
     helium = {
-        url = "github:vikingnope/helium-browser-nix-flake";
-        inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:vikingnope/helium-browser-nix-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Add nix-visualize for Nix configuration visualization
     nix-visualize = {
-        url = "github:craigmbooth/nix-visualize";
-        inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:craigmbooth/nix-visualize";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
@@ -52,7 +52,6 @@
 
       # Per-system configuration (packages, devShells, etc.)
       perSystem = {
-        config,
         pkgs,
         system,
         ...

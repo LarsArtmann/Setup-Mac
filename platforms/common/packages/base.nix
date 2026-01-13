@@ -131,7 +131,7 @@
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
     [
-     helium
+      helium
       # Import platform-specific Helium browser - them disable
       #(
       #  if stdenv.isDarwin

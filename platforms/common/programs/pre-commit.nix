@@ -1,6 +1,6 @@
 # Pre-commit hooks configuration (Cross-Platform)
 # Migrated from dotfiles/.pre-commit-config.yaml
-{...}: {
+_: {
   # Pre-commit hooks for configuration validation
   # Ensures configuration errors are caught early in development workflow
   home.file.".config/pre-commit/config.yaml" = {

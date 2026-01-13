@@ -1,12 +1,17 @@
-{ pkgs, lib, ... }:
-let
+{
+  pkgs,
+  lib,
+  ...
+}: let
   # Platform-specific SSH configuration includes
   # These are conditionally added based on the platform
   platformIncludes =
-    if pkgs.stdenv.isDarwin then [
-      "~/.orbstack/ssh/config"  # OrbStack (macOS-only)
-      "~/.colima/ssh_config"     # Colima (macOS-only)
-    ] else [];
+    if pkgs.stdenv.isDarwin
+    then [
+      "~/.orbstack/ssh/config" # OrbStack (macOS-only)
+      "~/.colima/ssh_config" # Colima (macOS-only)
+    ]
+    else [];
 
   # Cross-platform SSH hosts (work on both macOS and NixOS)
   commonMatchBlocks = {
@@ -51,7 +56,6 @@ let
       identityAgent = lib.mkDefault "/Users/larsartmann/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
     };
   };
-
 in {
   # Enable SSH configuration management via Home Manager
   programs.ssh = {

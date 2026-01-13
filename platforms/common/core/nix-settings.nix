@@ -8,7 +8,7 @@
 
       # Enhanced Nix settings for better performance and reliability
       builders-use-substitutes = true;
-      connect-timeout = 60; # Increased to 60s to handle DNS timeouts
+      connect-timeout = 120; # Increased to 120s to handle DNS/IPv6 timeouts
       fallback = true;
       http-connections = 10; # Reduced to avoid "Too many open files" errors
       keep-derivations = true;
@@ -17,7 +17,7 @@
       max-free = 3000000000; # 3GB
       min-free = 1000000000; # 1GB
       sandbox = true; # Strict sandboxing for security
-      # Force IPv4-only binary caches (trailing slashes prevent IPv6 DNS lookups)
+      # Force IPv4-only binary caches
       substituters = [
         "https://cache.nixos.org/"
         "https://nix-community.cachix.org/"
@@ -45,9 +45,15 @@
       build-max-jobs = auto
       cores = 0
 
+      # Network settings to fix IPv6 DNS issues
+      netrc-file = /etc/nix/netrc
+
       # Flake settings
       accept-flake-config = true
       show-trace = true
+
+      # Force IPv4-only for network operations
+      narinfo-cache-negative-ttl = 0
     '';
   };
 

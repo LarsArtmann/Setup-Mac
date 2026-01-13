@@ -1,9 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
-}: {
+{pkgs, ...}: {
   # Import common Home Manager modules
   imports = [
     ../common/home-base.nix

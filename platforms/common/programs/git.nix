@@ -1,4 +1,4 @@
-{config, pkgs, lib, ...}: {
+_: {
   programs.git = {
     enable = true;
     lfs.enable = true;

@@ -1,5 +1,5 @@
 # Common Home Manager configuration for all platforms
-{config, pkgs, lib, ...}: {
+{...}: {
   # Import common program configurations
   imports = [
     # Shell configurations (shared aliases, no duplication!)

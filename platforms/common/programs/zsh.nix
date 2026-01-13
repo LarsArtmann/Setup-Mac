@@ -1,27 +1,14 @@
 # Zsh shell configuration (Cross-Platform)
 # Performance-optimized config migrated from dotfiles/.zshrc
-{config, lib, ...}: let
+{
+  config,
+  lib,
+  ...
+}: let
   # Import shared aliases from shell-aliases.nix
   commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
-
   # Expected common aliases
-  expectedAliases = ["l" "t" "gs" "gd" "ga" "gc" "gp" "gl"];
-
   # Type assertions
-  assertions = [
-    {
-      assertion = lib.isAttrs commonAliases;
-      message = "programs.zsh.shellAliases: Must be an attribute set";
-    }
-    {
-      assertion = lib.length (lib.attrNames commonAliases) == lib.length expectedAliases;
-      message = "programs.zsh.shellAliases: Must have exactly ${toString (lib.length expectedAliases)} aliases, found ${toString (lib.length (lib.attrNames commonAliases))}";
-    }
-    {
-      assertion = lib.all (name: lib.hasAttr name commonAliases) expectedAliases;
-      message = "programs.zsh.shellAliases: All expected aliases must be defined (l, t, gs, gd, ga, gc, gp, gl)";
-    }
-  ];
 in {
   # Common Zsh shell configuration
   programs.zsh = {

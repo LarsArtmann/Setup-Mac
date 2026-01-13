@@ -1,7 +1,7 @@
 {pkgs, ...}: {
   imports = [
     ../../common/home-base.nix
-    ../programs/shells.nix  # NixOS shell configuration
+    ../programs/shells.nix # NixOS shell configuration
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
     ../modules/hyprland-animated-wallpaper.nix
   ];

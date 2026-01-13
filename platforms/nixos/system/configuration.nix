@@ -1,4 +1,4 @@
-{pkgs, helium, ...}: {
+{pkgs, ...}: {
   imports = [
     # Import common packages shared with macOS
     ../../common/packages/base.nix

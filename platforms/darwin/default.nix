@@ -1,17 +1,11 @@
-{
-  lib,
-  pkgs,
-  config,
-  helium,
-  ...
-}: {
+{lib, ...}: {
   # Import Darwin-specific system configurations
   imports = [
     ./networking/default.nix
     ./nix/settings.nix
     ./security/pam.nix
     ./services/default.nix
-    ./services/launchagents.nix  # Declarative LaunchAgents (replaces bash scripts)
+    ./services/launchagents.nix # Declarative LaunchAgents (replaces bash scripts)
     ./system/activation.nix
     ./system/settings.nix
     ./environment.nix

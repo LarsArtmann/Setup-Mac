@@ -1,8 +1,4 @@
-{
-  pkgs,
-  config,
-  ...
-}: {
+{pkgs, ...}: {
   # ActivityWatch Configuration (Linux only - NixOS)
   # ActivityWatch does not support Darwin (macOS) - only Linux platforms
   services.activitywatch = {

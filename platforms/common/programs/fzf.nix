@@ -1,7 +1,7 @@
 # FZF configuration (Cross-Platform)
 # Migrated from dotfiles/.fzf.zsh
 # Home Manager manages completion and keybindings automatically
-{...}: {
+_: {
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;

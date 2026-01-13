@@ -1,6 +1,6 @@
 # LaunchAgent Management for macOS (nix-darwin)
 # Declarative service management to replace imperative bash scripts
-{config, pkgs, lib, ...}: let
+{config, ...}: let
   # User home directory (from nix-darwin users option)
   userHome = config.users.users.larsartmann.home or "/Users/larsartmann";
 in {
@@ -12,7 +12,7 @@ in {
     # NOTE: Binary is aw-qt, not ActivityWatch (Homebrew-installed app bundle)
     # TODO: Migrate ActivityWatch to Nix package when available (currently only in unstable)
     "net.activitywatch.ActivityWatch.plist" = {
-      enable = true;  # Set to false to disable
+      enable = true; # Set to false to disable
       text = ''
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

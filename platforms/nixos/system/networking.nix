@@ -2,27 +2,40 @@ _: {
   # Networking configuration
   networking = {
     hostName = "evo-x2"; # Machine name
-    networkmanager.enable = true;
+    # Disable NetworkManager - use dhcpcd instead for simpler DNS management
+    # networkmanager.enable = true;
     enableIPv6 = false; # IPv6 is unreachable, disable entirely
+
+    # Use dhcpcd for network and DNS management
+    # This provides better control over DNS settings
+    useDHCP = true;
+
+    # dhcpcd specific configuration
+    dhcpcd = {
+      enable = true;
+      persistent = true; # Keep DHCP lease across reboots
+      extraConfig = ''
+        # Ignore router DNS
+        nooption routers
+        nooption domain_name_servers
+        # Use static Quad9 DNS
+        static domain_name_servers=9.9.9.10 9.9.9.11
+        # Disable IPv6 completely
+        noipv6
+        noipv6rs
+      '';
+    };
 
     # DNS configuration - FORCE Quad9 only
     nameservers = ["9.9.9.10" "9.9.9.11"];
 
-    # Force Quad9 DNS via dhcpcd, ignore router DNS
-    dhcpcd.extraConfig = ''
-      nohook resolv.conf
-      static domain_name_servers=9.9.9.10 9.9.9.11
-    '';
-
-    # Force IPv4-only for DNS to prevent IPv6 queries
-    resolvconf.extraConfig = ''
-      options inet6
-    '';
+    # Note: DNS options like timeout/attempts are managed by glibc resolver
+    # and can be set in /etc/resolv.conf manually if needed
   };
 
-  # Configure NetworkManager DNS settings
-  # This ensures Quad9 DNS is used instead of router's DNS
-  networking.networkmanager.dns = "none"; # Disable automatic DNS handling
+  # Use NetworkManager for WiFi management only (if needed)
+  # networking.networkmanager.enable = true;
+  # networking.networkmanager.wifi.backend = "iwd";
 
   # Disable systemd-resolved to prevent DNS conflicts
   services.resolved.enable = false;

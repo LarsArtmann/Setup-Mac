@@ -3,7 +3,6 @@
   pkgs,
 }: let
   inherit (pkgs.stdenv) isAarch64;
-  inherit (pkgs.stdenv) isx86_64;
 in
   pkgs.stdenv.mkDerivation rec {
     pname = "helium";

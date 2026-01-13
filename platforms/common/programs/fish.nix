@@ -1,5 +1,5 @@
 # Fish shell configuration
-{config, lib, ...}: let
+_: let
   # Import shared aliases from shell-aliases.nix
   commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 in {

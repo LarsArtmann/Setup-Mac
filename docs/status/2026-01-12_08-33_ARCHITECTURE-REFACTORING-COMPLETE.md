@@ -1,8 +1,8 @@
 # Setup-Mac Status Report: Architecture Refactoring Complete
 
-**Date:** 2026-01-12 08:33  
-**Project:** Setup-Mac - Cross-Platform Nix Configuration  
-**Status:** 🟢 Stable - Major Architecture Improvements Deployed  
+**Date:** 2026-01-12 08:33
+**Project:** Setup-Mac - Cross-Platform Nix Configuration
+**Status:** 🟢 Stable - Major Architecture Improvements Deployed
 **Overall Health:** 85%
 
 ---
@@ -70,7 +70,7 @@ The `hyprland-animated-wallpaper.nix` module is entirely Linux-specific (depends
 
 **Files Changed:**
 ```
-renamed: platforms/common/modules/hyprland-animated-wallpaper.nix 
+renamed: platforms/common/modules/hyprland-animated-wallpaper.nix
     → platforms/nixos/modules/hyprland-animated-wallpaper.nix
 modified: platforms/nixos/users/home.nix
 ```
@@ -100,7 +100,7 @@ modified: platforms/nixos/users/home.nix
 
 **Files Changed:**
 ```
-renamed: platforms/common/core/HyprlandTypes.nix 
+renamed: platforms/common/core/HyprlandTypes.nix
     → platforms/nixos/core/HyprlandTypes.nix
 modified: platforms/nixos/desktop/hyprland.nix
 ```
@@ -150,7 +150,7 @@ The Helium browser package `helium-darwin.nix` is exclusively for macOS (Darwin 
 
 **Files Changed:**
 ```
-renamed: platforms/common/packages/helium-darwin.nix 
+renamed: platforms/common/packages/helium-darwin.nix
     → platforms/darwin/packages/helium.nix
 modified: platforms/common/packages/base.nix
 ```
@@ -387,7 +387,7 @@ Find idiomatic Nix/nix-darwin pattern for:
 
 1. **`darwin/test-darwin.nix`** (Line 1)
    ```nix
-   ## TODO: very much not a fan of this file at all! 
+   ## TODO: very much not a fan of this file at all!
    ## It should be all moved into other config files and then deleted.
    ```
    - Issue: Outdated test file references old username (`larsartmann`)
@@ -1901,9 +1901,9 @@ Contributions welcome! See project README for guidelines.
 
 ## ✅ Status Report Complete
 
-**Report Generated:** 2026-01-12 08:33  
-**Next Review:** After Nix settings refactor completion  
-**Report Maintainer:** Lars Artmann  
+**Report Generated:** 2026-01-12 08:33
+**Next Review:** After Nix settings refactor completion
+**Report Maintainer:** Lars Artmann
 
 ---
 

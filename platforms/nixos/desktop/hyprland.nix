@@ -1,34 +1,4 @@
-{
-  pkgs,
-  lib,
-  ...
-}: let
-  # TODO: Import Hyprland type safety framework (currently disabled due to path resolution issues)
-  # hyprlandTypes = import ../core/HyprlandTypes.nix {inherit lib;};
-  # Validate Hyprland configuration at evaluation time
-  hyprlandConfig = {
-    variables = {
-      "$mod" = "SUPER";
-      "$terminal" = "kitty";
-      "$menu" = "rofi -show drun -show-icons";
-    };
-    monitor = "HDMI-A-1,preferred,auto,1.25";
-    workspaces = [
-      "1, name:💻 Dev"
-      "2, name:🌐 Web"
-      "3, name:📁 Files"
-      "4, name:📝 Edit"
-      "5, name:💬 Chat"
-      "6, name:🔧 Tools"
-      "7, name:🎮 Games"
-      "8, name:🎵 Media"
-      "9, name:📊 Mon"
-      "10, name:🌟 Misc"
-    ];
-  };
-  # TODO: Re-enable type safety validation once path is fixed
-  # validationResult = hyprlandTypes.validateHyprlandConfig hyprlandConfig;
-in {
+{pkgs, ...}: {
   imports = [
     ./waybar.nix
   ];

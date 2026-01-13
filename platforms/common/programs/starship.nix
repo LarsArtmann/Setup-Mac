@@ -1,6 +1,6 @@
 # Starship Prompt Configuration (Cross-Platform)
 # Performance-optimized config migrated from dotfiles/.config/starship.toml
-{...}: {
+_: {
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
@@ -9,8 +9,8 @@
 
     settings = {
       # Performance optimization settings
-      command_timeout = 400;  # 400ms max per command
-      scan_timeout = 100;      # 100ms max scanning
+      command_timeout = 400; # 400ms max per command
+      scan_timeout = 100; # 100ms max scanning
 
       # Format: Enhanced prompt with performance budget
       format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
@@ -46,7 +46,7 @@
         modified = "+";
         staged = "+";
         untracked = "?";
-        ignore_submodules = true;  # Disable slow operations
+        ignore_submodules = true; # Disable slow operations
       };
 
       # Character: Simple prompt character
@@ -126,7 +126,7 @@
       zig.disabled = true;
       cmd_duration = {
         disabled = false;
-        min_time = 2000;  # Show duration for commands >2s
+        min_time = 2000; # Show duration for commands >2s
         style = "bold yellow";
       };
     };

@@ -1,4 +1,4 @@
-{lib, ...}: {
+_: {
   # TEMP: Disable common module import to avoid sandbox merging conflicts
   # TODO: Refactor to properly override sandbox setting
   # imports = [../../common/core/nix-settings.nix];
