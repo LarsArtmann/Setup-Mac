@@ -125,15 +125,6 @@
     };
 
     runtime = {
-      wrapper_execution_failed = {
-        type = "runtime";
-        severity = "medium";
-        autoRetry = true;
-        rollbackable = true;
-        notifyUser = true;
-        logLevel = "warn";
-        recoveryActions = ["restart_wrapper" "check_permissions"];
-      };
       performance_threshold_exceeded = {
         type = "runtime";
         severity = "low";

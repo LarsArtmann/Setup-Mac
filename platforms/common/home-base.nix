@@ -1,5 +1,5 @@
 # Common Home Manager configuration for all platforms
-{...}: {
+{config, ...}: {
   # Import common program configurations
   imports = [
     # Shell configurations (shared aliases, no duplication!)
@@ -28,9 +28,14 @@
   # Go language configuration (Nix-native GOPATH management)
   programs.go = {
     enable = true;
-    env = {
-      GOPATH = "${config.home.homeDirectory}/go";
-    };
+    # Note: env variables are set via home.sessionVariables below
+    # This ensures GOPATH is available in all shells, not just Go commands
+  };
+
+  # Session variables (available to all shells and applications)
+  home.sessionVariables = {
+    # Go development
+    GOPATH = "${config.home.homeDirectory}/go";
   };
 
   # Home Manager version for compatibility

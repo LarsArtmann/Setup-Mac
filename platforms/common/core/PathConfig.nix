@@ -34,12 +34,6 @@
         description = "Core configuration modules";
         example = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/core";
       };
-
-      wrappers = lib.mkOption {
-        type = lib.types.path;
-        description = "Wrapper configurations";
-        example = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/wrappers";
-      };
     };
   };
 
@@ -50,7 +44,6 @@
     dotfiles = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles";
     nixConfig = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix";
     core = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/core";
-    wrappers = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/wrappers";
   };
 in {
   # Export types for external use
@@ -66,7 +59,6 @@ in {
     dotfiles = "/Users/${username}/Desktop/Setup-Mac/dotfiles";
     nixConfig = "/Users/${username}/Desktop/Setup-Mac/dotfiles/nix";
     core = "/Users/${username}/Desktop/Setup-Mac/dotfiles/nix/core";
-    wrappers = "/Users/${username}/Desktop/Setup-Mac/dotfiles/nix/wrappers";
   };
 
   # Path manipulation helpers

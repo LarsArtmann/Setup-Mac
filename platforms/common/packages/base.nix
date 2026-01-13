@@ -18,6 +18,7 @@
       # Version control
       git
       git-town # High-level Git workflow management
+      jj # Git-compatible version control system
 
       # Essential editors
       micro

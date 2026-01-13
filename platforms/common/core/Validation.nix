@@ -49,33 +49,6 @@
     inherit essentialMissing;
   };
 
-  # CONFIGURATION VALIDATION - TYPE-SAFE
-  validateConfig = wrapper: config: let
-    requiredFields = wrapper.config.requiredFields or [];
-    missingFields = lib.filter (_field: !config ? field) requiredFields;
-    invalidFields = lib.filter (_field: config ? field && !(wrapper.config.validFields or {} ? field)) (lib.attrNames config);
-  in {
-    allPresent = (builtins.length missingFields) == 0;
-    inherit missingFields;
-    allValid = (builtins.length invalidFields) == 0;
-    inherit invalidFields;
-  };
-
-  # PERFORMANCE VALIDATION - TYPE-SAFE
-  validatePerformance = wrapper: actualPerformance: let
-    expectedPerformance = wrapper.performance or {};
-    maxMemory = expectedPerformance.maxMemory or 512;
-    actualMemory = actualPerformance.memory or 0;
-    isMemoryWithinLimit = actualMemory <= maxMemory;
-  in {
-    memoryValid = isMemoryWithinLimit;
-    memoryUsage = "${toString actualMemory}MB / ${toString maxMemory}MB";
-    memoryExcess =
-      if actualMemory > maxMemory
-      then "${toString (actualMemory - maxMemory)}MB over limit"
-      else "within limits";
-  };
-
   # VALIDATE CROSS-PLATFORM PACKAGE - TYPE-SAFE
   validateCrossPlatformPackage = pkg: system: let
     isCrossPlatform =
@@ -116,102 +89,6 @@
     inherit hasValidBinaryPath;
     valid = supportsCurrentSystem && archSupported && hasValidPassthru && hasValidBinaryPath;
   };
-
-  # COMPREHENSIVE VALIDATION PIPELINE
-  validateWrapper = wrapper: level: system: let
-    inherit (wrapper) package;
-    wrapperType = wrapper.type or "cli-tool";
-    platform = wrapper.platform or "all";
-
-    # Level-based validation
-    strictValidation = level == "strict";
-    standardValidation = level == "standard";
-
-    # Core validations
-    packageValid = package ? outPath && package ? meta;
-    platformValid =
-      if platform == "all"
-      then true
-      else if platform == "darwin"
-      then validateDarwin package
-      else if platform == "linux"
-      then validateLinux package
-      else if platform == "aarch64-darwin"
-      then validateAarch64 package
-      else if platform == "x86_64-darwin"
-      then validateX86_64 package
-      else true;
-
-    typeValid = lib.elem wrapperType ["cli-tool" "gui-app" "shell" "service" "dev-env"];
-
-    # Level-dependent validations
-    strictValid =
-      if strictValidation
-      then
-        validateLicense system.allowedUnfreeLicenses package
-        && (validateDependencies system.packages package).allAvailable
-      else true;
-
-    # Configuration validation for standard+ levels
-    configValid =
-      if (standardValidation || strictValidation)
-      then
-        (validateConfig wrapper wrapper.config).allPresent
-        && (validateConfig wrapper wrapper.config).allValid
-      else true;
-
-    # Performance validation for strict level
-    perfValid =
-      if strictValidation
-      then (validatePerformance wrapper (wrapper.performance or {})).memoryValid
-      else true;
-
-    # Overall validation result
-    overallValid = packageValid && platformValid && typeValid && strictValid && configValid && perfValid;
-
-    validationResults = {
-      package = {
-        valid = packageValid;
-        name = lib.getName package;
-        version = lib.getVersion package;
-      };
-      platform = {
-        valid = platformValid;
-        required = platform;
-      };
-      type = {
-        valid = typeValid;
-        actual = wrapperType;
-      };
-      license = {
-        valid =
-          if strictValidation
-          then (validateLicense system.allowedUnfreeLicenses package)
-          else true;
-        skipped = !strictValidation;
-      };
-      dependencies = {
-        valid =
-          if strictValidation
-          then (validateDependencies system.packages package).allAvailable
-          else true;
-        skipped = !strictValidation;
-        missing = (validateDependencies system.packages package).missingDependencies;
-        inherit ((validateDependencies system.packages package)) essentialMissing;
-      };
-      config = {
-        valid = configValid;
-        skipped = !standardValidation && !strictValidation;
-      };
-      performance = {
-        valid = perfValid;
-        skipped = !strictValidation;
-      };
-      overall = overallValid;
-      inherit level;
-    };
-  in
-    validationResults;
 in {
   inherit
     validateDarwin
@@ -220,9 +97,6 @@ in {
     validateX86_64
     validateLicense
     validateDependencies
-    validateConfig
-    validatePerformance
-    validateWrapper
     validateCrossPlatformPackage
     ;
 }
