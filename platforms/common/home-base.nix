@@ -25,6 +25,14 @@
   # All shells now use shared aliases from shell-aliases.nix
   # Platform-specific aliases added via lib.mkAfter in platform configs
 
+  # Go language configuration (Nix-native GOPATH management)
+  programs.go = {
+    enable = true;
+    env = {
+      GOPATH = "${config.home.homeDirectory}/go";
+    };
+  };
+
   # Home Manager version for compatibility
   home.stateVersion = "24.05";
 }
