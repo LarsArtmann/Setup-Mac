@@ -29,6 +29,9 @@ in {
 
       # Note: GOPATH is managed by Home Manager programs.go
       # Fish will inherit GOPATH automatically from Home Manager session variables
+
+      # GOPATH/bin needs to be in PATH for Go binaries
+      fish_add_path --prepend --global $GOPATH/bin
     '';
   };
 }

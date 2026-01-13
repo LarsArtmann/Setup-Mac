@@ -35,7 +35,7 @@
 
   # uBlock Origin filter management
   programs.ublock-filters = {
-    enable = true;
+    enable = false;  # Temporarily disabled due to time parsing issues
     enableAutoUpdate = true;
     updateInterval = "09:00";
   };
@@ -50,8 +50,6 @@
   home.sessionPath = [
     # Go binaries (must use same path as GOPATH variable)
     "${config.home.homeDirectory}/go/bin"
-    # Traditional Unix paths for manually installed tools
-    "/usr/local/bin"
   ];
 
   # Home Manager version for compatibility

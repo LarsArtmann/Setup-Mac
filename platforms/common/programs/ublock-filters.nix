@@ -206,13 +206,11 @@ Nix only manages filter lists, not the extension itself.
             Hour = let
               hourStr = builtins.substring 0 2 cfg.updateInterval;
             in
-              if hourStr == "09" then 9
-              else lib.toInt hourStr;
+              builtins.fromJSON (builtins.toJSON (lib.toInt hourStr));
             Minute = let
               minuteStr = builtins.substring 3 5 cfg.updateInterval;
             in
-              if minuteStr == "09" then 9
-              else lib.toInt minuteStr;
+              builtins.fromJSON (builtins.toJSON (lib.toInt minuteStr));
           }
         ];
         StandardOutPath = config.home.homeDirectory + "/Library/Logs/ublock-update.log";
@@ -222,7 +220,6 @@ Nix only manages filter lists, not the extension itself.
 
     # Systemd timer (NixOS only)
     systemd.user.timers."ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
-      enable = true;
       timerConfig = {
         OnCalendar = cfg.updateInterval;
         Unit = "ublock-filter-update.service";
@@ -230,7 +227,6 @@ Nix only manages filter lists, not the extension itself.
     };
 
     systemd.user.services."ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
-      enable = true;
       serviceConfig = {
         ExecStart = "/bin/sh -c 'echo \"uBlock filters updated\" | systemd-cat -t ublock'";
         Type = "oneshot";
