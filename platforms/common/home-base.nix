@@ -48,8 +48,8 @@
 
   # PATH additions (available to all shells)
   home.sessionPath = [
-    # Go binaries
-    "$GOPATH/bin"
+    # Go binaries (must use same path as GOPATH variable)
+    "${config.home.homeDirectory}/go/bin"
   ];
 
   # Home Manager version for compatibility
