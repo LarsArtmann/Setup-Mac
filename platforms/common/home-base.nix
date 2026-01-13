@@ -35,7 +35,7 @@
 
   # uBlock Origin filter management
   programs.ublock-filters = {
-    enable = false;  # Temporarily disabled due to time parsing issues
+    enable = false; # Temporarily disabled due to time parsing issues
     enableAutoUpdate = true;
     updateInterval = "09:00";
   };

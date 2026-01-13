@@ -1,9 +1,11 @@
 # Local Technitium DNS Server for evo-x2
 # This configures Technitium DNS Server for local DNS caching and ad blocking
-
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   # Enable Technitium DNS Server
   services.technitium-dns-server = {
     enable = true;
@@ -23,7 +25,7 @@
   };
 
   # Configure system to use local Technitium DNS
-  networking.nameservers = [ "127.0.0.1" ];
+  networking.nameservers = ["127.0.0.1"];
 
   # Note: Additional configuration (forwarders, blocklists, etc.)
   # is done via the web console at http://localhost:5380

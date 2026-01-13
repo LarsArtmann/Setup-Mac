@@ -21,6 +21,9 @@ _: {
         # Disable IPv6 completely
         noipv6
         noipv6rs
+        # Prevent dhcpcd from managing /etc/resolv.conf
+        # This avoids conflicts with NixOS's network-setup.service
+        nohook resolv.conf
       '';
     };
 

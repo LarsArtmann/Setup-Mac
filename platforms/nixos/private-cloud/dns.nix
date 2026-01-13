@@ -1,9 +1,11 @@
 # Technitium DNS Server for Private Cloud
 # This configures Technitium DNS Server for network-wide DNS service
-
-{ config, lib, pkgs, ... }:
-
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   # Enable Technitium DNS Server
   services.technitium-dns-server = {
     enable = true;
@@ -15,19 +17,19 @@
     # Firewall port configuration
     # Standard ports: 53 (DNS), 5380 (HTTP), 53443 (HTTPS)
     # Additional ports for encrypted DNS: 443 (DoH), 853 (DoT)
-    firewallUDPPorts = [ 53 ];
+    firewallUDPPorts = [53];
     firewallTCPPorts = [
-      53      # Standard DNS (TCP)
-      5380    # Web Console (HTTP)
-      53443   # Web Console (HTTPS)
-      443     # DNS-over-HTTPS (DoH)
-      853     # DNS-over-TLS (DoT)
+      53 # Standard DNS (TCP)
+      5380 # Web Console (HTTP)
+      53443 # Web Console (HTTPS)
+      443 # DNS-over-HTTPS (DoH)
+      853 # DNS-over-TLS (DoT)
     ];
   };
 
   # Configure system to use local DNS
   # Note: This server will be used by other devices on the network
-  networking.nameservers = [ "127.0.0.1" ];
+  networking.nameservers = ["127.0.0.1"];
 
   # Optional: Replace existing DHCP server with Technitium's built-in DHCP
   # Uncomment if you want Technitium DNS to manage DHCP
