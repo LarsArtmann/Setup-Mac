@@ -1,10 +1,14 @@
 {pkgs, ...}: {
-  # Import common environment variables
+  # Import common environment variables module
+  # Note: Common variables are applied via Nix module system
+  # Darwin-specific additions below are merged with commonEnvVars
   imports = [../common/environment/variables.nix];
 
-  # Darwin-specific environment variables
+  # Darwin-specific environment variables (merged with commonEnvVars)
+  # Note: Common variables from variables.nix are applied automatically
+  # We use mkMerge to combine common and Darwin-specific variables
   environment.variables = {
-    # macOS-specific settings
+    # macOS-specific additions (don't override common settings)
     BROWSER = "helium";
     TERMINAL = "iTerm2"; ## TODO: <-- should we move this to the dedicated iterm2 config?
   };

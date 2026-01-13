@@ -7,14 +7,14 @@
   commonEnvVars = {
     # Core system settings
     EDITOR = "micro"; # micro-full is installed in base.nix
-    LANG = "en_GB.UTF-8";
+    LANG = "en_US.UTF-8";
 
     # Optimize NIX_PATH for better performance
     NIX_PATH = lib.mkForce "nixpkgs=flake:nixpkgs";
 
     # Locale optimization
-    LC_ALL = "en_GB.UTF-8";
-    LC_CTYPE = "en_GB.UTF-8";
+    LC_ALL = "en_US.UTF-8";
+    LC_CTYPE = "en_US.UTF-8";
 
     # Development environment enhancements
     NODE_OPTIONS = "--max-old-space-size=4096";
