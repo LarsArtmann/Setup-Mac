@@ -221,7 +221,7 @@ Nix only manages filter lists, not the extension itself.
       };
     };
 
-    systemd.user.services."ublock-filter-update" = mkIf cfg.enableAutoUpdate {
+    systemd.user.services."ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
       enable = true;
       serviceConfig = {
         ExecStart = "/bin/sh -c 'echo \"uBlock filters updated\" | systemd-cat -t ublock'";
