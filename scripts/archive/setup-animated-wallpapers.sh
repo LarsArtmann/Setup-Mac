@@ -1,5 +1,30 @@
 #!/usr/bin/env bash
-# Animated wallpapers setup script
+# =============================================================================
+# DEPRECATED - This script has been superseded by Nix-native implementation
+# =============================================================================
+#
+# This script is OBSOLETE and has been replaced by:
+#   platforms/nixos/modules/hyprland-animated-wallpaper.nix
+#
+# Migration Date: 2026-01-13
+# Reason: Nix-native module provides declarative wallpaper management
+#
+# New Implementation:
+#   - Fully declarative via Home Manager
+#   - Integrates with Hyprland via exec-once and keybindings
+#   - Provides scripts: swww-anim-wallpaper, swww-next, swww-prev
+#   - Managed by Nix (no manual setup needed)
+#
+# To use new implementation:
+#   1. Enable in platforms/nixos/users/home.nix:
+#      programs.hyprland-animated-wallpaper.enable = true;
+#   2. Run: sudo nixos-rebuild switch
+#   3. Wallpapers auto-start and cycle automatically
+#
+# DO NOT USE THIS SCRIPT - Use Nix module instead
+# =============================================================================
+#
+# Animated wallpapers setup script (OBSOLETE - see above)
 # This script sets up the wallpaper management system with swww
 
 set -euo pipefail

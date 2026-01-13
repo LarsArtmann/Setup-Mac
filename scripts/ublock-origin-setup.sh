@@ -1,5 +1,33 @@
 #!/usr/bin/env bash
 
+# =============================================================================
+# PARTIAL MIGRATION - Filter lists now managed by Nix
+# =============================================================================
+#
+# This script has been PARTIALLY migrated to Nix:
+#   platforms/common/programs/ublock-filters.nix
+#
+# Migration Date: 2026-01-13
+# What's now managed by Nix:
+#   ✅ Custom filter lists (custom-filters.txt, anti-adblock.txt, allowlist.txt)
+#   ✅ Automatic filter updates via LaunchAgent (Darwin) or systemd (Linux)
+#   ✅ Declarative configuration
+#
+# What's still managed by this script:
+#   🔧 Backup and restore of uBlock settings from browsers
+#   🔧 Browser-specific installation guides
+#   🔧 Manual filter list updates
+#
+# To enable Nix-managed filters:
+#   1. Already enabled in platforms/common/home-base.nix:
+#      programs.ublock-filters.enable = true;
+#   2. Run: just switch (macOS) or sudo nixos-rebuild switch (Linux)
+#   3. Filter lists will be in ~/.config/ublock-origin/filters/
+#   4. Import filters manually via uBlock dashboard
+#
+# This script remains useful for backup/restore functionality.
+# =============================================================================
+#
 # uBlock Origin Setup Automation
 # Addresses issue #40: Set up uBlock Origin automation
 #
@@ -10,7 +38,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_DIR="$(dirname "$SCRIPT_DIR")/dotfiles"
-UBLOCK_CONFIG_DIR="$DOTFILES_DIR/ublock-origin"
+# Updated to use Nix-managed config location
+UBLOCK_CONFIG_DIR="${HOME}/.config/ublock-origin"
 
 # Colors for output
 RED='\033[0;31m'

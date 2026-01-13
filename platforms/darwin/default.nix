@@ -20,9 +20,8 @@
     allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
   };
 
-  # Define users for Home Manager (workaround for nix-darwin/common.nix import issue)
-  users.users.larsartmann = {
-    name = "larsartmann";
-    home = "/Users/larsartmann";
-  };
+  # NOTE: Removed users.users.larsartmann definition (2026-01-13)
+  # This workaround was thought to be required for Home Manager integration
+  # Testing to confirm if actually needed (see docs/reports/home-manager-users-workaround-bug-report.md)
+  # If build fails, restore users definition
 }

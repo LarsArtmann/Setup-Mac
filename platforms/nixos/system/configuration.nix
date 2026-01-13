@@ -7,6 +7,7 @@
     # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
     ./boot.nix
     ./networking.nix
+    ./dns-config.nix # Technitium DNS Server for local caching and ad blocking
     ./snapshots.nix # BTRFS snapshots with Timeshift
     ../services/ssh.nix
     ../services/default.nix

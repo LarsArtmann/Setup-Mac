@@ -17,6 +17,7 @@
     [
       # Version control
       git
+      gh # GitHub CLI
       git-town # High-level Git workflow management
       jj # Git-compatible version control system
 

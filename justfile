@@ -1099,3 +1099,159 @@ dep-graph-update:
     @echo "👀 Opening in browser..."
     @sleep 1
     @just dep-graph-view
+
+# ========================================
+# DNS Management Commands
+# ========================================
+
+# Open Technitium DNS web console
+dns-console:
+    @echo "🌐 Opening Technitium DNS web console..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "⚠️  Technitium DNS is only configured on NixOS (evo-x2)"; \
+        echo "ℹ️  On Darwin, use system DNS or configure to use Private Cloud DNS"; \
+    else \
+        xdg-open http://localhost:5380 || firefox http://localhost:5380 || echo "❌ Could not open browser. Access http://localhost:5380 manually"; \
+    fi
+
+# Check Technitium DNS service status
+dns-status:
+    @echo "🔍 Checking Technitium DNS status..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Technitium DNS is not configured on Darwin"; \
+        echo "ℹ️  NixOS (evo-x2) has Technitium DNS enabled"; \
+    else \
+        systemctl status technitium-dns-server --no-pager || echo "❌ Technitium DNS service not found or not running"; \
+    fi
+
+# View Technitium DNS logs
+dns-logs:
+    @echo "📋 Viewing Technitium DNS logs..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Technitium DNS is not configured on Darwin"; \
+    else \
+        journalctl -u technitium-dns-server -f --no-pager; \
+    fi
+
+# Restart Technitium DNS service
+dns-restart:
+    @echo "🔄 Restarting Technitium DNS..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "⚠️  Technitium DNS is not configured on Darwin"; \
+    else \
+        sudo systemctl restart technitium-dns-server && echo "✅ Technitium DNS restarted" || echo "❌ Failed to restart Technitium DNS"; \
+    fi
+
+# Test DNS resolution
+dns-test:
+    @echo "🧪 Testing DNS resolution..."
+    @echo ""
+    @echo "Testing basic resolution..."
+    @if command -v dig >/dev/null 2>&1; then \
+        echo "  google.com:"; \
+        dig google.com +short | head -1 || echo "    ❌ Resolution failed"; \
+        echo ""; \
+        echo "Testing ad blocking (should return 0.0.0.0 or NXDOMAIN)..."; \
+        echo "  doubleclick.net:"; \
+        dig doubleclick.net +short || echo "    ✅ Domain blocked"; \
+        echo ""; \
+        echo "Testing DNSSEC validation..."; \
+        echo "  example.net:"; \
+        dig +dnssec example.net +short | head -1 || echo "    ❌ Resolution failed"; \
+    elif command -v nslookup >/dev/null 2>&1; then \
+        echo "  google.com:"; \
+        nslookup google.com | grep "Address:" | head -1 || echo "    ❌ Resolution failed"; \
+    else \
+        echo "❌ Neither 'dig' nor 'nslookup' found. Install with: 'just switch' (includes bind package)"; \
+    fi
+
+# Test DNS resolution with specific server
+dns-test-server server:
+    @echo "🧪 Testing DNS resolution with server: {{server}}..."
+    @if command -v dig >/dev/null 2>&1; then \
+        echo "  Testing google.com via {{server}}..."; \
+        dig @{{server}} google.com +short | head -1 || echo "    ❌ Resolution failed"; \
+        echo "  Testing ad blocking via {{server}}..."; \
+        dig @{{server}} doubleclick.net +short || echo "    ✅ Domain blocked"; \
+    else \
+        echo "❌ 'dig' not found. Install with: 'just switch' (includes bind package)"; \
+    fi
+
+# Test DNS performance (cached vs uncached)
+dns-perf:
+    @echo "⚡ Testing DNS performance..."
+    @if command -v dig >/dev/null 2>&1; then \
+        echo ""; \
+        echo "Uncached resolution (first lookup):"; \
+        time dig github.com +short > /dev/null; \
+        echo ""; \
+        echo "Cached resolution (second lookup - should be faster):"; \
+        time dig github.com +short > /dev/null; \
+        echo ""; \
+        echo "✅ Performance test complete. Compare times above."; \
+        echo "   If cached time is <10ms, caching is working correctly."; \
+    else \
+        echo "❌ 'dig' not found. Install with: 'just switch' (includes bind package)"; \
+    fi
+
+# Check DNS configuration
+dns-config:
+    @echo "📋 Checking DNS configuration..."
+    @echo ""
+    @echo "System DNS servers:"
+    @if [ -f /etc/resolv.conf ]; then \
+        grep -E "^nameserver|^options" /etc/resolv.conf || echo "  (empty or no resolv.conf)"; \
+    else \
+        echo "  (no /etc/resolv.conf)"; \
+    fi
+    @echo ""
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "macOS DNS configuration:"; \
+        scutil --dns | grep -A 5 "resolver #0" || true; \
+    else \
+        echo "Technitium DNS service status:"; \
+        systemctl is-active technitium-dns-server && echo "  ✅ Running" || echo "  ❌ Not running"; \
+    fi
+
+# Backup Technitium DNS configuration
+dns-backup:
+    @echo "💾 Backing up Technitium DNS configuration..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "⚠️  Technitium DNS is not configured on Darwin"; \
+    elif [ -d /var/lib/technitium-dns-server ]; then \
+        BACKUP_FILE="backups/technitium-dns-backup-$(date '+%Y%m%d-%H%M%S').tar.gz"; \
+        mkdir -p backups; \
+        sudo tar -czf "$BACKUP_FILE" /var/lib/technitium-dns-server/; \
+        echo "✅ Backup created: $BACKUP_FILE"; \
+    else \
+        echo "⚠️  Technitium DNS state directory not found (not yet configured?)"; \
+    fi
+
+# Restore Technitium DNS configuration
+dns-restore backup:
+    @echo "📦 Restoring Technitium DNS configuration from: {{backup}}..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "⚠️  Technitium DNS is not configured on Darwin"; \
+    elif [ -f "{{backup}}" ]; then \
+        sudo systemctl stop technitium-dns-server; \
+        sudo tar -xzf "{{backup}}" -C /; \
+        sudo systemctl start technitium-dns-server; \
+        echo "✅ Technitium DNS restored from backup"; \
+        echo "ℹ️  Please verify configuration via web console: http://localhost:5380"; \
+    else \
+        echo "❌ Backup file not found: {{backup}}"; \
+        echo "   Available backups:"; \
+        ls -lh backups/technitium-dns-backup-*.tar.gz 2>/dev/null || echo "   (no backups found)"; \
+    fi
+
+# DNS diagnostics (comprehensive check)
+dns-diagnostics:
+    @echo "🔬 Running DNS diagnostics..."
+    @echo ""
+    @just dns-status
+    @echo ""
+    @just dns-config
+    @echo ""
+    @just dns-test
+    @echo ""
+    @echo "✅ DNS diagnostics complete"
