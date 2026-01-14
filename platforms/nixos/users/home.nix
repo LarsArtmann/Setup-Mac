@@ -106,7 +106,7 @@
     enable = true;
     font = {
       name = "Sans";
-      size = 11;
+      size = 16; # Increased for TV viewing (2m distance)
     };
   };
 
@@ -114,5 +114,81 @@
   qt = {
     enable = true;
     platformTheme.name = "adwaita";
+  };
+
+  # Kitty terminal configuration (TV-friendly font size)
+  programs.kitty = {
+    enable = true;
+    font = {
+      name = "JetBrainsMono Nerd Font";
+      size = 16; # TV viewing size (2m distance)
+    };
+    settings = {
+      bold_font = "auto";
+      italic_font = "auto";
+      bold_italic_font = "auto";
+      background_opacity = "0.85";
+      confirm_os_window_close = 0;
+      update_check_interval = 0;
+      enable_audio_bell = false;
+    };
+  };
+
+  # Dunst notification configuration (TV-friendly)
+  services.dunst = {
+    enable = true;
+    settings = {
+      global = {
+        font = "JetBrainsMono Nerd Font 16";
+        markup = "full";
+        format = "<b>%s</b>\\n%b";
+        sort = "yes";
+        indicate_hidden = "yes";
+        alignment = "center";
+        show_age_threshold = 60;
+        word_wrap = "yes";
+        ignore_newline = "no";
+        stack_duplicates = true;
+        hide_duplicate_count = false;
+        show_indicators = "yes";
+        icon_position = "left";
+        max_icon_size = 64;
+        sticky_history = "yes";
+        history_length = 20;
+        dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst:";
+        browser = "${pkgs.firefox}/bin/firefox --new-tab";
+        always_run_script = true;
+        title = "Dunst";
+        class = "Dunst";
+        corner_radius = 12;
+        ignore_dbusclose = false;
+        layer = "overlay";
+        force_xinerama = false;
+        mouse_left_click = "close_current";
+        mouse_middle_click = "do_action, close_current";
+        mouse_right_click = "close_all";
+      };
+      experimental = {
+        per_monitor_dpi = false;
+      };
+      urgency_low = {
+        background = "rgba(30,30,46,0.9)";
+        foreground = "#cdd6f4";
+        frame_color = "#89b4fa";
+        timeout = 5;
+      };
+      urgency_normal = {
+        background = "rgba(30,30,46,0.9)";
+        foreground = "#cdd6f4";
+        frame_color = "#89b4fa";
+        timeout = 5;
+      };
+      urgency_critical = {
+        background = "rgba(243,139,168,0.9)";
+        foreground = "#1e1e2e";
+        frame_color = "#f38ba8";
+        timeout = 0;
+      };
+    };
   };
 }

@@ -6,8 +6,8 @@
       mainBar = {
         layer = "top";
         position = "top";
-        height = 41;
-        spacing = 4;
+        height = 55;
+        spacing = 8;
 
         modules-left = [
           "hyprland/workspaces"
@@ -52,7 +52,7 @@
         };
 
         "hyprland/submap" = {
-          format = "<span style='italic'> {}</span>";
+          format = "<span style='italic'> {text}</span>";
         };
 
         "idle_inhibitor" = {
@@ -77,7 +77,7 @@
         };
 
         "memory" = {
-          format = "{}% ";
+          format = "{text}% ";
           interval = 3;
           min-length = 6;
         };
@@ -158,7 +158,7 @@
         # };
 
         "custom/sudo" = {
-          format = "{}";
+          format = "{text}";
           exec = pkgs.writeShellScript "waybar-sudo-status" ''
             if pgrep -x sudo >/dev/null 2>&1; then
               echo "⚠️"
@@ -168,7 +168,7 @@
           '';
           interval = 2;
           tooltip = true;
-          tooltip-format = "Sudo status: {}";
+          tooltip-format = "Sudo status: {text}";
           on-click = pkgs.writeShellScript "waybar-sudo-reset" ''
             # Check if sudo timestamp exists
             if sudo -n true 2>/dev/null; then
@@ -182,10 +182,11 @@
         };
 
         "custom/clipboard" = {
-          format = "📋 {}";
+          format = "📋 {text}";
           exec = pkgs.writeShellScript "waybar-clipboard" ''
             CLIP_CONTENT=$(${pkgs.cliphist}/bin/cliphist list | head -1 | ${pkgs.gawk}/bin/awk -F'\t' '{print $2}' || echo "Empty")
-            echo "$CLIP_CONTENT"
+            # Escape special characters for Pango markup
+            echo "$CLIP_CONTENT" | sed 's/&/\&amp;/g'
           '';
           interval = 5;
           tooltip = false;
@@ -201,18 +202,18 @@
         };
 
         "custom/gpu" = {
-          format = "🌡️ {}";
+          format = "🌡️ {text}";
           exec = pkgs.writeShellScript "waybar-gpu-temp" ''
             ${pkgs.lm_sensors}/bin/sensors | grep 'Tctl' | awk '{print $2}' | tr -d '+'
           '';
           exec-if = "which sensors";
           interval = 2;
           tooltip = "AMD GPU Temperature";
-          tooltip-format = "Tctl: {}°C";
+          tooltip-format = "Tctl: {text}°C";
         };
 
         "custom/netbandwidth" = {
-          format = "📶 {}";
+          format = "📶 {text}";
           exec = pkgs.writeShellScript "waybar-netbandwidth" ''
             # Get active network interface
             IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk '/default/ {print $5}')
@@ -226,7 +227,7 @@
           '';
           exec-if = "which ip";
           interval = 10;
-          tooltip-format = "Network Interface: {}\nIP Address: {}";
+          tooltip-format = "Network Interface: {text}\nIP Address: {text}";
           tooltip = true;
         };
       };
@@ -235,12 +236,12 @@
     style = ''
       * {
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         font-family: "JetBrainsMono Nerd Font";
-        font-size: 13px;
+        font-size: 18px;
         min-height: 0;
-        margin: 2px 1px;
-        padding: 0 6px;
+        margin: 3px 2px;
+        padding: 0 8px;
         transition: all 0.15s ease;
       }
 
@@ -378,7 +379,7 @@
       #custom-clipboard {
         background: rgba(243, 139, 168, 0.15);
         color: #f38ba8;
-        font-size: 12px;
+        font-size: 16px;
       }
 
       #custom-gpu {
