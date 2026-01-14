@@ -1,5 +1,5 @@
 # Bash shell configuration
-{lib, ...}: let
+{...}: let
   # Import shared aliases from shell-aliases.nix
   commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
   # Expected common aliases

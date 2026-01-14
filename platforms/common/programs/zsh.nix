@@ -2,7 +2,6 @@
 # Performance-optimized config migrated from dotfiles/.zshrc
 {
   config,
-  lib,
   ...
 }: let
   # Import shared aliases from shell-aliases.nix

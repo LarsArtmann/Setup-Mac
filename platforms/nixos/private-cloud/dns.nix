@@ -1,11 +1,6 @@
 # Technitium DNS Server for Private Cloud
 # This configures Technitium DNS Server for network-wide DNS service
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}: {
+{...}: {
   # Enable Technitium DNS Server
   services.technitium-dns-server = {
     enable = true;
