@@ -1,4 +1,4 @@
-_: {
+{pkgs, lib, ...}: {
   programs.git = {
     enable = true;
     lfs.enable = true;
@@ -48,7 +48,17 @@ _: {
       };
 
       gpg = {
+        format = "openpgp";
         program = "/run/current-system/sw/bin/gpg";
+      };
+
+      filter = {
+        "lfs" = {
+          clean = "git-lfs clean -- %f";
+          process = "git-lfs filter-process";
+          required = true;
+          smudge = "git-lfs smudge -- %f";
+        };
       };
 
       "git-town" = {
