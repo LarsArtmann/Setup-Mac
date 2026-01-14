@@ -51,6 +51,13 @@
     ];
   };
 
+  # Ensure Home Manager profile directory exists for user lars
+  # This is required for home-manager.useUserPackages = true to work properly
+  system.activationScripts.home-manager-profile-dirs = ''
+    mkdir -p /nix/var/nix/profiles/per-user/lars
+    chown lars:users /nix/var/nix/profiles/per-user/lars
+  '';
+
   # Enable Fish shell system-wide
   programs.fish.enable = true;
 
