@@ -19,39 +19,45 @@
     ./programs/ublock-filters.nix
   ];
 
-  # Enable Home Manager to manage itself
-  programs.home-manager.enable = true;
-
   # Cross-platform shell configurations (Fish, Zsh, Bash)
   # All shells now use shared aliases from shell-aliases.nix
   # Platform-specific aliases added via lib.mkAfter in platform configs
 
-  # Go language configuration (Nix-native GOPATH management)
-  programs.go = {
-    enable = true;
-    # Note: env variables are set via home.sessionVariables below
-    # This ensures GOPATH is available in all shells, not just Go commands
+  # Common program configurations
+  programs = {
+    # Enable Home Manager to manage itself
+    home-manager.enable = true;
+
+    # Go language configuration (Nix-native GOPATH management)
+    go = {
+      enable = true;
+      # Note: env variables are set via home.sessionVariables below
+      # This ensures GOPATH is available in all shells, not just Go commands
+    };
+
+    # uBlock Origin filter management
+    ublock-filters = {
+      enable = false; # Temporarily disabled due to time parsing issues
+      enableAutoUpdate = true;
+      updateInterval = "09:00";
+    };
   };
 
-  # uBlock Origin filter management
-  programs.ublock-filters = {
-    enable = false; # Temporarily disabled due to time parsing issues
-    enableAutoUpdate = true;
-    updateInterval = "09:00";
+  # Home configuration
+  home = {
+    # Session variables (available to all shells and applications)
+    sessionVariables = {
+      # Go development
+      GOPATH = "${config.home.homeDirectory}/go";
+    };
+
+    # PATH additions (available to all shells)
+    sessionPath = [
+      # Go binaries (must use same path as GOPATH variable)
+      "${config.home.homeDirectory}/go/bin"
+    ];
+
+    # Home Manager version for compatibility
+    stateVersion = "24.05";
   };
-
-  # Session variables (available to all shells and applications)
-  home.sessionVariables = {
-    # Go development
-    GOPATH = "${config.home.homeDirectory}/go";
-  };
-
-  # PATH additions (available to all shells)
-  home.sessionPath = [
-    # Go binaries (must use same path as GOPATH variable)
-    "${config.home.homeDirectory}/go/bin"
-  ];
-
-  # Home Manager version for compatibility
-  home.stateVersion = "24.05";
 }

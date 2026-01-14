@@ -24,8 +24,9 @@ in {
   };
 
   config = mkIf cfg.enable {
-    # uBlock Origin custom filters
-    xdg.configFile."ublock-origin/filters/custom-filters.txt".text = ''
+    # uBlock Origin custom filters and configuration
+    xdg.configFile = {
+      "ublock-origin/filters/custom-filters.txt".text = ''
       ! Title: Lars Custom uBlock Filters
       ! Description: Custom filters for enhanced privacy and performance
       ! Homepage: https://github.com/larsartmann/setup-mac
@@ -87,9 +88,9 @@ in {
       stackoverflow.com##.s-sidebarwidget--content > .grid
       ! Remove promotional banners from documentation sites
       docs.github.com##.BorderGrid-row:has(.text-bold:contains("GitHub Copilot"))
-    '';
+      '';
 
-    xdg.configFile."ublock-origin/filters/anti-adblock.txt".text = ''
+      "ublock-origin/filters/anti-adblock.txt".text = ''
       ! Title: Anti-Adblock Circumvention
       ! Description: Filters to circumvent anti-adblock detection
       ! Version: 1.0.0
@@ -101,9 +102,9 @@ in {
 
       ! Site-specific anti-adblock fixes
       ! Add specific sites that block adblockers here
-    '';
+      '';
 
-    xdg.configFile."ublock-origin/filters/allowlist.txt".text = ''
+      "ublock-origin/filters/allowlist.txt".text = ''
       ! Title: Development Allowlist
       ! Description: Allowed domains for development and trusted services
       ! Version: 1.0.0
@@ -134,9 +135,9 @@ in {
       @@||icloud.com^
       @@||microsoft.com^
       @@||office.com^
-    '';
+      '';
 
-    xdg.configFile."ublock-origin/README.md".text = ''
+      "ublock-origin/README.md".text = ''
       # uBlock Origin Filter Management
 
       This directory contains custom uBlock Origin filter lists managed by Nix.
@@ -179,7 +180,8 @@ in {
 
       Browser extensions must be installed via browser extension stores.
       Nix only manages filter lists, not the extension itself.
-    '';
+      '';
+    };
 
     # Automatic filter updates via LaunchAgent (Darwin only)
     launchd.agents."com.larsartmann.ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isDarwin) {
