@@ -22,8 +22,8 @@
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
 
-    # Cursor size (extra large for TV display)
-    XCURSOR_SIZE = "48";
+    # Cursor size (3x extra large for TV display)
+    XCURSOR_SIZE = "144";
   };
 
   # NixOS-specific packages
@@ -53,7 +53,7 @@
     enable = true;
     cursorTheme = {
       name = "Adwaita";
-      size = 48;
+      size = 144;
     };
     font = {
       name = "Sans";
