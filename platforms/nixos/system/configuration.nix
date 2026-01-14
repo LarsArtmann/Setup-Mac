@@ -47,6 +47,7 @@
     ];
     packages = with pkgs; [
       firefox
+      home-manager # Install Home Manager CLI for manual management
       # Desktop packages are now managed via Home Manager (see platforms/nixos/desktop/hyprland.nix)
     ];
   };
