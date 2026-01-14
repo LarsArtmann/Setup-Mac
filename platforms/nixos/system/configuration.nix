@@ -9,6 +9,7 @@
     ./networking.nix
     ./dns-config.nix # Technitium DNS Server for local caching and ad blocking
     ./snapshots.nix # BTRFS snapshots with Timeshift
+    ./sudo.nix # Passwordless sudo for wheel group
     ../services/ssh.nix
     ../services/default.nix
     ../hardware/amd-gpu.nix
