@@ -13,6 +13,7 @@
           "hyprland/workspaces"
           "hyprland/submap"
           "hyprland/window"
+          "custom/gpu"
         ];
 
         modules-center = [
@@ -24,6 +25,7 @@
         modules-right = [
           "pulseaudio"
           "network"
+          "custom/netbandwidth"
           "cpu"
           "memory"
           "temperature"
@@ -197,6 +199,36 @@
           on-click = "wlogout";
           tooltip = "Power menu";
         };
+
+        "custom/gpu" = {
+          format = "🌡️ {}";
+          exec = pkgs.writeShellScript "waybar-gpu-temp" ''
+            ${pkgs.lm_sensors}/bin/sensors | grep 'Tctl' | awk '{print $2}' | tr -d '+'
+          '';
+          exec-if = "which sensors";
+          interval = 2;
+          tooltip = "AMD GPU Temperature";
+          tooltip-format = "Tctl: {}°C";
+        };
+
+        "custom/netbandwidth" = {
+          format = "📶 {}";
+          exec = pkgs.writeShellScript "waybar-netbandwidth" ''
+            # Get active network interface
+            IFACE=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk '/default/ {print $5}')
+            [ -z "$IFACE" ] && IFACE="eth0"
+
+            # Get IP address
+            IP=$(${pkgs.iproute2}/bin/ip -4 addr show dev "$IFACE" 2>/dev/null | ${pkgs.gawk}/bin/awk '/inet/ {print $2}' | cut -d'/' -f1)
+            [ -z "$IP" ] && IP="No IP"
+
+            echo "$IFACE: $IP"
+          '';
+          exec-if = "which ip";
+          interval = 10;
+          tooltip-format = "Network Interface: {}\nIP Address: {}";
+          tooltip = true;
+        };
       };
     };
 
@@ -347,6 +379,16 @@
         background: rgba(243, 139, 168, 0.15);
         color: #f38ba8;
         font-size: 12px;
+      }
+
+      #custom-gpu {
+        background: rgba(250, 179, 135, 0.15);
+        color: #fab387;
+      }
+
+      #custom-netbandwidth {
+        background: rgba(137, 180, 250, 0.15);
+        color: #89b4fa;
       }
 
       #custom-security {

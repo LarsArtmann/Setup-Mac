@@ -61,6 +61,7 @@
       bottom
       procs
       btop
+      lm_sensors # Hardware monitoring (GPU/CPU temperature)
 
       # File utilities
       sd # Modern find and replace
