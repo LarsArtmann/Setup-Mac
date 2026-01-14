@@ -27,6 +27,66 @@
   # Configure system to use local Technitium DNS
   networking.nameservers = ["127.0.0.1"];
 
+  # Automated backup - Daily backups at 2 AM
+  systemd = {
+    timers.technitium-dns-backup = {
+      description = "Daily Technitium DNS backup";
+      timerConfig = {
+        OnCalendar = "02:00";
+        Persistent = true;
+      };
+      wantedBy = ["timers.target"];
+    };
+
+    services.technitium-dns-backup = {
+      description = "Backup Technitium DNS configuration";
+      serviceConfig = {
+        Type = "oneshot";
+        User = "root";
+        ExecStart = pkgs.writeShellScript "backup-technitium-dns" ''
+          #!/bin/sh
+          set -e
+
+          DATE=$(${pkgs.coreutils}/bin/date +%Y%m%d_%H%M%S)
+          BACKUP_DIR="/var/backups/technitium-dns"
+
+          # Create backup directory
+          ${pkgs.coreutils}/bin/mkdir -p "$BACKUP_DIR"
+
+          # Backup state directory
+          ${pkgs.coreutils}/bin/tar -czf "$BACKUP_DIR/backup-$DATE.tar.gz" \
+            -C /var/lib/technitium-dns-server .
+
+          # Keep last 7 backups
+          ${pkgs.findutils}/bin/find "$BACKUP_DIR" -name "backup-*.tar.gz" -mtime +7 -delete
+
+          ${pkgs.coreutils}/bin/echo "Backup completed: $BACKUP_DIR/backup-$DATE.tar.gz"
+        '';
+      };
+    };
+
+    # Health check - Verify DNS server is responding
+    services.technitium-dns-healthcheck = {
+      description = "Technitium DNS health check";
+      after = ["technitium-dns-server.service" "network-online.target"];
+      wants = ["network-online.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.bind.dnsutils}/bin/dig @127.0.0.1 +short google.com";
+        ExecStartPost = "${pkgs.coreutils}/bin/echo 'DNS health check passed'";
+      };
+    };
+
+    timers.technitium-dns-healthcheck = {
+      description = "Run Technitium DNS health check every 5 minutes";
+      timerConfig = {
+        OnUnitActiveSec = "5min";
+        AccuracySec = "1s";
+      };
+      wantedBy = ["timers.target"];
+    };
+  };
+
   # Note: Additional configuration (forwarders, blocklists, etc.)
   # is done via the web console at http://localhost:5380
   #
