@@ -335,7 +335,8 @@ in {
 
       # Validate using HyprlandTypes
       validation = hyprlandTypes.validateHyprlandConfig hyprlandConfig;
-    in ([
+    in
+      [
         {
           assertion = validation.valid;
           message = lib.concatStringsSep "\n" validation.errorMessages;
@@ -357,6 +358,6 @@ in {
         playerctl = null;
         brightnessctl = null;
         dolphin = null;
-      });
+      };
   };
 }
