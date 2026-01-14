@@ -106,6 +106,10 @@
       delve
       gup
 
+      # JavaScript/TypeScript development (Oxc tools)
+      oxlint
+      tsgolint
+
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp
       google-cloud-sdk # Google Cloud SDK for cloud management
@@ -145,6 +149,7 @@
     ++ lib.optionals stdenv.isDarwin [
       google-chrome
       iterm2
+      duti # macOS file association utility (used by activation scripts)
     ];
 
   # AI tools (conditionally added)
