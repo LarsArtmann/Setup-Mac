@@ -315,23 +315,6 @@ in {
       };
     };
 
-    # Packages
-    home.packages = with pkgs; [
-      kitty
-      ghostty
-      hyprpaper
-      hyprlock
-      hypridle
-      hyprpicker
-      hyprsunset
-      dunst
-      libnotify
-      wlogout
-      grimblast
-      playerctl
-      brightnessctl
-    ];
-
     # Type safety assertions - catch config errors at build time using HyprlandTypes validation
     assertions = let
       inherit (config.wayland.windowManager.hyprland) settings;

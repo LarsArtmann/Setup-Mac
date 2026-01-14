@@ -39,6 +39,21 @@
     # System Tools
     # Note: rofi moved to multi-wm.nix for system-wide availability
     # Note: xdg-utils moved to base.nix for cross-platform consistency
+
+    # Hyprland-specific packages (moved from desktop/hyprland.nix to avoid NixOS module conflict)
+    kitty
+    ghostty
+    hyprpaper
+    hyprlock
+    hypridle
+    hyprpicker
+    hyprsunset
+    dunst
+    libnotify
+    wlogout
+    grimblast
+    playerctl
+    brightnessctl
   ];
 
   # XDG Directories (Linux specific)
