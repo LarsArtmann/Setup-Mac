@@ -2,10 +2,15 @@
   pkgs,
   lib,
   config,
+  nix-colors,
   ...
 }: let
   # Import Hyprland type safety module
   hyprlandTypes = import ../core/HyprlandTypes.nix {inherit lib;};
+
+  # Get color scheme from nix-colors
+  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+  hexToRgba = hex: alpha: "rgba(${builtins.substring 0 2 hex},${builtins.substring 2 2 hex},${builtins.substring 4 2 hex},${alpha})";
 in {
   imports = [
     ./waybar.nix
@@ -61,7 +66,7 @@ in {
 
         # hy3 plugin settings (i3-style tiling)
         hy3 = {
-          gaps_between = 10;
+          gaps_in = 10;
           tab_split_threshold = 0;
         };
 

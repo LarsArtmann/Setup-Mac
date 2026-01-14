@@ -1,6 +1,12 @@
 # Starship Prompt Configuration (Cross-Platform)
 # Performance-optimized config migrated from dotfiles/.config/starship.toml
-_: {
+{
+  config,
+  nix-colors,
+  ...
+}: let
+  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+in {
   programs.starship = {
     enable = true;
     enableFishIntegration = true;
@@ -20,14 +26,14 @@ _: {
         truncation_length = 1;
         truncation_symbol = "";
         truncate_to_repo = false;
-        style = "bold cyan";
+        style = "bold #${colors.base0C}";
         read_only = " 🔒";
       };
 
       # Git branch: Fast git operations
       git_branch = {
         symbol = "";
-        style = "bold green";
+        style = "bold #${colors.base0B}";
         format = "[$symbol$branch]($style)";
         truncation_length = 10;
         truncation_symbol = "…";
@@ -36,7 +42,7 @@ _: {
       # Git status: Simplified status with fast checks
       git_status = {
         format = "[$all_status]($style)";
-        style = "bold green";
+        style = "bold #${colors.base0B}";
         ahead = "⇡";
         behind = "⇣";
         diverged = "⇕";
@@ -51,9 +57,9 @@ _: {
 
       # Character: Simple prompt character
       character = {
-        success_symbol = "[❯](bold green)";
-        error_symbol = "[❯](bold red)";
-        vicmd_symbol = "[❮](bold yellow)";
+        success_symbol = "[❯](bold #${colors.base0B})";
+        error_symbol = "[❯](bold #${colors.base08})";
+        vicmd_symbol = "[❮](bold #${colors.base0A})";
       };
 
       # Disable ALL unnecessary modules for maximum performance
@@ -82,7 +88,7 @@ _: {
       golang = {
         disabled = false;
         symbol = "🐹 ";
-        style = "bold cyan";
+        style = "bold #${colors.base0C}";
       };
       haskell.disabled = true;
       helm.disabled = true;
@@ -99,7 +105,7 @@ _: {
       nodejs = {
         disabled = false;
         symbol = "⬢ ";
-        style = "bold green";
+        style = "bold #${colors.base0B}";
       };
       ocaml.disabled = true;
       openstack.disabled = true;
@@ -127,7 +133,7 @@ _: {
       cmd_duration = {
         disabled = false;
         min_time = 2000; # Show duration for commands >2s
-        style = "bold yellow";
+        style = "bold #${colors.base0A}";
       };
     };
   };

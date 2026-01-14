@@ -1,5 +1,12 @@
 # 📋 TMUX CONFIGURATION FOR SETUP-MAC
-{pkgs, ...}: {
+{
+  config,
+  pkgs,
+  nix-colors,
+  ...
+}: let
+  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+in {
   programs.tmux = {
     enable = true;
     clock24 = true;
@@ -51,16 +58,16 @@
       # Status bar customization
       set -g status-interval 1
       set -g status-justify centre
-      set -g status-bg "#1e1e2e"
-      set -g status-fg "#d4d4d4"
-      set -g status-left "#[fg=green]#S#[fg=default] #I:#W "
-      set -g status-right "#[fg=green]#(date '+%Y-%m-%d %H:%M')#[fg=default]"
+      set -g status-bg "#${colors.base00}"
+      set -g status-fg "#${colors.base05}"
+      set -g status-left "#[fg=#${colors.base0B}]#S#[fg=default] #I:#W "
+      set -g status-right "#[fg=#${colors.base0B}]#(date '+%Y-%m-%d %H:%M')#[fg=default]"
 
       # Window/pane customization
-      setw -g window-status-current-bg "#4a4a4a"
-      setw -g window-status-current-fg "#ffffff"
-      setw -g pane-active-border-style fg="#61afef"
-      setw -g pane-border-style fg="#3b4252"
+      setw -g window-status-current-bg "#${colors.base01}"
+      setw -g window-status-current-fg "#${colors.base05}"
+      setw -g pane-active-border-style fg="#${colors.base0D}"
+      setw -g pane-border-style fg="#${colors.base02}"
 
       # Pain-control enhancements
       bind-key -n M-left select-pane -L
