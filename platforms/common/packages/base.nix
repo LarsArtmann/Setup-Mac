@@ -61,7 +61,6 @@
       bottom
       procs
       btop
-      lm_sensors # Hardware monitoring (GPU/CPU temperature)
 
       # File utilities
       sd # Modern find and replace
@@ -133,6 +132,9 @@
       fcast-receiver # FCast Receiver, media streaming receiver
       ffcast # Run commands on rectangular screen regions
       castnow # Command-line Chromecast player for Google Cast devices
+
+      # Hardware monitoring (Linux-only)
+      lm_sensors # Hardware monitoring (GPU/CPU temperature)
     ];
 
   # GUI Applications (cross-platform)
