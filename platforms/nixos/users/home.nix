@@ -59,11 +59,37 @@
     brightnessctl
   ];
 
-  # XDG Directories (Linux specific)
-  xdg.enable = true;
-  xdg.userDirs = {
+  # XDG configuration (Linux specific)
+  xdg = {
     enable = true;
-    createDirectories = true;
+
+    # User directories
+    userDirs = {
+      enable = true;
+      createDirectories = true;
+    };
+
+    # Default applications for MIME types
+    mimeApps = {
+      enable = true;
+      defaultApplications = {
+        # Web browsing
+        "text/html" = ["helium.desktop"];
+        "application/xhtml+xml" = ["helium.desktop"];
+        "x-scheme-handler/http" = ["helium.desktop"];
+        "x-scheme-handler/https" = ["helium.desktop"];
+
+        # Terminal
+        "x-scheme-handler/terminal" = ["kitty.desktop"];
+        "application/x-terminal-emulator" = ["kitty.desktop"];
+
+        # Text files (use terminal editors for now)
+        "text/plain" = ["kitty.desktop"];
+        "text/markdown" = ["kitty.desktop"];
+        "application/json" = ["kitty.desktop"];
+        "application/x-yaml" = ["kitty.desktop"];
+      };
+    };
   };
 
   # GTK settings for cursor size and theme
