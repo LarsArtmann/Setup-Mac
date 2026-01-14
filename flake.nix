@@ -34,6 +34,9 @@
       url = "github:craigmbooth/nix-visualize";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Add nix-colors for declarative color schemes
+    nix-colors.url = "github:misterio77/nix-colors";
   };
 
   outputs = inputs @ {
@@ -45,6 +48,7 @@
     nur,
     llm-agents,
     nix-visualize,
+    nix-colors,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -89,6 +93,7 @@
             inherit helium;
             inherit nur;
             inherit nix-visualize;
+            inherit nix-colors;
           };
           modules = [
             # Import Home Manager module for Darwin
@@ -103,6 +108,7 @@
                 backupFileExtension = "backup";
                 overwriteBackup = true;
                 users.larsartmann = import ./platforms/darwin/home.nix;
+                extraSpecialArgs = {inherit nix-colors;};
               };
             }
 
@@ -120,6 +126,7 @@
             inherit helium;
             inherit nur;
             inherit nix-visualize;
+            inherit nix-colors;
           };
           modules = [
             # Core system configuration
@@ -143,6 +150,7 @@
                 backupFileExtension = "backup";
                 overwriteBackup = true;
                 users.lars = import ./platforms/nixos/users/home.nix;
+                extraSpecialArgs = {inherit nix-colors;};
               };
             }
 
@@ -157,6 +165,7 @@
         in {
           "evo-x2" = home-manager.lib.homeManagerConfiguration {
             inherit pkgs;
+            extraSpecialArgs = {inherit nix-colors;};
             modules = [
               ./platforms/nixos/users/home.nix
               {
