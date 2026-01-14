@@ -28,18 +28,9 @@
     # NixOS-specific Fish shell initialization
     fish.shellInit = lib.mkAfter ''
       # Nix path setup (NixOS-specific)
-      # Required for system packages and Home Manager-managed binaries
-      if type -q fish_add_path
-          fish_add_path --prepend --global /run/current-system/sw/bin
-          fish_add_path --prepend --global /etc/profiles/per-user/$USER/bin
-      else
-          if not contains /run/current-system/sw/bin $fish_user_paths
-              set --global fish_user_paths /run/current-system/sw/bin $fish_user_paths
-          end
-          if not contains /etc/profiles/per-user/$USER/bin $fish_user_paths
-              set --global fish_user_paths /etc/profiles/per-user/$USER/bin $fish_user_paths
-          end
-      end
+      # Note: /run/current-system/sw/bin and wrappers are already in PATH from /etc/profile
+      # with correct order (wrappers first for setuid programs like sudo)
+      # DO NOT use fish_add_path --prepend here - it breaks sudo and other setuid programs
 
       # NixOS-specific completions
       if test -d /etc/profiles/per-user/$USER/share/nixos/completions

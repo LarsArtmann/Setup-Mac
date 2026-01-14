@@ -6,13 +6,12 @@
 }: let
   # Platform-specific SSH configuration includes
   # These are conditionally added based on the platform and file existence
-  platformIncludes =
-    lib.optionals (pkgs.stdenv.isDarwin) (
-      (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.orbstack/ssh/config")
-        "~/.orbstack/ssh/config") ++
-      (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.colima/ssh_config")
-        "~/.colima/ssh_config")
-    );
+  platformIncludes = lib.optionals pkgs.stdenv.isDarwin (
+    (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.orbstack/ssh/config")
+      "~/.orbstack/ssh/config")
+    ++ (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.colima/ssh_config")
+      "~/.colima/ssh_config")
+  );
 
   # Cross-platform SSH hosts (work on both macOS and NixOS)
   commonMatchBlocks = {
