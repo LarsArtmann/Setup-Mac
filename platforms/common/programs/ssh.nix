@@ -1,17 +1,18 @@
 {
   pkgs,
+  config,
   lib,
   ...
 }: let
   # Platform-specific SSH configuration includes
-  # These are conditionally added based on the platform
+  # These are conditionally added based on the platform and file existence
   platformIncludes =
-    if pkgs.stdenv.isDarwin
-    then [
-      "~/.orbstack/ssh/config" # OrbStack (macOS-only)
-      "~/.colima/ssh_config" # Colima (macOS-only)
-    ]
-    else [];
+    lib.optionals (pkgs.stdenv.isDarwin) (
+      (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.orbstack/ssh/config")
+        "~/.orbstack/ssh/config") ++
+      (lib.optional (builtins.pathExists "${config.home.homeDirectory}/.colima/ssh_config")
+        "~/.colima/ssh_config")
+    );
 
   # Cross-platform SSH hosts (work on both macOS and NixOS)
   commonMatchBlocks = {
@@ -56,6 +57,29 @@
       identityAgent = lib.mkDefault "/Users/larsartmann/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
     };
   };
+
+  linuxMatchBlocks = {
+    # NixOS-only: Private cloud Hetzner servers
+    "private-cloud-hetzner-0" = lib.mkIf pkgs.stdenv.isLinux {
+      hostname = "37.27.217.205";
+      user = "root";
+    };
+
+    "private-cloud-hetzner-1" = lib.mkIf pkgs.stdenv.isLinux {
+      hostname = "37.27.195.171";
+      user = "root";
+    };
+
+    "private-cloud-hetzner-2" = lib.mkIf pkgs.stdenv.isLinux {
+      hostname = "37.27.24.111";
+      user = "root";
+    };
+
+    "private-cloud-hetzner-3" = lib.mkIf pkgs.stdenv.isLinux {
+      hostname = "138.201.155.93";
+      user = "root";
+    };
+  };
 in {
   # Enable SSH configuration management via Home Manager
   programs.ssh = {
@@ -73,6 +97,7 @@ in {
       defaultMatchBlocks
       commonMatchBlocks
       darwinMatchBlocks
+      linuxMatchBlocks
     ];
   };
 }
