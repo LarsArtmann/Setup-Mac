@@ -113,6 +113,6 @@
   # Qt cursor settings for consistency
   qt = {
     enable = true;
-    platformTheme = "adwaita";
+    platformTheme.name = "adwaita";
   };
 }
