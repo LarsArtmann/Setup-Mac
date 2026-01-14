@@ -65,10 +65,10 @@ in {
         };
 
         # hy3 plugin settings (i3-style tiling)
-        hy3 = {
-          gaps_in = 10;
-          tab_split_threshold = 0;
-        };
+        # Note: hy3 uses 'plugin {}' nesting in hyprland.conf, but
+        # Home Manager's hy3 module handles plugin config separately.
+        # Most hy3 settings go in the plugin {} section.
+        # See https://github.com/outfoxxed/hy3#config-fields
 
         # Decoration (nested types validated)
         decoration = {
@@ -261,8 +261,12 @@ in {
           "$mod, F6, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
           # Wallpaper cycling
-          "$mod, SHIFT, W, exec, swww-next"
-          "$mod, CTRL, W, exec, swww-prev"
+          "SUPER SHIFT, W, exec, ${pkgs.writeShellScriptBin "swww-next" ''
+            ${pkgs.swww}/bin/swww img next
+          ''}/bin/swww-next"
+          "SUPER CTRL, W, exec, ${pkgs.writeShellScriptBin "swww-prev" ''
+            ${pkgs.swww}/bin/swww img prev
+          ''}/bin/swww-prev"
 
           # Window controls
           "$mod, V, togglefloating,"
@@ -286,7 +290,6 @@ in {
         # Performance (all types validated)
         render = {
           direct_scanout = 1;
-          explicit_sync = 1;
           new_render_scheduling = true;
         };
 
@@ -302,7 +305,6 @@ in {
           vfr = true;
           animate_manual_resizes = false;
           animate_mouse_windowdragging = false;
-          render_ahead_of_time = true;
         };
 
         debug = {
