@@ -22,8 +22,14 @@
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
 
-    # Cursor size (3x extra large for TV display)
-    XCURSOR_SIZE = "144";
+    # Cursor theme for Hyprland (Wayland)
+    # Note: XCURSOR_SIZE does NOT work in Wayland/Hyprland
+    # Cursor size is determined by the cursor theme's built-in sizes
+    # Bibata has XL size (96px) built-in
+    XCURSOR_THEME = "Bibata-Modern-Classic";
+
+    # Fallback for X11 applications (rarely used)
+    XCURSOR_SIZE = "96";
   };
 
   # NixOS-specific packages
@@ -31,6 +37,9 @@
     # GUI Tools
     pavucontrol # Audio control (user-level access for audio settings)
     signal-desktop # Secure messaging application
+
+    # XL Cursor theme for TV viewing (2 meters away)
+    bibata-cursors
 
     # Development tools
     gitui # Terminal UI for git
@@ -92,16 +101,18 @@
     };
   };
 
-  # GTK settings for cursor size and theme
+  # GTK settings for theme (NOTE: cursor settings don't affect Hyprland compositor)
   gtk = {
     enable = true;
-    cursorTheme = {
-      name = "Adwaita";
-      size = 144;
-    };
     font = {
       name = "Sans";
       size = 11;
     };
+  };
+
+  # Qt cursor settings for consistency
+  qt = {
+    enable = true;
+    platformTheme = "adwaita";
   };
 }
