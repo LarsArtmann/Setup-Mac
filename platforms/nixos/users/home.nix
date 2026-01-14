@@ -32,6 +32,9 @@
     pavucontrol # Audio control (user-level access for audio settings)
     signal-desktop # Secure messaging application
 
+    # Development tools
+    gitui # Terminal UI for git
+
     # Cursor themes
     adwaita-icon-theme
     hicolor-icon-theme

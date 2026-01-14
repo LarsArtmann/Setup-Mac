@@ -23,6 +23,7 @@
 
       # Essential editors
       micro
+      neovim
 
       # Terminal emulator
       alacritty-graphics

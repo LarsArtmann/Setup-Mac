@@ -170,7 +170,7 @@ in {
           "waybar"
           "dunst"
           "wl-paste --watch cliphist store"
-          "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e htop"
+          "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e ${pkgs.htop}/bin/htop"
           "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"
           "${pkgs.kitty}/bin/kitty --class kitty-quake --name Quake -e zsh"
         ];
@@ -181,9 +181,9 @@ in {
           "$mod, Return, exec, $terminal"
           "$mod, Space, exec, $menu"
           "$mod, R, exec, $menu"
-          "$mod, N, exec, dolphin"
-          "$mod, E, exec, dolphin"
-          "$mod, B, exec, firefox"
+          "$mod, N, exec, ${pkgs.kdePackages.dolphin}/bin/dolphin"
+          "$mod, E, exec, ${pkgs.kdePackages.dolphin}/bin/dolphin"
+          "$mod, B, exec, ${pkgs.firefox}/bin/firefox"
           "$mod, D, exec, $menu -show run"
           "$mod, C, killactive,"
           "$mod, V, togglefloating,"
@@ -244,28 +244,28 @@ in {
           "$mod SHIFT, grave, movetoworkspace, special:quake"
           "$mod, mouse_down, workspace, e+1"
           "$mod, mouse_up, workspace, e-1"
-          "$mod, Escape, exec, hyprlock"
-          "$mod, X, exec, wlogout"
+          "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
+          "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
           "$mod SHIFT, R, exec, hyprctl reload"
-          "$mod SHIFT, E, exec, wlogout"
-          "$mod, Print, exec, grimblast copy area"
-          "$mod SHIFT, Print, exec, grimblast copy screen"
-          "$mod CTRL, Print, exec, grimblast copy window"
+          "$mod SHIFT, E, exec, ${pkgs.wlogout}/bin/wlogout"
+          "$mod, Print, exec, ${pkgs.grimblast}/bin/grimblast copy area"
+          "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
+          "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
           ", XF86AudioRaiseVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%"
           ", XF86AudioLowerVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ -5%"
           ", XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle"
-          ", XF86AudioPlay, exec, playerctl play-pause"
-          ", XF86AudioNext, exec, playerctl next"
-          ", XF86AudioPrev, exec, playerctl previous"
-          ", XF86MonBrightnessUp, exec, brightnessctl set +5%"
-          ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
+          ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next"
+          ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous"
+          ", XF86MonBrightnessUp, exec, ${pkgs.brightnessctl}/bin/brightnessctl set +5%"
+          ", XF86MonBrightnessDown, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-"
           "$mod, F1, exec, hyprctl dispatch focuswindow ^btop-bg$"
           "$mod, F2, exec, hyprctl dispatch focuswindow ^htop-bg$"
           "$mod, F3, exec, hyprctl dispatch focuswindow ^logs-bg$"
           "$mod, F4, exec, hyprctl dispatch focuswindow ^nvim-bg$"
-          "$mod, G, exec, gitui"
-          "$mod, H, exec, btop"
-          "$mod, A, exec, nvim ~/todo.md"
+          "$mod, G, exec, ${pkgs.gitui}/bin/gitui"
+          "$mod, H, exec, ${pkgs.btop}/bin/btop"
+          "$mod, A, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
           # hy3 layout switching (i3-style tiling)
           "$mod, T, hy3:changegroup, tab" # Tabbed layout
@@ -335,11 +335,28 @@ in {
 
       # Validate using HyprlandTypes
       validation = hyprlandTypes.validateHyprlandConfig hyprlandConfig;
-    in [
-      {
-        assertion = validation.valid;
-        message = lib.concatStringsSep "\n" validation.errorMessages;
-      }
-    ];
+    in ([
+        {
+          assertion = validation.valid;
+          message = lib.concatStringsSep "\n" validation.errorMessages;
+        }
+      ]
+      ++ lib.mapAttrsToList (name: package: {
+        assertion = builtins.hasAttr name pkgs || (name == "dolphin" && pkgs.kdePackages ? dolphin);
+        message =
+          if name == "dolphin"
+          then "Package '${name}' not found in pkgs.kdePackages - add to platforms/nixos/desktop/multi-wm.nix"
+          else "Package '${name}' not found in nixpkgs - add to appropriate package list";
+      }) {
+        htop = null;
+        btop = null;
+        firefox = null;
+        gitui = null;
+        neovim = null;
+        grimblast = null;
+        playerctl = null;
+        brightnessctl = null;
+        dolphin = null;
+      });
   };
 }
