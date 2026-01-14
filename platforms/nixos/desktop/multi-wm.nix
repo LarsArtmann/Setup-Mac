@@ -1,9 +1,9 @@
 {pkgs, ...}: {
-  # Enable multiple window managers alongside Hyprland
+  # Enable backup window manager alongside Hyprland
   # This allows switching between different WMs at SDDM login screen
 
   programs = {
-    # Sway - i3 successor for stable tiling
+    # Sway - i3 successor for stable tiling (backup WM)
     sway = {
       enable = true;
       wrapperFeatures.gtk = true; # So that GTK applications work properly
@@ -15,30 +15,11 @@
         foot # Terminal
       ];
     };
-
-    # Niri - Scrollable tiling window manager
-    niri = {
-      enable = true;
-      package = pkgs.niri;
-    };
-
-    # LabWC - Openbox-inspired floating window manager
-    labwc = {
-      enable = true;
-    };
   };
 
   services = {
     xserver = {
-      # Awesome - Dynamic window manager with Lua scripting
-      windowManager.awesome = {
-        enable = true;
-        luaModules = with pkgs.luaPackages; [
-          lgi
-        ];
-      };
-
-      # Configure keymap in X11 (for X11-based WMs)
+      # Configure keymap in X11 (for X11-based WMs like Sway)
       xkb = {
         layout = "us";
         variant = "";
@@ -46,7 +27,7 @@
     };
   };
 
-  # Additional packages needed for all window managers
+  # Additional packages needed for Sway backup WM
   environment.systemPackages = with pkgs; [
     # Common terminal for all WMs
     foot
@@ -69,12 +50,6 @@
 
     # Background settings
     swaybg
-
-    # Authentication agents and XDG utilities moved to security-hardening.nix
-    # - polkit_gnome, xdg-utils
-    #
-    # Note: pavucontrol moved to home.nix (user-level access)
-    # (Audio utilities are user-accessible, not system-specific)
 
     # Screenshot tools
     grim
