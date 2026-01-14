@@ -243,11 +243,6 @@ in {
     wayland.windowManager.hyprland = mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
       settings = {
         exec-once = ["swww-anim-wallpaper"];
-
-        bind = lib.optionals cfg.enable [
-          "$mod, W, exec, swww-next"
-          "$mod SHIFT, W, exec, swww-prev"
-        ];
       };
     };
   };

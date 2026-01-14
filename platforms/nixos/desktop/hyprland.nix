@@ -178,9 +178,7 @@ in {
         # Keybindings
         bind = [
           "$mod, Q, exec, $terminal"
-          "$mod, Return, exec, $terminal"
           "$mod, Space, exec, $menu"
-          "$mod, R, exec, $menu"
           "$mod, N, exec, ${pkgs.kdePackages.dolphin}/bin/dolphin"
           "$mod, B, exec, ${pkgs.firefox}/bin/firefox"
           "$mod, D, exec, $menu -show run"
@@ -234,7 +232,7 @@ in {
           "$mod, mouse_up, workspace, e-1"
           "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
           "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
-          "$mod SHIFT, R, exec, hyprctl reload"
+          "$mod SHIFT, Return, exec, hyprctl reload"
           "$mod, Print, exec, ${pkgs.grimblast}/bin/grimblast copy area"
           "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
           "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
@@ -255,12 +253,11 @@ in {
 
           # System tools
           "$mod, H, exec, ${pkgs.btop}/bin/btop"
-          "$mod, F5, exec, ${pkgs.gitui}/bin/gitui"
           "$mod, F6, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
           # Wallpaper cycling
           "$mod, SHIFT, W, exec, swww-next"
-          "$mod, ALT, W, exec, swww-prev"
+          "$mod, CTRL, W, exec, swww-prev"
 
           # Window controls
           "$mod, V, togglefloating,"
