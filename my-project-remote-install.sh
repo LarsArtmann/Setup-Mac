@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Use SSH for private Go modules
+export GOPRIVATE="github.com/larsartmann/*,github.com/LarsArtmann/*"
+
 echo "Installing remote Go tools..."
 
 go install github.com/larsartmann/buildflow/cmd/buildflow@latest
