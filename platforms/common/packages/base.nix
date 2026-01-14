@@ -105,6 +105,13 @@
       delve
       gup
 
+      # CGO build tools for Go
+      gcc
+      gnumake
+
+      # Common libraries for CGO dependencies
+      pkg-config
+
       # JavaScript/TypeScript development (Oxc tools)
       oxlint
       tsgolint
