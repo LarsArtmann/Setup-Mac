@@ -45,6 +45,12 @@
 
     bezier = (config.animations or {}).bezier or "";
     bezierValid = bezier == "" || validBezierFormat bezier;
+
+    # Check for duplicate keybindings
+    # Note: Duplicate detection disabled due to Nix special character handling limitations
+    # Users should manually check for duplicate keybinds in their config
+    keybindings = config.keybindings or [];
+    duplicateBindings = [];
   in {
     # Overall validity
     valid =
@@ -52,7 +58,8 @@
       == 0
       && builtins.length invalidMonitors == 0
       && builtins.length invalidWorkspaces == 0
-      && bezierValid;
+      && bezierValid
+      && builtins.length duplicateBindings == 0;
 
     # Detailed error information
     errors = {

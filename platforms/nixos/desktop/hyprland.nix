@@ -182,32 +182,20 @@ in {
           "$mod, Space, exec, $menu"
           "$mod, R, exec, $menu"
           "$mod, N, exec, ${pkgs.kdePackages.dolphin}/bin/dolphin"
-          "$mod, E, exec, ${pkgs.kdePackages.dolphin}/bin/dolphin"
           "$mod, B, exec, ${pkgs.firefox}/bin/firefox"
           "$mod, D, exec, $menu -show run"
           "$mod, C, killactive,"
-          "$mod, V, togglefloating,"
           "$mod, F, fullscreen,"
           "$mod, M, fullscreen, 1"
           "$mod, P, pseudo,"
-          "$mod, J, togglesplit,"
-          "$mod, T, togglefloating,"
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"
           "$mod, up, movefocus, u"
           "$mod, down, movefocus, d"
-          "$mod, H, movefocus, l"
-          "$mod, L, movefocus, r"
-          "$mod, K, movefocus, u"
-          "$mod, J, movefocus, d"
           "$mod SHIFT, left, movewindow, l"
           "$mod SHIFT, right, movewindow, r"
           "$mod SHIFT, up, movewindow, u"
           "$mod SHIFT, down, movewindow, d"
-          "$mod SHIFT, H, movewindow, l"
-          "$mod SHIFT, L, movewindow, r"
-          "$mod SHIFT, K, movewindow, u"
-          "$mod SHIFT, J, movewindow, d"
           "$mod, 1, workspace, 1"
           "$mod, 2, workspace, 2"
           "$mod, 3, workspace, 3"
@@ -247,7 +235,6 @@ in {
           "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
           "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
           "$mod SHIFT, R, exec, hyprctl reload"
-          "$mod SHIFT, E, exec, ${pkgs.wlogout}/bin/wlogout"
           "$mod, Print, exec, ${pkgs.grimblast}/bin/grimblast copy area"
           "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
           "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
@@ -264,16 +251,26 @@ in {
           "$mod, F3, exec, hyprctl dispatch focuswindow ^logs-bg$"
           "$mod, F4, exec, hyprctl dispatch focuswindow ^nvim-bg$"
           "$mod, G, exec, ${pkgs.gitui}/bin/gitui"
-          "$mod, H, exec, ${pkgs.btop}/bin/btop"
           "$mod, A, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
+          # System tools
+          "$mod, H, exec, ${pkgs.btop}/bin/btop"
+          "$mod, F5, exec, ${pkgs.gitui}/bin/gitui"
+          "$mod, F6, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
+
+          # Wallpaper cycling
+          "$mod, SHIFT, W, exec, swww-next"
+          "$mod, ALT, W, exec, swww-prev"
+
+          # Window controls
+          "$mod, V, togglefloating,"
+          "$mod, T, togglefloating,"
+
           # hy3 layout switching (i3-style tiling)
-          "$mod, T, hy3:changegroup, tab" # Tabbed layout
-          "$mod, Y, hy3:changegroup, stack" # Stacked layout
-          "$mod, W, hy3:changegroup, hsplit" # Horizontal split
-          "$mod, V, hy3:changegroup, vsplit" # Vertical split
-          "$mod, E, hy3:makegroup, hsplit" # New horizontal group
-          "$mod SHIFT, E, hy3:makegroup, vsplit" # New vertical group
+          "$mod, W, hy3:changegroup, hsplit"
+          "$mod, Y, hy3:changegroup, toggletab"
+          "$mod, E, hy3:makegroup, hsplit"
+          "$mod SHIFT, E, hy3:makegroup, vsplit"
           "$mod, O, exec, ${pkgs.writeShellScriptBin "clipboard-menu" ''
             ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
           ''}/bin/clipboard-menu"
