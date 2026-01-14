@@ -61,6 +61,7 @@
       bottom
       procs
       btop
+      htop
 
       # File utilities
       sd # Modern find and replace
