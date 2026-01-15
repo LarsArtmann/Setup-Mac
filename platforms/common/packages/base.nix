@@ -122,6 +122,10 @@
       terraform # Infrastructure as Code tool from HashiCorp
       google-cloud-sdk # Google Cloud SDK for cloud management
 
+      # Container tools
+      docker # Docker CLI tools
+      docker-compose # Multi-container Docker applications
+
       # Nix helper tools
       nh
 
