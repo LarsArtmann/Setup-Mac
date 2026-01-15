@@ -139,12 +139,12 @@
     enable = true;
     settings = {
       global = {
-        font = "JetBrainsMono Nerd Font 16";
+        font = "JetBrainsMono Nerd Font Bold 16";
         markup = "full";
-        format = "<b>%s</b>\\n%b";
+        format = "<b><span foreground='#89b4fa'>%s</span></b>\\n%b";
         sort = "yes";
         indicate_hidden = "yes";
-        alignment = "center";
+        alignment = "left";
         show_age_threshold = 60;
         word_wrap = "yes";
         ignore_newline = "no";
@@ -152,7 +152,7 @@
         hide_duplicate_count = false;
         show_indicators = "yes";
         icon_position = "left";
-        max_icon_size = 64;
+        max_icon_size = 128;
         sticky_history = "yes";
         history_length = 20;
         dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst:";
@@ -160,34 +160,52 @@
         always_run_script = true;
         title = "Dunst";
         class = "Dunst";
-        corner_radius = 12;
+        corner_radius = 16;
         ignore_dbusclose = false;
         layer = "overlay";
         force_xinerama = false;
         mouse_left_click = "close_current";
         mouse_middle_click = "do_action, close_current";
         mouse_right_click = "close_all";
+        padding = 24;
+        horizontal_padding = 24;
+        text_icon_padding = 24;
+        frame_width = 4;
+        frame_color = "#89b4fa";
+        separator_height = 2;
+        separator_color = "frame";
+        progress_bar = true;
+        progress_bar_height = 12;
+        progress_bar_frame_width = 1;
+        progress_bar_min_width = 150;
+        progress_bar_max_width = 400;
+        progress_bar_corner_radius = 6;
+        transparency = 10;
+        idle_threshold = 120;
       };
       experimental = {
         per_monitor_dpi = false;
       };
       urgency_low = {
-        background = "rgba(30,30,46,0.9)";
+        background = "#1e1e2e";
         foreground = "#cdd6f4";
         frame_color = "#89b4fa";
         timeout = 5;
+        highlight = "#89b4fa";
       };
       urgency_normal = {
-        background = "rgba(30,30,46,0.9)";
+        background = "#1e1e2e";
         foreground = "#cdd6f4";
         frame_color = "#89b4fa";
-        timeout = 5;
+        timeout = 8;
+        highlight = "#89b4fa";
       };
       urgency_critical = {
-        background = "rgba(243,139,168,0.9)";
-        foreground = "#1e1e2e";
+        background = "#1e1e2e";
+        foreground = "#f38ba8";
         frame_color = "#f38ba8";
         timeout = 0;
+        highlight = "#f38ba8";
       };
     };
   };
