@@ -116,7 +116,7 @@ imports = [
       "timeout": 120,
       "disabled": false,
       "headers": {
-        "CONTEXT7_API_KEY": "ctx7sk-a5b195d3-2696-485d-980c-55d26d5913b5"
+        "CONTEXT7_API_KEY": "YOUR_CONTEXT7_API_KEY"
       }
     }
   }
@@ -343,7 +343,7 @@ tar -czf ~/.config/crush/crush-manual-backup-$(date +%Y%m%d-%H%M).tar.gz \
 **Current Risk:**
 ```
 crush.json contains:
-"CONTEXT7_API_KEY": "ctx7sk-a5b195d3-2696-485d-980c-55d26d5913b5"
+"CONTEXT7_API_KEY": "REDACTED_API_KEY"
 ```
 
 **Recommended Solutions:**
@@ -645,7 +645,7 @@ These need to be cleaned up after verifying Nix symlinks are active.
 ### API Key Exposure
 The Context7 API key is hardcoded in crush.json:
 ```
-ctx7sk-a5b195d3-2696-485d-980c-55d26d5913b5
+REDACTED_API_KEY
 ```
 
 This is a security risk and should be moved to a secure location (environment variable, sops, or agenix).

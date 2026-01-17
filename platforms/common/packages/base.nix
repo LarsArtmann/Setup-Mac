@@ -9,6 +9,9 @@
   # llm-agents provides CRUSH AI tool through its packages
   inherit (pkgs.stdenv.hostPlatform) system;
   crush = llm-agents.packages.${system}.crush or pkgs.crush or null;
+  heliumPackage = if builtins.hasAttr "packages" helium && builtins.hasAttr system helium.packages
+    then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
+    else null;
 
   # Import custom packages
 
@@ -152,8 +155,8 @@
 
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
-    [
-      helium
+    (lib.optional (heliumPackage != null) heliumPackage)
+    ++ [
       # Import platform-specific Helium browser - them disable
       #(
       #  if stdenv.isDarwin
