@@ -193,6 +193,183 @@ deep-clean:
     @just clean
     @echo "✅ Deep cleanup complete"
 
+# KeyChain management commands
+keychain-list:
+    @echo "🔑 Listing KeyChain items..."
+    @echo ""
+    @echo "=== Available KeyChains ==="
+    @security list-keychains | sed 's/^/  /'
+    @echo ""
+    @echo "=== Keys (SSH, Signing, Encryption) ==="
+    @security find-key -v ~/Library/Keychains/login.keychain-db 2>/dev/null | grep -A 5 "class: \"keys\"" | head -30 || echo "  No keys found"
+    @echo ""
+    @echo "=== Certificates ==="
+    @security find-certificate -v ~/Library/Keychains/login.keychain-db 2>/dev/null | grep -A 2 "SHA-1 hash" | head -20 || echo "  No certificates found"
+    @echo ""
+    @echo "=== Identities (Certificate + Private Key) ==="
+    @security find-identity -v ~/Library/Keychains/login.keychain-db 2>/dev/null | grep "identity:" | head -20 || echo "  No identities found"
+
+keychain-status:
+    @echo "🔐 KeyChain Status"
+    @echo "==============="
+    @echo ""
+    @echo "=== KeyChain Info ==="
+    @security show-keychain-info ~/Library/Keychains/login.keychain-db 2>&1 || echo "  Keychain info not available"
+    @echo ""
+    @echo "=== Available KeyChains ==="
+    @security list-keychains | sed 's/^/  /'
+    @echo ""
+    @echo "=== Touch ID Status ==="
+    @if [ -f /etc/pam.d/sudo_local ]; then \
+        if grep -q "pam_tid.so" /etc/pam.d/sudo_local; then \
+            echo "  ✓ Touch ID enabled for sudo"; \
+        else \
+            echo "  ✗ Touch ID not enabled for sudo"; \
+        fi; \
+    else \
+        echo "  ✗ sudo_local file not found"; \
+    fi
+
+keychain-add account service password:
+    @echo "🔑 Adding password to KeyChain..."
+    @security add-generic-password -a {{account}} -s {{service}} -w {{password}} -U && \
+        echo "✅ Password added to KeyChain" || \
+        echo "❌ Failed to add password"
+    @echo ""
+    @echo "💡 To enable Touch ID for this item:"
+    @echo "   1. Open Keychain Access app"
+    @echo "   2. Find the item for service: {{service}}"
+    @echo "   3. Right-click → Get Info"
+    @echo "   4. Access Control tab → Check 'Touch ID'"
+
+# List all keys (SSH, signing, encryption)
+keychain-keys:
+    @echo "🔑 Listing All Keys..."
+    @echo ""
+    @echo "=== Private Keys (Signing, Encryption, SSH) ==="
+    @security find-key -v ~/Library/Keychains/login.keychain-db 2>/dev/null || echo "  No private keys found"
+    @echo ""
+    @echo "=== SSH Keys ==="
+    @ssh-add -l 2>/dev/null || echo "  No SSH keys loaded in agent"
+    @echo ""
+    @echo "=== System Keys ==="
+    @security find-key -v /Library/Keychains/System.keychain 2>/dev/null | grep -A 5 "class: \"keys\"" | head -20 || echo "  No system keys found"
+
+# List all certificates
+keychain-certs:
+    @echo "📜 Listing Certificates..."
+    @echo ""
+    @echo "=== User Certificates ==="
+    @security find-certificate -v ~/Library/Keychains/login.keychain-db 2>/dev/null | grep -E "(SHA-1 hash|label:|class: \"cert\")" | head -40 || echo "  No certificates found"
+    @echo ""
+    @echo "=== System Certificates ==="
+    @security find-certificate -v /Library/Keychains/System.keychain 2>/dev/null | grep -E "(SHA-1 hash|label:)" | head -20 || echo "  No system certificates"
+
+# List all identities (certificate + private key pairs)
+keychain-identities:
+    @echo "🎫 Listing Identities (Certificate + Private Key) ==="
+    @echo ""
+    @echo "=== User Identities ==="
+    @security find-identity -v ~/Library/Keychains/login.keychain-db 2>/dev/null || echo "  No identities found"
+    @echo ""
+    @echo "=== System Identities ==="
+    @security find-identity -v /Library/Keychains/System.keychain 2>/dev/null | head -20 || echo "  No system identities"
+
+# Add SSH key to KeyChain with Touch ID prompt
+keychain-ssh-add:
+    @echo "🔐 Adding SSH Key to KeyChain..."
+    @echo ""
+    @echo "Usage: just keychain-ssh-add [key-path]"
+    @echo ""
+    @echo "Examples:"
+    @echo "  just keychain-ssh-add ~/.ssh/id_ed25519"
+    @echo "  just keychain-ssh-add ~/.ssh/id_rsa"
+    @echo ""
+    @echo "This will:"
+    @echo "  1. Prompt for key passphrase (if encrypted)"
+    @echo "  2. Add key to SSH agent with KeyChain storage"
+    @echo "  3. Prompt for Touch ID on first use"
+    @echo ""
+    @echo "To add all SSH keys from ~/.ssh/:"
+    @for key in ~/.ssh/id_*; do \
+        if [ -f "$$key" ] && ! echo "$$key" | grep -q ".pub$$"; then \
+            echo "Adding $$key..."; \
+            ssh-add -K "$$key" 2>/dev/null || echo "  Failed to add $$key"; \
+        fi; \
+    done
+
+# Configure keychain partition for SSH key
+keychain-ssh-partition keypath:
+    @echo "🔐 Configuring SSH Key for Touch ID..."
+    @echo ""
+    @echo "Setting partition list for SSH key: {{keypath}}"
+    @security set-key-partition-list -S apple-tool:,ssh: -k "" -T /usr/bin/ssh-agent -T /usr/bin/ssh {{keypath}} 2>&1 && \
+        echo "✅ SSH key configured for Touch ID" || \
+        echo "❌ Failed to configure SSH key"
+    @echo ""
+    @echo "Note: This configures the key to work with ssh-agent"
+
+keychain-biometric service:
+    @echo "🔐 Enabling Touch ID for existing KeyChain item: {{service}}"
+    @echo ""
+    @echo "⚠️  This requires updating the access control of the item"
+    @echo "⚠️  You'll need to use the Keychain Access app for this operation"
+    @echo ""
+    @echo "Steps:"
+    @echo "1. Open Keychain Access app"
+    @echo "2. Find the item for service: {{service}}"
+    @echo "3. Right-click → Get Info"
+    @echo "4. Access Control tab → Add Touch ID requirement"
+
+keychain-lock:
+    @echo "🔒 Locking all KeyChains..."
+    @security lock-keychain ~/Library/Keychains/login.keychain-db && \
+        echo "✅ KeyChains locked" || \
+        echo "❌ Failed to lock KeyChains"
+
+keychain-unlock:
+    @echo "🔓 Unlocking KeyChain..."
+    @security unlock-keychain ~/Library/Keychains/login.keychain-db && \
+        echo "✅ KeyChain unlocked" || \
+        echo "❌ Failed to unlock KeyChain (requires password)"
+
+keychain-settings:
+    @echo "⚙️  Configuring KeyChain security settings..."
+    @echo "Setting: Lock after 5 minutes of inactivity"
+    @security set-keychain-settings -l -u -t 300 login.keychain-db 2>/dev/null && \
+        echo "✅ KeyChain settings updated" || \
+        echo "❌ Failed to update KeyChain settings"
+
+keychain-help:
+    @echo "🔑 KeyChain Management Commands"
+    @echo "================================"
+    @echo ""
+    @echo "Available commands:"
+    @echo "  just keychain-list        - List all KeyChain items (keys, certificates, identities)"
+    @echo "  just keychain-status       - Show KeyChain status and Touch ID info"
+    @echo "  just keychain-add account service password"
+    @echo "                           - Add password/application data"
+    @echo "  just keychain-keys        - List all keys (SSH, signing, encryption)"
+    @echo "  just keychain-certs       - List all certificates"
+    @echo "  just keychain-identities  - List all identities (cert + private key)"
+    @echo "  just keychain-ssh-add     - Add SSH key to KeyChain with Touch ID"
+    @echo "  just keychain-biometric service"
+    @echo "                           - Instructions for enabling Touch ID (manual)"
+    @echo "  just keychain-lock         - Lock all KeyChains"
+    @echo "  just keychain-unlock       - Unlock KeyChain (requires password)"
+    @echo "  just keychain-settings     - Configure KeyChain security settings"
+    @echo ""
+    @echo "Key Types:"
+    @echo "  • SSH keys - For Git, remote servers"
+    @echo "  • Signing keys - Code signing, document signing"
+    @echo "  • Encryption keys - PGP, file encryption"
+    @echo "  • Application keys - API tokens, service credentials"
+    @echo "  • Identities - Certificate + private key pairs"
+    @echo ""
+    @echo "Note: Touch ID for KeyChain items must be configured per-item"
+    @echo "      Use Keychain Access app for existing items"
+    @echo "      Use 'just keychain-ssh-add' for SSH keys"
+
 # Check system status and outdated packages
 check:
     @echo "🔍 Checking system status..."

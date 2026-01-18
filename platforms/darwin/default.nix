@@ -8,6 +8,7 @@
     ./networking/default.nix
     ./nix/settings.nix
     ./security/pam.nix
+    ./security/keychain.nix
     ./services/default.nix
     ./services/launchagents.nix # Declarative LaunchAgents (replaces bash scripts)
     ./system/activation.nix
