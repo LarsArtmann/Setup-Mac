@@ -8,6 +8,9 @@ _: {
     l = "ls -laSh";
     t = "tree -h -L 2 -C --dirsfirst";
 
+    # GNU utilities (use GNU versions on all platforms)
+    sed = "gsed";
+
     # Development shortcuts
     gs = "git status";
     gd = "git diff";
