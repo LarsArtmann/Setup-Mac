@@ -32,13 +32,16 @@ gnused  # GNU sed 4.9
 - Available system-wide via Nix profile
 
 #### 2. Shell Alias Configuration
-**File**: `platforms/common/programs/shell-aliases.nix:11`
+**File**: `platforms/common/programs/shell-aliases.nix`
 ```nix
-sed = "gsed";
+# No alias needed - gnused provides GNU sed as default `sed` command
 ```
-- Added alias to shared shell aliases
-- Applies to Fish, Zsh, Bash, Nushell
-- Cross-platform consistency ensured
+- `gnused` package provides GNU sed 4.9 as the default `sed` command
+- No shell alias required - GNU sed is available system-wide
+- Applies to Fish, Zsh, Bash, Nushell automatically
+- Cross-platform consistency ensured through Nix package management
+
+**Note**: Previous attempt to use `sed = "gsed"` alias was removed because `gnused` provides GNU sed directly as the `sed` command, not as `gsed`.
 
 ### Verification Results
 
@@ -88,7 +91,13 @@ sed --version | head -1
 - Improved compatibility with Linux workflows
 - Documentation updated in AGENTS.md
 
-**Rollback Plan**: Remove alias from shell-aliases.nix if needed
+**Fix Applied (2026-01-19)**:
+- **Issue**: `sed = "gsed"` alias caused Fish shell errors (`fish: Unknown command: gsed`)
+- **Root Cause**: `gnused` package provides GNU sed as `sed` command, not `gsed`
+- **Solution**: Removed the alias since GNU sed is already the default
+- **Result**: All sed operations work correctly, no shell errors
+
+**Rollback Plan**: Add alias back to shell-aliases.nix if needed (not recommended)
 
 ---
 
