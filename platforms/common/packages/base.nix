@@ -120,6 +120,7 @@
       # JavaScript/TypeScript development (Oxc tools)
       oxlint
       tsgolint
+      oxfmt
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp
