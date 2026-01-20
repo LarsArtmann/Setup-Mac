@@ -45,6 +45,13 @@
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
     };
 
+    # Pin Go to version 1.26
+    nixpkgs.overlays = [
+      (final: prev: {
+        go = prev.callPackage (prev.path + "/pkgs/development/compilers/go/1.26.nix") {};
+      })
+    ];
+
     # Workaround: Define users for Home Manager (see docs/reports/home-manager-users-workaround-bug-report.md)
     # Home Manager's nix-darwin/default.nix imports ../nixos/common.nix which requires this
     users.users.larsartmann = {
