@@ -23,7 +23,7 @@ in {
             <key>ProgramArguments</key>
             <array>
                 <string>/Applications/ActivityWatch.app/Contents/MacOS/aw-qt</string>
-                <string>--background</string>
+                <string>--no-gui</string>
             </array>
             <key>RunAtLoad</key>
             <true/>
