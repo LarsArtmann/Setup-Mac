@@ -19,7 +19,7 @@ in {
       scan_timeout = 100; # 100ms max scanning
 
       # Format: Enhanced prompt with performance budget
-      format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
+      format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$character";
 
       # Directory: Minimal path display
       directory = {
@@ -41,7 +41,7 @@ in {
 
       # Git status: Simplified status with fast checks
       git_status = {
-        format = "[[$all_status]]($style)";
+        format = "[$all_status]($style)";
         style = "bold #${colors.base08}";
         ahead = "⇡";
         behind = "⇣";
