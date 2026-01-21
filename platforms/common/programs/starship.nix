@@ -41,7 +41,7 @@ in {
 
       # Git status: Simplified status with fast checks
       git_status = {
-        format = "[ [$all_status] ]($style)";
+        format = "[[$all_status]]($style)";
         style = "bold #${colors.base08}";
         ahead = "⇡";
         behind = "⇣";
