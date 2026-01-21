@@ -27,6 +27,12 @@ in {
       # Additional Fish-specific optimizations
       set -g fish_autosuggestion_enabled 1
 
+      # Private Go modules (use SSH instead of public proxy)
+      set -gx GOPRIVATE "github.com/LarsArtmann/*"
+
+      # Disable checksum database for private repos
+      set -gx GONOSUMDB "github.com/LarsArtmann/*"
+
       # Note: GOPATH is managed by Home Manager programs.go
       # Fish will inherit GOPATH automatically from Home Manager session variables
 
