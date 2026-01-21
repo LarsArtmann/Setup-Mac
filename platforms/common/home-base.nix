@@ -49,6 +49,12 @@
     sessionVariables = {
       # Go development
       GOPATH = "${config.home.homeDirectory}/go";
+
+      # Private Go modules (use SSH instead of public proxy)
+      GOPRIVATE = "github.com/LarsArtmann/*";
+
+      # Disable checksum database for private repos
+      GONOSUMDB = "github.com/LarsArtmann/*";
     };
 
     # PATH additions (available to all shells)

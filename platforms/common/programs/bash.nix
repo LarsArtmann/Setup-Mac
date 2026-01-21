@@ -14,7 +14,7 @@ in {
 
     # Bash-specific configuration
     profileExtra = ''
-      export GOPRIVATE=github.com/LarsArtmann/*
+      export GOPRIVATE="github.com/LarsArtmann/*"
     '';
 
     initExtra = ''
