@@ -19,7 +19,7 @@ in {
       scan_timeout = 100; # 100ms max scanning
 
       # Format: Enhanced prompt with performance budget
-      format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$character";
+      format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
 
       # Directory: Minimal path display
       directory = {
@@ -28,20 +28,21 @@ in {
         truncate_to_repo = false;
         style = "bold #${colors.base0C}";
         read_only = " 🔒";
+        format = "[$path]($style) ";
       };
 
       # Git branch: Fast git operations
       git_branch = {
         symbol = "";
         style = "bold #${colors.base0B}";
-        format = "[$symbol$branch]($style)";
+        format = "[$symbol$branch]($style) ";
         truncation_length = 10;
         truncation_symbol = "…";
       };
 
       # Git status: Simplified status with fast checks
       git_status = {
-        format = "[$all_status]($style)";
+        format = " [$all_status]($style)";
         style = "bold #${colors.base08}";
         ahead = "⇡";
         behind = "⇣";
@@ -89,6 +90,7 @@ in {
         disabled = false;
         symbol = "🐹 ";
         style = "bold #${colors.base0C}";
+        format = "via [$symbol($version )]($style)";
       };
       haskell.disabled = true;
       helm.disabled = true;
@@ -106,6 +108,7 @@ in {
         disabled = false;
         symbol = "⬢ ";
         style = "bold #${colors.base0B}";
+        format = "via [$symbol($version )]($style)";
       };
       ocaml.disabled = true;
       openstack.disabled = true;
@@ -134,6 +137,7 @@ in {
         disabled = false;
         min_time = 2000; # Show duration for commands >2s
         style = "bold #${colors.base0A}";
+        format = "took [$duration]($style) ";
       };
     };
   };
