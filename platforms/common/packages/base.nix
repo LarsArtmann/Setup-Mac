@@ -57,7 +57,6 @@
       gnupg
       pre-commit
       openssh
-      netscanner
 
       # Modern CLI productivity tools
       glow # Render markdown on the CLI, with pizzazz

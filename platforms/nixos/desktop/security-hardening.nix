@@ -80,6 +80,7 @@
     netsniff-ng # Network packet capture
     wireshark # Network protocol analyzer (GUI)
     aircrack-ng # WiFi security testing
+    netscanner # Network scanning tool
 
     # System Security Monitoring
     aide # File integrity monitoring

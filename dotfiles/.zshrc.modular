@@ -1,1 +1,4 @@
 export GOOGLE_CLOUD_QUOTA_PROJECT=helpcenter-rrps-iac
+
+# Added by template-arch-lint bootstrap
+export PATH="/Users/larsartmann/.local/bin:$PATH"
