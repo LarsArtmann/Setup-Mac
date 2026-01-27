@@ -5,8 +5,10 @@
   helium,
   ...
 }: let
-  # Import crush from llm-agents packages
-  # llm-agents provides CRUSH AI tool through its packages
+  # Import custom packages
+  crush-patched = import ../../pkgs/crush-patched.nix { inherit lib; };
+
+  # Import crush from llm-agents packages (only used as fallback)
   inherit (pkgs.stdenv.hostPlatform) system;
   crush = llm-agents.packages.${system}.crush or pkgs.crush or null;
   heliumPackage = if builtins.hasAttr "packages" helium && builtins.hasAttr system helium.packages
@@ -172,8 +174,8 @@
       duti # macOS file association utility (used by activation scripts)
     ];
 
-  # AI tools (conditionally added)
-  aiPackages = lib.optional (crush != null) crush;
+  # AI tools (using patched version with Lars' PRs)
+  aiPackages = [crush-patched];
 in {
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
