@@ -837,6 +837,8 @@ health:
     @if command -v git >/dev/null 2>&1; then echo "✅ $(git --version | cut -d' ' -f3)"; else echo "❌ Missing"; fi
     @echo -n "Just: "
     @if command -v just >/dev/null 2>&1; then echo "✅ $(just --version | cut -d' ' -f2)"; else echo "❌ Missing"; fi
+    @echo -n "D2: "
+    @if command -v d2 >/dev/null 2>&1; then echo "✅ $(d2 --version | head -1)"; else echo "❌ Missing"; fi
     @echo ""
     @echo "=== Dotfile Links ==="
     @echo -n ".zshrc link: "
@@ -851,6 +853,31 @@ health:
     @if zsh -i -c 'exit' 2>&1 | grep -q "error\|Error\|ERROR\|WARN"; then echo "❌ Has errors/warnings"; else echo "✅ Clean startup"; fi
     @echo ""
     @echo "✅ Health check complete"
+
+# Verify d2 installation and file association
+d2-verify:
+    @echo "🔍 Verifying d2 installation..."
+    @echo ""
+    @echo "=== D2 Binary ==="
+    @if command -v d2 >/dev/null 2>&1; then \
+        echo "✅ Binary found: $$(which d2)"; \
+        echo "✅ Version: $$(d2 --version | head -1)"; \
+    else \
+        echo "❌ d2 binary not found in PATH"; \
+    fi
+    @echo ""
+    @echo "=== D2 File Association ==="
+    @verify_d2=$$(duti -x .d2 2>/dev/null | head -1); \
+    if [[ "$$verify_d2" == *"Sublime"* ]]; then \
+        echo "✅ .d2 → Sublime Text"; \
+    else \
+        echo "⚠️ .d2 association: $$verify_d2"; \
+    fi
+    @echo ""
+    @echo "=== D2 Syntax Check ==="
+    @echo 'x -> y' | d2 - >/dev/null 2>&1 && echo "✅ D2 syntax works" || echo "❌ D2 syntax check failed"
+    @echo ""
+    @echo "✅ D2 verification complete"
 
 # Go Development Tools
 # ===================

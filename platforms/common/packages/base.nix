@@ -78,6 +78,7 @@
 
       # Graph visualization
       graphviz
+      d2 # Declarative diagram scripting language
 
       # Task management
       taskwarrior3

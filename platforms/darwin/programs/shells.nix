@@ -35,9 +35,13 @@
       # Nix path setup (Darwin-specific)
       # Required for system packages and Home Manager-managed binaries
       if type -q fish_add_path
+          fish_add_path --prepend --global ~/.nix-profile/bin
           fish_add_path --prepend --global /run/current-system/sw/bin
           fish_add_path --prepend --global /etc/profiles/per-user/$USER/bin
       else
+          if not contains ~/.nix-profile/bin $fish_user_paths
+              set --global fish_user_paths ~/.nix-profile/bin $fish_user_paths
+          end
           if not contains /run/current-system/sw/bin $fish_user_paths
               set --global fish_user_paths /run/current-system/sw/bin $fish_user_paths
           end
@@ -73,6 +77,9 @@
         eval "$(/opt/homebrew/bin/brew shellenv)"
       fi
 
+      # Nix profile PATH (Darwin-specific)
+      export PATH="$HOME/.nix-profile/bin:$PATH"
+
       # COMPLETIONS: Universal completion engine (1000+ commands)
       if command -v carapace >/dev/null 2>&1; then
         source <(carapace _carapace zsh)
@@ -85,6 +92,9 @@
       if [ -f /opt/homebrew/bin/brew ]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
       fi
+
+      # Nix profile PATH (Darwin-specific)
+      export PATH="$HOME/.nix-profile/bin:$PATH"
 
       # COMPLETIONS: Universal completion engine (1000+ commands)
       if command -v carapace >/dev/null 2>&1; then

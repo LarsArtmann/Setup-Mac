@@ -34,6 +34,15 @@
 
   # Wrap all configuration in config attribute
   config = {
+    # Build-time validation: Ensure critical packages exist in nixpkgs
+    # These assertions fail fast if packages are unavailable
+    assertions = [
+      {
+        assertion = (builtins.hasAttr "d2" (import <nixpkgs> {system = "aarch64-darwin";}));
+        message = "d2 package not found in nixpkgs - verify package name and availability";
+      }
+    ];
+
     # Define color scheme and utilities
     colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
     colorSchemeLib = nix-colors.lib;
