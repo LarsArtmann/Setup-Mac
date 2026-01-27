@@ -3,10 +3,14 @@
   lib,
   llm-agents,
   helium,
+  superfile,
   ...
 }: let
   # Import custom packages
-  crush-patched = import ../../pkgs/crush-patched.nix { inherit lib; };
+  crush-patched = import ../../../pkgs/crush-patched.nix {
+    inherit lib;
+    inherit (pkgs) buildGoModule fetchFromGitHub fetchurl stdenv;
+  };
 
   # Import crush from llm-agents packages (only used as fallback)
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -175,8 +179,15 @@
     ];
 
   # AI tools (using patched version with Lars' PRs)
-  aiPackages = [crush-patched];
+  # TODO: Uncomment when crush-patched hash is fixed
+  # aiPackages = [crush-patched];
+  aiPackages = [];
+  # Import superfile for terminal file management
+  superfilePackage = if builtins.hasAttr "packages" superfile && builtins.hasAttr "${pkgs.stdenv.hostPlatform.system}" superfile.packages
+    then superfile.packages.${pkgs.stdenv.hostPlatform.system}.default
+    else null;
 in {
   # System packages list
-  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
+  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities
+    ++ lib.optional (superfilePackage != null) superfilePackage;
 }

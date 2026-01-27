@@ -1,4 +1,5 @@
 {
+  pkgs,
   lib,
   nix-colors,
   ...
@@ -38,7 +39,7 @@
     # These assertions fail fast if packages are unavailable
     assertions = [
       {
-        assertion = (builtins.hasAttr "d2" (import <nixpkgs> {system = "aarch64-darwin";}));
+        assertion = (builtins.hasAttr "d2" pkgs);
         message = "d2 package not found in nixpkgs - verify package name and availability";
       }
     ];
