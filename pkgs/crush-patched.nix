@@ -1,31 +1,28 @@
-{
-  lib,
-  buildGoModule,
-  fetchFromGitHub,
-  fetchurl,
-  stdenv,
-}:
-buildGoModule rec {
+{ pkgs }:
+let
+  lib = pkgs.lib;
+in
+pkgs.buildGoModule rec {
   pname = "crush-patched";
   version = "0.1.0";
 
-  src = fetchFromGitHub {
+  src = pkgs.fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "main";
-    hash = "sha256-1nzlgrl8f30lyzqli3y3iic9wdpz45f73vabj8yxnmp2x2yl4ay6";
+    sha256 = "sha256:xitCvejiVts9kkvtcVwh/zaeWIzDj0jx9xQMh2h+9Ns=";
+    fetchSubmodules = true;
   };
 
-  # TODO: PR patches temporarily disabled due to hash mismatch issues
-  # See: docs/notes/crush-patches.md for instructions on re-enabling
   patches = [];
 
-
-  vendorHash = lib.fakeHash; # Will be auto-detected on first build
-
-  meta = {
+  # Verified: sha256-8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=
+  vendorHash = "sha256:8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=";
+  
+  meta = with lib; {
     description = "Crush with Lars' PR patches applied";
     homepage = "https://github.com/charmbracelet/crush";
-    license = lib.licenses.mit;
+    license = licenses.mit;
+    platforms = platforms.all;
   };
 }
