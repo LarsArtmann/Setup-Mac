@@ -186,6 +186,8 @@
   aiPackages = [];
 in {
   # System packages list
-  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities
-    ++ lib.optional (superfilePackage != null) superfilePackage;
+  # Temporarily disable superfile until vendorHash is fixed
+  # environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities
+  #   ++ lib.optional (superfilePackage != null) superfilePackage;
+  environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
 }
