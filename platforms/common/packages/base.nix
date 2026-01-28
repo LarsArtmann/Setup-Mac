@@ -3,7 +3,6 @@
   lib,
   llm-agents,
   helium,
-  superfile,
   ...
 }: let
   # Import custom packages
@@ -19,7 +18,10 @@
     then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
     else null;
 
-  # Import custom packages
+  # Import local superfile package (tests disabled to fix build)
+  superfilePackage = import ../../../pkgs/superfile.nix {
+    inherit pkgs;
+  };
 
   # Essential CLI tools that work across platforms
   essentialPackages = with pkgs;
@@ -182,10 +184,6 @@
   # TODO: Uncomment when crush-patched hash is fixed
   # aiPackages = [crush-patched];
   aiPackages = [];
-  # Import superfile for terminal file management
-  superfilePackage = if builtins.hasAttr "packages" superfile && builtins.hasAttr "${pkgs.stdenv.hostPlatform.system}" superfile.packages
-    then superfile.packages.${pkgs.stdenv.hostPlatform.system}.default
-    else null;
 in {
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities

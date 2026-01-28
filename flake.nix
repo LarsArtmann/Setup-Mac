@@ -37,12 +37,6 @@
 
     # Add nix-colors for declarative color schemes
     nix-colors.url = "github:misterio77/nix-colors";
-
-    # Add superfile - terminal file manager
-    superfile = {
-      url = "github:yorukot/superfile";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   outputs = inputs @ {
@@ -55,7 +49,6 @@
     llm-agents,
     nix-visualize,
     nix-colors,
-    superfile,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -74,7 +67,11 @@
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
         };
 
-        packages = {};
+        packages = {
+          crush-patched = import ./pkgs/crush-patched.nix {
+            inherit pkgs;
+          };
+        };
 
         # Development shells for different program categories
         devShells = {
@@ -101,7 +98,6 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
-            inherit superfile;
           };
           modules = [
             # Import Home Manager module for Darwin
@@ -135,7 +131,6 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
-            inherit superfile;
           };
           modules = [
             # Core system configuration
