@@ -18,11 +18,6 @@
     then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
     else null;
 
-  # Import local superfile package (tests disabled to fix build)
-  superfilePackage = import ../../../pkgs/superfile.nix {
-    inherit pkgs;
-  };
-
   # Essential CLI tools that work across platforms
   essentialPackages = with pkgs;
     [
@@ -186,8 +181,5 @@
   aiPackages = [];
 in {
   # System packages list
-  # Temporarily disable superfile until vendorHash is fixed
-  # environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities
-  #   ++ lib.optional (superfilePackage != null) superfilePackage;
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
 }
