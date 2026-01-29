@@ -14,10 +14,30 @@ pkgs.buildGoModule rec {
     fetchSubmodules = true;
   };
 
-  patches = [];
+  patches = [
+    # PR #1854: fix(grep): prevent tool from hanging when context is cancelled
+    pkgs.fetchpatch {
+      url = "https://github.com/charmbracelet/crush/pull/1854.patch";
+      sha256 = "sha256:fWWY+3/ycyvGtRsPxKIYVOt/CdQfmMAcAa8H6gONAFA=";
+      stripLength = 1;
+    }
+    # PR #1617: refactor: eliminate all duplicate code blocks over 200 tokens
+    pkgs.fetchpatch {
+      url = "https://github.com/charmbracelet/crush/pull/1617.patch";
+      sha256 = "sha256:yFprXfDfWxeWrsmhGmXvxrfjD0GK/DVDi6mugdrM/sg=";
+      stripLength = 1;
+    }
+    # PR #1589: feat: add UI feedback when messages are dropped due to slow consumer
+    pkgs.fetchpatch {
+      url = "https://github.com/charmbracelet/crush/pull/1589.patch";
+      sha256 = "sha256:oVa/WZo+rjmdHh6v6ueUVNrC8glAKWvdZ2mGe7Jsv74=";
+      stripLength = 1;
+    }
+  ];
+
   doCheck = false; # Tests require network access to fetch providers
 
-  # Verified: sha256-8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=
+  # Will be updated after first build attempt
   vendorHash = "sha256:8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=";
   
   meta = with lib; {
