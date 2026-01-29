@@ -13,8 +13,9 @@ pkgs.buildGoModule rec {
     sha256 = "sha256-bnftcbi42KFxi6CSRcCE2e+Jo3u/yBWkS5KT/MTiJds=";
   };
 
-  # Vendor hash computed with: nix-prefetch-url --type sha256 https://github.com/yorukot/superfile/archive/f804bf069bb079b7a6613b4640a3cc90a17b8c56.tar.gz
-  vendorHash = "sha256-bnftcbi42KFxi6CSRcCE2e+Jo3u/yBWkS5KT/MTiJds=";
+  # Vendor hash - set to null so Nix computes it automatically
+  # On first build, it will fail and show the actual hash
+  vendorHash = null;
 
   # Disable tests due to flaky zoxide integration test
   doCheck = false;
