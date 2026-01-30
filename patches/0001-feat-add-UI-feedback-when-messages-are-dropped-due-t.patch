@@ -1,0 +1,133 @@
+From 1c8a54e3a85b5fcb4c001071053f749dde17f79e Mon Sep 17 00:00:00 2001
+From: Lars Artmann <git@lars.software>
+Date: Wed, 10 Dec 2025 10:42:06 +0100
+Subject: [PATCH] feat: add UI feedback when messages are dropped due to slow
+ consumer
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously, when the consumer was too slow and the events channel was blocked, messages were silently dropped after 2 seconds, logging only a warning. This left users unaware of potential data loss or missing updates.
+
+This change introduces a dedicated `droppedMsgCh` to bypass the potentially blocked main events channel. When a message is dropped, a `pubsub.MessageDroppedMsg` is sent to this new channel. The TUI then consumes this message and displays a warning toast to the user.
+
+- Add `MessageDroppedMsg` to `internal/pubsub`
+- Add `droppedMsgCh` to `App` struct
+- Update `setupSubscriber` to send notification on drop
+- Update TUI to display warning toast for dropped messages
+
+Fixes #1454
+
+💘 Generated with Crush
+
+Assisted-by: Gemini 3 Pro (Preview) via Crush <crush@charm.land>
+---
+ internal/app/app.go       | 24 +++++++++++++++++-------
+ internal/pubsub/events.go |  5 +++++
+ internal/tui/tui.go       |  7 +++++++
+ 3 files changed, 29 insertions(+), 7 deletions(-)
+
+diff --git a/internal/app/app.go b/internal/app/app.go
+index 1694a0ec..c8343c1f 100644
+--- a/internal/app/app.go
++++ b/internal/app/app.go
+@@ -54,6 +54,7 @@ type App struct {
+ 	serviceEventsWG *sync.WaitGroup
+ 	eventsCtx       context.Context
+ 	events          chan tea.Msg
++	droppedMsgCh    chan tea.Msg
+ 	tuiWG           *sync.WaitGroup
+ 
+ 	// global context and cleanup functions
+@@ -85,6 +86,7 @@ func New(ctx context.Context, conn *sql.DB, cfg *config.Config) (*App, error) {
+ 		config: cfg,
+ 
+ 		events:          make(chan tea.Msg, 100),
++		droppedMsgCh:    make(chan tea.Msg, 100),
+ 		serviceEventsWG: &sync.WaitGroup{},
+ 		tuiWG:           &sync.WaitGroup{},
+ 	}
+@@ -269,13 +271,13 @@ func (app *App) UpdateAgentModel(ctx context.Context) error {
+ func (app *App) setupEvents() {
+ 	ctx, cancel := context.WithCancel(app.globalCtx)
+ 	app.eventsCtx = ctx
+-	setupSubscriber(ctx, app.serviceEventsWG, "sessions", app.Sessions.Subscribe, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "messages", app.Messages.Subscribe, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "permissions", app.Permissions.Subscribe, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "permissions-notifications", app.Permissions.SubscribeNotifications, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "history", app.History.Subscribe, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "mcp", mcp.SubscribeEvents, app.events)
+-	setupSubscriber(ctx, app.serviceEventsWG, "lsp", SubscribeLSPEvents, app.events)
++	setupSubscriber(ctx, app.serviceEventsWG, "sessions", app.Sessions.Subscribe, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "messages", app.Messages.Subscribe, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "permissions", app.Permissions.Subscribe, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "permissions-notifications", app.Permissions.SubscribeNotifications, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "history", app.History.Subscribe, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "mcp", mcp.SubscribeEvents, app.events, app.droppedMsgCh)
++	setupSubscriber(ctx, app.serviceEventsWG, "lsp", SubscribeLSPEvents, app.events, app.droppedMsgCh)
+ 	cleanupFunc := func() error {
+ 		cancel()
+ 		app.serviceEventsWG.Wait()
+@@ -290,6 +292,7 @@ func setupSubscriber[T any](
+ 	name string,
+ 	subscriber func(context.Context) <-chan pubsub.Event[T],
+ 	outputCh chan<- tea.Msg,
++	droppedMsgCh chan<- tea.Msg,
+ ) {
+ 	wg.Go(func() {
+ 		subCh := subscriber(ctx)
+@@ -305,6 +308,11 @@ func setupSubscriber[T any](
+ 				case outputCh <- msg:
+ 				case <-time.After(2 * time.Second):
+ 					slog.Warn("message dropped due to slow consumer", "name", name)
++					select {
++					case droppedMsgCh <- pubsub.MessageDroppedMsg{Name: name}:
++					default:
++						slog.Warn("failed to send dropped message notification", "name", name)
++					}
+ 				case <-ctx.Done():
+ 					slog.Debug("subscription cancelled", "name", name)
+ 					return
+@@ -367,6 +375,8 @@ func (app *App) Subscribe(program *tea.Program) {
+ 				return
+ 			}
+ 			program.Send(msg)
++		case msg := <-app.droppedMsgCh:
++			program.Send(msg)
+ 		}
+ 	}
+ }
+diff --git a/internal/pubsub/events.go b/internal/pubsub/events.go
+index dadecaa1..63138ab8 100644
+--- a/internal/pubsub/events.go
++++ b/internal/pubsub/events.go
+@@ -33,3 +33,8 @@ type UpdateAvailableMsg struct {
+ 	LatestVersion  string
+ 	IsDevelopment  bool
+ }
++
++// MessageDroppedMsg is sent when a message is dropped due to a slow consumer.
++type MessageDroppedMsg struct {
++	Name string
++}
+diff --git a/internal/tui/tui.go b/internal/tui/tui.go
+index 45f0ae5e..b3d1add7 100644
+--- a/internal/tui/tui.go
++++ b/internal/tui/tui.go
+@@ -167,6 +167,13 @@ func (a *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+ 			return a, handleMCPToolsEvent(context.Background(), msg.Payload.Name)
+ 		}
+ 
++	case pubsub.MessageDroppedMsg:
++		return a, util.CmdHandler(util.InfoMsg{
++			Type: util.InfoTypeWarn,
++			Msg:  fmt.Sprintf("System is busy: Dropped messages from %s. Some updates may be missing.", msg.Name),
++			TTL:  10 * time.Second,
++		})
++
+ 	// Completions messages
+ 	case completions.OpenCompletionsMsg, completions.FilterCompletionsMsg,
+ 		completions.CloseCompletionsMsg, completions.RepositionCompletionsMsg:
+-- 
+2.52.0
+

@@ -176,9 +176,7 @@
     ];
 
   # AI tools (using patched version with Lars' PRs)
-  # TODO: Uncomment when crush-patched hash is fixed
-  # aiPackages = [crush-patched];
-  aiPackages = [];
+  aiPackages = [crush-patched];
 in {
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
