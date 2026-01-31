@@ -7,8 +7,7 @@
 }: let
   # Import custom packages
   crush-patched = import ../../../pkgs/crush-patched.nix {
-    inherit lib;
-    inherit (pkgs) buildGoModule fetchFromGitHub fetchurl stdenv;
+    inherit pkgs;
   };
 
   # Import crush from llm-agents packages (only used as fallback)

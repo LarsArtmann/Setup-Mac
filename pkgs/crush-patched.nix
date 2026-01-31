@@ -4,14 +4,11 @@ let
 in
 pkgs.buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.32.1-lars";  # Base version + Lars' patches
+  version = "v0.36.0";
 
-  src = pkgs.fetchFromGitHub {
-    owner = "charmbracelet";
-    repo = "crush";
-    rev = "main";
-    sha256 = "sha256:xitCvejiVts9kkvtcVwh/zaeWIzDj0jx9xQMh2h+9Ns=";
-    fetchSubmodules = true;
+  src = pkgs.fetchurl {
+    url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.36.0.tar.gz";
+    sha256 = "sha256:HtcnWbgya8AbzT6lf2e3/Xy/oLWYR28iLj3V4hh5Neg=";
   };
 
   patches = [
@@ -55,7 +52,6 @@ pkgs.buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  # Will be updated after first build attempt
   vendorHash = "sha256:8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=";
 
   meta = with lib; {
