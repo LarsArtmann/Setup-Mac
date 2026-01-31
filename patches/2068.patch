@@ -1,0 +1,41 @@
+From f2da8d64b0cf6b50bc124d742b7fde1ecb9518c5 Mon Sep 17 00:00:00 2001
+From: Andrey Nering <andreynering@users.noreply.github.com>
+Date: Fri, 30 Jan 2026 16:58:20 -0300
+Subject: [PATCH] fix: ensure the commands and models dialogs render with
+ borders
+
+---
+ internal/ui/dialog/commands.go | 4 ++--
+ internal/ui/dialog/models.go   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/internal/ui/dialog/commands.go b/internal/ui/dialog/commands.go
+index 416f5a013..0b0185b03 100644
+--- a/internal/ui/dialog/commands.go
++++ b/internal/ui/dialog/commands.go
+@@ -240,8 +240,8 @@ func commandsRadioView(sty *styles.Styles, selected CommandType, hasUserCmds boo
+ // Draw implements [Dialog].
+ func (c *Commands) Draw(scr uv.Screen, area uv.Rectangle) *tea.Cursor {
+ 	t := c.com.Styles
+-	width := max(0, min(defaultCommandsDialogMaxWidth, area.Dx()))
+-	height := max(0, min(defaultCommandsDialogMaxHeight, area.Dy()))
++	width := max(0, min(defaultCommandsDialogMaxWidth, area.Dx()-t.Dialog.View.GetHorizontalBorderSize()))
++	height := max(0, min(defaultCommandsDialogMaxHeight, area.Dy()-t.Dialog.View.GetVerticalBorderSize()))
+ 	if area.Dx() != c.windowWidth && c.selected == SystemCommands {
+ 		c.windowWidth = area.Dx()
+ 		// since some items in the list depend on width (e.g. toggle sidebar command),
+diff --git a/internal/ui/dialog/models.go b/internal/ui/dialog/models.go
+index 354d02434..44ff42a23 100644
+--- a/internal/ui/dialog/models.go
++++ b/internal/ui/dialog/models.go
+@@ -251,8 +251,8 @@ func (m *Models) modelTypeRadioView() string {
+ // Draw implements [Dialog].
+ func (m *Models) Draw(scr uv.Screen, area uv.Rectangle) *tea.Cursor {
+ 	t := m.com.Styles
+-	width := max(0, min(defaultModelsDialogMaxWidth, area.Dx()))
+-	height := max(0, min(defaultDialogHeight, area.Dy()))
++	width := max(0, min(defaultModelsDialogMaxWidth, area.Dx()-t.Dialog.View.GetHorizontalBorderSize()))
++	height := max(0, min(defaultDialogHeight, area.Dy()-t.Dialog.View.GetVerticalBorderSize()))
+ 	innerWidth := width - t.Dialog.View.GetHorizontalFrameSize()
+ 	heightOffset := t.Dialog.Title.GetVerticalFrameSize() + titleContentHeight +
+ 		t.Dialog.InputPrompt.GetVerticalFrameSize() + inputContentHeight +

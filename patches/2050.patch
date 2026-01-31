@@ -1,0 +1,392 @@
+From 0e134e37c93cc5837aad907ae6ef746e5dd4b40c Mon Sep 17 00:00:00 2001
+From: Kieran Klukas <me@dunkirk.sh>
+Date: Thu, 29 Jan 2026 13:56:59 -0500
+Subject: [PATCH] feat: prompt with warning for dangerous commands instead of
+ blocking
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Changed dangerous command handling to always show a permission popup
+with a warning, regardless of YOLO mode. Previously these commands
+(sudo, curl, npm install --global, etc.) were completely blocked.
+
+Changes:
+- Dangerous commands always require user approval, even in YOLO mode
+- Permission dialog shows yellow WARNING tag with icon matching app style
+- Shell-level blocking removed in favor of permission-level handling
+- Added isDangerousCommand() helper to detect risky commands
+- Added IsCommandBlocked() to shell package for pre-execution checking
+- Updated system prompt to reflect new behavior
+- Comprehensive tests for dangerous command detection and YOLO mode
+
+The warning UI follows the app's design language with a yellow WARNING
+tag badge and warning icon, consistent with other warning messages.
+
+Only implemented for the new UI (internal/ui) accessed via CRUSH_NEW_UI=1.
+
+💘 Generated with Crush
+
+Assisted-by: Claude Sonnet 4.5 via Crush <crush@charm.land>
+---
+ internal/agent/tools/bash.go           | 16 ++++-
+ internal/agent/tools/bash.tpl          |  2 +-
+ internal/agent/tools/bash_test.go      | 88 ++++++++++++++++++++++++++
+ internal/permission/permission.go      |  6 +-
+ internal/permission/permission_test.go | 57 +++++++++++++----
+ internal/shell/shell.go                | 39 ++++++++++++
+ internal/ui/dialog/permissions.go      | 17 ++++-
+ 7 files changed, 206 insertions(+), 19 deletions(-)
+ create mode 100644 internal/agent/tools/bash_test.go
+
+diff --git a/internal/agent/tools/bash.go b/internal/agent/tools/bash.go
+index ca3612e091..531e4de46a 100644
+--- a/internal/agent/tools/bash.go
++++ b/internal/agent/tools/bash.go
+@@ -186,6 +186,12 @@ func blockFuncs() []shell.BlockFunc {
+ 	}
+ }
+ 
++// isDangerousCommand checks if a command is considered dangerous and requires
++// explicit user approval even in YOLO mode.
++func isDangerousCommand(command string) bool {
++	return shell.IsCommandBlocked(command, blockFuncs())
++}
++
+ func NewBashTool(permissions permission.Service, workingDir string, attribution *config.Attribution, modelName string) fantasy.AgentTool {
+ 	return fantasy.NewAgentTool(
+ 		BashToolName,
+@@ -215,6 +221,9 @@ func NewBashTool(permissions permission.Service, workingDir string, attribution
+ 				return fantasy.ToolResponse{}, fmt.Errorf("session ID is required for executing shell command")
+ 			}
+ 			if !isSafeReadOnly {
++				// Check if the command is dangerous
++				isDangerous := isDangerousCommand(params.Command)
++
+ 				p, err := permissions.Request(ctx,
+ 					permission.CreatePermissionRequest{
+ 						SessionID:   sessionID,
+@@ -224,6 +233,7 @@ func NewBashTool(permissions permission.Service, workingDir string, attribution
+ 						Action:      "execute",
+ 						Description: fmt.Sprintf("Execute command: %s", params.Command),
+ 						Params:      BashPermissionsParams(params),
++						Dangerous:   isDangerous,
+ 					},
+ 				)
+ 				if err != nil {
+@@ -240,7 +250,8 @@ func NewBashTool(permissions permission.Service, workingDir string, attribution
+ 				bgManager := shell.GetBackgroundShellManager()
+ 				bgManager.Cleanup()
+ 				// Use background context so it continues after tool returns
+-				bgShell, err := bgManager.Start(context.Background(), execWorkingDir, blockFuncs(), params.Command, params.Description)
++				// No block functions - permission check handles dangerous commands
++				bgShell, err := bgManager.Start(context.Background(), execWorkingDir, nil, params.Command, params.Description)
+ 				if err != nil {
+ 					return fantasy.ToolResponse{}, fmt.Errorf("error starting background shell: %w", err)
+ 				}
+@@ -295,7 +306,8 @@ func NewBashTool(permissions permission.Service, workingDir string, attribution
+ 			// Start with detached context so it can survive if moved to background
+ 			bgManager := shell.GetBackgroundShellManager()
+ 			bgManager.Cleanup()
+-			bgShell, err := bgManager.Start(context.Background(), execWorkingDir, blockFuncs(), params.Command, params.Description)
++			// No block functions - permission check handles dangerous commands
++			bgShell, err := bgManager.Start(context.Background(), execWorkingDir, nil, params.Command, params.Description)
+ 			if err != nil {
+ 				return fantasy.ToolResponse{}, fmt.Errorf("error starting shell: %w", err)
+ 			}
+diff --git a/internal/agent/tools/bash.tpl b/internal/agent/tools/bash.tpl
+index f1ef4b5a79..87ebcae217 100644
+--- a/internal/agent/tools/bash.tpl
++++ b/internal/agent/tools/bash.tpl
+@@ -8,7 +8,7 @@ Common shell builtins and core utils available on Windows.
+ 
+ <execution_steps>
+ 1. Directory Verification: If creating directories/files, use LS tool to verify parent exists
+-2. Security Check: Banned commands ({{ .BannedCommands }}) return error - explain to user. Safe read-only commands execute without prompts
++2. Security Check: Dangerous commands ({{ .BannedCommands }}) require explicit user approval with a warning popup, even in YOLO mode. Safe read-only commands execute without prompts
+ 3. Command Execution: Execute with proper quoting, capture output
+ 4. Auto-Background: Commands exceeding 1 minute automatically move to background and return shell ID
+ 5. Output Processing: Truncate if exceeds {{ .MaxOutputLength }} characters
+diff --git a/internal/agent/tools/bash_test.go b/internal/agent/tools/bash_test.go
+new file mode 100644
+index 0000000000..34166385da
+--- /dev/null
++++ b/internal/agent/tools/bash_test.go
+@@ -0,0 +1,88 @@
++package tools
++
++import (
++	"testing"
++
++	"github.com/stretchr/testify/assert"
++)
++
++func TestIsDangerousCommand(t *testing.T) {
++	tests := []struct {
++		name      string
++		command   string
++		dangerous bool
++	}{
++		{
++			name:      "simple banned command - curl",
++			command:   "curl https://example.com",
++			dangerous: true,
++		},
++		{
++			name:      "simple banned command - sudo",
++			command:   "sudo apt-get update",
++			dangerous: true,
++		},
++		{
++			name:      "npm global install with --global",
++			command:   "npm install --global typescript",
++			dangerous: true,
++		},
++		{
++			name:      "npm global install with -g",
++			command:   "npm install -g typescript",
++			dangerous: true,
++		},
++		{
++			name:      "npm local install",
++			command:   "npm install typescript",
++			dangerous: false,
++		},
++		{
++			name:      "go test with -exec",
++			command:   "go test -exec ./malicious ./...",
++			dangerous: true,
++		},
++		{
++			name:      "go test without -exec",
++			command:   "go test ./...",
++			dangerous: false,
++		},
++		{
++			name:      "safe command - ls",
++			command:   "ls -la",
++			dangerous: false,
++		},
++		{
++			name:      "safe command - echo",
++			command:   "echo hello",
++			dangerous: false,
++		},
++		{
++			name:      "safe command - git",
++			command:   "git status",
++			dangerous: false,
++		},
++		{
++			name:      "pip install with --user",
++			command:   "pip install --user requests",
++			dangerous: true,
++		},
++		{
++			name:      "pip install without --user",
++			command:   "pip install requests",
++			dangerous: false,
++		},
++		{
++			name:      "brew install",
++			command:   "brew install wget",
++			dangerous: true,
++		},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			result := isDangerousCommand(tt.command)
++			assert.Equal(t, tt.dangerous, result, "command: %s", tt.command)
++		})
++	}
++}
+diff --git a/internal/permission/permission.go b/internal/permission/permission.go
+index fc47b7dc93..972ac6021b 100644
+--- a/internal/permission/permission.go
++++ b/internal/permission/permission.go
+@@ -23,6 +23,7 @@ type CreatePermissionRequest struct {
+ 	Action      string `json:"action"`
+ 	Params      any    `json:"params"`
+ 	Path        string `json:"path"`
++	Dangerous   bool   `json:"dangerous"`
+ }
+ 
+ type PermissionNotification struct {
+@@ -40,6 +41,7 @@ type PermissionRequest struct {
+ 	Action      string `json:"action"`
+ 	Params      any    `json:"params"`
+ 	Path        string `json:"path"`
++	Dangerous   bool   `json:"dangerous"`
+ }
+ 
+ type Service interface {
+@@ -130,7 +132,8 @@ func (s *permissionService) Deny(permission PermissionRequest) {
+ }
+ 
+ func (s *permissionService) Request(ctx context.Context, opts CreatePermissionRequest) (bool, error) {
+-	if s.skip {
++	// Skip mode: auto-approve everything EXCEPT dangerous commands.
++	if s.skip && !opts.Dangerous {
+ 		return true, nil
+ 	}
+ 
+@@ -181,6 +184,7 @@ func (s *permissionService) Request(ctx context.Context, opts CreatePermissionRe
+ 		Description: opts.Description,
+ 		Action:      opts.Action,
+ 		Params:      opts.Params,
++		Dangerous:   opts.Dangerous,
+ 	}
+ 
+ 	s.sessionPermissionsMu.RLock()
+diff --git a/internal/permission/permission_test.go b/internal/permission/permission_test.go
+index 79930f3ae1..ca062a771d 100644
+--- a/internal/permission/permission_test.go
++++ b/internal/permission/permission_test.go
+@@ -80,21 +80,50 @@ func TestPermissionService_AllowedCommands(t *testing.T) {
+ }
+ 
+ func TestPermissionService_SkipMode(t *testing.T) {
+-	service := NewPermissionService("/tmp", true, []string{})
+-
+-	result, err := service.Request(t.Context(), CreatePermissionRequest{
+-		SessionID:   "test-session",
+-		ToolName:    "bash",
+-		Action:      "execute",
+-		Description: "test command",
+-		Path:        "/tmp",
++	t.Run("skip mode auto-approves non-dangerous commands", func(t *testing.T) {
++		service := NewPermissionService("/tmp", true, []string{})
++
++		result, err := service.Request(t.Context(), CreatePermissionRequest{
++			SessionID:   "test-session",
++			ToolName:    "bash",
++			Action:      "execute",
++			Description: "test command",
++			Path:        "/tmp",
++			Dangerous:   false,
++		})
++		require.NoError(t, err)
++		assert.True(t, result, "expected permission to be granted in skip mode")
++	})
++
++	t.Run("skip mode prompts for dangerous commands", func(t *testing.T) {
++		service := NewPermissionService("/tmp", true, []string{})
++
++		done := make(chan struct{})
++		go func() {
++			result, err := service.Request(t.Context(), CreatePermissionRequest{
++				SessionID:   "test-session",
++				ToolCallID:  "test-call",
++				ToolName:    "bash",
++				Action:      "execute",
++				Description: "dangerous command",
++				Path:        "/tmp",
++				Dangerous:   true,
++			})
++			require.NoError(t, err)
++			assert.True(t, result)
++			close(done)
++		}()
++
++		// Wait for permission request to be published
++		events := service.Subscribe(t.Context())
++		event := <-events
++		assert.Equal(t, "bash", event.Payload.ToolName)
++		assert.True(t, event.Payload.Dangerous)
++
++		// Grant the permission
++		service.Grant(event.Payload)
++		<-done
+ 	})
+-	if err != nil {
+-		t.Errorf("unexpected error: %v", err)
+-	}
+-	if !result {
+-		t.Error("expected permission to be granted in skip mode")
+-	}
+ }
+ 
+ func TestPermissionService_SequentialProperties(t *testing.T) {
+diff --git a/internal/shell/shell.go b/internal/shell/shell.go
+index ced8da26ed..984dc8775d 100644
+--- a/internal/shell/shell.go
++++ b/internal/shell/shell.go
+@@ -218,6 +218,45 @@ func splitArgsFlags(parts []string) (args []string, flags []string) {
+ 	return args, flags
+ }
+ 
++// IsCommandBlocked checks if a command string would be blocked by the given
++// block functions. This is useful for detecting dangerous commands before
++// execution.
++func IsCommandBlocked(command string, blockFuncs []BlockFunc) bool {
++	// Parse the command to extract arguments
++	line, err := syntax.NewParser().Parse(strings.NewReader(command), "")
++	if err != nil {
++		// If we can't parse it, consider it potentially dangerous
++		return true
++	}
++
++	// Extract the command and arguments from the parsed syntax tree
++	blocked := false
++	syntax.Walk(line, func(node syntax.Node) bool {
++		if callExpr, ok := node.(*syntax.CallExpr); ok {
++			args := make([]string, 0, len(callExpr.Args))
++			for _, arg := range callExpr.Args {
++				// Extract the word from the argument
++				for _, part := range arg.Parts {
++					if lit, ok := part.(*syntax.Lit); ok {
++						args = append(args, lit.Value)
++					}
++				}
++			}
++
++			// Check if this command is blocked
++			for _, blockFunc := range blockFuncs {
++				if blockFunc(args) {
++					blocked = true
++					return false
++				}
++			}
++		}
++		return true
++	})
++
++	return blocked
++}
++
+ func (s *Shell) blockHandler() func(next interp.ExecHandlerFunc) interp.ExecHandlerFunc {
+ 	return func(next interp.ExecHandlerFunc) interp.ExecHandlerFunc {
+ 		return func(ctx context.Context, args []string) error {
+diff --git a/internal/ui/dialog/permissions.go b/internal/ui/dialog/permissions.go
+index 8f2ca1ed27..f6ee69a7fb 100644
+--- a/internal/ui/dialog/permissions.go
++++ b/internal/ui/dialog/permissions.go
+@@ -413,11 +413,26 @@ func (p *Permissions) renderHeader(contentWidth int) string {
+ 	title := common.DialogTitle(t, "Permission Required", contentWidth-t.Dialog.Title.GetHorizontalFrameSize())
+ 	title = t.Dialog.Title.Render(title)
+ 
++	lines := []string{title, ""}
++
++	// Add warning for dangerous commands.
++	if p.permission.Dangerous {
++		warningTag := t.Base.
++			Foreground(t.BgOverlay).
++			Background(t.Yellow).
++			Padding(0, 1).
++			Render("WARNING")
++		warningIcon := t.Base.Foreground(t.Warning).Render("⚠")
++		warningMsg := t.Base.Foreground(t.FgHalfMuted).Render(" Potentially dangerous command")
++		warningLine := lipgloss.JoinHorizontal(lipgloss.Left, warningIcon, " ", warningTag, warningMsg)
++		lines = append(lines, warningLine, "")
++	}
++
+ 	// Tool info.
+ 	toolLine := p.renderToolName(contentWidth)
+ 	pathLine := p.renderKeyValue("Path", fsext.PrettyPath(p.permission.Path), contentWidth)
+ 
+-	lines := []string{title, "", toolLine, pathLine}
++	lines = append(lines, toolLine, pathLine)
+ 
+ 	// Add tool-specific header info.
+ 	switch p.permission.ToolName {

@@ -1,0 +1,1428 @@
+From 388cd7c72f35ae40a7e2e72932f7516d1b6fc5b2 Mon Sep 17 00:00:00 2001
+From: Kieran Klukas <me@dunkirk.sh>
+Date: Thu, 29 Jan 2026 17:14:21 -0500
+Subject: [PATCH 1/3] feat: add plan mode for read-only exploration
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Introduces a three-phase permission system (regular/yolo/plan) where
+plan mode restricts the agent to read-only tools for safe exploration
+and planning. Includes shift+tab keybinding to cycle modes, UI styling,
+and OAuth header support for Anthropic.
+
+💘 Generated with Crush
+
+Assisted-by: Claude Opus 4.5 via Crush <crush@charm.land>
+---
+ internal/agent/agent.go                       |  32 ++++-
+ internal/agent/agentic_fetch_tool.go          |   2 +-
+ internal/agent/common_test.go                 |  10 +-
+ internal/agent/coordinator.go                 | 125 ++++++++++++++++--
+ internal/agent/event.go                       |  13 +-
+ internal/agent/tools/multiedit_test.go        |   6 +
+ internal/agent/tools/tools.go                 |  16 +++
+ internal/permission/permission.go             |  79 ++++++++++-
+ internal/permission/permission_test.go        |  91 +++++++++++++
+ internal/tui/components/chat/chat.go          |   1 +
+ internal/tui/components/chat/editor/editor.go |  92 ++++++++++++-
+ internal/tui/components/chat/editor/keys.go   |   6 +
+ .../components/dialogs/commands/commands.go   |  18 +++
+ .../tui/components/dialogs/models/keys.go     |  20 ++-
+ .../tui/components/dialogs/models/list.go     |   3 +-
+ internal/tui/page/chat/chat.go                |  13 +-
+ internal/tui/styles/charmtone.go              |   6 +
+ internal/tui/styles/theme.go                  |   6 +
+ internal/tui/tui.go                           |   8 +-
+ internal/ui/dialog/models.go                  |   3 +-
+ internal/ui/model/ui.go                       |  13 +-
+ 21 files changed, 517 insertions(+), 46 deletions(-)
+
+diff --git a/internal/agent/agent.go b/internal/agent/agent.go
+index d46f42334f..e3cf39033b 100644
+--- a/internal/agent/agent.go
++++ b/internal/agent/agent.go
+@@ -78,6 +78,7 @@ type SessionAgent interface {
+ 	SetModels(large Model, small Model)
+ 	SetTools(tools []fantasy.AgentTool)
+ 	SetSystemPrompt(systemPrompt string)
++	SetSystemPromptPrefix(prefix string)
+ 	Cancel(sessionID string)
+ 	CancelAll()
+ 	IsSessionBusy(sessionID string) bool
+@@ -105,8 +106,8 @@ type sessionAgent struct {
+ 	isSubAgent           bool
+ 	sessions             session.Service
+ 	messages             message.Service
++	permissions          permission.Service
+ 	disableAutoSummarize bool
+-	isYolo               bool
+ 
+ 	messageQueue   *csync.Map[string, []SessionAgentCall]
+ 	activeRequests *csync.Map[string, context.CancelFunc]
+@@ -119,9 +120,9 @@ type SessionAgentOptions struct {
+ 	SystemPrompt         string
+ 	IsSubAgent           bool
+ 	DisableAutoSummarize bool
+-	IsYolo               bool
+ 	Sessions             session.Service
+ 	Messages             message.Service
++	Permissions          permission.Service
+ 	Tools                []fantasy.AgentTool
+ }
+ 
+@@ -136,9 +137,9 @@ func NewSessionAgent(
+ 		isSubAgent:           opts.IsSubAgent,
+ 		sessions:             opts.Sessions,
+ 		messages:             opts.Messages,
++		permissions:          opts.Permissions,
+ 		disableAutoSummarize: opts.DisableAutoSummarize,
+ 		tools:                csync.NewSliceFrom(opts.Tools),
+-		isYolo:               opts.IsYolo,
+ 		messageQueue:         csync.NewMap[string, []SessionAgentCall](),
+ 		activeRequests:       csync.NewMap[string, context.CancelFunc](),
+ 	}
+@@ -184,6 +185,25 @@ func (a *sessionAgent) Run(ctx context.Context, call SessionAgentCall) (*fantasy
+ 		systemPrompt += "\n\n<mcp-instructions>\n" + s + "\n</mcp-instructions>"
+ 	}
+ 
++	// Inject plan mode instructions if enabled.
++	if a.permissions != nil && a.permissions.GetMode() == permission.ModePlan {
++		planModeInstructions := `
++Plan mode is active. The user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supercedes any other instructions you have received.
++
++When in plan mode:
++- Only use READ-ONLY tools (View, LS, Glob, Grep, lsp_diagnostics, lsp_references, agent, fetch, agentic_fetch, sourcegraph, mcp_sequential-thinking_sequentialthinking, Bash with readonly commands)
++- DO NOT use Edit, Write, Multiedit, or any tools that modify files
++- DO NOT run bash commands that modify the system
++- DO NOT make commits or push changes
++- Your goal is to explore, understand, and create a plan
++- Explain what you would do and what files you would change
++- Ask clarifying questions if needed
++`
++		systemPrompt = string(promptPrefix) + planModeInstructions + systemPrompt
++	} else {
++		systemPrompt = string(promptPrefix) + systemPrompt
++	}
++
+ 	if len(agentTools) > 0 {
+ 		// Add Anthropic caching to the last tool.
+ 		agentTools[len(agentTools)-1].SetProviderOptions(a.getCacheControlOptions())
+@@ -300,6 +320,8 @@ func (a *sessionAgent) Run(ctx context.Context, call SessionAgentCall) (*fantasy
+ 			callContext = context.WithValue(callContext, tools.MessageIDContextKey, assistantMsg.ID)
+ 			callContext = context.WithValue(callContext, tools.SupportsImagesContextKey, largeModel.CatwalkCfg.SupportsImages)
+ 			callContext = context.WithValue(callContext, tools.ModelNameContextKey, largeModel.CatwalkCfg.Name)
++			isPlanMode := a.permissions != nil && a.permissions.GetMode() == permission.ModePlan
++			callContext = context.WithValue(callContext, tools.PlanModeContextKey, isPlanMode)
+ 			currentAssistant = &assistantMsg
+ 			return callContext, prepared, err
+ 		},
+@@ -1012,6 +1034,10 @@ func (a *sessionAgent) SetSystemPrompt(systemPrompt string) {
+ 	a.systemPrompt.Set(systemPrompt)
+ }
+ 
++func (a *sessionAgent) SetSystemPromptPrefix(prefix string) {
++	a.systemPromptPrefix.Set(prefix)
++}
++
+ func (a *sessionAgent) Model() Model {
+ 	return a.largeModel.Get()
+ }
+diff --git a/internal/agent/agentic_fetch_tool.go b/internal/agent/agentic_fetch_tool.go
+index 08da0e8701..5eb7dd176c 100644
+--- a/internal/agent/agentic_fetch_tool.go
++++ b/internal/agent/agentic_fetch_tool.go
+@@ -177,9 +177,9 @@ func (c *coordinator) agenticFetchTool(_ context.Context, client *http.Client) (
+ 				SystemPromptPrefix:   smallProviderCfg.SystemPromptPrefix,
+ 				SystemPrompt:         systemPrompt,
+ 				DisableAutoSummarize: c.cfg.Options.DisableAutoSummarize,
+-				IsYolo:               c.permissions.SkipRequests(),
+ 				Sessions:             c.sessions,
+ 				Messages:             c.messages,
++				Permissions:          c.permissions,
+ 				Tools:                fetchTools,
+ 			})
+ 
+diff --git a/internal/agent/common_test.go b/internal/agent/common_test.go
+index 2bb5e5650b..d0136a0aa1 100644
+--- a/internal/agent/common_test.go
++++ b/internal/agent/common_test.go
+@@ -153,7 +153,15 @@ func testSessionAgent(env fakeEnv, large, small fantasy.LanguageModel, systemPro
+ 			DefaultMaxTokens: 10000,
+ 		},
+ 	}
+-	agent := NewSessionAgent(SessionAgentOptions{largeModel, smallModel, "", systemPrompt, false, false, true, env.sessions, env.messages, tools})
++	agent := NewSessionAgent(SessionAgentOptions{
++		LargeModel:           largeModel,
++		SmallModel:           smallModel,
++		SystemPrompt:         systemPrompt,
++		DisableAutoSummarize: true,
++		Sessions:             env.sessions,
++		Messages:             env.messages,
++		Tools:                tools,
++	})
+ 	return agent
+ }
+ 
+diff --git a/internal/agent/coordinator.go b/internal/agent/coordinator.go
+index 40b7e029e4..e757ccaf3b 100644
+--- a/internal/agent/coordinator.go
++++ b/internal/agent/coordinator.go
+@@ -47,6 +47,7 @@ type Coordinator interface {
+ 	// INFO: (kujtim) this is not used yet we will use this when we have multiple agents
+ 	// SetMainAgent(string)
+ 	Run(ctx context.Context, sessionID, prompt string, attachments ...message.Attachment) (*fantasy.AgentResult, error)
++	RunWithPlanMode(ctx context.Context, sessionID, prompt string, isPlanMode bool, attachments ...message.Attachment) (*fantasy.AgentResult, error)
+ 	Cancel(sessionID string)
+ 	CancelAll()
+ 	IsSessionBusy(sessionID string) bool
+@@ -117,6 +118,21 @@ func NewCoordinator(
+ 
+ // Run implements Coordinator.
+ func (c *coordinator) Run(ctx context.Context, sessionID string, prompt string, attachments ...message.Attachment) (*fantasy.AgentResult, error) {
++	return c.RunWithPlanMode(ctx, sessionID, prompt, false, attachments...)
++}
++
++// RunWithPlanMode implements Coordinator with plan mode support.
++func (c *coordinator) RunWithPlanMode(ctx context.Context, sessionID string, prompt string, isPlanMode bool, attachments ...message.Attachment) (*fantasy.AgentResult, error) {
++	// Set the permission mode based on isPlanMode parameter
++	previousMode := c.permissions.GetMode()
++	if isPlanMode {
++		c.permissions.SetMode(permission.ModePlan)
++	} else if previousMode == permission.ModePlan {
++		// If we're exiting plan mode, restore to regular mode and notify the agent
++		c.permissions.SetMode(permission.ModeRegular)
++		prompt = "[SYSTEM: Plan mode has been exited. You can now execute write operations and modify the system.]\n\n" + prompt
++	}
++
+ 	if err := c.readyWg.Wait(); err != nil {
+ 		return nil, err
+ 	}
+@@ -332,17 +348,30 @@ func (c *coordinator) buildAgent(ctx context.Context, prompt *prompt.Prompt, age
+ 	}
+ 
+ 	largeProviderCfg, _ := c.cfg.Providers.Get(large.ModelCfg.Provider)
++
++	// Build system prompt prefix, prepending Claude Code identity for OAuth
++	systemPromptPrefix := largeProviderCfg.SystemPromptPrefix
++	if largeProviderCfg.OAuthToken != nil && largeProviderCfg.Type == anthropic.Name {
++		// For OAuth tokens, we MUST identify as Claude Code
++		claudeCodeIdentity := "You are Claude Code, Anthropic's official CLI for Claude."
++		if systemPromptPrefix != "" {
++			systemPromptPrefix = claudeCodeIdentity + "\n\n" + systemPromptPrefix
++		} else {
++			systemPromptPrefix = claudeCodeIdentity
++		}
++	}
++
+ 	result := NewSessionAgent(SessionAgentOptions{
+-		large,
+-		small,
+-		largeProviderCfg.SystemPromptPrefix,
+-		"",
+-		isSubAgent,
+-		c.cfg.Options.DisableAutoSummarize,
+-		c.permissions.SkipRequests(),
+-		c.sessions,
+-		c.messages,
+-		nil,
++		LargeModel:           large,
++		SmallModel:           small,
++		SystemPromptPrefix:   systemPromptPrefix,
++		SystemPrompt:         "",
++		IsSubAgent:           isSubAgent,
++		DisableAutoSummarize: c.cfg.Options.DisableAutoSummarize,
++		Sessions:             c.sessions,
++		Messages:             c.messages,
++		Permissions:          c.permissions,
++		Tools:                nil,
+ 	})
+ 
+ 	c.readyWg.Go(func() error {
+@@ -442,12 +471,55 @@ func (c *coordinator) buildTools(ctx context.Context, agent config.Agent) ([]fan
+ 		}
+ 		slog.Debug("MCP not allowed", "tool", tool.Name(), "agent", agent.Name)
+ 	}
++
++	// Filter out write tools in plan mode
++	if c.permissions.GetMode() == permission.ModePlan {
++		filteredTools = filterPlanModeTools(filteredTools)
++	}
++
+ 	slices.SortFunc(filteredTools, func(a, b fantasy.AgentTool) int {
+ 		return strings.Compare(a.Info().Name, b.Info().Name)
+ 	})
+ 	return filteredTools, nil
+ }
+ 
++// filterPlanModeTools removes write tools when in plan mode, keeping only
++// read-only tools.
++func filterPlanModeTools(tools []fantasy.AgentTool) []fantasy.AgentTool {
++	// List of tools allowed in plan mode (read-only operations)
++	allowedInPlanMode := []string{
++		"view",
++		"ls",
++		"glob",
++		"grep",
++		"lsp_diagnostics",
++		"lsp_references",
++		"agent",
++		"fetch",
++		"agentic_fetch",
++		"sourcegraph",
++		"job_output",
++		"job_kill",
++		"bash", // bash is allowed but write operations are blocked by permission system
++		"mcp_sequential-thinking_sequentialthinking",
++	}
++
++	var result []fantasy.AgentTool
++	for _, tool := range tools {
++		toolName := tool.Info().Name
++		// Allow if in the allowlist
++		if slices.Contains(allowedInPlanMode, toolName) {
++			result = append(result, tool)
++			continue
++		}
++		// Allow MCP tools that start with mcp_sequential-thinking_
++		if strings.HasPrefix(toolName, "mcp_sequential-thinking_") {
++			result = append(result, tool)
++		}
++	}
++	return result
++}
++
+ // TODO: when we support multiple agents we need to change this so that we pass in the agent specific model config
+ func (c *coordinator) buildAgentModels(ctx context.Context, isSubAgent bool) (Model, Model, error) {
+ 	largeModelCfg, ok := c.cfg.Models[config.SelectedModelTypeLarge]
+@@ -723,6 +795,9 @@ func (c *coordinator) isAnthropicThinking(model config.SelectedModel) bool {
+ 	return false
+ }
+ 
++// claudeCodeVersion is used for User-Agent when using OAuth tokens
++const claudeCodeVersion = "2.1.2"
++
+ func (c *coordinator) buildProvider(providerCfg config.ProviderConfig, model config.SelectedModel, isSubAgent bool) (fantasy.Provider, error) {
+ 	headers := maps.Clone(providerCfg.ExtraHeaders)
+ 	if headers == nil {
+@@ -730,11 +805,33 @@ func (c *coordinator) buildProvider(providerCfg config.ProviderConfig, model con
+ 	}
+ 
+ 	// handle special headers for anthropic
+-	if providerCfg.Type == anthropic.Name && c.isAnthropicThinking(model) {
+-		if v, ok := headers["anthropic-beta"]; ok {
+-			headers["anthropic-beta"] = v + ",interleaved-thinking-2025-05-14"
++	if providerCfg.Type == anthropic.Name {
++		// Add OAuth/setup-token headers if using OAuth authentication
++		// This mimics Claude Code's headers exactly for compatibility
++		if providerCfg.OAuthToken != nil {
++			// Build the anthropic-beta header with all required flags
++			betaFlags := []string{"claude-code-20250219", "oauth-2025-04-20"}
++			if c.isAnthropicThinking(model) {
++				betaFlags = append(betaFlags, "interleaved-thinking-2025-05-14")
++			}
++			if v, ok := headers["anthropic-beta"]; ok && v != "" {
++				headers["anthropic-beta"] = v + "," + strings.Join(betaFlags, ",")
++			} else {
++				headers["anthropic-beta"] = strings.Join(betaFlags, ",")
++			}
++
++			// Add Claude Code identity headers
++			headers["user-agent"] = fmt.Sprintf("claude-cli/%s (external, cli)", claudeCodeVersion)
++			headers["x-app"] = "cli"
+ 		} else {
+-			headers["anthropic-beta"] = "interleaved-thinking-2025-05-14"
++			// Add thinking beta flag if using thinking model (non-OAuth)
++			if c.isAnthropicThinking(model) {
++				if v, ok := headers["anthropic-beta"]; ok {
++					headers["anthropic-beta"] = v + ",interleaved-thinking-2025-05-14"
++				} else {
++					headers["anthropic-beta"] = "interleaved-thinking-2025-05-14"
++				}
++			}
+ 		}
+ 	}
+ 
+diff --git a/internal/agent/event.go b/internal/agent/event.go
+index 3f6c640f6a..5fab9cd544 100644
+--- a/internal/agent/event.go
++++ b/internal/agent/event.go
+@@ -5,6 +5,7 @@ import (
+ 
+ 	"charm.land/fantasy"
+ 	"github.com/charmbracelet/crush/internal/event"
++	"github.com/charmbracelet/crush/internal/permission"
+ )
+ 
+ func (a *sessionAgent) eventPromptSent(sessionID string) {
+@@ -40,12 +41,22 @@ func (a *sessionAgent) eventTokensUsed(sessionID string, model Model, usage fant
+ func (a *sessionAgent) eventCommon(sessionID string, model Model) []any {
+ 	m := model.ModelCfg
+ 
++	mode := "regular"
++	if a.permissions != nil {
++		switch a.permissions.GetMode() {
++		case permission.ModeYolo:
++			mode = "yolo"
++		case permission.ModePlan:
++			mode = "plan"
++		}
++	}
++
+ 	return []any{
+ 		"session id", sessionID,
+ 		"provider", m.Provider,
+ 		"model", m.Model,
+ 		"reasoning effort", m.ReasoningEffort,
+ 		"thinking mode", m.Think,
+-		"yolo mode", a.isYolo,
++		"permission mode", mode,
+ 	}
+ }
+diff --git a/internal/agent/tools/multiedit_test.go b/internal/agent/tools/multiedit_test.go
+index 1ca2a6f768..511c17aa16 100644
+--- a/internal/agent/tools/multiedit_test.go
++++ b/internal/agent/tools/multiedit_test.go
+@@ -28,6 +28,12 @@ func (m *mockPermissionService) GrantPersistent(req permission.PermissionRequest
+ 
+ func (m *mockPermissionService) AutoApproveSession(sessionID string) {}
+ 
++func (m *mockPermissionService) SetMode(mode permission.PermissionMode) {}
++
++func (m *mockPermissionService) GetMode() permission.PermissionMode {
++	return permission.ModeRegular
++}
++
+ func (m *mockPermissionService) SetSkipRequests(skip bool) {}
+ 
+ func (m *mockPermissionService) SkipRequests() bool {
+diff --git a/internal/agent/tools/tools.go b/internal/agent/tools/tools.go
+index 7d03d0e227..ad57c3fc95 100644
+--- a/internal/agent/tools/tools.go
++++ b/internal/agent/tools/tools.go
+@@ -9,6 +9,7 @@ type (
+ 	messageIDContextKey string
+ 	supportsImagesKey   string
+ 	modelNameKey        string
++	planModeKey         string
+ )
+ 
+ const (
+@@ -20,6 +21,8 @@ const (
+ 	SupportsImagesContextKey supportsImagesKey = "supports_images"
+ 	// ModelNameContextKey is the key for the model name in the context.
+ 	ModelNameContextKey modelNameKey = "model_name"
++	// PlanModeContextKey is the key for plan mode in the context.
++	PlanModeContextKey planModeKey = "plan_mode"
+ )
+ 
+ // GetSessionFromContext retrieves the session ID from the context.
+@@ -72,3 +75,16 @@ func GetModelNameFromContext(ctx context.Context) string {
+ 	}
+ 	return s
+ }
++
++// IsPlanMode checks if plan mode is enabled in the context.
++func IsPlanMode(ctx context.Context) bool {
++	planMode := ctx.Value(PlanModeContextKey)
++	if planMode == nil {
++		return false
++	}
++	b, ok := planMode.(bool)
++	if !ok {
++		return false
++	}
++	return b
++}
+diff --git a/internal/permission/permission.go b/internal/permission/permission.go
+index fc47b7dc93..40e989339d 100644
+--- a/internal/permission/permission.go
++++ b/internal/permission/permission.go
+@@ -3,6 +3,7 @@ package permission
+ import (
+ 	"context"
+ 	"errors"
++	"fmt"
+ 	"os"
+ 	"path/filepath"
+ 	"slices"
+@@ -13,6 +14,18 @@ import (
+ 	"github.com/google/uuid"
+ )
+ 
++// PermissionMode represents the three mutually exclusive permission states.
++type PermissionMode int
++
++const (
++	// ModeRegular requires user approval for each action.
++	ModeRegular PermissionMode = iota
++	// ModeYolo automatically approves all actions without prompting.
++	ModeYolo
++	// ModePlan blocks all write operations and prompts for read operations.
++	ModePlan
++)
++
+ var ErrorPermissionDenied = errors.New("user denied permission")
+ 
+ type CreatePermissionRequest struct {
+@@ -49,7 +62,11 @@ type Service interface {
+ 	Deny(permission PermissionRequest)
+ 	Request(ctx context.Context, opts CreatePermissionRequest) (bool, error)
+ 	AutoApproveSession(sessionID string)
++	SetMode(mode PermissionMode)
++	GetMode() PermissionMode
++	// Deprecated: Use SetMode(ModeYolo) instead.
+ 	SetSkipRequests(skip bool)
++	// Deprecated: Use GetMode() == ModeYolo instead.
+ 	SkipRequests() bool
+ 	SubscribeNotifications(ctx context.Context) <-chan pubsub.Event[PermissionNotification]
+ }
+@@ -64,7 +81,8 @@ type permissionService struct {
+ 	pendingRequests       *csync.Map[string, chan bool]
+ 	autoApproveSessions   map[string]bool
+ 	autoApproveSessionsMu sync.RWMutex
+-	skip                  bool
++	mode                  PermissionMode
++	modeMu                sync.RWMutex
+ 	allowedTools          []string
+ 
+ 	// used to make sure we only process one request at a time
+@@ -130,8 +148,23 @@ func (s *permissionService) Deny(permission PermissionRequest) {
+ }
+ 
+ func (s *permissionService) Request(ctx context.Context, opts CreatePermissionRequest) (bool, error) {
+-	if s.skip {
++	s.modeMu.RLock()
++	mode := s.mode
++	s.modeMu.RUnlock()
++
++	// Check mode-specific behavior
++	switch mode {
++	case ModePlan:
++		// Plan mode: block all write operations (except read-only tools)
++		if isWriteOperation(opts.Action) && !isReadOnlyTool(opts.ToolName) {
++			return false, fmt.Errorf("write operations are not allowed in plan mode")
++		}
++		// Read operations fall through to normal permission checks
++	case ModeYolo:
++		// Yolo mode: auto-approve everything
+ 		return true, nil
++	case ModeRegular:
++		// Regular mode: fall through to normal permission checks
+ 	}
+ 
+ 	// tell the UI that a permission was requested
+@@ -225,23 +258,59 @@ func (s *permissionService) SubscribeNotifications(ctx context.Context) <-chan p
+ 	return s.notificationBroker.Subscribe(ctx)
+ }
+ 
++func (s *permissionService) SetMode(mode PermissionMode) {
++	s.modeMu.Lock()
++	s.mode = mode
++	s.modeMu.Unlock()
++}
++
++func (s *permissionService) GetMode() PermissionMode {
++	s.modeMu.RLock()
++	defer s.modeMu.RUnlock()
++	return s.mode
++}
++
+ func (s *permissionService) SetSkipRequests(skip bool) {
+-	s.skip = skip
++	if skip {
++		s.SetMode(ModeYolo)
++	} else {
++		s.SetMode(ModeRegular)
++	}
+ }
+ 
+ func (s *permissionService) SkipRequests() bool {
+-	return s.skip
++	return s.GetMode() == ModeYolo
+ }
+ 
+ func NewPermissionService(workingDir string, skip bool, allowedTools []string) Service {
++	mode := ModeRegular
++	if skip {
++		mode = ModeYolo
++	}
+ 	return &permissionService{
+ 		Broker:              pubsub.NewBroker[PermissionRequest](),
+ 		notificationBroker:  pubsub.NewBroker[PermissionNotification](),
+ 		workingDir:          workingDir,
+ 		sessionPermissions:  make([]PermissionRequest, 0),
+ 		autoApproveSessions: make(map[string]bool),
+-		skip:                skip,
++		mode:                mode,
+ 		allowedTools:        allowedTools,
+ 		pendingRequests:     csync.NewMap[string, chan bool](),
+ 	}
+ }
++
++// isWriteOperation checks if an action is a write operation that should be
++// blocked in plan mode.
++func isWriteOperation(action string) bool {
++	writeActions := []string{"write", "execute"}
++	return slices.Contains(writeActions, action)
++}
++
++// isReadOnlyTool checks if a tool is read-only and should be allowed in plan
++// mode despite having an "execute" action. These tools don't modify state.
++func isReadOnlyTool(toolName string) bool {
++	readOnlyTools := []string{
++		"mcp_sequential-thinking_sequentialthinking",
++	}
++	return slices.Contains(readOnlyTools, toolName)
++}
+diff --git a/internal/permission/permission_test.go b/internal/permission/permission_test.go
+index 79930f3ae1..4daf5fef36 100644
+--- a/internal/permission/permission_test.go
++++ b/internal/permission/permission_test.go
+@@ -251,3 +251,94 @@ func TestPermissionService_SequentialProperties(t *testing.T) {
+ 		assert.True(t, result, "Repeated request should be auto-approved due to persistent permission")
+ 	})
+ }
++
++func TestPermissionService_PlanMode(t *testing.T) {
++	t.Parallel()
++
++	tests := []struct {
++		name         string
++		mode         PermissionMode
++		toolName     string
++		action       string
++		allowedTools []string
++		shouldBlock  bool
++		errContains  string
++	}{
++		{
++			name:        "plan mode blocks write action",
++			mode:        ModePlan,
++			toolName:    "test-tool",
++			action:      "write",
++			shouldBlock: true,
++			errContains: "write operations are not allowed in plan mode",
++		},
++		{
++			name:        "plan mode blocks execute action",
++			mode:        ModePlan,
++			toolName:    "test-tool",
++			action:      "execute",
++			shouldBlock: true,
++			errContains: "write operations are not allowed in plan mode",
++		},
++		{
++			name:         "plan mode allows sequential thinking tool",
++			mode:         ModePlan,
++			toolName:     "mcp_sequential-thinking_sequentialthinking",
++			action:       "execute",
++			allowedTools: []string{"mcp_sequential-thinking_sequentialthinking"},
++			shouldBlock:  false,
++		},
++		{
++			name:        "yolo mode allows write action",
++			mode:        ModeYolo,
++			toolName:    "test-tool",
++			action:      "write",
++			shouldBlock: false,
++		},
++		{
++			name:        "yolo mode allows execute action",
++			mode:        ModeYolo,
++			toolName:    "test-tool",
++			action:      "execute",
++			shouldBlock: false,
++		},
++		{
++			name:        "yolo mode allows read action",
++			mode:        ModeYolo,
++			toolName:    "test-tool",
++			action:      "read",
++			shouldBlock: false,
++		},
++	}
++
++	for _, tt := range tests {
++		t.Run(tt.name, func(t *testing.T) {
++			t.Parallel()
++			// Create service in regular mode initially.
++			service := NewPermissionService("/tmp", false, tt.allowedTools)
++
++			// Set the mode for this test case.
++			service.SetMode(tt.mode)
++
++			ctx := t.Context()
++
++			result, err := service.Request(ctx, CreatePermissionRequest{
++				SessionID:  "test-session",
++				ToolCallID: "test-call",
++				ToolName:   tt.toolName,
++				Action:     tt.action,
++				Path:       "/tmp",
++			})
++
++			if tt.shouldBlock {
++				require.Error(t, err)
++				assert.False(t, result)
++				assert.Contains(t, err.Error(), tt.errContains)
++			} else {
++				// In yolo mode, all non-blocked requests are auto-approved.
++				require.NoError(t, err)
++				assert.True(t, result)
++			}
++		})
++	}
++}
+diff --git a/internal/tui/components/chat/chat.go b/internal/tui/components/chat/chat.go
+index 036c8262d2..f5913e2da1 100644
+--- a/internal/tui/components/chat/chat.go
++++ b/internal/tui/components/chat/chat.go
+@@ -24,6 +24,7 @@ import (
+ type SendMsg struct {
+ 	Text        string
+ 	Attachments []message.Attachment
++	IsPlanMode  bool
+ }
+ 
+ type SessionSelectedMsg = session.Session
+diff --git a/internal/tui/components/chat/editor/editor.go b/internal/tui/components/chat/editor/editor.go
+index 575c23114a..81d291ae5c 100644
+--- a/internal/tui/components/chat/editor/editor.go
++++ b/internal/tui/components/chat/editor/editor.go
+@@ -20,6 +20,7 @@ import (
+ 	"github.com/charmbracelet/crush/internal/app"
+ 	"github.com/charmbracelet/crush/internal/fsext"
+ 	"github.com/charmbracelet/crush/internal/message"
++	"github.com/charmbracelet/crush/internal/permission"
+ 	"github.com/charmbracelet/crush/internal/session"
+ 	"github.com/charmbracelet/crush/internal/tui/components/chat"
+ 	"github.com/charmbracelet/crush/internal/tui/components/completions"
+@@ -54,6 +55,7 @@ type Editor interface {
+ 	HasAttachments() bool
+ 	IsEmpty() bool
+ 	Cursor() *tea.Cursor
++	GetMode() commands.EditorMode
+ }
+ 
+ type FileCompletionItem struct {
+@@ -72,6 +74,7 @@ type editorCmp struct {
+ 	deleteMode         bool
+ 	readyPlaceholder   string
+ 	workingPlaceholder string
++	mode               commands.EditorMode
+ 
+ 	keyMap EditorKeyMap
+ 
+@@ -169,6 +172,7 @@ func (m *editorCmp) send() tea.Cmd {
+ 		util.CmdHandler(chat.SendMsg{
+ 			Text:        value,
+ 			Attachments: attachments,
++			IsPlanMode:  m.mode == commands.PlanMode,
+ 		}),
+ 	)
+ }
+@@ -299,7 +303,21 @@ func (m *editorCmp) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ 		})
+ 
+ 	case commands.ToggleYoloModeMsg:
++		// Sync yolo mode with the 3-phase system
++		if m.mode == commands.YoloMode {
++			m.mode = commands.RegularMode
++		} else {
++			m.mode = commands.YoloMode
++		}
++		m.setEditorPrompt()
++		m.syncModeToPermissions()
++		// Don't forward - parent will handle permission toggle
++		return m, nil
++	case commands.CycleModeMsg:
++		m.mode = (m.mode + 1) % 3
+ 		m.setEditorPrompt()
++		// Sync permissions with new mode
++		m.syncModeToPermissions()
+ 		return m, nil
+ 	case tea.KeyPressMsg:
+ 		cur := m.textarea.Cursor()
+@@ -349,6 +367,12 @@ func (m *editorCmp) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ 			}
+ 			return m, m.openEditor(m.textarea.Value())
+ 		}
++		if key.Matches(msg, m.keyMap.CycleMode) {
++			m.mode = (m.mode + 1) % 3
++			m.setEditorPrompt()
++			m.syncModeToPermissions()
++			return m, nil
++		}
+ 		if key.Matches(msg, DeleteKeyMaps.Escape) {
+ 			m.deleteMode = false
+ 			return m, nil
+@@ -490,11 +514,14 @@ func (m *editorCmp) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ }
+ 
+ func (m *editorCmp) setEditorPrompt() {
+-	if m.app.Permissions.SkipRequests() {
++	switch m.mode {
++	case commands.YoloMode:
+ 		m.textarea.SetPromptFunc(4, yoloPromptFunc)
+-		return
++	case commands.PlanMode:
++		m.textarea.SetPromptFunc(4, planPromptFunc)
++	default:
++		m.textarea.SetPromptFunc(4, normalPromptFunc)
+ 	}
+-	m.textarea.SetPromptFunc(4, normalPromptFunc)
+ }
+ 
+ func (m *editorCmp) completionsPosition() (int, int) {
+@@ -543,10 +570,14 @@ func (m *editorCmp) View() string {
+ 	if m.app.AgentCoordinator != nil && m.app.AgentCoordinator.IsBusy() {
+ 		m.textarea.Placeholder = m.workingPlaceholder
+ 	} else {
+-		m.textarea.Placeholder = m.readyPlaceholder
+-	}
+-	if m.app.Permissions.SkipRequests() {
+-		m.textarea.Placeholder = "Yolo mode!"
++		switch m.mode {
++		case commands.YoloMode:
++			m.textarea.Placeholder = "Yolo mode!"
++		case commands.PlanMode:
++			m.textarea.Placeholder = "Plan mode!"
++		default:
++			m.textarea.Placeholder = m.readyPlaceholder
++		}
+ 	}
+ 	if len(m.attachments) == 0 {
+ 		return t.S().Base.Padding(1).Render(
+@@ -692,6 +723,24 @@ func (c *editorCmp) IsEmpty() bool {
+ 	return strings.TrimSpace(c.textarea.Value()) == ""
+ }
+ 
++func (m *editorCmp) GetMode() commands.EditorMode {
++	return m.mode
++}
++
++// syncModeToPermissions updates the permission service to match the editor mode.
++func (m *editorCmp) syncModeToPermissions() {
++	var permMode permission.PermissionMode
++	switch m.mode {
++	case commands.RegularMode:
++		permMode = permission.ModeRegular
++	case commands.YoloMode:
++		permMode = permission.ModeYolo
++	case commands.PlanMode:
++		permMode = permission.ModePlan
++	}
++	m.app.Permissions.SetMode(permMode)
++}
++
+ func normalPromptFunc(info textarea.PromptInfo) string {
+ 	t := styles.CurrentTheme()
+ 	if info.LineNumber == 0 {
+@@ -721,6 +770,21 @@ func yoloPromptFunc(info textarea.PromptInfo) string {
+ 	return fmt.Sprintf("%s ", t.YoloDotsBlurred)
+ }
+ 
++func planPromptFunc(info textarea.PromptInfo) string {
++	t := styles.CurrentTheme()
++	if info.LineNumber == 0 {
++		if info.Focused {
++			return fmt.Sprintf("%s ", t.PlanIconFocused)
++		} else {
++			return fmt.Sprintf("%s ", t.PlanIconBlurred)
++		}
++	}
++	if info.Focused {
++		return fmt.Sprintf("%s ", t.PlanDotsFocused)
++	}
++	return fmt.Sprintf("%s ", t.PlanDotsBlurred)
++}
++
+ func New(app *app.App) Editor {
+ 	t := styles.CurrentTheme()
+ 	ta := textarea.New()
+@@ -729,11 +793,25 @@ func New(app *app.App) Editor {
+ 	ta.CharLimit = -1
+ 	ta.SetVirtualCursor(false)
+ 	ta.Focus()
++
++	// Initialize mode based on current permissions state.
++	initialMode := commands.RegularMode
++	permMode := app.Permissions.GetMode()
++	switch permMode {
++	case permission.ModeYolo:
++		initialMode = commands.YoloMode
++	case permission.ModePlan:
++		initialMode = commands.PlanMode
++	case permission.ModeRegular:
++		initialMode = commands.RegularMode
++	}
++
+ 	e := &editorCmp{
+ 		// TODO: remove the app instance from here
+ 		app:      app,
+ 		textarea: ta,
+ 		keyMap:   DefaultEditorKeyMap(),
++		mode:     initialMode,
+ 	}
+ 	e.setEditorPrompt()
+ 
+diff --git a/internal/tui/components/chat/editor/keys.go b/internal/tui/components/chat/editor/keys.go
+index c20df5cc1c..688fa02db0 100644
+--- a/internal/tui/components/chat/editor/keys.go
++++ b/internal/tui/components/chat/editor/keys.go
+@@ -10,6 +10,7 @@ type EditorKeyMap struct {
+ 	OpenEditor  key.Binding
+ 	Newline     key.Binding
+ 	PasteImage  key.Binding
++	CycleMode   key.Binding
+ }
+ 
+ func DefaultEditorKeyMap() EditorKeyMap {
+@@ -37,6 +38,10 @@ func DefaultEditorKeyMap() EditorKeyMap {
+ 			key.WithKeys("ctrl+v"),
+ 			key.WithHelp("ctrl+v", "paste image from clipboard"),
+ 		),
++		CycleMode: key.NewBinding(
++			key.WithKeys("shift+tab"),
++			key.WithHelp("shift+tab", "cycle mode"),
++		),
+ 	}
+ }
+ 
+@@ -48,6 +53,7 @@ func (k EditorKeyMap) KeyBindings() []key.Binding {
+ 		k.OpenEditor,
+ 		k.Newline,
+ 		k.PasteImage,
++		k.CycleMode,
+ 		AttachmentsKeyMaps.AttachmentDeleteMode,
+ 		AttachmentsKeyMaps.DeleteAllAttachments,
+ 		AttachmentsKeyMaps.Escape,
+diff --git a/internal/tui/components/dialogs/commands/commands.go b/internal/tui/components/dialogs/commands/commands.go
+index 3c86c98456..0b08468e3d 100644
+--- a/internal/tui/components/dialogs/commands/commands.go
++++ b/internal/tui/components/dialogs/commands/commands.go
+@@ -79,11 +79,20 @@ type (
+ 	OpenReasoningDialogMsg struct{}
+ 	OpenExternalEditorMsg  struct{}
+ 	ToggleYoloModeMsg      struct{}
++	CycleModeMsg           struct{}
+ 	CompactMsg             struct {
+ 		SessionID string
+ 	}
+ )
+ 
++type EditorMode int
++
++const (
++	RegularMode EditorMode = iota
++	YoloMode
++	PlanMode
++)
++
+ func NewCommandDialog(sessionID string) CommandsDialog {
+ 	keyMap := DefaultCommandsDialogKeyMap()
+ 	listKeyMap := list.DefaultKeyMap()
+@@ -439,6 +448,15 @@ func (c *commandDialogCmp) defaultCommands() []Command {
+ 				return util.CmdHandler(ToggleYoloModeMsg{})
+ 			},
+ 		},
++		{
++			ID:          "cycle_mode",
++			Title:       "Cycle Mode",
++			Shortcut:    "shift+tab",
++			Description: "Cycle between regular, yolo, and plan mode",
++			Handler: func(cmd Command) tea.Cmd {
++				return util.CmdHandler(CycleModeMsg{})
++			},
++		},
+ 		{
+ 			ID:          "toggle_help",
+ 			Title:       "Toggle Help",
+diff --git a/internal/tui/components/dialogs/models/keys.go b/internal/tui/components/dialogs/models/keys.go
+index ff81404b1f..48340310aa 100644
+--- a/internal/tui/components/dialogs/models/keys.go
++++ b/internal/tui/components/dialogs/models/keys.go
+@@ -15,9 +15,10 @@ type KeyMap struct {
+ 	isAPIKeyHelp  bool
+ 	isAPIKeyValid bool
+ 
+-	isHyperDeviceFlow    bool
+-	isCopilotDeviceFlow  bool
+-	isCopilotUnavailable bool
++	isHyperDeviceFlow     bool
++	isCopilotDeviceFlow   bool
++	isCopilotUnavailable  bool
++	isAnthropicDeviceFlow bool
+ }
+ 
+ func DefaultKeyMap() KeyMap {
+@@ -86,6 +87,19 @@ func (k KeyMap) ShortHelp() []key.Binding {
+ 			k.Close,
+ 		}
+ 	}
++	if k.isAnthropicDeviceFlow {
++		return []key.Binding{
++			key.NewBinding(
++				key.WithKeys("enter"),
++				key.WithHelp("enter", "submit"),
++			),
++			key.NewBinding(
++				key.WithKeys("tab"),
++				key.WithHelp("tab", "switch"),
++			),
++			k.Close,
++		}
++	}
+ 	if k.isCopilotUnavailable {
+ 		return []key.Binding{
+ 			key.NewBinding(
+diff --git a/internal/tui/components/dialogs/models/list.go b/internal/tui/components/dialogs/models/list.go
+index 581122525a..ce41daab4c 100644
+--- a/internal/tui/components/dialogs/models/list.go
++++ b/internal/tui/components/dialogs/models/list.go
+@@ -64,7 +64,8 @@ func (m *ModelListComponent) Init() tea.Cmd {
+ 			hasAPIKeyEnv := strings.HasPrefix(p.APIKey, "$")
+ 			isHyper := p.ID == "hyper"
+ 			isCopilot := p.ID == catwalk.InferenceProviderCopilot
+-			if (hasAPIKeyEnv && p.ID != catwalk.InferenceProviderAzure) || isHyper || isCopilot {
++			isAnthropic := p.ID == catwalk.InferenceProviderAnthropic
++			if (hasAPIKeyEnv && p.ID != catwalk.InferenceProviderAzure) || isHyper || isCopilot || isAnthropic {
+ 				filteredProviders = append(filteredProviders, p)
+ 			}
+ 		}
+diff --git a/internal/tui/page/chat/chat.go b/internal/tui/page/chat/chat.go
+index bb2eb755bf..75d0a96dd3 100644
+--- a/internal/tui/page/chat/chat.go
++++ b/internal/tui/page/chat/chat.go
+@@ -267,7 +267,7 @@ func (p *chatPage) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ 		p.editor = u.(editor.Editor)
+ 		return p, cmd
+ 	case chat.SendMsg:
+-		return p, p.sendMessage(msg.Text, msg.Attachments)
++		return p, p.sendMessage(msg.Text, msg.Attachments, msg.IsPlanMode)
+ 	case chat.SessionSelectedMsg:
+ 		return p, p.setSession(msg)
+ 	case splash.SubmitAPIKeyMsg:
+@@ -388,6 +388,11 @@ func (p *chatPage) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ 		u, cmd := p.editor.Update(msg)
+ 		p.editor = u.(editor.Editor)
+ 		return p, cmd
++	case commands.CycleModeMsg:
++		// update the editor style
++		u, cmd := p.editor.Update(msg)
++		p.editor = u.(editor.Editor)
++		return p, cmd
+ 	case pubsub.Event[history.File], sidebar.SessionFilesMsg:
+ 		u, cmd := p.sidebar.Update(msg)
+ 		p.sidebar = u.(sidebar.Sidebar)
+@@ -404,7 +409,7 @@ func (p *chatPage) Update(msg tea.Msg) (util.Model, tea.Cmd) {
+ 			return p, util.ReportWarn("Agent is busy, please wait before executing a command...")
+ 		}
+ 
+-		cmd := p.sendMessage(msg.Content, nil)
++		cmd := p.sendMessage(msg.Content, nil, false)
+ 		if cmd != nil {
+ 			return p, cmd
+ 		}
+@@ -957,7 +962,7 @@ func (p *chatPage) toggleDetails() {
+ 	p.setShowDetails(!p.showingDetails)
+ }
+ 
+-func (p *chatPage) sendMessage(text string, attachments []message.Attachment) tea.Cmd {
++func (p *chatPage) sendMessage(text string, attachments []message.Attachment, isPlanMode bool) tea.Cmd {
+ 	session := p.session
+ 	var cmds []tea.Cmd
+ 	if p.session.ID == "" {
+@@ -976,7 +981,7 @@ func (p *chatPage) sendMessage(text string, attachments []message.Attachment) te
+ 	}
+ 	cmds = append(cmds, p.chat.GoToBottom())
+ 	cmds = append(cmds, func() tea.Msg {
+-		_, err := p.app.AgentCoordinator.Run(context.Background(), session.ID, text, attachments...)
++		_, err := p.app.AgentCoordinator.RunWithPlanMode(context.Background(), session.ID, text, isPlanMode, attachments...)
+ 		if err != nil {
+ 			isCancelErr := errors.Is(err, context.Canceled)
+ 			isPermissionErr := errors.Is(err, permission.ErrorPermissionDenied)
+diff --git a/internal/tui/styles/charmtone.go b/internal/tui/styles/charmtone.go
+index 44508e5a24..dd8d7ae606 100644
+--- a/internal/tui/styles/charmtone.go
++++ b/internal/tui/styles/charmtone.go
+@@ -73,6 +73,12 @@ func NewCharmtoneTheme() *Theme {
+ 	t.YoloDotsFocused = lipgloss.NewStyle().Foreground(charmtone.Zest).SetString(":::")
+ 	t.YoloDotsBlurred = t.YoloDotsFocused.Foreground(charmtone.Squid)
+ 
++	// Editor: Plan Mode.
++	t.PlanIconFocused = lipgloss.NewStyle().Foreground(charmtone.Pepper).Background(charmtone.Charple).Bold(true).SetString(" # ")
++	t.PlanIconBlurred = t.PlanIconFocused.Foreground(charmtone.Pepper).Background(charmtone.Squid)
++	t.PlanDotsFocused = lipgloss.NewStyle().Foreground(charmtone.Charple).SetString(":::")
++	t.PlanDotsBlurred = t.PlanDotsFocused.Foreground(charmtone.Squid)
++
+ 	// oAuth Chooser.
+ 	t.AuthBorderSelected = lipgloss.NewStyle().BorderForeground(charmtone.Guac)
+ 	t.AuthTextSelected = lipgloss.NewStyle().Foreground(charmtone.Julep)
+diff --git a/internal/tui/styles/theme.go b/internal/tui/styles/theme.go
+index b03603c574..80f1236efd 100644
+--- a/internal/tui/styles/theme.go
++++ b/internal/tui/styles/theme.go
+@@ -92,6 +92,12 @@ type Theme struct {
+ 	YoloDotsFocused lipgloss.Style
+ 	YoloDotsBlurred lipgloss.Style
+ 
++	// Editor: Plan Mode.
++	PlanIconFocused lipgloss.Style
++	PlanIconBlurred lipgloss.Style
++	PlanDotsFocused lipgloss.Style
++	PlanDotsBlurred lipgloss.Style
++
+ 	// oAuth Chooser.
+ 	AuthBorderSelected   lipgloss.Style
+ 	AuthTextSelected     lipgloss.Style
+diff --git a/internal/tui/tui.go b/internal/tui/tui.go
+index 9a51a2497f..2bb339ea76 100644
+--- a/internal/tui/tui.go
++++ b/internal/tui/tui.go
+@@ -269,7 +269,13 @@ func (a *appModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+ 			Model: quit.NewQuitDialog(),
+ 		})
+ 	case commands.ToggleYoloModeMsg:
+-		a.app.Permissions.SetSkipRequests(!a.app.Permissions.SkipRequests())
++		// Forward to current page to update editor UI, which will sync permissions
++		if item, ok := a.pages[a.currentPage]; ok {
++			updated, cmd := item.Update(msg)
++			a.pages[a.currentPage] = updated
++			return a, cmd
++		}
++		return a, nil
+ 	case commands.ToggleHelpMsg:
+ 		a.status.ToggleFullHelp()
+ 		a.showingFullHelp = !a.showingFullHelp
+diff --git a/internal/ui/dialog/models.go b/internal/ui/dialog/models.go
+index 450ee8b99b..39ed97530e 100644
+--- a/internal/ui/dialog/models.go
++++ b/internal/ui/dialog/models.go
+@@ -514,12 +514,13 @@ func getFilteredProviders(cfg *config.Config) ([]catwalk.Provider, error) {
+ 	for _, p := range providers {
+ 		var (
+ 			isAzure         = p.ID == catwalk.InferenceProviderAzure
++			isAnthropic     = p.ID == catwalk.InferenceProviderAnthropic
+ 			isCopilot       = p.ID == catwalk.InferenceProviderCopilot
+ 			isHyper         = string(p.ID) == "hyper"
+ 			hasAPIKeyEnv    = strings.HasPrefix(p.APIKey, "$")
+ 			_, isConfigured = cfg.Providers.Get(string(p.ID))
+ 		)
+-		if isAzure || isCopilot || isHyper || hasAPIKeyEnv || isConfigured {
++		if isAzure || isAnthropic || isCopilot || isHyper || hasAPIKeyEnv || isConfigured {
+ 			filteredProviders = append(filteredProviders, p)
+ 		}
+ 	}
+diff --git a/internal/ui/model/ui.go b/internal/ui/model/ui.go
+index 1b828dffd1..32e0fc60fb 100644
+--- a/internal/ui/model/ui.go
++++ b/internal/ui/model/ui.go
+@@ -705,7 +705,7 @@ func (m *UI) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+ 		} else {
+ 			m.textarea.Placeholder = m.readyPlaceholder
+ 		}
+-		if m.com.App.Permissions.SkipRequests() {
++		if m.com.App.Permissions.GetMode() == permission.ModeYolo {
+ 			m.textarea.Placeholder = "Yolo mode!"
+ 		}
+ 	}
+@@ -1045,6 +1045,7 @@ func (m *UI) handleChildSessionMessage(event pubsub.Event[message.Message]) tea.
+ func (m *UI) handleDialogMsg(msg tea.Msg) tea.Cmd {
+ 	var cmds []tea.Cmd
+ 	action := m.dialog.Update(msg)
++	slog.Info("handleDialogMsg", "action", fmt.Sprintf("%T", action), "msg", fmt.Sprintf("%T", msg))
+ 	if action == nil {
+ 		return tea.Batch(cmds...)
+ 	}
+@@ -1088,9 +1089,13 @@ func (m *UI) handleDialogMsg(msg tea.Msg) tea.Cmd {
+ 
+ 	// Command dialog messages
+ 	case dialog.ActionToggleYoloMode:
+-		yolo := !m.com.App.Permissions.SkipRequests()
+-		m.com.App.Permissions.SetSkipRequests(yolo)
+-		m.setEditorPrompt(yolo)
++		isYolo := m.com.App.Permissions.GetMode() == permission.ModeYolo
++		if isYolo {
++			m.com.App.Permissions.SetMode(permission.ModeRegular)
++		} else {
++			m.com.App.Permissions.SetMode(permission.ModeYolo)
++		}
++		m.setEditorPrompt(!isYolo)
+ 		m.dialog.CloseDialog(dialog.CommandsID)
+ 	case dialog.ActionNewSession:
+ 		if m.isAgentBusy() {
+
+From 517e43caaf00528515167d082913b5d830d626c9 Mon Sep 17 00:00:00 2001
+From: Kieran Klukas <me@dunkirk.sh>
+Date: Thu, 29 Jan 2026 17:20:05 -0500
+Subject: [PATCH 2/3] docs: add plan mode to README and move prompt to template
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Moves plan mode instructions from inline string to
+templates/plan_mode.md and documents the feature in README.
+
+💘 Generated with Crush
+
+Assisted-by: Claude Opus 4.5 via Crush <crush@charm.land>
+---
+ README.md                             | 13 +++++++++++++
+ internal/agent/agent.go               | 17 ++++-------------
+ internal/agent/templates/plan_mode.md | 10 ++++++++++
+ 3 files changed, 27 insertions(+), 13 deletions(-)
+ create mode 100644 internal/agent/templates/plan_mode.md
+
+diff --git a/README.md b/README.md
+index 6e167345dd..dd4ac39dc5 100644
+--- a/README.md
++++ b/README.md
+@@ -349,6 +349,19 @@ permissions. Use this with care.
+ You can also skip all permission prompts entirely by running Crush with the
+ `--yolo` flag. Be very, very careful with this feature.
+ 
++### Plan Mode
++
++Plan mode is a read-only mode where Crush can explore your codebase and create
++implementation plans without making any changes. This is useful for:
++
++- Designing implementation plans before executing
++- Safe codebase exploration
++- Review workflows
++
++In plan mode, write tools (Edit, Write, MultiEdit) are disabled and the agent
++is instructed to only use read-only operations. Press `shift+tab` to cycle
++between Regular, Yolo, and Plan modes.
++
+ ### Disabling Built-In Tools
+ 
+ If you'd like to prevent Crush from using certain built-in tools entirely, you
+diff --git a/internal/agent/agent.go b/internal/agent/agent.go
+index e3cf39033b..c423f71cc3 100644
+--- a/internal/agent/agent.go
++++ b/internal/agent/agent.go
+@@ -57,6 +57,9 @@ var titlePrompt []byte
+ //go:embed templates/summary.md
+ var summaryPrompt []byte
+ 
++//go:embed templates/plan_mode.md
++var planModePrompt []byte
++
+ // Used to remove <think> tags from generated titles.
+ var thinkTagRegex = regexp.MustCompile(`<think>.*?</think>`)
+ 
+@@ -187,19 +190,7 @@ func (a *sessionAgent) Run(ctx context.Context, call SessionAgentCall) (*fantasy
+ 
+ 	// Inject plan mode instructions if enabled.
+ 	if a.permissions != nil && a.permissions.GetMode() == permission.ModePlan {
+-		planModeInstructions := `
+-Plan mode is active. The user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supercedes any other instructions you have received.
+-
+-When in plan mode:
+-- Only use READ-ONLY tools (View, LS, Glob, Grep, lsp_diagnostics, lsp_references, agent, fetch, agentic_fetch, sourcegraph, mcp_sequential-thinking_sequentialthinking, Bash with readonly commands)
+-- DO NOT use Edit, Write, Multiedit, or any tools that modify files
+-- DO NOT run bash commands that modify the system
+-- DO NOT make commits or push changes
+-- Your goal is to explore, understand, and create a plan
+-- Explain what you would do and what files you would change
+-- Ask clarifying questions if needed
+-`
+-		systemPrompt = string(promptPrefix) + planModeInstructions + systemPrompt
++		systemPrompt = string(promptPrefix) + string(planModePrompt) + "\n" + systemPrompt
+ 	} else {
+ 		systemPrompt = string(promptPrefix) + systemPrompt
+ 	}
+diff --git a/internal/agent/templates/plan_mode.md b/internal/agent/templates/plan_mode.md
+new file mode 100644
+index 0000000000..8ab8af669a
+--- /dev/null
++++ b/internal/agent/templates/plan_mode.md
+@@ -0,0 +1,10 @@
++Plan mode is active. The user indicated that they do not want you to execute yet -- you MUST NOT make any edits, run any non-readonly tools (including changing configs or making commits), or otherwise make any changes to the system. This supercedes any other instructions you have received.
++
++When in plan mode:
++- Only use READ-ONLY tools (View, LS, Glob, Grep, lsp_diagnostics, lsp_references, agent, fetch, agentic_fetch, sourcegraph, mcp_sequential-thinking_sequentialthinking, Bash with readonly commands)
++- DO NOT use Edit, Write, Multiedit, or any tools that modify files
++- DO NOT run bash commands that modify the system
++- DO NOT make commits or push changes
++- Your goal is to explore, understand, and create a plan
++- Explain what you would do and what files you would change
++- Ask clarifying questions if needed
+
+From f5afd7432c7c467f6a2af917d3905a80270d9d7f Mon Sep 17 00:00:00 2001
+From: Kieran Klukas <me@dunkirk.sh>
+Date: Thu, 29 Jan 2026 22:22:26 -0800
+Subject: [PATCH 3/3] feat(ui): add plan mode support to internal/ui
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Adds plan mode cycling (shift+tab) and UI styling to the new internal/ui
+path, matching the existing internal/tui implementation.
+
+💘 Generated with Crush
+
+Assisted-by: Claude Opus 4.5 via Crush <crush@charm.land>
+---
+ internal/ui/dialog/actions.go  |  1 +
+ internal/ui/dialog/commands.go |  1 +
+ internal/ui/model/keys.go      |  5 ++++
+ internal/ui/model/ui.go        | 47 +++++++++++++++++++++++++++++++++-
+ internal/ui/styles/styles.go   |  8 ++++++
+ 5 files changed, 61 insertions(+), 1 deletion(-)
+
+diff --git a/internal/ui/dialog/actions.go b/internal/ui/dialog/actions.go
+index b5db016924..f3578473ef 100644
+--- a/internal/ui/dialog/actions.go
++++ b/internal/ui/dialog/actions.go
+@@ -49,6 +49,7 @@ type (
+ 	ActionToggleThinking    struct{}
+ 	ActionExternalEditor    struct{}
+ 	ActionToggleYoloMode    struct{}
++	ActionCycleMode         struct{}
+ 	// ActionInitializeProject is a message to initialize a project.
+ 	ActionInitializeProject struct{}
+ 	ActionSummarize         struct {
+diff --git a/internal/ui/dialog/commands.go b/internal/ui/dialog/commands.go
+index 416f5a0131..f46d807db7 100644
+--- a/internal/ui/dialog/commands.go
++++ b/internal/ui/dialog/commands.go
+@@ -443,6 +443,7 @@ func (c *Commands) defaultCommands() []*CommandItem {
+ 
+ 	return append(commands,
+ 		NewCommandItem(c.com.Styles, "toggle_yolo", "Toggle Yolo Mode", "", ActionToggleYoloMode{}),
++		NewCommandItem(c.com.Styles, "cycle_mode", "Cycle Mode", "shift+tab", ActionCycleMode{}),
+ 		NewCommandItem(c.com.Styles, "toggle_help", "Toggle Help", "ctrl+g", ActionToggleHelp{}),
+ 		NewCommandItem(c.com.Styles, "init", "Initialize Project", "", ActionInitializeProject{}),
+ 		NewCommandItem(c.com.Styles, "quit", "Quit", "ctrl+c", tea.QuitMsg{}),
+diff --git a/internal/ui/model/keys.go b/internal/ui/model/keys.go
+index a42b1e7aa0..62cd591f62 100644
+--- a/internal/ui/model/keys.go
++++ b/internal/ui/model/keys.go
+@@ -11,6 +11,7 @@ type KeyMap struct {
+ 		AddImage    key.Binding
+ 		MentionFile key.Binding
+ 		Commands    key.Binding
++		CycleMode   key.Binding
+ 
+ 		// Attachments key maps
+ 		AttachmentDeleteMode key.Binding
+@@ -128,6 +129,10 @@ func DefaultKeyMap() KeyMap {
+ 		key.WithKeys("/"),
+ 		key.WithHelp("/", "commands"),
+ 	)
++	km.Editor.CycleMode = key.NewBinding(
++		key.WithKeys("shift+tab"),
++		key.WithHelp("shift+tab", "cycle mode"),
++	)
+ 	km.Editor.AttachmentDeleteMode = key.NewBinding(
+ 		key.WithKeys("ctrl+r"),
+ 		key.WithHelp("ctrl+r+{i}", "delete attachment at index i"),
+diff --git a/internal/ui/model/ui.go b/internal/ui/model/ui.go
+index 32e0fc60fb..b007936d44 100644
+--- a/internal/ui/model/ui.go
++++ b/internal/ui/model/ui.go
+@@ -705,8 +705,11 @@ func (m *UI) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+ 		} else {
+ 			m.textarea.Placeholder = m.readyPlaceholder
+ 		}
+-		if m.com.App.Permissions.GetMode() == permission.ModeYolo {
++		switch m.com.App.Permissions.GetMode() {
++		case permission.ModeYolo:
+ 			m.textarea.Placeholder = "Yolo mode!"
++		case permission.ModePlan:
++			m.textarea.Placeholder = "Plan mode!"
+ 		}
+ 	}
+ 
+@@ -1097,6 +1100,12 @@ func (m *UI) handleDialogMsg(msg tea.Msg) tea.Cmd {
+ 		}
+ 		m.setEditorPrompt(!isYolo)
+ 		m.dialog.CloseDialog(dialog.CommandsID)
++	case dialog.ActionCycleMode:
++		mode := m.com.App.Permissions.GetMode()
++		newMode := (mode + 1) % 3
++		m.com.App.Permissions.SetMode(newMode)
++		m.updatePlaceholderForMode()
++		m.dialog.CloseDialog(dialog.CommandsID)
+ 	case dialog.ActionNewSession:
+ 		if m.isAgentBusy() {
+ 			cmds = append(cmds, uiutil.ReportWarn("Agent is busy, please wait before starting a new session..."))
+@@ -1551,6 +1560,11 @@ func (m *UI) handleKeyPressMsg(msg tea.KeyPressMsg) tea.Cmd {
+ 				if cmd != nil {
+ 					cmds = append(cmds, cmd)
+ 				}
++			case key.Matches(msg, m.keyMap.Editor.CycleMode):
++				mode := m.com.App.Permissions.GetMode()
++				newMode := (mode + 1) % 3
++				m.com.App.Permissions.SetMode(newMode)
++				m.updatePlaceholderForMode()
+ 			case key.Matches(msg, m.keyMap.Editor.Commands) && m.textarea.Value() == "":
+ 				if cmd := m.openCommandsDialog(); cmd != nil {
+ 					cmds = append(cmds, cmd)
+@@ -2400,6 +2414,37 @@ func (m *UI) yoloPromptFunc(info textarea.PromptInfo) string {
+ 	return t.EditorPromptYoloDotsBlurred.Render()
+ }
+ 
++// planPromptFunc returns the plan mode editor prompt style.
++func (m *UI) planPromptFunc(info textarea.PromptInfo) string {
++	t := m.com.Styles
++	if info.LineNumber == 0 {
++		if info.Focused {
++			return t.EditorPromptPlanIconFocused.Render()
++		}
++		return t.EditorPromptPlanIconBlurred.Render()
++	}
++	if info.Focused {
++		return t.EditorPromptPlanDotsFocused.Render()
++	}
++	return t.EditorPromptPlanDotsBlurred.Render()
++}
++
++// updatePlaceholderForMode updates the editor prompt based on the current
++// permission mode.
++func (m *UI) updatePlaceholderForMode() {
++	switch m.com.App.Permissions.GetMode() {
++	case permission.ModeYolo:
++		m.textarea.SetPromptFunc(4, m.yoloPromptFunc)
++		m.textarea.Placeholder = "Yolo mode!"
++	case permission.ModePlan:
++		m.textarea.SetPromptFunc(4, m.planPromptFunc)
++		m.textarea.Placeholder = "Plan mode!"
++	default:
++		m.textarea.SetPromptFunc(4, m.normalPromptFunc)
++		m.textarea.Placeholder = m.readyPlaceholder
++	}
++}
++
+ // closeCompletions closes the completions popup and resets state.
+ func (m *UI) closeCompletions() {
+ 	m.completionsOpen = false
+diff --git a/internal/ui/styles/styles.go b/internal/ui/styles/styles.go
+index 455658e7f4..3c734d1661 100644
+--- a/internal/ui/styles/styles.go
++++ b/internal/ui/styles/styles.go
+@@ -144,6 +144,10 @@ type Styles struct {
+ 	EditorPromptYoloIconBlurred lipgloss.Style
+ 	EditorPromptYoloDotsFocused lipgloss.Style
+ 	EditorPromptYoloDotsBlurred lipgloss.Style
++	EditorPromptPlanIconFocused lipgloss.Style
++	EditorPromptPlanIconBlurred lipgloss.Style
++	EditorPromptPlanDotsFocused lipgloss.Style
++	EditorPromptPlanDotsBlurred lipgloss.Style
+ 
+ 	// Radio
+ 	RadioOn  lipgloss.Style
+@@ -1175,6 +1179,10 @@ func DefaultStyles() Styles {
+ 	s.EditorPromptYoloIconBlurred = s.EditorPromptYoloIconFocused.Foreground(charmtone.Pepper).Background(charmtone.Squid)
+ 	s.EditorPromptYoloDotsFocused = lipgloss.NewStyle().MarginRight(1).Foreground(charmtone.Zest).SetString(":::")
+ 	s.EditorPromptYoloDotsBlurred = s.EditorPromptYoloDotsFocused.Foreground(charmtone.Squid)
++	s.EditorPromptPlanIconFocused = lipgloss.NewStyle().MarginRight(1).Foreground(charmtone.Pepper).Background(charmtone.Charple).Bold(true).SetString(" # ")
++	s.EditorPromptPlanIconBlurred = s.EditorPromptPlanIconFocused.Foreground(charmtone.Pepper).Background(charmtone.Squid)
++	s.EditorPromptPlanDotsFocused = lipgloss.NewStyle().MarginRight(1).Foreground(charmtone.Charple).SetString(":::")
++	s.EditorPromptPlanDotsBlurred = s.EditorPromptPlanDotsFocused.Foreground(charmtone.Squid)
+ 
+ 	s.RadioOn = s.HalfMuted.SetString(RadioOn)
+ 	s.RadioOff = s.HalfMuted.SetString(RadioOff)

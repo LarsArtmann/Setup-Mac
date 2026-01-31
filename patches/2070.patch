@@ -1,0 +1,69 @@
+From e4aa1742699db27c2ccd5e9c2b9f4d0948870581 Mon Sep 17 00:00:00 2001
+From: Lars Artmann <git@lars.software>
+Date: Sat, 31 Jan 2026 04:39:39 +0100
+Subject: [PATCH] fix(ui): show grep search parameters in pending state instead
+ of just "Working.."
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Previously, when the grep tool was running (pending state), the UI only displayed
+"● Grep" with an animation, hiding what the tool was actually searching for.
+This was frustrating for users who wanted to see the search pattern, path,
+include filters, and literal mode setting while the grep was in progress.
+
+The root cause was that the tool parameters were parsed AFTER the pending check,
+so they weren't available when rendering the pending state. This commit moves the
+parameter parsing before the pending check, ensuring the full tool header with
+all parameters is available during execution.
+
+Changes:
+- Moved parameter parsing before the pending check in GrepToolRenderContext
+- Updated pending state to call toolHeader with the parsed parameters
+- Added animation rendering to the tool header in pending state
+- Maintains consistency with non-pending state rendering
+
+The user now sees: "● Grep A9041!eAD$80@a9 path=. include=*.go literal=true ..."
+with animation instead of just "● Grep ... animation", providing complete context
+about what the grep tool is searching for while it's running.
+
+File: internal/ui/chat/search.go:95-140
+Function: GrepToolRenderContext.RenderTool
+
+💘 Generated with Crush
+
+Assisted-by: GLM-4.7 via Crush <crush@charm.land>
+---
+ internal/ui/chat/search.go | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/internal/ui/chat/search.go b/internal/ui/chat/search.go
+index 2342f671fd..3ae83fd0b8 100644
+--- a/internal/ui/chat/search.go
++++ b/internal/ui/chat/search.go
+@@ -95,9 +95,6 @@ type GrepToolRenderContext struct{}
+ // RenderTool implements the [ToolRenderer] interface.
+ func (g *GrepToolRenderContext) RenderTool(sty *styles.Styles, width int, opts *ToolRenderOpts) string {
+ 	cappedWidth := cappedMessageWidth(width)
+-	if opts.IsPending() {
+-		return pendingTool(sty, "Grep", opts.Anim)
+-	}
+ 
+ 	var params tools.GrepParams
+ 	if err := json.Unmarshal([]byte(opts.ToolCall.Input), &params); err != nil {
+@@ -115,6 +112,15 @@ func (g *GrepToolRenderContext) RenderTool(sty *styles.Styles, width int, opts *
+ 		toolParams = append(toolParams, "literal", "true")
+ 	}
+ 
++	if opts.IsPending() {
++		header := toolHeader(sty, opts.Status, "Grep", cappedWidth, opts.Compact, toolParams...)
++		var animView string
++		if opts.Anim != nil {
++			animView = opts.Anim.Render()
++		}
++		return header + " " + animView
++	}
++
+ 	header := toolHeader(sty, opts.Status, "Grep", cappedWidth, opts.Compact, toolParams...)
+ 	if opts.Compact {
+ 		return header
