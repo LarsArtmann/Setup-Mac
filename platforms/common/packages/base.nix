@@ -155,6 +155,16 @@
 
       # Hardware monitoring (Linux-only)
       lm_sensors # Hardware monitoring (GPU/CPU temperature)
+
+      # Additional ricing tools discovered from community configs
+      hyprpicker # Color picker for Wayland
+      swappy # Screenshot annotation tool
+      imv # Minimal image viewer
+      wf-recorder # Screen recorder
+      brillo # Brightness control utility
+      pamixer # PulseAudio command line mixer
+      foot # Lightweight Wayland terminal emulator
+      zellij # Modern terminal multiplexer
     ];
 
   # GUI Applications (cross-platform)

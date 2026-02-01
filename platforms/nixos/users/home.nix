@@ -2,6 +2,10 @@
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration
+    ../programs/rofi.nix # Rofi launcher with Catppuccin theme
+    ../programs/wlogout.nix # Power menu with Catppuccin theme
+    ../programs/hyprlock.nix # Lock screen with Catppuccin theme
+    ../programs/hypridle.nix # Idle management daemon
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
     ../modules/hyprland-animated-wallpaper.nix
   ];
@@ -48,6 +52,12 @@
     adwaita-icon-theme
     hicolor-icon-theme
 
+    # GTK Theming
+    catppuccin-gtk
+    papirus-icon-theme
+    libsForQt5.qt5ct
+    qt6.qtbase
+
     # System Tools
     # Note: rofi moved to multi-wm.nix for system-wide availability
     # Note: xdg-utils moved to base.nix for cross-platform consistency
@@ -55,6 +65,7 @@
     # Hyprland-specific packages (moved from desktop/hyprland.nix to avoid NixOS module conflict)
     kitty
     ghostty
+    foot
     hyprpaper
     hyprlock
     hypridle
@@ -66,6 +77,8 @@
     grimblast
     playerctl
     brightnessctl
+    cliphist
+    wl-clipboard
   ];
 
   # XDG configuration (Linux specific)
@@ -101,19 +114,40 @@
     };
   };
 
-  # GTK settings for theme (NOTE: cursor settings don't affect Hyprland compositor)
+  # GTK settings for Catppuccin Mocha theme
   gtk = {
     enable = true;
     font = {
       name = "Sans";
       size = 16; # Increased for TV viewing (2m distance)
     };
+    theme = {
+      name = "Catppuccin-Mocha-Compact-Lavender-Dark";
+      package = pkgs.catppuccin-gtk.override {
+        accents = ["lavender"];
+        size = "compact";
+        variant = "mocha";
+      };
+    };
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
+    cursorTheme = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+      size = 24;
+    };
   };
 
-  # Qt cursor settings for consistency
+  # Qt settings for consistency with GTK
   qt = {
     enable = true;
-    platformTheme.name = "adwaita";
+    platformTheme.name = "gtk2";
+    style = {
+      name = "gtk2";
+      package = pkgs.qt6.qtbase;
+    };
   };
 
   # Kitty terminal configuration (TV-friendly font size)
@@ -131,6 +165,48 @@
       confirm_os_window_close = 0;
       update_check_interval = 0;
       enable_audio_bell = false;
+    };
+  };
+
+  # Foot terminal configuration (lightweight Wayland alternative)
+  programs.foot = {
+    enable = true;
+    settings = {
+      main = {
+        font = "JetBrainsMono Nerd Font:size=12";
+        dpi-aware = "yes";
+        pad = "12x12";
+        shell = "fish";
+      };
+      cursor = {
+        style = "block";
+        blink = "yes";
+      };
+      mouse = {
+        hide-when-typing = "yes";
+      };
+      colors = {
+        alpha = "0.95";
+        background = "1e1e2e";
+        foreground = "cdd6f4";
+        # Catppuccin Mocha colors
+        regular0 = "45475a";  # black
+        regular1 = "f38ba8";  # red
+        regular2 = "a6e3a1";  # green
+        regular3 = "f9e2af";  # yellow
+        regular4 = "89b4fa";  # blue
+        regular5 = "f5c2e7";  # magenta
+        regular6 = "94e2d5";  # cyan
+        regular7 = "bac2de";  # white
+        bright0 = "585b70";   # bright black
+        bright1 = "f38ba8";   # bright red
+        bright2 = "a6e3a1";   # bright green
+        bright3 = "f9e2af";   # bright yellow
+        bright4 = "89b4fa";   # bright blue
+        bright5 = "f5c2e7";   # bright magenta
+        bright6 = "94e2d5";   # bright cyan
+        bright7 = "a6adc8";   # bright white
+      };
     };
   };
 
