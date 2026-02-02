@@ -194,6 +194,12 @@ in {
           "size 800 600,class:^(nvim-bg)$"
           "move 100 720,class:^(nvim-bg)$"
 
+          # Zellij float window rules
+          "float,class:^(zellij-float)$"
+          "size 90% 80%,class:^(zellij-float)$"
+          "center,class:^(zellij-float)$"
+          "noborder,class:^(zellij-float)$"
+
           # Quake terminal rules (dropdown terminal)
           "float,class:^(kitty-quake)$"
           "size 80% 40%,class:^(kitty-quake)$"
@@ -296,6 +302,34 @@ in {
           "$mod SHIFT, Z, exec, ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij attach --create main"
           "$mod CTRL, Z, exec, ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij --layout dev"
 
+          # Zellij session selector via rofi
+          "$mod ALT, Z, exec, ${pkgs.writeShellScriptBin "zellij-session-menu" ''
+            # Get list of zellij sessions
+            sessions=$(${pkgs.zellij}/bin/zellij list-sessions 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1}')
+            # Add "New Session" option
+            options="New Session
+          $sessions"
+            # Show rofi menu
+            selected=$(echo "$options" | ${pkgs.rofi}/bin/rofi -dmenu -p 'Zellij:')
+            if [ "$selected" = "New Session" ]; then
+              ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij
+            elif [ -n "$selected" ]; then
+              ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij attach "$selected"
+            fi
+          ''}/bin/zellij-session-menu"
+
+          # Smart gaps toggle
+          "$mod SHIFT, M, exec, ${pkgs.writeShellScriptBin "toggle-smart-gaps" ''
+            current=$(${pkgs.hyprland}/bin/hyprctl getoption dwindle:no_gaps_when_only -j | ${pkgs.jq}/bin/jq -r '.int')
+            if [ "$current" = "1" ]; then
+              ${pkgs.hyprland}/bin/hyprctl keyword dwindle:no_gaps_when_only 0
+              ${pkgs.libnotify}/bin/notify-send "Smart Gaps" "Disabled"
+            else
+              ${pkgs.hyprland}/bin/hyprctl keyword dwindle:no_gaps_when_only 1
+              ${pkgs.libnotify}/bin/notify-send "Smart Gaps" "Enabled"
+            fi
+          ''}/bin/toggle-smart-gaps"
+
           # Wallpaper cycling
           "SUPER SHIFT, W, exec, ${pkgs.writeShellScriptBin "swww-next" ''
             ${pkgs.swww}/bin/swww img next
@@ -329,6 +363,30 @@ in {
           "$mod, mouse:272, movewindow"
           "$mod, mouse:273, resizewindow"
         ];
+
+        # Submap for resize mode (SUPER+ALT+R to enter, ESC to exit)
+        # Note: Using extraConfig for submap bindings since they require duplicate bind keys
+        extraConfig = ''
+          bind = $mod ALT, R, submap, resize
+
+          submap = resize
+          bind = , right, resizeactive, 20 0
+          bind = , left, resizeactive, -20 0
+          bind = , up, resizeactive, 0 -20
+          bind = , down, resizeactive, 0 20
+          bind = , l, resizeactive, 20 0
+          bind = , h, resizeactive, -20 0
+          bind = , k, resizeactive, 0 -20
+          bind = , j, resizeactive, 0 20
+          bind = SHIFT, right, resizeactive, 50 0
+          bind = SHIFT, left, resizeactive, -50 0
+          bind = SHIFT, up, resizeactive, 0 -50
+          bind = SHIFT, down, resizeactive, 0 50
+          bind = , escape, submap, reset
+          bind = , RETURN, submap, reset
+          bind = $mod, R, submap, reset
+          submap = reset
+        '';
 
         # Performance (all types validated)
         render = {
