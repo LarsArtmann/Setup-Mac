@@ -62,13 +62,24 @@ in {
           "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
           "col.inactive_border" = "rgba(595959aa)";
           layout = "dwindle";
+          # Cursor theme - uses XCursor (bibata-cursors) since hyprcursor version not in nixpkgs
+          # Hyprland will use XCursor fallback automatically
+          cursor_theme = "Bibata-Modern-Classic";
         };
 
-        # hy3 plugin settings (i3-style tiling)
-        # Note: hy3 uses 'plugin {}' nesting in hyprland.conf, but
-        # Home Manager's hy3 module handles plugin config separately.
-        # Most hy3 settings go in the plugin {} section.
-        # See https://github.com/outfoxxed/hy3#config-fields
+        # Dwindle layout with smart gaps
+        dwindle = {
+          # Smart gaps - no gaps when only one window
+          no_gaps_when_only = true;
+          # Other dwindle settings
+          pseudotile = true;
+          preserve_split = true;
+          smart_split = false;
+          smart_resizing = true;
+          special_scale_factor = 0.8;
+          split_bias = 0;
+          default_split_ratio = 1.0;
+        };
 
         # Decoration (nested types validated)
         decoration = {
@@ -86,18 +97,39 @@ in {
           };
         };
 
-        # Animations
+        # Animations with Material Design 3 curves
         animations = {
           enabled = true;
-          bezier = "myBezier, 0.25, 0.46, 0.45, 0.94";
+          # MD3 bezier curves for natural motion
+          bezier = [
+            # Standard - general purpose
+            "md3_standard, 0.2, 0.0, 0.0, 1.0"
+            # Decelerate - entering elements (fast start, slow end)
+            "md3_decel, 0.0, 0.0, 0.0, 1.0"
+            # Accelerate - exiting elements (slow start, fast end)
+            "md3_accel, 0.3, 0.0, 0.8, 0.15"
+            # Emphasized - emphasized motion (overshoot)
+            "md3_emphasized, 0.2, 0.0, 0.0, 1.0"
+            # Legacy fallback
+            "myBezier, 0.25, 0.46, 0.45, 0.94"
+          ];
           animation = [
-            "windows, 1, 3, myBezier, slide"
-            "windowsOut, 1, 2, default, popin 90%"
-            "border, 1, 5, default"
-            "borderangle, 1, 6, default"
-            "fade, 1, 3, default"
-            "workspaces, 1, 0.5, default, slidefadevert"
-            "specialWorkspace, 1, 0.5, default, slidefadevert"
+            # Windows - use decel for smooth entrance
+            "windows, 1, 4, md3_decel, slide"
+            "windowsOut, 1, 3, md3_accel, popin 85%"
+            # Borders - standard motion
+            "border, 1, 5, md3_standard"
+            "borderangle, 1, 6, md3_standard"
+            # Fade - emphasized for visibility
+            "fade, 1, 4, md3_emphasized"
+            "fadeDim, 1, 4, md3_standard"
+            # Workspaces - decel for smooth transitions
+            "workspaces, 1, 3, md3_decel, slidefadevert"
+            "specialWorkspace, 1, 3, md3_decel, slidefadevert"
+            # Layers - standard
+            "layers, 1, 3, md3_standard, slide"
+            # Scroll - quick response
+            "scroll, 1, 2, md3_standard"
           ];
         };
 
@@ -260,6 +292,10 @@ in {
           "$mod, H, exec, ${pkgs.btop}/bin/btop"
           "$mod, F6, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
+          # Zellij integration
+          "$mod SHIFT, Z, exec, ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij attach --create main"
+          "$mod CTRL, Z, exec, ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij --layout dev"
+
           # Wallpaper cycling
           "SUPER SHIFT, W, exec, ${pkgs.writeShellScriptBin "swww-next" ''
             ${pkgs.swww}/bin/swww img next
@@ -271,6 +307,13 @@ in {
           # Window controls
           "$mod, V, togglefloating,"
           "$mod, T, togglefloating,"
+
+          # Grouped windows (tabbed/stacked) - i3-style groups
+          "$mod, G, togglegroup,"
+          "$mod, TAB, changegroupactive, f"
+          "$mod SHIFT, TAB, changegroupactive, b"
+          # Lock/unlock group focus
+          "$mod CTRL, G, lockactivegroup, toggle"
 
           # hy3 layout switching (i3-style tiling)
           "$mod, W, hy3:changegroup, hsplit"

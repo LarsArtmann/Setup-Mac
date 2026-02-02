@@ -6,6 +6,7 @@
     ../programs/wlogout.nix # Power menu with Catppuccin theme
     ../programs/hyprlock.nix # Lock screen with Catppuccin theme
     ../programs/hypridle.nix # Idle management daemon
+    ../programs/zellij.nix # Zellij terminal multiplexer
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
     ../modules/hyprland-animated-wallpaper.nix
   ];
@@ -79,6 +80,7 @@
     brightnessctl
     cliphist
     wl-clipboard
+    zellij # Terminal multiplexer (modern tmux alternative)
   ];
 
   # XDG configuration (Linux specific)
