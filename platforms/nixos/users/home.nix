@@ -81,6 +81,9 @@
     cliphist
     wl-clipboard
     zellij # Terminal multiplexer (modern tmux alternative)
+    # Scripts dependencies
+    jq # JSON processing for hyprctl scripts
+    gawk # Text processing for zellij session menu
   ];
 
   # XDG configuration (Linux specific)

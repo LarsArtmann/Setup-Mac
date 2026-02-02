@@ -276,9 +276,11 @@ in {
           "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
           "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
           "$mod SHIFT, Return, exec, hyprctl reload"
+          # Screenshot and color picker tools
           "$mod, Print, exec, ${pkgs.grimblast}/bin/grimblast copy area"
           "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
           "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
+          "$mod SHIFT, C, exec, ${pkgs.hyprpicker}/bin/hyprpicker -a -f hex" # Color picker with clipboard
           ", XF86AudioRaiseVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%"
           ", XF86AudioLowerVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ -5%"
           ", XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle"
