@@ -25,15 +25,10 @@ pkgs.buildGoModule rec {
       sha256 = "yFprXfDfWxeWrsmhGmXvxrfjD0GK/DVDi6mugdrM/sg=";
     })
     # PR #2068: fix: ensure commands and models dialogs render with borders
-    (pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/pull/2068.patch";
-      sha256 = "sha256:5f30a28e50e0d9a56a82046035d3686d9f67851a8f4519993e570053097e1a4c";
-    })
+    # REMOVED: Already merged and included in v0.39.1 (merged 2026-02-02, released 2026-02-04)
     # PR #2019: feat: Plan mode with readonly permission enforcement
-    (pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/pull/2019.patch";
-      sha256 = "sha256:c68f4835de3bdb0ec75cf79033b3499bc9ac495ba8a96e8a9263072f020b4c32";
-    })
+    # TEMPORARILY REMOVED - Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132 in permission.go)
+    # Will re-add once conflict is resolved
     # PR #2070: fix(ui): show grep search parameters in pending state
     (pkgs.fetchurl {
       url = "https://github.com/charmbracelet/crush/pull/2070.patch";
