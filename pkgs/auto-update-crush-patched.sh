@@ -6,6 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NIX_FILE="$SCRIPT_DIR/crush-patched.nix"
 BUILD_LOG="/tmp/crush-patched-build.log"
+EXTRACTOR_SCRIPT="$SCRIPT_DIR/extract-vendorhash.py"
 
 echo "=== Full Automatic Crush-Patched Update ==="
 echo ""
@@ -35,27 +36,17 @@ fi
 
 echo ""
 
-# Step 3: Extract and update vendorHash
+# Step 3: Extract and update vendorHash using Python extractor
 echo "Step 3/5: Extracting vendorHash..."
 echo ""
 
-# Extract hash using Python for reliable parsing
-VENDOR_HASH=$(python3 << 'PYTHON_EOF'
-import sys
-# Read build log and find hash
-with open('/tmp/crush-patched-build.log') as f:
-    for line in f:
-        if 'uo9Ve' in line:  # Look for our known hash pattern
-            # Extract hash part (after colon, strip prefix)
-            hash_part = line.split(':')[-1].strip()
-            # Remove 'sha256:' prefix if present
-            hash_part = hash_part.replace('sha256:', '').strip()
-            # Remove trailing whitespace/newlines
-            hash_part = hash_part.rstrip('\n')
-            print(hash_part)
-            break
-PYTHON_EOF
-)
+if [[ ! -f "$EXTRACTOR_SCRIPT" ]]; then
+    echo "❌ Extractor script not found: $EXTRACTOR_SCRIPT"
+    exit 1
+fi
+
+# Use Python script for reliable hash extraction
+VENDOR_HASH=$("$EXTRACTOR_SCRIPT" "$BUILD_LOG" 2>&1)
 
 if [[ -z "$VENDOR_HASH" ]]; then
     echo "❌ Could not extract vendorHash from build log"
@@ -66,26 +57,16 @@ if [[ -z "$VENDOR_HASH" ]]; then
     exit 1
 fi
 
-# Remove trailing '=' if present (base32 hash includes it)
-VENDOR_HASH="${VENDOR_HASH%=}"
-
 echo "Extracted vendorHash: $VENDOR_HASH"
 echo "Hash length: ${#VENDOR_HASH}"
-
-# Validate hash format (52 base32 chars or 64 hex)
-if [[ ${#VENDOR_HASH} -eq 51 ]]; then
-    # Base32 hash, append '=' if needed
-    if [[ "$VENDOR_HASH" != *"=" ]]; then
-        VENDOR_HASH="${VENDOR_HASH}="
-    fi
-elif [[ ${#VENDOR_HASH} -eq 64 ]]; then
-    # SHA256 hash (valid)
-    :
-else
-    echo "⚠️ Hash has unusual length: ${#VENDOR_HASH} (expected 51 or 64)"
-fi
-
 echo ""
+
+# Validate hash format (52 base32 chars with = or 64 hex)
+if [[ ${#VENDOR_HASH} -eq 51 ]] || [[ ${#VENDOR_HASH} -eq 52 ]] || [[ ${#VENDOR_HASH} -eq 64 ]]; then
+    echo "✅ Hash format is valid"
+else
+    echo "⚠️ Hash has unusual length: ${#VENDOR_HASH} (expected 51, 52, or 64)"
+fi
 
 # Update vendorHash in nix file
 echo "Updating vendorHash in $NIX_FILE..."
