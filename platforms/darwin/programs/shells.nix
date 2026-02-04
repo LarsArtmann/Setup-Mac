@@ -38,6 +38,8 @@
           fish_add_path --prepend --global ~/.nix-profile/bin
           fish_add_path --prepend --global /run/current-system/sw/bin
           fish_add_path --prepend --global /etc/profiles/per-user/$USER/bin
+          fish_add_path --prepend --global /usr/local/bin
+          fish_add_path --prepend --global ~/.orbstack/bin
       else
           if not contains ~/.nix-profile/bin $fish_user_paths
               set --global fish_user_paths ~/.nix-profile/bin $fish_user_paths
@@ -47,6 +49,12 @@
           end
           if not contains /etc/profiles/per-user/$USER/bin $fish_user_paths
               set --global fish_user_paths /etc/profiles/per-user/$USER/bin $fish_user_paths
+          end
+          if not contains /usr/local/bin $fish_user_paths
+              set --global fish_user_paths /usr/local/bin $fish_user_paths
+          end
+          if not contains ~/.orbstack/bin $fish_user_paths
+              set --global fish_user_paths ~/.orbstack/bin $fish_user_paths
           end
       end
 
@@ -80,6 +88,10 @@
       # Nix profile PATH (Darwin-specific)
       export PATH="$HOME/.nix-profile/bin:$PATH"
 
+      # OrbStack and local binaries (kubectl, docker, etc.)
+      export PATH="/usr/local/bin:$PATH"
+      export PATH="$HOME/.orbstack/bin:$PATH"
+
       # COMPLETIONS: Universal completion engine (1000+ commands)
       if command -v carapace >/dev/null 2>&1; then
         source <(carapace _carapace zsh)
@@ -95,6 +107,10 @@
 
       # Nix profile PATH (Darwin-specific)
       export PATH="$HOME/.nix-profile/bin:$PATH"
+
+      # OrbStack and local binaries (kubectl, docker, etc.)
+      export PATH="/usr/local/bin:$PATH"
+      export PATH="$HOME/.orbstack/bin:$PATH"
 
       # COMPLETIONS: Universal completion engine (1000+ commands)
       if command -v carapace >/dev/null 2>&1; then

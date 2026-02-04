@@ -55,6 +55,14 @@
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
     };
 
+    # Homebrew casks for GUI applications not available in nixpkgs
+    homebrew = {
+      enable = true;
+      casks = [
+        "headlamp" # Kubernetes dashboard GUI
+      ];
+    };
+
     # Pin Go to version 1.26
     nixpkgs.overlays = [
       (final: prev: {

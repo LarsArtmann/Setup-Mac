@@ -37,6 +37,24 @@
 
     # Add nix-colors for declarative color schemes
     nix-colors.url = "github:misterio77/nix-colors";
+
+    # Add nix-homebrew for declarative Homebrew management
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Homebrew bundle for cask management
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+
+    # Homebrew cask for headlamp and other GUI apps
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
@@ -49,6 +67,9 @@
     llm-agents,
     nix-visualize,
     nix-colors,
+    nix-homebrew,
+    homebrew-bundle,
+    homebrew-cask,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -100,6 +121,22 @@
             inherit nix-colors;
           };
           modules = [
+            # Import nix-homebrew for declarative Homebrew management
+            nix-homebrew.darwinModules.nix-homebrew
+            {
+              nix-homebrew = {
+                enable = true;
+                enableRosetta = true;
+                user = "larsartmann";
+                autoMigrate = true;
+                # Pin Homebrew taps to flake inputs for reproducibility
+                taps = {
+                  "homebrew/bundle" = homebrew-bundle;
+                  "homebrew/cask" = homebrew-cask;
+                };
+              };
+            }
+
             # Import Home Manager module for Darwin
             inputs.home-manager.darwinModules.home-manager
 
