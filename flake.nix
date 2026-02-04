@@ -18,10 +18,16 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
 
     # Add NUR (Nix User Repository) for other packages
-    nur.url = "github:nix-community/NUR";
+    nur = {
+      url = "github:nix-community/NUR";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Add llm-agents.nix for CRUSH and other AI tools
-    llm-agents.url = "github:numtide/llm-agents.nix";
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Helium Browser
     helium = {
@@ -39,10 +45,7 @@
     nix-colors.url = "github:misterio77/nix-colors";
 
     # Add nix-homebrew for declarative Homebrew management
-    nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
     # Homebrew bundle for cask management
     homebrew-bundle = {
