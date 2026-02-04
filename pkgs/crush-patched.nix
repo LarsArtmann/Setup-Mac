@@ -66,7 +66,7 @@ pkgs.buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  vendorHash = lib.fakeHash;
+  vendorHash = "sha256-uo9VelhRjtWiaYI88+eTk9PxAUE18Tu2pNq4qQqoTwk";
 
   meta = with lib; {
     description = "Crush with Lars' PR patches applied";
