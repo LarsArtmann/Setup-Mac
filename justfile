@@ -45,7 +45,14 @@ update:
     @echo "📦 Updating system packages..."
     @echo "Updating Nix flake..."
     nix flake update
+    @echo ""
+    @echo "Updating crush-patched to latest version..."
+    @./pkgs/update-crush-patched.sh || echo "⚠️  crush-patched update skipped (manual intervention needed)"
     @echo "✅ System updated"
+    @echo ""
+    @echo "💡 Next steps:"
+    @echo "   - Run 'just switch' to apply changes"
+    @echo "   - If crush-patched was updated, run 'just crush-full-update' to complete the process"
 
 # ActivityWatch manual control commands
 activitywatch-start:
@@ -1051,7 +1058,7 @@ help:
     @echo "Main Commands:"
     @echo "  setup          - Complete initial setup (run after cloning)"
     @echo "  switch         - Apply Nix configuration changes"
-    @echo "  update         - Update all packages and system"
+    @echo "  update         - Update Nix flake, packages, and crush-patched"
     @echo "  clean          - Clean up caches and old packages"
     @echo ""
     @echo "Development:"
@@ -1108,12 +1115,60 @@ help:
     @echo "  pre-commit-run     - Run pre-commit on all files"
     @echo "  status             - Show git status and recent commits"
     @echo ""
+    @echo "Crush-Patched Management:"
+    @echo "  crush-update         - Update to latest Crush release (manual workflow)"
+    @echo "  crush-full-update    - Full auto-update workflow (builds & verifies)"
+    @echo "  crush-build          - Build crush-patched"
+    @echo "  crush-info           - Show current version and patches"
+    @echo ""
     @echo "Utilities:"
     @echo "  info           - Show system information"
     @echo "  ssh-setup      - Create SSH directories"
     @echo "  rollback       - Emergency rollback to previous generation"
     @echo ""
     @echo "Run 'just <command>' to execute any task."
+
+# Crush-Patched Management
+# ======================
+
+# Update crush-patched to latest release
+crush-update:
+    @echo "🔄 Updating crush-patched to latest version..."
+    ./pkgs/update-crush-patched.sh
+
+# Build crush-patched to get vendorHash
+crush-build:
+    @echo "🔨 Building crush-patched..."
+    nix build .#crush-patched 2>&1 | tee /tmp/crush-build.log
+
+# Auto-update vendorHash after build
+crush-fix-hash:
+    @echo "🔧 Extracting vendorHash from build log..."
+    @HASH=$(grep -oP 'got: *\K[^\s]+' /tmp/crush-build.log | head -1); \
+    if [[ -z "$$HASH" ]]; then \
+        echo "❌ No vendorHash found in build log"; \
+        echo "   Run 'just crush-build' first"; \
+    else \
+        echo "Found vendorHash: $$HASH"; \
+        echo "Updating pkgs/crush-patched.nix..."; \
+        sed -i '' 's|vendorHash = "sha256:[^"]*";|vendorHash = "'$$HASH'";|' pkgs/crush-patched.nix; \
+        echo "✅ vendorHash updated"; \
+        echo "Run 'just crush-build' to rebuild with correct hash"; \
+    fi
+
+# Full workflow: update, build, fix hash, rebuild, verify
+crush-full-update:
+    @echo "🚀 Running full crush-patched update workflow..."
+    @./pkgs/auto-update-crush-patched.sh
+
+# Show current crush-patched version info
+crush-info:
+    @echo "📋 Crush-Patched Information"
+    @echo "=========================="
+    @grep -A 3 "pname = \"crush-patched\"" pkgs/crush-patched.nix | head -4 | sed 's/^/  /'
+    @echo ""
+    @echo "Patches applied:"
+    @grep -E "PR #|pull/.*patch" pkgs/crush-patched.nix | sed 's/^/  /'
 
 # Documentation Management Commands
 # ================================
