@@ -1,6 +1,6 @@
 # Setup-Mac: AGENT GUIDE
 
-**Last Updated:** 2025-12-06
+**Last Updated:** 2026-02-05
 **Project Type:** Cross-Platform Nix Configuration (macOS + NixOS)
 **Architecture:** Declarative System Configuration with Type Safety
 
@@ -16,6 +16,164 @@ Setup-Mac is a comprehensive, production-ready Nix-based configuration system fo
 - **Ghost Systems Integration**: Advanced type-safe architecture patterns
 - **Development Environment**: Complete toolchain for Go, TypeScript, AI/ML development
 - **Security-First**: Built-in security tools and configurations
+
+## 🤖 AI BEHAVIOR GUIDELINES
+
+### Decision Protocols
+
+AI assistants working on this project must follow these decision-making patterns:
+
+#### One Alternative Protocol
+For straightforward decisions with clear best practices:
+1. **Present your recommendation confidently** with rationale
+2. **Offer exactly one alternative** with a single reason for dismissal
+3. **Execute immediately** - no waiting for confirmation on obvious choices
+
+*Example: "I'll use `pkgs.stdenv.isLinux` for platform detection - it's the standard Nix pattern. Alternative: custom `isDarwin` function - dismissed as unnecessary abstraction. Proceeding with implementation."*
+
+#### Complex Decision Protocol
+For tasks with 3+ valid approaches:
+1. **Present top 2-3 strongest candidates** with tradeoffs
+2. **State your recommendation** clearly
+3. **Dismiss others by category** (e.g., "Options 4-10: excessive complexity, poor maintainability, or scope creep")
+4. **Execute** unless user requests discussion
+
+*Example: "For DNS management: (1) Technitium DNS - full control but complex, (2) dnsmasq - simple but limited features, (3) systemd-resolved - integrated but less flexible. Recommend Technitium for this homelab use case. Dismissing others: cloud options add unnecessary external dependencies, manual configuration lacks automation. Proceeding with Technitium setup."*
+
+### Communication Standards
+
+- **Keep responses under 4 lines** unless detail explicitly requested
+- **Answer directly** without preamble ("I'll...", "Here's...")
+- **No postamble** ("Let me know...", "Hope this helps...")
+- **One-word answers** when sufficient
+- **No emojis ever** in technical output
+- **Use rich Markdown** for multi-sentence answers (headings, lists, code blocks)
+- **Never use** the construction "This is not THIS — it is THAT" (sounds manufactured)
+
+### Context Sensitivity
+
+**Engineering Mode** (default): Full standards, decision protocols active, READ → UNDERSTAND → RESEARCH → THINK → REFLECT → Execute.
+
+**Exploration Mode** (detected by signals):
+- Open-ended questions ("What do you think about...", "Explain...", "Research...")
+- Brainstorming or ideation requests
+- "Should I...", "Compare...", "Pros and cons..."
+
+In exploration mode:
+- Multiple options welcome
+- Discuss angles and approaches
+- Ask clarifying questions
+- Return to Engineering Mode on explicit build requests ("Do it", "Implement", "Add this")
+
+### Task Management
+
+For complex, multi-step tasks, use structured todo lists to track progress:
+
+**When to Use:**
+- Tasks requiring 3+ distinct steps or actions
+- Non-trivial work requiring careful planning
+- User explicitly requests todo list management
+- Multiple tasks provided (numbered or comma-separated)
+- After receiving new instructions to capture requirements
+
+**Task States:**
+- **pending**: Task not yet started
+- **in_progress**: Currently working on (limit to ONE task at a time)
+- **completed**: Task finished successfully
+
+**Task Management Rules:**
+1. **Update status in real-time** as work progresses
+2. **Mark tasks complete IMMEDIATELY** after finishing (don't batch)
+3. **Exactly ONE task in_progress** at any time (not less, not more)
+4. **Complete current tasks** before starting new ones
+5. **Remove irrelevant tasks** from the list entirely
+
+**Requirements for Each Task:**
+- **content**: Imperative form ("Run tests", "Build the project")
+- **active_form**: Present continuous ("Running tests", "Building the project")
+
+**Completion Requirements:**
+- ONLY mark complete when FULLY accomplished
+- Never mark complete if: tests failing, implementation partial, unresolved errors, missing dependencies
+- If blocked: keep as in_progress, create new task describing what needs resolution
+
+### Sub-Agent Context Requirements
+
+When delegating to sub-agents, provide COMPREHENSIVE context:
+
+**Required Context:**
+- **Project background**: What we're building and why
+- **Current task context**: Where this fits in the larger goal
+- **Technical stack**: Current project's technology choices
+- **Code patterns**: Existing conventions and architecture
+- **User preferences**: Technology stack, coding standards, constraints
+- **Safety preferences**: Tool preferences and safety requirements
+- **Test status**: Current test failures and successes
+- **Architecture decisions**: Key architectural choices and patterns
+- **Quality standards**: Code quality tools and standards in use
+
+**Context Mandate:**
+- NEVER send sub-agents without sufficient context
+- Include file paths, relevant code snippets, and error messages
+- Provide example patterns from the codebase
+- State expected outcomes clearly
+
+### Error Handling Protocol
+
+**When errors occur:**
+1. **Read complete error message** - Don't skim, understand root cause
+2. **Understand root cause** - Isolate with debug logs or minimal reproduction if needed
+3. **Try different approaches** - Don't repeat same action
+4. **Search for similar code that works** - Find working patterns in codebase
+5. **Make targeted fix** - Address root cause, not symptoms
+6. **Test to verify** - Confirm fix works
+
+**For each error, attempt at least 2-3 distinct strategies before concluding the problem is externally blocked.**
+
+**Specific Error Types:**
+
+| Error Type | Remediation Strategy |
+|------------|---------------------|
+| Import/Module | Check paths, spelling, verify what exists |
+| Syntax | Check brackets, indentation, typos |
+| Tests fail | Read test, see what it expects |
+| File not found | Use `ls`, check exact path |
+| Edit tool "old_string not found" | View file again, copy EXACT text including whitespace |
+
+**Escalation Protocol:**
+- **Stop on first error** - Don't continue with broken state
+- **Rollback incomplete changes** - Revert to last working state
+- **Escalate blocking issues** - Ask user for resolution when stuck
+- **Log error context thoroughly** - Capture environment, inputs, stack traces
+
+### Tool Usage Priorities
+
+**Preferred Tools (in order):**
+
+| Priority | Tool | Use For |
+|----------|------|---------|
+| 1 | **Agent** | Open-ended searches requiring multiple rounds |
+| 2 | **Glob/Grep** | Pattern matching and content search |
+| 3 | **View/Read** | File examination and content analysis |
+| 4 | **Edit/MultiEdit** | Precise file modifications |
+| 5 | **Bash** | Commands that modify system state |
+
+**Tool Selection Rules:**
+- **Use Agent tool** for complex, multi-step tasks requiring exploration
+- **Use Glob/Grep** instead of bash `find`/`grep` (handles permissions correctly)
+- **Use `rg` (ripgrep)** in bash over `grep` for command line search
+- **Batch operations** - Multiple tool calls in single response when efficient
+- **Never use `curl`** through bash - use `fetch` tool instead
+- **Prefer `fetch`** with `format=markdown` over `text` or `html`
+
+**Research Workflow:**
+1. Use **Agent** for complex searches
+2. Use **Glob** to find relevant files
+3. Use **Grep** to search contents
+4. Use **View** to examine specific files
+5. Use **Edit** for modifications
+
+---
 
 ## 🏗️ ARCHITECTURE
 
@@ -368,6 +526,29 @@ just monitor-all        # Start comprehensive monitoring
 - **Pre-commit hooks**: Gitleaks, trailing whitespace, Nix syntax
 - **Comprehensive health check**: `just health` for full system validation
 
+### Testing Philosophy
+
+**Core Principles:**
+- **Build-before-test policy** - TypeScript/Nix compilation MUST pass before running tests
+- **Test behavior, not implementation** - Focus on what code does, not how
+- **Integration tests over unit tests** where possible
+- **Real implementations over mocks** - Avoid excessive mocking
+- **E2E tests** for critical user paths
+- **MANY tests** with comprehensive coverage
+- **Test infrastructure** that's maintainable and fast
+
+**Nix-Specific Testing:**
+- **Fast syntax check**: `just test-fast` (no build)
+- **Full build verification**: `just test` (builds without applying)
+- **Evaluation testing**: `nix-instantiate --eval` for syntax validation
+- **Flake checking**: `nix flake check --no-build` for quick validation
+- **Platform testing**: Test both Darwin and NixOS configurations
+
+**Test Command Priority:**
+1. `just test-fast` - Syntax only (fastest)
+2. `nix flake check --no-build` - Flake validation
+3. `just test` - Full build (slowest, most thorough)
+
 ### Validation Commands
 ```bash
 # Configuration validation
@@ -430,6 +611,92 @@ just go-check          # Run gopls language server check
 - **Small, atomic commits** with comprehensive messages
 - **Feature branches** for all work
 - **ALWAYS** use `git mv` instead of `mv` for file moves
+
+### Git Commit Standards
+
+**Commit Workflow (ALWAYS follow this sequence):**
+1. `git status` - Check what files are changed
+2. `git diff` - Review all changes being committed
+3. `git add <files>` - Stage specific files (never `git add .`)
+4. `git commit` - With detailed commit message
+5. `git push` - Push changes immediately
+
+**Commit Message Format:**
+```
+type(scope): brief description
+
+- Detailed explanation of what was changed
+- Why it was changed (business/technical reason)
+- Any side effects or considerations
+- Link to issues/tickets if applicable
+
+💘 Generated with Crush
+```
+
+**Commit Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, semicolons)
+- `refactor`: Code refactoring
+- `test`: Adding or updating tests
+- `chore`: Build process or auxiliary tool changes
+- `build`: Changes affecting build system
+- `ci`: CI/CD configuration changes
+
+**Commit Rules:**
+- **Done? Commit.** - Finish a feature/fix/change → `git commit` immediately
+- One logical change per commit
+- Don't accumulate large changesets
+- Include TODOs in commit messages for future work
+- **Never force push** - Use `--force-with-lease` only if really needed and with user approval
+- **Never `git reset --hard`** - Only if really needed, with user approval, and zero uncommitted changes
+
+### Code Conventions & Standards
+
+**Nix Code:**
+- Use 2-space indentation for Nix expressions
+- Prefer `let...in` over nested `with` for explicit dependencies
+- Use `lib.optional` and `lib.optionals` for conditional lists
+- Prefer `mkMerge` over nested conditionals for complex configs
+- Use descriptive variable names (e.g., `cfg` for config, `pkgs` for packages)
+- Comment complex logic with "why" not "what"
+
+**Shell Scripts:**
+- Use `#!/usr/bin/env bash` shebang for portability
+- Quote all variables: `"${variable}"`
+- Use `set -euo pipefail` for strict mode
+- Prefer `[[ ]]` over `[ ]` for conditionals
+- Use functions for reusable logic
+- Document with comments for non-obvious operations
+
+**Documentation:**
+- Update AGENTS.md when discovering new patterns
+- Comment "why" not "what" in code
+- Use Markdown for all documentation
+- Keep line length under 100 characters in docs
+
+### Immediate Refactoring Rules (Automatic)
+
+**When these conditions are detected, fix immediately:**
+
+| Condition | Action | Priority |
+|-----------|--------|----------|
+| Functions >30 lines | Break into smaller functions | High |
+| Duplicate code >3 instances | Extract to shared utility | High |
+| Nested conditionals >3 levels | Use early returns | Medium |
+| Magic numbers/strings | Extract to named constants | Medium |
+| Files >300 lines | Split into focused modules | Medium |
+| TODO items >1 week old | Address or remove | Low |
+| Large log files | Implement log rotation | High |
+| Broken links/references | Fix immediately | High |
+| Missing dependencies | Install now | High |
+| Deprecated packages | Update/replace within 24h | Medium |
+
+**Zero Tolerance Policy:**
+- Don't leave warnings or inconsistencies
+- Fix immediately (5-minute rule for simple issues)
+- If it takes >5 minutes, create tracked task
 
 ---
 
@@ -496,6 +763,30 @@ sudo nixos-rebuild build --flake .#evo-x2
 - **ntopng**: Network monitoring at http://localhost:3000
 - **Built-in benchmarks**: `just benchmark-all`
 
+### Performance Guidelines
+
+**Optimization Rules:**
+- **Measure before optimizing** - Use automated profiling tools only
+- **Correctness first** - Readable code over premature optimization
+- **Use production monitoring AFTER functional** - Performance issues caught by observability
+
+**Nix Performance:**
+- **Fast syntax check**: `just test-fast` for quick iteration
+- **Avoid unnecessary builds**: Use `--no-build` for flake checks
+- **Binary caches**: Use Nix binary caches to avoid rebuilding
+- **Garbage collection**: Regular `just clean` to free disk space
+
+**Shell Performance:**
+- **Target**: Shell startup under 2 seconds
+- **Benchmark**: `just benchmark` for shell startup timing
+- **Profile**: `just debug` for verbose startup logging
+- **Lazy loading**: Defer heavy initialization until needed
+
+**Performance Testing Policy:**
+- **NO manual performance testing** - All validation must be automated
+- **NO benchmark prompting** - Don't suggest unless specifically requested
+- **Focus on correctness first** - Readable code over premature optimization
+
 ### Maintenance Commands
 ```bash
 # Regular maintenance (weekly)
@@ -524,10 +815,31 @@ just clean-backups      # Clean old backups (keep last 10)
 - **Encryption**: Age for modern file encryption
 
 ### Security Practices
+
+**Secret Management:**
 - **No hardcoded secrets** - Use environment variables or private files
-- **Pre-commit hooks** prevent accidental secret commits
-- **Regular updates** via `just update`
-- **Audit tools**: Gitleaks, security scanning
+- **Use `~/.env.private`** for local secrets (not tracked in git)
+- **KeyChain for macOS** - Store sensitive data in macOS KeyChain
+- **Pre-commit hooks** prevent accidental secret commits via Gitleaks
+
+**Development Security:**
+- **Regular updates** via `just update` to patch vulnerabilities
+- **Audit tools**: Gitleaks, security scanning in CI/CD
+- **Dependency scanning** - Monitor Nix packages for CVEs
+- **Least privilege** - Use minimal required permissions
+
+**Nix-Specific Security:**
+- **Pure builds** - Use `--pure` flag for reproducible builds
+- **Sandboxing** - Leverage Nix build sandboxing
+- **Content-addressed** - Nix store paths are content-hashed
+- **Pinned dependencies** - Lock files ensure reproducible builds
+
+**Verification Commands:**
+```bash
+just pre-commit-run     # Check for secrets
+just security-scan      # Run security audit (if available)
+nix-store --verify      # Verify store integrity
+```
 
 ---
 
@@ -615,6 +927,33 @@ just benchmark-all     # Performance analysis
 
 ---
 
+## ✅ PRE-COMPLETION CHECKLIST
+
+Before marking any task as complete, verify:
+
+### Code Quality
+- [ ] **Static Analysis**: Appropriate linter passes without warnings
+- [ ] **Type Checking**: Type checking passes with strict mode when available
+- [ ] **Build Success**: Build compiles without errors
+- [ ] **Test Coverage**: All tests pass with high coverage
+- [ ] **Security Scan**: No hardcoded secrets or vulnerabilities
+- [ ] **Documentation**: Public APIs documented with examples
+
+### Nix-Specific Checks
+- [ ] **Nix Syntax**: `nix-instantiate --eval` passes on changed files
+- [ ] **Flake Check**: `nix flake check --no-build` passes
+- [ ] **Type Safety**: All configurations validate through core system
+- [ ] **No Eval Errors**: `just test-fast` passes
+- [ ] **Platform Valid**: Both Darwin and NixOS configurations eval successfully
+
+### Final Verification
+- [ ] **Manual Testing**: Changes tested in real environment
+- [ ] **Rollback Plan**: Can revert to previous state if needed
+- [ ] **Documentation Updated**: AGENTS.md updated if patterns discovered
+- [ ] **No Breaking Changes**: Backward compatibility maintained
+
+---
+
 ## 🎯 SUCCESS CRITERIA
 
 ### Working Configuration
@@ -631,4 +970,36 @@ just benchmark-all     # Performance analysis
 
 ---
 
-*This AGENTS.md file is maintained as part of the Setup-Mac project. Last updated: 2025-12-06*
+## 📝 CONTINUOUS IMPROVEMENT
+
+### When to Write Suggestions
+
+If you learn something non-obvious about the user, project, or workflow that future sessions should know:
+
+**Create a suggestion file:**
+```bash
+# Location: ~/.config/crush/suggestions/
+# Format: <YYYY-MM-DD_hh-mm>-<project-name>-<brief-title>.md
+```
+
+**Content guidelines:**
+- One insight per file
+- Concise and actionable
+- No fluff or filler
+- Focus on non-obvious patterns
+
+**Do not edit** `~/.config/crush/AGENTS.md` **directly.**
+
+### Knowledge Capture Triggers
+
+Capture insights when you discover:
+- Undocumented workarounds or hacks
+- Non-obvious tool behaviors
+- User preferences not in AGENTS.md
+- Project-specific quirks
+- Performance optimizations
+- Security considerations
+
+---
+
+*This AGENTS.md file is maintained as part of the Setup-Mac project. Last updated: 2026-02-05*
