@@ -53,6 +53,9 @@
     nixpkgs.config = {
       allowUnfree = true;
       allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
+      permittedInsecurePackages = [
+        "google-chrome-144.0.7559.97"
+      ];
     };
 
     # Homebrew casks for GUI applications not available in nixpkgs
