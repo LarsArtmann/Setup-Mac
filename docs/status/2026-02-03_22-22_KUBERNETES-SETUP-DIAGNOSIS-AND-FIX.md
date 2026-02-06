@@ -1,10 +1,10 @@
 # Kubernetes Setup Diagnosis and Fix Report
 
-**Date:** 2026-02-03 22:22:25  
-**Status:** IN PROGRESS  
-**Priority:** HIGH  
-**Reporter:** User (larsartmann)  
-**Investigator:** Crush AI Assistant  
+**Date:** 2026-02-03 22:22:25
+**Status:** IN PROGRESS
+**Priority:** HIGH
+**Reporter:** User (larsartmann)
+**Investigator:** Crush AI Assistant
 
 ---
 
@@ -204,7 +204,7 @@ Initial `just switch` or `just test` takes 5-15 minutes because:
 warning: input 'nix-homebrew' has an override for a non-existent input 'nixpkgs'
 ```
 
-**Impact:** Low - does not affect functionality  
+**Impact:** Low - does not affect functionality
 **Fix:** Remove `inputs.nixpkgs.follows = "nixpkgs";` from nix-homebrew input
 
 ### 2. Observation: No System-Wide Fish Config
@@ -295,6 +295,6 @@ After running `just switch` and opening a new terminal, all kubernetes tools wil
 
 ---
 
-**Report Generated:** 2026-02-03 22:22:25  
-**Next Review:** After `just switch` completion  
+**Report Generated:** 2026-02-03 22:22:25
+**Next Review:** After `just switch` completion
 **Status:** AWAITING USER ACTION (run `just switch`)

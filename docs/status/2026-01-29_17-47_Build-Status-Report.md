@@ -1,8 +1,8 @@
 # Crush-Patched Nix Build Status Report
 
-**Date:** 2026-01-29  
-**Time:** 17:47  
-**Status:** BUILD IN PROGRESS  
+**Date:** 2026-01-29
+**Time:** 17:47
+**Status:** BUILD IN PROGRESS
 **Author:** Crush AI Assistant
 
 ---
@@ -11,8 +11,8 @@
 
 This report documents the ongoing effort to build a patched version of Crush (your AI coding assistant) using Nix, incorporating your three open PRs with custom features. The build is currently in progress with tests disabled to work around network dependency issues.
 
-**Current Status:** Building (Background Shell 062)  
-**Expected Outcome:** Functional `crush-patched` binary in `/nix/store/`  
+**Current Status:** Building (Background Shell 062)
+**Expected Outcome:** Functional `crush-patched` binary in `/nix/store/`
 **Next Steps:** Verify binary, add patches, integrate into system packages
 
 ---
@@ -117,7 +117,7 @@ pkgs.buildGoModule rec {
 
   # Verified: sha256-8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=
   vendorHash = "sha256:8Tw+O57E5aKFO2bKimiXRK9tGnAAQr3qsuP6P9LgBjw=";
-  
+
   meta = with lib; {
     description = "Crush with Lars' PR patches applied";
     homepage = "https://github.com/charmbracelet/crush";
@@ -467,5 +467,5 @@ git push
 
 ---
 
-**Report Generated:** 2026-01-29 17:47  
+**Report Generated:** 2026-01-29 17:47
 **Next Update:** When build completes or significant progress is made

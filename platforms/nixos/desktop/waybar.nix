@@ -193,10 +193,10 @@
             # Check for privacy-sensitive conditions
             WEBCAM=$(${pkgs.lsof}/bin/lsof /dev/video0 2>/dev/null | ${pkgs.gawk}/bin/awk 'NR>1 {print $1}' | sort -u | tr '\n' ' ' || echo "")
             MIC=$(${pkgs.lsof}/bin/lsof /dev/snd/pcmC0D0c 2>/dev/null | ${pkgs.gawk}/bin/awk 'NR>1 {print $1}' | sort -u | tr '\n' ' ' || echo "")
-            
+
             # Check for screen sharing (common screen capture processes)
             SCREENSHARE=$(pgrep -x "wf-recorder|ffmpeg|obs|simplescreenrec" 2>/dev/null | wc -l)
-            
+
             ICON=""
             if [ -n "$WEBCAM" ]; then
               ICON="󰖠"
@@ -205,7 +205,7 @@
             elif [ "$SCREENSHARE" -gt 0 ]; then
               ICON="󰹑"
             fi
-            
+
             echo "$ICON"
           '';
           exec-if = "which lsof";

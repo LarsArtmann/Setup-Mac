@@ -100,7 +100,7 @@ For each tracked patch:
 - **Before**: Grep syntax error with `-- P` flag
   - Error: `grep: invalid option -- P`
   - Cause: Incorrect regex pattern `got: *\K[^\s]+`
-  
+
 - **After**: Multiple fallback hash extraction methods
   - Method 1: Look for `got: sha256:` format
   - Method 2: Look for `got:` followed by hash (alternative)

@@ -1,7 +1,7 @@
 # Setup-Mac Project Status Report
-**Generated:** 2026-01-24 05:11 UTC  
-**Report Type:** Comprehensive Architecture Review  
-**Analyst:** Crush AI (Architectural Assessment)  
+**Generated:** 2026-01-24 05:11 UTC
+**Report Type:** Comprehensive Architecture Review
+**Analyst:** Crush AI (Architectural Assessment)
 **Project Health:** B+ (Strong Foundation, High Maintenance Cost)
 
 ---
@@ -39,7 +39,7 @@ This report provides a comprehensive analysis of the Setup-Mac Nix configuration
 ### 🟢 Strengths (What Works Exceptionally Well)
 
 #### 1. Cross-Platform Modularization
-**Location:** `platforms/common/` & platform-specific overrides  
+**Location:** `platforms/common/` & platform-specific overrides
 **Health:** ⭐⭐⭐⭐⭐ (Exemplary)
 
 ```nix
@@ -56,7 +56,7 @@ imports = [
 **Impact:** Reduced duplication, consistent UX, single source of truth
 
 #### 2. Type Safety System (Ghost Systems Pattern)
-**Location:** `platforms/common/core/`  
+**Location:** `platforms/common/core/`
 **Health:** ⭐⭐⭐⭐½ (Strong with minor gaps)
 
 Components:
@@ -76,7 +76,7 @@ validateDarwin = pkg:
 **Gap:** Uses `builtins.trace` (warnings) instead of `lib.throw` (failures)
 
 #### 3. CI/CD Pipeline Quality
-**Location:** `.github/workflows/nix-check.yml`  
+**Location:** `.github/workflows/nix-check.yml`
 **Health:** ⭐⭐⭐⭐ (Production-ready)
 
 Features:
@@ -88,7 +88,7 @@ Features:
 **Recent Activity:** Last runs likely passing before flake check regression
 
 #### 4. Developer Experience
-**Location:** `justfile` (142 commands)  
+**Location:** `justfile` (142 commands)
 **Health:** ⭐⭐⭐⭐½ (Comprehensive, minor duplication)
 
 Command Categories:
@@ -106,8 +106,8 @@ Command Categories:
 ### 1. Code Quality Issues
 
 #### TODO Proliferation
-**Count:** 11 open TODOs in production code  
-**Severity:** Medium  
+**Count:** 11 open TODOs in production code
+**Severity:** Medium
 **Locations:**
 - `flake.nix:67` - Home Manager inline config TODO
 - `platforms/darwin/default.nix:41` - Nixpkgs config location TODO
@@ -117,7 +117,7 @@ Command Categories:
 **Action Required:** Convert to GitHub issues, remove from code
 
 #### File Size Violations
-**Threshold:** 300 lines (AGENTS.md standard)  
+**Threshold:** 300 lines (AGENTS.md standard)
 **Violations:**
 - `platforms/nixos/desktop/hyprland.nix` - 364 lines
 - `platforms/common/errors/ErrorManagement.nix` - 409 lines
@@ -158,7 +158,7 @@ inputs.self.packages.${system}....
 
 #### Go Toolchain Exception
 **Issue:** Wire tool uses `go install`, not Nix package
-**Location:** `justfile:963-963`  
+**Location:** `justfile:963-963`
 **Comment:** "wire not in Nixpkgs"
 
 **Better:** Use `buildGoModule` overlay or fetch from source
@@ -188,8 +188,8 @@ inputs.self.packages.${system}....
 ### 1. Build System Instability ⚠️ CRITICAL
 
 #### Flake Check Regression
-**Symptom:** `nix flake check --no-build` hangs after 2+ minutes  
-**Shell ID:** 00B (background process with no output)  
+**Symptom:** `nix flake check --no-build` hangs after 2+ minutes
+**Shell ID:** 00B (background process with no output)
 **Impact:** Blocks CI/CD, prevents validation, undermines pre-commit hooks
 
 **Likely Causes:**
@@ -209,7 +209,7 @@ nix-instantiate --eval platforms/common/core/Validation.nix
 ```
 
 #### Unstable Channel Usage
-**Location:** `flake.nix:6`  
+**Location:** `flake.nix:6`
 ```nix
 inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 ```
@@ -228,8 +228,8 @@ inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
 ### 2. Security Vulnerabilities
 
 #### Sudo Usage in Scripts
-**Count:** 7 instances in shell scripts  
-**Risk:** Privilege escalation, unintended system modification  
+**Count:** 7 instances in shell scripts
+**Risk:** Privilege escalation, unintended system modification
 **Scripts:**
 - `scripts/fix-nix-cache.sh` - 6 sudo commands
 - `dns-restart` recipe in `justfile` - Systemctl restart
@@ -247,17 +247,17 @@ sudo -u nix-daemon -- nix-collect-garbage
 ```
 
 #### GitHub Token Handling
-**Location:** `justfile:608-609`  
+**Location:** `justfile:608-609`
 ```bash
 export GITHUB_TOKEN=$$(gh auth token 2>/dev/null || echo "")
 export GITHUB_PERSONAL_ACCESS_TOKEN="$$GITHUB_TOKEN"
 ```
 
-**Risk:** Potential exposure in process list, shell history  
+**Risk:** Potential exposure in process list, shell history
 **Better:** Use `env` command or pass directly to child processes
 
 #### SSH Key in Configuration
-**Location:** `platforms/nixos/system/configuration.nix:71`  
+**Location:** `platforms/nixos/system/configuration.nix:71`
 ```nix
 openssh.authorizedKeys.keys = [
   "ssh-rsa AAAAB3Nza..."
@@ -272,13 +272,13 @@ openssh.authorizedKeys.keys = lib.splitString "\n" (builtins.readFile ./ssh-keys
 ### 3. Data Loss Risks
 
 #### Aggressive Cleanup Commands
-**Location:** `justfile:164-165`  
+**Location:** `justfile:164-165`
 ```bash
 rm -rf ~/.cache || true && mkdir -p ~/.cache
 rm -rf ~/Library/Developer/Xcode/DerivedData || true
 ```
 
-**Risk:** No confirmation, deletes critical build caches  
+**Risk:** No confirmation, deletes critical build caches
 **Impact:** Hours of rebuild time if accidentally triggered
 
 **Better:**
@@ -290,15 +290,15 @@ fi
 ```
 
 #### Backup System Gaps
-**Issue:** `restore` creates auto-backup, but `clean-aggressive` does not  
-**Gap:** User can restore from backup, then immediately delete it  
+**Issue:** `restore` creates auto-backup, but `clean-aggressive` does not
+**Gap:** User can restore from backup, then immediately delete it
 
 **Better:** Add versioned backups with retention policy
 
 ### 4. System Integrity Issues
 
 #### Validation Non-Blocking
-**Problem:** `Validation.nix` functions log warnings but don't prevent evaluation  
+**Problem:** `Validation.nix` functions log warnings but don't prevent evaluation
 **Example:**
 ```nix
 validateDarwin = pkg:
@@ -315,16 +315,16 @@ validateDarwin = pkg:
 **Impact:** Configuration with incompatible packages will evaluate, fail at build time
 
 #### Module Coupling
-**Issue:** `ErrorManagement.nix` imports `error-modules/` subdirectory  
-**Risk:** Potential circular imports, hard to extract as standalone library  
+**Issue:** `ErrorManagement.nix` imports `error-modules/` subdirectory
+**Risk:** Potential circular imports, hard to extract as standalone library
 
 **Better:** Flatten structure or use explicit dependency injection
 
 ### 5. Development Velocity Concerns
 
 #### Excessive Commit Frequency
-**Metric:** 259 commits in 30 days (~8.6 commits/day)  
-**Pattern:** Suggests reactive development, lack of planning, firefighting  
+**Metric:** 259 commits in 30 days (~8.6 commits/day)
+**Pattern:** Suggests reactive development, lack of planning, firefighting
 
 **Healthy Range:** 2-4 commits/day with comprehensive testing per commit
 
@@ -333,7 +333,7 @@ validateDarwin = pkg:
 - `docs/status/2026-01-12_23-55_...` - 2,178 lines (single report)
 - `docs/planning/2025-11-11_06-33_...` - 2,294 lines
 
-**Maintenance Burden:** Unlikely these are read or maintained  
+**Maintenance Burden:** Unlikely these are read or maintained
 **Better:** Consolidate into single `CHANGELOG.md` with structured sections
 
 ---
@@ -341,18 +341,18 @@ validateDarwin = pkg:
 ## Performance Analysis
 
 ### Shell Performance
-**Startup Time:** Unknown (not benchmarked recently)  
-**Scripts:** 39 shell scripts averaging 164 lines each  
+**Startup Time:** Unknown (not benchmarked recently)
+**Scripts:** 39 shell scripts averaging 164 lines each
 **Optimization:** Fish shell configured with minimal greeting, optimized history
 
 ### Build Performance
-**Flake Evaluation:** Hanging (critical issue)  
-**Package Count:** ~200 packages across platforms  
-**Cache Strategy:** Local `result` symlink, no remote caching in CI  
+**Flake Evaluation:** Hanging (critical issue)
+**Package Count:** ~200 packages across platforms
+**Cache Strategy:** Local `result` symlink, no remote caching in CI
 
 ### CI/CD Performance
-**Build Time:** Unknown (hanging)  
-**Matrix Builds:** macOS + Ubuntu (parallel)  
+**Build Time:** Unknown (hanging)
+**Matrix Builds:** macOS + Ubuntu (parallel)
 **Optimization Opportunity:** Upload to Cachix, enable binary substitution
 
 ---
@@ -508,12 +508,12 @@ However, the project suffers from:
 
 **Recommendation:** Halt new feature development until flake check is resolved and stabilize the nixpkgs channel. Implement the critical fixes outlined above, then address technical debt systematically.
 
-**Estimated Time to Critical Fixes:** 1-2 weeks  
-**Estimated Time to Full Health:** 1-2 months  
+**Estimated Time to Critical Fixes:** 1-2 weeks
+**Estimated Time to Full Health:** 1-2 months
 **Risk if Unaddressed:** Medium (potential data loss, build failures, security exposure)
 
 ---
 
-**Report Prepared By:** Crush AI via Setup-Mac evaluation framework  
-**Framework Version:** AGENTS.md v3.2 - Architectural Excellence Edition  
+**Report Prepared By:** Crush AI via Setup-Mac evaluation framework
+**Framework Version:** AGENTS.md v3.2 - Architectural Excellence Edition
 **Next Review Date:** 2026-02-24 (30 days)
