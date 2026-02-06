@@ -18,11 +18,26 @@ if [[ -n "$NEW_VERSION" ]]; then
     echo "Target:  $NEW_VERSION"
 fi
 
-# If no version provided, check if we're already up to date
+# If no version provided, auto-detect latest from GitHub
 if [[ -z "$NEW_VERSION" ]]; then
-    echo "ℹ️  No version specified, skipping update"
-    echo "   To update to a new version, run: ./pkgs/update-crush-patched.sh v0.39.3"
-    exit 0
+    echo "🔍 Detecting latest version from GitHub..."
+    LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git \
+      | head -1 | sed 's|.*refs/tags/\(v[0-9.]*\).*|\1|')
+
+    if [[ -z "$LATEST_VERSION" ]]; then
+        echo "❌ Failed to detect latest version from GitHub"
+        exit 1
+    fi
+
+    echo "Latest:  $LATEST_VERSION"
+
+    if [[ "$LATEST_VERSION" == "$CURRENT_VERSION" ]]; then
+        echo "✅ Already at latest version $CURRENT_VERSION"
+        exit 0
+    fi
+
+    NEW_VERSION="$LATEST_VERSION"
+    echo "Target:  $NEW_VERSION"
 fi
 
 # Same version? Nothing to do
@@ -49,7 +64,7 @@ echo "✅ Source hash: $SOURCE_HASH"
 echo ""
 echo "📝 Updating $NIX_FILE..."
 sed -i.bak \
-  -e "s|^version = \".*\";|version = \"$NEW_VERSION\";|" \
+  -e "s|^  version = \".*\";|  version = \"$NEW_VERSION\";|" \
   -e "s|^    url = \".*\";$|    url = \"$SOURCE_URL\";|" \
   -e "s|^    sha256 = \".*\";|    sha256 = \"$SOURCE_HASH\";|" \
   -e "s|^  vendorHash = \".*\";|  vendorHash = null;|" \
