@@ -3,7 +3,7 @@
 # Usage: ./pkgs/update-crush-patched.sh [VERSION]
 # If VERSION not provided, assumes current version is up to date
 
-set -euo pipefail
+set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NIX_FILE="$SCRIPT_DIR/crush-patched.nix"
@@ -60,34 +60,53 @@ fi
 
 echo "✅ Source hash: $SOURCE_HASH"
 
+# Backup original Nix file
+BACKUP_FILE="${NIX_FILE}.backup-$(date +%s)"
+cp "$NIX_FILE" "$BACKUP_FILE"
+
 # Update Nix file
 echo ""
 echo "📝 Updating $NIX_FILE..."
-sed -i.bak \
+sed -i.tmp \
   -e "s|^  version = \".*\";|  version = \"$NEW_VERSION\";|" \
   -e "s|^    url = \".*\";$|    url = \"$SOURCE_URL\";|" \
   -e "s|^    sha256 = \".*\";|    sha256 = \"$SOURCE_HASH\";|" \
   -e "s|^  vendorHash = \".*\";|  vendorHash = null;|" \
   "$NIX_FILE"
-rm -f "${NIX_FILE}.bak"
+rm -f "${NIX_FILE}.tmp"
 echo "✅ Version updated to $NEW_VERSION"
 
 # Build to get vendorHash
 echo ""
 echo "🔨 Building to detect vendorHash..."
-if nix build .#crush-patched 2>&1 | tee /tmp/crush-build.log; then
+nix build .#crush-patched 2>&1 | tee /tmp/crush-build.log || true
+
+if grep -q "got:.*sha256-" /tmp/crush-build.log; then
+    # Extract hash from error message (build succeeded but vendorHash was wrong)
+    VENDOR_HASH=$(grep 'got:.*sha256-' /tmp/crush-build.log | \
+      sed 's/.*sha256-//' | head -1)
+elif [[ -f ./result ]]; then
+    # Build succeeded, extract from store
     echo "✅ Build succeeded!"
     VENDOR_HASH=$(nix-store --query --requisites ./result 2>/dev/null | \
       grep 'crush-patched.*go-modules' | sed 's|.*/\([a-z0-9]*\)-.*|\1|' | head -1)
 else
-    # Extract hash from error message
-    VENDOR_HASH=$(grep 'got:.*sha256-' /tmp/crush-build.log | \
-      sed 's/.*sha256-//' | head -1)
+    # Build failed for real reason (patches, etc.)
+    VENDOR_HASH=""
 fi
 
 if [[ -z "$VENDOR_HASH" ]]; then
     echo "❌ Could not extract vendorHash"
     echo "   Check /tmp/crush-build.log"
+    echo ""
+    echo "🔄 Rolling back to previous version..."
+    cp "$BACKUP_FILE" "$NIX_FILE"
+    rm -f "$BACKUP_FILE"
+    echo "✅ Rolled back to $CURRENT_VERSION"
+    echo "   Your system is in a consistent state."
+    echo ""
+    echo "💡 This usually means patches need to be updated for the new version."
+    echo "   Check pkgs/crush-patched.nix to update or remove incompatible patches."
     exit 1
 fi
 
@@ -104,7 +123,21 @@ echo "✅ vendorHash updated"
 echo ""
 echo "🔨 Rebuilding with correct vendorHash..."
 rm -f result
-nix build .#crush-patched
+if ! nix build .#crush-patched 2>&1 | tee /tmp/crush-build-final.log; then
+    echo ""
+    echo "❌ Final build failed"
+    echo "   Check /tmp/crush-build-final.log"
+    echo ""
+    echo "🔄 Rolling back to previous version..."
+    cp "$BACKUP_FILE" "$NIX_FILE"
+    rm -f "$BACKUP_FILE"
+    echo "✅ Rolled back to $CURRENT_VERSION"
+    echo "   Your system is in a consistent state."
+    exit 1
+fi
+
+# Clean up backup on success
+rm -f "$BACKUP_FILE"
 
 echo ""
 echo "✅ Update complete! Run 'just switch' to install."
