@@ -3,6 +3,7 @@
   lib,
   llm-agents,
   helium,
+  modernizePackage ? null,
   ...
 }: let
   # Import custom packages
@@ -143,6 +144,7 @@
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
     ]
+    ++ lib.optionals (modernizePackage != null) [ modernizePackage ]
     ++ lib.optionals stdenv.isLinux [
       swww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
       geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities (Linux-only)

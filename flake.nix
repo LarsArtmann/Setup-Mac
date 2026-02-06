@@ -89,10 +89,21 @@
           inherit system;
           config.allowUnfree = true;
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
+          overlays = [
+            # Pin Go to version 1.26rc2 for all systems
+            (final: prev: {
+              go = prev.go_1_26;
+              # Override buildGoModule to use Go 1.26 instead of default
+              buildGoModule = prev.buildGo126Module;
+            })
+          ];
         };
 
         packages = {
           crush-patched = import ./pkgs/crush-patched.nix {
+            inherit pkgs;
+          };
+          modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
         };
@@ -122,6 +133,7 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
+            modernizePackage = inputs.self.packages.aarch64-darwin.modernize;
           };
           modules = [
             # Import nix-homebrew for declarative Homebrew management
@@ -171,6 +183,7 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
+            modernizePackage = inputs.self.packages.x86_64-linux.modernize;
           };
           modules = [
             # Core system configuration
