@@ -4,11 +4,11 @@ let
 in
 pkgs.buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.39.3";
+  version = "v0.39.1";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.3.tar.gz";
-    sha256 = "sha256:1gshc4hcvz6b2vary8295wy3fqsyh2rf0arrjzvy47j7jx3m6545";
+    url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.1.tar.gz";
+    sha256 = "sha256:085ffzc30k7xha9nbgdgr70f2ib6lw1k7hz86fmkihbal9y8frv0";
   };
 
   patches = [
@@ -66,7 +66,7 @@ pkgs.buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-uo9VelhRjtWiaYI88+eTk9PxAUE18Tu2pNq4qQqoTwk=";
 
   meta = with lib; {
     description = "Crush with Lars' PR patches applied";

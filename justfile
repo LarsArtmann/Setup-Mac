@@ -52,7 +52,6 @@ update:
     @echo ""
     @echo "💡 Next steps:"
     @echo "   - Run 'just switch' to apply changes"
-    @echo "   - If crush-patched was updated, run 'just crush-full-update' to complete the process"
 
 # ActivityWatch manual control commands
 activitywatch-start:
@@ -1116,9 +1115,7 @@ help:
     @echo "  status             - Show git status and recent commits"
     @echo ""
     @echo "Crush-Patched Management:"
-    @echo "  crush-update         - Update to latest Crush release (manual workflow)"
-    @echo "  crush-full-update    - Full auto-update workflow (builds & verifies)"
-    @echo "  crush-build          - Build crush-patched"
+    @echo "  crush-build          - Build crush-patched (see pkgs/README.md for updates)"
     @echo "  crush-info           - Show current version and patches"
     @echo ""
     @echo "Utilities:"
@@ -1131,35 +1128,10 @@ help:
 # Crush-Patched Management
 # ======================
 
-# Update crush-patched to latest release
-crush-update:
-    @echo "🔄 Updating crush-patched to latest version..."
-    ./pkgs/update-crush-patched.sh
-
-# Build crush-patched to get vendorHash
+# Build crush-patched
 crush-build:
     @echo "🔨 Building crush-patched..."
-    nix build .#crush-patched 2>&1 | tee /tmp/crush-build.log
-
-# Auto-update vendorHash after build
-crush-fix-hash:
-    @echo "🔧 Extracting vendorHash from build log..."
-    @HASH=$(grep -oP 'got: *\K[^\s]+' /tmp/crush-build.log | head -1); \
-    if [[ -z "$$HASH" ]]; then \
-        echo "❌ No vendorHash found in build log"; \
-        echo "   Run 'just crush-build' first"; \
-    else \
-        echo "Found vendorHash: $$HASH"; \
-        echo "Updating pkgs/crush-patched.nix..."; \
-        sed -i '' 's|vendorHash = "sha256:[^"]*";|vendorHash = "'$$HASH'";|' pkgs/crush-patched.nix; \
-        echo "✅ vendorHash updated"; \
-        echo "Run 'just crush-build' to rebuild with correct hash"; \
-    fi
-
-# Full workflow: update, build, fix hash, rebuild, verify
-crush-full-update:
-    @echo "🚀 Running full crush-patched update workflow..."
-    @./pkgs/auto-update-crush-patched.sh
+    @nix build .#crush-patched
 
 # Show current crush-patched version info
 crush-info:
