@@ -47,7 +47,7 @@ update:
     nix flake update
     @echo ""
     @echo "Updating crush-patched to latest version..."
-    @./pkgs/update-crush-patched.sh || echo "⚠️  crush-patched update skipped (manual intervention needed)"
+    @bash ./pkgs/update-crush-patched.sh || echo "⚠️  crush-patched update skipped (manual intervention needed)"
     @echo "✅ System updated"
     @echo ""
     @echo "💡 Next steps:"
