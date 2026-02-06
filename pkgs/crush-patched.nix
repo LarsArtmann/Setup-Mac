@@ -13,30 +13,27 @@ pkgs.buildGoModule rec {
 
   patches = [
     # PR #1854: fix(grep): prevent tool from hanging when context is cancelled
-    # KEEP until PR #1906 merge conflicts are resolved
-    (pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/pull/1854.patch";
-      sha256 = "fWWY+3/ycyvGtRsPxKIYVOt/CdQfmMAcAa8H6gONAFA=";
-    })
+    # REMOVED: Superseded by PR #1906 which merged into v0.39.0
+    # Functionality is now included in v0.39.0+
+    #
     # PR #1617: refactor: eliminate all duplicate code blocks over 200 tokens
-    # KEEP permanently
-    (pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/pull/1617.patch";
-      sha256 = "yFprXfDfWxeWrsmhGmXvxrfjD0GK/DVDi6mugdrM/sg=";
-    })
+    # REMOVED: PR closed due to UI rewrite (internal/tui → internal/ui in v0.39.0)
+    # PR targets old codebase structure
+    #
     # PR #2068: fix: ensure commands and models dialogs render with borders
-    # REMOVED: Already merged and included in v0.39.1 (merged 2026-02-02, released 2026-02-04)
+    # REMOVED: Already merged and included in v0.39.1
+    #
     # PR #2019: feat: Plan mode with readonly permission enforcement
-    # TEMPORARILY REMOVED - Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132 in permission.go)
-    # Will re-add once conflict is resolved
+    # REMOVED: Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132)
+    #
     # PR #2070: fix(ui): show grep search parameters in pending state
-    (pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/pull/2070.patch";
-      sha256 = "sha256:ede9e0ff7b642db0b07295a1bc9539ee53acc087343226167ca902c4512fd50d";
-    })
+    # REMOVED: OPEN as of 2026-02-06
+    # Note: v0.39.2+ has broken vendor directory (upstream issue)
+    # Once upstream fixes vendor, this patch can be re-evaluated
+    #
     # PR #2050: feat: prompt with warning for dangerous commands instead of blocking
-    # TEMPORARILY REMOVED - Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132 in permission.go)
-    # Will re-add once conflict is resolved
+    # REMOVED: Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132)
+    #
     # PR #1611: Will be added when merge conflicts are resolved
   ];
 
