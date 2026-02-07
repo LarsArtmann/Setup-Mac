@@ -133,9 +133,18 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
-            modernizePackage = inputs.self.packages.aarch64-darwin.modernize;
           };
           modules = [
+            # Pin Go to version 1.26rc2 for all packages in system
+            {
+              nixpkgs.overlays = [
+                (final: prev: {
+                  go = prev.go_1_26;
+                  buildGoModule = prev.buildGo126Module;
+                })
+              ];
+            }
+
             # Import nix-homebrew for declarative Homebrew management
             nix-homebrew.darwinModules.nix-homebrew
             {
@@ -183,7 +192,6 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
-            modernizePackage = inputs.self.packages.x86_64-linux.modernize;
           };
           modules = [
             # Core system configuration

@@ -486,6 +486,7 @@ All Go development tools are managed via Nix packages (defined in `platforms/com
 - **buf**: Protocol buffer toolchain
 - **delve**: Go debugger
 - **gup**: Go binary updater
+- **modernize**: Go code modernization tool (built with Go 1.26rc2 via flake-parts)
 
 **Migration Status:**
 - ✅ Migrated to Nix packages (90% success rate)

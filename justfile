@@ -846,6 +846,22 @@ health:
     @echo -n "D2: "
     @if command -v d2 >/dev/null 2>&1; then echo "✅ $(d2 --version | head -1)"; else echo "❌ Missing"; fi
     @echo ""
+    @echo "=== Go Development Tools ==="
+    @echo -n "Go: "
+    @if command -v go >/dev/null 2>&1; then echo "✅ $(go version)"; else echo "❌ Missing"; fi
+    @echo -n "gopls: "
+    @if command -v gopls >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
+    @echo -n "modernize: "
+    @if command -v modernize >/dev/null 2>&1; then \
+        if go version -m $(which modernize) 2>&1 | grep -q "go1.26rc2"; then \
+            echo "✅ Built with Go 1.26rc2"; \
+        else \
+            echo "⚠️ Built with $(go version -m $(which modernize) 2>&1 | head -1)"; \
+        fi; \
+    else \
+        echo "❌ Missing"; \
+    fi
+    @echo ""
     @echo "=== Dotfile Links ==="
     @echo -n ".zshrc link: "
     @if [ -L ~/.zshrc ]; then echo "✅ Linked to $(readlink ~/.zshrc)"; else echo "❌ Not linked"; fi
@@ -899,6 +915,12 @@ go-format *ARGS=".":
     @echo "🎨 Formatting Go code with gofumpt..."
     gofumpt -l -w {{ ARGS }}
     @echo "✅ Go code formatted"
+
+# Modernize Go code with Go 1.26rc2 modernize tool
+go-modernize *ARGS="./...":
+    @echo "🔄 Modernizing Go code (built with Go 1.26rc2)..."
+    modernize -fix {{ ARGS }}
+    @echo "✅ Go code modernized"
 
 # Generate Go tests for a package using gotests
 go-gen-tests package *ARGS="":

@@ -3,7 +3,6 @@
   lib,
   llm-agents,
   helium,
-  modernizePackage ? null,
   ...
 }: let
   # Import custom packages
@@ -11,8 +10,22 @@
     inherit pkgs;
   };
 
-  # Import crush from llm-agents packages (only used as fallback)
+  # Import modernize from local pkgs if available
   inherit (pkgs.stdenv.hostPlatform) system;
+  modernizePackage = (builtins.tryEval (import ../../../pkgs/modernize.nix {
+    inherit pkgs;
+  })).value or null;
+
+  # Override gopls to remove modernize binary (we use our custom build)
+  goplsWithoutModernize = pkgs.symlinkJoin {
+    name = "gopls-without-modernize";
+    paths = [ pkgs.gopls ];
+    postBuild = ''
+      rm -f $out/bin/modernize
+    '';
+  };
+
+  # Import crush from llm-agents packages (only used as fallback)
   crush = llm-agents.packages.${system}.crush or pkgs.crush or null;
   heliumPackage = if builtins.hasAttr "packages" helium && builtins.hasAttr system helium.packages
     then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
@@ -104,7 +117,7 @@
 
       # Go development
       go
-      gopls
+      goplsWithoutModernize  # Custom override without modernize binary (use our custom build)
       golangci-lint
       gofumpt
       gotests
