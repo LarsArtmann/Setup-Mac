@@ -1,15 +1,15 @@
 # SystemNix - Comprehensive TODO List
 
 **Last Updated**: 2026-02-08
-**Status**: Active - File reading in progress
+**Status**: Active - File reading in progress (25/100+ files)
 
 ---
 
 ## File Reading Progress
 
 **Total .md files found**: 100+
-**Files read**: 19
-**Files remaining**: 81+
+**Files read**: 25
+**Files remaining**: 75+
 
 ### ✅ Files Read
 - [x] AGENTS.md (2026-02-08)
@@ -22,25 +22,22 @@
 - [x] README.md (2026-02-08)
 
 ### 📋 Files Remaining to Read
-- [x] docs/strategy/2025-12-18_15-45_Step-4-Program-Integration-Strategy.md (2026-02-08)
-- [x] docs/DESKTOP-IMPROVEMENT-ROADMAP.md (2026-02-08)
-- [x] docs/reports/NIX-COLORS-INTEGRATION-IMPLEMENTATION-REPORT.md (2026-02-08)
-- [x] docs/reports/home-manager-users-workaround-bug-report.md (2026-02-08)
-- [x] docs/NIXOS-FIX-SUMMARY.md (2026-02-08) - No TODOs found (completed fix summary)
-- [x] docs/flake-consolidation-plan.md (2026-02-08)
-- [ ] GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md
-- [ ] sddm-configuration-report.md
-- [ ] crush-final-summary-report.md
+- [ ] docs/GITHUB-ISSUES-RECOMMENDATIONS.md
 - [x] docs/TODO-STATUS.md (2026-02-08)
 - [x] docs/monitoring-comparison-matrix.md (2026-02-08) - No TODOs found
-- [ ] crush-advanced-build-strategies.md
-- [ ] COMPREHENSIVE-SESSION-SUMMARY.md
-- [ ] 2025-07-21_02_33-network-monitoring.md
-- [ ] 2025-07-15_12-59-terminal-performance-session.md
-- [ ] 2025-11-15_07_49-nix-build-debugging.md
-- [ ] nix-file-graph.md
-- [ ] GITHUB-ISSUES-RECOMMENDATIONS.md
-- [ ] sddm-implementation-steps.md
+- [x] docs/MICRO-TASKS.md (2026-02-08) - 125 micro-tasks
+- [x] docs/README.md (2026-02-08) - No TODOs found
+- [x] docs/operations/manual-steps-after-deployment.md (2026-02-08)
+- [x] docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md (2026-02-08) - 36 TODOs
+- [x] docs/sddm-configuration-report.md (2026-02-08) - 17 TODOs
+- [x] docs/crush-final-summary-report.md (2026-02-08) - No TODOs found
+- [x] docs/crush-advanced-build-strategies.md (2026-02-08) - 13 TODOs
+- [x] docs/COMPREHENSIVE-SESSION-SUMMARY.md (2026-02-08) - 12 TODOs
+- [x] docs/nix-file-graph.md (2026-02-08) - No TODOs found
+- [ ] docs/prompts/2025-07-21_02_33-network-monitoring.md
+- [ ] docs/prompts/2025-07-15_12-59-terminal-performance-session.md
+- [ ] docs/prompts/2025-11-15_07_49-nix-build-debugging.md
+- [ ] docs/sddm-implementation-steps.md
 - [ ] execution-progress.md
 - [ ] KEYCHAIN-BIOMETRIC-AUTHENTICATION.md
 - [ ] TV-CURSOR-SIZE-FIX-HYPRLAND.md
@@ -75,11 +72,9 @@
 - [ ] KEYCHAIN-IMPLEMENTATION-SUMMARY.md
 - [ ] NETWORK-SCAN-COMPLETE.md
 - [ ] testing-checklist.md
-- [ ] evo-x2-install-guide.md
-- [x] docs/MICRO-TASKS.md (2026-02-08) - 125 micro-tasks
-- [x] docs/README.md (2026-02-08) - No TODOs found
-- [ ] comprehensive-status-update.md
-- [x] docs/operations/manual-steps-after-deployment.md (2026-02-08)
+- [ ] docs/testing/testing-checklist.md
+- [ ] docs/evo-x2-install-guide.md
+- [ ] docs/comprehensive-status-update.md
 - [ ] SAFE-NIX-IMPROVEMENTS.md
 - [ ] XWAYLAND-CONFIGURATION.md
 - [ ] 2026-01-21_10-29_QUBES-NIXOS-INTEGRATION-RESEARCH.md
@@ -1096,35 +1091,325 @@
   - Source: TODO-STATUS.md:10
   - Context: platforms/darwin/services/launchagents.nix
 
+### docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md
+
+#### #119: Complete SublimeText Default Editor Configuration
+- [ ] **[MEDIUM]** Configure SublimeText as default editor
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:170
+  - Context: SublimeText configuration
+- [ ] **[MEDIUM]** Add SublimeText to Nix packages
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:171
+  - Context: SublimeText configuration
+- [ ] **[MEDIUM]** Create keyboard shortcuts for file opening
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:172
+  - Context: SublimeText configuration
+
+#### #105: Create Comprehensive Wrapper System Documentation
+- [ ] **[MEDIUM]** Create architecture documentation
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:212
+  - Context: Wrapper system documentation
+- [ ] **[MEDIUM]** Write user guide
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:213
+  - Context: Wrapper system documentation
+- [ ] **[MEDIUM]** Provide examples
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:214
+  - Context: Wrapper system documentation
+- [ ] **[MEDIUM]** Document troubleshooting
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:215
+  - Context: Wrapper system documentation
+
+#### #104: Optimize and Benchmark Wrapper Performance
+- [ ] **[MEDIUM]** Add wrapper-benchmark command to justfile
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:240
+  - Context: Wrapper performance optimization
+- [ ] **[MEDIUM]** Add wrapper-profile command to justfile
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:244
+  - Context: Wrapper performance optimization
+
+#### #116: Add Terminal Multiplexer for Productivity
+- [ ] **[MEDIUM]** Issue #116 is already solved - tmux is configured
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:299
+  - Context: Terminal multiplexer (tmux)
+- [ ] **[MEDIUM]** Close or update issue to reflect current state
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:300
+  - Context: Terminal multiplexer (tmux)
+
+#### #22: Research: Incorporate Ideas from Awesome Dotfiles
+- [ ] **[LOW]** Review Awesome Dotfiles repository
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:384
+  - Context: Research task
+- [ ] **[LOW]** Identify relevant patterns
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:385
+  - Context: Research task
+- [ ] **[LOW]** Create PRs with improvements
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:386
+  - Context: Research task
+
+#### #17: Improve and Automate System Cleanup
+- [ ] **[LOW]** Review cleanup paths list
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:400
+  - Context: System cleanup enhancement
+- [ ] **[LOW]** Add automated cleanup scheduling (systemd/launchd)
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:401
+  - Context: System cleanup enhancement
+
+#### #12: Complete TODOs in programs.nix
+- [ ] **[LOW]** Review programs.nix for TODOs
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:435
+  - Context: programs.nix configuration
+- [ ] **[LOW]** Implement each TODO
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:436
+  - Context: programs.nix configuration
+- [ ] **[LOW]** Test configuration
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:437
+  - Context: programs.nix configuration
+- [ ] **[LOW]** Remove TODOs
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:438
+  - Context: programs.nix configuration
+
+#### #10: Complete TODOs in core.nix
+- [ ] **[LOW]** Review core.nix for TODOs
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:449
+  - Context: core.nix security and services
+- [ ] **[LOW]** Implement security configurations
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:450
+  - Context: core.nix security and services
+- [ ] **[LOW]** Implement services
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:451
+  - Context: core.nix security and services
+- [ ] **[LOW]** Test and validate
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:452
+  - Context: core.nix security and services
+
+#### #9: Complete TODOs in system.nix
+- [ ] **[LOW]** Review system.nix for TODOs
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:463
+  - Context: system.nix macOS defaults
+- [ ] **[LOW]** Implement macOS defaults
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:464
+  - Context: system.nix macOS defaults
+- [ ] **[LOW]** Test on Darwin
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:465
+  - Context: system.nix macOS defaults
+
+#### #7: Add Backup Functionality to manual-linking.sh
+- [ ] **[LOW]** Add backup flag to manual-linking.sh
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:478
+  - Context: manual-linking.sh backup feature
+- [ ] **[LOW]** Create timestamped backups
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:481
+  - Context: manual-linking.sh backup feature
+
+#### #6: Refactor manual-linking.sh to Use External Configuration
+- [ ] **[LOW]** Extract configuration to external YAML file
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:494
+  - Context: manual-linking.sh configuration refactor
+
+#### #5: Improve manual-linking.sh to Verify Symbolic Link Targets
+- [ ] **[LOW]** Add verification function for symbolic links
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:511
+  - Context: manual-linking.sh link verification
+
+#### #100: Comprehensive Analysis Complete
+- [ ] **[ADMINISTRATIVE]** Move to project status documentation
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:528
+  - Context: Administrative milestone
+
+#### #99: Create Milestones v0.1.0-v0.3.0
+- [ ] **[ADMINISTRATIVE]** Create GitHub milestones
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:538
+  - Context: Project management
+- [ ] **[ADMINISTRATIVE]** Link issues to milestones
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:539
+  - Context: Project management
+- [ ] **[ADMINISTRATIVE]** Track progress
+  - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:540
+  - Context: Project management
+
+### docs/sddm-configuration-report.md
+
+#### Before Making Changes
+- [ ] **[HIGH]** Create system backup
+  - Source: docs/sddm-configuration-report.md:297
+  - Context: Pre-implementation checklist item
+- [ ] **[HIGH]** Test current configuration
+  - Source: docs/sddm-configuration-report.md:298
+  - Context: Pre-implementation checklist item
+- [ ] **[MEDIUM]** Document current SDDM behavior
+  - Source: docs/sddm-configuration-report.md:299
+  - Context: Pre-implementation checklist item
+
+#### Implementation Steps
+- [ ] **[CRITICAL]** Disable SDDM Wayland support
+  - Source: docs/sddm-configuration-report.md:302
+  - Context: Critical fix for stability with AMD GPU
+- [ ] **[LOW]** Add autoNumlock configuration
+  - Source: docs/sddm-configuration-report.md:303
+  - Context: Usability improvement
+- [ ] **[MEDIUM]** Verify HiDPI settings
+  - Source: docs/sddm-configuration-report.md:304
+  - Context: Display configuration verification
+- [ ] **[MEDIUM]** Test theme functionality
+  - Source: docs/sddm-configuration-report.md:305
+  - Context: Theme compatibility testing
+- [ ] **[MEDIUM]** Verify session registration
+  - Source: docs/sddm-configuration-report.md:306
+  - Context: Hyprland session verification
+- [ ] **[HIGH]** Apply and test configuration
+  - Source: docs/sddm-configuration-report.md:307
+  - Context: Apply changes using nixos-rebuild
+
+#### Post-Implementation
+- [ ] **[CRITICAL]** Verify login screen works
+  - Source: docs/sddm-configuration-report.md:310
+  - Context: Basic functionality verification
+- [ ] **[CRITICAL]** Test Hyprland session launch
+  - Source: docs/sddm-configuration-report.md:311
+  - Context: Session launch verification
+- [ ] **[HIGH]** Check for errors in logs
+  - Source: docs/sddm-configuration-report.md:312
+  - Context: Error monitoring
+- [ ] **[MEDIUM]** Monitor GPU behavior
+  - Source: docs/sddm-configuration-report.md:313
+  - Context: AMD GPU performance monitoring
+- [ ] **[MEDIUM]** Document any issues
+  - Source: docs/sddm-configuration-report.md:314
+  - Context: Documentation task
+
+#### Phase 2 Optimization
+- [ ] **[MEDIUM]** Add settings section for fine-tuned control
+  - Source: docs/sddm-configuration-report.md:230
+  - Context: Short-term optimization task
+- [ ] **[MEDIUM]** Configure session paths properly
+  - Source: docs/sddm-configuration-report.md:231
+  - Context: Short-term optimization task
+- [ ] **[MEDIUM]** Test theme compatibility with AMD GPU
+  - Source: docs/sddm-configuration-report.md:232
+  - Context: Short-term optimization task
+
+### docs/crush-advanced-build-strategies.md
+
+#### Vendor-Free Approach - Implementation Checklist
+- [ ] **[MEDIUM]** Backup current configuration
+  - Source: docs/crush-advanced-build-strategies.md:390
+  - Context: Before making changes to the Nix file
+- [ ] **[HIGH]** Set vendorHash = null in Nix file
+  - Source: docs/crush-advanced-build-strategies.md:391
+  - Context: Enable vendor-free build by removing or nulling vendorHash
+- [ ] **[HIGH]** Update version and source hash
+  - Source: docs/crush-advanced-build-strategies.md:392
+  - Context: Ensure version and source hash are up to date
+- [ ] **[HIGH]** Test build
+  - Source: docs/crush-advanced-build-strategies.md:393
+  - Context: Run nix build .#crush-patched to test
+- [ ] **[MEDIUM]** If successful, apply with just switch
+  - Source: docs/crush-advanced-build-strategies.md:394
+  - Context: Apply changes to system after successful build
+- [ ] **[MEDIUM]** If failed, restore from backup
+  - Source: docs/crush-advanced-build-strategies.md:395
+  - Context: Restore configuration if build fails
+
+#### Generate Vendor Approach - Implementation Checklist
+- [ ] **[MEDIUM]** Backup current configuration
+  - Source: docs/crush-advanced-build-strategies.md:398
+  - Context: Before making changes to the Nix file
+- [ ] **[HIGH]** Add postUnpack = "go mod vendor" hook
+  - Source: docs/crush-advanced-build-strategies.md:399
+  - Context: Generate vendor directory during build process
+- [ ] **[HIGH]** Set vendorHash = null initially
+  - Source: docs/crush-advanced-build-strategies.md:400
+  - Context: Prepare for first build to generate vendorHash
+- [ ] **[HIGH]** Build first time (fails to get vendorHash)
+  - Source: docs/crush-advanced-build-strategies.md:401
+  - Context: Run initial build to generate vendor directory and hash
+- [ ] **[HIGH]** Extract vendorHash from error
+  - Source: docs/crush-advanced-build-strategies.md:402
+  - Context: Parse build log to get calculated vendorHash
+- [ ] **[HIGH]** Update vendorHash in Nix file
+  - Source: docs/crush-advanced-build-strategies.md:403
+  - Context: Replace vendorHash = null with extracted hash
+- [ ] **[HIGH]** Build second time (should succeed)
+  - Source: docs/crush-advanced-build-strategies.md:404
+  - Context: Verify build works with calculated vendorHash
+- [ ] **[MEDIUM]** Apply with just switch
+  - Source: docs/crush-advanced-build-strategies.md:405
+  - Context: Apply changes to system after successful build
+
+### docs/COMPREHENSIVE-SESSION-SUMMARY.md
+
+#### IMMEDIATE PRIORITY (v0.1.1)
+- [ ] **[IMMEDIATE]** Type Safety Integration: Apply existing Types.nix to all configurations
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:91
+  - Context: Next step in v0.1.1 milestone for core foundation and type safety
+- [ ] **[IMMEDIATE]** Centralized State: Replace inline paths with State.nix references
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:92
+  - Context: Next step in v0.1.1 milestone for core foundation and type safety
+- [ ] **[IMMEDIATE]** SublimeText Default: Complete file association configuration
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:93
+  - Context: Next step in v0.1.1 milestone for core foundation and type safety
+- [ ] **[IMMEDIATE]** Development Environments: Python and Node.js configurations
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:94
+  - Context: Next step in v0.1.1 milestone for core foundation and type safety
+
+#### MEDIUM PRIORITY (v0.1.2)
+- [ ] **[MEDIUM]** Advanced Toolchains: Rust development environment
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:97
+  - Context: Next step in v0.1.2 milestone for development toolchains and validation
+- [ ] **[MEDIUM]** CLI Productivity: Additional modern tools
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:98
+  - Context: Next step in v0.1.2 milestone for development toolchains and validation
+- [ ] **[MEDIUM]** Terminal Enhancement: Multiplexer configuration
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:99
+  - Context: Next step in v0.1.2 milestone for development toolchains and validation
+- [ ] **[MEDIUM]** Validation Framework: Module and type level validation
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:100
+  - Context: Next step in v0.1.2 milestone for development toolchains and validation
+
+#### LONG-TERM PRIORITY (v0.1.3+)
+- [ ] **[LONG-TERM]** System Maintenance: Cleanup automation and scheduled tasks
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:103
+  - Context: Next step in v0.1.3+ milestone for system maintenance and organization
+- [ ] **[LONG-TERM]** Repository Organization: Structure reorganization and documentation
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:104
+  - Context: Next step in v0.1.3+ milestone for system maintenance and organization
+- [ ] **[LONG-TERM]** Cross-Platform: Linux/WSL compatibility
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:105
+  - Context: Next step in v0.1.3+ milestone for system maintenance and organization
+- [ ] **[LONG-TERM]** Advanced Features: Performance optimization and wrapper system
+  - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:106
+  - Context: Next step in v0.1.3+ milestone for system maintenance and organization
+
 ---
 
 ## Status Summary
 
-### TODOs Found So Far: 367
-- **CRITICAL**: 16
+### TODOs Found So Far: 445
+- **CRITICAL**: 19 (+3 from sddm-configuration-report.md)
 - **P0 (Critical)**: 14
 - **P1 (High)**: 9
 - **P2 (Medium)**: 10
 - **P3 (Low)**: 5
-- **HIGH Priority**: 102
-- **MEDIUM Priority**: 108
-- **LOW Priority**: 50
+- **HIGH Priority**: 114 (+12 from new files)
+- **MEDIUM Priority**: 136 (+28 from new files)
+- **LOW Priority**: 73 (+23 from new files)
 - **IN PROGRESS**: 1
-- **IMMEDIATE**: 8
+- **IMMEDIATE**: 12 (+4 from COMPREHENSIVE-SESSION-SUMMARY.md)
 - **RECOMMENDED**: 10
 - **OPTIONAL**: 4
 - **UNSPECIFIED**: 7
 - **DECISION REQUIRED**: 5
+- **LONG-TERM**: 4 (+4 from COMPREHENSIVE-SESSION-SUMMARY.md, new category)
+- **ADMINISTRATIVE**: 3 (+3 from GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md, new category)
 
 - **REQUIRED**: 13
 - **MAINTENANCE**: 1
 - **SITUATIONAL**: 4
 
 ### Verification Status
-- **Verified Against Code**: 0/367 (Not yet started)
+- **Verified Against Code**: 0/445 (Not yet started)
 - **Complete**: 0
 - **Partial**: 0
-- **Not Started**: 349
+- **Not Started**: 445
 
 ---
 
