@@ -4,11 +4,11 @@ let
 in
 pkgs.buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.39.1";
+  version = "v0.39.3";
 
   src = pkgs.fetchurl {
-    url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.1.tar.gz";
-    sha256 = "sha256:085ffzc30k7xha9nbgdgr70f2ib6lw1k7hz86fmkihbal9y8frv0";
+    url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.3.tar.gz";
+    sha256 = "sha256:1gshc4hcvz6b2vary8295wy3fqsyh2rf0arrjzvy47j7jx3m6545";
   };
 
   patches = [
@@ -28,8 +28,6 @@ pkgs.buildGoModule rec {
     #
     # PR #2070: fix(ui): show grep search parameters in pending state
     # REMOVED: OPEN as of 2026-02-06
-    # Note: v0.39.2+ has broken vendor directory (upstream issue)
-    # Once upstream fixes vendor, this patch can be re-evaluated
     #
     # PR #2050: feat: prompt with warning for dangerous commands instead of blocking
     # REMOVED: Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132)
@@ -63,7 +61,7 @@ pkgs.buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  vendorHash = "sha256-uo9VelhRjtWiaYI88+eTk9PxAUE18Tu2pNq4qQqoTwk=";
+  vendorHash = "sha256-Y7QterJ5Mmjg/kMqFGbeSvd+3UwG8uGFTrdIBET5yRI=";
 
   meta = with lib; {
     description = "Crush with Lars' PR patches applied";
