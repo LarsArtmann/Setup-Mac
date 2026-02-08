@@ -66,10 +66,8 @@
       # INFO: Set password manually with `passwd lars` after installation
       # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
       shell = pkgs.fish;
-      openssh.authorizedKeys.keys = [
-        # MacBook SSH key - matches git@lars.software
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCf94DAHsLLwuc9CMlAZE2GGlp84BR2IG9LoAcBGCR1orOQgkx2lvvQZXnLkwGR+8C8wqjSLM05KeI4v7Fig+AaoRomWQHESqMESXgJmoS87oP3BwOCCxFcQJonPwLSamsHRKdDvEPwQYN82C91cPW4VL0ZCxsqAATZotK5945YVPaL/WUjUlE9n4NTuO6JF8yw28QgO9QzWvqSywWPD1tZp3S3CpVluCKqgzn3CTusJpbcAbbvMGN2BzeUW/wyLguOn/64OaxlXFR45hv/OmS3NEoQ/1suHErMNrRu3EJ68LBliC6OEGAVkImtEBMn/hlTEi3L2w4XDiAiax7zvOUB4TPD2SdJ/1yVQVmjkyizpIhtEc0lkvdguf8kzHrPBSJOMwQrUPLxesUUmhJWqqxJVHdnKhhtINxxJ3q3ejZ1+X5p0MspGpKqtPUdq+nl2Gn3Rf5qcHtnhoLKIeN7whHN/+PHaN1AZkX/eFyIR+O3bZtQZPTHJWn+mCoRpYW60b0= git@lars.software"
-      ];
+      openssh.authorizedKeys.keys = lib.optional (builtins.pathExists ./ssh-keys/lars.pub)
+        (builtins.readFile ./ssh-keys/lars.pub);
       packages = with pkgs; [
         firefox
         home-manager # Install Home Manager CLI for manual management

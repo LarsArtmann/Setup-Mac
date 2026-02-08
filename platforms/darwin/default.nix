@@ -66,16 +66,22 @@
       ];
     };
 
-    # Pin Go to version 1.26
+    # Pin Go to version 1.26rc3
     nixpkgs.overlays = [
       (final: prev: {
-        go = prev.callPackage (prev.path + "/pkgs/development/compilers/go/1.26.nix") {};
+        go = prev.go_1_26.overrideAttrs (oldAttrs: {
+          version = "1.26rc3";
+          src = prev.fetchurl {
+            url = "https://go.dev/dl/go1.26rc3.src.tar.gz";
+            hash = "sha256:16rfmn05vkrpyr817xz1lq1w1i26bi6kq0j7h7fnb19qw03sfzdp";
+          };
+        });
       })
       (final: prev: {
-        # Override golangci-lint to use Go 1.26 instead of default Go version
-        # golangci-lint uses buildGo125Module by default, we need to use buildGo126Module
+        # Override golangci-lint to use Go 1.26rc3 instead of default Go version
+        # golangci-lint uses buildGo125Module by default, we need to use our Go version
         golangci-lint = prev.golangci-lint.override {
-          buildGo125Module = prev.buildGo126Module;
+          buildGo125Module = prev.buildGoModule.override { go = final.go; };
         };
       })
     ];

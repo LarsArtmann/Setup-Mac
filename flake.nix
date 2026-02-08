@@ -90,11 +90,18 @@
           config.allowUnfree = true;
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays = [
-            # Pin Go to version 1.26rc2 for all systems
+            # Pin Go to version 1.26rc3 for all systems
             (final: prev: {
-              go = prev.go_1_26;
-              # Override buildGoModule to use Go 1.26 instead of default
-              buildGoModule = prev.buildGo126Module;
+              go = prev.go_1_26.overrideAttrs (oldAttrs: {
+                version = "1.26rc3";
+                src = prev.fetchurl {
+                  url = "https://go.dev/dl/go1.26rc3.src.tar.gz";
+                  hash = "sha256:16rfmn05vkrpyr817xz1lq1w1i26bi6kq0j7h7fnb19qw03sfzdp";
+                };
+              });
+              buildGo126Module = prev.buildGoModule.override { go = final.go; };
+              # Override buildGoModule to use Go 1.26rc3 instead of default
+              buildGoModule = prev.buildGoModule.override { go = final.go; };
             })
           ];
         };
@@ -135,12 +142,19 @@
             inherit nix-colors;
           };
           modules = [
-            # Pin Go to version 1.26rc2 for all packages in system
+            # Pin Go to version 1.26rc3 for all packages in system
             {
               nixpkgs.overlays = [
                 (final: prev: {
-                  go = prev.go_1_26;
-                  buildGoModule = prev.buildGo126Module;
+                  go = prev.go_1_26.overrideAttrs (oldAttrs: {
+                    version = "1.26rc3";
+                    src = prev.fetchurl {
+                      url = "https://go.dev/dl/go1.26rc3.src.tar.gz";
+                      hash = "sha256:16rfmn05vkrpyr817xz1lq1w1i26bi6kq0j7h7fnb19qw03sfzdp";
+                    };
+                  });
+                  buildGo126Module = prev.buildGoModule.override { go = final.go; };
+                  buildGoModule = prev.buildGoModule.override { go = final.go; };
                 })
               ];
             }
