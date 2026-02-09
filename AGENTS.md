@@ -1,6 +1,6 @@
 # Setup-Mac: AGENT GUIDE
 
-**Last Updated:** 2026-02-05
+**Last Updated:** 2026-02-09
 **Project Type:** Cross-Platform Nix Configuration (macOS + NixOS)
 **Architecture:** Declarative System Configuration with Type Safety
 
@@ -779,6 +779,7 @@ type(scope): brief description
 - **NEVER edit package.json manually** - Always use `bun add`
 - **ALWAYS use `git mv`** - Never plain `mv` in git repos
 - **TYPE SAFETY FIRST** - All configs must validate through core system
+- **NEVER use OpenZFS on macOS** - Causes kernel panics (see ADR-003). ZFS only allowed on NixOS Linux
 
 ### Common Pitfalls
 
@@ -792,6 +793,7 @@ type(scope): brief description
 - **macOS**: Use `darwin-rebuild` commands via Just
 - **NixOS**: Use `nixos-rebuild` commands via Just
 - **Cross-platform**: Shared packages in `platforms/common/` prevent drift
+- **ZFS**: Linux only - OpenZFS on macOS causes kernel panics (banned per ADR-003)
 
 ---
 
