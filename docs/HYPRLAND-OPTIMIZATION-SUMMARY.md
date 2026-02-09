@@ -1,21 +1,26 @@
 # Hyprland + AMD GPU Optimization Summary
 
 ## Overview
+
 This document summarizes the optimizations applied to the NixOS configuration for optimal Hyprland performance on AMD hardware (Ryzen AI Max+).
 
 ## Questions Answered
 
 ### 1. Is Hyprland using Home Manager?
+
 **YES** - And this is the recommended approach:
+
 - **System Level** (`programs.hyprland`): Core package, Xwayland, portal integration
 - **User Level** (`wayland.windowManager.hyprland`): Window manager configuration, keybindings, rules
 
 ### 2. Is OpenGL enabled?
+
 **YES** - OpenGL is enabled via `hardware.graphics.enable = true` with AMD-specific optimizations
 
 ## Applied Optimizations
 
 ### 1. Enhanced Graphics Packages (dotfiles/nixos/configuration.nix)
+
 ```nix
 hardware.graphics = {
   enable = true;
@@ -30,6 +35,7 @@ hardware.graphics = {
 ```
 
 ### 2. AMD Kernel Parameters (dotfiles/nixos/configuration.nix)
+
 ```nix
 boot.kernelParams = [
   "amdgpu.ppfeaturemask=0xfffd7fff"  # Enable all GPU features
@@ -40,6 +46,7 @@ boot.kernelParams = [
 ```
 
 ### 3. Performance Environment Variables (dotfiles/nixos/configuration.nix)
+
 ```nix
 environment.sessionVariables = {
   # Graphics driver settings
@@ -55,6 +62,7 @@ environment.sessionVariables = {
 ```
 
 ### 4. Monitoring Tools Added (dotfiles/nixos/configuration.nix)
+
 ```nix
 environment.systemPackages = with pkgs; [
   # AMD GPU monitoring and control
@@ -67,6 +75,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 ### 5. Hyprland Rendering Optimizations (platforms/nixos/desktop/hyprland.nix)
+
 ```nix
 misc = {
   force_default_wallpaper = 0;
@@ -84,6 +93,7 @@ render = {
 ```
 
 ### 6. User-level Monitoring Tools (platforms/nixos/desktop/hyprland.nix)
+
 ```nix
 home.packages = with pkgs; [
   # ... (previous packages)
@@ -96,7 +106,9 @@ home.packages = with pkgs; [
 ## Verification Tools Created
 
 ### verify-hyprland.sh
+
 A comprehensive script that checks:
+
 - AMD GPU driver status
 - OpenGL/Vulkan support
 - Kernel parameters
@@ -108,16 +120,19 @@ A comprehensive script that checks:
 ## Usage Instructions
 
 ### To Apply Changes
+
 ```bash
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 ### To Verify Optimizations
+
 ```bash
 ./verify-hyprland.sh
 ```
 
 ### To Monitor GPU Performance
+
 ```bash
 # Real-time GPU monitoring
 amdgpu_top
@@ -143,16 +158,19 @@ corectrl
 ## Troubleshooting
 
 ### If GPU driver not loaded:
+
 - Check hardware compatibility
 - Verify amdgpu is in kernel modules
 - Run `lspci -nnk | grep -i vga`
 
 ### If Vulkan not working:
+
 - Verify installation with `vulkaninfo`
 - Check that AMD_VULKAN_ICD=RADV is set
 - Ensure proper GPU drivers are installed
 
 ### If Hyprland performance issues:
+
 - Check that user is in 'video' and 'input' groups
 - Verify Wayland environment variables
 - Test with minimal Hyprland config

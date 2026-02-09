@@ -64,6 +64,7 @@ Ready? Here's my error:
 ## Usage Example
 
 **User Input:**
+
 ```
 I'm getting this error when running `just switch`:
 
@@ -72,6 +73,7 @@ at /path/to/WrapperTemplate.nix:46:30
 ```
 
 **AI Response:**
+
 ```
 ROOT CAUSE:
 WrapperTemplate.nix uses `config` self-reference in a lib.types.submodule
@@ -108,6 +110,7 @@ Shall I proceed with Option 1?
 ## Variations
 
 ### For Dependency Issues:
+
 ```
 Error involves broken package (marked as broken in nixpkgs).
 
@@ -118,6 +121,7 @@ Add this requirement:
 ```
 
 ### For Performance Issues:
+
 ```
 Build succeeds but system is slow.
 
@@ -128,6 +132,7 @@ Add this requirement:
 ```
 
 ### For Type Errors:
+
 ```
 Error about type mismatches or unexpected arguments.
 
@@ -142,6 +147,7 @@ Add this requirement:
 ## Success Criteria
 
 After following this prompt, you should have:
+
 - ✅ Clear understanding of root cause
 - ✅ 2-3 evaluated options
 - ✅ Incremental git commits with detailed messages

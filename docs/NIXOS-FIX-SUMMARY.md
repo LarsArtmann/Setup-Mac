@@ -1,16 +1,20 @@
 # NixOS evo-x2 Home Manager Fix Summary
 
 ## Issue Identified
+
 Home Manager error was caused by parameter mismatch in `dotfiles/nixos/home.nix`:
+
 - Expected `Validation` parameter that wasn't passed from `flake.nix`
 - `Validation` is commented out in flake.nix due to Darwin-specific code
 
 ## Fix Applied
+
 ✅ Removed `Validation` from parameter list in `dotfiles/nixos/home.nix`
 
 ## How to Apply the Fix on evo-x2
 
 1. **Transfer the fixed file to evo-x2**:
+
    ```bash
    # On macOS, create a tarball of the fixed files
    tar -czf nixos-fix.tar.gz \
@@ -27,6 +31,7 @@ Home Manager error was caused by parameter mismatch in `dotfiles/nixos/home.nix`
    ```
 
 2. **On evo-x2, extract and apply**:
+
    ```bash
    # Extract files
    cd /home/lars/Setup-Mac  # Or wherever your repo is
@@ -40,6 +45,7 @@ Home Manager error was caused by parameter mismatch in `dotfiles/nixos/home.nix`
    ```
 
 3. **Quick test without diagnostic script**:
+
    ```bash
    # Test build without applying
    sudo nixos-rebuild check --flake .#evo-x2

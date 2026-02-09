@@ -169,12 +169,14 @@ AVOID THESE APPROACHES:
 ## Success Criteria Templates
 
 ### Minimal Success
+
 - [ ] Package installs successfully on macOS
 - [ ] Basic functionality verified with simple test
 - [ ] No system conflicts or configuration breaking
 - [ ] Working uninstall/rollback procedure documented
 
 ### Standard Success
+
 - [ ] All minimal success criteria met
 - [ ] Integration with existing configuration management
 - [ ] Service starts automatically if applicable
@@ -182,6 +184,7 @@ AVOID THESE APPROACHES:
 - [ ] Troubleshooting steps documented
 
 ### Comprehensive Success
+
 - [ ] All standard success criteria met
 - [ ] Advanced configuration and customization
 - [ ] Performance optimization applied
@@ -239,11 +242,13 @@ nix search nixpkgs tcpdump
 ## Integration with Existing Workflows
 
 ### Nix Configuration Files
+
 - **CLI tools**: Add to `dotfiles/nix/environment.nix` systemPackages
 - **GUI applications**: Add to `dotfiles/nix/homebrew.nix` casks
 - **Services**: Configure in appropriate Nix modules
 
 ### Deployment Commands
+
 ```bash
 just test        # Verify configuration before applying
 just switch      # Apply changes
@@ -251,6 +256,7 @@ just rollback    # Revert if issues
 ```
 
 ### Verification Commands
+
 ```bash
 just health      # System health check
 just check       # Configuration status

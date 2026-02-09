@@ -25,15 +25,18 @@
    - Select backup file from `backup/` directory
 
 ## Extension URL
+
 chrome-extension://cjpalhdlnbpafiamejdnhcphjbkeiagm/dashboard.html
 
 ## Advanced Configuration
 
 ### Custom Filter Lists
+
 - Enable "Malware Domain List"
 - Enable "Peter Lowe's Ad and tracking server list"
 - Add custom filter URLs if needed
 
 ### Whitelist Management
+
 - Add trusted domains to whitelist
 - Use temporary whitelist for troubleshooting

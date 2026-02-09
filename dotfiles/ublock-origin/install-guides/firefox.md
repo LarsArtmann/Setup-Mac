@@ -24,16 +24,19 @@
    - Import from backup file when needed
 
 ## Extension URL
+
 moz-extension://[unique-id]/dashboard.html
 
 ## Firefox-Specific Features
 
 ### Enhanced Tracking Protection
+
 - Works alongside Firefox's built-in protection
 - Can be configured to complement each other
 - Avoid conflicts by reviewing settings
 
 ### Developer Tools Integration
+
 - Advanced users can use Firefox Developer Tools
 - Network monitoring shows blocked requests
 - Useful for filter development and testing

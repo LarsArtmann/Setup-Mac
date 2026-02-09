@@ -1,6 +1,7 @@
 # Nix Configuration File Dependency Graph
 
 ## Entry Point
+
 ```
 flake.nix (ROOT)
 │
@@ -12,6 +13,7 @@ flake.nix (ROOT)
 ## Module Loading Order (flake.nix lines 82-148)
 
 ### 1. Base Configuration
+
 ```
 base (system config revision)
 │
@@ -19,6 +21,7 @@ base (system config revision)
 ```
 
 ### 2. Custom Packages Overlay
+
 ```
 heliumOverlay
 │
@@ -28,6 +31,7 @@ heliumOverlay
 ```
 
 ### 3. Core System Modules
+
 ```
 ./dotfiles/nix/core.nix
 │
@@ -44,6 +48,7 @@ heliumOverlay
 ```
 
 ### 4. System Preferences
+
 ```
 ./dotfiles/nix/system.nix
 │
@@ -56,6 +61,7 @@ heliumOverlay
 ```
 
 ### 5. Environment & Packages
+
 ```
 ./dotfiles/nix/environment.nix
 │
@@ -70,6 +76,7 @@ heliumOverlay
 ```
 
 ### 6. Programs Configuration
+
 ```
 ./dotfiles/nix/programs.nix
 │
@@ -82,6 +89,7 @@ heliumOverlay
 ```
 
 ### 7. Application Integration
+
 ```
 ./dotfiles/nix/activitywatch.nix
 │
@@ -90,6 +98,7 @@ heliumOverlay
 ```
 
 ### 8. Community Packages
+
 ```
 ./dotfiles/nix/nur.nix
 │
@@ -97,6 +106,7 @@ heliumOverlay
 ```
 
 ### 9. Homebrew Integration
+
 ```
 ./dotfiles/nix/homebrew.nix + nix-homebrew module
 │
@@ -112,6 +122,7 @@ heliumOverlay
 ```
 
 ### 10. Network Configuration
+
 ```
 ./dotfiles/nix/networking.nix
 │
@@ -119,6 +130,7 @@ heliumOverlay
 ```
 
 ### 11. User Management
+
 ```
 ./dotfiles/nix/users.nix
 │
@@ -127,6 +139,7 @@ heliumOverlay
 ```
 
 ### 12. macOS Integration
+
 ```
 mac-app-util.darwinModules.default
 │
@@ -136,6 +149,7 @@ mac-app-util.darwinModules.default
 ## Core Support Files
 
 ### User Configuration
+
 ```
 ./core/UserConfig.nix
 │
@@ -144,6 +158,7 @@ mac-app-util.darwinModules.default
 ```
 
 ### Path Configuration
+
 ```
 ./core/PathConfig.nix
 │
@@ -153,6 +168,7 @@ mac-app-util.darwinModules.default
 ```
 
 ### Validation Framework
+
 ```
 ./core/Validation.nix
 ./core/ConfigAssertions.nix
@@ -164,6 +180,7 @@ mac-app-util.darwinModules.default
 ```
 
 ### Wrappers System
+
 ```
 ./wrappers/default.nix
 ├── ./wrappers/applications/ (GUI app wrappers)
@@ -227,6 +244,7 @@ The GitHub CLI (`gh`) issue stems from:
 ## Configuration Validation
 
 The system includes comprehensive validation:
+
 - Module assertions in core.nix
 - Configuration validation in environment.nix
 - Path validation in PathConfig.nix

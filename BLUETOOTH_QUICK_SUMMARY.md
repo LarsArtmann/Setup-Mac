@@ -3,10 +3,12 @@
 ## What I Did
 
 ### 1. Created Comprehensive Documentation
+
 - **AUDIO_CASTING_HISTORY.md** - Complete history of all attempts, failures, and lessons learned
 - **BLUETOOTH_SETUP_GUIDE.md** - Step-by-step guide for pairing and configuring Bluetooth
 
 ### 2. Implemented Bluetooth Solution
+
 - **File:** `/home/lars/Setup-Mac/platforms/nixos/hardware/bluetooth.nix`
   - Enabled Bluetooth hardware support
   - Configured audio source/sink roles
@@ -17,6 +19,7 @@
   - Imported Bluetooth module into system configuration
 
 ### 3. Committed All Changes
+
 - All changes committed to git with detailed message
 - All pre-commit hooks passed (gitleaks, deadnix, statix, alejandra, flake check)
 
@@ -25,6 +28,7 @@
 ## Why This Approach?
 
 ### The Problem (What Went Wrong):
+
 1. **FCast ≠ Google Cast** - Completely different protocols, incompatible
 2. **Google Cast limitation** - Not designed for live system audio streaming
 3. **Complex workaround required** - Would need 4-process chain (capture → encode → stream → cast)
@@ -32,6 +36,7 @@
 5. **Poor reliability** - Multiple failure points, buffer issues
 
 ### The Solution (Bluetooth):
+
 ✅ Native Nest Audio support
 ✅ Simple, reliable setup
 ✅ Works with ALL system audio
@@ -47,12 +52,14 @@
 ### On evo-x2 System:
 
 **Step 1: Rebuild NixOS**
+
 ```bash
 cd /home/lars/Setup-Mac
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 **Step 2: Reboot (required for Bluetooth kernel modules)**
+
 ```bash
 sudo reboot
 ```
@@ -60,12 +67,14 @@ sudo reboot
 **Step 3: After reboot, pair with Nest Audio**
 
 **Option A - GUI (Recommended):**
+
 ```bash
 blueman-manager
 # Click Search → Select "Google Nest Audio" → Click Pair → Click Connect
 ```
 
 **Option B - Command Line:**
+
 ```bash
 # Turn on Bluetooth
 bluetoothctl power on
@@ -86,6 +95,7 @@ bluetoothctl trust XX:XX:XX:XX:XX:XX
 ```
 
 **Step 4: Set Nest Audio as Default Audio Output**
+
 ```bash
 # List available audio sinks
 pactl list short sinks
@@ -99,6 +109,7 @@ pavucontrol
 ```
 
 **Step 5: Test**
+
 ```bash
 # Play test sound
 paplay /usr/share/sounds/freedesktop/stereo/complete.oga
@@ -113,14 +124,17 @@ vlc /path/to/music.mp3
 ## Files Created/Modified
 
 ### New Files:
+
 - `AUDIO_CASTING_HISTORY.md` - Complete project history
 - `BLUETOOTH_SETUP_GUIDE.md` - Detailed setup instructions
 - `platforms/nixos/hardware/bluetooth.nix` - Bluetooth configuration
 
 ### Modified Files:
+
 - `platforms/nixos/system/configuration.nix` - Added Bluetooth import
 
 ### Unchanged (not relevant to Bluetooth):
+
 - `cast-all-audio.sh` - Bash streaming script (abandoned)
 - `cast-audio.go` - Go streaming program (abandoned)
 - `go.mod` - Go module dependencies (abandoned)
@@ -153,6 +167,7 @@ vlc /path/to/music.mp3
 ## Troubleshooting
 
 ### If Bluetooth won't start:
+
 ```bash
 sudo systemctl start bluetooth
 sudo systemctl enable bluetooth
@@ -160,6 +175,7 @@ bluetoothctl power on
 ```
 
 ### If Nest Audio not found during scan:
+
 ```bash
 # Make sure Bluetooth is powered on
 bluetoothctl power on
@@ -171,6 +187,7 @@ bluetoothctl scan off
 ```
 
 ### If pairing fails:
+
 ```bash
 # Remove any existing pairing
 bluetoothctl remove XX:XX:XX:XX:XX:XX
@@ -181,6 +198,7 @@ bluetoothctl pair XX:XX:XX:XX:XX:XX
 ```
 
 ### If no audio comes from Nest Audio:
+
 ```bash
 # Check output device
 pactl list short sinks
@@ -208,17 +226,17 @@ pavucontrol
 
 ## Why This Is Better Than the Streaming Scripts
 
-| Aspect | Bluetooth | Streaming Scripts |
-|--------|-----------|------------------|
-| Reliability | High | Low |
-| Complexity | Low | Very High |
-| Latency | 50-200ms | 2-5 seconds |
-| Audio Quality | No loss | Encoding loss |
-| Setup Time | 10-15 min | 30+ min + debugging |
-| Maintenance | Minimal | High |
-| Works Offline | Yes | No |
-| All System Audio | Yes | Questionable |
-| Failure Points | 1 | 4+ |
+| Aspect           | Bluetooth | Streaming Scripts   |
+| ---------------- | --------- | ------------------- |
+| Reliability      | High      | Low                 |
+| Complexity       | Low       | Very High           |
+| Latency          | 50-200ms  | 2-5 seconds         |
+| Audio Quality    | No loss   | Encoding loss       |
+| Setup Time       | 10-15 min | 30+ min + debugging |
+| Maintenance      | Minimal   | High                |
+| Works Offline    | Yes       | No                  |
+| All System Audio | Yes       | Questionable        |
+| Failure Points   | 1         | 4+                  |
 
 ---
 
@@ -271,5 +289,5 @@ sudo systemctl restart bluetooth
 
 ---
 
-*Summary Created: 2025-12-31*
-*Author: Crush AI Assistant*
+_Summary Created: 2025-12-31_
+_Author: Crush AI Assistant_

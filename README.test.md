@@ -57,23 +57,27 @@ platforms/
 ### Shared Modules
 
 **Fish Shell** (`platforms/common/programs/fish.nix`):
+
 - Common aliases: `l` (list), `t` (tree)
 - Platform-specific alias placeholders
 - Fish greeting disabled (performance)
 - Fish history settings configured
 
 **Starship Prompt** (`platforms/common/programs/starship.nix`):
+
 - Identical on both platforms
 - Fish integration automatic
 - Settings: `add_newline = false`, `format = "$all$character"`
 
 **Tmux** (`platforms/common/programs/tmux.nix`):
+
 - Identical on both platforms
 - Clock24 enabled, mouse enabled
 - Base index: 1, terminal: screen-256color
 - History limit: 100000
 
 **ActivityWatch** (`platforms/common/programs/activitywatch.nix`):
+
 - Platform-conditional: `enable = pkgs.stdenv.isLinux`
 - Darwin: DISABLED (not supported on macOS)
 - NixOS: ENABLED (supported on Linux)
@@ -81,11 +85,13 @@ platforms/
 ### Platform-Specific Overrides
 
 **Darwin** (`platforms/darwin/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (darwin-rebuild)
 - Fish init: Homebrew integration, Carapace completions
 - No Starship/Tmux overrides (uses shared modules)
 
 **NixOS** (`platforms/nixos/users/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (nixos-rebuild)
 - Session variables: Wayland, Qt, NixOS_OZONE_WL
 - Packages: pavucontrol (audio), xdg utils
@@ -104,6 +110,7 @@ platforms/
    - `platforms/nixos/users/home.nix` - NixOS-specific overrides
 
 3. **Validate configuration**:
+
    ```bash
    # Fast syntax check (no build)
    just test-fast
@@ -113,6 +120,7 @@ platforms/
    ```
 
 4. **Apply changes**:
+
    ```bash
    # Darwin (macOS)
    just switch
@@ -129,6 +137,7 @@ platforms/
 ### Import Paths
 
 **Darwin Home Manager** (`platforms/darwin/home.nix`):
+
 ```nix
 imports = [
   ../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -136,6 +145,7 @@ imports = [
 ```
 
 **NixOS Home Manager** (`platforms/nixos/users/home.nix`):
+
 ```nix
 imports = [
   ../../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -147,9 +157,11 @@ imports = [
 ### Known Issues
 
 #### Home Manager Users Definition (Darwin)
+
 **Issue**: Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix` (NixOS-specific file) which requires `config.users.users.<name>.home` to be defined.
 
 **Workaround**: Added explicit user definition in `platforms/darwin/default.nix`:
+
 ```nix
 users.users.lars = {
   name = "lars";
@@ -162,6 +174,7 @@ users.users.lars = {
 **Note**: This may be a Home Manager architecture issue. Consider reporting if causes problems in future versions.
 
 #### ActivityWatch Platform Support
+
 **Issue**: ActivityWatch only supports Linux platforms, not Darwin (macOS).
 
 **Workaround**: Made conditional - `enable = pkgs.stdenv.isLinux` in `platforms/common/programs/activitywatch.nix`.
@@ -171,8 +184,10 @@ users.users.lars = {
 ### Troubleshooting
 
 #### Starship Prompt Not Appearing
+
 **Problem**: Default Fish prompt instead of Starship
 **Solution**:
+
 ```bash
 # Restart shell
 exec fish
@@ -185,8 +200,10 @@ which starship
 ```
 
 #### Fish Aliases Not Working
+
 **Problem**: `nixup` command not found
 **Solution**:
+
 ```bash
 # Reload Fish config
 source ~/.config/fish/config.fish
@@ -197,8 +214,10 @@ type nixup
 ```
 
 #### Tmux Not Configured
+
 **Problem**: Default Tmux config instead of custom
 **Solution**:
+
 ```bash
 # Check Tmux config
 cat ~/.config/tmux/tmux.conf
@@ -208,8 +227,10 @@ tmux kill-server && tmux new-session
 ```
 
 #### Environment Variables Not Set
+
 **Problem**: `EDITOR` or `LANG` not set
 **Solution**:
+
 ```bash
 # Check environment
 echo $EDITOR
@@ -222,6 +243,7 @@ exec fish
 ### Documentation
 
 For detailed information:
+
 - **[Deployment Guide](./docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md)** - Step-by-step deployment and verification
 - **[Verification Template](./docs/verification/HOME-MANAGER-VERIFICATION-TEMPLATE.md)** - Comprehensive checklist
 - **[Cross-Platform Report](./docs/verification/CROSS-PLATFORM-CONSISTENCY-REPORT.md)** - Architecture analysis
@@ -240,11 +262,13 @@ For detailed information:
 ### Installation
 
 1. **Install Nix (Determinate Systems installer recommended):**
+
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
    ```
 
 2. **Clone and apply configuration:**
+
    ```bash
    git clone https://github.com/LarsArtmann/Setup-Mac.git ~/Desktop/Setup-Mac
    cd ~/Desktop/Setup-Mac
@@ -267,6 +291,7 @@ For detailed information:
 After installation, you'll have access to 100+ development tools including:
 
 **Languages & Runtimes:**
+
 - Go (with templ, sqlc, go-tools)
 - Node.js, Bun, pnpm
 - Java (JDK 21), Kotlin
@@ -274,12 +299,14 @@ After installation, you'll have access to 100+ development tools including:
 - Python utilities (uv)
 
 **Cloud & DevOps:**
+
 - AWS CLI, Google Cloud SDK
 - Kubernetes (kubectl, k9s, Helm)
 - Terraform, Docker Buildx
 - Infrastructure tools
 
 **Development:**
+
 - Git + GitHub CLI + Git Town
 - JetBrains Toolbox
 - VS Code, Sublime Text
@@ -298,3 +325,4 @@ The project uses **Just** as a task runner for all operations:
 just setup          # Complete fresh installation
 just switch         # Apply Nix configuration
 just build          # Build without applying
+```

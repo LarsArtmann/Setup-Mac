@@ -9,6 +9,7 @@
 ## 📋 Quick Reference
 
 ### Current Status
+
 - **Version**: v0.39.1 (working perfectly)
 - **Automation**: 100% functional and tested
 - **Documentation**: 5 comprehensive files (42+ KB)
@@ -16,6 +17,7 @@
 - **v0.39.3 Upgrade**: Blocked by 2 external factors
 
 ### Key Commands
+
 ```bash
 # Apply configuration
 just switch
@@ -31,6 +33,7 @@ just clean-aggressive
 ```
 
 ### Blocking Issues
+
 1. **Disk Space**: 99% used (2.9GB free, need ~20GB)
 2. **Upstream Bug**: v0.39.2+ vendor directory broken
 
@@ -39,9 +42,11 @@ just clean-aggressive
 ## 📚 Documentation Index
 
 ### 1. crush-patched-automation-status.md (6.6 KB)
+
 **Purpose**: Automation status and troubleshooting guide
 
 **Contents**:
+
 - Automation features and status
 - Known patch conflicts (all documented)
 - Usage examples
@@ -53,9 +58,11 @@ just clean-aggressive
 ---
 
 ### 2. crush-upgrade-action-plan.md (11 KB)
+
 **Purpose**: Complete action plan for v0.39.3 upgrade
 
 **Contents**:
+
 - Root cause analysis of blocking issues
 - Disk space problem detailed analysis
 - Vendor directory issue deep dive
@@ -68,9 +75,11 @@ just clean-aggressive
 ---
 
 ### 3. crush-final-summary-report.md (17.6 KB)
+
 **Purpose**: Executive summary of entire project
 
 **Contents**:
+
 - What was accomplished
 - Testing performed and results
 - Files modified and commits pushed
@@ -83,9 +92,11 @@ just clean-aggressive
 ---
 
 ### 4. crush-advanced-build-strategies.md (12+ KB)
+
 **Purpose**: Alternative build strategies when standard approach fails
 
 **Contents**:
+
 - Strategy 1: Vendor-free build (simplest)
 - Strategy 2: Generate vendor during build (fastest after first)
 - Strategy 3: Force network mode
@@ -98,9 +109,11 @@ just clean-aggressive
 ---
 
 ### 5. crush-comprehensive-test-plan.md (16+ KB)
+
 **Purpose**: Complete testing strategy
 
 **Contents**:
+
 - Unit tests (6 completed)
 - Integration tests (1/4 completed)
 - Edge cases (3/6 completed)
@@ -189,11 +202,13 @@ A local copy of all Go dependencies in the `vendor/` directory.
 `buildGoModule` uses vendor directory if present, requiring `vendorHash` for reproducibility.
 
 **The problem with v0.39.2+:**
+
 - `vendor/modules.txt` must match `go.mod` exactly
 - v0.39.2+ tarballs have NO vendor directory
 - Build process may create inconsistent vendor
 
 **Solution approaches:**
+
 1. **Standard**: Let Nix calculate vendorHash (current default)
 2. **Vendor-free**: Set `vendorHash = null`, download all deps (Strategy 1)
 3. **Generate vendor**: Add `postUnpack = "go mod vendor"` (Strategy 2)
@@ -204,6 +219,7 @@ A local copy of all Go dependencies in the `vendor/` directory.
 
 **What keeps paths alive?**
 GC roots (symlinks) prevent deletion:
+
 - System generations (e.g., `/nix/var/nix/profiles/system-57-link`)
 - User profiles (e.g., `~/.local/state/nix/profiles/profile-36-link`)
 - Home Manager (e.g., `~/.local/state/home-manager/gcroots/current-home`)
@@ -213,6 +229,7 @@ GC roots (symlinks) prevent deletion:
 All large packages (llvm, rustc, go, etc.) are in active generations.
 
 **What to do:**
+
 ```bash
 # Option 1: Remove old generations (safe)
 nix-collect-garbage -d --delete-older-than 1d
@@ -229,21 +246,25 @@ nix-store --optimize
 ### Automation Design Philosophy
 
 **Principle 1: Failure is Expected**
+
 - System designed to fail gracefully
 - Every error path has rollback
 - No broken state possible
 
 **Principle 2: User Empathy**
+
 - Clear error messages
 - Actionable next steps
 - No cryptic technical jargon alone
 
 **Principle 3: State Consistency**
+
 - Backup before ANY changes
 - Rollback on ANY failure
 - System ALWAYS buildable
 
 **Principle 4: Automation First**
+
 - Detect latest version automatically
 - Extract vendorHash automatically
 - Clean up automatically
@@ -254,34 +275,37 @@ nix-store --optimize
 ## 📊 Success Metrics
 
 ### Automation System
-| Component | Status | Tests | Coverage |
-|-----------|--------|--------|----------|
-| Version detection | ✅ | 3/3 | 100% |
-| Backup management | ✅ | 2/2 | 100% |
-| VendorHash extraction | ✅ | 1/1 | 100% |
-| Rollback mechanism | ✅ | 2/2 | 100% |
-| Error handling | ✅ | 6/6 | 100% |
-| **Overall** | **✅** | **14/14** | **100%** |
+
+| Component             | Status | Tests     | Coverage |
+| --------------------- | ------ | --------- | -------- |
+| Version detection     | ✅     | 3/3       | 100%     |
+| Backup management     | ✅     | 2/2       | 100%     |
+| VendorHash extraction | ✅     | 1/1       | 100%     |
+| Rollback mechanism    | ✅     | 2/2       | 100%     |
+| Error handling        | ✅     | 6/6       | 100%     |
+| **Overall**           | **✅** | **14/14** | **100%** |
 
 ### Testing Status
-| Category | Completed | Total | Coverage |
-|----------|-----------|-------|----------|
-| Unit tests | 6 | 6 | 100% |
-| Integration tests | 1 | 4 | 25% |
-| Edge cases | 3 | 6 | 50% |
-| Regression tests | 1 | 3 | 33% |
-| Performance tests | 2 | 3 | 67% |
-| **Overall** | **13** | **22** | **59%** |
+
+| Category          | Completed | Total  | Coverage |
+| ----------------- | --------- | ------ | -------- |
+| Unit tests        | 6         | 6      | 100%     |
+| Integration tests | 1         | 4      | 25%      |
+| Edge cases        | 3         | 6      | 50%      |
+| Regression tests  | 1         | 3      | 33%      |
+| Performance tests | 2         | 3      | 67%      |
+| **Overall**       | **13**    | **22** | **59%**  |
 
 ### Documentation
-| File | Size | Purpose |
-|------|------|---------|
-| crush-patched-automation-status.md | 6.6 KB | Status & troubleshooting |
-| crush-upgrade-action-plan.md | 11 KB | Action plan |
-| crush-final-summary-report.md | 17.6 KB | Executive summary |
-| crush-advanced-build-strategies.md | 12+ KB | Alternative strategies |
-| crush-comprehensive-test-plan.md | 16+ KB | Test plan |
-| **Total** | **63+ KB** | **Complete** |
+
+| File                               | Size       | Purpose                  |
+| ---------------------------------- | ---------- | ------------------------ |
+| crush-patched-automation-status.md | 6.6 KB     | Status & troubleshooting |
+| crush-upgrade-action-plan.md       | 11 KB      | Action plan              |
+| crush-final-summary-report.md      | 17.6 KB    | Executive summary        |
+| crush-advanced-build-strategies.md | 12+ KB     | Alternative strategies   |
+| crush-comprehensive-test-plan.md   | 16+ KB     | Test plan                |
+| **Total**                          | **63+ KB** | **Complete**             |
 
 ---
 
@@ -290,6 +314,7 @@ nix-store --optimize
 ### For New Users
 
 **Step 1: Understand the system**
+
 ```bash
 # Read executive summary
 cat docs/crush-final-summary-report.md | head -100
@@ -299,11 +324,13 @@ cat pkgs/crush-patched.nix | grep "version ="
 ```
 
 **Step 2: Apply current configuration**
+
 ```bash
 just switch
 ```
 
 **Step 3: Verify it works**
+
 ```bash
 which crush
 crush --version
@@ -314,6 +341,7 @@ crush --version
 ### For Upgrading to v0.39.3
 
 **Prerequisites Check:**
+
 ```bash
 # Check disk space
 df -h /nix | tail -1
@@ -322,6 +350,7 @@ df -h /nix | tail -1
 ```
 
 **If disk space OK:**
+
 ```bash
 # Try automatic update
 just update
@@ -334,6 +363,7 @@ crush --version
 ```
 
 **If disk space insufficient:**
+
 ```bash
 # Free disk space
 just clean-aggressive
@@ -343,6 +373,7 @@ just update
 ```
 
 **If vendor issues persist:**
+
 ```bash
 # Read alternative strategies
 cat docs/crush-advanced-build-strategies.md
@@ -360,6 +391,7 @@ nix build .#crush-patched
 ### For Troubleshooting
 
 **Issue: Build fails**
+
 ```bash
 # Check build log
 cat /tmp/crush-build.log
@@ -372,6 +404,7 @@ cat pkgs/crush-patched.nix | grep "version ="
 ```
 
 **Issue: Can't extract vendorHash**
+
 ```bash
 # Read troubleshooting guide
 cat docs/crush-patched-automation-status.md | grep -A 20 "Troubleshooting"
@@ -381,6 +414,7 @@ cat docs/crush-patched-automation-status.md | grep -A 20 "Troubleshooting"
 ```
 
 **Issue: Disk space**
+
 ```bash
 # Check space
 df -h /nix
@@ -417,9 +451,11 @@ Setup-Mac/
 ## 🔑 Key Files Explained
 
 ### pkgs/crush-patched.nix
+
 **Purpose**: Nix package definition for crush-patched
 
 **Key sections**:
+
 - `version`: Current version (v0.39.1)
 - `src`: Source tarball URL and hash
 - `vendorHash`: Hash of Go dependencies (for reproducibility)
@@ -428,6 +464,7 @@ Setup-Mac/
 - `ldflags`: Linker flags (version, stripping)
 
 **Modifying**:
+
 ```nix
 # To change version:
 version = "v0.39.3";  # Update version string
@@ -449,9 +486,11 @@ postUnpack = ''
 ---
 
 ### pkgs/update-crush-patched.sh
+
 **Purpose**: Automated update script
 
 **Key features**:
+
 1. Version detection from GitHub API
 2. Backup creation before changes
 3. Source hash calculation
@@ -461,6 +500,7 @@ postUnpack = ''
 7. Cleanup on success
 
 **Running manually**:
+
 ```bash
 # Automatic version detection
 ./pkgs/update-crush-patched.sh
@@ -470,6 +510,7 @@ postUnpack = ''
 ```
 
 **Error handling**:
+
 - Network failure: Exits with error message
 - Invalid version: Exits with error message
 - Build failure: Rolls back and explains why
@@ -478,9 +519,11 @@ postUnpack = ''
 ---
 
 ### justfile
+
 **Purpose**: Task runner
 
 **Relevant command** (line 50):
+
 ```makefile
 update:
     @echo "📦 Updating system packages..."
@@ -493,6 +536,7 @@ update:
 ```
 
 **Usage**:
+
 ```bash
 just update      # Updates everything (includes crush-patched)
 just switch      # Applies configuration changes
@@ -504,16 +548,19 @@ just test-fast   # Quick syntax check
 ## 🎓 Learning Path
 
 ### Beginner
+
 1. Read `crush-final-summary-report.md` (executive overview)
 2. Read `crush-patched-automation-status.md` (how it works)
 3. Run `just switch` to see it in action
 
 ### Intermediate
+
 1. Read `crush-upgrade-action-plan.md` (deep dive)
 2. Understand Nix store GC behavior
 3. Try vendor-free build strategy
 
 ### Advanced
+
 1. Read `crush-advanced-build-strategies.md` (all strategies)
 2. Read `crush-comprehensive-test-plan.md` (testing)
 3. Contribute improvements or report issues
@@ -523,16 +570,19 @@ just test-fast   # Quick syntax check
 ## 🔗 External References
 
 ### Crush Repository
+
 - **GitHub**: https://github.com/charmbracelet/crush
 - **Releases**: https://github.com/charmbracelet/crush/releases
 - **Issues**: https://github.com/charmbracelet/crush/issues
 
 ### Nix Documentation
+
 - **buildGoModule**: https://nixos.org/manual/nixpkgs/stable/#sec-functions-library-buildGoModule
 - **Vendor Hashes**: https://nixos.org/manual/nixpkgs/stable/#sec-language-go-vendorHash
 - **Garbage Collection**: https://nixos.org/manual/nix/stable/chapters/garbage-collector.html
 
 ### Go Documentation
+
 - **go mod vendor**: https://go.dev/ref/mod#go-mod-vendor
 - **Vendor Directory**: https://go.dev/ref/mod#vendor-directories
 
@@ -541,24 +591,28 @@ just test-fast   # Quick syntax check
 ## ✅ Verification Checklist
 
 ### Before Making Changes
+
 - [ ] Read relevant documentation
 - [ ] Understand what you're changing
 - [ ] Backup current configuration
 - [ ] Have rollback plan ready
 
 ### After Making Changes
+
 - [ ] Run `just test-fast`
 - [ ] Run `nix flake check --no-build`
 - [ ] Update documentation if needed
 - [ ] Test actual functionality
 
 ### Before Upgrading
+
 - [ ] Check disk space (need ~20GB)
 - [ ] Read upgrade action plan
 - [ ] Have time to troubleshoot if needed
 - [ ] Know rollback procedure
 
 ### After Upgrading
+
 - [ ] Verify new version works
 - [ ] Run system health check
 - [ ] Update any affected documentation
@@ -639,6 +693,7 @@ cat docs/crush-advanced-build-strategies.md
 ## 📈 Future Enhancements
 
 ### Automation Improvements
+
 - [ ] Add vendor-free fallback automatically
 - [ ] Parallel version and source fetch
 - [ ] Cache GitHub API responses
@@ -646,6 +701,7 @@ cat docs/crush-advanced-build-strategies.md
 - [ ] Support for multiple architectures
 
 ### Documentation Improvements
+
 - [ ] Add more examples
 - [ ] Create video tutorials
 - [ ] Add FAQ section
@@ -653,6 +709,7 @@ cat docs/crush-advanced-build-strategies.md
 - [ ] Add performance benchmarks
 
 ### Testing Improvements
+
 - [ ] Automated test runner
 - [ ] CI/CD integration
 - [ ] Mock external dependencies
@@ -677,6 +734,7 @@ cat docs/crush-advanced-build-strategies.md
 🔵 **Ready** - Everything in place for seamless upgrade
 
 **What's Next**:
+
 1. Free disk space: `just clean-aggressive`
 2. Wait for vendor fix or use vendor-free strategy
 3. Run `just update` - automation handles everything

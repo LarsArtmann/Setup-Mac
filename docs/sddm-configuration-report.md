@@ -9,6 +9,7 @@
 ## 🔍 Current Configuration Analysis
 
 ### Current SDDM Setup
+
 ```nix
 services.displayManager.sddm = {
   enable = true;
@@ -18,6 +19,7 @@ services.displayManager.sddm = {
 ```
 
 ### Critical Findings
+
 1. **Experimental Wayland Enabled** - May cause stability issues with AMD GPU
 2. **Missing Important Options** - No autoNumlock, enableHidpi, or extraPackages
 3. **Theme Package Correctly Added** - Good setup in systemPackages
@@ -30,12 +32,14 @@ services.displayManager.sddm = {
 ### 🔧 CORE DISPLAY MANAGER OPTIONS
 
 #### **`services.displayManager.sddm.enable`**
+
 - **Purpose:** Enables SDDM as the system display manager
 - **Current:** `true` ✅
 - **Recommendation:** Keep `true` - essential for login screen
 - **Priority:** CRITICAL
 
 #### **`services.displayManager.sddm.wayland.enable`**
+
 - **Purpose:** Enables experimental Wayland support for SDDM itself
 - **Current:** `true` ⚠️
 - **Recommendation:** Set to `false` for stability
@@ -47,6 +51,7 @@ services.displayManager.sddm = {
   - Wayland in SDDM ≠ Wayland in Hyprland
 
 #### **`services.displayManager.sddm.wayland.compositor`**
+
 - **Purpose:** Compositor for SDDM's own interface when in Wayland mode
 - **Current:** Not set (defaults to "weston")
 - **Recommendation:** Not needed when `wayland.enable = false`
@@ -55,6 +60,7 @@ services.displayManager.sddm = {
 ### 🎨 VISUAL AND THEMING OPTIONS
 
 #### **`services.displayManager.sddm.theme`**
+
 - **Purpose:** Sets the visual theme for login screen
 - **Current:** `"sddm-sugar-dark"` ✅
 - **Recommendation:** Keep current theme
@@ -62,6 +68,7 @@ services.displayManager.sddm = {
 - **Alternatives:** `"breeze"`, `"maldives"`, custom themes
 
 #### **`services.displayManager.sddm.enableHidpi`**
+
 - **Purpose:** Automatic HiDPI scaling for high-resolution displays
 - **Current:** Not set (defaults to `true`)
 - **Recommendation:** Keep default `true`
@@ -71,12 +78,14 @@ services.displayManager.sddm = {
 ### 📦 PACKAGE MANAGEMENT OPTIONS
 
 #### **`services.displayManager.sddm.package`**
+
 - **Purpose:** Which SDDM package to use
 - **Current:** Not set (uses default `pkgs.kdePackages.sddm`)
 - **Recommendation:** Keep default package
 - **Priority:** LOW
 
 #### **`services.displayManager.sddm.extraPackages`**
+
 - **Purpose:** Additional Qt plugins/QML libraries
 - **Current:** Not set (empty list)
 - **Recommendation:** Add theme-specific packages if needed
@@ -85,18 +94,21 @@ services.displayManager.sddm = {
 ### ⚙️ BEHAVIORAL OPTIONS
 
 #### **`services.displayManager.sddm.autoNumlock`**
+
 - **Purpose:** Enables numlock at login screen
 - **Current:** Not set (defaults to `false`)
 - **Recommendation:** Set to `true` for usability
 - **Priority:** LOW
 
 #### **`services.displayManager.sddm.stopScript`**
+
 - **Purpose:** Script executed when stopping display server
 - **Current:** Not set
 - **Recommendation:** Keep empty unless specific cleanup needed
 - **Priority:** LOW
 
 #### **`services.displayManager.sddm.setupScript`**
+
 - **Purpose:** Script executed when starting display server (DEPRECATED)
 - **Current:** Not set
 - **Recommendation:** Use alternatives like `services.xserver.displayManager.setupCommands`
@@ -105,18 +117,21 @@ services.displayManager.sddm = {
 ### 🔧 ADVANCED CONFIGURATION OPTIONS
 
 #### **`services.displayManager.sddm.settings`**
+
 - **Purpose:** Fine-tuned SDDM configuration overrides
 - **Current:** Not set (empty attrset)
 - **Recommendation:** Add for optimal performance and security
 - **Priority:** MEDIUM
 
 #### **`services.displayManager.sddm.autoLogin.relogin`**
+
 - **Purpose:** Auto-login again after session logout
 - **Current:** Not set (defaults to `false`)
 - **Recommendation:** Keep `false` for security
 - **Priority:** SECURITY
 
 #### **`services.displayManager.sddm.autoLogin.minimumUid`**
+
 - **Purpose:** Minimum user ID for auto-login eligibility
 - **Current:** Not set (defaults to `1000`)
 - **Recommendation:** Keep default
@@ -127,6 +142,7 @@ services.displayManager.sddm = {
 ## 🎯 OPTIMAL CONFIGURATION FOR YOUR SETUP
 
 ### **Recommended Stable Configuration**
+
 ```nix
 services.displayManager.sddm = {
   enable = true;
@@ -169,6 +185,7 @@ services.displayManager.sddm = {
 ```
 
 ### **Alternative: Minimal Stable Configuration**
+
 ```nix
 services.displayManager.sddm = {
   enable = true;
@@ -184,19 +201,23 @@ services.displayManager.sddm = {
 ## ⚠️ CRITICAL WARNINGS FOR AMD GPU + HYPRLAND
 
 ### **1. Wayland Compatibility Issues**
+
 - **Problem:** SDDM Wayland mode has known issues with AMD GPUs
 - **Solution:** Keep `wayland.enable = false` for SDDM
 - **Impact:** SDDM runs in X11 mode, but Hyprland still runs in Wayland
 
 ### **2. Session Registration**
+
 - **Requirement:** Ensure Hyprland session is properly registered
 - **Solution:** Verify `/share/wayland-sessions/hyprland.desktop` exists
 
 ### **3. Theme Rendering**
+
 - **Issue:** Some themes may not render correctly with AMD drivers
 - **Solution:** Test themes; fallback to basic theme if issues occur
 
 ### **4. Performance Optimization**
+
 - **GPU Variables:** AMD-specific variables already configured in `amd-gpu.nix`
 - **Display Scaling:** Configure both in SDDM and Hyprland for consistency
 
@@ -205,15 +226,18 @@ services.displayManager.sddm = {
 ## 🔒 SECURITY CONSIDERATIONS
 
 ### **Auto-Login Security**
+
 - **Current:** Not configured
 - **Recommendation:** Keep disabled for security
 - **If Needed:** Only for development/kiosk systems
 
 ### **Session Isolation**
+
 - **Important:** SDDM should not interfere with Hyprland's security model
 - **Configuration:** Minimize SDDM customizations to avoid conflicts
 
 ### **Authentication**
+
 - **Current:** Polkit properly configured
 - **Recommendation:** Keep current authentication setup
 
@@ -222,16 +246,19 @@ services.displayManager.sddm = {
 ## 🚀 IMPLEMENTATION PRIORITY
 
 ### **Phase 1: Critical Fixes (Immediate)**
+
 1. **Disable SDDM Wayland** (`wayland.enable = false`)
 2. **Add autoNumlock** for better usability
 3. **Verify enableHidpi** for your display
 
 ### **Phase 2: Optimization (Short-term)**
+
 1. **Add settings section** for fine-tuned control
 2. **Configure session paths** properly
 3. **Test theme compatibility** with AMD GPU
 
 ### **Phase 3: Advanced (Optional)**
+
 1. **Add custom stopScript** if cleanup needed
 2. **Explore alternative themes** for better aesthetics
 3. **Configure auto-login** only if required for specific use case
@@ -241,6 +268,7 @@ services.displayManager.sddm = {
 ## 📊 TESTING AND VERIFICATION
 
 ### **Pre-Implementation Tests**
+
 ```bash
 # Test current configuration
 sudo nixos-rebuild test --flake .#evo-x2
@@ -250,6 +278,7 @@ ls /run/current-system/sw/share/sddm/sessions/
 ```
 
 ### **Post-Implementation Verification**
+
 ```bash
 # Apply changes
 sudo nixos-rebuild switch --flake .#evo-x2
@@ -262,6 +291,7 @@ journalctl -u sddm -f
 ```
 
 ### **Performance Monitoring**
+
 ```bash
 # Monitor GPU usage during login
 amdgpu_top
@@ -275,16 +305,19 @@ systemd-analyze blame | grep sddm
 ## 🎯 FINAL RECOMMENDATIONS
 
 ### **Immediate Action Required**
+
 1. **Set `wayland.enable = false`** - This is the most critical fix for stability
 2. **Add `autoNumlock = true`** - Improves user experience
 3. **Keep current theme** - `sddm-sugar-dark` works well
 
 ### **Long-term Considerations**
+
 1. **Monitor SDDM Wayland development** - May become stable in future
 2. **Backup working configuration** - Before making experimental changes
 3. **Test thoroughly** after each change
 
 ### **Hardware-Specific Notes**
+
 - **AMD GPU:** Current configuration in `amd-gpu.nix` is optimal
 - **High DPI:** Ensure consistent scaling between SDDM and Hyprland
 - **Performance:** SDDM has minimal impact on Hyprland performance
@@ -294,11 +327,13 @@ systemd-analyze blame | grep sddm
 ## 📝 IMPLEMENTATION CHECKLIST
 
 ### **Before Making Changes**
+
 - [ ] Create system backup
 - [ ] Test current configuration
 - [ ] Document current SDDM behavior
 
 ### **Implementation Steps**
+
 - [ ] Disable SDDM Wayland support
 - [ ] Add autoNumlock configuration
 - [ ] Verify HiDPI settings
@@ -307,6 +342,7 @@ systemd-analyze blame | grep sddm
 - [ ] Apply and test configuration
 
 ### **Post-Implementation**
+
 - [ ] Verify login screen works
 - [ ] Test Hyprland session launch
 - [ ] Check for errors in logs
@@ -320,21 +356,25 @@ systemd-analyze blame | grep sddm
 ### **Common Issues and Solutions**
 
 #### **Black Screen on Login**
+
 - **Cause:** SDDM Wayland mode with AMD GPU
 - **Solution:** Set `wayland.enable = false`
 
 #### **Session Not Appearing in SDDM**
+
 - **Cause:** Missing session file
 - **Solution:** Verify Hyprland session registration
 
 #### **Theme Not Loading**
+
 - **Cause:** Missing theme package or incorrect path
 - **Solution:** Verify theme package installation
 
 #### **Performance Issues**
+
 - **Cause:** GPU driver conflicts
 - **Solution:** Review AMD GPU configuration
 
 ---
 
-*This report is tailored specifically for your AMD Ryzen AI Max+ 395 system with Hyprland. The recommendations prioritize stability and security while maintaining optimal performance.*
+_This report is tailored specifically for your AMD Ryzen AI Max+ 395 system with Hyprland. The recommendations prioritize stability and security while maintaining optimal performance._

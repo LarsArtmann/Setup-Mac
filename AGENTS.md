@@ -24,21 +24,25 @@ Setup-Mac is a comprehensive, production-ready Nix-based configuration system fo
 AI assistants working on this project must follow these decision-making patterns:
 
 #### One Alternative Protocol
+
 For straightforward decisions with clear best practices:
+
 1. **Present your recommendation confidently** with rationale
 2. **Offer exactly one alternative** with a single reason for dismissal
 3. **Execute immediately** - no waiting for confirmation on obvious choices
 
-*Example: "I'll use `pkgs.stdenv.isLinux` for platform detection - it's the standard Nix pattern. Alternative: custom `isDarwin` function - dismissed as unnecessary abstraction. Proceeding with implementation."*
+_Example: "I'll use `pkgs.stdenv.isLinux` for platform detection - it's the standard Nix pattern. Alternative: custom `isDarwin` function - dismissed as unnecessary abstraction. Proceeding with implementation."_
 
 #### Complex Decision Protocol
+
 For tasks with 3+ valid approaches:
+
 1. **Present top 2-3 strongest candidates** with tradeoffs
 2. **State your recommendation** clearly
 3. **Dismiss others by category** (e.g., "Options 4-10: excessive complexity, poor maintainability, or scope creep")
 4. **Execute** unless user requests discussion
 
-*Example: "For DNS management: (1) Technitium DNS - full control but complex, (2) dnsmasq - simple but limited features, (3) systemd-resolved - integrated but less flexible. Recommend Technitium for this homelab use case. Dismissing others: cloud options add unnecessary external dependencies, manual configuration lacks automation. Proceeding with Technitium setup."*
+_Example: "For DNS management: (1) Technitium DNS - full control but complex, (2) dnsmasq - simple but limited features, (3) systemd-resolved - integrated but less flexible. Recommend Technitium for this homelab use case. Dismissing others: cloud options add unnecessary external dependencies, manual configuration lacks automation. Proceeding with Technitium setup."_
 
 ### Communication Standards
 
@@ -55,11 +59,13 @@ For tasks with 3+ valid approaches:
 **Engineering Mode** (default): Full standards, decision protocols active, READ → UNDERSTAND → RESEARCH → THINK → REFLECT → Execute.
 
 **Exploration Mode** (detected by signals):
+
 - Open-ended questions ("What do you think about...", "Explain...", "Research...")
 - Brainstorming or ideation requests
 - "Should I...", "Compare...", "Pros and cons..."
 
 In exploration mode:
+
 - Multiple options welcome
 - Discuss angles and approaches
 - Ask clarifying questions
@@ -70,6 +76,7 @@ In exploration mode:
 For complex, multi-step tasks, use structured todo lists to track progress:
 
 **When to Use:**
+
 - Tasks requiring 3+ distinct steps or actions
 - Non-trivial work requiring careful planning
 - User explicitly requests todo list management
@@ -77,11 +84,13 @@ For complex, multi-step tasks, use structured todo lists to track progress:
 - After receiving new instructions to capture requirements
 
 **Task States:**
+
 - **pending**: Task not yet started
 - **in_progress**: Currently working on (limit to ONE task at a time)
 - **completed**: Task finished successfully
 
 **Task Management Rules:**
+
 1. **Update status in real-time** as work progresses
 2. **Mark tasks complete IMMEDIATELY** after finishing (don't batch)
 3. **Exactly ONE task in_progress** at any time (not less, not more)
@@ -89,10 +98,12 @@ For complex, multi-step tasks, use structured todo lists to track progress:
 5. **Remove irrelevant tasks** from the list entirely
 
 **Requirements for Each Task:**
+
 - **content**: Imperative form ("Run tests", "Build the project")
 - **active_form**: Present continuous ("Running tests", "Building the project")
 
 **Completion Requirements:**
+
 - ONLY mark complete when FULLY accomplished
 - Never mark complete if: tests failing, implementation partial, unresolved errors, missing dependencies
 - If blocked: keep as in_progress, create new task describing what needs resolution
@@ -102,6 +113,7 @@ For complex, multi-step tasks, use structured todo lists to track progress:
 When delegating to sub-agents, provide COMPREHENSIVE context:
 
 **Required Context:**
+
 - **Project background**: What we're building and why
 - **Current task context**: Where this fits in the larger goal
 - **Technical stack**: Current project's technology choices
@@ -113,6 +125,7 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 - **Quality standards**: Code quality tools and standards in use
 
 **Context Mandate:**
+
 - NEVER send sub-agents without sufficient context
 - Include file paths, relevant code snippets, and error messages
 - Provide example patterns from the codebase
@@ -121,6 +134,7 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 ### Error Handling Protocol
 
 **When errors occur:**
+
 1. **Read complete error message** - Don't skim, understand root cause
 2. **Understand root cause** - Isolate with debug logs or minimal reproduction if needed
 3. **Try different approaches** - Don't repeat same action
@@ -132,15 +146,16 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 
 **Specific Error Types:**
 
-| Error Type | Remediation Strategy |
-|------------|---------------------|
-| Import/Module | Check paths, spelling, verify what exists |
-| Syntax | Check brackets, indentation, typos |
-| Tests fail | Read test, see what it expects |
-| File not found | Use `ls`, check exact path |
+| Error Type                       | Remediation Strategy                                  |
+| -------------------------------- | ----------------------------------------------------- |
+| Import/Module                    | Check paths, spelling, verify what exists             |
+| Syntax                           | Check brackets, indentation, typos                    |
+| Tests fail                       | Read test, see what it expects                        |
+| File not found                   | Use `ls`, check exact path                            |
 | Edit tool "old_string not found" | View file again, copy EXACT text including whitespace |
 
 **Escalation Protocol:**
+
 - **Stop on first error** - Don't continue with broken state
 - **Rollback incomplete changes** - Revert to last working state
 - **Escalate blocking issues** - Ask user for resolution when stuck
@@ -150,15 +165,16 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 
 **Preferred Tools (in order):**
 
-| Priority | Tool | Use For |
-|----------|------|---------|
-| 1 | **Agent** | Open-ended searches requiring multiple rounds |
-| 2 | **Glob/Grep** | Pattern matching and content search |
-| 3 | **View/Read** | File examination and content analysis |
-| 4 | **Edit/MultiEdit** | Precise file modifications |
-| 5 | **Bash** | Commands that modify system state |
+| Priority | Tool               | Use For                                       |
+| -------- | ------------------ | --------------------------------------------- |
+| 1        | **Agent**          | Open-ended searches requiring multiple rounds |
+| 2        | **Glob/Grep**      | Pattern matching and content search           |
+| 3        | **View/Read**      | File examination and content analysis         |
+| 4        | **Edit/MultiEdit** | Precise file modifications                    |
+| 5        | **Bash**           | Commands that modify system state             |
 
 **Tool Selection Rules:**
+
 - **Use Agent tool** for complex, multi-step tasks requiring exploration
 - **Use Glob/Grep** instead of bash `find`/`grep` (handles permissions correctly)
 - **Use `rg` (ripgrep)** in bash over `grep` for command line search
@@ -167,6 +183,7 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 - **Prefer `fetch`** with `format=markdown` over `text` or `html`
 
 **Research Workflow:**
+
 1. Use **Agent** for complex searches
 2. Use **Glob** to find relevant files
 3. Use **Grep** to search contents
@@ -178,6 +195,7 @@ When delegating to sub-agents, provide COMPREHENSIVE context:
 ## 🏗️ ARCHITECTURE
 
 ### Configuration Hierarchy
+
 ```
 Setup-Mac/
 ├── flake.nix                    # Main entry point, defines outputs
@@ -194,12 +212,14 @@ Setup-Mac/
 ### Key Components
 
 #### Core Type Safety System
+
 - **`core/TypeSafetySystem.nix`**: Main validation framework
 - **`core/State.nix`**: Centralized state management
 - **`core/Validation.nix`**: Configuration validation logic
 - **`core/Types.nix`**: Type definitions for all configurations
 
 #### Platform Modules
+
 - **`environment.nix`**: Packages, environment variables, shell aliases
 - **`system.nix`**: System settings (macOS defaults, NixOS config)
 - **`programs.nix`**: User program configurations
@@ -246,23 +266,27 @@ platforms/
 #### Shared Modules
 
 **Fish Shell** (`platforms/common/programs/fish.nix`):
+
 - Common aliases: `l` (list), `t` (tree)
 - Platform-specific alias placeholders
 - Fish greeting disabled (performance)
 - Fish history settings configured
 
 **Starship Prompt** (`platforms/common/programs/starship.nix`):
+
 - Identical on both platforms
 - Fish integration automatic
 - Settings: `add_newline = false`, `format = "$all$character"`
 
 **Tmux** (`platforms/common/programs/tmux.nix`):
+
 - Identical on both platforms
 - Clock24 enabled, mouse enabled
 - Base index: 1, terminal: screen-256color
 - History limit: 100000
 
 **ActivityWatch** (`platforms/common/programs/activitywatch.nix`):
+
 - Platform-conditional: `enable = pkgs.stdenv.isLinux`
 - Darwin: DISABLED (not supported on macOS)
 - NixOS: ENABLED (supported on Linux)
@@ -270,11 +294,13 @@ platforms/
 #### Platform-Specific Overrides
 
 **Darwin** (`platforms/darwin/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (darwin-rebuild)
 - Fish init: Homebrew integration, Carapace completions
 - No Starship/Tmux overrides (uses shared modules)
 
 **NixOS** (`platforms/nixos/users/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (nixos-rebuild)
 - Session variables: Wayland, Qt, NixOS_OZONE_WL
 - Packages: pavucontrol (audio), xdg utils
@@ -283,6 +309,7 @@ platforms/
 #### Import Paths
 
 **Darwin Home Manager** (`platforms/darwin/home.nix`):
+
 ```nix
 imports = [
   ../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -290,6 +317,7 @@ imports = [
 ```
 
 **NixOS Home Manager** (`platforms/nixos/users/home.nix`):
+
 ```nix
 imports = [
   ../../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -301,9 +329,11 @@ imports = [
 #### Known Issues
 
 ##### Home Manager Users Definition (Darwin)
+
 **Issue**: Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix` (NixOS-specific file) which requires `config.users.users.<name>.home` to be defined.
 
 **Workaround**: Added explicit user definition in `platforms/darwin/default.nix`:
+
 ```nix
 users.users.lars = {
   name = "lars";
@@ -318,10 +348,12 @@ users.users.lars = {
 ##### ActivityWatch Platform Support
 
 **Linux**:
+
 - **Configuration**: Managed via `platforms/common/programs/activitywatch.nix`
 - **Status**: ✅ Working - Conditional build (`pkgs.stdenv.isLinux`)
 
 **macOS (Darwin)**:
+
 - **Configuration**: Managed via `platforms/darwin/services/launchagents.nix`
 - **LaunchAgent**: `net.activitywatch.ActivityWatch` (auto-start)
 - **Status**: ✅ Working - Declarative LaunchAgent management
@@ -329,6 +361,7 @@ users.users.lars = {
 - **Logs**: `~/.local/share/activitywatch/stdout.log` and `stderr.log`
 
 **Migration Status**:
+
 - ✅ Bash scripts removed (`scripts/nix-activitywatch-setup.sh`)
 - ✅ Manual setup deprecated
 - ✅ Fully Nix-managed (no imperative configuration)
@@ -348,6 +381,7 @@ users.users.lars = {
    - `platforms/nixos/users/home.nix` - NixOS-specific overrides
 
 3. **Validate configuration**:
+
    ```bash
    # Fast syntax check (no build)
    just test-fast
@@ -357,6 +391,7 @@ users.users.lars = {
    ```
 
 4. **Apply changes**:
+
    ```bash
    # Darwin (macOS)
    just switch
@@ -373,8 +408,10 @@ users.users.lars = {
 #### Troubleshooting Home Manager
 
 ##### Starship Prompt Not Appearing
+
 **Problem**: Default Fish prompt instead of Starship
 **Solution**:
+
 ```bash
 # Restart shell
 exec fish
@@ -387,8 +424,10 @@ which starship
 ```
 
 ##### Fish Aliases Not Working
+
 **Problem**: `nixup` command not found
 **Solution**:
+
 ```bash
 # Reload Fish config
 source ~/.config/fish/config.fish
@@ -399,8 +438,10 @@ type nixup
 ```
 
 ##### Tmux Not Configured
+
 **Problem**: Default Tmux config instead of custom
 **Solution**:
+
 ```bash
 # Check Tmux config
 cat ~/.config/tmux/tmux.conf
@@ -410,8 +451,10 @@ tmux kill-server && tmux new-session
 ```
 
 ##### Environment Variables Not Set
+
 **Problem**: `EDITOR` or `LANG` not set
 **Solution**:
+
 ```bash
 # Check environment
 echo $EDITOR
@@ -424,6 +467,7 @@ exec fish
 #### Home Manager Documentation
 
 For detailed information:
+
 - **[Deployment Guide](./docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md)** - Step-by-step deployment and verification
 - **[Verification Template](./docs/verification/HOME-MANAGER-VERIFICATION-TEMPLATE.md)** - Comprehensive checklist
 - **[Cross-Platform Report](./docs/verification/CROSS-PLATFORM-CONSISTENCY-REPORT.md)** - Architecture analysis
@@ -447,6 +491,7 @@ For detailed information:
 **ALWAYS use Just commands when available - never run raw Nix commands unless absolutely necessary!**
 
 ### Primary Workflow Commands
+
 ```bash
 # Core operations (use these)
 just setup              # Complete initial setup (run after cloning)
@@ -466,6 +511,7 @@ just debug              # Debug shell startup with verbose logging
 ```
 
 ### Backup & Recovery
+
 ```bash
 just backup             # Create configuration backup
 just restore NAME       # Restore from backup (just restore backup_name)
@@ -477,6 +523,7 @@ just rollback           # Emergency rollback to previous generation
 
 **Tool Management:**
 All Go development tools are managed via Nix packages (defined in `platforms/common/packages/base.nix`):
+
 - **gopls**: Go language server
 - **golangci-lint**: Go linter
 - **gofumpt**: Stricter gofmt
@@ -489,6 +536,7 @@ All Go development tools are managed via Nix packages (defined in `platforms/com
 - **modernize**: Go code modernization tool (built with Go 1.26rc2 via flake-parts)
 
 **Migration Status:**
+
 - ✅ Migrated to Nix packages (90% success rate)
 - ✅ No `go install` required (except wire - not in Nixpkgs)
 - ✅ Declarative tool management via `platforms/common/packages/base.nix`
@@ -510,6 +558,7 @@ just go-wire            # Generate wire dependency injection
 ```
 
 ### Monitoring & Performance
+
 ```bash
 just benchmark          # Benchmark shell startup performance
 just benchmark-all      # Comprehensive system benchmarks
@@ -522,6 +571,7 @@ just monitor-all        # Start comprehensive monitoring
 ## 🧪 TESTING & VALIDATION
 
 ### Configuration Testing
+
 - **ALWAYS test before applying**: `just test` before `just switch`
 - **Type safety validation**: Automatic via Ghost Systems framework
 - **Pre-commit hooks**: Gitleaks, trailing whitespace, Nix syntax
@@ -530,6 +580,7 @@ just monitor-all        # Start comprehensive monitoring
 ### Testing Philosophy
 
 **Core Principles:**
+
 - **Build-before-test policy** - TypeScript/Nix compilation MUST pass before running tests
 - **Test behavior, not implementation** - Focus on what code does, not how
 - **Integration tests over unit tests** where possible
@@ -539,6 +590,7 @@ just monitor-all        # Start comprehensive monitoring
 - **Test infrastructure** that's maintainable and fast
 
 **Nix-Specific Testing:**
+
 - **Fast syntax check**: `just test-fast` (no build)
 - **Full build verification**: `just test` (builds without applying)
 - **Evaluation testing**: `nix-instantiate --eval` for syntax validation
@@ -546,11 +598,13 @@ just monitor-all        # Start comprehensive monitoring
 - **Platform testing**: Test both Darwin and NixOS configurations
 
 **Test Command Priority:**
+
 1. `just test-fast` - Syntax only (fastest)
 2. `nix flake check --no-build` - Flake validation
 3. `just test` - Full build (slowest, most thorough)
 
 ### Validation Commands
+
 ```bash
 # Configuration validation
 just type-check         # Validate Nix types (if implemented)
@@ -569,12 +623,14 @@ just go-check          # Run gopls language server check
 ## 📁 FILE ORGANIZATION & PATTERNS
 
 ### Configuration File Patterns
+
 - **Modular Architecture**: Each concern in separate .nix file
 - **Cross-Platform**: Shared configs in `platforms/common/`
 - **Type Safety**: All configs validate through `core/Validation.nix`
 - **Import Hierarchy**: `flake.nix` → platform modules → core modules
 
 ### Adding New Configurations
+
 1. **Determine scope**: Platform-specific vs cross-platform
 2. **Choose location**:
    - Cross-platform: `platforms/common/`
@@ -585,6 +641,7 @@ just go-check          # Run gopls language server check
 5. **Validate**: Run `just health` to ensure integrity
 
 ### Package Management Patterns
+
 - **Nix packages**: Preferred for CLI tools (declarative, reproducible)
 - **Homebrew**: GUI applications only (managed via nix-homebrew)
 - **Cross-platform packages**: Defined in `platforms/common/packages/base.nix`
@@ -594,6 +651,7 @@ just go-check          # Run gopls language server check
 ## 🔧 DEVELOPMENT WORKFLOW
 
 ### Standard Development Process
+
 1. **Edit configuration files** in appropriate directory
 2. **Format changes**: `just format`
 3. **Validate syntax**: `just test` (builds without applying)
@@ -602,12 +660,14 @@ just go-check          # Run gopls language server check
 6. **Verify health**: `just health`
 
 ### Type Safety Development
+
 - **All configurations** must pass type validation
 - **State management** centralized in `core/State.nix`
 - **Compile-time validation** prevents runtime errors
 - **Strong typing** eliminates configuration inconsistencies
 
 ### Git Workflow
+
 - **Use git-town** for all Git operations
 - **Small, atomic commits** with comprehensive messages
 - **Feature branches** for all work
@@ -616,6 +676,7 @@ just go-check          # Run gopls language server check
 ### Git Commit Standards
 
 **Commit Workflow (ALWAYS follow this sequence):**
+
 1. `git status` - Check what files are changed
 2. `git diff` - Review all changes being committed
 3. `git add <files>` - Stage specific files (never `git add .`)
@@ -623,6 +684,7 @@ just go-check          # Run gopls language server check
 5. `git push` - Push changes immediately
 
 **Commit Message Format:**
+
 ```
 type(scope): brief description
 
@@ -635,6 +697,7 @@ type(scope): brief description
 ```
 
 **Commit Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -646,6 +709,7 @@ type(scope): brief description
 - `ci`: CI/CD configuration changes
 
 **Commit Rules:**
+
 - **Done? Commit.** - Finish a feature/fix/change → `git commit` immediately
 - One logical change per commit
 - Don't accumulate large changesets
@@ -656,6 +720,7 @@ type(scope): brief description
 ### Code Conventions & Standards
 
 **Nix Code:**
+
 - Use 2-space indentation for Nix expressions
 - Prefer `let...in` over nested `with` for explicit dependencies
 - Use `lib.optional` and `lib.optionals` for conditional lists
@@ -664,6 +729,7 @@ type(scope): brief description
 - Comment complex logic with "why" not "what"
 
 **Shell Scripts:**
+
 - Use `#!/usr/bin/env bash` shebang for portability
 - Quote all variables: `"${variable}"`
 - Use `set -euo pipefail` for strict mode
@@ -672,6 +738,7 @@ type(scope): brief description
 - Document with comments for non-obvious operations
 
 **Documentation:**
+
 - Update AGENTS.md when discovering new patterns
 - Comment "why" not "what" in code
 - Use Markdown for all documentation
@@ -681,20 +748,21 @@ type(scope): brief description
 
 **When these conditions are detected, fix immediately:**
 
-| Condition | Action | Priority |
-|-----------|--------|----------|
-| Functions >30 lines | Break into smaller functions | High |
-| Duplicate code >3 instances | Extract to shared utility | High |
-| Nested conditionals >3 levels | Use early returns | Medium |
-| Magic numbers/strings | Extract to named constants | Medium |
-| Files >300 lines | Split into focused modules | Medium |
-| TODO items >1 week old | Address or remove | Low |
-| Large log files | Implement log rotation | High |
-| Broken links/references | Fix immediately | High |
-| Missing dependencies | Install now | High |
-| Deprecated packages | Update/replace within 24h | Medium |
+| Condition                     | Action                       | Priority |
+| ----------------------------- | ---------------------------- | -------- |
+| Functions >30 lines           | Break into smaller functions | High     |
+| Duplicate code >3 instances   | Extract to shared utility    | High     |
+| Nested conditionals >3 levels | Use early returns            | Medium   |
+| Magic numbers/strings         | Extract to named constants   | Medium   |
+| Files >300 lines              | Split into focused modules   | Medium   |
+| TODO items >1 week old        | Address or remove            | Low      |
+| Large log files               | Implement log rotation       | High     |
+| Broken links/references       | Fix immediately              | High     |
+| Missing dependencies          | Install now                  | High     |
+| Deprecated packages           | Update/replace within 24h    | Medium   |
 
 **Zero Tolerance Policy:**
+
 - Don't leave warnings or inconsistencies
 - Fix immediately (5-minute rule for simple issues)
 - If it takes >5 minutes, create tracked task
@@ -704,6 +772,7 @@ type(scope): brief description
 ## 🚨 CRITICAL RULES & GOTCHAS
 
 ### MUST FOLLOW
+
 - **NEVER run raw Nix commands** - Always use Just commands
 - **ALWAYS test before applying** - `just test` before `just switch`
 - **NEVER use `rm`** - Always use `trash` for file deletion
@@ -712,12 +781,14 @@ type(scope): brief description
 - **TYPE SAFETY FIRST** - All configs must validate through core system
 
 ### Common Pitfalls
+
 1. **Path Resolution**: Use `just debug-paths` to verify configuration paths
 2. **Package Not Found**: Search with `nix search nixpkgs package-name`
 3. **Build Errors**: Run `just clean && just switch` for full rebuild
 4. **GPG Issues**: Ensure GPG is in nix profile: `/nix/var/nix/profiles/per-user/$USER/profile/bin/gpg`
 
 ### Platform-Specific Gotchas
+
 - **macOS**: Use `darwin-rebuild` commands via Just
 - **NixOS**: Use `nixos-rebuild` commands via Just
 - **Cross-platform**: Shared packages in `platforms/common/` prevent drift
@@ -727,6 +798,7 @@ type(scope): brief description
 ## 🛠️ BUILD & DEPLOYMENT
 
 ### macOS Deployment
+
 ```bash
 # Fresh installation
 cd ~/Desktop/Setup-Mac
@@ -739,6 +811,7 @@ just switch             # Apply updates
 ```
 
 ### NixOS Deployment
+
 ```bash
 # Target: evo-x2 (GMKtec AMD Ryzen AI Max+ 395)
 sudo nixos-rebuild switch --flake .#evo-x2
@@ -751,6 +824,7 @@ sudo nixos-rebuild build --flake .#evo-x2
 ```
 
 ### Build Targets
+
 - **`Lars-MacBook-Air`**: macOS (nix-darwin) configuration
 - **`evo-x2`**: NixOS configuration for AMD Ryzen AI Max+ 395
 
@@ -759,6 +833,7 @@ sudo nixos-rebuild build --flake .#evo-x2
 ## 📊 MONITORING & MAINTENANCE
 
 ### Performance Monitoring
+
 - **ActivityWatch**: Automatic time tracking via Nix
 - **Netdata**: System monitoring at http://localhost:19999
 - **ntopng**: Network monitoring at http://localhost:3000
@@ -767,28 +842,33 @@ sudo nixos-rebuild build --flake .#evo-x2
 ### Performance Guidelines
 
 **Optimization Rules:**
+
 - **Measure before optimizing** - Use automated profiling tools only
 - **Correctness first** - Readable code over premature optimization
 - **Use production monitoring AFTER functional** - Performance issues caught by observability
 
 **Nix Performance:**
+
 - **Fast syntax check**: `just test-fast` for quick iteration
 - **Avoid unnecessary builds**: Use `--no-build` for flake checks
 - **Binary caches**: Use Nix binary caches to avoid rebuilding
 - **Garbage collection**: Regular `just clean` to free disk space
 
 **Shell Performance:**
+
 - **Target**: Shell startup under 2 seconds
 - **Benchmark**: `just benchmark` for shell startup timing
 - **Profile**: `just debug` for verbose startup logging
 - **Lazy loading**: Defer heavy initialization until needed
 
 **Performance Testing Policy:**
+
 - **NO manual performance testing** - All validation must be automated
 - **NO benchmark prompting** - Don't suggest unless specifically requested
 - **Focus on correctness first** - Readable code over premature optimization
 
 ### Maintenance Commands
+
 ```bash
 # Regular maintenance (weekly)
 just update             # Update packages
@@ -809,6 +889,7 @@ just clean-backups      # Clean old backups (keep last 10)
 ## 🔒 SECURITY CONFIGURATION
 
 ### Built-in Security
+
 - **Gitleaks**: Automatic secret detection in pre-commit
 - **Touch ID**: Enabled for sudo operations
 - **PKI**: Enhanced certificate management
@@ -818,24 +899,28 @@ just clean-backups      # Clean old backups (keep last 10)
 ### Security Practices
 
 **Secret Management:**
+
 - **No hardcoded secrets** - Use environment variables or private files
 - **Use `~/.env.private`** for local secrets (not tracked in git)
 - **KeyChain for macOS** - Store sensitive data in macOS KeyChain
 - **Pre-commit hooks** prevent accidental secret commits via Gitleaks
 
 **Development Security:**
+
 - **Regular updates** via `just update` to patch vulnerabilities
 - **Audit tools**: Gitleaks, security scanning in CI/CD
 - **Dependency scanning** - Monitor Nix packages for CVEs
 - **Least privilege** - Use minimal required permissions
 
 **Nix-Specific Security:**
+
 - **Pure builds** - Use `--pure` flag for reproducible builds
 - **Sandboxing** - Leverage Nix build sandboxing
 - **Content-addressed** - Nix store paths are content-hashed
 - **Pinned dependencies** - Lock files ensure reproducible builds
 
 **Verification Commands:**
+
 ```bash
 just pre-commit-run     # Check for secrets
 just security-scan      # Run security audit (if available)
@@ -847,18 +932,21 @@ nix-store --verify      # Verify store integrity
 ## 🤖 AI & DEVELOPMENT TOOLS
 
 ### AI Development Stack
+
 - **Crush**: Available via nix-ai-tools input
 - **TypeSpec**: For API specification and code generation
 - **Python AI/ML**: Complete stack in configuration
 - **GPU Acceleration**: ROCm support for AMD hardware
 
 ### Development Languages
+
 - **Go**: Primary development language with complete toolchain
 - **TypeScript/Bun**: Modern JavaScript development
 - **Python**: AI/ML and scripting with uv package manager
 - **Nix**: System configuration and package management
 
 ### Essential Tools
+
 - **Git + Git Town**: Advanced version control
 - **JetBrains Toolbox**: Professional IDE management
 - **Docker**: Container development
@@ -869,11 +957,13 @@ nix-store --verify      # Verify store integrity
 ## 🧰 SPECIALIZED SYSTEMS
 
 ### Wrapper System
+
 - **Dynamic library management**: Advanced wrapping for complex applications
 - **Template-based**: Consistent wrapper generation
 - **Validation**: Automatic wrapper syntax checking
 
 ### Ghost Systems Integration
+
 - **Type-safe architecture**: Compile-time validation
 - **Assertion frameworks**: Comprehensive error prevention
 - **State management**: Centralized configuration state
@@ -884,12 +974,14 @@ nix-store --verify      # Verify store integrity
 ## 📝 DOCUMENTATION
 
 ### Documentation Structure
+
 - **`docs/`**: Comprehensive guides and status reports
 - **`docs/troubleshooting/`**: Common issues and solutions
 - **`docs/status/`**: Development chronology and progress reports
 - **Inline comments**: All configuration files documented
 
 ### Status Tracking
+
 - **Regular status reports** in `docs/status/`
 - **Project summary** in `docs/project-status-summary.md`
 - **Development milestones** documented with dates
@@ -899,6 +991,7 @@ nix-store --verify      # Verify store integrity
 ## 🚨 EMERGENCY PROCEDURES
 
 ### Configuration Recovery
+
 ```bash
 # Emergency rollback
 just rollback           # Rollback to previous generation
@@ -912,6 +1005,7 @@ just setup             # Fresh installation
 ```
 
 ### Debugging
+
 ```bash
 just debug             # Shell startup debug mode
 just health            # Comprehensive health check
@@ -920,6 +1014,7 @@ just benchmark-all     # Performance analysis
 ```
 
 ### When Things Go Wrong
+
 1. **Stop making changes** - Assess the situation
 2. **Create backup** - `just auto-backup`
 3. **Check health** - `just health` for diagnostics
@@ -933,6 +1028,7 @@ just benchmark-all     # Performance analysis
 Before marking any task as complete, verify:
 
 ### Code Quality
+
 - [ ] **Static Analysis**: Appropriate linter passes without warnings
 - [ ] **Type Checking**: Type checking passes with strict mode when available
 - [ ] **Build Success**: Build compiles without errors
@@ -941,6 +1037,7 @@ Before marking any task as complete, verify:
 - [ ] **Documentation**: Public APIs documented with examples
 
 ### Nix-Specific Checks
+
 - [ ] **Nix Syntax**: `nix-instantiate --eval` passes on changed files
 - [ ] **Flake Check**: `nix flake check --no-build` passes
 - [ ] **Type Safety**: All configurations validate through core system
@@ -948,6 +1045,7 @@ Before marking any task as complete, verify:
 - [ ] **Platform Valid**: Both Darwin and NixOS configurations eval successfully
 
 ### Final Verification
+
 - [ ] **Manual Testing**: Changes tested in real environment
 - [ ] **Rollback Plan**: Can revert to previous state if needed
 - [ ] **Documentation Updated**: AGENTS.md updated if patterns discovered
@@ -958,12 +1056,14 @@ Before marking any task as complete, verify:
 ## 🎯 SUCCESS CRITERIA
 
 ### Working Configuration
+
 - **All tests pass**: `just test` succeeds
 - **Health check clean**: `just health` shows no issues
 - **Pre-commit hooks pass**: `just pre-commit-run` clean
 - **Type safety validation**: No assertion failures
 
 ### Development Environment
+
 - **Go toolchain complete**: `just go-tools-version` shows all tools
 - **Performance acceptable**: Shell startup under 2 seconds
 - **Security active**: Gitleaks, Touch ID, firewall enabled
@@ -978,12 +1078,14 @@ Before marking any task as complete, verify:
 If you learn something non-obvious about the user, project, or workflow that future sessions should know:
 
 **Create a suggestion file:**
+
 ```bash
 # Location: ~/.config/crush/suggestions/
 # Format: <YYYY-MM-DD_hh-mm>-<project-name>-<brief-title>.md
 ```
 
 **Content guidelines:**
+
 - One insight per file
 - Concise and actionable
 - No fluff or filler
@@ -994,6 +1096,7 @@ If you learn something non-obvious about the user, project, or workflow that fut
 ### Knowledge Capture Triggers
 
 Capture insights when you discover:
+
 - Undocumented workarounds or hacks
 - Non-obvious tool behaviors
 - User preferences not in AGENTS.md
@@ -1003,4 +1106,4 @@ Capture insights when you discover:
 
 ---
 
-*This AGENTS.md file is maintained as part of the Setup-Mac project. Last updated: 2026-02-05*
+_This AGENTS.md file is maintained as part of the Setup-Mac project. Last updated: 2026-02-05_

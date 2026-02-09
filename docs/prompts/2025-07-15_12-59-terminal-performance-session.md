@@ -8,9 +8,11 @@ Session: Terminal Performance & Fish Shell Migration
 ### **Prompt Name:** "Ultimate Terminal Performance Optimization"
 
 ### **Use Case:**
+
 When terminal startup is slow (>500ms) and you want to achieve sub-100ms startup times while maintaining all functionality.
 
 ### **Prompt:**
+
 ```
 You are a terminal performance optimization expert. I need to optimize my shell startup time from current slow performance to <100ms consistently.
 
@@ -56,9 +58,11 @@ Use hyperfine for accurate benchmarking and focus on customer value delivery.
 ### **Prompt Name:** "Safe Nix Darwin Configuration Deployment"
 
 ### **Use Case:**
+
 When deploying Nix darwin configurations and need to ensure complete, verified deployment without breaking the system.
 
 ### **Prompt:**
+
 ```
 You are a Nix darwin configuration expert. I need to deploy configuration changes safely with complete verification.
 
@@ -109,9 +113,11 @@ Focus on complete, verified deployment with no surprises.
 ### **Prompt Name:** "Terminal Performance Regression Monitoring"
 
 ### **Use Case:**
+
 When you've achieved good performance and need to maintain it over time with automated monitoring.
 
 ### **Prompt:**
+
 ```
 You are a performance monitoring expert. I need to set up automated monitoring for terminal performance to prevent regressions.
 
@@ -157,9 +163,11 @@ Focus on preventing performance regressions while maintaining development veloci
 ### **Prompt Name:** "Shell Configuration Debugging & Troubleshooting"
 
 ### **Use Case:**
+
 When shell configuration isn't working as expected and you need systematic debugging.
 
 ### **Prompt:**
+
 ```
 You are a shell configuration debugging expert. I need to systematically debug and fix shell configuration issues.
 
@@ -205,9 +213,11 @@ Focus on systematic problem-solving and preventive measures.
 ### **Prompt Name:** "Terminal Architecture Migration Planning"
 
 ### **Use Case:**
+
 When considering major architectural changes to terminal setup (e.g., ZSH to Fish migration).
 
 ### **Prompt:**
+
 ```
 You are a terminal architecture expert. I need to plan and execute a major terminal architecture migration.
 

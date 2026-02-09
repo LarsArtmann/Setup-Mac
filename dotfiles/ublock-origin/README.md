@@ -36,6 +36,7 @@ For browsers that require manual installation:
 ## Custom Filters
 
 Custom filters are automatically applied and include:
+
 - Enhanced privacy protection
 - Social media tracking blockers
 - Development-specific ad blockers
@@ -44,6 +45,7 @@ Custom filters are automatically applied and include:
 ## Restoration
 
 To restore settings on a new system:
+
 ```bash
 ./scripts/ublock-origin-setup.sh --restore
 ```

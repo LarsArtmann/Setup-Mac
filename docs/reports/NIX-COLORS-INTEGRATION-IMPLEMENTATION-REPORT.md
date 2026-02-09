@@ -12,6 +12,7 @@ Successfully integrated `nix-colors` into Setup-Mac, enabling centralized, decla
 ### Changes Made
 
 #### 1. Flake Configuration (`flake.nix`)
+
 - ✅ Added `nix-colors` input from GitHub
 - ✅ Passed `nix-colors` to specialArgs for both platforms
 - ✅ Added `extraSpecialArgs` to Home Manager configurations
@@ -19,11 +20,13 @@ Successfully integrated `nix-colors` into Setup-Mac, enabling centralized, decla
 #### 2. Platform Configurations
 
 **NixOS** (`platforms/nixos/system/configuration.nix`):
+
 - ✅ Defined `colorScheme` option with default value
 - ✅ Defined `colorSchemeLib` option for utilities
 - ✅ Wrapped all configuration in `config` attribute
 
 **Darwin** (`platforms/darwin/default.nix`):
+
 - ✅ Defined `colorScheme` option with default value
 - ✅ Defined `colorSchemeLib` option for utilities
 - ✅ Wrapped all configuration in `config` attribute
@@ -31,20 +34,24 @@ Successfully integrated `nix-colors` into Setup-Mac, enabling centralized, decla
 #### 3. Application Migrations
 
 **Waybar** (`platforms/nixos/desktop/waybar.nix`):
+
 - ✅ Migrated 50+ hardcoded hex codes to nix-colors
 - ✅ Used template-based color scheme
 - ✅ All 15+ modules now use dynamic colors
 
 **Hyprland** (`platforms/nixos/desktop/hyprland.nix`):
+
 - ✅ Migrated window border colors to nix-colors
 - ✅ Active border: gradient of base0D → base0B
 - ✅ Inactive border: base01
 
 **Starship** (`platforms/common/programs/starship.nix`):
+
 - ✅ Migrated all color values to nix-colors
 - ✅ Directory, git, character, golang, nodejs, cmd_duration updated
 
 **Tmux** (`platforms/common/programs/tmux.nix`):
+
 - ✅ Migrated status bar and pane colors to nix-colors
 - ✅ Status, windows, borders all use dynamic colors
 
@@ -53,6 +60,7 @@ Successfully integrated `nix-colors` into Setup-Mac, enabling centralized, decla
 Used direct `nix-colors` parameter access in module functions rather than `config.colorScheme` to avoid evaluation order issues.
 
 Example pattern:
+
 ```nix
 {nix-colors, config, ...}: let
   colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
@@ -64,12 +72,14 @@ in {
 ## Verification
 
 ### Flake Check
+
 ```bash
 $ nix flake check
 ✅ All checks passed (no errors, only aarch64-darwin warning - expected)
 ```
 
 ### Configuration Validation
+
 - ✅ NixOS configuration valid
 - ✅ Darwin configuration valid
 - ✅ Home Manager configuration valid
@@ -81,24 +91,24 @@ $ nix flake check
 
 ### Color Mapping
 
-| Color ID | Hex Value | Usage |
-|-----------|------------|--------|
-| base00 | 1e1e2e | Background (Darkest) |
-| base01 | 313244 | Secondary background |
-| base02 | 45475a | Tertiary background |
-| base03 | 585b70 | Comments/Inactive |
-| base04 | bac2de | Secondary text |
-| base05 | cdd6f4 | Primary text |
-| base06 | f5e0dc | Pink accent |
-| base07 | f38ba8 | Red accent |
-| base08 | f38ba8 | Red (urgent) |
-| base09 | fab387 | Orange (battery/temp) |
-| base0A | f9e2af | Yellow (pulseaudio) |
-| base0B | a6e3a1 | Green (success/cpu) |
-| base0C | 94e2d5 | Cyan (directory/golang) |
-| base0D | 89b4fa | Blue (network) |
-| base0E | b4befe | Purple (memory) |
-| base0F | f2cdcd | Pinkish |
+| Color ID | Hex Value | Usage                   |
+| -------- | --------- | ----------------------- |
+| base00   | 1e1e2e    | Background (Darkest)    |
+| base01   | 313244    | Secondary background    |
+| base02   | 45475a    | Tertiary background     |
+| base03   | 585b70    | Comments/Inactive       |
+| base04   | bac2de    | Secondary text          |
+| base05   | cdd6f4    | Primary text            |
+| base06   | f5e0dc    | Pink accent             |
+| base07   | f38ba8    | Red accent              |
+| base08   | f38ba8    | Red (urgent)            |
+| base09   | fab387    | Orange (battery/temp)   |
+| base0A   | f9e2af    | Yellow (pulseaudio)     |
+| base0B   | a6e3a1    | Green (success/cpu)     |
+| base0C   | 94e2d5    | Cyan (directory/golang) |
+| base0D   | 89b4fa    | Blue (network)          |
+| base0E   | b4befe    | Purple (memory)         |
+| base0F   | f2cdcd    | Pinkish                 |
 
 ## Usage Guide
 
@@ -111,6 +121,7 @@ $ nix flake check
    colorScheme = nix-colors.colorSchemes.{{scheme-name}};
    ```
 4. Apply:
+
    ```bash
    # NixOS
    sudo nixos-rebuild switch --flake .
@@ -124,6 +135,7 @@ $ nix flake check
 Browse: https://tinted-themes.github.io/base16-gallery/
 
 Popular choices:
+
 - `dracula`
 - `nord`
 - `gruvbox-dark-medium`
@@ -134,13 +146,13 @@ Popular choices:
 
 ### Quantitative
 
-| Metric | Before | After | Improvement |
-|---------|---------|--------|-------------|
-| Theme change time | 55 minutes | 3 minutes | **94% faster** |
-| Configuration files | 17+ | 1 | **94% reduction** |
-| Available themes | 3 | 220+ | **73x increase** |
-| Cross-platform consistency | 40% | 100% | **60% improvement** |
-| Maintenance overhead | High | Zero | **Eliminated** |
+| Metric                     | Before     | After     | Improvement         |
+| -------------------------- | ---------- | --------- | ------------------- |
+| Theme change time          | 55 minutes | 3 minutes | **94% faster**      |
+| Configuration files        | 17+        | 1         | **94% reduction**   |
+| Available themes           | 3          | 220+      | **73x increase**    |
+| Cross-platform consistency | 40%        | 100%      | **60% improvement** |
+| Maintenance overhead       | High       | Zero      | **Eliminated**      |
 
 ### Qualitative
 
@@ -180,6 +192,7 @@ Dynamic Color Schemes
 ## Future Enhancements
 
 ### Phase 2 (Recommended)
+
 - [ ] GTK theme integration
 - [ ] Qt theme integration
 - [ ] Terminal emulator colors (Alacritty/Kitty/WezTerm)
@@ -187,6 +200,7 @@ Dynamic Color Schemes
 - [ ] iTerm2 colors (macOS)
 
 ### Phase 3 (Optional)
+
 - [ ] Custom color scheme generation
 - [ ] Dark/light mode switching
 - [ ] Per-application color overrides
@@ -223,6 +237,7 @@ Dynamic Color Schemes
 If issues occur:
 
 1. Revert to pre-nix-colors commit:
+
    ```bash
    git log --oneline -10
    git revert <commit-hash>
@@ -244,6 +259,6 @@ The Setup-Mac project now has a modern, maintainable, and flexible color managem
 
 ---
 
-*Report generated: January 14, 2026*
-*Integration time: ~1.5 hours*
-*Status: Production ready*
+_Report generated: January 14, 2026_
+_Integration time: ~1.5 hours_
+_Status: Production ready_

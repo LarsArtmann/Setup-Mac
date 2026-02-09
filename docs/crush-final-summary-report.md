@@ -12,6 +12,7 @@
 **Result**: Successfully implemented 100% automated crush-patched upgrade system with robust error handling and rollback protection.
 
 **Current State**:
+
 - ✅ v0.39.1 installed and working perfectly
 - ✅ Automation system fully functional
 - ✅ Rollback mechanism tested and working
@@ -19,10 +20,12 @@
 - ❌ v0.39.3 upgrade blocked by 2 external factors
 
 **Blocking Issues** (External, Not Our Fault):
+
 1. **Disk Space**: 99% used (2.9GB free, need ~20GB for Go builds)
 2. **Upstream Bug**: Crush v0.39.2+ has broken vendor directory
 
 **When Can v0.39.3 Be Installed?**
+
 1. Free disk space: Run `just clean-aggressive` (10 minutes)
 2. Wait for vendor fix: Monitor GitHub (1-2 weeks estimate)
 3. Run: `just update` - automation handles everything
@@ -32,12 +35,15 @@
 ## 🎯 What Was Accomplished
 
 ### 1. Permission Error Fixed ✅
+
 **Problem**: Script lacked execute permissions
 **Solution**: Changed justfile line 50 from `@./pkgs/update-crush-patched.sh` to `@bash ./pkgs/update-crush-patched.sh`
 **Commit**: 715b7ec
 
 ### 2. 100% Automation Implemented ✅
+
 **Features**:
+
 - Automatic version detection from GitHub API
 - Automatic vendorHash extraction from build errors
 - Automatic backup before changes
@@ -45,6 +51,7 @@
 - Clear, actionable error messages
 
 **Solution**: Added Git command to fetch latest version:
+
 ```bash
 LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git \
   | head -1 | sed 's|.*refs/tags/\(v[0-9.]*\).*|\1|')
@@ -53,14 +60,17 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charm
 **Commit**: 726a3da
 
 ### 3. Rollback Mechanism ✅
+
 **Problem**: When build failed, Nix file left in broken state
 **Solution**:
+
 - Creates timestamped backup before changes
 - Detects vendorHash errors vs real failures
 - Automatic rollback on any failure
 - Restores to working version
 
 **Key Changes**:
+
 - Changed `set -euo pipefail` to `set -uo pipefail` (manual error handling)
 - Added backup file management
 - Added rollback logic for both vendorHash extraction and final build failures
@@ -68,11 +78,14 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charm
 **Commit**: 5f9f478
 
 ### 4. Documentation Created ✅
+
 **Files Created**:
+
 - `docs/crush-patched-automation-status.md` (225 lines) - Automation status and troubleshooting
 - `docs/crush-upgrade-action-plan.md` (460+ lines) - Complete action plan and technical analysis
 
 **Content**:
+
 - Automation status summary
 - Known patch conflicts (all removed)
 - Usage examples
@@ -84,7 +97,9 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charm
 **Commit**: 540ca0f
 
 ### 5. Patch Compatibility Research ✅
+
 **Research Conducted**:
+
 1. **PR #1854** (grep context cancellation fix):
    - Status: CLOSED
    - Superseded by PR #1906 → merged into **v0.39.0**
@@ -106,7 +121,9 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charm
 ## 🧪 Testing Performed
 
 ### Automation Script Tests
+
 ✅ **Version Detection**:
+
 ```bash
 LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git \
   | head -1 | sed 's|.*refs/tags/\(v[0-9.]*\).*|\1|')
@@ -115,6 +132,7 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charm
 ```
 
 ✅ **Sed Pattern**:
+
 ```bash
 sed -i.tmp \
   -e "s|^  version = \".*\";|  version = \"v0.39.3\";|" \
@@ -126,6 +144,7 @@ sed -i.tmp \
 ```
 
 ✅ **Rollback Mechanism**:
+
 ```bash
 BACKUP_FILE="${NIX_FILE}.backup-$(date +%s)"
 cp "$NIX_FILE" "$BACKUP_FILE"
@@ -137,25 +156,30 @@ rm -f "$BACKUP_FILE"
 ```
 
 ### System Validation Tests
+
 ✅ **Flake Check**:
+
 ```bash
 nix flake check --no-build
 # Result: All checks passed ✅
 ```
 
 ✅ **Version Verification**:
+
 ```bash
 nix eval .#packages.aarch64-darwin.crush-patched.version
 # Result: "v0.39.1" ✅
 ```
 
 ✅ **Fast Syntax Test**:
+
 ```bash
 just test-fast
 # Result: Fast configuration test passed ✅
 ```
 
 ✅ **Current Installation**:
+
 ```bash
 which crush && crush --version
 # Result: /run/current-system/sw/bin/crush v0.39.1 ✅
@@ -166,20 +190,25 @@ which crush && crush --version
 ## 📁 Files Modified
 
 ### Justfile
+
 **Line 50**: Changed script execution method
+
 ```diff
 - @./pkgs/update-crush-patched.sh
 + @bash ./pkgs/update-crush-patched.sh
 ```
 
 ### pkgs/update-crush-patched.sh
+
 **Changes**:
+
 - Added automatic version detection from GitHub (lines 22-40)
 - Added backup/rollback mechanism (lines 63-110, 131-136)
 - Changed error handling to `set -uo pipefail` (line 6)
 - Fixed sed pattern for version updates (lines 70-75)
 
 **Features**:
+
 - Detects latest version automatically
 - Creates timestamped backup before changes
 - Extracts vendorHash from build errors
@@ -187,12 +216,15 @@ which crush && crush --version
 - Clear error messages explaining what to do
 
 ### pkgs/crush-patched.nix
+
 **Changes**:
+
 - Removed all patches (documented why each was removed)
 - Removed postUnpack attempts
 - Removed GOFLAGS modifications
 
 **Current State**:
+
 ```nix
 version = "v0.39.1";
 vendorHash = "sha256-uo9VelhRjtWiaYI88+eTk9PxAUE18Tu2pNq4qQqoTwk=";
@@ -202,6 +234,7 @@ patches = [
 ```
 
 ### Documentation Created
+
 1. **`docs/crush-patched-automation-status.md`** (6.6KB)
    - Automation status summary
    - Known patch conflicts
@@ -217,7 +250,9 @@ patches = [
    - Support & troubleshooting
 
 ### flake.lock
+
 **Changes**:
+
 - Updated NUR input (multiple times during development)
 
 ---
@@ -225,6 +260,7 @@ patches = [
 ## 🔍 Technical Deep-Dive
 
 ### Automation Flow
+
 ```
 1. Detect latest version from GitHub API
    ↓
@@ -248,6 +284,7 @@ patches = [
 ```
 
 ### Error Handling Strategy
+
 ```
 ERROR → Detect Type → Take Action
        ↓
@@ -256,9 +293,11 @@ ERROR → Detect Type → Take Action
 ```
 
 ### Rollback Guarantee
+
 **Promise**: System is ALWAYS in a buildable state after any operation.
 
 **How it works**:
+
 1. Backup created before ANY changes
 2. If ANY step fails → restore from backup
 3. Only remove backup if FULL success
@@ -271,6 +310,7 @@ ERROR → Detect Type → Take Action
 ### Issue 1: Disk Space (Critical)
 
 **Current Status**:
+
 ```
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/disk3s7    229G  226G  2.9G  99% /nix
@@ -279,11 +319,13 @@ Filesystem      Size  Used Avail Use% Mounted on
 **Problem**: Only 2.9GB free, Go builds require ~20GB temporary space.
 
 **Root Cause**:
+
 - All Nix store paths are actively referenced (system + user profiles)
 - GC cannot remove anything
 - Go build artifacts, sources, modules consume significant space
 
 **Solution**: Run aggressive cleanup
+
 ```bash
 just clean-aggressive
 ```
@@ -299,6 +341,7 @@ just clean-aggressive
 **Current Status**: Broken in v0.39.2 and v0.39.3
 
 **Error**:
+
 ```
 go: inconsistent vendoring in /nix/var/nix/builds/...:
   charm.land/bubbles/v2@v2.0.0-rc.1.0.20260109112849-ae99f46cec66:
@@ -306,15 +349,18 @@ go: inconsistent vendoring in /nix/var/nix/builds/...:
 ```
 
 **Root Cause**: Upstream Crush repository has inconsistent vendor directory
+
 - `vendor/modules.txt` doesn't match `go.mod`
 - Likely due to manual vendoring without updating modules.txt
 
 **Affected Versions**:
+
 - v0.39.2: ❌ Broken
 - v0.39.3: ❌ Broken
 - v0.39.1: ✅ Working
 
 **Attempts to Fix**:
+
 1. ❌ Remove all patches - Still failed
 2. ❌ Add `preBuild` with `go mod vendor` - Still failed
 3. ❌ Add `GOFLAGS = "-mod=mod"` - Still failed
@@ -322,6 +368,7 @@ go: inconsistent vendoring in /nix/var/nix/builds/...:
 5. ❌ Research `buildGo123Module` - Same issue
 
 **Solution**: Wait for upstream fix
+
 - Monitor GitHub for vendor-related issues/PRs
 - Watch for v0.39.4 or later
 - Estimated time: 1-2 weeks
@@ -331,29 +378,32 @@ go: inconsistent vendoring in /nix/var/nix/builds/...:
 ## 📊 Success Metrics
 
 ### Automation System
-| Component | Status | Tests Passed |
-|-----------|--------|--------------|
-| Version detection | ✅ | 1/1 |
-| Backup creation | ✅ | 1/1 |
-| VendorHash extraction | ✅ | 1/1 |
-| Rollback mechanism | ✅ | 2/2 |
-| Error messages | ✅ | Clear & actionable |
-| State consistency | ✅ | Always buildable |
+
+| Component             | Status | Tests Passed       |
+| --------------------- | ------ | ------------------ |
+| Version detection     | ✅     | 1/1                |
+| Backup creation       | ✅     | 1/1                |
+| VendorHash extraction | ✅     | 1/1                |
+| Rollback mechanism    | ✅     | 2/2                |
+| Error messages        | ✅     | Clear & actionable |
+| State consistency     | ✅     | Always buildable   |
 
 ### Current System
-| Component | Status | Details |
-|-----------|--------|---------|
-| v0.39.1 | ✅ | Installed and working |
-| Configuration | ✅ | Passes all checks |
-| Flake validation | ✅ | All checks passed |
-| Build verification | ✅ | v0.39.1 builds successfully |
+
+| Component          | Status | Details                     |
+| ------------------ | ------ | --------------------------- |
+| v0.39.1            | ✅     | Installed and working       |
+| Configuration      | ✅     | Passes all checks           |
+| Flake validation   | ✅     | All checks passed           |
+| Build verification | ✅     | v0.39.1 builds successfully |
 
 ### Documentation
-| Document | Status | Size |
-|----------|--------|------|
-| Automation status | ✅ | 6.6KB |
-| Action plan | ✅ | 11KB |
-| Total | ✅ | 17.6KB |
+
+| Document          | Status | Size   |
+| ----------------- | ------ | ------ |
+| Automation status | ✅     | 6.6KB  |
+| Action plan       | ✅     | 11KB   |
+| Total             | ✅     | 17.6KB |
 
 ---
 
@@ -370,6 +420,7 @@ go: inconsistent vendoring in /nix/var/nix/builds/...:
 ## 🎯 What's Working Right Now
 
 ### Commands That Work
+
 ```bash
 # Apply current configuration (v0.39.1)
 just switch
@@ -390,6 +441,7 @@ which crush && crush --version
 ```
 
 ### Automation Readiness
+
 ```bash
 # Version detection (tested)
 ./pkgs/update-crush-patched.sh
@@ -410,13 +462,17 @@ which crush && crush --version
 ## 🚀 Next Steps (When Ready)
 
 ### Immediate (When Disk Space Available)
+
 1. **Free disk space** (10 minutes)
+
    ```bash
    just clean-aggressive
    ```
+
    Expected: Free ~15-30GB
 
 2. **Monitor upstream** (1-2 weeks)
+
    ```bash
    # Watch for vendor fix
    gh issue list --repo charmbracelet/crush --search vendor
@@ -424,6 +480,7 @@ which crush && crush --version
    ```
 
 3. **Test v0.39.3** (5 minutes)
+
    ```bash
    just update
    # Automation handles everything
@@ -435,6 +492,7 @@ which crush && crush --version
    ```
 
 ### Alternative: Stay on v0.39.1
+
 - ✅ Working perfectly
 - ✅ No urgent features in v0.39.3
 - ✅ Can wait for vendor fix
@@ -445,6 +503,7 @@ which crush && crush --version
 ## 🎓 Key Technical Insights
 
 ### Go Vendor Directory
+
 - **What**: Local copy of all dependencies
 - **Why important**: `buildGoModule` uses vendor if present
 - **The problem**: `vendor/modules.txt` must match `go.mod` exactly
@@ -452,12 +511,14 @@ which crush && crush --version
 - **Why v0.39.2+ fails**: Dependency updates broke synchronization
 
 ### Nix Store GC Behavior
+
 - **What keeps paths alive**: GC roots (symlinks)
 - **Why GC didn't work**: All large packages actively referenced
 - **Why 99% used**: Go builds + sources + binaries = large storage
 - **What to do**: Aggressive cleanup (remove old generations)
 
 ### Automation Design
+
 - **Separation of concerns**: Each component testable independently
 - **Failure is expected**: System designed to fail gracefully
 - **User empathy**: Clear error messages explain what to do
@@ -489,6 +550,7 @@ which crush && crush --version
 ### For Immediate Issues
 
 **If automation fails**:
+
 ```bash
 # Check what happened
 cat /tmp/crush-build.log
@@ -498,6 +560,7 @@ cat pkgs/crush-patched.nix | grep "version ="
 ```
 
 **If need manual rollback**:
+
 ```bash
 # Find latest backup
 ls -lt pkgs/crush-patched.nix.backup-* | head -1
@@ -507,6 +570,7 @@ cp pkgs/crush-patched.nix.backup-XXXXX pkgs/crush-patched.nix
 ```
 
 **If want to try upgrade again**:
+
 ```bash
 # Make sure disk space is available
 df -h /nix
@@ -526,6 +590,7 @@ just update
 ## 🎉 Conclusion
 
 ### What We Achieved
+
 ✅ **Complete automation system** - 100% automatic updates with rollback
 ✅ **Robust error handling** - System never in broken state
 ✅ **Comprehensive testing** - All logic paths validated
@@ -533,15 +598,18 @@ just update
 ✅ **Professional quality** - Production-ready, maintainable code
 
 ### What's Blocking Us
+
 ❌ **Disk space** - External factor, user needs to run `just clean-aggressive`
 ❌ **Upstream bug** - External factor, Crush team needs to fix vendor directory
 
 ### What We Can Do Now
+
 ✅ **Use v0.39.1** - Working perfectly, no urgency to upgrade
 ✅ **Wait for fix** - Monitor GitHub for vendor fix (1-2 weeks)
 ✅ **Ready to upgrade** - When disk space + vendor fix available, automation will handle it
 
 ### System Status
+
 🟢 **STABLE** - v0.39.1 working, automation ready
 🟡 **BLOCKED** - v0.39.3 upgrade waiting on external factors
 🔵 **READY** - Everything in place for seamless upgrade when possible

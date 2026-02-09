@@ -7,6 +7,7 @@ The NixOS configuration for GMKtec EVO-X2 with Ryzen AI Max+ 395 is now **deploy
 ## Hardware Coverage Matrix
 
 ### ✅ Fully Supported (Production Ready)
+
 - **AMD Ryzen AI Max+ 395**: Complete CPU optimization
 - **AMD Radeon 8060S GPU**: Full RDNA 3.5 acceleration
 - **ROCm AI Stack**: Complete AI/ML acceleration pipeline
@@ -17,11 +18,13 @@ The NixOS configuration for GMKtec EVO-X2 with Ryzen AI Max+ 395 is now **deploy
 - **Development Tools**: Python, pip, and AI development stack
 
 ### ⚠️ Partially Supported (Functional)
+
 - **WiFi 7 (MT7925)**: Basic connectivity enabled
 - **2.5G Ethernet (RTL8125BG)**: Interface detection enabled
 - **Audio**: Generic Pipewire configuration
 
 ### ❌ Future Enhancements (Post-Deployment)
+
 - **WiFi 7 Optimization**: Chipset-specific firmware
 - **Advanced Audio**: Controller-specific configuration
 - **Thunderbolt**: Security and device management
@@ -31,18 +34,21 @@ The NixOS configuration for GMKtec EVO-X2 with Ryzen AI Max+ 395 is now **deploy
 ## Deployment Readiness Assessment
 
 ### Configuration Quality: ✅ 95%
+
 - Clean, validated architecture
 - All syntax issues resolved
 - No duplicate definitions
 - Proper module imports
 
 ### Hardware Support: ✅ 75%
+
 - Core components fully optimized
 - Essential functionality operational
 - High-performance configurations in place
 - AI acceleration stack complete
 
 ### Validation Status: ✅ 100%
+
 - `nix flake check`: ✅ PASSED
 - `statix check`: ✅ PASSED
 - `deadnix`: ✅ PASSED
@@ -51,6 +57,7 @@ The NixOS configuration for GMKtec EVO-X2 with Ryzen AI Max+ 395 is now **deploy
 ## Immediate Deployment Steps
 
 ### 1. System Preparation
+
 ```bash
 # Create bootable USB with latest NixOS
 # Boot into installation environment
@@ -58,6 +65,7 @@ The NixOS configuration for GMKtec EVO-X2 with Ryzen AI Max+ 395 is now **deploy
 ```
 
 ### 2. Configuration Deployment
+
 ```bash
 # Clone repository
 git clone <repository-url>
@@ -68,6 +76,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 ### 3. Post-Deployment Validation
+
 ```bash
 # Verify hardware detection
 lspci -nn | grep -E "(VGA|Display|3D)"
@@ -83,6 +92,7 @@ python3 -c "import torch; print(torch.cuda.is_available())"
 ```
 
 ### 4. Hardware-Specific Testing
+
 ```bash
 # CPU Performance
 stress --cpu 16 --timeout 60s
@@ -101,18 +111,21 @@ ip link show
 ## Expected Performance Metrics
 
 ### CPU Performance
+
 - **Base Clock**: 3.6 GHz (confirmed)
 - **Boost Clock**: 5.1 GHz (expected)
 - **Core Configuration**: 16 cores/32 threads
 - **TDP**: 120-140W (optimized)
 
 ### GPU Performance
+
 - **Architecture**: RDNA 3.5 (supported)
 - **Compute Units**: 40 (enabled)
 - **Memory**: LPDDR5X integration
 - **Acceleration**: Vulkan, OpenGL, ROCm (ready)
 
 ### AI Acceleration
+
 - **XDNA 2 Architecture**: 50 TOPS (configured)
 - **ROCm Stack**: Complete pipeline (installed)
 - **Framework Support**: PyTorch, TensorFlow (ready)
@@ -122,6 +135,7 @@ ip link show
 ### Common Issues & Solutions
 
 #### WiFi Not Connecting
+
 ```bash
 # Check firmware loading
 dmesg | grep -i mt7925
@@ -131,6 +145,7 @@ sudo systemctl restart wpa_supplicant
 ```
 
 #### GPU Not Detected
+
 ```bash
 # Verify kernel modules
 lsmod | grep amdgpu
@@ -140,6 +155,7 @@ lspci -nnk | grep -A 3 "\[0300\]"
 ```
 
 #### Thermal Throttling
+
 ```bash
 # Monitor temperatures
 watch -n 2 sensors
@@ -151,24 +167,28 @@ sudo cpupower frequency-set -g performance
 ## Post-Deployment Enhancements
 
 ### Week 1: Hardware Optimization
+
 - [ ] Run hardware detection commands
 - [ ] Document actual chipset models
 - [ ] Add chipset-specific firmware
 - [ ] Tune performance profiles
 
 ### Week 2: Network Enhancement
+
 - [ ] Optimize WiFi 7 performance
 - [ ] Configure 2.5G Ethernet settings
 - [ ] Test throughput capabilities
 - [ ] Optimize routing tables
 
 ### Week 3: Advanced Features
+
 - [ ] Configure Thunderbolt security
 - [ ] Set up RGB lighting control
 - [ ] Implement custom power profiles
 - [ ] Optimize battery management
 
 ### Week 4: Production Hardening
+
 - [ ] Security audit and hardening
 - [ ] Performance benchmarking
 - [ ] Documentation updates
@@ -177,6 +197,7 @@ sudo cpupower frequency-set -g performance
 ## Success Criteria
 
 ### Deployment Success: ✅ Achieved
+
 - System boots successfully with latest kernel
 - All core hardware components detected
 - Desktop environment fully operational
@@ -184,6 +205,7 @@ sudo cpupower frequency-set -g performance
 - AI development stack functional
 
 ### Performance Success: ✅ Expected
+
 - CPU performance at rated specifications
 - GPU acceleration for graphics and AI
 - Thermal management under load
@@ -191,6 +213,7 @@ sudo cpupower frequency-set -g performance
 - Development tools accessible
 
 ### Validation Success: ✅ Completed
+
 - All configuration checks pass
 - Syntax validation successful
 - Hardware modules properly loaded
@@ -199,16 +222,19 @@ sudo cpupower frequency-set -g performance
 ## Documentation and Support
 
 ### Configuration Files
+
 - **Main Config**: `dotfiles/nixos/configuration.nix`
 - **Hardware Config**: `dotfiles/nixos/hardware-configuration.nix`
 - **Analysis**: `docs/evo-x2-analysis.md`
 
 ### Validation Tools
+
 - `nix flake check` - Configuration validation
 - `statix check` - Nix best practices
 - `deadnix` - Dead code elimination
 
 ### Monitoring Tools
+
 - `sensors` - Temperature monitoring
 - `radeontop` - GPU utilization
 - `lm_sensors` - System monitoring

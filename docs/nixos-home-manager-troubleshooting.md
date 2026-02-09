@@ -3,11 +3,13 @@
 ## Quick Start
 
 1. **Run the diagnostic script** on evo-x2:
+
    ```bash
    ./nixos-diagnostic.sh
    ```
 
 2. **If diagnostics pass**, run:
+
    ```bash
    sudo nixos-rebuild switch --flake .#evo-x2
    ```
@@ -19,10 +21,12 @@
 ### Issue 1: Home Manager Profile Corruption
 
 **Symptoms:**
+
 - `home-manager switch` fails with profile errors
 - Broken symlinks in ~/.nix-profile
 
 **Solution:**
+
 ```bash
 # Clean up old generations
 nix-env --delete-generations old --profile /nix/var/nix/profiles/per-user/$USER/home-manager
@@ -37,11 +41,13 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### Issue 2: Nix Store Corruption
 
 **Symptoms:**
+
 - "Nar hash mismatch" errors
 - "Bad nar archive" messages
 - Build failures with hash mismatches
 
 **Solution:**
+
 ```bash
 # Clean up store
 sudo nix-collect-garbage -d
@@ -56,10 +62,12 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### Issue 3: Insufficient Disk Space
 
 **Symptoms:**
+
 - Build fails during download or extraction
 - Out of space errors
 
 **Solution:**
+
 ```bash
 # Check space
 df -h /nix
@@ -75,11 +83,13 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### Issue 4: Nix Daemon Issues
 
 **Symptoms:**
+
 - Permission denied errors
 - "nix-daemon not running" messages
 - Build failures during fetch phase
 
 **Solution:**
+
 ```bash
 # Check daemon status
 sudo systemctl status nix-daemon
@@ -97,11 +107,13 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### Issue 5: Input/Output or Network Errors
 
 **Symptoms:**
+
 - "Connection refused" during fetch
 - "Input/output error" during build
 - Partial downloads
 
 **Solution:**
+
 ```bash
 # Clean downloads
 sudo rm -rf /tmp/nix-*
@@ -172,18 +184,21 @@ home-manager --version > hm-version.log
 ## Prevention Tips
 
 1. **Regular maintenance**:
+
    ```bash
    # Run weekly
    sudo nix-collect-garbage -d
    ```
 
 2. **Test before applying**:
+
    ```bash
    sudo nixos-rebuild test --flake .#evo-x2
    sudo nixos-rebuild switch --flake .#evo-x2
    ```
 
 3. **Keep working generations**:
+
    ```bash
    # Don't delete all old generations immediately
    sudo nixos-rebuild delete-generations +10  # Keep last 10

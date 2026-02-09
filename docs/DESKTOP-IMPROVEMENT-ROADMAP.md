@@ -34,17 +34,20 @@ Improvements are organized by priority and implementation phase.
 ### 1.2 Privacy & Screen Locking
 
 **Improvements**:
+
 - Blur effect for lock screen (using hyprlock blur)
 - Privacy mode (grayscale screen toggle)
 - Screenshot detection indicator in Waybar
 - Lock screen with camera preview
 
 **Features**:
+
 - Per-workspace privacy mode
 - Temporary privacy toggle (Ctrl+Alt+P)
 - Visual feedback when taking screenshots
 
 **Files**:
+
 - `platforms/nixos/desktop/hyprland.nix`
 - `platforms/nixos/desktop/waybar.nix`
 - `platforms/nixos/desktop/security-hardening.nix`
@@ -57,6 +60,7 @@ Improvements are organized by priority and implementation phase.
 ### 1.3 Productivity Scripts
 
 **Scripts to add**:
+
 1. **Quake Terminal** - Dropdown terminal (F12)
 2. **Screenshot + OCR** - Extract text from screenshots
 3. **Color Picker** - Pick screen color, save to clipboard
@@ -64,6 +68,7 @@ Improvements are organized by priority and implementation phase.
 5. **App Workspace Spawner** - Open app in specific workspace
 
 **Keybindings**:
+
 ```nix
 "bind = $mod, P, exec, ~/scripts/quake-terminal.sh"
 "bind = $mod, S, exec, ~/scripts/screenshot-ocr.sh"
@@ -80,6 +85,7 @@ Improvements are organized by priority and implementation phase.
 ### 1.4 Monitoring Improvements
 
 **Waybar Modules to add**:
+
 - GPU temperature (AMD GPU integration)
 - CPU usage (per-core)
 - Memory usage (with used/total)
@@ -87,6 +93,7 @@ Improvements are organized by priority and implementation phase.
 - Disk usage (for key mount points)
 
 **Implementation**:
+
 ```json
 "custom/gpu": {
   "exec": "sensors | grep 'Tctl' | awk '{print $2}'",
@@ -96,6 +103,7 @@ Improvements are organized by priority and implementation phase.
 ```
 
 **Files**:
+
 - `platforms/nixos/desktop/waybar.nix`
 - `platforms/nixos/desktop/monitoring.nix`
 
@@ -107,12 +115,14 @@ Improvements are organized by priority and implementation phase.
 ### 1.5 Window Management Enhancements
 
 **Features**:
+
 - **Scratchpad Workspaces** - Temporary windows (Alt+S)
 - **Better Floating Rules** - Size and position defaults
 - **Focus Follows Mouse** - Mouse movement controls focus
 - **Auto Back-and-Forth** - Toggle workspace with same key
 
 **Configuration**:
+
 ```nix
 # Scratchpad
 "bind = $mod, S, togglespecialworkspace, scratchpad"
@@ -135,12 +145,14 @@ binds.allow_workspace_cycles = true
 ### 2.1 Keyboard & Input
 
 **Improvements**:
+
 - Keyboard repeat rate optimization (faster typing)
 - Caps Lock as Escape/Control
 - Keyboard layout switcher indicator in Waybar
 - Trackpad gesture improvements (3-finger swipe)
 
 **Configuration**:
+
 ```nix
 # Caps Lock as Escape
 input.kb_options = "caps:escape"
@@ -151,6 +163,7 @@ input.repeat_delay = 200
 ```
 
 **Files**:
+
 - `platforms/nixos/desktop/hyprland.nix`
 - `platforms/nixos/desktop/waybar.nix`
 
@@ -162,17 +175,20 @@ input.repeat_delay = 200
 ### 2.2 Audio & Media
 
 **Waybar Modules**:
+
 - Audio visualizer (real-time)
 - Microphone status indicator
 - Media player integration (Now playing)
 - Volume control with visual feedback
 
 **Features**:
+
 - Per-app volume control
 - Noise suppression toggle
 - Bluetooth device switcher
 
 **Files**:
+
 - `platforms/nixos/desktop/waybar.nix`
 - `platforms/nixos/desktop/audio.nix`
 
@@ -184,12 +200,14 @@ input.repeat_delay = 200
 ### 2.3 Development Tools
 
 **Enhancements**:
+
 - Git branch display in Waybar
 - Terminal multiplexer integration (tmux/zellij)
 - Editor-specific window rules (nvim/vscode)
 - Dev environment launcher
 
 **Waybar Integration**:
+
 ```json
 "custom/git": {
   "exec": "git rev-parse --abbrev-ref HEAD",
@@ -199,6 +217,7 @@ input.repeat_delay = 200
 ```
 
 **Files**:
+
 - `platforms/nixos/desktop/waybar.nix`
 - `platforms/nixos/desktop/hyprland.nix`
 
@@ -210,12 +229,14 @@ input.repeat_delay = 200
 ### 2.4 Desktop Environment
 
 **Improvements**:
+
 - Better window borders and shadows
 - Animation tuning (smoother transitions)
 - Workspace naming persistence (remember names)
 - Application autostart management
 
 **Configuration**:
+
 ```nix
 decoration {
   drop_shadow = yes;
@@ -232,6 +253,7 @@ animations {
 ```
 
 **Files**:
+
 - `platforms/nixos/desktop/hyprland.nix`
 - `platforms/nixos/system/configuration.nix`
 
@@ -245,12 +267,14 @@ animations {
 ### 3.1 Backup & Configuration
 
 **Features**:
+
 - Automated config backups (hourly/daily)
 - Workspace state preservation (remember open apps)
 - One-click config sync (multiple machines)
 - Config versioning with rollback
 
 **Implementation**:
+
 ```bash
 # Backup script
 ~/.config/backup-desktop.sh
@@ -266,18 +290,21 @@ animations {
 ### 3.2 Gaming & Performance
 
 **Features**:
+
 - Game mode toggle (disable compositor effects)
 - GPU optimization profiles
 - Frame rate statistics in Waybar
 - Game-specific workspace themes
 
 **Keybindings**:
+
 ```nix
 # Game mode (Ctrl+Alt+G)
 "bind = $mod SHIFT, G, exec, ~/scripts/game-mode.sh"
 ```
 
 **Files**:
+
 - `platforms/nixos/desktop/hyprland.nix`
 - `platforms/nixos/desktop/waybar.nix`
 - `platforms/hardware/amd-gpu.nix`
@@ -290,12 +317,14 @@ animations {
 ### 3.3 Advanced Window Rules
 
 **Features**:
+
 - Auto-group similar windows (tabs)
 - Per-application layout rules
 - Smart window positioning
 - Window grouping by workflow
 
 **Configuration**:
+
 ```nix
 # Auto-group browser windows
 windowrulev2 = group, class:^(firefox)$
@@ -311,6 +340,7 @@ windowrulev2 = group barred, class:^(firefox)$
 ### 3.4 AI Integration
 
 **Features**:
+
 - AI-powered workspace suggestions
 - Smart window arrangement
 - Voice command integration
@@ -324,43 +354,47 @@ windowrulev2 = group barred, class:^(firefox)$
 
 ## 📊 Priority Matrix
 
-| Improvement | Impact | Complexity | Time | Phase |
-|------------|---------|-------------|-------|-------|
-| Config Reloader | ⭐⭐⭐⭐ | Low | 10m | 1 |
-| Privacy Features | ⭐⭐⭐⭐ | Medium | 1h | 1 |
-| Productivity Scripts | ⭐⭐⭐⭐ | Medium | 2h | 1 |
-| Monitoring | ⭐⭐⭐ | Medium | 1.5h | 1 |
-| Window Management | ⭐⭐⭐⭐ | Low | 30m | 1 |
-| Keyboard | ⭐⭐⭐ | Low | 20m | 2 |
-| Audio & Media | ⭐⭐ | Medium | 1h | 2 |
-| Dev Tools | ⭐⭐⭐ | Medium | 1h | 2 |
-| Desktop Environment | ⭐⭐ | Low | 30m | 2 |
-| Backup System | ⭐⭐⭐ | High | 3h | 3 |
-| Gaming Mode | ⭐⭐ | Medium | 2h | 3 |
-| Advanced Rules | ⭐⭐ | Medium | 1h | 3 |
-| AI Integration | ⭐ | High | 8h+ | 3 |
+| Improvement          | Impact   | Complexity | Time | Phase |
+| -------------------- | -------- | ---------- | ---- | ----- |
+| Config Reloader      | ⭐⭐⭐⭐ | Low        | 10m  | 1     |
+| Privacy Features     | ⭐⭐⭐⭐ | Medium     | 1h   | 1     |
+| Productivity Scripts | ⭐⭐⭐⭐ | Medium     | 2h   | 1     |
+| Monitoring           | ⭐⭐⭐   | Medium     | 1.5h | 1     |
+| Window Management    | ⭐⭐⭐⭐ | Low        | 30m  | 1     |
+| Keyboard             | ⭐⭐⭐   | Low        | 20m  | 2     |
+| Audio & Media        | ⭐⭐     | Medium     | 1h   | 2     |
+| Dev Tools            | ⭐⭐⭐   | Medium     | 1h   | 2     |
+| Desktop Environment  | ⭐⭐     | Low        | 30m  | 2     |
+| Backup System        | ⭐⭐⭐   | High       | 3h   | 3     |
+| Gaming Mode          | ⭐⭐     | Medium     | 2h   | 3     |
+| Advanced Rules       | ⭐⭐     | Medium     | 1h   | 3     |
+| AI Integration       | ⭐       | High       | 8h+  | 3     |
 
 ---
 
 ## 🚀 Implementation Order
 
 ### Week 1: Quick Wins (Phase 1)
+
 1. Config Reloader (10m)
 2. Window Management (30m)
 3. Keyboard & Input (20m)
 4. Desktop Environment (30m)
 
 ### Week 2: Productivity Boost (Phase 1-2)
+
 1. Productivity Scripts (2h)
 2. Development Tools (1h)
 3. Monitoring Improvements (1.5h)
 4. Audio & Media (1h)
 
 ### Week 3: Security & Privacy (Phase 1)
+
 1. Privacy Features (1h)
 2. Advanced Window Rules (1h)
 
 ### Week 4+: Long-term (Phase 3)
+
 1. Backup System (3h)
 2. Gaming Mode (2h)
 3. AI Integration (8h+)

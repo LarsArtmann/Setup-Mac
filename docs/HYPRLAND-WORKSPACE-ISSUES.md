@@ -2,6 +2,7 @@
 
 **Date:** 2025-12-31
 **Problem:** Multiple virtual desktops not working correctly
+
 - Everything stays same after switching workspaces
 - Everything disappears when switching workspaces
 
@@ -10,12 +11,15 @@
 ## 🔍 Root Cause Analysis
 
 ### Issue 1: 200% Monitor Scaling
+
 **File:** `platforms/nixos/desktop/hyprland.nix:25`
+
 ```nix
 monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ```
 
 **Problem:** 200% scaling can cause:
+
 - Windows to render off-screen or in wrong positions
 - Workspace switching visual glitches
 - Incorrect window size calculations
@@ -26,9 +30,11 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ---
 
 ### Issue 2: No Workspace Window Rules
+
 **File:** `platforms/nixos/desktop/hyprland.nix:47-77`
 
 **Problem:** No persistent window rules for applications
+
 - Applications don't remember which workspace they belong to
 - Every new window opens on current workspace
 - No logical workspace organization
@@ -40,12 +46,15 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ---
 
 ### Issue 3: Slow Workspace Animation
+
 **File:** `platforms/nixos/desktop/hyprland.nix:116`
+
 ```nix
 "workspaces, 1, 4, default, slidefadevert"
 ```
 
 **Problem:** 4-second animation duration makes workspace switching feel broken:
+
 - User thinks nothing is happening during animation
 - Visual confusion during long transition
 - Hard to tell if workspace actually changed
@@ -55,7 +64,9 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ---
 
 ### Issue 4: Missing Workspace Management Plugins
+
 **Problem:** No advanced workspace plugins installed
+
 - No `hyprsplit` plugin for better multi-monitor support
 - No `virtual-desktops` plugin for desktop-level organization
 - Standard Hyprland workspaces are monitor-specific, not global
@@ -65,7 +76,9 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ---
 
 ### Issue 5: No Explicit Workspace on Monitor Rules
+
 **Problem:** Workspaces can span across monitors unpredictably
+
 - Hyprland default behavior: workspace 1 appears on first monitor
 - Switching to workspace 1 switches the first monitor
 - Second monitor stays on previous workspace
@@ -80,16 +93,19 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 2x scaling for TV
 ### Solution 1: Fix Monitor Scaling (PRIORITY 1)
 
 **Option A: Reduce scaling to 150%**
+
 ```nix
 monitor = "HDMI-A-1,preferred,auto,1.5";  # 150% scaling
 ```
 
 **Option B: Reduce scaling to 125%**
+
 ```nix
 monitor = "HDMI-A-1,preferred,auto,1.25";  # 125% scaling
 ```
 
 **Option C: Disable scaling temporarily**
+
 ```nix
 monitor = "HDMI-A-1,preferred,auto,1";  # 100% scaling
 ```
@@ -97,6 +113,7 @@ monitor = "HDMI-A-1,preferred,auto,1";  # 100% scaling
 **Recommendation:** Try 125% first, adjust based on visibility needs.
 
 **Why this helps:**
+
 - Reduces window positioning bugs
 - Eliminates off-screen rendering issues
 - Improves workspace switching performance
@@ -107,6 +124,7 @@ monitor = "HDMI-A-1,preferred,auto,1";  # 100% scaling
 ### Solution 2: Add Persistent Workspace Window Rules (PRIORITY 2)
 
 **Add window rules for common applications:**
+
 ```nix
 windowrulev2 = [
   # Existing background console rules...
@@ -146,6 +164,7 @@ windowrulev2 = [
 ```
 
 **Why this helps:**
+
 - Applications open on designated workspaces
 - Workspace switching shows different sets of windows
 - Logical workspace organization
@@ -156,6 +175,7 @@ windowrulev2 = [
 ### Solution 3: Speed Up Workspace Animation (PRIORITY 3)
 
 **Reduce animation duration from 4s to 0.5s:**
+
 ```nix
 animations = {
   enabled = true;
@@ -173,6 +193,7 @@ animations = {
 ```
 
 **Alternative: Disable workspace animations entirely**
+
 ```nix
 animation = [
   "windows, 1, 3, myBezier, slide"
@@ -186,6 +207,7 @@ animation = [
 ```
 
 **Why this helps:**
+
 - Instant workspace switching
 - Clear visual feedback
 - Eliminates "stuck" feeling
@@ -196,6 +218,7 @@ animation = [
 ### Solution 4: Enable Workspace on Monitor Rules (PRIORITY 4)
 
 **Force specific workspaces on specific monitors:**
+
 ```nix
 # After monitor definition
 workspace = 1, monitor:HDMI-A-1, default:true
@@ -206,6 +229,7 @@ workspace = 5, monitor:HDMI-A-1, default:true
 ```
 
 **Alternative: Use monitor-specific workspace naming**
+
 ```nix
 monitor = "HDMI-A-1,preferred,auto,1.25"
 
@@ -217,6 +241,7 @@ bind = $mod, 3, focusworkspaceoncurrentmonitor, 3
 ```
 
 **Why this helps:**
+
 - Workspaces stay on correct monitor
 - Predictable workspace behavior
 - No windows disappearing to wrong monitor
@@ -227,6 +252,7 @@ bind = $mod, 3, focusworkspaceoncurrentmonitor, 3
 ### Solution 5: Add Hyprsplit Plugin (PRIORITY 5 - Optional)
 
 **Install hyprsplit plugin for better workspace management:**
+
 ```nix
 # In platforms/nixos/desktop/hyprland.nix
 wayland.windowManager.hyprland = {
@@ -253,6 +279,7 @@ wayland.windowManager.hyprland = {
 ```
 
 **Update workspace bindings to use hyprsplit:**
+
 ```nix
 bind = [
   # Use hyprsplit workspace commands
@@ -267,6 +294,7 @@ bind = [
 ```
 
 **Why this helps:**
+
 - Better multi-monitor workspace support
 - Recover lost windows easily
 - More predictable workspace behavior
@@ -277,6 +305,7 @@ bind = [
 ### Solution 6: Add Virtual Desktops Plugin (PRIORITY 6 - Optional)
 
 **For true virtual desktop behavior (windows persist across desktops):**
+
 ```nix
 wayland.windowManager.hyprland = {
   enable = true;
@@ -316,6 +345,7 @@ wayland.windowManager.hyprland = {
 ```
 
 **Why this helps:**
+
 - True virtual desktop behavior (like GNOME/KDE)
 - Windows stay on their virtual desktops
 - Remembers layouts across desktop switches
@@ -326,15 +356,18 @@ wayland.windowManager.hyprland = {
 ## 🎯 Implementation Priority
 
 ### Phase 1: Quick Fixes (Do Immediately)
+
 1. **Reduce monitor scaling** - Try 125% or 150%
 2. **Speed up workspace animation** - Change 4s to 0.5s
 3. **Test workspace switching** - Verify fixes work
 
 ### Phase 2: Persistent Rules (Do Next)
+
 4. **Add workspace window rules** - For terminal, browser, file manager, etc.
 5. **Enable workspace on monitor rules** - Force workspaces to monitor
 
 ### Phase 3: Advanced Features (Do If Needed)
+
 6. **Add hyprsplit plugin** - For better multi-monitor support
 7. **Add virtual-desktops plugin** - For true virtual desktop behavior
 
@@ -345,23 +378,27 @@ wayland.windowManager.hyprland = {
 After implementing fixes, test:
 
 ### Basic Workspace Switching
+
 - [ ] Press $mod+1 to go to workspace 1
 - [ ] Press $mod+2 to go to workspace 2
 - [ ] Verify windows appear/disappear correctly
 - [ ] Check no off-screen windows
 
 ### Application Workspace Rules
+
 - [ ] Open terminal (kitty) - should go to workspace 1
 - [ ] Open browser (firefox) - should go to workspace 2
 - [ ] Open file manager (dolphin) - should go to workspace 3
 - [ ] Open editor (nvim) - should go to workspace 4
 
 ### Multi-Monitor Behavior
+
 - [ ] Workspaces stay on correct monitor
 - [ ] No windows disappear when switching
 - [ ] Background consoles visible on all workspaces
 
 ### Animation and Responsiveness
+
 - [ ] Workspace switching feels instant
 - [ ] No visual glitches during switch
 - [ ] Clear feedback when workspace changes
@@ -397,18 +434,21 @@ pkill Hyprland
 ## 📊 Expected Results
 
 After implementing Phase 1 (Scaling + Animation):
+
 - ✅ Workspace switching works instantly
 - ✅ No windows disappear or stay stuck
 - ✅ Clear visual feedback when switching
 - ✅ All windows visible on correct workspace
 
 After implementing Phase 2 (Window Rules):
+
 - ✅ Applications open on designated workspaces
 - ✅ Each workspace has different set of windows
 - ✅ Logical workspace organization
 - ✅ Predictable workspace behavior
 
 After implementing Phase 3 (Plugins):
+
 - ✅ Advanced multi-monitor support
 - ✅ Lost window recovery
 - ✅ True virtual desktop behavior (if desired)
