@@ -77,7 +77,7 @@ ip addr show
 **On macOS (Your current machine):**
 ```bash
 # Navigate to repo root
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 
 # Copy files to the mounted /mnt/etc/nixos on EVO-X2
 # Replace <IP> with the address found above

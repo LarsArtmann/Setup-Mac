@@ -10,7 +10,7 @@
 ### 1. Deploy Configuration
 
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 sudo darwin-rebuild switch --flake .
 ```
 
@@ -35,7 +35,7 @@ sudo darwin-rebuild switch --flake .
 
 ```bash
 # Run verification script
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 just verify
 ```
 
@@ -157,7 +157,7 @@ tmux kill-server && tmux new-session
 **Solution:**
 ```bash
 # Rollback to previous generation
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 just rollback
 
 # Or manual rollback
@@ -171,7 +171,7 @@ sudo darwin-rebuild switch --rollback
 ### Update System
 
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 
 # Update flake inputs
 just update
@@ -185,7 +185,7 @@ just switch
 ### Rollback Changes
 
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 
 # Rollback to previous generation
 just rollback

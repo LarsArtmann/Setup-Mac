@@ -1,7 +1,7 @@
 # SDDM Configuration Implementation Steps
 
 **Purpose:** Implement optimal SDDM configuration for NixOS with AMD GPU + Hyprland
-**Target:** `/Users/larsartmann/Desktop/Setup-Mac/platforms/nixos/desktop/hyprland-system.nix`
+**Target:** `/Users/larsartmann/projects/SystemNix/platforms/nixos/desktop/hyprland-system.nix`
 
 ---
 
@@ -11,8 +11,8 @@
 
 ```bash
 # Create backup of current configuration
-cp /Users/larsartmann/Desktop/Setup-Mac/platforms/nixos/desktop/hyprland-system.nix \
-   /Users/larsartmann/Desktop/Setup-Mac/platforms/nixos/desktop/hyprland-system.nix.backup
+cp /Users/larsartmann/projects/SystemNix/platforms/nixos/desktop/hyprland-system.nix \
+   /Users/larsartmann/projects/SystemNix/platforms/nixos/desktop/hyprland-system.nix.backup
 
 # Test current configuration (safe, doesn't apply changes)
 sudo nixos-rebuild test --flake .#evo-x2

@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-SETUP_DIR="/Users/larsartmann/Desktop/Setup-Mac"
+SETUP_DIR="/Users/larsartmann/projects/SystemNix"
 SCRIPTS_DIR="$SETUP_DIR/scripts"
 DOTFILES_DIR="$SETUP_DIR/dotfiles"
 
@@ -204,8 +204,8 @@ if [[ -f "${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor/monitoring-hook.zs
 fi
 
 # Load lazy loading system (optional - for advanced users)
-# if [[ -f "/Users/larsartmann/Desktop/Setup-Mac/scripts/plugin-lazy-loader.zsh" ]]; then
-#     source "/Users/larsartmann/Desktop/Setup-Mac/scripts/plugin-lazy-loader.zsh"
+# if [[ -f "/Users/larsartmann/projects/SystemNix/scripts/plugin-lazy-loader.zsh" ]]; then
+#     source "/Users/larsartmann/projects/SystemNix/scripts/plugin-lazy-loader.zsh"
 # fi
 EOF
 

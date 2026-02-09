@@ -13,8 +13,8 @@
 
 ### Option A: Apply New Configuration
 ```bash
-# From Setup-Mac directory
-cd ~/Desktop/Setup-Mac
+# From SystemNix directory
+cd ~/projects/SystemNix
 
 # Apply new Home Manager configuration
 sudo darwin-rebuild switch --flake .

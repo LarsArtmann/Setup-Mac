@@ -1196,17 +1196,17 @@ tmux-setup:
     @echo "✅ Tmux configuration applied"
 
 tmux-dev:
-    @echo "🚀 Starting Setup-Mac development session..."
-    tmux has-session -t Setup-Mac && tmux attach-session -t Setup-Mac || \
-    tmux new-session -d -s Setup-Mac -n just "cd ~/Desktop/Setup-Mac && just" \; \
-                   new-window -d -n nvim "cd ~/Desktop/Setup-Mac && nvim" \; \
-                   new-window -d -n shell "cd ~/Desktop/Setup-Mac" \; \
+    @echo "🚀 Starting SystemNix development session..."
+    tmux has-session -t SystemNix && tmux attach-session -t SystemNix || \
+    tmux new-session -d -s SystemNix -n just "cd ~/projects/SystemNix && just" \; \
+                   new-window -d -n nvim "cd ~/projects/SystemNix && nvim" \; \
+                   new-window -d -n shell "cd ~/projects/SystemNix" \; \
                    select-window -t 0
-    tmux attach-session -t Setup-Mac
+    tmux attach-session -t SystemNix
 
 tmux-attach:
-    @echo "📋 Attaching to Setup-Mac session..."
-    tmux attach-session -t Setup-Mac || tmux new-session -s Setup-Mac
+    @echo "📋 Attaching to SystemNix session..."
+    tmux attach-session -t SystemNix || tmux new-session -s SystemNix
 
 tmux-sessions:
     @echo "📋 Active tmux sessions:"

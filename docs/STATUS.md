@@ -162,8 +162,8 @@ platforms/
 
 ### Step 1: Deploy Configuration
 ```bash
-# From Setup-Mac directory
-cd ~/Desktop/Setup-Mac
+# From SystemNix directory
+cd ~/projects/SystemNix
 
 # Deploy new Home Manager configuration
 sudo darwin-rebuild switch --flake .

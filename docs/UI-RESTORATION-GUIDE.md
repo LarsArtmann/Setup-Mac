@@ -13,8 +13,8 @@
 # SSH into your evo-x2
 ssh lars@evo-x2
 
-# Navigate to Setup-Mac
-cd ~/Desktop/Setup-Mac  # Adjust path as needed
+# Navigate to SystemNix
+cd ~/projects/SystemNix  # Adjust path as needed
 
 # Pull the UI fixes
 git pull
@@ -38,7 +38,7 @@ After system boots into UI, verify everything works:
 ### Run Verification Script
 ```bash
 # Execute the comprehensive verification
-~/Desktop/Setup-Mac/scripts/verify-hyprland.sh
+~/projects/SystemNix/scripts/verify-hyprland.sh
 ```
 
 ### Test Basic Functionality
@@ -143,7 +143,7 @@ sudo nix flake update && sudo nixos-rebuild switch --flake .
 sudo nix-collect-garbage -d
 
 # Verify configuration
-~/Desktop/Setup-Mac/scripts/verify-hyprland.sh
+~/projects/SystemNix/scripts/verify-hyprland.sh
 ```
 
 ### Monthly Commands

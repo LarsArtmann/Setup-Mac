@@ -246,8 +246,8 @@ For detailed information:
 
 2. **Clone and apply configuration:**
    ```bash
-   git clone https://github.com/LarsArtmann/Setup-Mac.git ~/Desktop/Setup-Mac
-   cd ~/Desktop/Setup-Mac
+   git clone https://github.com/LarsArtmann/SystemNix.git ~/projects/SystemNix
+   cd ~/projects/SystemNix
 
    # Use Just commands (recommended)
    just setup              # Complete initial setup
@@ -369,7 +369,7 @@ shellAliases = {
 ### Updating the System
 
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 
 # Using Just commands (recommended)
 just update             # Update all packages

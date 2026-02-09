@@ -803,7 +803,7 @@ type(scope): brief description
 
 ```bash
 # Fresh installation
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 just setup              # Complete initial setup
 just switch             # Apply configuration
 

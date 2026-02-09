@@ -56,8 +56,8 @@ cat ~/.ssh/id_rsa.pub | ssh lars@192.168.1.146 "mkdir -p ~/.ssh && chmod 700 ~/.
 # After SSH key setup
 ssh lars@192.168.1.146
 
-# Navigate to Setup-Mac
-cd ~/Desktop/Setup-Mac
+# Navigate to SystemNix
+cd ~/projects/SystemNix
 
 # Apply UI fixes
 sudo nixos-rebuild switch --flake .#evo-x2

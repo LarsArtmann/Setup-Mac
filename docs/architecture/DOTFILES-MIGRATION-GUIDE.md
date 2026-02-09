@@ -210,7 +210,7 @@ just rollback
 just restore <backup_name>
 
 # Then restore dotfiles manually
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 ./scripts/manual-linking.sh
 ```
 

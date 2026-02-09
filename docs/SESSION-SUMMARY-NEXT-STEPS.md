@@ -173,7 +173,7 @@ monitor = "HDMI-A-1,preferred,auto,2";  # 200% for TV (REVERT TO THIS?)
 
 ### Apply All Changes
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 sudo nixos-rebuild switch --flake .
 ```
 
