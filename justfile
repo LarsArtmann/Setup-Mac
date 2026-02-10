@@ -596,57 +596,60 @@ env-private:
     @echo "# export SOME_API_KEY=\"your-key-here\"" >> ~/.env.private
     @echo "✅ Private environment file created at ~/.env.private"
 
-# Benchmark shell startup performance (legacy)
-benchmark:
-    @echo "🏃 Benchmarking shell startup performance..."
-    @echo "Testing zsh startup time (10 runs):"
-    hyperfine --warmup 3 --runs 10 'zsh -i -c exit'
-    @echo ""
-    @echo "Testing bash startup time for comparison:"
-    hyperfine --warmup 3 --runs 10 'bash -i -c exit'
-    @echo "✅ Benchmark complete"
-
-# Comprehensive system performance benchmarks
-benchmark-all:
-    @echo "🚀 Running comprehensive system benchmarks..."
-    ./scripts/benchmark-system.sh
-    @echo "✅ All benchmarks complete"
-
-# Benchmark shell startup only
-benchmark-shells:
-    @echo "🐚 Benchmarking shell startup performance..."
-    ./scripts/benchmark-system.sh --shells
-    @echo "✅ Shell benchmarks complete"
-
-# Benchmark build tools performance
-benchmark-build:
-    @echo "🔨 Benchmarking build tools performance..."
-    ./scripts/benchmark-system.sh --build-tools
-    @echo "✅ Build tool benchmarks complete"
-
-# Benchmark system commands
-benchmark-system:
-    @echo "⚙️  Benchmarking system commands..."
-    ./scripts/benchmark-system.sh --system
-    @echo "✅ System command benchmarks complete"
-
-# Benchmark file operations
-benchmark-files:
-    @echo "📁 Benchmarking file operations..."
-    ./scripts/benchmark-system.sh --file-ops
-    @echo "✅ File operation benchmarks complete"
-
-# Show benchmark performance report
-benchmark-report:
-    @echo "📊 Generating performance report..."
-    ./scripts/benchmark-system.sh --report
-    @echo "✅ Report generated"
-
-# Clean old benchmark results
-benchmark-clean:
-    @echo "🧹 Cleaning old benchmark results..."
-    ./scripts/benchmark-system.sh --cleanup
-    @echo "✅ Benchmark cleanup complete"
+# Benchmark commands - unified interface
+# Usage: just benchmark [all|shells|build|system|files|report|clean|legacy]
+benchmark TYPE="all":
+    @case "{{ TYPE }}" in \
+        all) \
+            echo "🚀 Running comprehensive system benchmarks..."; \
+            ./scripts/benchmark-system.sh; \
+            echo "✅ All benchmarks complete"; \
+            ;; \
+        shells) \
+            echo "🐚 Benchmarking shell startup performance..."; \
+            ./scripts/benchmark-system.sh --shells; \
+            echo "✅ Shell benchmarks complete"; \
+            ;; \
+        build) \
+            echo "🔨 Benchmarking build tools performance..."; \
+            ./scripts/benchmark-system.sh --build-tools; \
+            echo "✅ Build tool benchmarks complete"; \
+            ;; \
+        system) \
+            echo "⚙️  Benchmarking system commands..."; \
+            ./scripts/benchmark-system.sh --system; \
+            echo "✅ System command benchmarks complete"; \
+            ;; \
+        files) \
+            echo "📁 Benchmarking file operations..."; \
+            ./scripts/benchmark-system.sh --file-ops; \
+            echo "✅ File operation benchmarks complete"; \
+            ;; \
+        report) \
+            echo "📊 Generating performance report..."; \
+            ./scripts/benchmark-system.sh --report; \
+            echo "✅ Report generated"; \
+            ;; \
+        clean) \
+            echo "🧹 Cleaning old benchmark results..."; \
+            ./scripts/benchmark-system.sh --cleanup; \
+            echo "✅ Benchmark cleanup complete"; \
+            ;; \
+        legacy) \
+            echo "🏃 Benchmarking shell startup performance (legacy)..."; \
+            echo "Testing zsh startup time (10 runs):"; \
+            hyperfine --warmup 3 --runs 10 'zsh -i -c exit'; \
+            echo ""; \
+            echo "Testing bash startup time for comparison:"; \
+            hyperfine --warmup 3 --runs 10 'bash -i -c exit'; \
+            echo "✅ Legacy benchmark complete"; \
+            ;; \
+        *) \
+            echo "❌ Unknown benchmark type: {{ TYPE }}"; \
+            echo "Usage: just benchmark [all|shells|build|system|files|report|clean|legacy]"; \
+            exit 1; \
+            ;; \
+    esac
 
 # Performance Monitoring
 # ======================
