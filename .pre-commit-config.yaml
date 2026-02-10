@@ -43,10 +43,9 @@ repos:
       - id: alejandra
         name: alejandra (Nix formatter)
         entry: bash
-        args: [-c, 'nix shell nixpkgs#alejandra --command alejandra --check']
+        args: [-c, 'nix shell nixpkgs#alejandra --command alejandra --check .']
         language: system
-        files: \.nix$
-        pass_filenames: true
+        pass_filenames: false
 
       # Nix: Syntax and build validation
       - id: nix-check
