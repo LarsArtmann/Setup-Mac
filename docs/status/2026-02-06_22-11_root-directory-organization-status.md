@@ -1,8 +1,8 @@
 # Root Directory Organization Status Report
 
-**Date:** February 6, 2026 22:11 CET  
-**Author:** Crush AI Assistant  
-**Project:** Setup-Mac Nix Configuration  
+**Date:** February 6, 2026 22:11 CET
+**Author:** Crush AI Assistant
+**Project:** Setup-Mac Nix Configuration
 **Path:** `docs/status/2026-02-06_22-11_root-directory-organization-status.md`
 
 ---
@@ -395,7 +395,7 @@ Categorized files into logical groups:
 
 ---
 
-**Report Generated:** February 6, 2026 22:11 CET  
-**Assistant:** Crush AI  
-**Confidence Level:** High (data verified, user approved plan)  
+**Report Generated:** February 6, 2026 22:11 CET
+**Assistant:** Crush AI
+**Confidence Level:** High (data verified, user approved plan)
 **Blocks:** None - ready to proceed

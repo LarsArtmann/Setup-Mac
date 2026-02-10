@@ -126,6 +126,6 @@ ls /usr/local/zfs             # Should not exist
 
 ---
 
-**Decision Record Owner:** SystemNix Architecture Team  
-**Last Updated:** 2026-02-09  
+**Decision Record Owner:** SystemNix Architecture Team
+**Last Updated:** 2026-02-09
 **Next Review:** N/A (Permanent Ban)

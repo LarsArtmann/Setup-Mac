@@ -1,8 +1,8 @@
 # LaunchAgent Audit & Nix Migration Plan
 
-**Date:** 2026-02-09 12:45  
-**Status:** Comprehensive Analysis Complete  
-**Scope:** All macOS LaunchAgents (User + System)  
+**Date:** 2026-02-09 12:45
+**Status:** Comprehensive Analysis Complete
+**Scope:** All macOS LaunchAgents (User + System)
 
 ---
 
@@ -169,8 +169,8 @@ These are installed by applications and run outside Nix/Homebrew.
    - Similar approach to Netdata
    - Note: Requires root privileges (use `launchd.daemons` instead)
 
-**Impact:** High  
-**Effort:** 2-3 hours  
+**Impact:** High
+**Effort:** 2-3 hours
 **Risk:** Low (existing configs preserved)
 
 ---
@@ -198,8 +198,8 @@ These are installed by applications and run outside Nix/Homebrew.
    └── file-renamer/
    ```
 
-**Impact:** High  
-**Effort:** 3-4 hours  
+**Impact:** High
+**Effort:** 3-4 hours
 **Risk:** Low
 
 ---
@@ -223,8 +223,8 @@ These are installed by applications and run outside Nix/Homebrew.
    - Podman Desktop: Docker alternative or unused?
    - VPN by Google One: Active subscription?
 
-**Impact:** Medium  
-**Effort:** 1-2 hours per service  
+**Impact:** Medium
+**Effort:** 1-2 hours per service
 **Risk:** Very Low
 
 ---
@@ -251,8 +251,8 @@ These are installed by applications and run outside Nix/Homebrew.
    - Migration guide for future services
    - Troubleshooting common issues
 
-**Impact:** Medium  
-**Effort:** 4-5 hours  
+**Impact:** Medium
+**Effort:** 4-5 hours
 **Risk:** None
 
 ---
@@ -270,7 +270,7 @@ let
 in {
   options.services.launchagents = {
     enable = lib.mkEnableOption "declarative LaunchAgent management";
-    
+
     netdata.enable = lib.mkEnableOption "Netdata monitoring";
     ntopng.enable = lib.mkEnableOption "ntopng network monitoring";
     maintenance.enable = lib.mkEnableOption "maintenance scripts";
@@ -388,6 +388,6 @@ Leverage existing `platforms/common/core/` infrastructure:
 
 ---
 
-**Report Generated:** 2026-02-09 12:45  
-**Author:** System Audit  
+**Report Generated:** 2026-02-09 12:45
+**Author:** System Audit
 **Next Review:** After Phase 1 completion
