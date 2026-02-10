@@ -192,15 +192,7 @@
 
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
-    (lib.optional (heliumPackage != null) heliumPackage)
-    ++ [
-      # Import platform-specific Helium browser - them disable
-      #(
-      #  if stdenv.isDarwin
-      #  then (import ../../darwin/packages/helium.nix {inherit lib pkgs;})
-      #  else (import ./helium-linux.nix {inherit lib pkgs;})
-      #)
-    ]
+    lib.optional (heliumPackage != null) heliumPackage
     ++ lib.optionals stdenv.isDarwin [
       google-chrome
       iterm2

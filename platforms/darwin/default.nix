@@ -39,7 +39,7 @@
     # These assertions fail fast if packages are unavailable
     assertions = [
       {
-        assertion = (builtins.hasAttr "d2" pkgs);
+        assertion = builtins.hasAttr "d2" pkgs;
         message = "d2 package not found in nixpkgs - verify package name and availability";
       }
     ];
@@ -81,7 +81,7 @@
         # Override golangci-lint to use Go 1.26rc3 instead of default Go version
         # golangci-lint uses buildGo125Module by default, we need to use our Go version
         golangci-lint = prev.golangci-lint.override {
-          buildGo125Module = prev.buildGoModule.override { go = final.go; };
+          buildGo125Module = prev.buildGoModule.override { inherit (final) go; };
         };
       })
     ];

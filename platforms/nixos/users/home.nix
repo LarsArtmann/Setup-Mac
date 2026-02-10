@@ -11,13 +11,76 @@
     ../modules/hyprland-animated-wallpaper.nix
   ];
 
-  # Enable animated wallpaper with swww
-  programs.hyprland-animated-wallpaper = {
-    enable = true;
-    updateInterval = 30; # Change wallpaper every 30 seconds
-    transitionType = "random"; # Random transition direction
-    transitionStep = 90; # Faster transition
-    transitionDuration = 3; # 3 second transition
+  # Programs configuration
+  programs = {
+    # Enable animated wallpaper with swww
+    hyprland-animated-wallpaper = {
+      enable = true;
+      updateInterval = 30; # Change wallpaper every 30 seconds
+      transitionType = "random"; # Random transition direction
+      transitionStep = 90; # Faster transition
+      transitionDuration = 3; # 3 second transition
+    };
+
+    # Kitty terminal configuration (TV-friendly font size)
+    kitty = {
+      enable = true;
+      font = {
+        name = "JetBrainsMono Nerd Font";
+        size = 16; # TV viewing size (2m distance)
+      };
+      settings = {
+        bold_font = "auto";
+        italic_font = "auto";
+        bold_italic_font = "auto";
+        background_opacity = "0.85";
+        confirm_os_window_close = 0;
+        update_check_interval = 0;
+        enable_audio_bell = false;
+      };
+    };
+
+    # Foot terminal configuration (lightweight Wayland alternative)
+    foot = {
+      enable = true;
+      settings = {
+        main = {
+          font = "JetBrainsMono Nerd Font:size=12";
+          dpi-aware = "yes";
+          pad = "12x12";
+          shell = "fish";
+        };
+        cursor = {
+          style = "block";
+          blink = "yes";
+        };
+        mouse = {
+          hide-when-typing = "yes";
+        };
+        colors = {
+          alpha = "0.95";
+          background = "1e1e2e";
+          foreground = "cdd6f4";
+          # Catppuccin Mocha colors
+          regular0 = "45475a";  # black
+          regular1 = "f38ba8";  # red
+          regular2 = "a6e3a1";  # green
+          regular3 = "f9e2af";  # yellow
+          regular4 = "89b4fa";  # blue
+          regular5 = "f5c2e7";  # magenta
+          regular6 = "94e2d5";  # cyan
+          regular7 = "bac2de";  # white
+          bright0 = "585b70";   # bright black
+          bright1 = "f38ba8";   # bright red
+          bright2 = "a6e3a1";   # bright green
+          bright3 = "f9e2af";   # bright yellow
+          bright4 = "89b4fa";   # bright blue
+          bright5 = "f5c2e7";   # bright magenta
+          bright6 = "94e2d5";   # bright cyan
+          bright7 = "a6adc8";   # bright white
+        };
+      };
+    };
   };
 
   # NixOS-specific session variables
@@ -152,66 +215,6 @@
     style = {
       name = "gtk2";
       package = pkgs.qt6.qtbase;
-    };
-  };
-
-  # Kitty terminal configuration (TV-friendly font size)
-  programs.kitty = {
-    enable = true;
-    font = {
-      name = "JetBrainsMono Nerd Font";
-      size = 16; # TV viewing size (2m distance)
-    };
-    settings = {
-      bold_font = "auto";
-      italic_font = "auto";
-      bold_italic_font = "auto";
-      background_opacity = "0.85";
-      confirm_os_window_close = 0;
-      update_check_interval = 0;
-      enable_audio_bell = false;
-    };
-  };
-
-  # Foot terminal configuration (lightweight Wayland alternative)
-  programs.foot = {
-    enable = true;
-    settings = {
-      main = {
-        font = "JetBrainsMono Nerd Font:size=12";
-        dpi-aware = "yes";
-        pad = "12x12";
-        shell = "fish";
-      };
-      cursor = {
-        style = "block";
-        blink = "yes";
-      };
-      mouse = {
-        hide-when-typing = "yes";
-      };
-      colors = {
-        alpha = "0.95";
-        background = "1e1e2e";
-        foreground = "cdd6f4";
-        # Catppuccin Mocha colors
-        regular0 = "45475a";  # black
-        regular1 = "f38ba8";  # red
-        regular2 = "a6e3a1";  # green
-        regular3 = "f9e2af";  # yellow
-        regular4 = "89b4fa";  # blue
-        regular5 = "f5c2e7";  # magenta
-        regular6 = "94e2d5";  # cyan
-        regular7 = "bac2de";  # white
-        bright0 = "585b70";   # bright black
-        bright1 = "f38ba8";   # bright red
-        bright2 = "a6e3a1";   # bright green
-        bright3 = "f9e2af";   # bright yellow
-        bright4 = "89b4fa";   # bright blue
-        bright5 = "f5c2e7";   # bright magenta
-        bright6 = "94e2d5";   # bright cyan
-        bright7 = "a6adc8";   # bright white
-      };
     };
   };
 
