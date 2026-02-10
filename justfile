@@ -651,38 +651,43 @@ benchmark TYPE="all":
             ;; \
     esac
 
-# Performance Monitoring
-# ======================
-
-# Setup performance monitoring system
-perf-setup:
-    @echo "🔧 Setting up performance monitoring..."
-    ./scripts/performance-monitor.sh setup-monitoring
-    @echo "✅ Performance monitoring setup complete"
-
-# Run performance monitoring benchmark
-perf-benchmark:
-    @echo "📊 Running performance monitoring benchmark..."
-    ./scripts/performance-monitor.sh benchmark-all
-    @echo "✅ Performance benchmark complete"
-
-# Generate performance report
-perf-report DAYS="7":
-    @echo "📈 Generating performance report ({{ DAYS }} days)..."
-    ./scripts/performance-monitor.sh report {{ DAYS }}
-    @echo "✅ Performance report generated"
-
-# Show performance alerts
-perf-alerts:
-    @echo "🚨 Showing performance alerts..."
-    ./scripts/performance-monitor.sh alerts
-    @echo "✅ Alerts displayed"
-
-# Clear performance cache
-perf-cache-clear PATTERN="*":
-    @echo "🧹 Clearing performance cache..."
-    ./scripts/performance-monitor.sh cache-clear {{ PATTERN }}
-    @echo "✅ Performance cache cleared"
+# Performance Monitoring commands - unified interface
+# Usage: just perf [setup|benchmark|report|alerts|cache-clear] [args]
+perf ACTION="benchmark" *ARGS="7":
+    @case "{{ ACTION }}" in \
+        setup) \
+            echo "🔧 Setting up performance monitoring..."; \
+            ./scripts/performance-monitor.sh setup-monitoring; \
+            echo "✅ Performance monitoring setup complete"; \
+            ;; \
+        benchmark) \
+            echo "📊 Running performance monitoring benchmark..."; \
+            ./scripts/performance-monitor.sh benchmark-all; \
+            echo "✅ Performance benchmark complete"; \
+            ;; \
+        report) \
+            days="${1:-7}"; \
+            echo "📈 Generating performance report ($$days days)..."; \
+            ./scripts/performance-monitor.sh report "$$days"; \
+            echo "✅ Performance report generated"; \
+            ;; \
+        alerts) \
+            echo "🚨 Showing performance alerts..."; \
+            ./scripts/performance-monitor.sh alerts; \
+            echo "✅ Alerts displayed"; \
+            ;; \
+        cache-clear) \
+            pattern="${1:-*}"; \
+            echo "🧹 Clearing performance cache (pattern: $$pattern)..."; \
+            ./scripts/performance-monitor.sh cache-clear "$$pattern"; \
+            echo "✅ Performance cache cleared"; \
+            ;; \
+        *) \
+            echo "❌ Unknown perf action: {{ ACTION }}"; \
+            echo "Usage: just perf [setup|benchmark|report|alerts|cache-clear] [args]"; \
+            exit 1; \
+            ;; \
+    esac
 
 # Network and System Monitoring
 # ==============================
