@@ -749,35 +749,41 @@ monitor-restart:
 # Context Detection and Analysis
 # ==============================
 
-# Detect current shell context
-context-detect:
-    @echo "🔍 Detecting current shell context..."
-    ./scripts/shell-context-detector.sh detect
-    @echo "✅ Context detection complete"
-
-# Log current shell session for analysis
-context-log:
-    @echo "📝 Logging current shell session..."
-    ./scripts/shell-context-detector.sh log
-    @echo "✅ Session logged"
-
-# Analyze shell usage patterns
-context-analyze:
-    @echo "📊 Analyzing shell usage patterns..."
-    ./scripts/shell-context-detector.sh analyze
-    @echo "✅ Analysis complete"
-
-# Get loading optimization recommendations
-context-recommend:
-    @echo "💡 Generating loading recommendations..."
-    ./scripts/shell-context-detector.sh recommend
-    @echo "✅ Recommendations generated"
-
-# Create context-aware loading hook
-context-setup:
-    @echo "🔧 Creating context-aware loading hook..."
-    ./scripts/shell-context-detector.sh create-hook
-    @echo "✅ Context-aware loading hook created"
+# Context detection commands - unified interface
+# Usage: just context [detect|log|analyze|recommend|setup]
+context ACTION="detect":
+    @case "{{ ACTION }}" in \
+        detect) \
+            echo "🔍 Detecting current shell context..."; \
+            ./scripts/shell-context-detector.sh detect; \
+            echo "✅ Context detection complete"; \
+            ;; \
+        log) \
+            echo "📝 Logging current shell session..."; \
+            ./scripts/shell-context-detector.sh log; \
+            echo "✅ Session logged"; \
+            ;; \
+        analyze) \
+            echo "📊 Analyzing shell usage patterns..."; \
+            ./scripts/shell-context-detector.sh analyze; \
+            echo "✅ Analysis complete"; \
+            ;; \
+        recommend) \
+            echo "💡 Generating loading recommendations..."; \
+            ./scripts/shell-context-detector.sh recommend; \
+            echo "✅ Recommendations generated"; \
+            ;; \
+        setup) \
+            echo "🔧 Creating context-aware loading hook..."; \
+            ./scripts/shell-context-detector.sh create-hook; \
+            echo "✅ Context-aware loading hook created"; \
+            ;; \
+        *) \
+            echo "❌ Unknown context action: {{ ACTION }}"; \
+            echo "Usage: just context [detect|log|analyze|recommend|setup]"; \
+            exit 1; \
+            ;; \
+    esac
 
 # Comprehensive Performance Analysis
 # ==================================
