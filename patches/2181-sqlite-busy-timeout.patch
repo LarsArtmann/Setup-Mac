@@ -1,0 +1,108 @@
+From 2b12f560f6a350393a27347a7f28a0ca8de483b7 Mon Sep 17 00:00:00 2001
+From: Carlos Alexandro Becker <caarlos0@users.noreply.github.com>
+Date: Tue, 10 Feb 2026 10:19:46 -0300
+Subject: [PATCH] fix(sqlite): increase busy timeout
+
+Also refactor so we have the same pragmas on both drivers.
+
+I couldn't reproduce OP's issue, but they're likely trying to use many
+Crush instances at the same time, which may cause this.
+
+The timeout was 5s only, so it was kind of easy to hit under load, I
+presume. Upping it to 30s should improve that. AFAIK there's not much
+else we can do.
+
+See https://www.sqlite.org/rescode.html#busy
+
+Closes #2129
+
+Signed-off-by: Carlos Alexandro Becker <caarlos0@users.noreply.github.com>
+---
+ internal/db/connect.go         | 10 ++++++++++
+ internal/db/connect_modernc.go | 11 ++++-------
+ internal/db/connect_ncruces.go | 20 ++++++--------------
+ 3 files changed, 20 insertions(+), 21 deletions(-)
+
+diff --git a/internal/db/connect.go b/internal/db/connect.go
+index 20f0c3f31b..231a4d0799 100644
+--- a/internal/db/connect.go
++++ b/internal/db/connect.go
+@@ -10,6 +10,16 @@ import (
+ 	"github.com/pressly/goose/v3"
+ )
+
++var pragmas = map[string]string{
++	"foreign_keys": "ON",
++	"journal_mode": "WAL",
++	"page_size":     "4096",
++	"cache_size":    "-8000",
++	"synchronous":   "NORMAL",
++	"secure_delete": "ON",
++	"busy_timeout":  "30000",
++}
++
+ // Connect opens a SQLite database connection and runs migrations.
+ func Connect(ctx context.Context, dataDir string) (*sql.DB, error) {
+ 	if dataDir == "" {
+diff --git a/internal/db/connect_modernc.go b/internal/db/connect_modernc.go
+index 303c4e9a11..39c7faa425 100644
+--- a/internal/db/connect_modernc.go
++++ b/internal/db/connect_modernc.go
+@@ -14,18 +14,15 @@ func openDB(dbPath string) (*sql.DB, error) {
+ 	// Set pragmas for better performance via _pragma query params.
+ 	// Format: _pragma=name(value)
+ 	params := url.Values{}
+-	params.Add("_pragma", "foreign_keys(on)")
+-	params.Add("_pragma", "journal_mode(WAL)")
+-	params.Add("_pragma", "page_size(4096)")
+-	params.Add("_pragma", "cache_size(-8000)")
+-	params.Add("_pragma", "synchronous(NORMAL)")
+-	params.Add("_pragma", "secure_delete(on)")
+-	params.Add("_pragma", "busy_timeout(5000)")
++	for name, value := range pragmas {
++		params.Add("_pragma", fmt.Sprintf("%s(%s)", name, value))
++	}
+
+ 	dsn := fmt.Sprintf("file:%s?%s", dbPath, params.Encode())
+ 	db, err := sql.Open("sqlite", dsn)
+ 	if err != nil {
+ 		return nil, fmt.Errorf("failed to open database: %w", err)
+ 	}
++
+ 	return db, nil
+ }
+diff --git a/internal/db/connect_ncruces.go b/internal/db/connect_ncruces.go
+index ceeb7233a4..4832398063 100644
+--- a/internal/db/connect_ncruces.go
++++ b/internal/db/connect_ncruces.go
+@@ -12,21 +12,12 @@ import (
+ )
+
+ func openDB(dbPath string) (*sql.DB, error) {
+-	// Set pragmas for better performance.
+-	pragmas := []string{
+-		"PRAGMA foreign_keys = ON;",
+-		"PRAGMA journal_mode = WAL;",
+-		"PRAGMA page_size = 4096;",
+-		"PRAGMA cache_size = -8000;",
+-		"PRAGMA synchronous = NORMAL;",
+-		"PRAGMA secure_delete = ON;",
+-		"PRAGMA busy_timeout = 5000;",
+-	}
+-
+ 	db, err := driver.Open(dbPath, func(c *sqlite3.Conn) error {
++		// Set pragmas for better performance via _pragma query params.
++		// Format: PRAGMA name = value;
++		for name, value := range pragmas {
++			if err := c.Exec(fmt.Sprintf("PRAGMA %s = %s;", name, value)); err != nil {
++				return fmt.Errorf("failed to set pragma %q: %w", name, value)
+ 			}
+ 		}
+ 		return nil
+@@ -34,5 +25,6 @@ func openDB(dbPath string) (*sql.DB, error) {
+ 	if err != nil {
+ 		return nil, fmt.Errorf("failed to open database: %w", err)
+ 	}
++
+ 	return db, nil
+ }

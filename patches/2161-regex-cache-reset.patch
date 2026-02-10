@@ -1,0 +1,53 @@
+From 2d5a911afd50a54aed5002ce0183263b49b712a7 Mon Sep 17 00:00:00 2001
+From: AnyCPU <AnyCPU@users.noreply.github.com>
+Date: Sun, 8 Feb 2026 00:56:10 +0200
+Subject: [PATCH] fix: clear regex cache on new session to prevent unbounded
+ growth
+
+---
+ internal/agent/tools/grep.go | 11 +++++++++++
+ internal/ui/model/ui.go      | 2 ++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/internal/agent/tools/grep.go b/internal/agent/tools/grep.go
+index 3111a3f568..8dc7598911 100644
+--- a/internal/agent/tools/grep.go
++++ b/internal/agent/tools/grep.go
+@@ -64,6 +64,17 @@ func (rc *regexCache) get(pattern string) (*regexp.Regexp, error) {
+ 	return regex, nil
+ }
+
++// ResetCache clears compiled regex caches to prevent unbounded growth across sessions.
++func ResetCache() {
++	searchRegexCache.mu.Lock()
++	clear(searchRegexCache.cache)
++	searchRegexCache.mu.Unlock()
++
++	globRegexCache.mu.Lock()
++	clear(globRegexCache.cache)
++	globRegexCache.mu.Unlock()
++}
++
+ // Global regex cache instances
+ var (
+ 	searchRegexCache = newRegexCache()
+diff --git a/internal/ui/model/ui.go b/internal/ui/model/ui.go
+index 60511aca1a..9a149fd18a 100644
+--- a/internal/ui/model/ui.go
++++ b/internal/ui/model/ui.go
+@@ -24,6 +24,7 @@ import (
+ 	tea "charm.land/bubbletea/v2"
+ 	"charm.land/catwalk/pkg/catwalk"
+ 	"charm.land/lipgloss/v2"
++	agenttools "github.com/charmbracelet/crush/internal/agent/tools"
+ 	"github.com/charmbracelet/crush/internal/agent/tools/mcp"
+ 	"github.com/charmbracelet/crush/internal/app"
+ 	"github.com/charmbracelet/crush/internal/commands"
+@@ -2973,6 +2974,7 @@ func (m *UI) newSession() tea.Cmd {
+ 	m.promptQueue = 0
+ 	m.pillsView = ""
+ 	m.historyReset()
++	agenttools.ResetCache()
+ 	return tea.Batch(
+ 		func() tea.Msg {
+ 			m.com.App.LSPManager.StopAll(context.Background())

@@ -3,35 +3,34 @@
 in
   pkgs.buildGoModule rec {
     pname = "crush-patched";
-    version = "v0.39.3";
+    version = "v0.41.0";
 
     src = pkgs.fetchurl {
-      url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.3.tar.gz";
-      sha256 = "sha256:1gshc4hcvz6b2vary8295wy3fqsyh2rf0arrjzvy47j7jx3m6545";
+      url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.41.0.tar.gz";
+      sha256 = "sha256:1wa04vl3xzbii185bnq20866fa473ihcdxwyajri1l06pj3bvkhq";
     };
 
     patches = [
-      # PR #1854: fix(grep): prevent tool from hanging when context is cancelled
-      # REMOVED: Superseded by PR #1906 which merged into v0.39.0
-      # Functionality is now included in v0.39.0+
-      #
-      # PR #1617: refactor: eliminate all duplicate code blocks over 200 tokens
-      # REMOVED: PR closed due to UI rewrite (internal/tui → internal/ui in v0.39.0)
-      # PR targets old codebase structure
-      #
-      # PR #2068: fix: ensure commands and models dialogs render with borders
-      # REMOVED: Already merged and included in v0.39.1
-      #
-      # PR #2019: feat: Plan mode with readonly permission enforcement
-      # REMOVED: Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132)
-      #
-      # PR #2070: fix(ui): show grep search parameters in pending state
-      # REMOVED: OPEN as of 2026-02-06
-      #
-      # PR #2050: feat: prompt with warning for dangerous commands instead of blocking
-      # REMOVED: Has merge conflict with v0.37.0 (Hunk #3 FAILED at 132)
-      #
-      # PR #1611: Will be added when merge conflicts are resolved
+      # PR #2181: fix(sqlite): increase busy timeout to 30s (fixes #2129)
+      # Consolidates pragma configuration for both SQLite drivers
+      (pkgs.fetchpatch {
+        url = "https://github.com/charmbracelet/crush/commit/2b12f560f6a350393a27347a7f28a0ca8de483b7.patch";
+        hash = "sha256:04z6mavq3pgz6jrj0rigj38qwlm983mdg2g62x1673jh54gnkzc1";
+      })
+
+      # PR #2180: fix(lsp): files outside cwd (fixes #1401)
+      # Makes LSP client receive working directory explicitly instead of calling os.Getwd()
+      (pkgs.fetchpatch {
+        url = "https://github.com/charmbracelet/crush/commit/5efab4c40a675297122f6eef18da53585b7150ba.patch";
+        hash = "sha256:1h2ngplw1njrx0fi5b701vw1wkx9jvc0py645c9q2lck7lknl2q3";
+      })
+
+      # PR #2161: fix: clear regex cache on new session to prevent unbounded growth
+      # Prevents memory leaks by clearing regex caches at session boundaries
+      (pkgs.fetchpatch {
+        url = "https://github.com/charmbracelet/crush/commit/2d5a911afd50a54aed5002ce0183263b49b712a7.patch";
+        hash = "sha256:1hiv6xjjzbjxxm3z187z8qghn0fmiq318vzkalra3czaj7ipmsik";
+      })
     ];
 
     # Build environment for optimal binary
@@ -60,7 +59,7 @@ in
 
     doCheck = false; # Tests require network access to fetch providers
 
-    vendorHash = "sha256-Y7QterJ5Mmjg/kMqFGbeSvd+3UwG8uGFTrdIBET5yRI=";
+    vendorHash = "sha256-2rEerdtwNAhQbdqabyyetw30DSpbmIxoiU2YPTWbEcg=";
 
     meta = with lib; {
       description = "Crush with Lars' PR patches applied";
