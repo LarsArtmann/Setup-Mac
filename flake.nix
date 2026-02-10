@@ -107,9 +107,7 @@
         };
 
         packages = {
-          crush-patched = import ./pkgs/crush-patched.nix {
-            inherit pkgs;
-          };
+          crush-patched = pkgs.callPackage ./pkgs/crush-patched/package.nix { };
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
