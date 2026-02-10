@@ -77,6 +77,10 @@ activitywatch-stop:
 clean:
     @echo "🧹 Starting comprehensive system cleanup..."
     @echo ""
+    @echo "=== Quick Cache Cleanup ==="
+    @echo "💡 Tip: Run 'just clean-storage' for safe cache-only cleanup (no sudo)"
+    @./scripts/storage-cleanup.sh
+    @echo ""
     @echo "=== Nix Store Cleanup ==="
     @echo "📊 Current store size:"
     @du -sh /nix/store || echo "Could not measure store size"
@@ -389,6 +393,12 @@ validate:
     nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Nix configuration validated"
 
+# Quick Nix syntax check (called by pre-commit hook)
+check-nix-syntax:
+    @echo "🔍 Checking Nix syntax..."
+    nix --extra-experimental-features "nix-command flakes" flake check --no-build
+    @echo "✅ Nix syntax valid"
+
 # Format code using treefmt
 format:
     @echo "🎨 Formatting code..."
@@ -489,6 +499,16 @@ clean-backups:
     cd backups 2>/dev/null || exit 0
     ls -1t | tail -n +11 | xargs rm -rf
     echo "✅ Old backups cleaned"
+
+# Quick storage cleanup (no Nix GC, safe to run)
+clean-storage:
+    @echo "🧹 Quick storage cleanup (safe, no sudo required)..."
+    @echo "  Note: This cleans caches, temp files, and build outputs"
+    @echo "  For Nix GC, use 'just clean' (requires sudo)"
+    ./scripts/storage-cleanup.sh
+    @echo "✅ Storage cleanup complete!"
+    @echo "💡 For comprehensive cleanup: just clean"
+    @echo "💡 For Nix GC: sudo nix-collect-garbage -d --delete-older-than 3d && sudo nix-store --optimize"
 
 # Rebuild zsh completion cache
 rebuild-completions:
@@ -1166,7 +1186,8 @@ help:
     @echo "  setup          - Complete initial setup (run after cloning)"
     @echo "  switch         - Apply Nix configuration changes"
     @echo "  update         - Update Nix flake, packages, and crush-patched"
-    @echo "  clean          - Clean up caches and old packages"
+    @echo "  clean          - Clean up caches and old packages (comprehensive, needs sudo)"
+    @echo "  clean-storage  - Quick cache cleanup (safe, no sudo needed)"
     @echo ""
     @echo "Development:"
     @echo "  format         - Format code with treefmt"

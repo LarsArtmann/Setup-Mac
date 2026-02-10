@@ -1,8 +1,8 @@
 # LaunchAgent Management for macOS (nix-darwin)
 # Declarative service management to replace imperative bash scripts
 {config, ...}: let
-  # User home directory (from nix-darwin users option)
-  userHome = config.users.users.larsartmann.home or "/Users/larsartmann";
+  # User home directory (from nix-darwin users option - guaranteed to exist)
+  userHome = config.users.users.larsartmann.home;
 in {
   # LaunchAgents for user-level services
   # Replaces scripts/nix-activitywatch-setup.sh with declarative Nix configuration
