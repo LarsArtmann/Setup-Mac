@@ -20,7 +20,7 @@
 
 **YOU (USER) need to:**
 1. Open Terminal.app (NOT iTerm2 - it's not installed yet)
-2. Navigate to: `cd ~/Desktop/Setup-Mac`
+2. Navigate to: `cd ~/projects/SystemNix`
 3. Restart Nix daemon (see: EMERGENCY-RECOVERY-GUIDE.md)
 4. Apply configuration: `just switch`
 5. Verify iTerm2 is installed
@@ -297,13 +297,13 @@
 ### Step 2: Navigate to Setup-Mac Directory
 
 ```bash
-cd ~/Desktop/Setup-Mac
+cd ~/projects/SystemNix
 ```
 
 **Verify location:**
 ```bash
 pwd
-# Should output: /Users/larsartmann/Desktop/Setup-Mac
+# Should output: /Users/larsartmann/projects/SystemNix
 ```
 
 ---
@@ -506,7 +506,7 @@ sudo result/activate
 ### User Action Required
 
 - [ ] Open Terminal.app (NOT iTerm2)
-- [ ] Navigate to Setup-Mac: `cd ~/Desktop/Setup-Mac`
+- [ ] Navigate to SystemNix: `cd ~/projects/SystemNix`
 - [ ] Restart Nix daemon (CRITICAL)
 - [ ] Apply configuration: `just switch`
 - [ ] Verify iTerm2: `ls /run/current-system/Applications/ | grep -i iterm`
@@ -553,7 +553,7 @@ sudo result/activate
 ### What You Need to Do Now
 
 1. **Open Terminal.app** (NOT iTerm2)
-2. **Navigate:** `cd ~/Desktop/Setup-Mac`
+2. **Navigate:** `cd ~/projects/SystemNix`
 3. **Restart daemon:** See EMERGENCY-RECOVERY-GUIDE.md, Step 1
 4. **Apply config:** `just switch`
 5. **Verify iTerm2:** `ls /run/current-system/Applications/ | grep -i iterm`
@@ -594,7 +594,7 @@ sudo result/activate
 
 2. **Check Git History:**
    ```bash
-   cd ~/Desktop/Setup-Mac
+   cd ~/projects/SystemNix
    git log --oneline -6
    git show 1464661  # Emergency guide
    git show cae80d5  # Sandbox research

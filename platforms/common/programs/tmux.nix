@@ -1,4 +1,4 @@
-# 📋 TMUX CONFIGURATION FOR SETUP-MAC
+# 📋 TMUX CONFIGURATION FOR SYSTEMNIX
 {
   config,
   pkgs,
@@ -23,26 +23,26 @@ in {
     ];
 
     extraConfig = ''
-      # Setup-Mac specific keybindings
+      # SystemNix specific keybindings
       bind c new-window -c "#{pane_current_path}"
       bind % split-window -h -c "#{pane_current_path}"
       bind '"' split-window -v -c "#{pane_current_path}"
       bind b last-window
 
-      # Setup-Mac development session template
-      bind D new-session -d -s Setup-Mac -n just "cd ~/Desktop/Setup-Mac && just" \; \
-                       new-window -d -n nvim "cd ~/Desktop/Setup-Mac && nvim" \; \
-                       new-window -d -n shell "cd ~/Desktop/Setup-Mac" \; \
+      # SystemNix development session template
+      bind D new-session -d -s SystemNix -n just "cd ~/projects/SystemNix && just" \; \
+                       new-window -d -n nvim "cd ~/projects/SystemNix && nvim" \; \
+                       new-window -d -n shell "cd ~/projects/SystemNix" \; \
                        select-window -t 0
 
       # Integration with Just commands
-      bind J new-window -c "#{pane_current_path}" "cd ~/Desktop/Setup-Mac && just"
-      bind T new-window -c "#{pane_current_path}" "cd ~/Desktop/Setup-Mac && just test"
-      bind S new-window -c "#{pane_current_path}" "cd ~/Desktop/Setup-Mac && just switch"
-      bind B new-window -c "#{pane_current_path}" "cd ~/Desktop/Setup-Mac && just benchmark"
-      bind H new-window -c "#{pane_current_path}" "cd ~/Desktop/Setup-Mac && just health"
+      bind J new-window -c "#{pane_current_path}" "cd ~/projects/SystemNix && just"
+      bind T new-window -c "#{pane_current_path}" "cd ~/projects/SystemNix && just test"
+      bind S new-window -c "#{pane_current_path}" "cd ~/projects/SystemNix && just switch"
+      bind B new-window -c "#{pane_current_path}" "cd ~/projects/SystemNix && just benchmark"
+      bind H new-window -c "#{pane_current_path}" "cd ~/projects/SystemNix && just health"
 
-      # Session persistence for Setup-Mac
+      # Session persistence for SystemNix
       set -g @resurrect-strategy-nvim 'session'
       set -g @resurrect-capture-pane-contents 'on'
       set -g @resurrect-save-bash-history 'on'

@@ -67,8 +67,8 @@ Now that the daemon is restarted with new sandbox paths, apply your configuratio
 **Run this in Terminal:**
 
 ```bash
-# Navigate to Setup-Mac directory
-cd ~/Desktop/Setup-Mac
+# Navigate to SystemNix directory
+cd ~/projects/SystemNix
 
 # Apply configuration
 just switch
@@ -352,7 +352,7 @@ Network download or large package compilation.
 ## 🏁 NEXT STEPS (IN ORDER)
 
 1. **Open Terminal.app** (NOT iTerm2 - it's not installed)
-2. **Navigate to Setup-Mac:** `cd ~/Desktop/Setup-Mac`
+2. **Navigate to SystemNix:** `cd ~/projects/SystemNix`
 3. **Restart Nix daemon:** See "Step 1" above
 4. **Apply configuration:** `just switch`
 5. **Verify iTerm2:** `open /run/current-system/Applications/iTerm2.app`

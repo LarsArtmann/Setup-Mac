@@ -20,19 +20,19 @@
       dotfiles = lib.mkOption {
         type = lib.types.path;
         description = "Dotfiles repository path";
-        example = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles";
+        example = "/Users/larsartmann/projects/SystemNix/dotfiles";
       };
 
       nixConfig = lib.mkOption {
         type = lib.types.path;
         description = "Nix configuration directory";
-        example = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix";
+        example = "/Users/larsartmann/projects/SystemNix/dotfiles/nix";
       };
 
       core = lib.mkOption {
         type = lib.types.path;
         description = "Core configuration modules";
-        example = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/core";
+        example = "/Users/larsartmann/projects/SystemNix/dotfiles/nix/core";
       };
     };
   };
@@ -41,9 +41,9 @@
   defaultPaths = {
     home = "/Users/larsartmann";
     config = "/Users/larsartmann/.config";
-    dotfiles = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles";
-    nixConfig = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix";
-    core = "/Users/larsartmann/Desktop/Setup-Mac/dotfiles/nix/core";
+    dotfiles = "/Users/larsartmann/projects/SystemNix/dotfiles";
+    nixConfig = "/Users/larsartmann/projects/SystemNix/dotfiles/nix";
+    core = "/Users/larsartmann/projects/SystemNix/dotfiles/nix/core";
   };
 in {
   # Export types for external use
@@ -56,9 +56,9 @@ in {
   mkPathConfig = username: {
     home = "/Users/${username}";
     config = "/Users/${username}/.config";
-    dotfiles = "/Users/${username}/Desktop/Setup-Mac/dotfiles";
-    nixConfig = "/Users/${username}/Desktop/Setup-Mac/dotfiles/nix";
-    core = "/Users/${username}/Desktop/Setup-Mac/dotfiles/nix/core";
+    dotfiles = "/Users/${username}/projects/SystemNix/dotfiles";
+    nixConfig = "/Users/${username}/projects/SystemNix/dotfiles/nix";
+    core = "/Users/${username}/projects/SystemNix/dotfiles/nix/core";
   };
 
   # Path manipulation helpers
