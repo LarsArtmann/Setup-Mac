@@ -1,0 +1,7 @@
+# Gitleaks configuration for SystemNix
+# This file excludes false positives from secret detection
+
+[allowlist]
+description = "Allowlist for known false positives"
+paths = ['''patches\/.*\.patch$''']
+regexes = ['''From [0-9a-f]{40} Mon''', '''YOUR_[A-Z_]+_KEY|YOUR_[A-Z_]+_TOKEN|REDACTED_.*_KEY''']
