@@ -1,5 +1,19 @@
-# Setup-Mac Justfile
-# Task runner for macOS configuration management
+# SystemNix Justfile
+# Task runner for cross-platform Nix configuration management
+
+# Shared function to detect package manager from lockfile
+_detect_pkg_manager:
+    @if [ -f "bun.lockb" ]; then \
+        echo "bun"; \
+    elif [ -f "pnpm-lock.yaml" ]; then \
+        echo "pnpm"; \
+    elif [ -f "package-lock.json" ]; then \
+        echo "npm"; \
+    elif [ -f "yarn.lock" ]; then \
+        echo "yarn"; \
+    else \
+        echo "none"; \
+    fi
 
 # Default recipe to display help
 default:
@@ -19,13 +33,6 @@ ssh-setup:
     @echo "📁 Creating SSH directories..."
     mkdir -p ~/.ssh/sockets
     @echo "✅ SSH directories created"
-
-# Link configuration files (deprecated - now managed by Home Manager)
-link:
-    @echo "ℹ️  Manual dotfile linking is deprecated"
-    @echo "ℹ️  All dotfiles are now managed declaratively via Home Manager"
-    @echo "ℹ️  To apply configuration changes, run: just switch"
-    @echo "✅ No manual linking needed"
 
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
@@ -154,7 +161,7 @@ clean-aggressive:
     @echo "🧹 Starting aggressive cleanup..."
     @echo ""
     @echo "=== Nix Nuclear Option ==="
-    nix-collect-garbage -d || sudo -S nix-collect-garbage -d
+    nix-collect-garbage ''-d'' || sudo -S nix-collect-garbage ''-d''
     nix profile wipe-history || true
     nix-store --optimize || sudo -S nix-store --optimize
     @echo ""
@@ -185,19 +192,6 @@ clean-aggressive:
     @echo ""
     @echo "✅ Aggressive cleanup complete!"
     @echo "⚡ You may need to reinstall some development tools"
-
-# Deep clean using the paths from your cleanup file
-deep-clean:
-    @echo "🧹 Performing deep cleanup..."
-    @echo "Cleaning build caches..."
-    rm -rf ~/.bun/install/cache || true
-    rm -rf ~/.gradle/caches/* || true
-    rm -rf ~/.cache/puppeteer || true
-    rm -rf ~/.nuget/packages || true
-    rm -rf ~/Library/Caches/lima || true
-    @echo "Running standard cleanup..."
-    @just clean
-    @echo "✅ Deep cleanup complete"
 
 # KeyChain management commands
 keychain-list:
@@ -389,14 +383,11 @@ check:
     git status --porcelain || true
     @echo "✅ System check complete"
 
-# Fast Nix syntax validation
-check-nix-syntax:
-    @echo "🔍 Checking Nix syntax..."
-    nix-instantiate --eval --show-trace platforms/darwin/default.nix
-    nix-instantiate --eval --show-trace platforms/darwin/home.nix
-    nix-instantiate --eval --show-trace platforms/nixos/users/home.nix
-    nix-instantiate --eval --show-trace platforms/common/home-base.nix
-    @echo "✅ Nix syntax validation complete"
+# Validate Nix configuration syntax
+validate:
+    @echo "🔍 Validating Nix configuration..."
+    nix --extra-experimental-features "nix-command flakes" flake check --no-build
+    @echo "✅ Nix configuration validated"
 
 # Format code using treefmt
 format:
@@ -557,19 +548,6 @@ deploy:
 verify:
     @echo "🧪 Verifying Home Manager integration..."
     ./scripts/test-home-manager.sh
-
-# Validate import paths and module structure
-validate: check-syntax check-imports
-    @echo "✅ All validation checks passed"
-
-check-syntax:
-    @echo "🔍 Checking syntax..."
-    nix --extra-experimental-features "nix-command flakes" flake check --no-build
-
-check-imports:
-    @echo "🔍 Checking import paths..."
-    @find platforms -name "*.nix" -exec grep -l "import" {} \;
-    @echo "✅ Import paths checked"
 
 # Rollback to previous generation
 rollback:
@@ -1062,41 +1040,55 @@ node-check *ARGS="./src":
 
 # Run tests (supports npm, pnpm, bun, and yarn)
 node-test *ARGS="":
-    @if [ -f "bun.lockb" ]; then \
-        echo "🧪 Running tests with bun..."; \
-        bun test {{ ARGS }}; \
-    elif [ -f "pnpm-lock.yaml" ]; then \
-        echo "🧪 Running tests with pnpm..."; \
-        pnpm test {{ ARGS }}; \
-    elif [ -f "package-lock.json" ]; then \
-        echo "🧪 Running tests with npm..."; \
-        npm test {{ ARGS }}; \
-    elif [ -f "yarn.lock" ]; then \
-        echo "🧪 Running tests with yarn..."; \
-        yarn test {{ ARGS }}; \
-    else \
-        echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
-        exit 1; \
-    fi
+    @pkg_manager=$$(just _detect_pkg_manager); \
+    case $$pkg_manager in \
+        bun) \
+            echo "🧪 Running tests with bun..."; \
+            bun test {{ ARGS }}; \
+            ;; \
+        pnpm) \
+            echo "🧪 Running tests with pnpm..."; \
+            pnpm test {{ ARGS }}; \
+            ;; \
+        npm) \
+            echo "🧪 Running tests with npm..."; \
+            npm test {{ ARGS }}; \
+            ;; \
+        yarn) \
+            echo "🧪 Running tests with yarn..."; \
+            yarn test {{ ARGS }}; \
+            ;; \
+        *) \
+            echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
+            exit 1; \
+            ;; \
+    esac
 
 # Build project (supports npm, pnpm, bun, and yarn)
 node-build *ARGS="":
-    @if [ -f "bun.lockb" ]; then \
-        echo "🔨 Building with bun..."; \
-        bun run build {{ ARGS }}; \
-    elif [ -f "pnpm-lock.yaml" ]; then \
-        echo "🔨 Building with pnpm..."; \
-        pnpm run build {{ ARGS }}; \
-    elif [ -f "package-lock.json" ]; then \
-        echo "🔨 Building with npm..."; \
-        npm run build {{ ARGS }}; \
-    elif [ -f "yarn.lock" ]; then \
-        echo "🔨 Building with yarn..."; \
-        yarn build {{ ARGS }}; \
-    else \
-        echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
-        exit 1; \
-    fi
+    @pkg_manager=$$(just _detect_pkg_manager); \
+    case $$pkg_manager in \
+        bun) \
+            echo "🔨 Building with bun..."; \
+            bun run build {{ ARGS }}; \
+            ;; \
+        pnpm) \
+            echo "🔨 Building with pnpm..."; \
+            pnpm run build {{ ARGS }}; \
+            ;; \
+        npm) \
+            echo "🔨 Building with npm..."; \
+            npm run build {{ ARGS }}; \
+            ;; \
+        yarn) \
+            echo "🔨 Building with yarn..."; \
+            yarn build {{ ARGS }}; \
+            ;; \
+        *) \
+            echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
+            exit 1; \
+            ;; \
+    esac
 
 # Full Node.js/TypeScript development workflow (format, lint, test, build)
 node-dev *ARGS="./src":
@@ -1153,8 +1145,8 @@ claude-test profile="personal":
 
 # Show help with detailed descriptions
 help:
-    @echo "Setup-Mac Task Runner"
-    @echo "===================="
+    @echo "SystemNix Task Runner"
+    @echo "====================="
     @echo ""
     @echo "Main Commands:"
     @echo "  setup          - Complete initial setup (run after cloning)"
@@ -1199,7 +1191,6 @@ help:
     @echo "  restore        - Restore from backup (usage: just restore BACKUP_NAME)"
     @echo "  clean-backups  - Clean old backups (keep last 10)"
     @echo "  rebuild-completions - Rebuild zsh completion cache"
-    @echo "  deep-clean     - Perform thorough cleanup"
     @echo ""
     @echo "Environment:"
     @echo "  env-private    - Create private environment file for secrets"
