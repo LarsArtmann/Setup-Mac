@@ -1041,6 +1041,86 @@ go-tools-version:
     @echo -n "buf: "; buf --version 2>/dev/null | head -1 || echo "installed"
     @echo -n "delve: "; dlv version | head -1
 
+# Node.js/TypeScript development commands (Nix-managed)
+# Lint TypeScript/JavaScript code with oxlint (faster than ESLint)
+node-lint *ARGS="./src":
+    @echo "🔍 Running oxlint on TypeScript/JavaScript code..."
+    oxlint {{ ARGS }}
+    @echo "✅ Linting complete"
+
+# Format TypeScript/JavaScript code with oxfmt
+node-format *ARGS="./src":
+    @echo "🎨 Formatting TypeScript/JavaScript code with oxfmt..."
+    oxfmt --write {{ ARGS }}
+    @echo "✅ Formatting complete"
+
+# Check TypeScript types with tsgolint (better than tsc)
+node-check *ARGS="./src":
+    @echo "🔎 Checking TypeScript types with tsgolint..."
+    tsgolint {{ ARGS }}
+    @echo "✅ Type checking complete"
+
+# Run tests (supports npm, pnpm, bun, and yarn)
+node-test *ARGS="":
+    @if [ -f "bun.lockb" ]; then \
+        echo "🧪 Running tests with bun..."; \
+        bun test {{ ARGS }}; \
+    elif [ -f "pnpm-lock.yaml" ]; then \
+        echo "🧪 Running tests with pnpm..."; \
+        pnpm test {{ ARGS }}; \
+    elif [ -f "package-lock.json" ]; then \
+        echo "🧪 Running tests with npm..."; \
+        npm test {{ ARGS }}; \
+    elif [ -f "yarn.lock" ]; then \
+        echo "🧪 Running tests with yarn..."; \
+        yarn test {{ ARGS }}; \
+    else \
+        echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
+        exit 1; \
+    fi
+
+# Build project (supports npm, pnpm, bun, and yarn)
+node-build *ARGS="":
+    @if [ -f "bun.lockb" ]; then \
+        echo "🔨 Building with bun..."; \
+        bun run build {{ ARGS }}; \
+    elif [ -f "pnpm-lock.yaml" ]; then \
+        echo "🔨 Building with pnpm..."; \
+        pnpm run build {{ ARGS }}; \
+    elif [ -f "package-lock.json" ]; then \
+        echo "🔨 Building with npm..."; \
+        npm run build {{ ARGS }}; \
+    elif [ -f "yarn.lock" ]; then \
+        echo "🔨 Building with yarn..."; \
+        yarn build {{ ARGS }}; \
+    else \
+        echo "❌ No lockfile found (bun.lockb, pnpm-lock.yaml, package-lock.json, or yarn.lock)"; \
+        exit 1; \
+    fi
+
+# Full Node.js/TypeScript development workflow (format, lint, test, build)
+node-dev *ARGS="./src":
+    @echo "🛠️  Running full Node.js/TypeScript development workflow..."
+    @just node-format {{ ARGS }}
+    @just node-lint {{ ARGS }}
+    @just node-check {{ ARGS }}
+    @just node-test
+    @just node-build
+    @echo "✅ Node.js/TypeScript development workflow complete"
+
+# Show Node.js/TypeScript tools versions
+node-tools-version:
+    @echo "📋 Node.js/TypeScript Development Tools Versions"
+    @echo "=============================================="
+    @echo -n "Node.js: "; node --version
+    @echo -n "Bun: "; bun --version
+    @echo -n "pnpm: "; pnpm --version
+    @echo -n "esbuild: "; esbuild --version 2>/dev/null || echo "installed"
+    @echo -n "vtsls: "; vtsls --version 2>/dev/null | head -1 || echo "installed"
+    @echo -n "oxlint: "; oxlint --version 2>/dev/null | head -1 || echo "installed"
+    @echo -n "tsgolint: "; tsgolint --version 2>/dev/null | head -1 || echo "installed"
+    @echo -n "oxfmt: "; oxfmt --version 2>/dev/null | head -1 || echo "installed"
+
 # Configure Claude AI settings using the Go tool
 claude-config profile="personal" *ARGS="":
     @echo "🤖 Configuring Claude AI with profile: {{ profile }}"
