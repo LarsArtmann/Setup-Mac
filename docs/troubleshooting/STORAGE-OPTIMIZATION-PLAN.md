@@ -37,7 +37,7 @@
 ```
 error: no space left on device
 - terraform build: failed
-- kubectl build: failed  
+- kubectl build: failed
 - k9s build: failed
 ```
 

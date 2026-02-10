@@ -81,7 +81,7 @@
         # Override golangci-lint to use Go 1.26rc3 instead of default Go version
         # golangci-lint uses buildGo125Module by default, we need to use our Go version
         golangci-lint = prev.golangci-lint.override {
-          buildGo125Module = prev.buildGoModule.override { inherit (final) go; };
+          buildGo125Module = prev.buildGoModule.override {inherit (final) go;};
         };
       })
     ];

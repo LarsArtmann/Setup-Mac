@@ -99,9 +99,9 @@
                   hash = "sha256:16rfmn05vkrpyr817xz1lq1w1i26bi6kq0j7h7fnb19qw03sfzdp";
                 };
               });
-              buildGo126Module = prev.buildGoModule.override { inherit (final) go; };
+              buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
               # Override buildGoModule to use Go 1.26rc3 instead of default
-              buildGoModule = prev.buildGoModule.override { inherit (final) go; };
+              buildGoModule = prev.buildGoModule.override {inherit (final) go;};
             })
           ];
         };
@@ -153,8 +153,8 @@
                       hash = "sha256:16rfmn05vkrpyr817xz1lq1w1i26bi6kq0j7h7fnb19qw03sfzdp";
                     };
                   });
-                  buildGo126Module = prev.buildGoModule.override { inherit (final) go; };
-                  buildGoModule = prev.buildGoModule.override { inherit (final) go; };
+                  buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
+                  buildGoModule = prev.buildGoModule.override {inherit (final) go;};
                 })
               ];
             }

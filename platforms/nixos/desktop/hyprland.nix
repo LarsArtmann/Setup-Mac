@@ -306,18 +306,18 @@ in {
 
           # Zellij session selector via rofi
           "$mod ALT, Z, exec, ${pkgs.writeShellScriptBin "zellij-session-menu" ''
-            # Get list of zellij sessions
-            sessions=$(${pkgs.zellij}/bin/zellij list-sessions 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1}')
-            # Add "New Session" option
-            options="New Session
-          $sessions"
-            # Show rofi menu
-            selected=$(echo "$options" | ${pkgs.rofi}/bin/rofi -dmenu -p 'Zellij:')
-            if [ "$selected" = "New Session" ]; then
-              ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij
-            elif [ -n "$selected" ]; then
-              ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij attach "$selected"
-            fi
+              # Get list of zellij sessions
+              sessions=$(${pkgs.zellij}/bin/zellij list-sessions 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1}')
+              # Add "New Session" option
+              options="New Session
+            $sessions"
+              # Show rofi menu
+              selected=$(echo "$options" | ${pkgs.rofi}/bin/rofi -dmenu -p 'Zellij:')
+              if [ "$selected" = "New Session" ]; then
+                ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij
+              elif [ -n "$selected" ]; then
+                ${pkgs.kitty}/bin/kitty --class zellij-float -e ${pkgs.zellij}/bin/zellij attach "$selected"
+              fi
           ''}/bin/zellij-session-menu"
 
           # Smart gaps toggle

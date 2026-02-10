@@ -66,7 +66,8 @@
       # INFO: Set password manually with `passwd lars` after installation
       # NOTE: After SSH hardening, password auth will be disabled - you MUST set up SSH keys
       shell = pkgs.fish;
-      openssh.authorizedKeys.keys = lib.optional (builtins.pathExists ./ssh-keys/lars.pub)
+      openssh.authorizedKeys.keys =
+        lib.optional (builtins.pathExists ./ssh-keys/lars.pub)
         (builtins.readFile ./ssh-keys/lars.pub);
       packages = with pkgs; [
         firefox

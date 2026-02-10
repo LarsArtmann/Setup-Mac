@@ -16,17 +16,17 @@ in {
       # Theme - Catppuccin Mocha
       theme = "catppuccin-mocha";
       themes.catppuccin-mocha = {
-        fg = "#${colors.base05}";      # Text
-        bg = "#${colors.base00}";      # Background
-        black = "#${colors.base01}";   # Dark bg
-        red = "#${colors.base08}";     # Red
-        green = "#${colors.base0B}";   # Green
-        yellow = "#${colors.base0A}";  # Yellow
-        blue = "#${colors.base0D}";    # Blue
+        fg = "#${colors.base05}"; # Text
+        bg = "#${colors.base00}"; # Background
+        black = "#${colors.base01}"; # Dark bg
+        red = "#${colors.base08}"; # Red
+        green = "#${colors.base0B}"; # Green
+        yellow = "#${colors.base0A}"; # Yellow
+        blue = "#${colors.base0D}"; # Blue
         magenta = "#${colors.base0E}"; # Magenta
-        cyan = "#${colors.base0C}";    # Cyan
-        white = "#${colors.base05}";   # White
-        orange = "#${colors.base09}";  # Orange
+        cyan = "#${colors.base0C}"; # Cyan
+        white = "#${colors.base05}"; # White
+        orange = "#${colors.base09}"; # Orange
       };
 
       # UI settings
@@ -46,10 +46,10 @@ in {
 
       # Plugins
       plugins = {
-        tab-bar = {path = "tab-bar"; };
-        status-bar = {path = "status-bar"; };
-        strider = {path = "strider"; };
-        compact-bar = {path = "compact-bar"; };
+        tab-bar = {path = "tab-bar";};
+        status-bar = {path = "status-bar";};
+        strider = {path = "strider";};
+        compact-bar = {path = "compact-bar";};
       };
     };
 
@@ -227,7 +227,7 @@ in {
       default = {
         layout = {
           _children = [
-            { pane = {}; }
+            {pane = {};}
             {
               pane = {
                 size = 2;

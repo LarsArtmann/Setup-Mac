@@ -1,4 +1,8 @@
-{pkgs, config, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   # Catppuccin Mocha colors
   colors = {
     base = "1e1e2e";
