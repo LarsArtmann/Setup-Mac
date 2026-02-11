@@ -73,6 +73,14 @@ activitywatch-stop:
     @sleep 2
     @pgrep -f ActivityWatch > /dev/null && echo "❌ ActivityWatch still running" || echo "✅ ActivityWatch stopped"
 
+# Fix ActivityWatch permissions (macOS Accessibility)
+activitywatch-fix-permissions:
+    @echo "🔧 Fixing ActivityWatch permissions..."
+    @echo ""
+    @echo "This will reset and re-grant Accessibility permissions for URL tracking."
+    @echo ""
+    @bash dotfiles/activitywatch/fix-permissions.sh
+
 # Clean up caches and old packages (comprehensive cleanup)
 clean:
     @echo "🧹 Starting comprehensive system cleanup..."
