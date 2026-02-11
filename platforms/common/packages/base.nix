@@ -5,10 +5,8 @@
   helium,
   ...
 }: let
-  # Import custom packages
-  crush-patched = import ../../../pkgs/crush-patched.nix {
-    inherit pkgs;
-  };
+  # Import custom packages - using callPackage for proper composability
+  crush-patched = pkgs.callPackage ../../../pkgs/crush-patched/package.nix {};
 
   # Import modernize from local pkgs if available
   inherit (pkgs.stdenv.hostPlatform) system;

@@ -6,7 +6,7 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-NIX_FILE="$SCRIPT_DIR/crush-patched.nix"
+NIX_FILE="$SCRIPT_DIR/crush-patched/package.nix"
 
 # Get current version from Nix file
 CURRENT_VERSION=$(grep 'version = ' "$NIX_FILE" | sed 's/.*"\([^"]*\)".*/\1/')
@@ -106,7 +106,7 @@ if [[ -z "$VENDOR_HASH" ]]; then
     echo "   Your system is in a consistent state."
     echo ""
     echo "💡 This usually means patches need to be updated for the new version."
-    echo "   Check pkgs/crush-patched.nix to update or remove incompatible patches."
+    echo "   Check pkgs/crush-patched/package.nix to update or remove incompatible patches."
     exit 1
 fi
 
