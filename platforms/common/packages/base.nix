@@ -95,6 +95,10 @@
       # Graph visualization
       graphviz
       d2 # Declarative diagram scripting language
+      mermaid-cli # CLI for Mermaid diagram generation from markdown
+
+      # Media tools
+      ffmpeg # Complete, cross-platform solution to record, convert and stream audio and video
 
       # Task management
       taskwarrior3
