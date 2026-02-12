@@ -7,6 +7,7 @@
 }: let
   # Import custom packages - using callPackage for proper composability
   crush-patched = pkgs.callPackage ../../../pkgs/crush-patched/package.nix {};
+  jscpd = pkgs.callPackage ../../../pkgs/jscpd.nix {};
 
   # Import modernize from local pkgs if available
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -146,6 +147,9 @@
       oxlint
       tsgolint
       oxfmt
+
+      # Code quality
+      jscpd # Copy/paste detector for programming source code
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp

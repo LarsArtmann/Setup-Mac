@@ -111,6 +111,7 @@
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
+          jscpd = pkgs.callPackage ./pkgs/jscpd.nix { };
         };
 
         # Development shells for different program categories
