@@ -128,6 +128,7 @@
       go
       goplsWithoutModernize # Custom override without modernize binary (use our custom build)
       golangci-lint
+      golangci-lint-langserver
       gofumpt
       gotests
       mockgen
