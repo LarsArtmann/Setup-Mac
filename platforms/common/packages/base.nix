@@ -3,6 +3,7 @@
   lib,
   llm-agents,
   helium,
+  otel-tui,
   ...
 }: let
   # Import custom packages - using callPackage for proper composability
@@ -163,6 +164,9 @@
       # Kubernetes tools
       kubectl # Kubernetes CLI (includes fish/zsh/bash completions!)
       k9s # Kubernetes CLI To Manage Your Clusters In Style
+
+      # Observability tools
+      otel-tui.packages.${system}.otel-tui # OpenTelemetry terminal viewer
 
       # Nix helper tools
       nh
