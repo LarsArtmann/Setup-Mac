@@ -22,7 +22,7 @@ in
     vendorHash = "sha256-FVtHrFgxgDBAfU4x4+zANNhGa3pfsh3XgEQaQYdV1Bs=";
 
     meta = with lib; {
-      description = "Modernize tool for Go code - built from golang.org/x/tools with Go 1.26rc3";
+      description = "Modernize tool for Go code - built from golang.org/x/tools with Go 1.26";
       homepage = "https://pkg.go.dev/golang.org/x/tools/gopls/internal/analysis/modernize";
       license = licenses.bsd3;
       platforms = platforms.all;
