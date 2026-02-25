@@ -1,6 +1,8 @@
 # Crush-Patched
 
-Hybrid Nix implementation combining **callPackage** for composability with **fetchpatch** for reliability.
+Nix package for the Crush CLI - AI-powered coding assistant.
+
+**Current Version: v0.45.0** (no patches needed - all previous fixes merged upstream)
 
 ## Quick Start
 
@@ -17,11 +19,9 @@ just switch
 
 ## Architecture
 
-### Hybrid Approach
+This package uses the standard **callPackage** pattern for composability.
 
-This package uses the **best of both worlds**:
-
-**callPackage Pattern (Composability):**
+**callPackage Pattern:**
 ```nix
 # flake.nix
 packages = {
@@ -32,21 +32,6 @@ packages = {
 - Allows easy overrides
 - Better composability
 - Clean module structure
-
-**fetchpatch (Reliability):**
-```nix
-# package.nix
-patches = [
-  (fetchpatch {
-    url = "https://github.com/charmbracelet/crush/commit/xxx.patch";
-    hash = "sha256:...";
-  })
-];
-```
-- No local file corruption issues
-- Immutable URLs with verified hashes
-- Reproduducible builds
-- No patch directory maintenance
 
 **Benefits:**
 - ✅ Clean `callPackage` pattern for composability
@@ -97,23 +82,26 @@ nix build .#crush-patched
 nix build .#crush-patched
 ```
 
-## Applied Patches
+## Previously Applied Patches (Now Merged Upstream)
+
+The following patches were required for versions prior to v0.45.0 but are now merged upstream:
 
 ### 1. PR #2181 - SQLite Busy Timeout Fix (Fixes #2129)
+- **Status:** ✅ Merged in v0.45.0
 - **Issue:** SQLite deadlocks under high concurrency with 5s timeout
 - **Fix:** Increase timeout from 5s to 30s, consolidate pragma configuration
 - **Impact:** Multi-instance usage no longer causes database lockups
 - **Commit:** 2b12f560f6a350393a27347a7f28a0ca8de483b7
-- **Files:** internal/db/connect.go, connect_modernc.go, connect_ncruces.go
 
 ### 2. PR #2180 - LSP Files Outside CWD Fix (Fixes #1401)
+- **Status:** ✅ Merged in v0.45.0
 - **Issue:** LSP client can't handle files outside working directory
 - **Fix:** Make LSP client receive working directory explicitly
 - **Impact:** Improved IDE/editor integration reliability
 - **Commit:** 5efab4c40a675297122f6eef18da53585b7150ba
-- **Files:** internal/lsp/client.go, client_test.go, manager.go
 
 ### 3. PR #2161 - Regex Cache Memory Leak Fix
+- **Status:** ✅ Merged in v0.45.0
 - **Issue:** Regex caches grow unbounded across sessions
 - **Fix:** Clear regex caches at session boundaries
 - **Impact:** Prevents memory leaks during long sessions

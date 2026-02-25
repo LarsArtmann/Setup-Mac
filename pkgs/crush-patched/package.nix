@@ -2,37 +2,20 @@
 
 buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.41.0";
+  version = "v0.45.0";
 
   src = fetchurl {
     url = "https://github.com/charmbracelet/crush/archive/refs/tags/${version}.tar.gz";
-    hash = "sha256:1wa04vl3xzbii185bnq20866fa473ihcdxwyajri1l06pj3bvkhq";
+    hash = "sha256:00s8c4dpyly5yx68cbk6pqbgfxm2fp57w7ygc3z9zxfn8p4caydn";
   };
 
   # Hybrid approach: callPackage for composability + fetchpatch for reliability
   # Benefits: No local file corruption, reproducible builds, easy updates
-  patches = [
-    # PR #2181: fix(sqlite): increase busy timeout to 30s (fixes #2129)
-    # Consolidates pragma configuration for both SQLite drivers
-    (fetchpatch {
-      url = "https://github.com/charmbracelet/crush/commit/2b12f560f6a350393a27347a7f28a0ca8de483b7.patch";
-      hash = "sha256:04z6mavq3pgz6jrj0rigj38qwlm983mdg2g62x1673jh54gnkzc1";
-    })
-
-    # PR #2180: fix(lsp): files outside cwd (fixes #1401)
-    # Makes LSP client receive working directory explicitly instead of calling os.Getwd()
-    (fetchpatch {
-      url = "https://github.com/charmbracelet/crush/commit/5efab4c40a675297122f6eef18da53585b7150ba.patch";
-      hash = "sha256:1h2ngplw1njrx0fi5b701vw1wkx9jvc0py645c9q2lck7lknl2q3";
-    })
-
-    # PR #2161: fix: clear regex cache on new session to prevent unbounded growth
-    # Prevents memory leaks by clearing regex caches at session boundaries
-    (fetchpatch {
-      url = "https://github.com/charmbracelet/crush/commit/2d5a911afd50a54aed5002ce0183263b49b712a7.patch";
-      hash = "sha256:1hiv6xjjzbjxxm3z187z8qghn0fmiq318vzkalra3czaj7ipmsik";
-    })
-  ];
+  # Note: Patches removed for v0.45.0 as they were merged upstream:
+  # - PR #2181 (SQLite busy timeout) - merged
+  # - PR #2180 (LSP files outside cwd) - merged
+  # - PR #2161 (Regex cache memory leak) - merged
+  patches = [ ];
 
   # Build environment for optimal binary
   env = {
@@ -57,10 +40,10 @@ buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  vendorHash = "sha256-2rEerdtwNAhQbdqabyyetw30DSpbmIxoiU2YPTWbEcg=";
+  vendorHash = "sha256-toatZYuXDn6aJXhgcMWXqvGVnp7+85K6QNYCNwIZfQY=";
 
   meta = with lib; {
-    description = "Crush with critical upstream patches applied (Hybrid: callPackage + fetchpatch)";
+    description = "Crush CLI - AI-powered coding assistant (v0.45.0+, no patches needed)";
     homepage = "https://github.com/charmbracelet/crush";
     license = licenses.mit;
     platforms = platforms.all;
