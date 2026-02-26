@@ -9,13 +9,20 @@ buildGoModule rec {
     hash = "sha256:00s8c4dpyly5yx68cbk6pqbgfxm2fp57w7ygc3z9zxfn8p4caydn";
   };
 
-  # Hybrid approach: callPackage for composability + fetchpatch for reliability
-  # Benefits: No local file corruption, reproducible builds, easy updates
-  # Note: Patches removed for v0.45.0 as they were merged upstream:
-  # - PR #2181 (SQLite busy timeout) - merged
-  # - PR #2180 (LSP files outside cwd) - merged
-  # - PR #2161 (Regex cache memory leak) - merged
-  patches = [ ];
+  # Note: Patches for v0.45.0:
+  # - PR #2181 (SQLite busy timeout) - merged upstream
+  # - PR #2180 (LSP files outside cwd) - merged upstream
+  # - PR #2161 (Regex cache memory leak) - merged upstream
+  # - PR #1589 (Slow consumer notification) - closed, obsolete (targets old internal/tui)
+  patches = [
+    # PR #2070: fix(ui): show grep search parameters in pending state
+    # Displays pattern, path, include filters while grep is running
+    # Still open, awaiting review
+    (fetchpatch {
+      url = "https://github.com/charmbracelet/crush/commit/e4aa1742699db27c2ccd5e9c2b9f4d0948870581.patch";
+      hash = "sha256:03fm5x8w80m9ghb2ccilhz0aqlzf76avr8cmfaqb0bb4ggzy1sgd";
+    })
+  ];
 
   # Build environment for optimal binary
   env = {
@@ -43,7 +50,7 @@ buildGoModule rec {
   vendorHash = "sha256-toatZYuXDn6aJXhgcMWXqvGVnp7+85K6QNYCNwIZfQY=";
 
   meta = with lib; {
-    description = "Crush CLI - AI-powered coding assistant (v0.45.0+, no patches needed)";
+    description = "Crush CLI - AI-powered coding assistant (v0.45.0 + PR #2070 grep UI fix)";
     homepage = "https://github.com/charmbracelet/crush";
     license = licenses.mit;
     platforms = platforms.all;
