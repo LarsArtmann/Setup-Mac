@@ -40,6 +40,7 @@
       git
       gh # GitHub CLI
       git-town # High-level Git workflow management
+      git-filter-repo # Rewrite git history
       jj # Git-compatible version control system
 
       # Essential editors
