@@ -9,6 +9,14 @@
       aw-watcher-afk = {
         package = pkgs.activitywatch;
       };
+      # Enable utilization watcher (monitors CPU, RAM, disk, network, sensors)
+      # https://github.com/Alwinator/aw-watcher-utilization
+      aw-watcher-utilization = {
+        package = pkgs.aw-watcher-utilization;
+        settings = {
+          poll_time = 5; # seconds between data collection (default: 5)
+        };
+      };
     };
   };
 }

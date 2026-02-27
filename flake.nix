@@ -110,6 +110,10 @@
               # Override buildGoModule to use Go 1.26 instead of default
               buildGoModule = prev.buildGoModule.override {inherit (final) go;};
             })
+            # Custom ActivityWatch watcher for system utilization monitoring
+            (final: prev: {
+              aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+            })
           ];
         };
 
@@ -119,6 +123,7 @@
             inherit pkgs;
           };
           jscpd = pkgs.callPackage ./pkgs/jscpd.nix { };
+          aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix { };
         };
 
         # Development shells for different program categories
@@ -162,6 +167,10 @@
                   });
                   buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
                   buildGoModule = prev.buildGoModule.override {inherit (final) go;};
+                })
+                # Custom ActivityWatch watcher for system utilization monitoring
+                (final: prev: {
+                  aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
                 })
               ];
             }
@@ -223,7 +232,13 @@
               nixpkgs.config.allowUnfree = true;
 
               # Add NUR overlay to make nur.repos available
-              nixpkgs.overlays = [nur.overlays.default];
+              nixpkgs.overlays = [
+                nur.overlays.default
+                # Custom ActivityWatch watcher for system utilization monitoring
+                (final: prev: {
+                  aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+                })
+              ];
             }
 
             # Import Home Manager module for NixOS
