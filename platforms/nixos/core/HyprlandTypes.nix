@@ -23,12 +23,13 @@
 
     invalidMonitors = lib.filter (m: !validMonitorFormat m) monitors;
 
-    # Validate workspace format: id[,name:Name]
+    # Validate workspace format: id[,name:Name] or special:name[,options...]
     validWorkspaceFormat = workspace: let
       parts = lib.splitString "," workspace;
       idStr = builtins.head parts;
+      isSpecialWorkspace = lib.hasPrefix "special:" idStr;
     in
-      builtins.match "^[0-9]+" idStr != null;
+      isSpecialWorkspace || (builtins.match "^[0-9]+" idStr != null);
 
     invalidWorkspaces = lib.filter (w: !validWorkspaceFormat w) workspaces;
 
