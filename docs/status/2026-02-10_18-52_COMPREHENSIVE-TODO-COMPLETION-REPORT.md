@@ -1,8 +1,8 @@
 # Comprehensive TODO Completion Report - LaunchAgent Migration & Pre-commit Fixes
 
-**Date:** 2026-02-10 18:52  
-**Branch:** master  
-**Commit Range:** 7d5f67b..a33c734  
+**Date:** 2026-02-10 18:52
+**Branch:** master
+**Commit Range:** 7d5f67b..a33c734
 **Status:** READY FOR COMMIT
 
 ---
@@ -23,13 +23,13 @@ Successfully completed critical TODO items from the comprehensive plan:
 
 ### P0: Fix alejandra Pre-commit Hook ✅ COMPLETE
 
-**Problem:**  
+**Problem:**
 Pre-commit hook failed with "Formatting stdin" errors when checking Nix files.
 
-**Root Cause:**  
+**Root Cause:**
 `pass_filenames: true` passed files as arguments to a bash wrapper that didn't forward them, causing alejandra to read empty stdin.
 
-**Solution:**  
+**Solution:**
 ```yaml
 # .pre-commit-config.yaml
 - repo: local
@@ -42,7 +42,7 @@ Pre-commit hook failed with "Formatting stdin" errors when checking Nix files.
       files: \.nix$
 ```
 
-**Verification:**  
+**Verification:**
 ```bash
 $ just pre-commit-run
 ✅ trim-trailing-whitespace .................... Passed
@@ -57,10 +57,10 @@ $ just pre-commit-run
 
 ### P1: uBlock LaunchAgent Migration ✅ ALREADY COMPLETE
 
-**Discovery:**  
+**Discovery:**
 The ublock LaunchAgent was **already migrated to Nix** in a previous commit.
 
-**Location:**  
+**Location:**
 - `platforms/common/programs/ublock-filters.nix:186-221`
 - `launchd.agents."com.larsartmann.ublock-filter-update"`
 
@@ -85,7 +85,7 @@ launchd.agents."com.larsartmann.ublock-filter-update" = {
 };
 ```
 
-**Status:**  
+**Status:**
 - ✅ Migration: Already complete
 - ⏸️ Legacy cleanup: PENDING (archive old bash script)
 
@@ -93,10 +93,10 @@ launchd.agents."com.larsartmann.ublock-filter-update" = {
 
 ### P2: SublimeText LaunchAgent Migration ✅ COMPLETE
 
-**Source:**  
+**Source:**
 Legacy bash script at `scripts/sublime-text-sync.sh:439-472`
 
-**Target:**  
+**Target:**
 `platforms/darwin/services/launchagents.nix`
 
 **Implementation:**
@@ -130,21 +130,21 @@ Legacy bash script at `scripts/sublime-text-sync.sh:439-472`
 
 ### P3: Create ublock Maintenance Script ⏭️ NOT NEEDED
 
-**Status:**  
+**Status:**
 No script needed - fully managed by Nix. The LaunchAgent runs curl directly with pkgs.curl.
 
 ---
 
 ### P4: Create sublime-text Sync Script ✅ EXISTS
 
-**Status:**  
+**Status:**
 Uses existing `sublime-text-sync.sh --export` command. Script already functional.
 
 ---
 
 ### P5: Test LaunchAgent Loading ⏸️ PENDING
 
-**Status:**  
+**Status:**
 Configuration built successfully (derivation created), but `just switch` timed out.
 
 **Build Evidence:**
@@ -165,7 +165,7 @@ building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sy
 - `scripts/ublock-origin-setup.sh` (legacy LaunchAgent code at lines 539-571)
 - `scripts/sublime-text-sync.sh` (still used by LaunchAgent, keep but document)
 
-**Target Location:**  
+**Target Location:**
 `scripts/archive/`
 
 ---
@@ -183,7 +183,7 @@ building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sy
 
 ### 1. `scripts/find-nix-duplicates.sh`
 
-**Purpose:**  
+**Purpose:**
 File-level and pattern duplication detection for Nix codebase.
 
 **Features:**
@@ -199,7 +199,7 @@ File-level and pattern duplication detection for Nix codebase.
 
 ### 2. `scripts/find-nix-semantic-dupes.sh`
 
-**Purpose:**  
+**Purpose:**
 AST-level semantic comparison for Nix files.
 
 **Features:**
@@ -208,7 +208,7 @@ AST-level semantic comparison for Nix files.
 - Detects structurally similar functions
 - Ignores formatting differences
 
-**Dependencies:**  
+**Dependencies:**
 Requires `nix-instantiate` and optionally `rnix-lsp` for AST parsing.
 
 **Usage:**
@@ -307,18 +307,18 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 ## Outstanding Issues
 
 ### 1. `just switch` Timeout
-**Issue:** Build killed after 5+ minutes while compiling crush-patched Go modules.  
-**Impact:** Cannot verify LaunchAgents load correctly.  
+**Issue:** Build killed after 5+ minutes while compiling crush-patched Go modules.
+**Impact:** Cannot verify LaunchAgents load correctly.
 **Resolution:** Retry with cached builds should complete faster.
 
 ### 2. Legacy Script Cleanup
-**Issue:** Old bash scripts still in `scripts/` root.  
-**Impact:** Confusion about which scripts are active.  
+**Issue:** Old bash scripts still in `scripts/` root.
+**Impact:** Confusion about which scripts are active.
 **Resolution:** Move to `scripts/archive/` after verifying Nix agents work.
 
 ### 3. Log Directory Creation
-**Issue:** `~/.local/share/sublime-text/` may not exist.  
-**Impact:** LaunchAgent may fail to write logs.  
+**Issue:** `~/.local/share/sublime-text/` may not exist.
+**Impact:** LaunchAgent may fail to write logs.
 **Resolution:** Add log directory creation to Nix config or script.
 
 ---
@@ -420,8 +420,8 @@ just health
 
 ---
 
-**Report Generated:** 2026-02-10 18:52  
-**Reporter:** Crush AI Assistant  
+**Report Generated:** 2026-02-10 18:52
+**Reporter:** Crush AI Assistant
 **Next Update:** After `just switch` retry
 
 ---

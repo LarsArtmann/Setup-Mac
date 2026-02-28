@@ -1,5 +1,9 @@
-{ lib, buildGoModule, fetchurl, fetchpatch }:
-
+{
+  lib,
+  buildGoModule,
+  fetchurl,
+  fetchpatch,
+}:
 buildGoModule rec {
   pname = "crush-patched";
   version = "v0.46.0";
@@ -47,13 +51,13 @@ buildGoModule rec {
 
   doCheck = false; # Tests require network access to fetch providers
 
-  vendorHash = "sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=";
+  vendorHash = "sha256-QNfuP8F0np4B+hzUvgrwqaZ5S6qdZf0iuM2uHlfElyU=";
 
   meta = with lib; {
     description = "Crush CLI - AI-powered coding assistant (v0.46.0 + PR #2070 grep UI fix)";
     homepage = "https://github.com/charmbracelet/crush";
     license = licenses.mit;
     platforms = platforms.all;
-    maintainers = [ "Lars Artmann" ];
+    maintainers = ["Lars Artmann"];
   };
 }

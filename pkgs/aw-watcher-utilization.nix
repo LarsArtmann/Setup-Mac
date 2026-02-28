@@ -10,18 +10,18 @@ in
       owner = "Alwinator";
       repo = "aw-watcher-utilization";
       tag = "v${version}";
-      hash = "sha256-QStroCcMmwwb4c9zZKjQeJeqkF8sUojcyWEb+IsuBUw=";
+      hash = "sha256-CZsJ8itg6wI19uD9nXl/H0A1EFbt87C0yFLHZAsvGQY=";
     };
 
     pyproject = true;
-    build-system = [ python3Packages.poetry-core ];
+    build-system = [python3Packages.poetry-core];
 
     dependencies = with python3Packages; [
       aw-client
       psutil
     ];
 
-    pythonImportsCheck = [ "aw_watcher_utilization" ];
+    pythonImportsCheck = ["aw_watcher_utilization"];
 
     meta = with lib; {
       description = "Monitors CPU, RAM, disk, network, and sensor usage for ActivityWatch";

@@ -1,8 +1,8 @@
 # ActivityWatch URL Tracking Investigation
 
-**Date:** 2026-02-11 02:31:31 CET  
-**Project:** SystemNix  
-**Task:** Investigate missing URLs in aw-watcher-window events  
+**Date:** 2026-02-11 02:31:31 CET
+**Project:** SystemNix
+**Task:** Investigate missing URLs in aw-watcher-window events
 **Status:** ✅ COMPLETE - Root Cause Identified, Solutions Implemented
 
 ---
@@ -11,9 +11,9 @@
 
 Investigated why ActivityWatch's `aw-watcher-window` bucket returns `"url": ""` for browser windows (Google Chrome). Successfully identified the root cause as missing macOS Accessibility permissions. Created comprehensive solutions including automated permission helper scripts, TCC configuration profiles, and Just commands. Documented macOS security limitations that prevent fully declarative permission management via Nix.
 
-**Key Finding:** ActivityWatch requires Accessibility permissions to extract URLs from browser windows on macOS  
-**Root Cause:** Permissions were reset/stale after system changes  
-**Solution:** Automated permission reset helper with GUI guidance  
+**Key Finding:** ActivityWatch requires Accessibility permissions to extract URLs from browser windows on macOS
+**Root Cause:** Permissions were reset/stale after system changes
+**Solution:** Automated permission reset helper with GUI guidance
 **Limitation:** macOS TCC framework requires manual user consent (cannot be fully automated)
 
 ---
@@ -431,8 +431,8 @@ ActivityWatch URL tracking on macOS is a **permission problem, not a configurati
 
 ---
 
-**Report Generated:** 2026-02-11 02:31:31 CET  
-**Next Action:** None required - investigation complete  
+**Report Generated:** 2026-02-11 02:31:31 CET
+**Next Action:** None required - investigation complete
 **Status:** ✅ RESOLVED
 
 ---

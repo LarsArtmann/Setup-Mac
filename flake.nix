@@ -118,12 +118,12 @@
         };
 
         packages = {
-          crush-patched = pkgs.callPackage ./pkgs/crush-patched/package.nix { };
+          crush-patched = pkgs.callPackage ./pkgs/crush-patched/package.nix {};
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
-          jscpd = pkgs.callPackage ./pkgs/jscpd.nix { };
-          aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix { };
+          jscpd = pkgs.callPackage ./pkgs/jscpd.nix {};
+          aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
         };
 
         # Development shells for different program categories
@@ -132,6 +132,8 @@
             packages = with pkgs; [
               git
               nixfmt
+              alejandra
+              treefmt
               deadnix
               shellcheck
               just # Task runner

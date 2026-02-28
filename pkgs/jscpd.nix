@@ -6,7 +6,6 @@
   makeWrapper,
   nodejs,
 }:
-
 stdenv.mkDerivation rec {
   pname = "jscpd";
   version = "4.0.8";
@@ -16,8 +15,8 @@ stdenv.mkDerivation rec {
     hash = "sha256-WgtPz/LdgqaIGt2hJjrH4loahhNKpuzkvi5BozRyLug=";
   };
 
-  nativeBuildInputs = [ makeWrapper ];
-  buildInputs = [ bun nodejs ];
+  nativeBuildInputs = [makeWrapper];
+  buildInputs = [bun nodejs];
 
   # npm pack tarballs have a 'package' directory
   sourceRoot = "package";
