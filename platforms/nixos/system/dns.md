@@ -12,6 +12,7 @@ This module configures Technitium DNS Server for local DNS caching and ad blocki
 ## Configuration
 
 The DNS server runs on:
+
 - Port 53 (DNS - UDP/TCP)
 - Port 5380 (Web Console - HTTP)
 - Port 53443 (Web Console - HTTPS)
@@ -22,9 +23,11 @@ Default Credentials: admin / admin (CHANGE IMMEDIATELY!)
 ## Setup Steps
 
 ### 1. Enable DNS Server
+
 This module is automatically imported via `platforms/nixos/system/configuration.nix`.
 
 ### 2. Access Web Console
+
 ```bash
 # From local machine
 xdg-open http://localhost:5380
@@ -35,6 +38,7 @@ firefox http://localhost:5380
 ### 3. Configure DNS Server (via Web Console)
 
 #### Initial Setup
+
 1. **Security:** Change admin password immediately
    - Go to: Settings > General > Admin Password
 
@@ -85,10 +89,12 @@ dig +dnssec example.net
 ### 5. Monitor DNS Server
 
 #### Via Web Console
+
 - Query Log: Real-time DNS requests
 - Statistics: Request rates, cache hit rate, blocked queries
 
 #### Via Command Line
+
 ```bash
 # Check service status
 systemctl status technitium-dns-server
@@ -103,6 +109,7 @@ htop  # Look for technitium-dns-server process
 ## Troubleshooting
 
 ### DNS Resolution Fails
+
 ```bash
 # Check if DNS server is running
 systemctl status technitium-dns-server
@@ -118,6 +125,7 @@ dig @127.0.0.1 google.com
 ```
 
 ### Web Console Inaccessible
+
 ```bash
 # Check if port is open
 ss -tulpn | grep 5380
@@ -127,6 +135,7 @@ sudo nixos-rebuild switch --flake .#evo-x2  # Rebuild to apply firewall rules
 ```
 
 ### Ad Blocking Not Working
+
 ```bash
 # Check blocklists in web console
 # Block Lists tab > Verify lists are downloaded
@@ -138,6 +147,7 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### Performance Issues
+
 ```bash
 # Check cache hit rate (via web console)
 # Higher hit rate = better performance
@@ -151,6 +161,7 @@ dig @127.0.0.1 doubleclick.net
 ## Advanced Configuration
 
 ### Custom Blocklists
+
 ```bash
 # Add custom blocklist URL
 # Block Lists > Add Block List URL
@@ -158,6 +169,7 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### Conditional Forwarding
+
 ```bash
 # Forward specific domains to specific DNS servers
 # DNS Settings > Conditional Forwarders
@@ -165,6 +177,7 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### DNS-over-HTTPS/TLS
+
 ```bash
 # Enable encrypted DNS to forwarders
 # DNS Settings > Forwarders > Edit Forwarder
@@ -173,6 +186,7 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### Split DNS (Internal vs External)
+
 ```bash
 # Configure internal zones for local network
 # DNS Settings > Zones > Add Zone
@@ -183,6 +197,7 @@ dig @127.0.0.1 doubleclick.net
 ## Backup & Recovery
 
 ### Backup Configuration
+
 ```bash
 # Backup state directory
 sudo tar -czf technitium-dns-backup-$(date +%Y%m%d).tar.gz \
@@ -193,6 +208,7 @@ mv technitium-dns-backup-*.tar.gz ~/backups/
 ```
 
 ### Restore Configuration
+
 ```bash
 # Stop service
 sudo systemctl stop technitium-dns-server
@@ -205,6 +221,7 @@ sudo systemctl start technitium-dns-server
 ```
 
 ### NixOS Rollback
+
 ```bash
 # If DNS configuration causes issues, rollback NixOS
 sudo nixos-rebuild switch --rollback
@@ -217,6 +234,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 ## Integration with Other Services
 
 ### Docker DNS Configuration
+
 ```nix
 # platforms/nixos/services/default.nix
 virtualisation.docker = {
@@ -226,6 +244,7 @@ virtualisation.docker = {
 ```
 
 ### Systemd Services DNS Configuration
+
 ```bash
 # For services that don't use system DNS
 # Add to service unit:
@@ -234,6 +253,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ```
 
 ### VPN Configuration
+
 ```bash
 # Configure VPN to use local DNS
 # Prevents DNS leaks via VPN
@@ -242,6 +262,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Security Considerations
 
 ### Web Console Access
+
 - **Default:** Localhost only (http://localhost:5380)
 - **Remote Access:** NOT recommended (exposes management interface)
 - **If Remote Access Needed:**
@@ -251,11 +272,13 @@ Environment="DNS_SERVER=127.0.0.1"
   - Enable TOTP 2FA
 
 ### DNS Over HTTPS/TLS
+
 - Encrypts DNS traffic between server and forwarders
 - Prevents ISP/Network snooping
 - Recommended for privacy
 
 ### Firewall Configuration
+
 - Default: Localhost only (no firewall ports open)
 - If exposing to network: Enable `openFirewall` in configuration
 - Recommended: Use VPN for remote DNS access
@@ -263,17 +286,20 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Performance Tuning
 
 ### Cache Settings
+
 - **Cache Size:** 100MB-500MB (adjust based on usage)
 - **Persistent Cache:** Enabled (faster startup)
 - **Prefetching:** Enabled (pre-populates cache)
 
 ### Blocklist Optimization
+
 - Too many blocklists = slower DNS resolution
 - Start with 3-5 popular blocklists
 - Monitor performance and adjust
 - Remove unnecessary blocklists
 
 ### Concurrent Queries
+
 - Default: 100 concurrent queries
 - Increase for high-traffic networks
 - Decrease for low-resource systems
@@ -281,6 +307,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Comparison: Before vs After
 
 ### Before (Quad9 via dhcpcd)
+
 - ✅ Simple, zero configuration
 - ❌ No ad blocking
 - ❌ No caching
@@ -289,6 +316,7 @@ Environment="DNS_SERVER=127.0.0.1"
 - ❌ No web console
 
 ### After (Technitium DNS)
+
 - ✅ Ad blocking (network-wide)
 - ✅ Persistent caching (10-100x faster for cached entries)
 - ✅ Query logging (full visibility)
@@ -306,6 +334,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Support
 
 For issues specific to this Setup-Mac configuration:
+
 ```bash
 # Check DNS configuration
 cat platforms/nixos/system/dns.nix
@@ -318,6 +347,7 @@ cat platforms/nixos/system/networking.nix
 ```
 
 For general Technitium DNS issues:
+
 - Check logs: `journalctl -u technitium-dns-server`
 - Web Console Help: http://localhost:5380/help.html
 - GitHub Issues: https://github.com/TechnitiumSoftware/DnsServer/issues

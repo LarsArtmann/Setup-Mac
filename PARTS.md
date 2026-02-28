@@ -10,14 +10,14 @@
 
 SystemNix contains **6 components** with extraction potential. Analysis reveals:
 
-| Component | Extraction Value | Complexity | Recommendation |
-|-----------|-----------------|------------|----------------|
-| Nix Type Safety System | **High** | Medium | Extract as `nix-types-lib` |
-| Error Management Framework | **High** | Low | Extract as `nix-error-lib` |
-| Hyprland Type Safety | Medium | Low | Extract as `nix-hyprland-types` |
-| Package Building Patterns | Low | Low | Document patterns, don't extract |
-| Cross-Shell Alias System | Low | Very Low | Keep in Home Manager ecosystem |
-| System Scripts | Medium | Medium | Extract as `nix-health-checker` |
+| Component                  | Extraction Value | Complexity | Recommendation                   |
+| -------------------------- | ---------------- | ---------- | -------------------------------- |
+| Nix Type Safety System     | **High**         | Medium     | Extract as `nix-types-lib`       |
+| Error Management Framework | **High**         | Low        | Extract as `nix-error-lib`       |
+| Hyprland Type Safety       | Medium           | Low        | Extract as `nix-hyprland-types`  |
+| Package Building Patterns  | Low              | Low        | Document patterns, don't extract |
+| Cross-Shell Alias System   | Low              | Very Low   | Keep in Home Manager ecosystem   |
+| System Scripts             | Medium           | Medium     | Extract as `nix-health-checker`  |
 
 **Recommended Priority:** Error Management Framework → Type Safety System → Hyprland Types
 
@@ -53,12 +53,12 @@ in {
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
-| `nixpkgs.lib.types` | Built-in Nix type system | Limited to basic types, no custom validation rules |
-| `nix-schema` | JSON Schema for Nix | External dependency, different paradigm |
-| Nix Flakes `nix flake check` | Built-in validation | Runtime only, no compile-time type safety |
-| **None** | No standard exists | This is a gap in the Nix ecosystem |
+| Alternative                  | Description              | Limitations                                        |
+| ---------------------------- | ------------------------ | -------------------------------------------------- |
+| `nixpkgs.lib.types`          | Built-in Nix type system | Limited to basic types, no custom validation rules |
+| `nix-schema`                 | JSON Schema for Nix      | External dependency, different paradigm            |
+| Nix Flakes `nix flake check` | Built-in validation      | Runtime only, no compile-time type safety          |
+| **None**                     | No standard exists       | This is a gap in the Nix ecosystem                 |
 
 ### Unique Value Proposition
 
@@ -73,6 +73,7 @@ in {
 **Extract as:** `github.com/larsartmann/nix-types-lib`
 
 **Structure:**
+
 ```
 nix-types-lib/
 ├── flake.nix
@@ -87,6 +88,7 @@ nix-types-lib/
 ```
 
 **API Design:**
+
 ```nix
 # Consumer usage
 {lib, nix-types-lib, ...}: {
@@ -136,12 +138,12 @@ ErrorCollector {
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
-| `builtins.throw` | Native error throwing | No categorization, no recovery actions |
-| `lib.assertMsg` | Assertion with message | Boolean only, no severity levels |
-| Nixpkgs `assert` statements | Basic assertions | No context enrichment, no batch processing |
-| **None** | No structured error framework exists | **Major gap in Nix ecosystem** |
+| Alternative                 | Description                          | Limitations                                |
+| --------------------------- | ------------------------------------ | ------------------------------------------ |
+| `builtins.throw`            | Native error throwing                | No categorization, no recovery actions     |
+| `lib.assertMsg`             | Assertion with message               | Boolean only, no severity levels           |
+| Nixpkgs `assert` statements | Basic assertions                     | No context enrichment, no batch processing |
+| **None**                    | No structured error framework exists | **Major gap in Nix ecosystem**             |
 
 ### Unique Value Proposition
 
@@ -159,6 +161,7 @@ ErrorCollector {
 **Priority: HIGH** - This fills a significant gap in the Nix ecosystem.
 
 **Structure:**
+
 ```
 nix-error-lib/
 ├── flake.nix
@@ -174,6 +177,7 @@ nix-error-lib/
 ```
 
 **API Design:**
+
 ```nix
 # Consumer usage
 {lib, nix-error-lib, ...}: {
@@ -222,11 +226,11 @@ in {
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
+| Alternative                  | Description                   | Limitations                  |
+| ---------------------------- | ----------------------------- | ---------------------------- |
 | Home Manager Hyprland Module | Official Home Manager support | Basic options, no validation |
-| nix-community/hyprland | Flakes support | Package only, no type safety |
-| Manual Configuration | Raw hyprland.conf | No type safety, easy errors |
+| nix-community/hyprland       | Flakes support                | Package only, no type safety |
+| Manual Configuration         | Raw hyprland.conf             | No type safety, easy errors  |
 
 ### Unique Value Proposition
 
@@ -290,11 +294,11 @@ buildGoModule rec {
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
-| `nixpkgs` `callPackage` | Standard pattern | Patches typically from local files |
+| Alternative               | Description        | Limitations                        |
+| ------------------------- | ------------------ | ---------------------------------- |
+| `nixpkgs` `callPackage`   | Standard pattern   | Patches typically from local files |
 | NUR (Nix User Repository) | Community packages | Shared repository, different goals |
-| `flake-utils` | Flake helpers | Build patterns not included |
+| `flake-utils`             | Flake helpers      | Build patterns not included        |
 
 ### Value Assessment
 
@@ -337,11 +341,11 @@ _: {
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
-| Home Manager `shellAliases` | Built-in option | Already using this |
-| `programs.bash.shellAliases` | Per-shell options | Duplication required |
-| POSIX aliases | Manual `.aliases` file | No Nix integration |
+| Alternative                  | Description            | Limitations          |
+| ---------------------------- | ---------------------- | -------------------- |
+| Home Manager `shellAliases`  | Built-in option        | Already using this   |
+| `programs.bash.shellAliases` | Per-shell options      | Duplication required |
+| POSIX aliases                | Manual `.aliases` file | No Nix integration   |
 
 ### Value Assessment
 
@@ -390,12 +394,12 @@ Comprehensive system health monitoring script with:
 
 ### Alternatives
 
-| Alternative | Description | Limitations |
-|-------------|-------------|-------------|
-| `nix doctor` | Nix-specific health | Nix only, no system checks |
-| `brew doctor` | Homebrew health | Homebrew only |
-| Nagios/Icinga | Enterprise monitoring | Overkill for personal use |
-| Custom scripts | Ad-hoc solutions | No standardization |
+| Alternative    | Description           | Limitations                |
+| -------------- | --------------------- | -------------------------- |
+| `nix doctor`   | Nix-specific health   | Nix only, no system checks |
+| `brew doctor`  | Homebrew health       | Homebrew only              |
+| Nagios/Icinga  | Enterprise monitoring | Overkill for personal use  |
+| Custom scripts | Ad-hoc solutions      | No standardization         |
 
 ### Unique Value Proposition
 
@@ -413,6 +417,7 @@ Comprehensive system health monitoring script with:
 **Priority: MEDIUM**
 
 **Structure:**
+
 ```
 nix-health-checker/
 ├── flake.nix
@@ -426,6 +431,7 @@ nix-health-checker/
 ```
 
 **API Design:**
+
 ```nix
 # NixOS integration
 {config, nix-health-checker, ...}: {
@@ -487,13 +493,13 @@ nix-health-checker/
 
 Per `HOW_TO_GOLANG.md` principles (adapted for Nix):
 
-| Principle | Application |
-|-----------|-------------|
-| **Type Safety First** | All extracted libraries use strong types |
-| **Errors as Values** | `nix-error-lib` provides structured error handling |
-| **Composition Over Inheritance** | Libraries designed for composition |
-| **Dogfooding First** | SystemNix consumes its own extracted libraries |
-| **No Reinventing the Wheel** | Only extract where no alternative exists |
+| Principle                        | Application                                        |
+| -------------------------------- | -------------------------------------------------- |
+| **Type Safety First**            | All extracted libraries use strong types           |
+| **Errors as Values**             | `nix-error-lib` provides structured error handling |
+| **Composition Over Inheritance** | Libraries designed for composition                 |
+| **Dogfooding First**             | SystemNix consumes its own extracted libraries     |
+| **No Reinventing the Wheel**     | Only extract where no alternative exists           |
 
 ### What NOT to Extract
 
@@ -509,11 +515,11 @@ Following the "established libs > custom solutions" principle:
 
 SystemNix contains valuable abstractions that could benefit the broader Nix ecosystem:
 
-| Library | Fills Ecosystem Gap | Extraction Effort | Community Value |
-|---------|---------------------|-------------------|-----------------|
-| nix-error-lib | **Yes** | Low | **High** |
-| nix-types-lib | Partial | Medium | Medium |
-| nix-health-checker | Partial | Medium | Medium |
-| nix-hyprland-types | No | Low | Low |
+| Library            | Fills Ecosystem Gap | Extraction Effort | Community Value |
+| ------------------ | ------------------- | ----------------- | --------------- |
+| nix-error-lib      | **Yes**             | Low               | **High**        |
+| nix-types-lib      | Partial             | Medium            | Medium          |
+| nix-health-checker | Partial             | Medium            | Medium          |
+| nix-hyprland-types | No                  | Low               | Low             |
 
 **Recommendation:** Prioritize `nix-error-lib` extraction as it fills a significant gap in the Nix ecosystem with minimal effort. The error management framework provides structured error handling, recovery actions, and batch processing - capabilities that don't exist in any standard Nix library.
