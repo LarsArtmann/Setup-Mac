@@ -276,10 +276,19 @@ in {
           "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
           "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
           "$mod SHIFT, Return, exec, hyprctl reload"
-          # Screenshot and color picker tools
-          "$mod, Print, exec, ${pkgs.grimblast}/bin/grimblast copy area"
-          "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
-          "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
+          # Screenshot and color picker tools with visual feedback
+          "$mod, Print, exec, ${pkgs.writeShellScriptBin "screenshot-area" ''
+            ${pkgs.grimblast}/bin/grimblast copy area
+            ${pkgs.libnotify}/bin/notify-send -t 2000 "Screenshot" "Area copied to clipboard"
+          ''}/bin/screenshot-area"
+          "$mod SHIFT, Print, exec, ${pkgs.writeShellScriptBin "screenshot-screen" ''
+            ${pkgs.grimblast}/bin/grimblast copy screen
+            ${pkgs.libnotify}/bin/notify-send -t 2000 "Screenshot" "Screen copied to clipboard"
+          ''}/bin/screenshot-screen"
+          "$mod CTRL, Print, exec, ${pkgs.writeShellScriptBin "screenshot-window" ''
+            ${pkgs.grimblast}/bin/grimblast copy window
+            ${pkgs.libnotify}/bin/notify-send -t 2000 "Screenshot" "Window copied to clipboard"
+          ''}/bin/screenshot-window"
           "$mod SHIFT, C, exec, ${pkgs.hyprpicker}/bin/hyprpicker -a -f hex" # Color picker with clipboard
 
           # Privacy mode toggle (grayscale screen)
