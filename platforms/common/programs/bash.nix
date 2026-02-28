@@ -13,11 +13,6 @@ in {
     shellAliases = commonAliases;
 
     # Bash-specific configuration
-    profileExtra = ''
-      export GOPRIVATE="github.com/LarsArtmann/*"
-      export GONOSUMDB="github.com/LarsArtmann/*"
-    '';
-
     initExtra = ''
       export GH_PAGER=""
     '';
