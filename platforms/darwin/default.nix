@@ -85,11 +85,8 @@
       })
     ];
 
-    # Workaround: Define users for Home Manager (see docs/reports/home-manager-users-workaround-bug-report.md)
-    # Home Manager's nix-darwin/default.nix imports ../nixos/common.nix which requires this
-    users.users.larsartmann = {
-      name = "larsartmann";
-      home = "/Users/larsartmann";
-    };
+    # TEST: Removed workaround - testing if still needed
+    # See docs/reports/home-manager-users-workaround-bug-report.md for details
+    # Was: users.users.larsartmann = { name = "larsartmann"; home = "/Users/larsartmann"; };
   };
 }
