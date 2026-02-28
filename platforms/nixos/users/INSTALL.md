@@ -3,6 +3,7 @@
 ## Option 1: Pre-built VM Image (Fastest)
 
 ### Download and Run
+
 ```bash
 # On your Mac, build the VM image
 nix build .#nixosConfigurations.evo-x2.config.system.build.vm
@@ -15,6 +16,7 @@ scp result/nixos-vm.* user@vm-host:
 ```
 
 ### All Tools Pre-installed
+
 - Go, Bun, Fish, Starship, Git
 - Hyprland + Wayland fully configured
 - Development environment ready in <2 minutes
@@ -25,6 +27,7 @@ scp result/nixos-vm.* user@vm-host:
 ## Option 2: Direct USB Installation with Pre-built Generation
 
 ### Build on Mac, Deploy to USB
+
 ```bash
 # Build complete system generation on Mac (faster build)
 nix build .#nixosConfigurations.evo-x2.config.system.build.toplevel
@@ -34,6 +37,7 @@ sudo dd if=result of=/dev/sdX bs=4M status=progress
 ```
 
 ### Install Without Internet
+
 ```bash
 # Boot from USB, system is already built
 sudo nixos-install --system /run/current-system
@@ -47,6 +51,7 @@ reboot
 ## Option 3: Remote Build with Binary Cache
 
 ### Build on Fast Machine, Deploy to Target
+
 ```bash
 # On your Mac (or any fast builder)
 nix build .#nixosConfigurations.evo-x2.config.system.build.toplevel --builders ssh://builder@
@@ -63,6 +68,7 @@ sudo nixos-install --system /tmp/nixos-system
 ## Option 4: NixOS-Anywhere Approach
 
 ### Universal Disk Image
+
 ```bash
 # Create universal disk image
 nix build .#nixosConfigurations.evo-x2.config.system.build.diskImage
@@ -78,18 +84,21 @@ sudo dd if=result of=/dev/nvme0n1 bs=4M
 ## Why This Approach is Better
 
 ### ⚡ Speed Advantages
+
 - **Pre-built**: No waiting for compilation on target hardware
 - **Optimized**: Built on fast Mac M-series vs PC hardware
 - **Complete**: All packages installed, no post-install steps
 - **Universal**: Same image works on VM, USB, or direct disk
 
 ### 🎯 Zero Configuration
+
 - **No WiFi Setup**: All dependencies included
 - **No Partitioning**: Pre-partitioned layouts
 - **No Generation Building**: Complete system ready
 - **No Package Downloads**: Everything pre-installed
 
 ### 🔄 Perfect Reproducibility
+
 - **Exact Same Environment**: Byte-for-byte identical to your Mac setup
 - **Immutable**: Rollback to previous generation if issues
 - **Tested**: All configurations validated before deployment

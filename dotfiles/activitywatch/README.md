@@ -6,15 +6,15 @@ This directory contains ActivityWatch configuration and utilities for both macOS
 
 ### Built-in Watchers
 
-| Watcher | Description | NixOS | macOS |
-|---------|-------------|-------|-------|
-| `aw-watcher-afk` | AFK detection (keyboard/mouse idle) | ✅ Auto | ✅ Auto |
-| `aw-watcher-window` | Window tracking | ✅ Auto | ✅ Auto |
+| Watcher             | Description                         | NixOS   | macOS   |
+| ------------------- | ----------------------------------- | ------- | ------- |
+| `aw-watcher-afk`    | AFK detection (keyboard/mouse idle) | ✅ Auto | ✅ Auto |
+| `aw-watcher-window` | Window tracking                     | ✅ Auto | ✅ Auto |
 
 ### Custom Watchers
 
-| Watcher | Description | NixOS | macOS |
-|---------|-------------|-------|-------|
+| Watcher                  | Description                      | NixOS   | macOS     |
+| ------------------------ | -------------------------------- | ------- | --------- |
 | `aw-watcher-utilization` | CPU, RAM, disk, network, sensors | ✅ Auto | ⚠️ Manual |
 
 ## aw-watcher-utilization
@@ -22,6 +22,7 @@ This directory contains ActivityWatch configuration and utilities for both macOS
 Monitors system resource utilization and sends data to ActivityWatch.
 
 **Data collected:**
+
 - CPU: Usage per core, times, frequency, load average
 - Memory: Virtual memory, swap usage
 - Disk: Usage, I/O counters
@@ -57,6 +58,7 @@ pip3 install --user aw-watcher-utilization
 ```
 
 After installation:
+
 1. Add to `~/Library/Application Support/activitywatch/aw-qt/aw-qt.toml`:
    ```toml
    [aw-qt]
@@ -66,19 +68,19 @@ After installation:
 
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `fix-permissions.sh` | Reset macOS Accessibility permissions |
-| `tcc-profile.mobileconfig` | macOS TCC profile for permissions |
-| `install-utilization.sh` | Install aw-watcher-utilization on macOS |
+| File                       | Purpose                                 |
+| -------------------------- | --------------------------------------- |
+| `fix-permissions.sh`       | Reset macOS Accessibility permissions   |
+| `tcc-profile.mobileconfig` | macOS TCC profile for permissions       |
+| `install-utilization.sh`   | Install aw-watcher-utilization on macOS |
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `just activitywatch-start` | Start ActivityWatch (macOS) |
-| `just activitywatch-stop` | Stop ActivityWatch (macOS) |
-| `just activitywatch-fix-permissions` | Fix Accessibility permissions |
+| Command                                  | Description                         |
+| ---------------------------------------- | ----------------------------------- |
+| `just activitywatch-start`               | Start ActivityWatch (macOS)         |
+| `just activitywatch-stop`                | Stop ActivityWatch (macOS)          |
+| `just activitywatch-fix-permissions`     | Fix Accessibility permissions       |
 | `just activitywatch-install-utilization` | Install utilization watcher (macOS) |
 
 ## Resources
