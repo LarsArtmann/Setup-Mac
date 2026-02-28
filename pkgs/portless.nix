@@ -13,7 +13,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://registry.npmjs.org/${pname}/-/${pname}-${version}.tgz";
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";  # Placeholder, will fix on first build
+    hash = "sha256-DX5L9c2xZ86VIJd7SZisO30huffjhRSqkpu7UAN4Wwo=";
   };
 
   nativeBuildInputs = [ makeWrapper ];
@@ -37,7 +37,7 @@ stdenv.mkDerivation rec {
     # Create bin directory and wrapper
     mkdir -p $out/bin
     makeWrapper ${nodejs}/bin/node $out/bin/portless \
-      --add-flags "$out/lib/node_modules/portless/bin/portless"
+      --add-flags "$out/lib/node_modules/portless/dist/cli.js"
 
     runHook postInstall
   '';

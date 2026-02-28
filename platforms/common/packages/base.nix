@@ -9,6 +9,7 @@
   # Import custom packages - using callPackage for proper composability
   crush-patched = pkgs.callPackage ../../../pkgs/crush-patched/package.nix {};
   jscpd = pkgs.callPackage ../../../pkgs/jscpd.nix {};
+  portless = pkgs.callPackage ../../../pkgs/portless.nix {};
 
   # Import modernize from local pkgs if available
   inherit (pkgs.stdenv.hostPlatform) system;
@@ -154,6 +155,9 @@
       # Code quality
       jscpd # Copy/paste detector for programming source code
       scc # Sloc, Cloc and Code: fast lines of code counter
+
+      # Development server tooling
+      portless # Replace port numbers with stable, named .localhost URLs
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp

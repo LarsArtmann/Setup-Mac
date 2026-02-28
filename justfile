@@ -81,6 +81,15 @@ activitywatch-fix-permissions:
     @echo ""
     @bash dotfiles/activitywatch/fix-permissions.sh
 
+# Install aw-watcher-utilization on macOS (manual install for Homebrew ActivityWatch)
+activitywatch-install-utilization:
+    @echo "📊 Installing aw-watcher-utilization..."
+    @echo ""
+    @echo "This installs the utilization watcher for ActivityWatch."
+    @echo "Monitors: CPU, RAM, disk, network, and hardware sensors"
+    @echo ""
+    @bash dotfiles/activitywatch/install-utilization.sh
+
 # Clean up caches and old packages (comprehensive cleanup)
 clean:
     @echo "🧹 Starting comprehensive system cleanup..."

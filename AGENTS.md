@@ -368,6 +368,26 @@ users.users.lars = {
 
 **Status**: ✅ FIXED - Both platforms fully supported via Nix
 
+#### Custom Watchers
+
+**aw-watcher-utilization** (System Resource Monitor)
+
+- **GitHub**: [Alwinator/aw-watcher-utilization](https://github.com/Alwinator/aw-watcher-utilization)
+- **Description**: Monitors CPU, RAM, disk, network, and hardware sensors
+- **NixOS**: Automatically installed via Home Manager module
+- **macOS**: Manual install via `just activitywatch-install-utilization`
+- **Config**: `platforms/common/programs/activitywatch.nix`
+- **Package**: `pkgs/aw-watcher-utilization.nix`
+
+**Data collected every 5 seconds:**
+- CPU: Usage per core, times, frequency, load average
+- Memory: Virtual memory, swap usage  
+- Disk: Usage, I/O counters
+- Network: Per-interface I/O stats
+- Sensors: Temperatures, fan speeds, battery
+
+**Status**: ✅ PACKAGED - NixOS auto, macOS manual
+
 #### Home Manager Configuration Workflow
 
 1. **Edit shared configuration** (affects both platforms):
