@@ -275,7 +275,10 @@ in {
           "$mod, mouse_up, workspace, e-1"
           "$mod, Escape, exec, ${pkgs.hyprlock}/bin/hyprlock"
           "$mod, X, exec, ${pkgs.wlogout}/bin/wlogout"
-          "$mod SHIFT, Return, exec, hyprctl reload"
+          "$mod SHIFT, Return, exec, ${pkgs.writeShellScriptBin "reload-hyprland" ''
+            ${pkgs.hyprland}/bin/hyprctl reload
+            ${pkgs.libnotify}/bin/notify-send -t 1500 "Hyprland" "Configuration reloaded"
+          ''}/bin/reload-hyprland"
           # Screenshot and color picker tools with visual feedback
           "$mod, Print, exec, ${pkgs.writeShellScriptBin "screenshot-area" ''
             ${pkgs.grimblast}/bin/grimblast copy area
