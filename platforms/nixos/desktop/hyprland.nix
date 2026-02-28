@@ -148,6 +148,7 @@ in {
           "8, name:🎵 Media"
           "9, name:📊 Mon"
           "10, name:🌟 Misc"
+          "special:scratchpad, on-created-empty:${pkgs.kitty}/bin/kitty, persistent:true"
         ];
 
         # Window rules
@@ -269,6 +270,8 @@ in {
           "ALT SHIFT, 0, movetoworkspacesilent, 10"
           "$mod, S, togglespecialworkspace, magic"
           "$mod SHIFT, S, movetoworkspace, special:magic"
+          "ALT, S, togglespecialworkspace, scratchpad" # Scratchpad (Alt+S)
+          "ALT SHIFT, S, movetoworkspace, special:scratchpad" # Move to scratchpad
           "$mod, grave, togglespecialworkspace, quake" # Quake terminal (Super+~)
           "$mod SHIFT, grave, movetoworkspace, special:quake"
           "$mod, mouse_down, workspace, e+1"
