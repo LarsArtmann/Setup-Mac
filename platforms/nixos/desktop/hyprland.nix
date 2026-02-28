@@ -281,7 +281,29 @@ in {
           "$mod SHIFT, Print, exec, ${pkgs.grimblast}/bin/grimblast copy screen"
           "$mod CTRL, Print, exec, ${pkgs.grimblast}/bin/grimblast copy window"
           "$mod SHIFT, C, exec, ${pkgs.hyprpicker}/bin/hyprpicker -a -f hex" # Color picker with clipboard
-          ", XF86AudioRaiseVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%"
+
+          # Privacy mode toggle (grayscale screen)
+          "$mod ALT, P, exec, ${pkgs.writeShellScriptBin "toggle-privacy" ''
+            current=$(${pkgs.hyprland}/bin/hyprctl getoption decoration:screen_shader -j | ${pkgs.jq}/bin/jq -r '.str' 2>/dev/null)
+            if [ "$current" = "null" ] || [ -z "$current" ]; then
+              ${pkgs.hyprland}/bin/hyprctl keyword decoration:screen_shader ${pkgs.writeText "grayscale.glsl" "
+                precision mediump float;
+                varying vec2 v_texcoord;
+                uniform sampler2D tex;
+                void main() {
+                  vec4 color = texture2D(tex, v_texcoord);
+                  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+                  gl_FragColor = vec4(vec3(gray), color.a);
+                }
+              "}
+              ${pkgs.libnotify}/bin/notify-send "Privacy Mode" "Grayscale enabled"
+            else
+              ${pkgs.hyprland}/bin/hyprctl keyword decoration:screen_shader ""
+              ${pkgs.libnotify}/bin/notify-send "Privacy Mode" "Grayscale disabled"
+            fi
+          ''}/bin/toggle-privacy"
+
+          ", XF86AudioRaiseVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%'"
           ", XF86AudioLowerVolume, exec, pactl set-sink-volume @DEFAULT_SINK@ -5%"
           ", XF86AudioMute, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle"
           ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
