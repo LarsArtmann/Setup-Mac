@@ -9,11 +9,13 @@
 ## 📊 Quick Summary by Category
 
 ### 🔴 HIGH PRIORITY (Action Required)
+
 - #113: Node.js & TypeScript tooling (Core development stack)
 - #115: Rust development toolchain (Core development stack)
 - #114: Python development environment (AI/ML development)
 
 ### 🟡 MEDIUM PRIORITY (Quality Improvements)
+
 - #119: Complete SublimeText configuration
 - #118: Set SublimeText as default .md editor
 - #105: Wrapper system documentation
@@ -21,10 +23,12 @@
 - #97: Performance-optimized wrapper library
 
 ### 🟡 MEDIUM PRIORITY (Development Tools)
+
 - #117: Additional CLI productivity tools
 - #116: Terminal multiplexer (tmux/zellij)
 
 ### 🟢 LOW PRIORITY (Enhancement)
+
 - #98: Cross-Platform portable development environments
 - #92: Objective-see.org apps via nix
 - #42: Create Nix package for Headlamp
@@ -39,6 +43,7 @@
 - #5: Improve manual-linking.sh verification
 
 ### 📋 TRACKING ISSUES (No Action)
+
 - #100: Comprehensive Analysis Complete (completed milestone)
 - #99: Create Milestones v0.1.0-v0.3.0 (administrative)
 
@@ -51,6 +56,7 @@
 **Summary:** Add Node.js development environment with TypeScript support.
 
 **Current State:**
+
 - ⚠️ Not configured in Nix
 - ⚠️ Bun package manager mentioned in AGENTS.md but not integrated
 - ⚠️ TypeScript tooling missing
@@ -58,6 +64,7 @@
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/common/packages/development/nodejs.nix
 { config, pkgs, ... }:
@@ -77,6 +84,7 @@
 ```
 
 **Just Commands:**
+
 ```bash
 node-dev:
   @echo "🟢 Node.js development environment..."
@@ -91,12 +99,14 @@ node-dev:
 **Summary:** Add Rust programming language development environment.
 
 **Current State:**
+
 - ⚠️ Not configured in Nix
 - ⚠️ No Rust tools available
 
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/common/packages/development/rust.nix
 { config, pkgs, ... }:
@@ -111,6 +121,7 @@ node-dev:
 ```
 
 **Just Commands:**
+
 ```bash
 rust-dev:
   @echo "🦀 Rust development environment..."
@@ -125,6 +136,7 @@ rust-dev:
 **Summary:** Add Python with AI/ML support using uv package manager.
 
 **Current State:**
+
 - ⚠️ Not configured in Nix
 - ⚠️ No uv package manager
 - ⚠️ No AI/ML packages configured
@@ -132,6 +144,7 @@ rust-dev:
 **Recommendation: IMPLEMENT (3-4 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/common/packages/development/python.nix
 { config, pkgs, ... }:
@@ -149,6 +162,7 @@ rust-dev:
 ```
 
 **Just Commands:**
+
 ```bash
 python-dev:
   @echo "🐍 Python development environment..."
@@ -167,11 +181,13 @@ python-dev:
 **Recommendation: IMPLEMENT (1-2 hours)**
 
 **Action Items:**
+
 1. Configure SublimeText as default editor
 2. Add to Nix packages
 3. Create keyboard shortcuts for file opening
 
 **Implementation:**
+
 ```nix
 # platforms/darwin/packages/editors/sublime.nix
 { config, pkgs, ... }:
@@ -189,6 +205,7 @@ python-dev:
 **Recommendation: IMPLEMENT (30 minutes - 1 hour)**
 
 **macOS Implementation:**
+
 ```bash
 # Add to justfile
 set-default-editor-sublime:
@@ -209,20 +226,25 @@ open README.md  # Should open in SublimeText
 **Recommendation: IMPLEMENT (4-6 hours)**
 
 **Implementation:**
+
 1. Create architecture documentation
 2. Write user guide
 3. Provide examples
 4. Document troubleshooting
 
 **File Structure:**
+
 ```markdown
 # docs/wrappers/README.md
+
 ## Wrapper System Architecture
 
 # docs/wrappers/USER-GUIDE.md
+
 ## How to Create Wrappers
 
 # docs/wrappers/EXAMPLES.md
+
 ## Common Wrapper Patterns
 ```
 
@@ -235,6 +257,7 @@ open README.md  # Should open in SublimeText
 **Recommendation: IMPLEMENT (4-6 hours)**
 
 **Implementation:**
+
 ```bash
 # Add to justfile
 wrapper-benchmark:
@@ -255,6 +278,7 @@ wrapper-profile:
 **Recommendation: DEFER (Low Priority)**
 
 **Rationale:**
+
 - Current wrapper system works well
 - No performance issues reported
 - Better to focus on higher-priority issues
@@ -270,6 +294,7 @@ wrapper-profile:
 **Recommendation: IMPLEMENT (1-2 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/common/packages/cli/productivity.nix
 { config, pkgs, ... }:
@@ -291,11 +316,13 @@ wrapper-profile:
 **Summary:** Configure terminal multiplexer (tmux already exists in common/programs/).
 
 **Current State:**
+
 - ✅ tmux already configured in `platforms/common/programs/tmux.nix`
 
 **Recommendation: MARK AS COMPLETE**
 
 **Action:**
+
 - Issue #116 is already solved - tmux is configured
 - Close or update issue to reflect current state
 
@@ -308,11 +335,13 @@ wrapper-profile:
 **Summary:** Add more security tools from objective-see.org.
 
 **Current Apps:**
+
 - BlockBlock, KnockKnock (if already installed)
 
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/darwin/packages/security/objective-see.nix
 { config, pkgs, ... }:
@@ -333,6 +362,7 @@ wrapper-profile:
 **Recommendation: DEFER (Low Priority)**
 
 **Rationale:**
+
 - Headlamp likely already available in Nixpkgs
 - Creating custom packages is complex
 - Better to use existing package or contribute to Nixpkgs
@@ -346,6 +376,7 @@ wrapper-profile:
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **macOS Implementation:**
+
 ```bash
 # Use macOS Automator or keyboard settings
 # OR use terminal aliases (already in fish.nix)
@@ -360,6 +391,7 @@ wrapper-profile:
 **Recommendation: IMPLEMENT (1-2 hours)**
 
 **Implementation:**
+
 ```yaml
 # .pre-commit-config.yaml
 repos:
@@ -381,6 +413,7 @@ repos:
 **Recommendation: DEFER (Research Task)**
 
 **Action:**
+
 - Review Awesome Dotfiles repository
 - Identify relevant patterns
 - Create PRs with improvements
@@ -392,11 +425,13 @@ repos:
 **Summary:** Enhance system cleanup with automation.
 
 **Current State:**
+
 - ✅ Just commands exist: `just clean`, `just clean-aggressive`
 
 **Recommendation: ENHANCE (2-3 hours)**
 
 **Action:**
+
 - Review cleanup paths list
 - Add automated cleanup scheduling (systemd/launchd)
 
@@ -409,6 +444,7 @@ repos:
 **Recommendation: IMPLEMENT (3-4 hours)**
 
 **Implementation:**
+
 ```nix
 # platforms/common/system/maintenance.nix
 {
@@ -432,6 +468,7 @@ repos:
 **Recommendation: IMPLEMENT (2-4 hours)**
 
 **Action:**
+
 1. Review programs.nix for TODOs
 2. Implement each TODO
 3. Test configuration
@@ -446,6 +483,7 @@ repos:
 **Recommendation: IMPLEMENT (3-5 hours)**
 
 **Action:**
+
 1. Review core.nix for TODOs
 2. Implement security configurations
 3. Implement services
@@ -460,6 +498,7 @@ repos:
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Action:**
+
 1. Review system.nix for TODOs
 2. Implement macOS defaults
 3. Test on Darwin
@@ -473,6 +512,7 @@ repos:
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Implementation:**
+
 ```bash
 # Add backup flag
 ./manual-linking.sh --backup
@@ -490,6 +530,7 @@ backup: ~/dotfiles-backup-$(date +%Y%m%d-%H%M%S).tar.gz
 **Recommendation: IMPLEMENT (2-3 hours)**
 
 **Implementation:**
+
 ```yaml
 # manual-linking.yaml
 links:
@@ -506,6 +547,7 @@ links:
 **Recommendation: IMPLEMENT (1-2 hours)**
 
 **Implementation:**
+
 ```bash
 # Add verification
 verify_links() {
@@ -535,6 +577,7 @@ verify_links() {
 **Recommendation:** IMPLEMENT (1-2 hours)
 
 **Action:**
+
 - Create GitHub milestones
 - Link issues to milestones
 - Track progress
@@ -584,15 +627,15 @@ verify_links() {
 
 ## 📊 Effort Estimates
 
-| Category | Issues | Total Effort | Priority |
-|-----------|---------|--------------|----------|
-| **Critical** | #122 | 30 min | 🔴 |
-| **High** | #113, #115, #114 | 7-10 hours | 🔴 |
-| **Medium-High** | #119, #118, #9, #10, #12 | 11-18 hours | 🟡 |
-| **Medium** | #105, #104, #38, #7, #6, #5, #117, #39 | 17-27 hours | 🟡 |
-| **Low** | #17, #15, #92, #22 | 11-16 hours | 🟢 |
-| **Administrative** | #100, #99 | 1-2 hours | 📋 |
-| **Defer** | #42, #97, #130 | 0 hours | ⚪ |
+| Category           | Issues                                 | Total Effort | Priority |
+| ------------------ | -------------------------------------- | ------------ | -------- |
+| **Critical**       | #122                                   | 30 min       | 🔴       |
+| **High**           | #113, #115, #114                       | 7-10 hours   | 🔴       |
+| **Medium-High**    | #119, #118, #9, #10, #12               | 11-18 hours  | 🟡       |
+| **Medium**         | #105, #104, #38, #7, #6, #5, #117, #39 | 17-27 hours  | 🟡       |
+| **Low**            | #17, #15, #92, #22                     | 11-16 hours  | 🟢       |
+| **Administrative** | #100, #99                              | 1-2 hours    | 📋       |
+| **Defer**          | #42, #97, #130                         | 0 hours      | ⚪       |
 
 **Total Effort (excluding defer):** ~47-73 hours (6-9 weeks)
 
@@ -615,16 +658,19 @@ By completing these issues, you'll achieve:
 ## 🚀 Next Steps
 
 ### This Week
+
 1. Fix Issue #122 (Testing Pipeline) - 30 min
 2. Implement Node.js/TypeScript (#113) - 2-3 hours
 3. Implement Rust (#115) - 2-3 hours
 4. Implement Python (#114) - 3-4 hours
 
 ### Next Week
+
 5. Complete SublimeText config (#119, #118) - 2-3 hours
 6. Finish TODOs (#9, #10, #12) - 7-12 hours
 
 ### Following Weeks
+
 7. Continue with medium-priority issues
 8. Monitor performance regressions (Issue #131)
 9. Deploy EVO-X2 (Issue #132)
