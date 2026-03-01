@@ -65,6 +65,8 @@ in {
           # Cursor theme - uses XCursor (bibata-cursors) since hyprcursor version not in nixpkgs
           # Hyprland will use XCursor fallback automatically
           cursor_theme = "Bibata-Modern-Classic";
+          # Enable workspace back-and-forth (toggle between current and previous workspace)
+          workspace_back_and_forth = true;
         };
 
         # Dwindle layout with smart gaps
