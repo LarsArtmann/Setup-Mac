@@ -282,6 +282,19 @@ in {
             ${pkgs.hyprland}/bin/hyprctl reload
             ${pkgs.libnotify}/bin/notify-send -t 1500 "Hyprland" "Configuration reloaded"
           ''}/bin/reload-hyprland"
+
+          # Focus follows mouse toggle (Super+Alt+M)
+          "$mod ALT, M, exec, ${pkgs.writeShellScriptBin "toggle-focus-follows" ''
+            current=$(${pkgs.hyprland}/bin/hyprctl getoption input:follow_mouse -j | ${pkgs.jq}/bin/jq -r '.int')
+            if [ "$current" = "1" ]; then
+              ${pkgs.hyprland}/bin/hyprctl keyword input:follow_mouse 0
+              ${pkgs.libnotify}/bin/notify-send "Input" "Focus follows mouse: OFF"
+            else
+              ${pkgs.hyprland}/bin/hyprctl keyword input:follow_mouse 1
+              ${pkgs.libnotify}/bin/notify-send "Input" "Focus follows mouse: ON"
+            fi
+          ''}/bin/toggle-focus-follows"
+
           # Screenshot and color picker tools with visual feedback
           "$mod, Print, exec, ${pkgs.writeShellScriptBin "screenshot-area" ''
             ${pkgs.grimblast}/bin/grimblast copy area
