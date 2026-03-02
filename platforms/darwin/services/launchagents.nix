@@ -93,12 +93,6 @@ in {
             <key>ProgramArguments</key>
             <array>
                 <string>${pkgs.aw-watcher-utilization}/bin/aw-watcher-utilization</string>
-                <string>--host</string>
-                <string>localhost</string>
-                <string>--port</string>
-                <string>5600</string>
-                <string>--poll-time</string>
-                <string>5</string>
             </array>
             <key>RunAtLoad</key>
             <true/>
