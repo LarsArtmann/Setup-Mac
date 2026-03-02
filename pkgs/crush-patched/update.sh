@@ -46,14 +46,17 @@ get_latest_version() {
   echo "$latest_version"
 }
 
-# Fetch source hash for a version
+# Fetch source hash for a version (SRI format)
 get_source_hash() {
   local version="$1"
   log_info "Fetching source hash for $version..."
   local url="https://github.com/${CRUSH_REPO}/archive/refs/tags/${version}.tar.gz"
-  local hash
-  hash=$(nix-prefetch-url --type sha256 "$url" 2>&1 | tail -1)
-  echo "$hash"
+  local hash_base32
+  local hash_sri
+  hash_base32=$(nix-prefetch-url --type sha256 "$url" 2>&1 | tail -1)
+  # Convert base32 to SRI format (sha256-...)
+  hash_sri=$(echo "$hash_base32" | xargs nix hash to-sri --type sha256 2>/dev/null)
+  echo "$hash_sri"
 }
 
 # Update version in package.nix

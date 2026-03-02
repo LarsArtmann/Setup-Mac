@@ -6,11 +6,11 @@
 }:
 buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.46.0";
+  version = "v0.46.1";
 
   src = fetchurl {
     url = "https://github.com/charmbracelet/crush/archive/refs/tags/${version}.tar.gz";
-    hash = "sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=";
+    hash = "sha256-xQxn9BorzKzMKgpiacbiArx/kt7xGDS72KKh9XSZXFU=";
   };
 
   # Note: Patches for v0.45.0:
@@ -54,7 +54,7 @@ buildGoModule rec {
   vendorHash = "sha256-QNfuP8F0np4B+hzUvgrwqaZ5S6qdZf0iuM2uHlfElyU=";
 
   meta = with lib; {
-    description = "Crush CLI - AI-powered coding assistant (v0.46.0 + PR #2070 grep UI fix)";
+    description = "Crush CLI - AI-powered coding assistant (v0.46.1 + PR #2070 grep UI fix)";
     homepage = "https://github.com/charmbracelet/crush";
     license = licenses.mit;
     platforms = platforms.all;
