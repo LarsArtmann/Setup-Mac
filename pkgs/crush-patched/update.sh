@@ -56,6 +56,14 @@ get_source_hash() {
   hash_base32=$(nix-prefetch-url --type sha256 "$url" 2>&1 | tail -1)
   # Convert base32 to SRI format (sha256-...)
   hash_sri=$(echo "$hash_base32" | xargs nix hash to-sri --type sha256 2>/dev/null)
+
+  # Validate SRI format
+  if [[ ! "$hash_sri" =~ ^sha256-[A-Za-z0-9+/=]+$ ]]; then
+    log_error "Invalid SRI hash format: $hash_sri"
+    log_error "Expected format: sha256-... (base64)"
+    return 1
+  fi
+
   echo "$hash_sri"
 }
 
@@ -68,8 +76,8 @@ update_version() {
   # Update version
   sed -i.bak "s|version = \"v.*\"|version = \"${version}\"|g" "$PACKAGE_FILE"
 
-  # Update source hash
-  sed -i.bak "s|hash = \"sha256:.*\";|hash = \"sha256:${hash}\";|g" "$PACKAGE_FILE"
+  # Update source hash (hash is already in SRI format)
+  sed -i.bak "s|hash = \"sha256-.*\";|hash = \"${hash}\";|g" "$PACKAGE_FILE"
 
   # Clean up backup
   rm -f "${PACKAGE_FILE}.bak"
