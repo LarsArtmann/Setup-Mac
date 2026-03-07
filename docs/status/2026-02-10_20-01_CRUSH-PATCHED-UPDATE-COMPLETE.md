@@ -7,6 +7,7 @@ Successfully updated `crush-patched` from v0.39.3 to v0.41.0 with three critical
 ## Changes Made
 
 ### Package Version Update
+
 - **Old Version:** v0.39.3
 - **New Version:** v0.41.0
 - **Release Date:** February 9, 2026
@@ -16,6 +17,7 @@ Successfully updated `crush-patched` from v0.39.3 to v0.41.0 with three critical
 Three critical patches were applied from upstream Crush PRs to fix bugs and improve stability:
 
 #### 1. PR #2181 - SQLite Busy Timeout Fix
+
 - **Issue:** #2129 - SQLite deadlocks under high concurrency
 - **Root Cause:** 5-second timeout too short for multi-instance usage
 - **Fix:** Increase timeout to 30s, consolidate pragma configuration
@@ -26,6 +28,7 @@ Three critical patches were applied from upstream Crush PRs to fix bugs and impr
 - **Impact:** Eliminates database lockups when using multiple Crush instances
 
 #### 2. PR #2180 - LSP Files Outside CWD Fix
+
 - **Issue:** #1401 - LSP client can't handle files outside working directory
 - **Root Cause:** Internal `os.Getwd()` calls instead of explicit working directory
 - **Fix:** Make LSP client receive working directory explicitly
@@ -36,6 +39,7 @@ Three critical patches were applied from upstream Crush PRs to fix bugs and impr
 - **Impact:** Improved reliability of IDE/editor integration
 
 #### 3. PR #2161 - Regex Cache Memory Leak Fix
+
 - **Issue:** Regex caches grow unbounded across sessions
 - **Root Cause:** No cache clearing at session boundaries
 - **Fix:** Clear regex caches when starting new sessions
@@ -47,12 +51,14 @@ Three critical patches were applied from upstream Crush PRs to fix bugs and impr
 ## Technical Implementation
 
 ### Package Changes
+
 - **File Modified:** `pkgs/crush-patched.nix`
 - **Source Hash:** Updated for v0.41.0 tarball
 - **Vendor Hash:** `sha256-2rEerdtwNAhQbdqabyyetw30DSpbmIxoiU2YPTWbEcg=`
 - **Patch Method:** Using `pkgs.fetchpatch` to download patches from GitHub
 
 ### Patch Management
+
 - **Approach:** Patches fetched directly from GitHub commit URLs via `pkgs.fetchpatch`
 - **Hashes:** All patches verified with SHA256 hashes from `nix-prefetch-url`
 - **Advantages:**
@@ -62,6 +68,7 @@ Three critical patches were applied from upstream Crush PRs to fix bugs and impr
   - Automatic hash verification
 
 ### Build Results
+
 - **Build Time:** ~2.5 minutes
 - **Binary Size:** 58.3 MB (after stripping)
 - **Go Version:** 1.26rc3
@@ -90,6 +97,7 @@ patching file internal/ui/model/ui.go
 ## Documentation Updates
 
 ### Files Updated
+
 - **`pkgs/README.md`** - Comprehensive documentation of:
   - Applied patches with detailed explanations
   - Update procedures for future versions
@@ -97,6 +105,7 @@ patching file internal/ui/model/ui.go
   - Verification commands
 
 ### Documentation Structure
+
 1. **Overview** - Version info and last update date
 2. **Applied Patches** - Detailed descriptions of each patch
 3. **Update to New Version** - Step-by-step update guide
@@ -106,6 +115,7 @@ patching file internal/ui/model/ui.go
 ## Build Process
 
 ### Initial Issues
+
 1. **Disk Space:** Initial build failed with "no space left on device" (96% full)
    - **Solution:** Ran `just clean` to free up Nix cache space
    - **Result:** Freed ~13GB, reducing usage to 91%
@@ -115,6 +125,7 @@ patching file internal/ui/model/ui.go
    - **Result:** Reproducible builds with verified patch hashes
 
 ### Final Build
+
 - **Status:** ✅ SUCCESS
 - **Command:** `nix build .#crush-patched`
 - **Output:** `/nix/store/5pzb0p7mqybgbn29pmnif3f0dggyii2r-crush-patched-v0.41.0`
@@ -123,14 +134,18 @@ patching file internal/ui/model/ui.go
 ## Next Steps
 
 ### Installation
+
 To install the updated package:
+
 ```bash
 nix build .#crush-patched
 just switch
 ```
 
 ### Future Updates
+
 To update to future versions:
+
 1. Check Crush GitHub releases for new version
 2. Update `version` and source `sha256` in `pkgs/crush-patched.nix`
 3. Update `vendorHash` with fake hash to trigger error
@@ -139,7 +154,9 @@ To update to future versions:
 6. Rebuild and install
 
 ### Patch Management
+
 To add new patches:
+
 1. Find PR/commit in Crush repository
 2. Get patch hash with `nix-prefetch-url`
 3. Add to `patches` list in `pkgs/crush-patched.nix`
@@ -148,6 +165,7 @@ To add new patches:
 ## Quality Assurance
 
 ### Verification Checklist
+
 - [x] Version updated to latest (v0.41.0)
 - [x] Source hash updated correctly
 - [x] Vendor hash computed and set
@@ -158,6 +176,7 @@ To add new patches:
 - [x] Package accessible via flake (`.#crush-patched`)
 
 ### Testing Results
+
 - **Build:** ✅ Successful in 2m 37s
 - **Patches:** ✅ All 3 patches applied (8 files modified)
 - **Binary:** ✅ Runs correctly, shows v0.41.0
@@ -167,10 +186,12 @@ To add new patches:
 ## Repository Status
 
 ### Modified Files
+
 - `pkgs/crush-patched.nix` - Main package definition
 - `pkgs/README.md` - Comprehensive documentation
 
 ### Unchanged Files (Legacy)
+
 - `patches/2181-sqlite-busy-timeout.patch` - Local patch (no longer used)
 - `patches/2180-lsp-files-outside-cwd.patch` - Local patch (no longer used)
 - `patches/2161-regex-cache-reset.patch` - Local patch (no longer used)
@@ -180,11 +201,13 @@ To add new patches:
 ## Lessons Learned
 
 ### Patch Management Best Practices
+
 - **Use `pkgs.fetchpatch`:** More reproducible than local files
 - **Fetch from GitHub:** Immutable URLs with guaranteed availability
 - **Verify hashes:** Always use `nix-prefetch-url` to get correct hashes
 
 ### Build Optimization
+
 - **Clean Nix cache:** Essential before large builds to avoid disk space issues
 - **Fake hash method:** Using `00000...` hash triggers helpful error with correct hash
 - **Verification:** Always run `--version` after build to confirm binary works

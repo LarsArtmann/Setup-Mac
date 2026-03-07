@@ -34,6 +34,7 @@ sudo dd if=path/to/nixos.iso of=/dev/rdiskN bs=4m status=progress
 ## Step 3: Partitioning
 
 We follow the layout defined in `hardware-configuration.nix`:
+
 - Label `boot`: FAT32, EFI System Partition
 - Label `nixos`: Ext4, Root Partition
 
@@ -64,6 +65,7 @@ sudo mount /dev/disk/by-label/boot /mnt/boot
 Since this repository is private/local, we will copy it from your Mac via SSH.
 
 **On EVO-X2 (Live ISO):**
+
 ```bash
 # Set a password for the 'nixos' user to allow SSH
 sudo passwd nixos
@@ -75,6 +77,7 @@ ip addr show
 ```
 
 **On macOS (Your current machine):**
+
 ```bash
 # Navigate to repo root
 cd ~/projects/SystemNix

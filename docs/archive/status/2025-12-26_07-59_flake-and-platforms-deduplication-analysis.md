@@ -11,6 +11,7 @@
 This analysis provides a thorough examination of the current state of Setup-Mac's flake and platforms architecture, identifying significant duplications across macOS (nix-darwin) and NixOS configurations. The findings reveal multiple layers of duplication requiring systematic de-duplication to improve maintainability, reduce errors, and ensure consistency across platforms.
 
 **Key Findings:**
+
 - 15+ duplicated packages across platform-specific modules
 - Inconsistent package organization patterns
 - Mixed concerns across multiple modules
@@ -69,10 +70,12 @@ Setup-Mac/
 **Main Entry Point:** `flake.nix` uses `flake-parts` for modular architecture
 
 **System Configurations:**
+
 - `Lars-MacBook-Air` (aarch64-darwin) → `platforms/darwin/default.nix`
 - `evo-x2` (x86_64-linux) → `platforms/nixos/system/configuration.nix`
 
 **Key Observations:**
+
 - Both configurations import `platforms/common/packages/base.nix`
 - NixOS uses Home Manager for user-level configuration
 - Darwin uses system-level packages and configuration
@@ -86,18 +89,18 @@ Setup-Mac/
 
 #### 1. Monitoring & System Tools
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `bottom` | `common/packages/base.nix` (line 57) | **Base** (correct location) |
-| `btop` | `nixos/desktop/monitoring.nix` (line 10) | **Duplicate** - Should be in common |
-| `procs` | `common/packages/base.nix` (line 58) | **Base** (correct location) |
-| `radeontop` | `nixos/hardware/amd-gpu.nix` (line 36) | **Hardware-specific** (correct) |
-| `radeontop` | `nixos/desktop/monitoring.nix` (line 6) | **Duplicate** - Should be in monitoring.nix only |
-| `radeontop` | `nixos/desktop/hyprland.nix` (line 334) | **Duplicate** - Should be in monitoring.nix only |
-| `amdgpu_top` | `nixos/hardware/amd-gpu.nix` (line 36) | **Hardware-specific** (correct) |
-| `amdgpu_top` | `nixos/desktop/monitoring.nix` (line 7) | **Duplicate** - Should be in hardware/amd-gpu.nix |
-| `amdgpu_top` | `nixos/desktop/hyprland.nix` (line 335) | **Duplicate** - Should be in hardware/amd-gpu.nix |
-| `nvtopPackages.amd` | `nixos/desktop/monitoring.nix` (line 5) | **Hardware-specific** (correct) |
+| Package             | Locations                                | Duplication Severity                              |
+| ------------------- | ---------------------------------------- | ------------------------------------------------- |
+| `bottom`            | `common/packages/base.nix` (line 57)     | **Base** (correct location)                       |
+| `btop`              | `nixos/desktop/monitoring.nix` (line 10) | **Duplicate** - Should be in common               |
+| `procs`             | `common/packages/base.nix` (line 58)     | **Base** (correct location)                       |
+| `radeontop`         | `nixos/hardware/amd-gpu.nix` (line 36)   | **Hardware-specific** (correct)                   |
+| `radeontop`         | `nixos/desktop/monitoring.nix` (line 6)  | **Duplicate** - Should be in monitoring.nix only  |
+| `radeontop`         | `nixos/desktop/hyprland.nix` (line 334)  | **Duplicate** - Should be in monitoring.nix only  |
+| `amdgpu_top`        | `nixos/hardware/amd-gpu.nix` (line 36)   | **Hardware-specific** (correct)                   |
+| `amdgpu_top`        | `nixos/desktop/monitoring.nix` (line 7)  | **Duplicate** - Should be in hardware/amd-gpu.nix |
+| `amdgpu_top`        | `nixos/desktop/hyprland.nix` (line 335)  | **Duplicate** - Should be in hardware/amd-gpu.nix |
+| `nvtopPackages.amd` | `nixos/desktop/monitoring.nix` (line 5)  | **Hardware-specific** (correct)                   |
 
 **Recommendation:** Consolidate GPU monitoring tools to `hardware/amd-gpu.nix`, keep generic monitors (`bottom`, `btop`, `procs`) in `common/packages/base.nix`, and remove from Hyprland-specific config (accessed system-wide anyway).
 
@@ -105,13 +108,13 @@ Setup-Mac/
 
 #### 2. Wallpaper Management
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `imagemagick` | `common/packages/base.nix` (line 98) | **Cross-platform** (correct) |
+| Package       | Locations                               | Duplication Severity                 |
+| ------------- | --------------------------------------- | ------------------------------------ |
+| `imagemagick` | `common/packages/base.nix` (line 98)    | **Cross-platform** (correct)         |
 | `imagemagick` | `nixos/desktop/hyprland.nix` (line 331) | **Duplicate** - Remove from Hyprland |
-| `hyprpaper` | `nixos/desktop/hyprland.nix` (line 313) | **Hyprland-specific** (correct) |
-| `swww` | `common/packages/base.nix` (line 101) | **Linux-only** (correct) |
-| `swww` | `nixos/desktop/hyprland.nix` (line 330) | **Duplicate** - Remove from Hyprland |
+| `hyprpaper`   | `nixos/desktop/hyprland.nix` (line 313) | **Hyprland-specific** (correct)      |
+| `swww`        | `common/packages/base.nix` (line 101)   | **Linux-only** (correct)             |
+| `swww`        | `nixos/desktop/hyprland.nix` (line 330) | **Duplicate** - Remove from Hyprland |
 
 **Recommendation:** `swww` and `imagemagick` should be in common/packages (with platform guards), remove from Hyprland. `hyprpaper` stays in Hyprland module.
 
@@ -119,16 +122,16 @@ Setup-Mac/
 
 #### 3. Window Management & Desktop Tools
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `waybar` | `common/packages/base.nix` | Not found (should be added for cross-platform) |
-| `waybar` | `nixos/desktop/multi-wm.nix` (line 13) | **Multi-WM specific** (correct) |
-| `waybar` | `nixos/desktop/hyprland.nix` (line 321) | **Duplicate** - Remove from Hyprland |
-| `rofi` | `nixos/users/home.nix` (line 27) | **User-level** (correct) |
-| `rofi` | `nixos/desktop/hyprland.nix` (line 310) | **Duplicate** - Remove from Hyprland |
-| `wofi` | `nixos/desktop/multi-wm.nix` (line 14) | **Multi-WM specific** (correct) |
-| `dunst` | `nixos/desktop/hyprland.nix` (line 322) | **Hyprland-specific** (correct) |
-| `mako` | `nixos/desktop/multi-wm.nix` (line 67) | **Multi-WM specific** (correct) |
+| Package  | Locations                               | Duplication Severity                           |
+| -------- | --------------------------------------- | ---------------------------------------------- |
+| `waybar` | `common/packages/base.nix`              | Not found (should be added for cross-platform) |
+| `waybar` | `nixos/desktop/multi-wm.nix` (line 13)  | **Multi-WM specific** (correct)                |
+| `waybar` | `nixos/desktop/hyprland.nix` (line 321) | **Duplicate** - Remove from Hyprland           |
+| `rofi`   | `nixos/users/home.nix` (line 27)        | **User-level** (correct)                       |
+| `rofi`   | `nixos/desktop/hyprland.nix` (line 310) | **Duplicate** - Remove from Hyprland           |
+| `wofi`   | `nixos/desktop/multi-wm.nix` (line 14)  | **Multi-WM specific** (correct)                |
+| `dunst`  | `nixos/desktop/hyprland.nix` (line 322) | **Hyprland-specific** (correct)                |
+| `mako`   | `nixos/desktop/multi-wm.nix` (line 67)  | **Multi-WM specific** (correct)                |
 
 **Recommendation:** Create dedicated `common/packages/desktop/launchers.nix` and `common/packages/desktop/notifications.nix` modules for better organization.
 
@@ -136,11 +139,11 @@ Setup-Mac/
 
 #### 4. Clipboard Management
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `cliphist` | `common/packages/base.nix` (line 77) | **Cross-platform** (correct) |
-| `cliphist` | `nixos/desktop/hyprland.nix` (line 327) | **Duplicate** - Remove from Hyprland |
-| `wl-clipboard` | `nixos/desktop/multi-wm.nix` (line 83) | **Multi-WM specific** (correct) |
+| Package        | Locations                               | Duplication Severity                 |
+| -------------- | --------------------------------------- | ------------------------------------ |
+| `cliphist`     | `common/packages/base.nix` (line 77)    | **Cross-platform** (correct)         |
+| `cliphist`     | `nixos/desktop/hyprland.nix` (line 327) | **Duplicate** - Remove from Hyprland |
+| `wl-clipboard` | `nixos/desktop/multi-wm.nix` (line 83)  | **Multi-WM specific** (correct)      |
 
 **Recommendation:** Keep `cliphist` in base (Wayland clipboard manager accessible from any WM), `wl-clipboard` stays in multi-wm (system-level dependency for all WMs).
 
@@ -148,10 +151,10 @@ Setup-Mac/
 
 #### 5. Audio Control
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `pavucontrol` | `nixos/users/home.nix` (line 26) | **User-level** (correct for Home Manager) |
-| `pavucontrol` | `nixos/desktop/multi-wm.nix` (line 76) | **System-level** (correct for multi-WM) |
+| Package       | Locations                              | Duplication Severity                      |
+| ------------- | -------------------------------------- | ----------------------------------------- |
+| `pavucontrol` | `nixos/users/home.nix` (line 26)       | **User-level** (correct for Home Manager) |
+| `pavucontrol` | `nixos/desktop/multi-wm.nix` (line 76) | **System-level** (correct for multi-WM)   |
 
 **Note:** This is intentional duplication - user-level access for personal use, system-level for all users. This is acceptable pattern.
 
@@ -159,12 +162,12 @@ Setup-Mac/
 
 #### 6. Terminal Emulators
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `alacritty-graphics` | `common/packages/base.nix` (line 25) | **Cross-platform** (correct) |
-| `kitty` | `nixos/desktop/hyprland.nix` (line 307) | **Hyprland-default** (correct) |
-| `ghostty` | `nixos/desktop/hyprland.nix` (line 308) | **Hyprland-modern** (correct) |
-| `foot` | `nixos/desktop/multi-wm.nix` (line 12, 52) | **Multi-WM** (correct) |
+| Package              | Locations                                  | Duplication Severity           |
+| -------------------- | ------------------------------------------ | ------------------------------ |
+| `alacritty-graphics` | `common/packages/base.nix` (line 25)       | **Cross-platform** (correct)   |
+| `kitty`              | `nixos/desktop/hyprland.nix` (line 307)    | **Hyprland-default** (correct) |
+| `ghostty`            | `nixos/desktop/hyprland.nix` (line 308)    | **Hyprland-modern** (correct)  |
+| `foot`               | `nixos/desktop/multi-wm.nix` (line 12, 52) | **Multi-WM** (correct)         |
 
 **Recommendation:** Consider creating `common/packages/terminals/` for better organization, but current separation by WM is logical.
 
@@ -172,10 +175,10 @@ Setup-Mac/
 
 #### 7. Screenshot Tools
 
-| Package | Locations | Duplication Severity |
-|---------|-----------|---------------------|
-| `grim` | `nixos/desktop/multi-wm.nix` (line 79) | **Multi-WM** (correct) |
-| `slurp` | `nixos/desktop/multi-wm.nix` (line 80) | **Multi-WM** (correct) |
+| Package     | Locations                               | Duplication Severity            |
+| ----------- | --------------------------------------- | ------------------------------- |
+| `grim`      | `nixos/desktop/multi-wm.nix` (line 79)  | **Multi-WM** (correct)          |
+| `slurp`     | `nixos/desktop/multi-wm.nix` (line 80)  | **Multi-WM** (correct)          |
 | `grimblast` | `nixos/desktop/hyprland.nix` (line 343) | **Hyprland-specific** (correct) |
 
 **Recommendation:** `grim` and `slurp` should be in `common/packages/desktop/screenshots.nix` (available to all WMs), `grimblast` stays in Hyprland (convenience wrapper).
@@ -187,16 +190,19 @@ Setup-Mac/
 #### 1. Nix Settings
 
 **Common Nix Settings:** `platforms/common/core/nix-settings.nix`
+
 - Experimental features: `nix-command flakes`
 - Binary caches: `cache.nixos.org`, `nix-community.cachix.org`
 - Garbage collection, optimization settings
 - nixpkgs config with unfree predicates
 
 **Darwin-specific:** `platforms/darwin/nix/settings.nix`
+
 - Imports common settings ✓
 - Adds: `sandbox = true`, `extra-sandbox-paths` (Darwin-specific)
 
 **NixOS-specific:** `platforms/nixos/system/configuration.nix`
+
 - Experimental features: `nix-command flakes` **DUPLICATE** (should import common)
 - Binary caches: `cache.nixos.org`, `hyprland.cachix.org` **MIXED** (hyprland cache should be common or desktop-specific)
 - Allows unfree: Yes **INCONSISTENT** (should use common predicates)
@@ -210,16 +216,19 @@ Setup-Mac/
 #### 2. Fish Shell Configuration
 
 **Common Pattern:** `platforms/common/programs/fish.nix`
+
 - Defines `commonAliases` and `commonInit`
 - Provides `platformAliases` and `platformInit` for override
 - Modern pattern using `interactiveShellInit`
 
 **Darwin Implementation:** `platforms/darwin/programs/shells.nix`
+
 - **Duplicate:** Defines aliases inline (`l`, `t`, `nixup`, etc.) instead of using common pattern
 - **Duplicate:** Defines `shellInit` with greeting, history settings, carapace, starship
 - **Platform-specific:** Homebrew integration (correct location)
 
 **NixOS Implementation:** `platforms/nixos/users/home.nix`
+
 - Defines platform-specific aliases (`nixup`, `nixbuild`, `nixcheck`)
 - No common aliases used (missing import)
 
@@ -232,27 +241,33 @@ Setup-Mac/
 #### 3. Environment Variables
 
 **Common Variables:** `platforms/common/environment/variables.nix`
+
 - `EDITOR`, `LANG`, `NIX_PATH`, locale settings
 - Development variables: `NODE_OPTIONS`, `NPM_CONFIG_*`
 - Build variables: `NIXPKGS_ALLOW_*`
 
 **Darwin-specific:** `platforms/darwin/environment.nix`
+
 - Imports common ✓
 - Adds: `BROWSER = "google-chrome"`, `TERMINAL = "iTerm2"`
 
 **NixOS-specific:** `platforms/nixos/users/home.nix`
+
 - Defines: `MOZ_ENABLE_WAYLAND`, `QT_QPA_PLATFORM`, `NIXOS_OZONE_WL`
 - No common variables import (Home Manager should handle this)
 
 **Hardware-specific:** `platforms/nixos/hardware/amd-gpu.nix`
+
 - Adds GPU-related variables: `__GLX_VENDOR_LIBRARY_NAME`, `LIBVA_DRIVER_NAME`, etc.
 - **Issue:** These are `environment.sessionVariables` (system-level), not `environment.variables`
 
 **AI Stack:** `platforms/nixos/desktop/ai-stack.nix`
+
 - Adds AI-related variables: `HIP_VISIBLE_DEVICES`, `ROCM_PATH`, `HSA_OVERRIDE_GFX_VERSION`, `PYTORCH_ROCM_ARCH`
 - **Issue:** These are `environment.variables` (system-level), should be in Home Manager for user services
 
 **Recommendation:**
+
 - Consolidate GPU variables to hardware module (correct location)
 - Move AI variables to Home Manager user config (user services run as user)
 - Ensure proper variable scope (system vs user level)
@@ -262,6 +277,7 @@ Setup-Mac/
 #### 4. Fonts Configuration
 
 **NixOS System:** `platforms/nixos/system/configuration.nix`
+
 - Installs: `jetbrains-mono`
 - Configures: fontconfig default fonts (mono, sans-serif, serif)
 - **Issue:** Font config should be in desktop module, not system config
@@ -277,6 +293,7 @@ Setup-Mac/
 #### 1. Desktop Module Structure
 
 **Current State:**
+
 ```
 platforms/nixos/desktop/
 ├── ai-stack.nix            # AI tools and Ollama service
@@ -292,6 +309,7 @@ platforms/nixos/desktop/
 ```
 
 **Issues:**
+
 1. `hyprland.nix` contains duplicate packages (radeontop, amdgpu_top, imagemagick, swww, rofi, waybar, cliphist)
 2. `hyprland-config.nix` has empty placeholder for xserver (line 6-12)
 3. `default.nix` is empty placeholder
@@ -299,6 +317,7 @@ platforms/nixos/desktop/
 5. Mixed concerns: User-level (Home Manager) and system-level configs in same directory
 
 **Recommendation:**
+
 - Split into `user/` (Home Manager configs) and `system/` (NixOS configs) subdirectories
 - Remove duplicate packages from Hyprland
 - Remove empty placeholder files
@@ -308,6 +327,7 @@ platforms/nixos/desktop/
 #### 2. Hardware Module Structure
 
 **Current State:**
+
 ```
 platforms/nixos/hardware/
 ├── hardware-configuration.nix   # Auto-generated hardware scan
@@ -315,6 +335,7 @@ platforms/nixos/hardware/
 ```
 
 **Issues:**
+
 1. `amd-gpu.nix` includes `amdgpu_top` and `corectrl` (system packages)
 2. These packages are duplicated in `monitoring.nix` and `hyprland.nix`
 
@@ -325,6 +346,7 @@ platforms/nixos/hardware/
 #### 3. Common Package Organization
 
 **Current State:**
+
 ```
 platforms/common/packages/
 ├── base.nix           # Essential CLI, development, GUI, AI packages
@@ -333,12 +355,14 @@ platforms/common/packages/
 ```
 
 **Issues:**
+
 1. `base.nix` is monolithic (119 lines) - mixing concerns
 2. Categories: `essentialPackages`, `developmentPackages`, `guiPackages`, `aiPackages`
 3. No clear separation between platform-agnostic and platform-specific packages
 4. `guiPackages` contains Helium (imported from separate file) and Chrome (macOS-only)
 
 **Recommendation:** Split into focused modules:
+
 ```
 platforms/common/packages/
 ├── essential/         # Core CLI tools (git, fish, curl, etc.)
@@ -519,9 +543,11 @@ platforms/
 ### Phase 1: Critical Duplications (High Priority)
 
 #### 1.1 GPU Monitoring Tools
+
 **Files:** `nixos/desktop/hyprland.nix`, `nixos/desktop/monitoring.nix`, `nixos/hardware/amd-gpu.nix`
 
 **Action:**
+
 1. Keep `amdgpu_top`, `radeontop` in `hardware/amd-gpu.nix` only
 2. Remove duplicate entries from `monitoring.nix` and `hyprland.nix`
 3. Keep `nvtopPackages.amd` in `hardware/amd-gpu.nix`
@@ -533,9 +559,11 @@ platforms/
 ---
 
 #### 1.2 Wallpaper Tools
+
 **Files:** `nixos/desktop/hyprland.nix`, `common/packages/base.nix`
 
 **Action:**
+
 1. Keep `imagemagick` in `common/packages/base.nix` with platform guard: `lib.optionals stdenv.isLinux [imagemagick]`
 2. Keep `swww` in `common/packages/base.nix` with platform guard: `lib.optionals stdenv.isLinux [swww]`
 3. Remove duplicate entries from `hyprland.nix`
@@ -546,9 +574,11 @@ platforms/
 ---
 
 #### 1.3 Desktop Tools (launchers, notifications, screenshots)
+
 **Files:** `nixos/desktop/hyprland.nix`, `nixos/desktop/multi-wm.nix`, `nixos/users/home.nix`
 
 **Action:**
+
 1. Create `common/packages/desktop/launchers.nix` with `rofi` and `wofi`
 2. Create `common/packages/desktop/notifications.nix` with `dunst` and `mako`
 3. Create `common/packages/desktop/screenshots.nix` with `grim`, `slurp`, `grimblast`
@@ -561,9 +591,11 @@ platforms/
 ---
 
 #### 1.4 Clipboard Management
+
 **Files:** `common/packages/base.nix`, `nixos/desktop/hyprland.nix`, `nixos/desktop/multi-wm.nix`
 
 **Action:**
+
 1. Keep `cliphist` in `common/packages/base.nix` (Wayland clipboard history)
 2. Remove from `hyprland.nix` (accessible system-wide)
 3. Keep `wl-clipboard` in `multi-wm.nix` (system-level dependency)
@@ -575,9 +607,11 @@ platforms/
 ### Phase 2: Configuration Duplications (Medium Priority)
 
 #### 2.1 Nix Settings
+
 **Files:** `nixos/system/configuration.nix`, `common/core/nix-settings.nix`
 
 **Action:**
+
 1. Import `common/core/nix-settings.nix` in `nixos/system/configuration.nix`
 2. Remove duplicate `nix.settings.experimental-features` (now imported)
 3. Move `hyprland.cachix.org` to desktop module or add to common with comment
@@ -588,9 +622,11 @@ platforms/
 ---
 
 #### 2.2 Fish Shell Configuration
+
 **Files:** `darwin/programs/shells.nix`, `common/programs/fish.nix`
 
 **Action:**
+
 1. Refactor `darwin/programs/shells.nix` to use common Fish pattern:
    ```nix
    {
@@ -611,9 +647,11 @@ platforms/
 ---
 
 #### 2.3 Environment Variables
+
 **Files:** Multiple files across platforms
 
 **Action:**
+
 1. Ensure `darwin/environment.nix` imports `common/environment/variables.nix` (already done ✓)
 2. Move AI variables from `ai-stack.nix` to Home Manager user config (`nixos/users/home.nix`)
 3. Keep GPU variables in `hardware/amd-gpu.nix` (already system-level, correct)
@@ -624,9 +662,11 @@ platforms/
 ---
 
 #### 2.4 Fonts Configuration
+
 **Files:** `nixos/system/configuration.nix`
 
 **Action:**
+
 1. Create `common/packages/graphics/fonts.nix` with:
    ```nix
    {pkgs, ...}: {
@@ -648,9 +688,11 @@ platforms/
 ### Phase 3: Package Organization Refactoring (Low Priority)
 
 #### 3.1 Split Common Packages
+
 **Files:** `common/packages/base.nix`
 
 **Action:**
+
 1. Create focused modules in `common/packages/`:
    - `essential/` directory with CLI tools
    - `development/` directory with dev tools
@@ -666,9 +708,11 @@ platforms/
 ---
 
 #### 3.2 Reorganize Desktop Modules
+
 **Files:** `nixos/desktop/` directory
 
 **Action:**
+
 1. Split into `system/` and `user/` subdirectories
 2. Move system configs:
    - `hyprland-system.nix` → `system/hyprland.nix`
@@ -687,9 +731,11 @@ platforms/
 ---
 
 #### 3.3 Remove Placeholder Files
+
 **Files:** `nixos/desktop/default.nix`, `nixos/desktop/hyprland-config.nix` (partial)
 
 **Action:**
+
 1. Delete `nixos/desktop/default.nix` (empty placeholder)
 2. Remove empty xserver configuration from `hyprland-config.nix` (lines 6-12)
 3. Clean up any other placeholder comments
@@ -701,9 +747,11 @@ platforms/
 ### Phase 4: Documentation & Validation (Medium Priority)
 
 #### 4.1 Update Documentation
+
 **Files:** `AGENTS.md`, `docs/status/`
 
 **Action:**
+
 1. Update `AGENTS.md` with new package structure
 2. Document de-duplication patterns and best practices
 3. Create status report for completed de-duplication work
@@ -713,7 +761,9 @@ platforms/
 ---
 
 #### 4.2 Validate Configuration
+
 **Action:**
+
 1. Run `just test` to verify Darwin configuration
 2. Run `just format` to ensure consistent formatting
 3. Run `just health` for comprehensive system check
@@ -726,22 +776,26 @@ platforms/
 ## Implementation Priority
 
 ### Immediate (Week 1)
+
 1. GPU monitoring tools de-duplication (1.1)
 2. Wallpaper tools de-duplication (1.2)
 3. Clipboard management de-duplication (1.4)
 
 ### Short-term (Week 2)
+
 4. Desktop tools organization (1.3)
 5. Nix settings de-duplication (2.1)
 6. Fish shell refactoring (2.2)
 
 ### Medium-term (Week 3-4)
+
 7. Environment variables cleanup (2.3)
 8. Fonts configuration (2.4)
 9. Desktop module reorganization (3.2)
 10. Placeholder file removal (3.3)
 
 ### Long-term (Month 2+)
+
 11. Common packages split (3.1)
 12. Documentation updates (4.1)
 13. Comprehensive validation (4.2)
@@ -751,16 +805,19 @@ platforms/
 ## Risk Assessment
 
 ### Low Risk
+
 - Package de-duplications (Phase 1)
 - Placeholder file removal (3.3)
 - Documentation updates (4.1)
 
 ### Medium Risk
+
 - Nix settings refactoring (2.1) - Requires testing on both platforms
 - Fish shell refactoring (2.2) - Shell startup critical for productivity
 - Desktop module reorganization (3.2) - Affects import paths
 
 ### High Risk
+
 - Common packages split (3.1) - Major refactoring, extensive testing required
 - Environment variables cleanup (2.3) - AI services may break
 
@@ -771,24 +828,28 @@ platforms/
 ## Success Criteria
 
 ### De-duplication Metrics
+
 - [ ] 15+ duplicated packages eliminated
 - [ ] 0 duplicate package definitions
 - [ ] Clear single source of truth for all packages
 - [ ] All package duplications resolved
 
 ### Organization Metrics
+
 - [ ] Package modules <50 lines (focused, single-purpose)
 - [ ] Clear hierarchical structure
 - [ ] Platform guards used appropriately
 - [ ] System vs user-level configs separated
 
 ### Quality Metrics
+
 - [ ] `just test` passes on both platforms
 - [ ] `just format` shows no changes
 - [ ] `just health` shows no issues
 - [ ] All builds complete successfully
 
 ### Maintainability Metrics
+
 - [ ] New packages easily added to correct location
 - [ ] Clear pattern for platform-specific packages
 - [ ] Documentation up-to-date
@@ -823,6 +884,6 @@ The improved package layout provides a solid foundation for future growth while 
 
 ---
 
-*Analysis completed: 2025-12-26 07:59 CET*
-*Prepared by: Crush AI Assistant*
-*Status: Ready for implementation*
+_Analysis completed: 2025-12-26 07:59 CET_
+_Prepared by: Crush AI Assistant_
+_Status: Ready for implementation_

@@ -16,12 +16,14 @@ Successfully implemented 100% Nix-declarative animated wallpapers for Hyprland. 
 ## ✅ COMPLETED: 100% Declarative Implementation
 
 ### 1. Pure Nix Solution (No Shell Scripts)
+
 - **Removed manual setup script** - Everything is now in Nix
 - **Auto-generated scripts** via `home.file."...".text`
 - **Auto-created directories** with `.gitkeep` files
 - **Auto-generated sample wallpapers** using imagemagick at build time
 
 ### 2. Fully Automated Components
+
 ```nix
 # Scripts generated at build time
 home.file.".config/scripts/wallpaper-switcher".text = ''
@@ -41,6 +43,7 @@ home.file.".config/wallpapers/static/default-nix.png" = {
 ```
 
 ### 3. Keybindings Integrated Directly
+
 ```nix
 bind = [
   # ... (other bindings)
@@ -55,6 +58,7 @@ bind = [
 ## 🎯 What Changed: Before vs After
 
 ### BEFORE (Manual Hell)
+
 ```bash
 # User had to run:
 ./setup-animated-wallpapers.sh  # ❌ Manual script
@@ -63,6 +67,7 @@ cp wallpapers ~/Pictures/         # ❌ Manual copy
 ```
 
 ### AFTER (Nix Heaven)
+
 ```bash
 # User just runs:
 sudo nixos-rebuild switch --flake .#evo-x2  # ✅ Everything automated
@@ -75,6 +80,7 @@ All setup happens transparently during the Nix build!
 ## 📁 Current File State
 
 ### Single Point of Configuration
+
 - **`platforms/nixos/desktop/hyprland.nix`** - Everything lives here
   - Packages (swww, imagemagick)
   - Scripts (auto-generated)
@@ -83,6 +89,7 @@ All setup happens transparently during the Nix build!
   - Keybindings (integrated)
 
 ### What We DON'T Have Anymore
+
 - ❌ `setup-animated-wallpapers.sh` - Deleted!
 - ❌ Manual setup documentation - Replaced with Nix-only guide
 - ❌ Shell script dependencies - Everything is Nix-managed
@@ -92,17 +99,20 @@ All setup happens transparently during the Nix build!
 ## 🚀 User Experience (Simplified)
 
 ### 1. Setup (One Command)
+
 ```bash
 # That's it!
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 ### 2. Usage (Ready Immediately)
+
 - **Super + W** - Random wallpaper with transition
 - **Super + Shift + W** - Animated mode
 - **Super + Alt + W** - Clear wallpaper
 
 ### 3. Add Your Wallpapers (Optional)
+
 ```bash
 # Only if you want custom wallpapers
 cp ~/Pictures/wallpapers/*.jpg ~/.config/wallpapers/static/
@@ -113,6 +123,7 @@ cp ~/Pictures/wallpapers/*.jpg ~/.config/wallpapers/static/
 ## 🔍 Technical Implementation Details
 
 ### Script Generation (Pure Nix)
+
 ```nix
 home.file.".config/scripts/wallpaper-switcher" = {
   text = ''
@@ -134,6 +145,7 @@ home.file.".config/scripts/wallpaper-switcher" = {
 ```
 
 ### Wallpaper Generation (Build-Time)
+
 ```nix
 home.file.".config/wallpapers/animated/sample-1.png" = {
   source = pkgs.runCommand "animated-wallpaper-1" { } ''
@@ -143,6 +155,7 @@ home.file.".config/wallpapers/animated/sample-1.png" = {
 ```
 
 ### Directory Creation (Declarative)
+
 ```nix
 home.file.".config/wallpapers/static/.gitkeep".text = "";
 home.file.".config/wallpapers/animated/.gitkeep".text = "";
@@ -154,14 +167,16 @@ home.file.".config/wallpapers/gifs/.gitkeep".text = "";
 ## 📊 Resource Usage (Optimized)
 
 ### Memory Footprint
-| Component | Usage | Notes |
-|-----------|--------|-------|
-| swww (idle) | 30-50MB | Zero overhead when not switching |
-| swww (active) | 40-60MB | During transitions |
-| Generated wallpapers | <1MB each | Created at build time |
-| Total impact | ~60MB on idle | Minimal for desktop use |
+
+| Component            | Usage         | Notes                            |
+| -------------------- | ------------- | -------------------------------- |
+| swww (idle)          | 30-50MB       | Zero overhead when not switching |
+| swww (active)        | 40-60MB       | During transitions               |
+| Generated wallpapers | <1MB each     | Created at build time            |
+| Total impact         | ~60MB on idle | Minimal for desktop use          |
 
 ### Performance on AMD
+
 - Hardware acceleration enabled by default
 - 60FPS smooth transitions
 - GPU utilization <5% during changes
@@ -172,6 +187,7 @@ home.file.".config/wallpapers/gifs/.gitkeep".text = "";
 ## 🎨 Available Features (Out of the Box)
 
 ### Immediate Use After Rebuild
+
 - ✅ Static wallpapers with transitions
 - ✅ Animated wallpaper mode
 - ✅ GIF wallpaper support
@@ -180,6 +196,7 @@ home.file.".config/wallpapers/gifs/.gitkeep".text = "";
 - ✅ Keyboard shortcut control
 
 ### Generated Content
+
 - ✅ Default gradient wallpaper (static)
 - ✅ 3 sample animated wallpapers
 - ✅ Directory structure ready for user content
@@ -189,16 +206,19 @@ home.file.".config/wallpapers/gifs/.gitkeep".text = "";
 ## 🔮 What's Next (Future Enhancements)
 
 ### Type Safety Integration
+
 - Define wallpaper configuration types
 - Compile-time validation of paths
 - Prevent invalid configurations
 
 ### Performance Monitoring
+
 - Resource usage tracking
 - Automatic performance adjustment
 - Battery vs AC mode optimization
 
 ### Advanced Features
+
 - Time-based wallpaper switching
 - Weather-integrated wallpapers
 - API-based wallpaper fetching

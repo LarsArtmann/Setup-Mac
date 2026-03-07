@@ -1,7 +1,9 @@
 # 🌳 Universal Nix Configuration Architecture Proposal
+
 ### Platform-Agnostic: macOS (nix-darwin) + NixOS Ready
 
 ---
+
 **⚠️ DOCUMENT STATUS: PROPOSAL - NOT IMPLEMENTED ⚠️**
 
 **Proposal Date:** 2025-11-11
@@ -13,19 +15,20 @@
 **IMPORTANT:** This document describes a PROPOSED architecture, not the CURRENT implementation.
 
 **Current Reality:**
+
 - Flat structure: `dotfiles/nix/*.nix` (1336 lines)
 - Darwin-only flake
 - No platform abstraction layer
 - No NixOS support yet
 
 **This Proposal Would Provide:**
+
 - Tree structure: `platforms/`, `lib/`, `profiles/`, `modules/`
 - Multi-platform flake (Darwin + NixOS)
 - Platform abstraction with 80%+ code reuse
 - 6-week implementation timeline (3 phases)
 
-**See Also:** docs/learnings/2025-11-15_13-44-planning-vs-reality-gap-analysis.md for gap analysis and options
----
+## **See Also:** docs/learnings/2025-11-15_13-44-planning-vs-reality-gap-analysis.md for gap analysis and options
 
 **Date:** 2025-11-11
 **Version:** 1.0
@@ -39,7 +42,9 @@
 This document proposes a comprehensive restructuring of the current Nix configuration into a unified, platform-agnostic architecture that supports both macOS (nix-darwin) and future NixOS deployment. The new tree-like structure provides clear separation of concerns, maximum code reuse, and seamless migration capabilities.
 
 ### Current State Analysis
+
 The existing configuration has grown organically with mixed organizational patterns:
+
 - **Flat structure**: Many `.nix` files in root `dotfiles/nix/` directory
 - **Partial categorization**: Some subdirectories exist but lack consistent hierarchy
 - **Scattered concerns**: Related functionality spread across multiple files
@@ -47,7 +52,9 @@ The existing configuration has grown organically with mixed organizational patte
 - **Limited reusability**: Hard to extract components for NixOS migration
 
 ### Vision Statement
+
 Create a universal Nix configuration that:
+
 - **Works seamlessly** on both macOS and NixOS
 - **Maximizes code reuse** (80%+ shared configuration)
 - **Provides clear separation** between platform-specific and universal concerns
@@ -403,23 +410,24 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 
 ### Current File → New Location Mapping
 
-| Current File | New Location | Notes |
-|--------------|--------------|-------|
-| `core.nix` | `platforms/common/core/nix-settings.nix` | Extract platform-specific parts |
-| `system.nix` | `platforms/darwin/system/` | Split into multiple modules |
-| `environment.nix` | `platforms/common/environment/` | Separate variables, shells, paths |
-| `programs.nix` | `platforms/common/programs/` | Split by category |
-| `homebrew.nix` | `platforms/darwin/services/homebrew.nix` | macOS-specific |
-| `networking.nix` | `platforms/darwin/networking/` | Platform adaptation needed |
-| `users.nix` | `platforms/common/` + platform-specific | Split user config |
-| `core/` | `lib/` | Reorganize as library |
-| `wrappers/` | `lib/wrappers/` | Move to library layer |
-| `packages/` | `packages/` | Keep same location |
-| `testing/` | `lib/assertions/` + `testing/` | Split validation and tests |
+| Current File      | New Location                             | Notes                             |
+| ----------------- | ---------------------------------------- | --------------------------------- |
+| `core.nix`        | `platforms/common/core/nix-settings.nix` | Extract platform-specific parts   |
+| `system.nix`      | `platforms/darwin/system/`               | Split into multiple modules       |
+| `environment.nix` | `platforms/common/environment/`          | Separate variables, shells, paths |
+| `programs.nix`    | `platforms/common/programs/`             | Split by category                 |
+| `homebrew.nix`    | `platforms/darwin/services/homebrew.nix` | macOS-specific                    |
+| `networking.nix`  | `platforms/darwin/networking/`           | Platform adaptation needed        |
+| `users.nix`       | `platforms/common/` + platform-specific  | Split user config                 |
+| `core/`           | `lib/`                                   | Reorganize as library             |
+| `wrappers/`       | `lib/wrappers/`                          | Move to library layer             |
+| `packages/`       | `packages/`                              | Keep same location                |
+| `testing/`        | `lib/assertions/` + `testing/`           | Split validation and tests        |
 
 ### Platform Separation Strategy
 
 #### Universal Components (80%+ reuse)
+
 - **Development Tools**: Git, editors, language runtimes
 - **Shell Configuration**: Fish, Zsh, Bash settings
 - **Security Tools**: SSH configuration, certificates
@@ -427,6 +435,7 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 - **Package Overlays**: Custom packages, version fixes
 
 #### Platform-Specific Components
+
 - **macOS**: Homebrew, Touch ID, Finder defaults, Spotlight
 - **NixOS**: Systemd services, filesystem configuration, boot settings
 
@@ -435,10 +444,13 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 ## 🚀 IMPLEMENTATION PHASES
 
 ### Phase 1: Foundation (Week 1-2)
+
 **Objective**: Create new structure and migrate core components
 
 #### Tasks
+
 1. **Create directory structure**
+
    ```bash
    mkdir -p nix-config/{platforms/{common,darwin,nixos}/{core,environment,packages,programs,services,networking,system},modules/{programs,services,development},lib/{platform,types,assertions,helpers},profiles/{base,user,role},packages/overlays,hosts/{macbook-air,future-nixos-pc,common}}
    ```
@@ -454,15 +466,18 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
    - Configure home-manager integration
 
 #### Deliverables
+
 - New directory structure created
 - Core configurations migrated
 - Flake updated with multi-platform support
 - Backward compatibility maintained
 
 ### Phase 2: Platform Abstraction (Week 3-4)
+
 **Objective**: Implement platform detection and conditional loading
 
 #### Tasks
+
 1. **Create platform detection library**
    - Implement platform detection utilities
    - Create abstraction layer for platform differences
@@ -479,15 +494,18 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
    - Create configuration composition system
 
 #### Deliverables
+
 - Platform detection library
 - Refactored configuration modules
 - Profile composition system
 - Cross-platform validation
 
 ### Phase 3: NixOS Preparation (Week 5-6)
+
 **Objective**: Add NixOS support and ensure full compatibility
 
 #### Tasks
+
 1. **Add NixOS-specific modules**
    - Create NixOS system configuration
    - Implement NixOS service configurations
@@ -504,6 +522,7 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
    - Performance optimization
 
 #### Deliverables
+
 - Complete NixOS module support
 - Migration testing framework
 - Comprehensive documentation
@@ -514,18 +533,21 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 ## 📊 BENEFITS ANALYSIS
 
 ### Immediate Benefits (Post-Phase 1)
+
 - **✅ Improved Organization**: Clear separation of concerns
 - **✅ Better Maintainability**: Easier to locate and modify configurations
 - **✅ Enhanced Reusability**: Modules can be reused across systems
 - **✅ Cleaner Flake**: Multi-platform support with clear structure
 
 ### Medium-term Benefits (Post-Phase 2)
+
 - **🔄 Seamless Migration**: Gradual transition from macOS to NixOS
 - **📦 Configuration Reuse**: 80%+ of config works on both platforms
 - **🎯 Platform Optimization**: Platform-specific optimizations where needed
 - **🧩 Modular Design**: Mix and match components as needed
 
 ### Long-term Benefits (Post-Phase 3)
+
 - **🔧 Future-Proof**: Ready for NixOS without rewriting everything
 - **🌐 Multi-Machine Support**: Easy deployment to multiple machines
 - **📈 Scalability**: Architecture supports complex configurations
@@ -537,38 +559,41 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 
 ### Technical Risks
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Migration breaks current setup | Medium | High | Incremental migration with testing at each step |
-| Platform differences cause issues | Low | Medium | Comprehensive platform abstraction layer |
-| Configuration complexity increases | Medium | Low | Clear documentation and module interfaces |
-| Performance regression | Low | Medium | Performance monitoring and optimization |
+| Risk                               | Probability | Impact | Mitigation                                      |
+| ---------------------------------- | ----------- | ------ | ----------------------------------------------- |
+| Migration breaks current setup     | Medium      | High   | Incremental migration with testing at each step |
+| Platform differences cause issues  | Low         | Medium | Comprehensive platform abstraction layer        |
+| Configuration complexity increases | Medium      | Low    | Clear documentation and module interfaces       |
+| Performance regression             | Low         | Medium | Performance monitoring and optimization         |
 
 ### Project Risks
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| Time estimation too optimistic | Medium | Medium | Flexible timeline with buffer periods |
-| Learning curve for new structure | Low | Low | Comprehensive documentation and examples |
-| Tool compatibility issues | Low | Medium | Thorough testing of all tools |
+| Risk                             | Probability | Impact | Mitigation                               |
+| -------------------------------- | ----------- | ------ | ---------------------------------------- |
+| Time estimation too optimistic   | Medium      | Medium | Flexible timeline with buffer periods    |
+| Learning curve for new structure | Low         | Low    | Comprehensive documentation and examples |
+| Tool compatibility issues        | Low         | Medium | Thorough testing of all tools            |
 
 ---
 
 ## 📋 SUCCESS METRICS
 
 ### Technical Metrics
+
 - **Configuration Reuse**: >80% of modules shared between platforms
 - **Migration Success**: Zero downtime during migration phases
 - **Performance**: <5% performance impact on current setup
 - **Validation**: 100% of configurations pass type checking
 
 ### Usability Metrics
+
 - **Module Discovery**: <30 seconds to find any configuration
 - **New Setup Time**: <50% time to configure new machine
 - **Documentation Coverage**: 100% of modules documented
 - **Error Messages**: Clear, actionable error messages
 
 ### Project Metrics
+
 - **Timeline**: Complete migration within 6 weeks
 - **Backward Compatibility**: 100% during transition period
 - **Testing Coverage**: >90% of configurations tested
@@ -579,18 +604,21 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 ## 🚀 NEXT STEPS
 
 ### Immediate Actions
+
 1. **Review and approve** this architecture proposal
 2. **Schedule migration timeline** with specific dates
 3. **Backup current configuration** for rollback capability
 4. **Begin Phase 1 implementation**
 
 ### Preparation Tasks
+
 - Review current configuration dependencies
 - Identify platform-specific components
 - Plan testing strategy for each migration phase
 - Prepare documentation templates
 
 ### Long-term Vision
+
 - **Multi-machine deployment**: Support for servers, laptops, desktops
 - **Team collaboration**: Share configuration across team members
 - **Continuous integration**: Automated testing of configuration changes
@@ -601,17 +629,20 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 ## 📚 REFERENCE MATERIALS
 
 ### Documentation
+
 - [NixOS Modules Documentation](https://nixos.org/manual/nixos/stable/)
 - [nix-darwin Documentation](https://github.com/LnL7/nix-darwin)
 - [Home Manager Documentation](https://nix-community.github.io/home-manager/)
 - [Flake Best Practices](https://github.com/jtojnar/nix flakes-templates)
 
 ### Related Projects
+
 - [nix-darwin-dotfiles](https://github.com/malob/nix-darwin-dotfiles)
 - [nixos-config](https://github.com/MatthiasBenaets/nixos-config)
 - [nix-homebrew](https://github.com/zhaofengli-wip/nix-homebrew)
 
 ### Tools and Utilities
+
 - [treefmt-nix](https://github.com/numtide/treefmt-nix)
 - [nix-ai-tools](https://github.com/numtide/nix-ai-tools)
 - [wrappers](https://github.com/lassulus/wrappers)
@@ -626,4 +657,4 @@ nix-config/                              # 🌳 ROOT (rename from dotfiles/nix/)
 
 ---
 
-*This proposal represents a significant investment in configuration infrastructure that will pay dividends in maintainability, scalability, and cross-platform compatibility for years to come.*
+_This proposal represents a significant investment in configuration infrastructure that will pay dividends in maintainability, scalability, and cross-platform compatibility for years to come._

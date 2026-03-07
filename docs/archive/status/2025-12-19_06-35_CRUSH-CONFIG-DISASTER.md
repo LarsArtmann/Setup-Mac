@@ -1,4 +1,5 @@
 # 🚨 CRUSH CONFIGURATION DISASTER REPORT
+
 **Date:** 2025-12-19_06-35
 **Status:** COMPLETE CONFIGURATION COLLAPSE - 25% Complete, System Broken
 
@@ -7,12 +8,15 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### 🔴 **CRITICAL FAILURE STATE**
+
 - **Configuration Status:** 🚨 COMPLETELY BROKEN
 - **System Health:** ❌ INFINITE RECURSION LOOP
 - **Progress Impact:** 🛑 ALL DEVELOPMENT HALTED
 
 ### 🎯 **MISSION OBJECTIVE**
+
 Fix CRUSH AI assistant configuration by:
+
 1. Replacing broken NUR crush module with functional llm-agents package
 2. Ensuring cross-platform compatibility (macOS + NixOS)
 3. Maintaining clean, reproducible flake configuration
@@ -24,6 +28,7 @@ Fix CRUSH AI assistant configuration by:
 ### **💥 WHAT WENT TERRIBLY WRONG**
 
 #### **Primary Failures**
+
 1. **❌ INFINITE RECURSION LOOP**
    - **Location:** `platforms/common/programs/activitywatch.nix:27:18`
    - **Cause:** `lib.optionalAttrs pkgs.stdenv.isDarwin` creates circular dependency
@@ -40,6 +45,7 @@ Fix CRUSH AI assistant configuration by:
    - **Module vs Package Mix:** Inconsistent installation patterns
 
 #### **Secondary Failures**
+
 - **VSCode Hardcode:** Removed but system expectations remain
 - **Package Catalog:** Enabled programs system unused/broken
 - **Testing Strategy:** Unable to test due to immediate crashes
@@ -49,15 +55,18 @@ Fix CRUSH AI assistant configuration by:
 ## 🔍 **ROOT CAUSE ANALYSIS**
 
 ### **🎯 CORE ISSUE**
+
 **"Over-engineered conditional configuration pattern creating circular dependencies"**
 
 #### **Technical Breakdown**
+
 - **Pattern:** Complex platform-specific conditional merging
 - **Problem:** Every conditional references `pkgs`, which triggers recursion
 - **Assumption:** `lib.optionalAttrs pkgs.stdenv.isDarwin` is safe ✅ **WRONG**
 - **Reality:** Module system cannot evaluate `pkgs` during import phase
 
 #### **Architecture Problem**
+
 ```
 flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs → ↻
 ```
@@ -67,12 +76,14 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## ✅ **WHAT WAS ACCOMPLISHED**
 
 ### **🎯 RESEARCH SUCCESS**
+
 - ✅ **Identified Correct Repository:** `github:numtide/llm-agents.nix`
 - ✅ **Package Verification:** Confirmed crush package availability
 - ✅ **Input Structure:** Proper flake input configuration
 - ✅ **Cross-Platform Plan:** Unified package approach for macOS+NixOS
 
 ### **🔧 PARTIAL FIXES**
+
 - ✅ **NUR Removal:** Eliminated broken `nur.repos.charmbracelet.modules.crush`
 - ✅ **Input Updates:** Added `llm-agents` with correct repository
 - ✅ **VSCode Hardcode:** Removed unnecessary program from catalog
@@ -85,6 +96,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ### **🚨 Phase 1: EMERGENCY STABILIZATION**
 
 #### **Step 1: SIMPLIFICATION SURGERY**
+
 1. **DISABLE PROBLEMATIC MODULES**
    - Temporarily comment out `activitywatch.nix` import
    - Remove all complex platform-specific logic
@@ -101,6 +113,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
    - Gradual re-enablement of modules
 
 #### **Step 2: ARCHITECTURE REDESIGN**
+
 1. **Package-First Strategy**
    - All cross-platform tools as packages only
    - No complex module-based configurations
@@ -121,12 +134,14 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 🔍 **TECHNICAL FINDINGS**
 
 ### **📚 Key Learnings**
+
 1. **Module System Limitations:** Cannot reference `pkgs` in import-phase conditionals
 2. **Circular Dependency Pattern:** `optionalAttrs` + `pkgs.stdenv` = recursion death spiral
 3. **Home-Manager Compatibility:** Version-specific option deprecation issues
 4. **Cross-Platform Complexity:** Platform-specific attrset merging error-prone
 
 ### **⚠️ Critical Insight**
+
 **"The more complex the configuration logic, the higher the probability of circular dependencies"**
 
 ---
@@ -134,6 +149,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 🎯 **NEXT STEPS**
 
 ### **🚨 IMMEDIATE (Next 24 Hours)**
+
 1. **EMERGENCY ROLLBACK** - Reset to last known working commit
 2. **SIMPLE CRUSH TEST** - Install as package only, verify functionality
 3. **ACTIVITYWATCH DISABLE** - Remove complex module entirely
@@ -141,6 +157,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 5. **STABILITY VERIFICATION** - Full configuration testing
 
 ### **🔧 SHORT-TERM (Next 3 Days)**
+
 1. **ARCHITECTURE SIMPLIFICATION** - Redesign configuration patterns
 2. **MODULE SYSTEM AUDIT** - Review all imported modules for similar issues
 3. **CROSS-PLATFORM STANDARDIZATION** - Unified approach for both platforms
@@ -152,6 +169,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 🤔 **BLOCKING QUESTIONS**
 
 ### **❓ TECHNICAL RESEARCH NEEDED**
+
 1. **Proper Module-Level Conditionals:** What's the correct pattern for platform-specific attrsets?
 2. **Home-Manager Version Strategy:** How to handle version-specific option compatibility?
 3. **Package vs Module Decision:** When should tools be packages vs modules?
@@ -163,12 +181,14 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 📈 **PROGRESS METRICS**
 
 ### **Current State**
+
 - **Completion:** 25% (Research done, Implementation failed)
 - **System Health:** 🚨 CRITICAL (Infinite recursion)
 - **Blockers:** 1 major (circular dependency), 3 minor (module conflicts)
 - **Estimated Recovery:** 4-6 hours (if approach correct)
 
 ### **Success Factors**
+
 - **High:** Research completed, correct repository identified
 - **Medium:** Partial fixes implemented, approach direction correct
 - **Low:** Implementation failed, configuration collapsed
@@ -179,6 +199,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 🚀 **RECOVERY READINESS**
 
 ### **✅ AVAILABLE ASSETS**
+
 - Working flake structure (before collapse)
 - Correct llm-agents repository URL
 - Package installation approach validated
@@ -186,6 +207,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 - Clear failure analysis (this report)
 
 ### **🎯 IMMEDIATE ACTION REQUIRED**
+
 **"Proceed with emergency rollback to stable configuration, then implement simple crush package installation"**
 
 ---
@@ -193,6 +215,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 ## 📋 **ACCOUNTABILITY**
 
 ### **✅ ACCOMPLISHED**
+
 - Deep root cause analysis completed
 - Correct technical solution identified
 - Recovery plan established
@@ -200,6 +223,7 @@ flake.nix → home-base.nix → activitywatch.nix → lib.optionalAttrs → pkgs
 - Blocker questions documented
 
 ### **❌ FAILED**
+
 - Configuration implementation
 - Complexity management
 - Incremental testing

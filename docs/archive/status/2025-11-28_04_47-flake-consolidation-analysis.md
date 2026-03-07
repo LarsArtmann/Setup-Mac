@@ -11,6 +11,7 @@
 **CRITICAL ISSUE:** Multiple conflicting `flake.nix` files discovered causing architectural confusion and potential system instability. Root cause: Configuration drift between primary flake files leading to disabled Home Manager and inconsistent tooling.
 
 **IMMEDIATE ACTIONS TAKEN:**
+
 - ✅ Analyzed architectural conflicts across 3 flake files
 - ✅ Removed failed cross-platform attempt (`flake.cross-platform.failed`)
 - ✅ Re-enabled Home Manager in primary flake.nix
@@ -42,15 +43,15 @@ Setup-Mac/
 
 ### **Feature Comparison Matrix**
 
-| Feature | Root flake.nix | dotfiles/nix/flake.nix | Status |
-|---------|----------------|------------------------|---------|
-| Home Manager | ✅ Re-enabled | ✅ Enabled | CONFLICT RESOLVED |
-| crush package | ❌ Missing | ✅ Available | NEEDS MERGE |
-| Ghost Systems | ✅ Advanced | ❌ Missing | PRESERVE |
-| Wrapper System | ✅ Available | ❌ Missing | PRESERVE |
-| URL Scheme | HTTPS | SSH | DECISION NEEDED |
-| Validation | ✅ Advanced | ❌ Basic | PRESERVE |
-| justfile Integration | ✅ Active | ❌ Broken | PRESERVE |
+| Feature              | Root flake.nix | dotfiles/nix/flake.nix | Status            |
+| -------------------- | -------------- | ---------------------- | ----------------- |
+| Home Manager         | ✅ Re-enabled  | ✅ Enabled             | CONFLICT RESOLVED |
+| crush package        | ❌ Missing     | ✅ Available           | NEEDS MERGE       |
+| Ghost Systems        | ✅ Advanced    | ❌ Missing             | PRESERVE          |
+| Wrapper System       | ✅ Available   | ❌ Missing             | PRESERVE          |
+| URL Scheme           | HTTPS          | SSH                    | DECISION NEEDED   |
+| Validation           | ✅ Advanced    | ❌ Basic               | PRESERVE          |
+| justfile Integration | ✅ Active      | ❌ Broken              | PRESERVE          |
 
 ---
 
@@ -97,6 +98,7 @@ Setup-Mac/
 **Lines:** 174-184
 
 **Before:**
+
 ```nix
 # Home Manager integration - temporarily disabled to migrate configs
 # home-manager.darwinModules.home-manager
@@ -111,6 +113,7 @@ Setup-Mac/
 ```
 
 **After:**
+
 ```nix
 # Home Manager integration - re-enabled for user configuration
 home-manager.darwinModules.home-manager
@@ -152,6 +155,7 @@ home-manager.darwinModules.home-manager
 ### **Pending Critical Tasks**
 
 1. **[ ] Comprehensive System Testing**
+
    ```bash
    just test    # Test configuration without applying
    just switch  # Apply and verify
@@ -194,11 +198,13 @@ just health
 **Decision Point:** Which flake.nix should be authoritative?
 
 **Option A:** Keep root flake.nix as primary
+
 - ✅ Preserves justfile integration
 - ✅ Maintains Ghost Systems features
 - ❌ Requires feature merging from secondary
 
 **Option B:** Switch to dotfiles/nix/flake.nix
+
 - ✅ Simpler, cleaner structure
 - ✅ Already has crush package
 - ❌ Requires justfile updates
@@ -270,4 +276,4 @@ just switch                       # Reapply working config
 
 ---
 
-*This report documents a critical architectural issue that required immediate attention. The consolidation plan has been prepared and awaits user decision before implementation proceeds.*
+_This report documents a critical architectural issue that required immediate attention. The consolidation plan has been prepared and awaits user decision before implementation proceeds._

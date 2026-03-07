@@ -13,6 +13,7 @@
 Critical Fish PATH issue **ROOT CAUSE IDENTIFIED AND FIXED** but **SYSTEM NOT YET REBUILT**. Fish shell remains broken because configuration changes committed to Git have not been applied to `/run/current-system`.
 
 **Impact:**
+
 - ✅ Configuration files fixed and committed
 - ❌ System still running old build (Dec 30 10:48, before fixes at 11:51)
 - ❌ Fish shell shows errors on every startup
@@ -26,6 +27,7 @@ Critical Fish PATH issue **ROOT CAUSE IDENTIFIED AND FIXED** but **SYSTEM NOT YE
 ## 🚨 Problem Statement
 
 ### Original Issue (Dec 30, 10:37)
+
 ```
 fish: Unknown command: carapace
 ~/.config/fish/config.fish (line 16):
@@ -33,6 +35,7 @@ carapace _carapace fish | source
 ```
 
 ### Symptoms
+
 1. **Fish shell unusable**: Every Fish startup shows error messages
 2. **Nix command missing**: `nix doctor` returns "Unknown command: nix"
 3. **Carapace completions broken**: `carapace _carapace fish | source` fails
@@ -40,6 +43,7 @@ carapace _carapace fish | source
 5. **PATH incomplete**: Essential packages not in Fish's PATH
 
 ### Expected Behavior
+
 - Fish shell should have full PATH with all Nix packages
 - `carapace` command should be available for completions
 - `nix` command should be accessible in Fish
@@ -50,6 +54,7 @@ carapace _carapace fish | source
 ## 🔍 Root Cause Analysis
 
 ### The Problem
+
 **Module Override in `platforms/darwin/environment.nix`**
 
 The file `platforms/darwin/environment.nix` contained:
@@ -64,6 +69,7 @@ environment.systemPackages = with pkgs; [
 This **OVERRIDED** (not appended to) the package list from `platforms/common/packages/base.nix`, preventing 80+ packages from being installed to `/run/current-system/sw/bin/`.
 
 ### Evidence
+
 1. **Configuration declared correctly** - `carapace` in `platforms/common/packages/base.nix:31`
 2. **Module imported correctly** - `platforms/darwin/default.nix:11` imports `../common/packages/base.nix`
 3. **System built recently** - `/run/current-system` timestamp: Dec 30 10:48
@@ -72,6 +78,7 @@ This **OVERRIDED** (not appended to) the package list from `platforms/common/pac
 6. **zsh works** - zsh properly loads environment via `/etc/zshenv`
 
 ### Why zsh Worked But Fish Didn't
+
 - **zsh**: Loads environment from `/etc/zshenv` which sources `/nix/store/5b7wb0k81i0yq0vdxqq1znmcifyadg1l-set-environment`
 - **Fish**: Also sources environment via `/etc/fish/nixos-env-preinit.fish`, but PATH was incomplete
 - Both shells got the **same incomplete PATH** from system, but Fish tried to run `carapace` which wasn't installed
@@ -81,10 +88,12 @@ This **OVERRIDED** (not appended to) the package list from `platforms/common/pac
 ## ✅ Configuration Fixes Applied
 
 ### Commit 1: `0e2ea35` - Refactor iTerm2 Location
+
 **Date:** December 30, 2025 - 11:51 CET
 **Purpose:** Move iTerm2 to proper platform-specific location
 
 **Changes Made:**
+
 ```diff
 # platforms/common/packages/base.nix
 ++ lib.optionals stdenv.isDarwin [
@@ -105,6 +114,7 @@ This **OVERRIDED** (not appended to) the package list from `platforms/common/pac
 ```
 
 **Benefits:**
+
 - ✅ All GUI packages now in `platforms/common/packages/base.nix`
 - ✅ Proper platform scoping with `lib.optionals stdenv.isDarwin`
 - ✅ Removed duplicate package definition
@@ -112,10 +122,12 @@ This **OVERRIDED** (not appended to) the package list from `platforms/common/pac
 - ✅ Aligned with Helium and Chrome platform-specific pattern
 
 ### Commit 2: `bac6a9f` - Update Flake Lock
+
 **Date:** December 30, 2025 - 12:00 CET
 **Purpose:** Update nixpkgs input after refactor
 
 **Changes:**
+
 - Updated `flake.lock` to sync with new package declarations
 - 24 additions, 24 deletions in flake lock
 
@@ -124,6 +136,7 @@ This **OVERRIDED** (not appended to) the package list from `platforms/common/pac
 ## 📊 Current System State
 
 ### Git Status
+
 ```bash
 On branch master
 Your branch is up to date with 'origin/master'.
@@ -131,6 +144,7 @@ nothing to commit, working tree clean
 ```
 
 ### System Build Information
+
 ```bash
 /run/current-system -> /nix/store/56rzl70zs58bj33hy35gi30gg3hf1m9z-darwin-system-26.05.5fb45ec
 Built: December 30, 2025 - 10:48 CET
@@ -139,7 +153,9 @@ Built: December 30, 2025 - 10:48 CET
 **Status:** SYSTEM IS OUTDATED - Last build BEFORE configuration fixes (commits at 11:51 and 12:00)
 
 ### Package Analysis
+
 **Expected Packages** (from `platforms/common/packages/base.nix`):
+
 - Essential CLI: git, micro, fish, starship, carapace, tree, ripgrep, fd, eza, bat, jq, yq-go, just, gitleaks, pre-commit
 - Development: bun, go, gopls, golangci-lint, terraform, nh
 - GUI (Darwin): iterm2, google-chrome, helium
@@ -147,6 +163,7 @@ Built: December 30, 2025 - 10:48 CET
 - And 40+ more...
 
 **Actually Installed** (from system closure):
+
 ```
 /nix/store/1k5hcxixm024rx3qpmd3nkjsn58s8wi6-system-applications
 /nix/store/1r5p3mwlq9m50yvcdaf64xdv7v5gq581-gnugrep-3.12
@@ -168,6 +185,7 @@ Built: December 30, 2025 - 10:48 CET
 **Total:** Only 15 packages in system closure (should be 80+)
 
 **Missing Examples:**
+
 - ❌ `carapace` - Required for Fish completions
 - ❌ `fish` shell configuration packages
 - ❌ `starship` - Custom prompt
@@ -177,11 +195,13 @@ Built: December 30, 2025 - 10:48 CET
 ### PATH Analysis
 
 **Fish Shell PATH (Broken):**
+
 ```
 PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:/run/current-system/sw/bin:/nix/var/nix/profiles/default/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 ```
 
 **Binary Availability in `/run/current-system/sw/bin/`:**
+
 - ✅ `fish` → `/nix/store/djms86zh0yjgss1bbk2gj5xn1w8ag5fp-fish-4.2.1/bin/fish`
 - ✅ `starship` → `/nix/store/gv1kzwpcbg9ng3d4p2gnv9sia8ldsp0n-starship-1.24.1/bin/starship`
 - ❌ `carapace` → **NOT FOUND**
@@ -198,6 +218,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 ## 🚧 Pending Work
 
 ### Critical - Must Complete Now
+
 - [ ] **Apply configuration fixes:** `just switch`
 - [ ] **Wait for rebuild:** 5-10 minutes for darwin-rebuild
 - [ ] **Open new Fish terminal:** Required for PATH updates
@@ -207,6 +228,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 - [ ] **Test Fish aliases:** `nixup`, `nixcheck`, `nixbuild`
 
 ### High Priority - Complete Today
+
 - [ ] Verify all essential packages in Fish PATH
 - [ ] Test Starship prompt appears in Fish
 - [ ] Test Fish history settings work
@@ -220,6 +242,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 - [ ] Run pre-commit hooks (`just pre-commit-run`)
 
 ### Medium Priority - This Week
+
 - [ ] Benchmark Fish shell startup time
 - [ ] Compare with zsh startup time
 - [ ] Clean up old Nix generations (`just clean`)
@@ -240,6 +263,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 4. But `nix-store -q --references /run/current-system` shows only 15 packages instead of 80+ expected
 
 **Specific Unknowns:**
+
 - Is there a module merge order issue preventing package list propagation?
 - Does nix-darwin's module system override `environment.systemPackages` somewhere else?
 - Are packages being filtered or excluded during build?
@@ -247,6 +271,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 - Do we need to explicitly merge package lists instead of just importing module?
 
 **Investigation Attempts:**
+
 - ✅ Checked module imports in Darwin config
 - ✅ Verified `base.nix` exports `environment.systemPackages`
 - ✅ Searched for override patterns in config files
@@ -254,6 +279,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 - ✅ Compared with working commit history
 
 **Still Unknown:**
+
 - Module evaluation order in nix-darwin
 - How `environment.systemPackages` propagates through module system
 - Debugging techniques to trace package list from definition to install
@@ -263,6 +289,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 ## 📈 Performance Observations
 
 ### Rebuild Issues
+
 1. **Slow rebuilds:** `darwin-rebuild` taking 5+ minutes
 2. **Cache downloads:** Downloading from `cache.nixos.org` taking excessive time
 3. **No progress indicators:** Hard to track which package is building
@@ -270,12 +297,13 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 5. **CPU underutilization:** Not leveraging all cores during build
 
 ### Build Attempts Summary
-| Attempt | Command | Duration | Result |
-|---------|---------|-----------|--------|
-| 1 | `just test` | Timeout 180s | Failed (Git tree dirty) |
-| 2 | `nix flake check` | Timeout 300s | Downloading from cache |
-| 3 | `just switch` | Signal 15 | Terminated (unknown reason) |
-| 4 | `just test-fast` | Timeout 300s | Downloading from cache |
+
+| Attempt | Command           | Duration     | Result                      |
+| ------- | ----------------- | ------------ | --------------------------- |
+| 1       | `just test`       | Timeout 180s | Failed (Git tree dirty)     |
+| 2       | `nix flake check` | Timeout 300s | Downloading from cache      |
+| 3       | `just switch`     | Signal 15    | Terminated (unknown reason) |
+| 4       | `just test-fast`  | Timeout 300s | Downloading from cache      |
 
 **Pattern:** All builds spending excessive time downloading from cache, even for packages that should be available locally.
 
@@ -284,12 +312,14 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 ## 🎯 Architecture Improvements Needed
 
 ### Package Management
+
 1. **Clearer separation:** Document which packages go where (system vs user)
 2. **Module merge strategy:** Use `lib.mkMerge` or `lib.mkAfter` for package lists
 3. **Package location consistency:** All GUI packages should follow same pattern
 4. **Validation tools:** Build-time checks for package availability
 
 ### Build Performance
+
 5. **Incremental rebuilds:** Detect packages already exist locally
 6. **Build monitoring:** Real-time progress for package builds
 7. **Cache optimization:** Why cache downloads so slow?
@@ -298,6 +328,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 10. **Network optimization:** Faster downloads from cache.nixos.org
 
 ### Shell Configuration
+
 11. **Shell initialization order:** Multiple Fish config sources (system + user)
 12. **Environment variable precedence:** Conflicts between nix-darwin and Home Manager
 13. **Documentation of architecture:** Hard to trace package flow from declaration to install
@@ -305,6 +336,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 15. **Profile management:** Multiple profiles (system + user) causing confusion
 
 ### Testing & Quality
+
 16. **Pre-rebuild validation:** Catch configuration errors before long builds
 17. **Dependency graph visualization:** Understand why rebuild takes so long
 18. **Rollback automation:** Automated testing after rebuild
@@ -312,6 +344,7 @@ PATH=/Users/larsartmann/.nix-profile/bin:/etc/profiles/per-user/larsartmann/bin:
 20. **Flake lock hygiene:** Why did nixpkgs need updating after small refactor?
 
 ### Documentation
+
 21. **Architecture decision records:** Document why iTerm2 moved, why packages split
 22. **Migration guides:** How to add new packages properly
 23. **Troubleshooting guides:** Common issues and solutions
@@ -340,14 +373,14 @@ cf7ab0e temp: disable micro-full to test wayland issue
 
 ### Timeline
 
-| Time | Event |
-|------|-------|
+| Time         | Event                                                            |
+| ------------ | ---------------------------------------------------------------- |
 | Dec 30 10:08 | Commit f8848fe: Re-enable essential packages (carapace included) |
-| Dec 30 10:48 | System built (current `/run/current-system`) |
-| Dec 30 10:37 | User reports Fish PATH broken (carapace missing) |
-| Dec 30 11:51 | Commit 0e2ea35: Fix root cause (move iTerm2, remove override) |
-| Dec 30 12:00 | Commit bac6a9f: Update flake.lock |
-| Dec 30 12:24 | Status report generated (THIS REPORT) |
+| Dec 30 10:48 | System built (current `/run/current-system`)                     |
+| Dec 30 10:37 | User reports Fish PATH broken (carapace missing)                 |
+| Dec 30 11:51 | Commit 0e2ea35: Fix root cause (move iTerm2, remove override)    |
+| Dec 30 12:00 | Commit bac6a9f: Update flake.lock                                |
+| Dec 30 12:24 | Status report generated (THIS REPORT)                            |
 
 ---
 
@@ -356,7 +389,9 @@ cf7ab0e temp: disable micro-full to test wayland issue
 ### Modified Files
 
 #### `platforms/common/packages/base.nix`
+
 **Lines 117-120:** Added iTerm2 to Darwin GUI packages
+
 ```nix
 ++ lib.optionals stdenv.isDarwin [
   google-chrome
@@ -365,7 +400,9 @@ cf7ab0e temp: disable micro-full to test wayland issue
 ```
 
 #### `platforms/darwin/environment.nix`
+
 **Lines 12-14:** Removed package override
+
 ```diff
 - # Darwin-specific packages
 - environment.systemPackages = with pkgs; [
@@ -392,6 +429,7 @@ cf7ab0e temp: disable micro-full to test wayland issue
 Once `just switch` completes successfully, verify:
 
 ### Core Functionality
+
 - [ ] `fish -c "which carapace"` → Returns path to carapace binary
 - [ ] `fish -c "carapace _carapace fish | source"` → No errors
 - [ ] `fish -c "nix doctor"` → All checks pass
@@ -400,6 +438,7 @@ Once `just switch` completes successfully, verify:
 - [ ] `ls -la /run/current-system/sw/bin/ | wc -l` → ~300+ binaries
 
 ### Essential Tools
+
 - [ ] `fish -c "which tree"` → Present
 - [ ] `fish -c "which ripgrep"` → Present
 - [ ] `fish -c "which fd"` → Present
@@ -409,12 +448,14 @@ Once `just switch` completes successfully, verify:
 - [ ] `fish -c "which yq"` → Present
 
 ### Development Tools
+
 - [ ] `fish -c "which bun"` → Present
 - [ ] `fish -c "which go"` → Present
 - [ ] `fish -c "which gopls"` → Present
 - [ ] `fish -c "which terraform"` → Present
 
 ### Fish Shell Features
+
 - [ ] Fish aliases work: `nixup`, `nixcheck`, `nixbuild`
 - [ ] Starship prompt appears (not default Fish prompt)
 - [ ] No error messages on Fish startup
@@ -422,11 +463,13 @@ Once `just switch` completes successfully, verify:
 - [ ] Homebrew integration active (Darwin)
 
 ### GUI Applications
+
 - [ ] `open -a Helium` → Helium launches
 - [ ] `open -a "Google Chrome"` → Chrome launches
 - [ ] `open -a iTerm2` → iTerm2 launches
 
 ### System Health
+
 - [ ] `just health` → All checks pass
 - [ ] No warnings in rebuild output
 - [ ] All expected packages in system closure
@@ -437,6 +480,7 @@ Once `just switch` completes successfully, verify:
 ## 🎯 Next Steps
 
 ### Immediate Action (Do Now)
+
 ```bash
 # 1. Apply configuration fixes
 just switch
@@ -451,6 +495,7 @@ fish -c "nix doctor"
 ```
 
 ### If Rebuild Fails
+
 1. Check error message in rebuild output
 2. Run `just test-fast` for syntax validation
 3. Review `platforms/common/packages/base.nix` for package conflicts
@@ -458,6 +503,7 @@ fish -c "nix doctor"
 5. Consult `docs/troubleshooting/` directory
 
 ### If Rebuild Succeeds But Fish Still Broken
+
 1. Open NEW Fish terminal (PATH updates require new session)
 2. Run `fish -c "echo \$PATH"` to verify PATH
 3. Run `fish -c "type -a carapace"` to check binary
@@ -469,6 +515,7 @@ fish -c "nix doctor"
 ## 📊 Metrics
 
 ### Before Fix
+
 - **Packages in system:** 15 (incomplete)
 - **Binaries in `/run/current-system/sw/bin/`:** 277
 - **Fish shell status:** Broken (errors on every startup)
@@ -477,6 +524,7 @@ fish -c "nix doctor"
 - **zsh shell status:** ✅ Working
 
 ### Expected After Fix
+
 - **Packages in system:** 80+ (complete)
 - **Binaries in `/run/current-system/sw/bin/`:** 300+
 - **Fish shell status:** ✅ Working (no errors)
@@ -489,12 +537,14 @@ fish -c "nix doctor"
 ## 🔗 Related Documentation
 
 ### Existing Documentation
+
 - `docs/troubleshooting/` - General troubleshooting guides
 - `docs/architecture/adr-001-home-manager-for-darwin.md` - Home Manager architecture
 - `AGENTS.md` - AI assistant configuration and guidelines
 - `docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md` - Home Manager setup
 
 ### Architecture Decision Records Needed
+
 - [ ] ADR-002: Package location strategy (system vs user)
 - [ ] ADR-003: Module merge patterns in nix-darwin
 - [ ] ADR-004: Shell initialization order
@@ -504,6 +554,7 @@ fish -c "nix doctor"
 ## 💡 Lessons Learned
 
 ### What Went Wrong
+
 1. **Silent override:** `environment.systemPackages` override replaced entire package list without warning
 2. **Missing validation:** No build-time check for package availability
 3. **Unclear architecture:** Hard to trace package flow from declaration to install
@@ -511,6 +562,7 @@ fish -c "nix doctor"
 5. **Slow feedback loop:** Long rebuild times delay testing
 
 ### What Went Right
+
 1. **Root cause found:** Systematic investigation identified exact issue
 2. **Minimal fix:** Only changed what was necessary (moved iTerm2)
 3. **Pattern consistency:** Aligned with existing platform-specific package pattern
@@ -518,6 +570,7 @@ fish -c "nix doctor"
 5. **Good documentation:** Existing architecture docs helped understand system
 
 ### Future Improvements
+
 1. **Pre-rebuild validation:** Check package availability before full rebuild
 2. **Smoke tests:** Fast test after rebuild to verify critical packages
 3. **Architecture docs:** Document module evaluation and package propagation
@@ -531,21 +584,25 @@ fish -c "nix doctor"
 ### If This Report Doesn't Solve The Problem
 
 1. **Check system logs:**
+
    ```bash
    log show --predicate 'process == "darwin-rebuild"' --last 1h
    ```
 
 2. **Verify Nix daemon status:**
+
    ```bash
    sudo launchctl list | grep nix
    ```
 
 3. **Check disk space:**
+
    ```bash
    df -h /nix
    ```
 
 4. **Nix garbage collection:**
+
    ```bash
    just clean
    ```
@@ -556,6 +613,7 @@ fish -c "nix doctor"
    ```
 
 ### Contact Information
+
 - **Git Repository:** https://github.com/your-org/Setup-Mac
 - **Nix-Darwin Issues:** https://github.com/LnL7/nix-darwin/issues
 - **NixOS Documentation:** https://nixos.org/manual/nixos/stable/
@@ -565,6 +623,7 @@ fish -c "nix doctor"
 ## 📋 Appendix
 
 ### A. Configuration File Locations
+
 ```
 platforms/common/packages/base.nix     - Shared package declarations
 platforms/darwin/default.nix           - Darwin system config
@@ -575,6 +634,7 @@ platforms/darwin/home.nix               - Darwin Home Manager config
 ```
 
 ### B. Key Commands
+
 ```bash
 # Apply configuration
 just switch
@@ -605,6 +665,7 @@ ls -ld /run/current-system
 ```
 
 ### C. Environment Variables
+
 ```bash
 # Nix configuration
 NIX_PATH=nixpkgs=flake:nixpkgs

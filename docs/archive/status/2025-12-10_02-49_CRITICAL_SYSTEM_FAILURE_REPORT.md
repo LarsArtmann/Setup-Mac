@@ -12,12 +12,14 @@
 ## 📋 CURRENT SITUATION
 
 ### FAILED ACTIONS
+
 - ❌ **Git commit blocked** by Nix validation failure
 - ❌ **NixOS configuration broken** - Hyprland build failure
 - ❌ **Pre-commit hooks failing** - System unbuildable
 - ❌ **All structural improvements blocked** by critical failures
 
 ### IDENTIFIED ROOT CAUSE
+
 ```
 error: path '/nix/store/c3vvaphsfpis8r4db02d2z9v92y44qll-source' is not valid
 ```
@@ -31,12 +33,14 @@ error: path '/nix/store/c3vvaphsfpis8r4db02d2z9v92y44qll-source' is not valid
 ## 🔍 DETAILED ANALYSIS
 
 ### COMPONENTS AFFECTED
+
 1. **NixOS Configuration (evo-x2)**: 100% BROKEN
 2. **Git Workflow**: 100% BLOCKED
 3. **Pre-commit Validation**: 100% FAILING
 4. **All Planning Work**: 100% BLOCKED
 
 ### ERROR BREAKDOWN
+
 ```
 Primary Error: Hyprland build failure
 - Missing VERSION file in source derivation
@@ -50,6 +54,7 @@ Secondary Errors:
 ```
 
 ### TECHNICAL DETAILS
+
 **Flake Configuration**: Line 236 in nixosConfigurations."evo-x2"
 **Hyprland Overlay**: Version f58c80f causing VERSION file issue
 **Nix Store Corruption**: Path reference invalid during build
@@ -60,12 +65,14 @@ Secondary Errors:
 ## 🚨 IMMEDIATE BLOCKERS
 
 ### CRITICAL (Block Everything)
+
 1. **Hyprland Build Failure** - VERSION file missing
 2. **Nix Store Path Invalid** - Source derivation broken
 3. **Git Commit Blocked** - Pre-commit validation failing
 4. **No Working Configuration** - System unbuildable
 
 ### DEPENDENCY CHAIN FAILURE
+
 ```
 Fix Hyprland → Nix Validation Passes → Git Commit Works →
 Planning Possible → Structural Changes Possible → Project Unblocked
@@ -76,6 +83,7 @@ Planning Possible → Structural Changes Possible → Project Unblocked
 ## 🎯 PARETO ANALYSIS PREPARATION
 
 ### 1% → 51% Impact (IMMEDIATE - Must Fix First)
+
 1. **Fix Hyprland VERSION file issue** (UNBLOCKS EVERYTHING)
 2. **Bypass problematic Hyprland commit** (RESTORES FUNCTIONALITY)
 3. **Emergency rollback to working state** (PREVENTS DATA LOSS)
@@ -83,6 +91,7 @@ Planning Possible → Structural Changes Possible → Project Unblocked
 5. **Fix Nix validation** (ALLOWS NORMAL WORKFLOW)
 
 ### 4% → 64% Impact (HIGH PRIORITY)
+
 6. **Commit stabilized configuration**
 7. **Create comprehensive structural plan**
 8. **Implement platform consolidation**
@@ -90,6 +99,7 @@ Planning Possible → Structural Changes Possible → Project Unblocked
 10. **Fix scripts organization**
 
 ### 20% → 80% Impact (MEDIUM PRIORITY)
+
 11. **Standard directory creation**
 12. **Documentation cleanup**
 13. **Configuration deduplication**
@@ -101,6 +111,7 @@ Planning Possible → Structural Changes Possible → Project Unblocked
 ## 📊 CURRENT WORK STATE
 
 ### FILES WITH CHANGES
+
 ```
 Modified:
 - dotfiles/nix/system.nix (iTerm2 enhancements)
@@ -110,6 +121,7 @@ Status: STAGED but COMMIT BLOCKED
 ```
 
 ### REPOSITORY STRUCTURE ISSUES
+
 ```
 Scattered Components:
 - platforms/nixos/ vs dotfiles/nixos/ (DUPLICATE)
@@ -123,13 +135,16 @@ Scattered Components:
 ## 🛠️ TECHNICAL SOLUTIONS NEEDED
 
 ### IMMEDIATE FIXES (Next 30 Minutes)
+
 1. **Hyprland Version Pinning**
+
    ```nix
    # Temporary fix - pin to working commit
    hyprland.url = "git+ssh://git@github.com/hyprwm/Hyprland?ref=v0.41.2";
    ```
 
 2. **Emergency Rollback Strategy**
+
    ```bash
    # Last known working configuration
    git checkout HEAD~1 -- flake.nix flake.lock
@@ -142,6 +157,7 @@ Scattered Components:
    ```
 
 ### SYSTEMIC FIXES (Next 24 Hours)
+
 1. **Platform Consolidation**
 2. **Core Module Reorganization**
 3. **Script Categorization**
@@ -153,12 +169,14 @@ Scattered Components:
 ## 🎪 PROJECT RISKS
 
 ### HIGH RISK
+
 - **Data Loss**: Without working backup
 - **System Corruption**: Invalid Nix store paths
 - **Development Paralysis**: Complete workflow blocked
 - **Rollback Complexity**: Multiple dependent failures
 
 ### MITIGATION STRATEGIES
+
 1. **Create manual backup** before any changes
 2. **Pin all versions** temporarily
 3. **Disable problematic modules** for quick restoration
@@ -169,12 +187,14 @@ Scattered Components:
 ## 📈 SUCCESS METRICS
 
 ### CURRENT METRICS
+
 - **Build Success Rate**: 0% (COMPLETE FAILURE)
 - **Git Workflow**: 100% BLOCKED
 - **Configuration Validity**: 0% (BROKEN)
 - **Development Velocity**: 0% (PARALYZED)
 
 ### TARGET METRICS (After Fix)
+
 - **Build Success Rate**: 100% (IMMEDIATE GOAL)
 - **Git Workflow**: 100% FUNCTIONAL
 - **Configuration Validity**: 100% STABLE
@@ -185,6 +205,7 @@ Scattered Components:
 ## 🚀 IMMEDIATE ACTION PLAN
 
 ### NEXT 60 MINUTES
+
 1. **Emergency rollback** to working Hyprland version
 2. **Fix Nix validation** with minimal changes
 3. **Commit stabilized configuration** with --no-verify
@@ -192,6 +213,7 @@ Scattered Components:
 5. **Implement 1%→51% improvements**
 
 ### NEXT 24 HOURS
+
 1. **Complete structural reorganization**
 2. **Implement comprehensive plan**
 3. **Fix all identified issues**
@@ -203,12 +225,14 @@ Scattered Components:
 ## 🔄 NEXT STEPS
 
 ### IMMEDIATE (Waiting for Instructions)
+
 1. **Hyprland fix strategy** (pin/bypass/rollback?)
 2. **Backup creation method** (manual/automated?)
 3. **Validation bypass approach** (temp/permanent?)
 4. **Rollback target** (which commit is safe?)
 
 ### SHORT-TERM (After Fix)
+
 1. **Execute Pareto analysis implementation**
 2. **Complete structural reorganization**
 3. **Implement all planned improvements**
@@ -232,6 +256,6 @@ Scattered Components:
 
 ---
 
-*Report Generated: 2025-12-10 02:49:28 CET*
-*System Status: CRITICAL FAILURE*
-*Next Review: Immediate (Post-Fix)*
+_Report Generated: 2025-12-10 02:49:28 CET_
+_System Status: CRITICAL FAILURE_
+_Next Review: Immediate (Post-Fix)_

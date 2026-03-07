@@ -9,6 +9,7 @@
 ## 🎯 QUICK FIX (5 minutes)
 
 ### 1. Pull Latest Changes
+
 ```bash
 # SSH into your evo-x2
 ssh lars@evo-x2
@@ -21,6 +22,7 @@ git pull
 ```
 
 ### 2. Apply UI Configuration
+
 ```bash
 # Rebuild with Hyprland enabled
 sudo nixos-rebuild switch --flake .#evo-x2
@@ -36,12 +38,14 @@ sudo reboot
 After system boots into UI, verify everything works:
 
 ### Run Verification Script
+
 ```bash
 # Execute the comprehensive verification
 ~/projects/SystemNix/scripts/verify-hyprland.sh
 ```
 
 ### Test Basic Functionality
+
 1. **SDDM Login:** Should see graphical login screen
 2. **Hyprland Desktop:** Wayland compositor should launch
 3. **Waybar:** Status bar should appear at top
@@ -53,10 +57,12 @@ After system boots into UI, verify everything works:
 ## 🛠️ WHAT WAS FIXED
 
 ### Root Cause
+
 - Hyprland configuration was commented out in `platforms/nixos/users/home.nix`
 - System lacked desktop environment, leaving only TTY access
 
 ### Comprehensive Improvements Applied
+
 1. **Re-enabled Hyprland** in Home Manager configuration
 2. **Fixed systemd conflicts** between UWSM and Home Manager
 3. **Added Hyprland Cachix** for faster binary cache downloads
@@ -70,6 +76,7 @@ After system boots into UI, verify everything works:
 ## 🚀 ADVANCED TIPS
 
 ### Performance Monitoring
+
 ```bash
 # Real-time GPU monitoring
 amdgpu_top
@@ -82,6 +89,7 @@ btop
 ```
 
 ### Useful Keybindings
+
 - `Super+Q`: Open terminal (Kitty)
 - `Super+R`: App launcher (Rofi)
 - `Super+V`: Toggle floating window
@@ -90,6 +98,7 @@ btop
 - `Super+Mouse_Drag`: Move/resize windows
 
 ### Wallpaper Management
+
 ```bash
 # Set wallpaper
 hyprctl dispatch wallpaper /path/to/image
@@ -103,16 +112,19 @@ swww img /path/to/image --transition-type random
 ## 🆘 TROUBLESHOOTING
 
 ### If UI Still Doesn't Appear
+
 1. Check boot log: `journalctl -b -u systemd-logind`
 2. Verify SDDM: `systemctl status sddm.service`
 3. Check GPU: `lsmod | grep amdgpu`
 
 ### If Windows Don't Render
+
 1. Check Hyprland: `journalctl --user -u hyprland`
 2. Verify Wayland: `echo $XDG_SESSION_TYPE`
 3. Test GPU: `glxinfo | grep "OpenGL renderer"`
 
 ### If Performance is Poor
+
 1. Run verification script for recommendations
 2. Check CPU scaling: `cpupower frequency-info`
 3. Monitor thermals: `sensors`
@@ -122,6 +134,7 @@ swww img /path/to/image --transition-type random
 ## 📊 SYSTEM HEALTH
 
 After applying fixes, your system should have:
+
 - ✅ **Bootloader:** systemd-boot (100% functional)
 - ✅ **Display Manager:** SDDM with Wayland support
 - ✅ **Compositor:** Hyprland with Xwayland compatibility
@@ -135,6 +148,7 @@ After applying fixes, your system should have:
 ## 🔄 MAINTENANCE
 
 ### Weekly Commands
+
 ```bash
 # Update packages
 sudo nix flake update && sudo nixos-rebuild switch --flake .
@@ -147,6 +161,7 @@ sudo nix-collect-garbage -d
 ```
 
 ### Monthly Commands
+
 ```bash
 # Deep clean
 sudo nix-collect-garbage
@@ -166,4 +181,4 @@ sudo nixos-rebuild check --flake .
 
 ---
 
-*This guide restores the full graphical desktop environment on evo-x2 with all 2025 best practices implemented.*
+_This guide restores the full graphical desktop environment on evo-x2 with all 2025 best practices implemented._

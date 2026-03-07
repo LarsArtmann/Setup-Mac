@@ -8,27 +8,30 @@ This directory contains comprehensive documentation for network and system monit
 
 ### 📚 Complete Documentation Set
 
-| Document | Purpose | Target Audience |
-|----------|---------|-----------------|
-| **[Netdata Setup Guide](./netdata-setup-guide.md)** | Comprehensive Netdata installation, configuration, and usage | Developers, DevOps |
-| **[ntopng Setup Guide](./ntopng-setup-guide.md)** | Complete ntopng installation, configuration, and network analysis | Network admins, Security |
-| **[Feature Comparison Matrix](./monitoring-comparison-matrix.md)** | Detailed comparison of Netdata vs ntopng capabilities | Decision makers, Architects |
-| **[Troubleshooting Guide](./monitoring-troubleshooting-guide.md)** | Common issues, solutions, and recovery procedures | All users |
-| **[Documentation Index](./monitoring-documentation-index.md)** | This file - navigation and overview | All users |
+| Document                                                           | Purpose                                                           | Target Audience             |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------- |
+| **[Netdata Setup Guide](./netdata-setup-guide.md)**                | Comprehensive Netdata installation, configuration, and usage      | Developers, DevOps          |
+| **[ntopng Setup Guide](./ntopng-setup-guide.md)**                  | Complete ntopng installation, configuration, and network analysis | Network admins, Security    |
+| **[Feature Comparison Matrix](./monitoring-comparison-matrix.md)** | Detailed comparison of Netdata vs ntopng capabilities             | Decision makers, Architects |
+| **[Troubleshooting Guide](./monitoring-troubleshooting-guide.md)** | Common issues, solutions, and recovery procedures                 | All users                   |
+| **[Documentation Index](./monitoring-documentation-index.md)**     | This file - navigation and overview                               | All users                   |
 
 ### 🎯 Quick Reference
 
 #### For System Monitoring (Netdata)
+
 - **Setup**: [Netdata Setup Guide](./netdata-setup-guide.md#quick-start)
 - **Configuration**: [Netdata Setup Guide](./netdata-setup-guide.md#configuration)
 - **Troubleshooting**: [Troubleshooting Guide](./monitoring-troubleshooting-guide.md#netdata-troubleshooting)
 
 #### For Network Analysis (ntopng)
+
 - **Setup**: [ntopng Setup Guide](./ntopng-setup-guide.md#quick-start)
 - **Configuration**: [ntopng Setup Guide](./ntopng-setup-guide.md#configuration)
 - **Troubleshooting**: [Troubleshooting Guide](./monitoring-troubleshooting-guide.md#ntopng-troubleshooting)
 
 #### For Comparison and Planning
+
 - **Tool Selection**: [Comparison Matrix](./monitoring-comparison-matrix.md#quick-recommendation)
 - **Implementation Strategy**: [Comparison Matrix](./monitoring-comparison-matrix.md#practical-implementation-strategy)
 
@@ -85,21 +88,25 @@ just ntopng-start                 # Network monitoring only
 ### Development Scenarios
 
 #### Scenario 1: General Development
+
 - **Tool**: Netdata only
 - **Purpose**: Monitor system resources during compilation, testing
 - **Command**: `just netdata-start`
 
 #### Scenario 2: API Development
+
 - **Tools**: Netdata + ntopng
 - **Purpose**: Monitor system + analyze API traffic patterns
 - **Command**: `just monitor-all`
 
 #### Scenario 3: Security Testing
+
 - **Tool**: ntopng focused
 - **Purpose**: Analyze network traffic for security vulnerabilities
 - **Command**: `sudo ntopng -i en0 --verbose=3`
 
 #### Scenario 4: Performance Debugging
+
 - **Tools**: Both with specific configuration
 - **Purpose**: Correlate system performance with network activity
 - **Command**: Custom configuration per guides
@@ -172,6 +179,7 @@ just ntopng-start                 # Network monitoring only
 ### Version Control Integration
 
 All documentation is version controlled alongside the configuration:
+
 - **Location**: `dotfiles/nix/docs/`
 - **Updates**: Tracked in git with configuration changes
 - **Branching**: Documentation updates follow same branch strategy
@@ -180,11 +188,13 @@ All documentation is version controlled alongside the configuration:
 ## Support and Community
 
 ### Internal Resources
+
 - **CLAUDE.md**: Project-specific monitoring integration
 - **Just Tasks**: Automated monitoring commands
 - **Configuration Files**: Real configuration examples in repository
 
 ### External Resources
+
 - **Netdata**: [Official Documentation](https://docs.netdata.cloud/)
 - **ntopng**: [Official Documentation](https://www.ntop.org/guides/ntopng/)
 - **Nix**: [Package Search](https://search.nixos.org/packages)
@@ -192,6 +202,7 @@ All documentation is version controlled alongside the configuration:
 ## Getting Help
 
 ### Escalation Path
+
 1. **Check Documentation**: Review relevant guide in this directory
 2. **Check Troubleshooting**: Review troubleshooting guide for common issues
 3. **Check Logs**: Use diagnostic commands from troubleshooting guide
@@ -199,7 +210,9 @@ All documentation is version controlled alongside the configuration:
 5. **Test Minimal Setup**: Try basic configuration to isolate issues
 
 ### Debug Information Collection
+
 When reporting issues, collect:
+
 ```bash
 # System information
 uname -a && sw_vers

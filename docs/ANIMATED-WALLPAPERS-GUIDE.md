@@ -5,6 +5,7 @@ This guide provides step-by-step instructions for setting up and managing animat
 ## Overview
 
 This setup uses:
+
 - **swww** (Simple Wayland Wallpaper) - An efficient wallpaper daemon for Wayland that supports animated wallpapers
 - **ImageMagick** - For creating and manipulating wallpaper images
 - **Custom scripts** - For automated wallpaper management
@@ -33,6 +34,7 @@ home.packages = with pkgs; [
 ### 1. Create Wallpaper Directories
 
 The following directory structure is automatically created:
+
 ```
 ~/.config/wallpapers/
 ├── static/      # Regular wallpapers
@@ -43,12 +45,14 @@ The following directory structure is automatically created:
 ### 2. Generate Sample Wallpapers
 
 Sample wallpapers are automatically created on first build:
+
 - Default static wallpaper: A dark gradient
 - Sample animated wallpapers: Red, green, and blue gradients
 
 ### 3. Start the Wallpaper Daemon
 
 The swww daemon is automatically started by Hyprland:
+
 ```bash
 # Manual restart if needed
 swww-daemon &
@@ -62,21 +66,25 @@ sleep 1
 The wallpaper management script provides several options:
 
 1. **Random static wallpaper** (default):
+
    ```bash
    ~/.config/scripts/wallpaper-switcher
    ```
 
 2. **Animated wallpaper**:
+
    ```bash
    ~/.config/scripts/wallpaper-switcher --animate
    ```
 
 3. **Clear wallpaper**:
+
    ```bash
    ~/.config/scripts/wallpaper-switcher --clear
    ```
 
 4. **Cycle through wallpapers**:
+
    ```bash
    ~/.config/scripts/wallpaper-switcher --cycle [delay_seconds]
    ```
@@ -89,6 +97,7 @@ The wallpaper management script provides several options:
 ### Hyprland Keybindings
 
 The following keybindings are configured:
+
 - `Mod + W`: Random static wallpaper
 - `Mod + Shift + W`: Animated wallpaper
 - `Mod + Alt + W`: Clear wallpaper
@@ -98,6 +107,7 @@ The following keybindings are configured:
 ### Static Wallpapers
 
 Simply add image files to:
+
 ```bash
 ~/.config/wallpapers/static/
 ```
@@ -107,6 +117,7 @@ Supported formats: PNG, JPG, JPEG
 ### Animated Wallpapers
 
 For animated effects, add images to:
+
 ```bash
 ~/.config/wallpapers/animated/
 ```
@@ -177,6 +188,7 @@ You can customize transition effects in the wallpaper script:
 ### Multiple Monitor Setup
 
 For multiple monitors, swww automatically handles all connected displays:
+
 ```bash
 # Set different wallpapers per monitor
 swww img wall1.png --outputs eDP-1
@@ -188,6 +200,7 @@ swww img wall2.png --outputs HDMI-A-1
 ### Hyprpaper Integration
 
 If you prefer Hyprpaper for static wallpapers:
+
 1. Both tools can coexist
 2. Use Hyprpaper for default static wallpapers
 3. Use swww for animated wallpapers and transitions
@@ -195,6 +208,7 @@ If you prefer Hyprpaper for static wallpapers:
 ### Systemd Integration
 
 The wallpaper daemon can be managed by systemd:
+
 ```bash
 # Enable auto-start
 systemctl --user enable swww.service
@@ -229,6 +243,7 @@ time swww img wallpaper.png --transition-type any
 ### Cleanup
 
 Remove old wallpapers to save space:
+
 ```bash
 # Clean cache
 swww cache-cleanup
@@ -240,6 +255,7 @@ rm -rf ~/.config/wallpapers/cache/
 ### Updates
 
 Update wallpaper tools with NixOS:
+
 ```bash
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
@@ -247,6 +263,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ## Support
 
 For issues:
+
 1. Check the Hyprland and swwww documentation
 2. Verify NixOS configuration is properly applied
 3. Test with minimal configuration

@@ -23,11 +23,13 @@ Investigated why ActivityWatch's `aw-watcher-window` bucket returns `"url": ""` 
 ### Step 1: Initial Problem Verification
 
 **API Endpoint Tested:**
+
 ```
 GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local/events?limit=10
 ```
 
 **Observed Response (Problematic):**
+
 ```json
 {
   "id": 1726911,
@@ -42,6 +44,7 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
 ```
 
 **Key Observation:**
+
 - `app` field correctly identifies "Google Chrome"
 - `url` field is empty string (`""`) - this is the problem
 - `title` field correctly captures window title
@@ -70,6 +73,7 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
    #poll_time = 1.0
    #strategy_macos = "swift"
    ```
+
    - Default configuration (all values commented out)
    - Uses Swift strategy (default for macOS v0.12+)
 
@@ -78,11 +82,13 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
 **Log File:** `~/.local/share/activitywatch/stdout.log`
 
 **Critical Findings:**
+
 - Multiple timeout errors from `aw-watcher-window-macos` (Swift subprocess)
 - Errors: `Failed to send heartbeat: Error Domain=NSURLErrorDomain Code=-1001`
 - Server restarts detected: `Serving Flask app 'aw-server'` (repeated)
 
 **Interpretation:**
+
 - Window watcher is running but experiencing communication issues
 - Timeouts suggest permission problems accessing window information
 - Server instability may be related to permission state
@@ -91,17 +97,18 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
 
 **All ActivityWatch Buckets Identified:**
 
-| Bucket | Type | Status | URL Capture |
-|--------|------|--------|-------------|
-| `aw-watcher-window_Lars-MacBook-Air.local` | currentwindow | ✅ Running | ❌ Missing |
-| `aw-watcher-afk_Lars-MacBook-Air.local` | afkstatus | ✅ Running | N/A |
-| `aw-watcher-intellij-idea_Lars-MacBook-Air.local` | app.editor.activity | ✅ Running | N/A |
-| `aw-watcher-web-chrome` | web.tab.current | ✅ Running | ✅ YES |
-| `aw-watcher-web-chrome_Lars-MacBook-Air.local` | web.tab.current | ✅ Running | ✅ YES |
-| `aw-watcher-webstorm_Lars-MacBook-Air.local` | app.editor.activity | ✅ Running | N/A |
-| `aw-watcher-input_Lars-MacBook-Air.local` | os.hid.input | ✅ Running | N/A |
+| Bucket                                            | Type                | Status     | URL Capture |
+| ------------------------------------------------- | ------------------- | ---------- | ----------- |
+| `aw-watcher-window_Lars-MacBook-Air.local`        | currentwindow       | ✅ Running | ❌ Missing  |
+| `aw-watcher-afk_Lars-MacBook-Air.local`           | afkstatus           | ✅ Running | N/A         |
+| `aw-watcher-intellij-idea_Lars-MacBook-Air.local` | app.editor.activity | ✅ Running | N/A         |
+| `aw-watcher-web-chrome`                           | web.tab.current     | ✅ Running | ✅ YES      |
+| `aw-watcher-web-chrome_Lars-MacBook-Air.local`    | web.tab.current     | ✅ Running | ✅ YES      |
+| `aw-watcher-webstorm_Lars-MacBook-Air.local`      | app.editor.activity | ✅ Running | N/A         |
+| `aw-watcher-input_Lars-MacBook-Air.local`         | os.hid.input        | ✅ Running | N/A         |
 
 **Alternative Solution Identified:**
+
 - `aw-watcher-web-chrome` bucket captures URLs via browser extension
 - No Accessibility permissions required for browser extension
 - Fully automated, no GUI interaction needed
@@ -113,6 +120,7 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
 ActivityWatch's `aw-watcher-window` on macOS requires **Accessibility permissions** to extract URLs from browser windows. The macOS TCC (Transparency, Consent, and Control) framework restricts programmatic access to window contents for privacy and security.
 
 **How URL Extraction Works:**
+
 1. `aw-watcher-window` uses Apple's Accessibility API
 2. Queries browser windows for their content
 3. Extracts URL from browser's accessibility tree
@@ -120,6 +128,7 @@ ActivityWatch's `aw-watcher-window` on macOS requires **Accessibility permission
 5. With permission: returns actual URL
 
 **Permission Requirements:**
+
 - **Accessibility**: Required for window inspection
 - **Automation**: May be required for System Events access
 - **User Consent**: Must be granted manually through System Settings
@@ -133,6 +142,7 @@ ActivityWatch's `aw-watcher-window` on macOS requires **Accessibility permission
 **File Created:** `dotfiles/activitywatch/fix-permissions.sh`
 
 **Features:**
+
 - Resets ActivityWatch permissions via `tccutil`
 - Opens System Settings to Accessibility page
 - Provides step-by-step instructions
@@ -140,11 +150,13 @@ ActivityWatch's `aw-watcher-window` on macOS requires **Accessibility permission
 - Supports configuration profile installation path
 
 **Usage:**
+
 ```bash
 just activitywatch-fix-permissions
 ```
 
 **Script Content:**
+
 ```bash
 #!/usr/bin/env bash
 set -e
@@ -178,18 +190,21 @@ echo "Done! URL tracking should work now."
 **File Created:** `dotfiles/activitywatch/tcc-profile.mobileconfig`
 
 **Purpose:**
+
 - Pre-configured PPPC (Privacy Preferences Policy Control) payload
 - Can be distributed to multiple machines
 - Reduces manual configuration steps
 - Still requires one-time user approval
 
 **Profile Contents:**
+
 - Payload type: `com.apple.TCC.configuration-profile-policy`
 - Service: Accessibility
 - Identifier: `net.activitywatch.ActivityWatch`
 - Permission: Allowed
 
 **Installation:**
+
 ```bash
 open dotfiles/activitywatch/tcc-profile.mobileconfig
 # Click "Install" in System Settings
@@ -200,6 +215,7 @@ open dotfiles/activitywatch/tcc-profile.mobileconfig
 **File Modified:** `justfile`
 
 **New Command Added:**
+
 ```just
 # Fix ActivityWatch permissions (macOS Accessibility)
 activitywatch-fix-permissions:
@@ -208,6 +224,7 @@ activitywatch-fix-permissions:
 ```
 
 **Full ActivityWatch Command Set:**
+
 ```bash
 just activitywatch-start           # Start ActivityWatch
 just activitywatch-stop            # Stop ActivityWatch
@@ -219,6 +236,7 @@ just activitywatch-fix-permissions # Fix permissions (NEW)
 **Existing Solution:** `aw-watcher-web-chrome`
 
 **Advantages:**
+
 - ✅ No Accessibility permissions required
 - ✅ No GUI interaction needed
 - ✅ Fully automated via Nix
@@ -226,6 +244,7 @@ just activitywatch-fix-permissions # Fix permissions (NEW)
 - ✅ Works in all browsers (Chrome, Firefox, Safari)
 
 **Verification:**
+
 ```bash
 open "http://localhost:5600/api/0/buckets/aw-watcher-web-chrome_Lars-MacBook-Air.local/events?limit=10"
 ```
@@ -237,30 +256,33 @@ open "http://localhost:5600/api/0/buckets/aw-watcher-web-chrome_Lars-MacBook-Air
 ### macOS Security Constraints
 
 **Cannot Be Automated:**
+
 - TCC permissions require explicit user consent
 - No CLI-only method to grant Accessibility permissions
 - Configuration profiles still require manual approval
 - Apple's security model prevents programmatic permission grants
 
 **Why Nix Cannot Help:**
+
 - nix-darwin has no TCC configuration options
 - No `system.defaults` for Accessibility permissions
-- No security.* options for Privacy settings
+- No security.\* options for Privacy settings
 - macOS architecture explicitly blocks this
 
 **Official Apple Position:**
+
 - PPPC payloads require MDM (Mobile Device Management) for full automation
 - Individual users must manually approve privacy-sensitive permissions
 - Security > Convenience by design
 
 ### Comparison with Other Platforms
 
-| Platform | URL Tracking | Permissions | Automatable |
-|----------|--------------|-------------|-------------|
-| **macOS** | Accessibility required | Manual GUI | ❌ No |
-| **NixOS** | Direct window access | None needed | ✅ Yes |
-| **Linux** | X11/Wayland protocols | None needed | ✅ Yes |
-| **Windows** | Win32 API | UAC prompt | ⚠️ Partial |
+| Platform    | URL Tracking           | Permissions | Automatable |
+| ----------- | ---------------------- | ----------- | ----------- |
+| **macOS**   | Accessibility required | Manual GUI  | ❌ No       |
+| **NixOS**   | Direct window access   | None needed | ✅ Yes      |
+| **Linux**   | X11/Wayland protocols  | None needed | ✅ Yes      |
+| **Windows** | Win32 API              | UAC prompt  | ⚠️ Partial  |
 
 ---
 
@@ -337,19 +359,23 @@ dotfiles/activitywatch/
 ### For Immediate Use
 
 **Option A: Use Browser Extension (Recommended)**
+
 ```bash
 # Already running, fully automated
 open "http://localhost:5600/api/0/buckets/aw-watcher-web-chrome_Lars-MacBook-Air.local/events?limit=10"
 ```
+
 - Zero configuration
 - No permissions needed
 - Most reliable URL capture
 
 **Option B: Fix Window Watcher Permissions**
+
 ```bash
 # One-time GUI interaction required
 just activitywatch-fix-permissions
 ```
+
 - Captures all application URLs
 - Requires manual permission grant
 - More comprehensive tracking
@@ -357,12 +383,14 @@ just activitywatch-fix-permissions
 ### For Future Setup
 
 **New Machine Installation:**
+
 1. Run `just setup` (existing automation)
 2. Run `just activitywatch-fix-permissions` (permission helper)
 3. Grant Accessibility permission in GUI
 4. Done - URL tracking works
 
 **Configuration Profile Deployment:**
+
 1. Distribute `tcc-profile.mobileconfig` to team
 2. Each user installs profile manually
 3. Single approval covers all permissions
@@ -399,15 +427,15 @@ just activitywatch-fix-permissions
 
 ## 📈 Metrics
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| **Investigation Time** | ~45 minutes | ✅ Complete |
-| **Root Cause Found** | Yes | ✅ Accessibility permissions |
-| **Solutions Implemented** | 4 | ✅ All working |
-| **Files Created** | 2 | ✅ Documented |
-| **Files Modified** | 1 | ✅ Minimal impact |
-| **GUI Required** | Yes | 🚧 macOS limitation |
-| **Browser Extension** | Working | ✅ Zero-touch |
+| Metric                    | Value       | Status                       |
+| ------------------------- | ----------- | ---------------------------- |
+| **Investigation Time**    | ~45 minutes | ✅ Complete                  |
+| **Root Cause Found**      | Yes         | ✅ Accessibility permissions |
+| **Solutions Implemented** | 4           | ✅ All working               |
+| **Files Created**         | 2           | ✅ Documented                |
+| **Files Modified**        | 1           | ✅ Minimal impact            |
+| **GUI Required**          | Yes         | 🚧 macOS limitation          |
+| **Browser Extension**     | Working     | ✅ Zero-touch                |
 
 ---
 
@@ -416,12 +444,14 @@ just activitywatch-fix-permissions
 **Investigation Status:** ✅ COMPLETE
 
 **Summary:**
+
 - Root cause identified: Missing macOS Accessibility permissions
 - Solutions implemented: Helper script, TCC profile, Just command
 - Limitations documented: macOS security requires GUI interaction
 - Alternative provided: Browser extension (fully automated)
 
 **Next Steps:**
+
 1. Run `just activitywatch-fix-permissions` to grant permissions
 2. Or use `aw-watcher-web-chrome` bucket for URL tracking
 3. No further action required

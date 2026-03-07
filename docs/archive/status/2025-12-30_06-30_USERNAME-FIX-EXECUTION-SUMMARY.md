@@ -10,6 +10,7 @@
 Home Manager was failing to activate because it was configured for user `lars`, but the macOS system username is `larsartmann`.
 
 **Error:**
+
 ```
 Activating home-manager configuration for lars
 id: 'lars': no such user: Invalid argument
@@ -41,11 +42,13 @@ id: 'lars': no such user: Invalid argument
 ### Verification
 
 **Build Command:**
+
 ```bash
 darwin-rebuild build --flake . --show-trace
 ```
 
 **Build Result:**
+
 - Exit Code: 0 ✅
 - Activation Script: `/nix/store/.../activation-larsartmann.drv` ✅
 - System Build: `/nix/store/.../darwin-system-26.05.f0c8e1f` ✅
@@ -64,31 +67,37 @@ darwin-rebuild build --flake . --show-trace
 ## User Action Required
 
 ### Step 1: Activate New Configuration
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake .
 ```
 
 ### Step 2: Open New Terminal
+
 **IMPORTANT:** Shell changes require new terminal session
+
 - Press `Cmd+N` in Terminal
 - Or quit and reopen Terminal
 
 ### Step 3: Verify Activation
 
 **Check System Generation:**
+
 ```bash
 ls -lt /nix/var/nix/profiles/system-* | head -3
 # Should show generation 207+
 ```
 
 **Check Home Manager:**
+
 ```bash
 ls -lt ~/.local/state/nix/profiles/home-manager* | head -3
 # Should show new generation
 ```
 
 **Verify Fish Shell:**
+
 ```bash
 # Open new terminal first!
 type nixup
@@ -96,6 +105,7 @@ type nixup
 ```
 
 **Verify Starship Prompt:**
+
 ```bash
 # Should see colorful Starship prompt (not default Fish prompt)
 ```
@@ -145,4 +155,4 @@ type nixup
 
 ---
 
-*Execution summary generated: 2025-12-30 06:26:00 CET*
+_Execution summary generated: 2025-12-30 06:26:00 CET_

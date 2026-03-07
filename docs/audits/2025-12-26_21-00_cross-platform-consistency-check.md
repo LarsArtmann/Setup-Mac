@@ -19,6 +19,7 @@
 ## 🎯 Platform Architecture Overview
 
 ### Shared Components (Common)
+
 ```
 platforms/common/
 ├── packages/
@@ -35,6 +36,7 @@ platforms/common/
 ```
 
 ### Darwin-Specific Components
+
 ```
 platforms/darwin/
 ├── default.nix (main entry point)
@@ -49,6 +51,7 @@ platforms/darwin/
 ```
 
 ### NixOS-Specific Components
+
 ```
 platforms/nixos/
 ├── system/configuration.nix (main system config)
@@ -80,6 +83,7 @@ platforms/nixos/
 **Severity:** Medium
 
 **Platform 1: Common Environment Variables**
+
 ```nix
 # platforms/common/environment/variables.nix
 commonEnvVars = {
@@ -92,6 +96,7 @@ commonEnvVars = {
 ```
 
 **Platform 2: Home Manager Base**
+
 ```nix
 # platforms/common/home-base.nix
 home = {
@@ -103,17 +108,20 @@ home = {
 ```
 
 **Issue:** Two different locale settings in the same codebase
+
 - Common environment: British English (en_GB)
 - Home Manager: American English (en_US)
 
 **Impact:** Confusing locale settings, potential date/time formatting differences
 
 **Recommendation:** Standardize on one locale
+
 - **Option A:** Use en_GB throughout (consistent with common/env)
 - **Option B:** Use en_US throughout (standard US locale)
 - **Option C:** Make locale configurable (most flexible)
 
 **My Recommendation:** Option B - Use en_US.UTF-8 throughout
+
 - US locale is more common and compatible
 - Fewer date/time formatting issues
 - Consistent with most development environments
@@ -128,12 +136,14 @@ home = {
 **Severity:** Low
 
 **Darwin:**
+
 ```nix
 # platforms/common/environment/variables.nix
 environment.shells = with pkgs; [fish zsh bash];
 ```
 
 **NixOS:**
+
 ```nix
 # platforms/nixos/system/configuration.nix
 programs.fish.enable = true;  # Only fish enabled system-wide
@@ -143,16 +153,19 @@ programs.fish.enable = true;  # Only fish enabled system-wide
 ```
 
 **Issue:** Inconsistent shell availability configuration
+
 - Darwin: All three shells (fish, zsh, bash) available system-wide
 - NixOS: Only fish enabled system-wide (but all available via Home Manager)
 
 **Impact:** Minor - shells still available, just configured differently
 
 **Recommendation:** Ensure consistent shell availability
+
 - Either enable all shells system-wide on NixOS
 - Or remove system-wide shell config on Darwin (use Home Manager only)
 
 **My Recommendation:** Use Home Manager for all shell configuration
+
 - Remove `environment.shells` from common/variables.nix
 - Configure shells per-user via Home Manager
 - More consistent approach across platforms
@@ -167,22 +180,26 @@ programs.fish.enable = true;  # Only fish enabled system-wide
 **Severity:** Low
 
 **Common Environment:**
+
 ```nix
 # platforms/common/environment/variables.nix
 EDITOR = "nano";
 ```
 
 **Darwin Environment:**
+
 ```nix
 # platforms/darwin/environment.nix (none - uses common)
 ```
 
 **NixOS User Config:**
+
 ```nix
 # platforms/nixos/users/home.nix (none - uses home-base)
 ```
 
 **Available Editors:**
+
 ```nix
 # platforms/common/packages/base.nix
 essentialPackages = with pkgs; [
@@ -192,6 +209,7 @@ essentialPackages = with pkgs; [
 ```
 
 **Issue:** EDITOR set to nano, but nano is NOT in packages!
+
 - vim and micro-full are installed
 - nano is not in any package list
 - EDITOR variable points to non-existent editor
@@ -199,6 +217,7 @@ essentialPackages = with pkgs; [
 **Impact:** Medium - editor commands will fail
 
 **Verification:**
+
 ```bash
 $ grep -r "nano" platforms/common/packages/*.nix
 # No results - nano not in packages!
@@ -207,6 +226,7 @@ $ grep -r "nano" platforms/common/packages/*.nix
 **Recommendation:** Either install nano or change EDITOR to vim/micro
 
 **Option A:** Install nano
+
 ```nix
 # Add to platforms/common/packages/base.nix
 essentialPackages = with pkgs; [
@@ -218,6 +238,7 @@ essentialPackages = with pkgs; [
 ```
 
 **Option B:** Change EDITOR to micro (more modern than nano)
+
 ```nix
 # Change in platforms/common/environment/variables.nix
 commonEnvVars = {
@@ -227,6 +248,7 @@ commonEnvVars = {
 ```
 
 **Option C:** Change EDITOR to vim (most widely used)
+
 ```nix
 # Change in platforms/common/environment/variables.nix
 commonEnvVars = {
@@ -236,6 +258,7 @@ commonEnvVars = {
 ```
 
 **My Recommendation:** Option B - Use micro
+
 - micro-full is already installed
 - More modern than nano
 - Better terminal experience
@@ -253,6 +276,7 @@ commonEnvVars = {
 **Severity:** Low
 
 **Darwin Environment:**
+
 ```nix
 # platforms/darwin/environment.nix
 environment.variables = {
@@ -261,6 +285,7 @@ environment.variables = {
 ```
 
 **NixOS Configuration:**
+
 ```nix
 # platforms/nixos/system/configuration.nix
 users.users.lars.packages = with pkgs; [
@@ -274,11 +299,13 @@ bind = [
 ```
 
 **Issue:** Different browsers preferred on each platform
+
 - Darwin: Chrome (google-chrome)
 - NixOS: Firefox
 - Both platforms have Chrome installed (Darwin via base.nix, NixOS not)
 
 **Available Browsers:**
+
 ```nix
 # platforms/common/packages/base.nix
 guiPackages = with pkgs; [
@@ -294,18 +321,22 @@ google-chrome  # Only on Darwin (conditional)
 **Recommendation:** Standardize on one browser or make explicit platform choice
 
 **Option A:** Use Chrome on both platforms
+
 - Add Chrome to NixOS packages
 - Change NixOS keybinding to Chrome
 
 **Option B:** Use Firefox on both platforms
+
 - Remove Chrome from Darwin (or make optional)
 - Keep Firefox on NixOS
 
 **Option C:** Use Helium on both platforms
+
 - Remove Chrome/Firefox preference
 - Use Helium everywhere
 
 **My Recommendation:** Option A - Use Chrome on both platforms
+
 - Chrome is already installed on Darwin
 - Better developer tools
 - Add Chrome to NixOS user packages
@@ -321,6 +352,7 @@ google-chrome  # Only on Darwin (conditional)
 **Severity:** Low
 
 **Darwin Environment:**
+
 ```nix
 # platforms/darwin/environment.nix
 environment.variables = {
@@ -329,6 +361,7 @@ environment.variables = {
 ```
 
 **NixOS Configuration:**
+
 ```nix
 # platforms/common/packages/base.nix
 essentialPackages = with pkgs; [
@@ -343,6 +376,7 @@ settings = {
 ```
 
 **Darwin Packages:**
+
 ```nix
 # platforms/darwin/environment.nix
 environment.systemPackages = with pkgs; [
@@ -351,6 +385,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 **NixOS Packages:**
+
 ```nix
 # platforms/nixos/desktop/hyprland.nix
 home.packages = with pkgs; [
@@ -360,6 +395,7 @@ home.packages = with pkgs; [
 ```
 
 **Issue:** Multiple terminal emulators with inconsistent preferences
+
 - Darwin: iTerm2 preferred (variable), alacritty installed (base)
 - NixOS: kitty preferred (binding), ghostty installed (home)
 
@@ -368,19 +404,23 @@ home.packages = with pkgs; [
 **Recommendation:** Standardize on one terminal emulator per platform or make explicit choice
 
 **Option A:** Use kitty on both platforms (modern, fast)
+
 - Remove iTerm2 from Darwin
 - Use kitty everywhere
 
 **Option B:** Use alacritty on both platforms (already in base)
+
 - Keep iTerm2 optional for Darwin
 - Use alacritty everywhere
 
 **Option C:** Platform-specific choices (current approach, documented)
+
 - Keep Darwin: iTerm2 + alacritty
 - Keep NixOS: kitty + ghostty
 - Add documentation explaining choices
 
 **My Recommendation:** Option C - Document platform-specific choices
+
 - Different terminals make sense for different platforms
 - iTerm2 is best-in-class on macOS
 - kitty/gpotty are excellent on Linux
@@ -394,6 +434,7 @@ home.packages = with pkgs; [
 ## 📊 Package Distribution Analysis
 
 ### Cross-Platform Packages (base.nix)
+
 ```
 Essential: 39 packages
   - Version control: git, git-town
@@ -428,6 +469,7 @@ AI: 0-1 packages
 ```
 
 ### Darwin-Only Packages
+
 ```
 platforms/darwin/environment.nix:
   - iterm2
@@ -436,6 +478,7 @@ Total: 1 package
 ```
 
 ### NixOS-Only Packages
+
 ```
 platforms/nixos/system/configuration.nix:
   - firefox
@@ -480,11 +523,13 @@ Total NixOS-only: ~73 packages
 ```
 
 ### Package Ratio
+
 - **Cross-Platform:** 57-59 packages (~44%)
 - **Darwin-Only:** 1 package (~0.8%)
 - **NixOS-Only:** 73 packages (~56%)
 
 **Analysis:** Good separation of concerns
+
 - Darwin is lightweight (mostly cross-platform)
 - NixOS has extensive desktop environment
 - Minimal duplication across platforms
@@ -494,21 +539,25 @@ Total NixOS-only: ~73 packages
 ## ✅ What's Working Well
 
 ### 1. Package Organization
+
 - ✅ Clear separation between cross-platform and platform-specific
 - ✅ Shared base.nix for common tools
 - ✅ Platform-specific modules isolated
 
 ### 2. Configuration Architecture
+
 - ✅ Common environment variables shared
 - ✅ Platform-specific variables isolated
 - ✅ Home Manager used for user-level config
 
 ### 3. Declarative Approach
+
 - ✅ All packages explicitly declared
 - ✅ No manual installation required
 - ✅ Reproducible configurations
 
 ### 4. Modularity
+
 - ✅ Desktop environment split into focused modules
 - ✅ Hardware configurations isolated
 - ✅ Security, monitoring, AI modules separated
@@ -553,11 +602,13 @@ Total NixOS-only: ~73 packages
 ### After Fixing High Priority Issues
 
 **Before:**
+
 - Locale inconsistency (en_GB vs en_US)
 - EDITOR points to non-existent nano
 - Potential confusion for users
 
 **After:**
+
 - Consistent locale across platforms
 - EDITOR works correctly
 - Clearer user experience
@@ -568,11 +619,13 @@ Total NixOS-only: ~73 packages
 ### After Fixing All Issues
 
 **Before:**
+
 - 3 confirmed inconsistencies
 - 2 potential inconsistencies
 - Some confusion in documentation
 
 **After:**
+
 - 0 confirmed inconsistencies
 - Documented platform choices
 - Clear, consistent user experience
@@ -599,7 +652,7 @@ Total NixOS-only: ~73 packages
 
 ---
 
-*Report completed: 2025-12-26 21:00 CET*
-*Total time: ~30 minutes*
-*Status: ✅ READY FOR ACTION*
-*Priority Actions: 2 (7 minutes)*
+_Report completed: 2025-12-26 21:00 CET_
+_Total time: ~30 minutes_
+_Status: ✅ READY FOR ACTION_
+_Priority Actions: 2 (7 minutes)_

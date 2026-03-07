@@ -8,6 +8,7 @@
 This analysis identifies multiple areas where the codebase is **fighting Nix** instead of leveraging it. The codebase mixes declarative Nix configuration with imperative shell scripts, manual file linking, and external package management, which undermines Nix's core benefits of reproducibility, immutability, and declarative configuration.
 
 **Key Findings:**
+
 - 🚨 **Critical**: Manual dotfiles management bypassing Home Manager
 - 🚨 **Critical**: Imperative LaunchAgent setup instead of nix-darwin module
 - ⚠️ **High**: Homebrew packages that should be in Nix
@@ -24,6 +25,7 @@ This analysis identifies multiple areas where the codebase is **fighting Nix** i
 **Location:** `scripts/manual-linking.sh`
 
 **Problem:**
+
 ```bash
 # ❌ Manual symlink creation with bash
 verified_link "$CURRENT_DIR/dotfiles/.ssh/config" ~/.ssh/config
@@ -34,12 +36,14 @@ verified_link "$CURRENT_DIR/dotfiles/.config/starship.toml" ~/.config/starship.t
 ```
 
 **Why This Is Fighting Nix:**
+
 - Nix/ Home Manager has built-in `home.file` and `home.xdg.configFile` for this exact purpose
 - Manual linking is fragile, error-prone, and not reproducible
 - Breaks atomic updates and rollback capabilities
 - Mixes imperative and declarative paradigms
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Declarative file management via Home Manager
 {
@@ -60,6 +64,7 @@ verified_link "$CURRENT_DIR/dotfiles/.config/starship.toml" ~/.config/starship.t
 ```
 
 **Impact:**
+
 - **Reproducibility**: ❌ Manual linking varies per system
 - **Atomic Updates**: ❌ Symlinks can be broken during updates
 - **Rollback**: ❌ No rollback capability for manual changes
@@ -72,6 +77,7 @@ verified_link "$CURRENT_DIR/dotfiles/.config/starship.toml" ~/.config/starship.t
 **Location:** `scripts/nix-activitywatch-setup.sh`
 
 **Problem:**
+
 ```bash
 # ❌ Imperative LaunchAgent creation
 cat > "$LAUNCH_AGENT_PLIST" << 'EOF'
@@ -90,12 +96,14 @@ launchctl load -w "$LAUNCH_AGENT_PLIST" 2>/dev/null
 ```
 
 **Why This Is Fighting Nix:**
+
 - nix-darwin has native `launchd.agents` module for declarative service management
 - Manual creation bypasses Nix's activation system
 - Breaks atomic updates and rollback
 - Creates imperative state outside Nix's control
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Declarative LaunchAgent management
 {
@@ -119,6 +127,7 @@ launchctl load -w "$LAUNCH_AGENT_PLIST" 2>/dev/null
 ```
 
 **Impact:**
+
 - **Declarative**: ❌ Manual script vs ✅ Nix module
 - **Reproducible**: ❌ System-specific vs ✅ Nix-controlled
 - **Atomic**: ❌ Manual load/unload vs ✅ Nix activation
@@ -131,6 +140,7 @@ launchctl load -w "$LAUNCH_AGENT_PLIST" 2>/dev/null
 **Location:** Multiple scripts
 
 **Problem:**
+
 ```bash
 # ❌ Hardcoded paths
 ACTIVITYWATCH_APP="/Applications/ActivityWatch.app"
@@ -138,11 +148,13 @@ ACTIVITYWATCH_APP="/Applications/ActivityWatch.app"
 ```
 
 **Why This Is Fighting Nix:**
+
 - Nix packages have store paths like `/nix/store/...-package-name`
 - Hardcoded paths break if packages change or update
 - Not reproducible across systems
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Nix store paths are automatically resolved
 {
@@ -167,6 +179,7 @@ ACTIVITYWATCH_APP="/Applications/ActivityWatch.app"
 **Location:** `scripts/manual-linking.sh`
 
 **Problem:**
+
 ```bash
 # ❌ Same config linked to two locations
 verified_link "$CURRENT_DIR/dotfiles/.config/nushell/aliases.nu" ~/.config/nushell/aliases.nu
@@ -174,11 +187,13 @@ verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" "$HOME/Library/A
 ```
 
 **Why This Is Fighting Nix:**
+
 - Nushell looks in both locations - only need one
 - Redundant configuration management
 - Home Manager can handle this correctly
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Single source of truth
 {
@@ -200,6 +215,7 @@ verified_link "$CURRENT_DIR/dotfiles/.config/nushell/config.nu" "$HOME/Library/A
 **Location:** `scripts/manual-linking.sh`
 
 **Problem:**
+
 ```bash
 # ❌ Manual linking to /etc/nix-darwin/
 verified_link "$CURRENT_DIR/dotfiles/nix/core.nix" /etc/nix-darwin/core.nix
@@ -207,11 +223,13 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 ```
 
 **Why This Is Fighting Nix:**
+
 - These should be imported as Nix modules, not symlinked
 - Bypasses nix-darwin's module system
 - Manual file management vs declarative imports
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Proper module imports
 {
@@ -230,17 +248,20 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 **Location:** `scripts/setup-animated-wallpapers.sh`, `scripts/activitywatch-config.sh`, etc.
 
 **Problem:**
+
 - Multiple imperative scripts doing configuration
 - Scripts can fail midway, leaving system in inconsistent state
 - No rollback capability
 - Not tracked in Nix store
 
 **Why This Is Fighting Nix:**
+
 - Nix activation scripts are the proper place for setup
 - Nix ensures atomic updates
 - Nix tracks all state changes
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Declarative activation scripts
 {
@@ -259,17 +280,20 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 **Location:** Multiple files
 
 **Problem:**
+
 - Variables defined in multiple locations
 - No single source of truth
 - Hard to maintain consistency
 
 **Locations:**
+
 - `platforms/darwin/environment.nix`
 - `platforms/common/environment/variables.nix`
 - `platforms/common/home-base.nix`
 - Shell init files in `dotfiles/`
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Centralized environment variables
 {
@@ -294,16 +318,19 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 **Location:** `platforms/common/core/WrapperTemplate.nix`
 
 **Problem:**
+
 - Complex wrapper system with custom types
 - Reinventing Nix's `makeWrapper`
 - 165 lines for functionality Nix provides natively
 
 **Why This Is Fighting Nix:**
+
 - Nix has built-in `pkgs.makeWrapper` for this
 - Custom implementation adds complexity
 - Native solution is better tested
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Use native makeWrapper
 {
@@ -326,11 +353,13 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 **Location:** `justfile` and implicit usage
 
 **Problem:**
+
 - ActivityWatch managed via Homebrew instead of Nix
 - GUI applications using Homebrew instead of Nix
 - Breaks Nix's reproducibility guarantees
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Use Nix packages instead
 {
@@ -348,17 +377,20 @@ verified_link "$CURRENT_DIR/dotfiles/nix/environment.nix" /etc/nix-darwin/enviro
 **Location:** `justfile` Go tool recipes
 
 **Problem:**
+
 ```bash
 # ❌ Manual Go tool installation
 go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 ```
 
 **Why This Is Fighting Nix:**
+
 - Not reproducible (version changes with @latest)
 - No rollback capability
 - Not tracked in Nix store
 
 **Leveraging Nix Solution:**
+
 ```nix
 # ✅ Declarative Go tools via Nix
 {
@@ -380,6 +412,7 @@ go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 **Location:** `justfile` clean recipes
 
 **Problem:**
+
 ```bash
 # ❌ Manual cleanup
 brew autoremove
@@ -389,11 +422,13 @@ rm -rf ~/.gradle/caches/*
 ```
 
 **Why This Is Fighting Nix:**
+
 - Nix has built-in garbage collection
 - Manual cleanup is fragile
 - Not atomic or reproducible
 
 **Leveraging Nix Solution:**
+
 ```bash
 # ✅ Use Nix's garbage collection
 nix-collect-garbage -d
@@ -409,11 +444,13 @@ nix-store --optimize
 **Location:** `justfile`
 
 **Problem:**
+
 - 1000+ lines of task runner
 - Many recipes duplicate Nix functionality
 - Adds maintenance burden
 
 **Consideration:**
+
 - Keep Just for developer convenience
 - Simplify by leveraging Nix more
 - Use `nix run` patterns
@@ -423,6 +460,7 @@ nix-store --optimize
 ## Migration Plan
 
 ### Phase 1: Critical Fixes (Week 1)
+
 1. **Migrate dotfiles to Home Manager**
    - Move all dotfiles to `home.file` or `home.xdg.configFile`
    - Remove `manual-linking.sh`
@@ -439,6 +477,7 @@ nix-store --optimize
    - Use `home.sessionVariables` user-level
 
 ### Phase 2: High Priority (Week 2)
+
 4. **Remove hardcoded paths**
    - Replace all hardcoded `/Applications/` with Nix packages
    - Use Nix store paths consistently
@@ -454,6 +493,7 @@ nix-store --optimize
    - Ensure atomic updates
 
 ### Phase 3: Medium Priority (Week 3)
+
 7. **Simplify wrapper system**
    - Evaluate if custom wrappers are needed
    - Replace with native `makeWrapper` where possible
@@ -465,6 +505,7 @@ nix-store --optimize
    - Remove manual Go tool management
 
 ### Phase 4: Documentation & Cleanup (Week 4)
+
 9. **Update documentation**
    - Remove references to bash scripts
    - Document Nix-way of doing things
@@ -480,12 +521,14 @@ nix-store --optimize
 ## Benefits of Migration
 
 ### Immediate Benefits
+
 - **Reproducibility**: All configuration declarative and tracked
 - **Atomic Updates**: Changes applied atomically or rolled back entirely
 - **Simplified Maintenance**: Single source of truth for configuration
 - **Better Testing**: Config can be tested without applying
 
 ### Long-term Benefits
+
 - **Reduced Technical Debt**: Less code to maintain
 - **Improved Security**: All packages built from Nix store
 - **Easier Onboarding**: Clear declarative configuration
@@ -496,14 +539,17 @@ nix-store --optimize
 ## Risk Assessment
 
 ### Low Risk
+
 - Environment variable consolidation
 - Go tool migration (Nix has all major tools)
 
 ### Medium Risk
+
 - Homebrew to Nix migration (some GUI apps may not be available)
 - Dotfiles to Home Manager (need thorough testing)
 
 ### High Risk
+
 - LaunchAgent migration (critical services must remain functional)
 - Removing manual linking (must ensure all files migrated first)
 
@@ -557,11 +603,13 @@ None currently - both critical fixes completed and verified.
 **📋 Pending (from original report):**
 
 **Critical (P0):**
+
 - ✅ Manual dotfiles linking - `scripts/manual-linking.sh` NOT FOUND (already removed)
 - ✅ LaunchAgent bash script - `scripts/nix-activitywatch-setup.sh` NOT FOUND (already removed)
 - ✅ Hardcoded system paths in multiple scripts - AUDITED: Acceptable (see findings below)
 
 **High Priority (P1):**
+
 - ⏳ Homebrew packages that should be in Nix - NOT APPLICABLE: Homebrew not installed
 - ✅ Complex bash scripts duplicating Nix capabilities - AUDITED: All acceptable (see findings below)
 - ✅ Scattered environment variable configuration - FIXED: Locale now consistent (en_US.UTF-8)
@@ -571,6 +619,7 @@ None currently - both critical fixes completed and verified.
 **Scripts Reviewed:** 40+ scripts in `scripts/` directory
 
 **Categories:**
+
 1. **Monitoring & Benchmarking** (acceptable):
    - `health-check.sh`, `benchmark-system.sh`, `performance-monitor.sh`, etc.
    - These are development tools, not system configuration
@@ -591,6 +640,7 @@ None currently - both critical fixes completed and verified.
    - `spotlight-privacy-setup.sh` - macOS privacy settings (one-time)
 
 **Hardcoded Paths Audit:**
+
 - `/Applications/Safari.app` - Existence check in `ublock-origin-setup.sh` (acceptable)
 - `/Applications/Google Chrome.app` - Existence check in `ublock-origin-setup.sh` (acceptable)
 - `/Applications/Sublime Text.app` - CLI symlink in `sublime-text-sync.sh` (acceptable - one-time)
@@ -600,6 +650,7 @@ None currently - both critical fixes completed and verified.
 None are fighting Nix by duplicating system configuration capabilities.
 
 **Completed Immediate Actions:**
+
 1. ✅ Run `just switch` to apply LaunchAgent and locale fixes
 2. ✅ Test ActivityWatch auto-start after switch - Verified running (PID 71939)
 3. ✅ Fix binary path from `ActivityWatch` → `aw-qt`
@@ -669,16 +720,19 @@ None are fighting Nix by duplicating system configuration capabilities.
 ### 📊 Overall Phase 1 Metrics
 
 **Anti-Patterns Addressed:** 6/6 (100%)
+
 - Critical (P0): 3/3 ✅
 - High Priority (P1): 3/3 ✅
 
 **Files Modified:**
+
 - `platforms/darwin/services/launchagents.nix` - Fixed API and binary path
 - `platforms/common/environment/variables.nix` - Fixed locale
 - `platforms/darwin/environment.nix` - Enhanced documentation
 - `docs/architecture/NIX-ANTI-PATTERNS-ANALYSIS.md` - Updated progress
 
 **Configuration Applied:** ✅
+
 - `just test` - Syntax check passed
 - `just switch` - Successfully applied
 - LaunchAgent - Loaded and running
@@ -687,12 +741,14 @@ None are fighting Nix by duplicating system configuration capabilities.
 ### 🎯 Architecture Improvements
 
 **Before Phase 1:**
+
 - ⚠️ Manual LaunchAgent setup (imperative bash script)
 - ⚠️ Locale inconsistency (en_GB vs en_US)
 - ⚠️ Scattered environment variables (multiple sources)
 - ⚠️ Unclear anti-patterns status
 
 **After Phase 1:**
+
 - ✅ Declarative LaunchAgent (Nix-managed service)
 - ✅ Consistent locale (en_US.UTF-8 across all configs)
 - ✅ Centralized environment variables (single source of truth)
@@ -702,20 +758,24 @@ None are fighting Nix by duplicating system configuration capabilities.
 ### 🚀 Benefits Realized
 
 **Reproducibility:**
+
 - ✅ LaunchAgent auto-starts ActivityWatch on login (declarative)
 - ✅ Environment variables consistent across all platforms
 - ✅ No manual setup scripts required
 
 **Atomic Updates:**
+
 - ✅ LaunchAgent configuration managed by Nix (rollback capable)
 - ✅ Locale settings applied atomically via `just switch`
 
 **Simplified Maintenance:**
+
 - ✅ Single source of truth for environment variables
 - ✅ All system configuration in Nix files
 - ✅ No manual scripts to maintain (all acceptable utilities)
 
 **Better Testing:**
+
 - ✅ Configuration validated before applying (`just test-fast`)
 - ✅ LaunchAgent tested and verified operational
 - ✅ Locale consistency verified
@@ -725,6 +785,7 @@ None are fighting Nix by duplicating system configuration capabilities.
 Since all Phase 1 (Critical) issues are resolved and Phase 2 (High Priority) issues were found to be not applicable or already acceptable, the anti-patterns remediation is **complete** for this codebase.
 
 **Outstanding Work (Optional):**
+
 1. **Migrate GUI applications to Nix** (effort: high, benefit: medium)
    - Homebrew not installed (good!)
    - GUI apps can be migrated to Nix if desired

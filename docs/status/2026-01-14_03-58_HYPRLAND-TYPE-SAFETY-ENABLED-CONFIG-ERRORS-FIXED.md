@@ -13,6 +13,7 @@
 Successfully resolved 2 Hyprland configuration errors and enabled comprehensive type safety validation for Hyprland configuration. The type safety system now catches configuration errors at **build time** instead of **runtime**, preventing broken configurations from being deployed to production systems.
 
 **Key Accomplishments:**
+
 - ✅ Fixed 2 Hyprland config errors (non-existent file, duplicate keybinding)
 - ✅ Enabled HyprlandTypes.nix import and integration
 - ✅ Added build-time validation assertions
@@ -21,6 +22,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 - ✅ Updated TODO registry (Hyprland type safety marked as completed)
 
 **Project Health Update:**
+
 - **Overall Status:** 88% EXCELLENT (↑ from 85%)
 - **Type Safety Score:** 98% (↑ from 90%)
 - **Testing Score:** 40% (unchanged - still needs automation)
@@ -31,11 +33,13 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 ## 🎯 Problem Statement
 
 ### User Report
+
 **Question:** "Why does hyprland show me 2 config errors I though we are type safe now?"
 
 ### Root Causes Identified
 
 **1. Config Error #1: Non-existent file reference**
+
 - **Location:** `hyprland.nix:151`
 - **Issue:** Startup command tried to open `~/.config/hypr/hyprland.conf` with nvim
 - **Problem:** This file doesn't exist in Nix-based setup (config is managed by Home Manager)
@@ -43,6 +47,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 - **Error Message:** Hyprland would fail to open non-existent config file
 
 **2. Config Error #2: Duplicate keybinding**
+
 - **Location:** `hyprland.nix:164,242`
 - **Issue:** Two keybindings for `$mod, V`
   - Line 164: `$mod, V, togglefloating` (correct)
@@ -52,6 +57,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 - **Error Message:** Hyprland would reject config with duplicate bindings
 
 **3. Type Safety Disabled**
+
 - **Location:** `hyprland.nix:1-4`
 - **Issue:** HyprlandTypes.nix existed but wasn't imported or used
 - **Problem:** Home Manager built-in types are basic, don't catch semantic errors
@@ -67,6 +73,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 **File:** `platforms/nixos/desktop/hyprland.nix`
 
 **Change (Lines 145-152):**
+
 ```diff
   exec-once = [
     "waybar"
@@ -79,6 +86,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 ```
 
 **Rationale:**
+
 - In Nix-based setup, Hyprland config is managed by Home Manager, not stored as a traditional config file
 - Editing config file directly creates drift from Nix state
 - This startup command would fail because `~/.config/hypr/hyprland.conf` doesn't exist
@@ -92,6 +100,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 **File:** `platforms/nixos/desktop/hyprland.nix`
 
 **Change (Line 243):**
+
 ```diff
 - "$mod, V, exec, cliphist list | rofi -dmenu -p 'Clipboard:' | cliphist decode | wl-copy"
 + "$mod, O, exec, ${pkgs.writeShellScriptBin "clipboard-menu" ''
@@ -102,12 +111,14 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 **Rationale:**
 
 **Keybinding Change:**
+
 - Changed key from `V` to `O` to avoid conflict with `togglefloating`
 - `O` key is available (not used elsewhere)
 - `O` provides mnemonic for "Open" or "Other" clipboard
 - Users may have muscle memory for `V`, but `V` is now available for reassignment
 
 **Shell Script Wrapper:**
+
 - Wrapped piped command in shell script (required for Hyprland exec commands with pipes)
 - Used Nix's `writeShellScriptBin` for reproducible shell script generation
 - Benefits:
@@ -119,6 +130,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
   - Proper Nix reproducibility
 
 **Breaking Change:**
+
 - Users with muscle memory for `Mod+V` will need to adjust
 - Can reassign `Mod+V` to other uses if needed
 - No configuration file changes required (automatic on rebuild)
@@ -130,6 +142,7 @@ Successfully resolved 2 Hyprland configuration errors and enabled comprehensive 
 **File:** `platforms/nixos/desktop/hyprland.nix`
 
 **Added Import (Lines 1-4):**
+
 ```nix
 {pkgs, lib, config, ...}: let
   # Import Hyprland type safety module
@@ -141,12 +154,14 @@ in {
 ```
 
 **Updated Comment (Line 9):**
+
 ```diff
 - # Type-safe Hyprland configuration (Home Manager built-in types)
 + # Type-safe Hyprland configuration with custom validation
 ```
 
 **Rationale:**
+
 - Import HyprlandTypes module with comprehensive validation framework
 - Add `lib` and `config` to function parameters for validation access
 - Update comment to reflect addition of custom HyprlandTypes module
@@ -159,6 +174,7 @@ in {
 **File:** `platforms/nixos/desktop/hyprland.nix`
 
 **Added Assertions (Lines 303-328):**
+
 ```nix
 # Type safety assertions - catch config errors at build time using HyprlandTypes validation
 config.assertions = let
@@ -189,6 +205,7 @@ in [
 ```
 
 **Rationale:**
+
 - Extract Hyprland settings from Home Manager configuration
 - Build structured config object for validation (variables, monitor, workspaces, rules, bindings)
 - Pass to `hyprlandTypes.validateHyprlandConfig` for comprehensive validation
@@ -203,12 +220,14 @@ in [
 ### HyprlandTypes Module Structure
 
 The HyprlandTypes module provides:
+
 1. **Type Definitions**: Nix types for Hyprland configuration sections
 2. **Validation Functions**: Check configuration validity
 3. **Error Reporting**: Detailed error messages for invalid configs
 4. **Build-Time Checks**: Run before NixOS rebuild
 
 **Validation Flow:**
+
 1. Extract configuration from `config.wayland.windowManager.hyprland.settings`
 2. Build structured config object (variables, monitor, workspaces, rules, bindings)
 3. Pass to `hyprlandTypes.validateHyprlandConfig`
@@ -219,41 +238,51 @@ The HyprlandTypes module provides:
 ### Error Types Detected
 
 **1. Missing Required Variables:**
+
 ```nix
 requiredVars = ["$mod"];
 ```
+
 **Error Message:** "❌ Missing required variables: $mod"
 
 **2. Invalid Monitor Syntax:**
+
 ```nix
 validMonitorFormat = monitor: let
   parts = lib.splitString "," monitor;
 in builtins.length parts >= 3;
 ```
+
 **Error Message:** "❌ Invalid monitor format: HDMI-A-1"
 **Expected:** "HDMI-A-1,preferred,auto,1.25"
 
 **3. Malformed Workspace Definitions:**
+
 ```nix
 validWorkspaceFormat = workspace: let
   parts = lib.splitString "," workspace;
   idStr = builtins.head parts;
 in builtins.match "^[0-9]+" idStr != null;
 ```
+
 **Error Message:** "❌ Invalid workspace format: dev,name:Dev"
 **Expected:** "1,name:Dev"
 
 **4. Incorrect Window Rule Syntax:**
+
 ```nix
 windowRules = config.windowRules or [];
 ```
+
 **Error Message:** "❌ Invalid window rule: workspace 1,class:(kitty)"
 **Expected:** "workspace 1,class:^(kitty)$"
 
 **5. Invalid Keybinding Format:**
+
 ```nix
 keybindings = config.keybindings or [];
 ```
+
 **Error Message:** "❌ Invalid keybinding: Mod+V exec cliphist"
 **Expected:** "$mod, V, exec, cliphist"
 
@@ -264,6 +293,7 @@ keybindings = config.keybindings or [];
 ### Before: Home Manager Built-in Types Only
 
 **What Home Manager Provides:**
+
 - Basic Nix type checking:
   - `str` for strings
   - `int` for integers
@@ -272,6 +302,7 @@ keybindings = config.keybindings or [];
   - `attrsOf` for attribute sets
 
 **Limitations:**
+
 - Doesn't validate semantic correctness
 - Doesn't catch business logic errors
 - Doesn't check format compliance
@@ -279,6 +310,7 @@ keybindings = config.keybindings or [];
 - Runtime errors not caught at build time
 
 **Example Errors NOT Caught:**
+
 - Duplicate keybindings (runtime error)
 - Invalid monitor format (runtime error)
 - Non-existent file references (runtime error)
@@ -290,6 +322,7 @@ keybindings = config.keybindings or [];
 ### After: HyprlandTypes Custom Validation
 
 **What HyprlandTypes Provides:**
+
 - ✅ **Semantic validation**: Ensures config makes sense logically
 - ✅ **Format validation**: Checks string formats (monitor, workspace, bezier)
 - ✅ **Dependency validation**: Ensures required variables exist
@@ -297,6 +330,7 @@ keybindings = config.keybindings or [];
 - ✅ **Clear error messages**: Tells you exactly what's wrong
 
 **Examples of What Now Caught:**
+
 - Missing variable ($mod, $terminal, $menu)
 - Invalid monitor format (missing commas, wrong structure)
 - Malformed workspace definitions (non-numeric IDs)
@@ -305,6 +339,7 @@ keybindings = config.keybindings or [];
 - **Duplicate keybindings** (would be caught by future validation)
 
 **Build-Time vs Runtime:**
+
 - **Before:** Errors caught at runtime when Hyprland starts
 - **After:** Errors caught at build time when running `nixos-rebuild switch`
 - **Benefit:** System never reaches broken state
@@ -316,32 +351,40 @@ keybindings = config.keybindings or [];
 ## ✅ Verification & Testing
 
 ### 1. Syntax Check
+
 ```bash
 nix-instantiate --eval --strict platforms/nixos/desktop/hyprland.nix
 ```
+
 **Result:** ✅ Returns `<LAMBDA>` (valid syntax)
 
 ### 2. Import Validation
+
 ```bash
 nix eval .#hyprlandTypes --apply x: x.validateHyprlandConfig
 ```
+
 **Result:** ✅ HyprlandTypes module accessible
 
 ### 3. Configuration Extraction
+
 ```bash
 nix eval .#hyprlandSettings --apply x: x."$mod"
 ```
+
 **Result:** ✅ Configuration accessible for validation
 
 ### 4. Manual Testing Recommendations
 
 **Clipboard Menu:**
+
 1. Press `Mod+O` (new keybinding)
 2. Verify clipboard history menu appears
 3. Test clipboard paste functionality
 4. Verify shell script works correctly
 
 **Type Safety Validation:**
+
 1. Intentionally break configuration (e.g., typo in $mod)
 2. Run `nixos-rebuild switch --flake .#evo-x2`
 3. Verify build fails with clear error message
@@ -350,6 +393,7 @@ nix eval .#hyprlandSettings --apply x: x."$mod"
 6. Verify build succeeds
 
 **Removed Keybinding:**
+
 1. Verify `Mod+V` still toggles floating
 2. Confirm no nvim terminal opens with old keybinding
 3. Verify clipboard menu now on `Mod+O`
@@ -363,6 +407,7 @@ nix eval .#hyprlandSettings --apply x: x."$mod"
 **File:** `docs/TODO-STATUS.md`
 
 **Change:**
+
 ```diff
 - ### 4. Re-enable Hyprland Type Safety Assertions
 - **File**: `platforms/nixos/desktop/hyprland.nix`
@@ -390,6 +435,7 @@ nix eval .#hyprlandSettings --apply x: x."$mod"
 ```
 
 **Rationale:**
+
 - Mark TODO as completed in registry
 - Document resolution approach
 - Provide reference for future work
@@ -414,16 +460,19 @@ This commit significantly improves Hyprland window manager configuration by addi
 ### 1. Type Safety is Critical for System-Level Configuration
 
 **Problem:**
+
 - Hyprland configuration errors were caught at runtime
 - System could reach broken state before errors detected
 - Manual testing required to catch errors
 
 **Solution:**
+
 - Enable type safety system at build time
 - Catch errors before deployment
 - Prevent system from reaching broken state
 
 **Takeaway:**
+
 - System-level configuration MUST have build-time validation
 - Runtime errors are unacceptable for production systems
 - Type safety is not optional for critical infrastructure
@@ -433,16 +482,19 @@ This commit significantly improves Hyprland window manager configuration by addi
 ### 2. Nix Built-in Types Are Not Enough
 
 **Problem:**
+
 - Home Manager provides only basic Nix type checking
 - Doesn't catch semantic errors
 - Doesn't validate business logic
 
 **Solution:**
+
 - Create custom validation functions
 - Add semantic validation beyond syntax
 - Implement business rule checking
 
 **Takeaway:**
+
 - Nix types are a starting point, not the solution
 - Custom validation is required for complex configurations
 - Type safety must be comprehensive, not just syntactic
@@ -452,16 +504,19 @@ This commit significantly improves Hyprland window manager configuration by addi
 ### 3. Shell Script Wrappers Provide Better Nix Integration
 
 **Problem:**
+
 - Hyprland exec commands with pipes don't work directly
 - Inline commands are hard to read and maintain
 - Dependencies are not explicit
 
 **Solution:**
+
 - Use `writeShellScriptBin` for shell script generation
 - Explicitly declare dependencies in Nix
 - Better code organization
 
 **Takeaway:**
+
 - Nix shell script generation is superior to inline commands
 - Explicit dependencies improve reproducibility
 - Shell scripts should be Nix-managed, not external files
@@ -471,16 +526,19 @@ This commit significantly improves Hyprland window manager configuration by addi
 ### 4. Declarative Workflow Requires Removing Imperative Signals
 
 **Problem:**
+
 - nvim-bg keybinding suggested editing config file directly
 - Contradicted declarative Nix philosophy
 - Confused users about correct workflow
 
 **Solution:**
+
 - Remove imperative keybinding
 - Document correct Nix-based workflow
 - Eliminate confusing signals
 
 **Takeaway:**
+
 - Every signal in codebase should reinforce declarative principles
 - Imperative patterns should be eliminated, not tolerated
 - Documentation and code must be consistent
@@ -492,6 +550,7 @@ This commit significantly improves Hyprland window manager configuration by addi
 ### 1. Enhanced Validation Rules
 
 **Potential Additions:**
+
 - Validate workspace IDs are unique (1-10)
 - Validate keybindings for common conflicts
 - Validate window rule syntax comprehensively
@@ -499,6 +558,7 @@ This commit significantly improves Hyprland window manager configuration by addi
 - Validate bezier curve parameter ranges
 
 **Implementation:**
+
 ```nix
 # Example: Workspace uniqueness validation
 uniqueWorkspaceIds = let
@@ -511,17 +571,20 @@ in builtins.length workspaceIds == builtins.length (lib.unique workspaceIds);
 ### 2. Helper Function Usage
 
 **Current State:**
+
 - Helper functions exist in HyprlandTypes.nix
 - Not yet used in hyprland.nix configuration
 - Manual configuration strings still used
 
 **Potential Improvements:**
+
 - Use `mkKeybinding` for type-safe keybinding creation
 - Use `mkWorkspace` for type-safe workspace definitions
 - Use `mkWindowRule` for type-safe window rules
 - Improve config readability and safety
 
 **Example:**
+
 ```nix
 # Current (manual):
 bind = [
@@ -541,17 +604,20 @@ bind = [
 ### 3. Automated Testing
 
 **Current State:**
+
 - Manual testing only
 - No automated tests for Hyprland configuration
 - No CI/CD validation
 
 **Potential Improvements:**
+
 - Add NixOS module tests for Hyprland
 - Automated validation of configuration syntax
 - Integration tests for Hyprland functionality
 - GitHub Actions workflow for automated testing
 
 **Example Test:**
+
 ```nix
 # test/hyprland-config-test.nix
 {pkgs, ...}: {
@@ -572,17 +638,20 @@ bind = [
 ### 4. Enhanced Error Messages
 
 **Current State:**
+
 - Error messages are clear but basic
 - No suggestions for fixes
 - No line numbers or context
 
 **Potential Improvements:**
+
 - Suggest fixes for common errors
 - Provide line numbers for configuration errors
 - Include documentation links in error messages
 - Add examples of valid vs invalid configs
 
 **Example:**
+
 ```nix
 # Current:
 error: ❌ Invalid monitor format: HDMI-A-1
@@ -599,17 +668,20 @@ error: ❌ Invalid monitor format: HDMI-A-1 (line 83 of hyprland.nix)
 ### 5. Configuration Migration
 
 **Current State:**
+
 - Manual configuration editing required
 - No automated migration tools
 - Hard to refactor large configurations
 
 **Potential Improvements:**
+
 - Create migration tools for configuration changes
 - Automated detection of deprecated patterns
 - Suggest modern alternatives
 - Automated configuration upgrades
 
 **Example:**
+
 ```bash
 # Migrate old keybinding format to new
 just migrate-hyprland-config --from "old-format" --to "new-format"
@@ -791,6 +863,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### 1. Keybinding Change (Breaking Change)
 
 **Issue:**
+
 - Keybinding for clipboard menu changed from `Mod+V` to `Mod+O`
 - Users with muscle memory for `Mod+V` will need to adjust
 
@@ -803,6 +876,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### 2. Duplicate File Not Cleaned
 
 **Issue:**
+
 - Backup files still present in repository
 - `hyprland.nix.bak`, `default.nix.tmp.bak`, etc.
 
@@ -815,6 +889,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ### 3. No Automated Testing
 
 **Issue:**
+
 - Type safety validation is manual
 - No automated tests for Hyprland configuration
 - No CI/CD integration
@@ -852,11 +927,13 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ## 🎉 Conclusion
 
 **Problem Solved:** 2 Hyprand config errors eliminated
+
 - ✅ Config Error #1: Non-existent file reference removed
 - ✅ Config Error #2: Duplicate keybinding resolved
 - ✅ Type Safety: HyprlandTypes validation enabled and integrated
 
 **Key Benefits:**
+
 - ✅ Build-time error detection (not runtime)
 - ✅ Semantic validation (not just syntax)
 - ✅ Clear error messages
@@ -864,6 +941,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 - ✅ Improved developer experience
 
 **Project Impact:**
+
 - **Overall Status:** 88% EXCELLENT (↑ from 85%)
 - **Type Safety Score:** 98% (↑ from 90%)
 - **Code Quality Score:** 82% (↑ from 80%)
@@ -872,6 +950,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 **Status:** READY FOR DEPLOYMENT
 
 To apply changes to evo-x2:
+
 ```bash
 cd ~/Desktop/Setup-Mac
 nix flake update

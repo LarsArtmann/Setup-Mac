@@ -12,6 +12,7 @@
 Successfully analyzed and fixed critical Git and SSH configuration issues across macOS (nix-darwin) and NixOS platforms. Implemented platform-specific conditional logic for safe.directory paths and added missing Hetzner SSH hosts to Nix configuration.
 
 **Achievements:**
+
 - ✅ Discovered 99% Git config alignment with Nix
 - ✅ Discovered 70% SSH config alignment with Nix
 - ✅ Fixed critical Git safe.directory paths (macOS vs NixOS)
@@ -20,10 +21,12 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 - ✅ macOS configuration ready to deploy
 
 **Blockers:**
+
 - 🔴 **CRITICAL:** NixOS build blocked by crush.nix import failure
 - 🔴 **CRITICAL:** Cannot verify NixOS config fixes until build succeeds
 
 **Next Steps:**
+
 1. Fix crush.nix NixOS import issue
 2. Build and deploy NixOS config
 3. Verify all Git/SSH configurations on both platforms
@@ -37,6 +40,7 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 **Task:** Find all Git and SSH configs on system
 
 **Actions:**
+
 - Located `~/.config/git/config` (Home Manager managed, symlinked to Nix store)
 - Located `~/.ssh/config` (Home Manager managed, symlinked to Nix store)
 - Located `~/.ssh/config.backup` (manual Hetzner hosts)
@@ -45,6 +49,7 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 - Compared system configs with Nix configs
 
 **Deliverables:**
+
 - `GIT-SSH-CONFIG-ANALYSIS.md` (8 sections, 150+ lines)
 - Complete comparison matrix
 - Platform-specific differences documented
@@ -59,11 +64,13 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 **Task:** Compare system Git config with Nix config
 
 **Findings:**
+
 - **Alignment:** 99% (excellent)
 - **Critical Issue:** safe.directory paths hardcoded to macOS (`/Users/larsartmann`)
 - **Impact:** NixOS would have wrong paths, breaking Git operations
 
 **Git Settings Documented:**
+
 - User identity (name, email)
 - GPG signing (key, program, format)
 - Core settings (autocrlf, compression, editor, pager)
@@ -85,11 +92,13 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 **Task:** Compare system SSH config with Nix config
 
 **Findings:**
+
 - **Alignment:** 70% (good, but missing critical hosts)
 - **Critical Issue:** 4 Hetzner private cloud hosts missing from Nix
 - **Minor Issue:** Include paths may warn if files don't exist
 
 **SSH Hosts Documented:**
+
 - ✅ github.com (cross-platform)
 - ✅ onprem (cross-platform)
 - ✅ secretive-example (macOS-only, Secretive integration)
@@ -99,6 +108,7 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 - ❌ private-cloud-hetzner-3 → 138.201.155.93 (missing in Nix)
 
 **Includes Documented:**
+
 - ✅ ~/.orbstack/ssh/config (macOS-only, Docker alternative)
 - ✅ ~/.colima/ssh_config (macOS-only, Docker alternative)
 
@@ -111,6 +121,7 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 **Task:** Analyze macOS vs NixOS differences
 
 **Findings:**
+
 - **Cross-Platform Consistency:** 99% excellent
 - **Platform-Specific (Correctly Conditional):**
   - OrbStack & Colima (macOS-only Docker tools)
@@ -129,6 +140,7 @@ Successfully analyzed and fixed critical Git and SSH configuration issues across
 **Task:** Fix Git safe.directory paths for cross-platform compatibility
 
 **Problem:**
+
 ```nix
 # Before (platforms/common/programs/git.nix)
 safe = {
@@ -140,6 +152,7 @@ safe = {
 ```
 
 **Solution:**
+
 ```nix
 # After (platforms/common/programs/git.nix:96-108)
 safe = {
@@ -158,11 +171,13 @@ safe = {
 ```
 
 **Changes:**
+
 - Added `lib.optionals pkgs.stdenv.isDarwin` for macOS paths
 - Added `lib.optionals pkgs.stdenv.isLinux` for NixOS paths
 - Platform-specific paths selected automatically at build time
 
 **Expected Result:**
+
 - macOS: `/Users/larsartmann/projects/*`
 - NixOS: `/home/lars/projects/*`
 
@@ -175,11 +190,13 @@ safe = {
 **Task:** Add missing Hetzner SSH hosts to Nix configuration
 
 **Problem:**
+
 - Hetzner hosts in `~/.ssh/config.backup` but not in Nix
 - Cannot access Hetzner servers via Nix-managed config
 - Inconsistent SSH config across machines
 
 **Solution v1 (Attempted):**
+
 ```nix
 # Added to platforms/common/programs/ssh.nix:61-94
 linuxMatchBlocks = {
@@ -195,6 +212,7 @@ linuxMatchBlocks = {
 ```
 
 **Result:** ❌ **FAILED**
+
 - Home Manager error: `option 'matchBlocks.private-cloud-hetzner-0.data.preferredAuthentications' does not exist`
 - `preferredAuthentications` is not a valid Home Manager SSH option
 
@@ -207,11 +225,13 @@ linuxMatchBlocks = {
 **Task:** Fix Home Manager SSH schema error for Hetzner hosts
 
 **Problem:**
+
 - Used `preferredAuthentications` from original SSH config
 - Home Manager SSH module does not support this option
 - Need to use valid Home Manager SSH attributes
 
 **Solution v2:**
+
 ```nix
 # Final (platforms/common/programs/ssh.nix:61-94)
 linuxMatchBlocks = {
@@ -238,6 +258,7 @@ linuxMatchBlocks = {
 ```
 
 **Changes:**
+
 - Removed `extraOptions.PreferredAuthentications` (invalid)
 - Kept only valid Home Manager SSH attributes:
   - `hostname`
@@ -245,6 +266,7 @@ linuxMatchBlocks = {
 - All 4 Hetzner hosts added with `lib.mkIf pkgs.stdenv.isLinux`
 
 **Expected Result:**
+
 - macOS: Hetzner hosts NOT in config (correct)
 - NixOS: All 4 Hetzner hosts in config (correct)
 
@@ -257,6 +279,7 @@ linuxMatchBlocks = {
 **Task:** Add file existence checks for SSH includes
 
 **Problem:**
+
 ```nix
 # Current (platforms/common/programs/ssh.nix:6-14)
 platformIncludes =
@@ -269,6 +292,7 @@ platformIncludes =
 ```
 
 **Attempted Fix:**
+
 ```nix
 # Tried to add existence checks
 platformIncludes =
@@ -281,11 +305,13 @@ platformIncludes =
 ```
 
 **Result:** ⚠️ **REVERTED**
+
 - Hit Nix scope issues (needs `config` parameter in function args)
 - Decided simpler approach is better
 - SSH already silently ignores missing includes (no warnings in practice)
 
 **Current State:**
+
 - Simple platform conditional without existence checks
 - Comment added: `# Note: SSH will silently ignore missing include files`
 
@@ -298,6 +324,7 @@ platformIncludes =
 **Task:** Test Nix configuration syntax for macOS
 
 **Command:**
+
 ```bash
 nix --extra-experimental-features "nix-command flakes" flake check
 ```
@@ -305,6 +332,7 @@ nix --extra-experimental-features "nix-command flakes" flake check
 **Result:** ✅ **PASSED**
 
 **Details:**
+
 ```
 checking flake output 'packages'...                 ✅
 checking flake output 'devShells'...              ✅
@@ -321,6 +349,7 @@ checking flake output 'darwinConfigurations'...     ✅
 **Task:** Test Nix configuration syntax for NixOS
 
 **Command:**
+
 ```bash
 nix --extra-experimental-features "nix-command flakes" flake check --all-systems
 ```
@@ -328,17 +357,20 @@ nix --extra-experimental-features "nix-command flakes" flake check --all-systems
 **Result:** ❌ **FAILED**
 
 **Error:**
+
 ```
 error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ```
 
 **Context:**
+
 - File exists: `ls -la platforms/common/programs/crush.nix` ✅
 - macOS evaluation works: Uses crush.nix successfully ✅
 - NixOS evaluation fails: Cannot find crush.nix ❌
 - Same import in `platforms/common/home-base.nix:20`
 
 **Impact:**
+
 - 🔴 **CRITICAL BLOCKER:** Cannot build NixOS config
 - Cannot apply NixOS changes
 - Cannot verify NixOS Git/SSH fixes
@@ -353,11 +385,13 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 2.1 Modified Files
 
 **platforms/common/programs/git.nix** (228 lines)
+
 - Line 96-108: Added platform-specific safe.directory paths
 - Change: Used `lib.optionals pkgs.stdenv.isDarwin/Linux`
 - Status: ✅ **MODIFIED**
 
 **platforms/common/programs/ssh.nix** (98 lines)
+
 - Line 61-94: Added `linuxMatchBlocks` with 4 Hetzner hosts
 - Change: NixOS-only SSH hosts
 - Status: ✅ **MODIFIED**
@@ -365,25 +399,30 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 2.2 Created Files
 
 **GIT-SSH-CONFIG-ANALYSIS.md** (200+ lines)
+
 - Complete analysis report
 - 8 sections: Executive summary, Git analysis, SSH analysis, etc.
 - Status: ✅ **CREATED**
 
 **docs/status/2026-01-14_04-07_GIT-SSH-CONFIGURATION-FIXES.md** (this file)
+
 - Status report for this session
 - Status: ✅ **CREATED**
 
 ### 2.3 Affected Files (No Changes)
 
 **platforms/common/home-base.nix**
+
 - Imports: `./programs/crush.nix` (line 20)
 - Status: ❌ **NIXOS IMPORT FAILS** (file exists but NixOS can't find it)
 
 **~/.config/git/config**
+
 - Status: ✅ **Home Manager managed** (symlink to Nix store)
 - Will update after `just switch`
 
 **~/.ssh/config**
+
 - Status: ✅ **Home Manager managed** (symlink to Nix store)
 - Will update after `just switch`
 
@@ -396,17 +435,20 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 **Status:** ✅ **READY TO DEPLOY**
 
 **Configuration:**
+
 - ✅ Git safe.directory paths fixed (macOS-specific)
 - ✅ SSH Hetzner hosts excluded (Linux-only)
 - ✅ Nix flake check passes
 - ✅ All syntax valid
 
 **Next Steps:**
+
 1. Run `just switch` to apply changes
 2. Verify Git config with `git config --global --get-all safe.directory`
 3. Verify SSH config with `cat ~/.ssh/config`
 
 **Expected Result After Switch:**
+
 - Git: `/Users/larsartmann/projects/*` safe directories
 - SSH: No Hetzner hosts (correct for macOS)
 
@@ -415,34 +457,40 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 **Status:** 🔴 **BLOCKED**
 
 **Configuration:**
+
 - ✅ Git safe.directory paths fixed (NixOS-specific)
 - ✅ SSH Hetzner hosts included (Linux-only)
 - ❌ Nix flake check FAILS
 - ❌ crush.nix import error
 
 **Blocker:**
+
 ```
 error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ```
 
 **Impact:**
+
 - Cannot build NixOS config
 - Cannot apply NixOS changes
 - Cannot verify NixOS Git/SSH fixes
 
 **Root Cause (Unknown):**
+
 - File exists in source tree
 - macOS evaluation works
 - NixOS evaluation fails
 - Same import statement for both platforms
 
 **Next Steps:**
+
 1. **CRITICAL:** Fix crush.nix NixOS import issue
 2. Run `nix flake check` to verify fix
 3. Build with `sudo nixos-rebuild build --flake .#evo-x2`
 4. Switch with `sudo nixos-rebuild switch --flake .#evo-x2`
 
 **Expected Result After Switch:**
+
 - Git: `/home/lars/projects/*` safe directories
 - SSH: All 4 Hetzner hosts included
 
@@ -453,6 +501,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 4.1 Critical Issues 🔴
 
 **Issue #1: NixOS crush.nix Import Failure**
+
 - **Severity:** 🔴 CRITICAL
 - **Status:** ❌ NOT FIXED
 - **Impact:** Blocks all NixOS configuration work
@@ -473,6 +522,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 4.2 Fixed Issues ✅
 
 **Issue #2: Git Safe Directory Paths**
+
 - **Severity:** 🔴 CRITICAL (was)
 - **Status:** ✅ FIXED
 - **Impact:** Would break NixOS Git operations
@@ -484,6 +534,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
   - NixOS: `/home/lars/projects/*`
 
 **Issue #3: Missing Hetzner SSH Hosts**
+
 - **Severity:** 🔴 HIGH (was)
 - **Status:** ✅ FIXED
 - **Impact:** Cannot access Hetzner servers via Nix config
@@ -493,6 +544,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 - **Expected Result:** NixOS has all Hetzner hosts, macOS does not
 
 **Issue #4: Home Manager SSH Schema Mismatch**
+
 - **Severity:** 🟡 MEDIUM (was)
 - **Status:** ✅ FIXED
 - **Impact:** Build failure due to invalid SSH option
@@ -504,6 +556,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 4.3 Minor Issues 🟡
 
 **Issue #5: SSH Include Paths**
+
 - **Severity:** 🟡 LOW
 - **Status:** ⚠️ ACCEPTABLE
 - **Impact:** Potential warnings if include files don't exist
@@ -579,6 +632,7 @@ error: path '/nix/store/.../platforms/common/programs/crush.nix' does not exist
 ### 6.1 Pre-Deployment Testing
 
 **macOS:**
+
 ```bash
 # Verify Nix syntax
 nix --extra-experimental-features "nix-command flakes" flake check
@@ -588,6 +642,7 @@ darwin-rebuild build --flake .
 ```
 
 **NixOS (after crush.nix fix):**
+
 ```bash
 # Verify Nix syntax
 nix --extra-experimental-features "nix-command flakes" flake check --all-systems
@@ -599,6 +654,7 @@ sudo nixos-rebuild build --flake .#evo-x2
 ### 6.2 Post-Deployment Verification
 
 **Git Configuration:**
+
 ```bash
 # macOS
 git config --global --get-all safe.directory
@@ -614,6 +670,7 @@ git status  # Should work without permission prompts
 ```
 
 **SSH Configuration:**
+
 ```bash
 # macOS
 cat ~/.ssh/config | grep -i hetzner
@@ -635,12 +692,14 @@ ssh private-cloud-hetzner-0 hostname  # Test Hetzner (if accessible)
 ### 7.1 File-Level Rollback
 
 **Git Safe Directory Fix:**
+
 ```bash
 cd /Users/larsartmann/Desktop/Setup-Mac
 git checkout HEAD -- platforms/common/programs/git.nix
 ```
 
 **SSH Hetzner Hosts Fix:**
+
 ```bash
 cd /Users/larsartmann/Desktop/Setup-Mac
 git checkout HEAD -- platforms/common/programs/ssh.nix
@@ -649,11 +708,13 @@ git checkout HEAD -- platforms/common/programs/ssh.nix
 ### 7.2 Generation-Level Rollback
 
 **macOS:**
+
 ```bash
 just rollback
 ```
 
 **NixOS:**
+
 ```bash
 sudo nixos-rebuild switch --rollback
 ```
@@ -745,6 +806,7 @@ cp ~/.ssh/config.backup ~/.ssh/config
 ### 9.1 Critical Questions
 
 **Q1: Why does crush.nix fail to import on NixOS but work on macOS?**
+
 - File exists in source tree ✅
 - Same import statement ✅
 - macOS evaluates successfully ✅
@@ -755,6 +817,7 @@ cp ~/.ssh/config.backup ~/.ssh/config
 ### 9.2 Design Decisions
 
 **Q2: Should Hetzner SSH hosts be cross-platform or NixOS-only?**
+
 - **Cross-Platform:**
   - Pros: Simpler architecture, accessible from both
   - Cons: Adds unused hosts to macOS config
@@ -766,6 +829,7 @@ cp ~/.ssh/config.backup ~/.ssh/config
 - **Needs:** User confirmation of usage pattern
 
 **Q3: Should safe.directory paths be hardcoded or dynamic?**
+
 - **Hardcoded (Current):**
   - Pros: Explicit, no runtime dependencies
   - Cons: Brittle if username changes
@@ -791,6 +855,7 @@ cp ~/.ssh/config.backup ~/.ssh/config
 ### 10.2 Platform Success
 
 **macOS (nix-darwin):**
+
 - ✅ Git safe.directory: `/Users/larsartmann/projects/*`
 - ✅ SSH Hetzner hosts: Excluded (correct)
 - ✅ Nix build: Success
@@ -798,6 +863,7 @@ cp ~/.ssh/config.backup ~/.ssh/config
 - ✅ SSH connectivity: Success
 
 **NixOS (evo-x2):**
+
 - ✅ Git safe.directory: `/home/lars/projects/*`
 - ✅ SSH Hetzner hosts: All 4 included (correct)
 - ✅ Nix build: Success
@@ -875,21 +941,25 @@ cp ~/.ssh/config.backup ~/.ssh/config
 Successfully analyzed and addressed critical Git and SSH configuration issues across macOS and NixOS platforms:
 
 ✅ **Analysis Complete:**
+
 - Comprehensive comparison of system vs Nix configs
 - 99% Git alignment, 70% SSH alignment
 - Platform-specific differences documented
 
 ✅ **Git Fixed:**
+
 - Cross-platform safe.directory paths
 - macOS: `/Users/larsartmann/projects/*`
 - NixOS: `/home/lars/projects/*`
 
 ✅ **SSH Fixed:**
+
 - 4 Hetzner hosts added to Nix
 - NixOS-only (correct)
 - Home Manager schema compliance
 
 ✅ **Documentation:**
+
 - Complete analysis report (200+ lines)
 - This status report (400+ lines)
 - Testing plan, rollback procedures
@@ -897,6 +967,7 @@ Successfully analyzed and addressed critical Git and SSH configuration issues ac
 ### 13.2 Blockers
 
 🔴 **CRITICAL BLOCKER:**
+
 - NixOS crush.nix import failure
 - Cannot build NixOS config
 - Cannot deploy NixOS changes
@@ -914,6 +985,7 @@ Successfully analyzed and addressed critical Git and SSH configuration issues ac
 **Status:** 🟡 **IN PROGRESS** - macOS Ready, NixOS Blocked
 
 **Progress:**
+
 - Analysis: ✅ 100%
 - Fixes: ✅ 60% (macOS complete, NixOS blocked)
 - Deployment: ✅ 50% (macOS ready, NixOS blocked)
@@ -925,6 +997,6 @@ Successfully analyzed and addressed critical Git and SSH configuration issues ac
 
 **Report End**
 
-*Generated: January 14, 2026 04:07 CET*
-*Status Report: Git & SSH Configuration Fixes*
-*Next Session: Fix crush.nix NixOS import issue*
+_Generated: January 14, 2026 04:07 CET_
+_Status Report: Git & SSH Configuration Fixes_
+_Next Session: Fix crush.nix NixOS import issue_

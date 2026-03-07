@@ -11,6 +11,7 @@
 This session focused on systematically addressing critical TODOs and analyzing codebase patterns for Nix idiomatic compliance. All critical issues were resolved, configuration syntax validated, and comprehensive recommendations documented for future improvements.
 
 **Key Achievements**:
+
 - ✅ Fixed 4 high-priority technical issues
 - ✅ Eliminated code duplication in sandbox configuration (~30 lines)
 - ✅ Resolved pre-commit hook failures
@@ -27,6 +28,7 @@ This session focused on systematically addressing critical TODOs and analyzing c
 **Problem**: Pre-commit hook at `.pre-commit-config.yaml:55` called `just check-nix-syntax` which didn't exist, causing pre-commit failures.
 
 **Solution**: Added new recipe:
+
 ```nix
 check-nix-syntax:
     @echo "🔍 Checking Nix syntax..."
@@ -45,6 +47,7 @@ check-nix-syntax:
 **Problem**: Previous implementation duplicated all common settings (~30 lines) and disabled the common module import to avoid merge conflicts. This violated Nix module system patterns.
 
 **Before**:
+
 ```nix
 _: {
   # TEMP: Disable common module import to avoid sandbox merging conflicts
@@ -60,6 +63,7 @@ _: {
 ```
 
 **After**:
+
 ```nix
 {lib, ...}: {
   # Import common Nix settings (Darwin-specific overrides below)
@@ -73,6 +77,7 @@ _: {
 ```
 
 **Impact**:
+
 - Eliminated 30+ lines of duplicate code
 - Restored proper module inheritance
 - Using `lib.mkForce` for correct override pattern
@@ -89,11 +94,13 @@ _: {
 **Problem**: Fallback value `config.users.users.larsartmann.home or "/Users/larsartmann"` was unnecessary workaround. The user.home is now guaranteed to exist via explicit user definition in `platforms/darwin/default.nix:90-94`.
 
 **Before**:
+
 ```nix
 userHome = config.users.users.larsartmann.home or "/Users/larsartmann";
 ```
 
 **After**:
+
 ```nix
 userHome = config.users.users.larsartmann.home;
 ```
@@ -115,6 +122,7 @@ userHome = config.users.users.larsartmann.home;
 3. **Audit logs still work** despite service failure (cosmetic bug only)
 
 **Updated Comments**:
+
 ```nix
 # Audit daemon disabled due to AppArmor conflicts
 # NixOS 26.05 (Jan 2026) has bug where audit-rules-nixos.service fails with "No rules"
@@ -162,10 +170,13 @@ A comprehensive analysis of non-Nix-idiomatic patterns was conducted across the 
 ### 🔴 HIGH PRIORITY: Immediate Wins
 
 #### 1. Eliminate Imperative `go install` Scripts
+
 **Files**:
+
 - `bin/my-project-remote-install.sh` (Lines 10-12)
 
 **Current Pattern**:
+
 ```bash
 go install github.com/larsartmann/buildflow/cmd/buildflow@latest
 go install github.com/larsartmann/branching-flow/cmd/context-analyzer@latest
@@ -177,11 +188,14 @@ go install github.com/LarsArtmann/ast-state-analyzer/cmd/ast-state-analyzer@late
 ---
 
 #### 2. Migrate LaunchAgents from Bash to Nix
+
 **Files**:
+
 - `scripts/ublock-origin-setup.sh` (Lines 539-571)
 - `scripts/sublime-text-sync.sh` (Lines 439-472)
 
 **Current Pattern**:
+
 ```bash
 cat > ~/Library/LaunchAgents/com.larsartmann.service.plist << 'EOF'
   <key>ProgramArguments</key>
@@ -195,6 +209,7 @@ launchctl load ~/Library/LaunchAgents/com.larsartmann.service.plist
 **Recommended**: Extend `platforms/darwin/services/launchagents.nix` with declarative LaunchAgent definitions
 
 **Good Example Already Exists**:
+
 ```nix
 environment.userLaunchAgents."net.activitywatch.ActivityWatch.plist" = {
   enable = true;
@@ -205,9 +220,11 @@ environment.userLaunchAgents."net.activitywatch.ActivityWatch.plist" = {
 ---
 
 #### 3. Remove Homebrew Cask Dependency
+
 **File**: `platforms/darwin/default.nix` (Lines 62-67)
 
 **Current**:
+
 ```nix
 homebrew = {
   enable = true;
@@ -216,6 +233,7 @@ homebrew = {
 ```
 
 **Recommended**:
+
 1. Search Nixpkgs: `nix search nixpkgs headlamp`
 2. If available, use `environment.systemPackages = [pkgs.headlamp]`
 3. If unavailable, build via flake overlay
@@ -223,11 +241,14 @@ homebrew = {
 ---
 
 #### 4. Eliminate Hardcoded Homebrew Paths
+
 **Files**:
+
 - `platforms/darwin/programs/shells.nix` (Lines 62-64, 84-85, 104-105)
 - `platforms/common/programs/nushell.nix` (Lines 23-25)
 
 **Current Pattern**:
+
 ```nix
 # fish
 if test -f /opt/homebrew/bin/brew
@@ -242,13 +263,16 @@ end
 ### 🟡 MEDIUM PRIORITY: Technical Debt
 
 #### 5. Consolidate Shell Configuration
+
 **Files**:
+
 - `platforms/darwin/programs/shells.nix` (120+ lines)
 - `platforms/nixos/programs/shells.nix` (74+ lines)
 
 **Issue**: Fish/Zsh/Tmux init logic duplicated (~30% overlap)
 
 **Recommended**: Create `platforms/common/programs/shells-common.nix` with platform conditionals:
+
 ```nix
 {pkgs, ...}: {
   programs.fish = {
@@ -271,13 +295,16 @@ end
 ---
 
 #### 6. Merge Helium Darwin/Linux Packages
+
 **Files**:
+
 - `platforms/darwin/packages/helium.nix`
 - `platforms/common/packages/helium-linux.nix`
 
 **Issue**: Entire package definition duplicated (60+ lines each)
 
 **Recommended**: Single file with platform conditional:
+
 ```nix
 {pkgs, ...}: {
   helium = pkgs.stdenv.mkDerivation rec {
@@ -295,16 +322,20 @@ end
 ---
 
 #### 7. Replace Manual DNS Scripts
+
 **Files**:
+
 - `bin/fix-dns.sh` (Lines 13-22)
 - `bin/fix-network-deep.sh` (Lines 13-21, 27-34)
 
 **Current Pattern**:
+
 ```bash
 sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 ```
 
 **Recommended**:
+
 - **NixOS**: Use `networking.nameservers` in configuration
 - **Darwin**: Use `system.activationScripts` for declarative DNS management (already exists)
 
@@ -313,6 +344,7 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 ### 🟢 LOW PRIORITY: Acceptable Patterns
 
 **These patterns are acceptable for system-specific requirements:**
+
 - macOS tools: `osascript`, `mdutil`, `lsregister` (required for native integration)
 - Docker commands: Container management outside Nix scope
 - systemctl/journalctl in diagnostic scripts (monitoring, not configuration)
@@ -323,20 +355,20 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 
 ### Phase 1: Quick Wins (1-2 hours each)
 
-| Priority | Task | Impact |
-|----------|------|--------|
-| 1 | Replace `go install` scripts with Nix packages | Fixes 3 imperative scripts |
-| 2 | Migrate uBlock LaunchAgent to Nix | Eliminates 30+ lines of bash |
-| 3 | Migrate Sublime Text LaunchAgent to Nix | Eliminates 170+ lines of bash |
-| 4 | Replace Homebrew cask "headlamp" | Reduces external dependencies |
+| Priority | Task                                           | Impact                        |
+| -------- | ---------------------------------------------- | ----------------------------- |
+| 1        | Replace `go install` scripts with Nix packages | Fixes 3 imperative scripts    |
+| 2        | Migrate uBlock LaunchAgent to Nix              | Eliminates 30+ lines of bash  |
+| 3        | Migrate Sublime Text LaunchAgent to Nix        | Eliminates 170+ lines of bash |
+| 4        | Replace Homebrew cask "headlamp"               | Reduces external dependencies |
 
 ### Phase 2: Documentation Improvements (2-4 hours)
 
-| Priority | Task | Impact |
-|----------|------|--------|
-| 1 | Create `platforms/common/programs/shells-common.nix` | 40% code reduction |
-| 2 | Merge Helium packages into single file | 50% code reduction |
-| 3 | Audit all hardcoded paths (Homebrew, /opt/homebrew) | Future-proofing |
+| Priority | Task                                                 | Impact             |
+| -------- | ---------------------------------------------------- | ------------------ |
+| 1        | Create `platforms/common/programs/shells-common.nix` | 40% code reduction |
+| 2        | Merge Helium packages into single file               | 50% code reduction |
+| 3        | Audit all hardcoded paths (Homebrew, /opt/homebrew)  | Future-proofing    |
 
 ### Phase 3: Nix Idiomatic Patterns (Ongoing)
 
@@ -348,12 +380,12 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 
 ## Files Modified
 
-| File | Changes | Lines Changed |
-|------|---------|---------------|
-| `justfile` | Added `check-nix-syntax` recipe | +5 lines |
-| `platforms/darwin/nix/settings.nix` | Fixed sandbox override, added lib import | -30 lines net |
-| `platforms/darwin/services/launchagents.nix` | Removed userHome fallback | -1 word |
-| `platforms/nixos/desktop/security-hardening.nix` | Updated audit documentation | ~context improvement |
+| File                                             | Changes                                  | Lines Changed        |
+| ------------------------------------------------ | ---------------------------------------- | -------------------- |
+| `justfile`                                       | Added `check-nix-syntax` recipe          | +5 lines             |
+| `platforms/darwin/nix/settings.nix`              | Fixed sandbox override, added lib import | -30 lines net        |
+| `platforms/darwin/services/launchagents.nix`     | Removed userHome fallback                | -1 word              |
+| `platforms/nixos/desktop/security-hardening.nix` | Updated audit documentation              | ~context improvement |
 
 **Net Impact**: ~25 lines of code eliminated through proper Nix patterns
 
@@ -362,21 +394,25 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 ## Next Steps
 
 ### Immediate (This Session)
+
 1. Apply `just switch` to activate configuration changes
 2. Verify LaunchAgent services load correctly
 3. Test that Homebrew paths no longer needed in shell configs
 
 ### Short Term (This Week)
+
 1. **Address Bash LaunchAgent scripts** – Move `ublock-origin-setup.sh`, `sublime-text-sync.sh` LaunchAgents to Nix modules
 2. **Replace `go install`** – Migrate `bin/my-project-remote-install.sh` tools to Nix packages
 3. **Eliminate Homebrew cask** – Find or build Nix package for "headlamp"
 
 ### Medium Term (This Month)
+
 1. **Consolidate shell configuration** – Create common shell module
 2. **Merge duplicate packages** – Helium Darwin/Linux single file
 3. **Audit hardcoded paths** – Remove `/opt/homebrew` from shell configs
 
 ### Long Term (This Quarter)
+
 1. **Complete Nix migration** – Eliminate all imperative configuration scripts
 2. **Nix-only toolchain** – No more `go install`, `brew install`, `npm install -g`
 3. **Cross-platform consistency** – >80% code sharing between Darwin/NixOS
@@ -385,13 +421,13 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 
 ## Technical Debt Summary
 
-| Category | Items | Total Lines | Priority |
-|----------|-------|-------------|----------|
-| Bash scripts doing Nix config | 6 scripts | ~2,000 lines | 🔴 High |
-| Hardcoded paths (/opt/homebrew) | 8 files | ~15 instances | 🔴 High |
-| Code duplication | 3 duplicate patterns | ~200 lines | 🟡 Medium |
-| Homebrew dependencies | 1+ casks | N/A | 🔴 High |
-| Manual package install | 3 scripts | ~50 lines | 🔴 High |
+| Category                        | Items                | Total Lines   | Priority  |
+| ------------------------------- | -------------------- | ------------- | --------- |
+| Bash scripts doing Nix config   | 6 scripts            | ~2,000 lines  | 🔴 High   |
+| Hardcoded paths (/opt/homebrew) | 8 files              | ~15 instances | 🔴 High   |
+| Code duplication                | 3 duplicate patterns | ~200 lines    | 🟡 Medium |
+| Homebrew dependencies           | 1+ casks             | N/A           | 🔴 High   |
+| Manual package install          | 3 scripts            | ~50 lines     | 🔴 High   |
 
 **Estimated effort to reach 100% Nix idiomatic**: 8-12 hours
 
@@ -399,26 +435,28 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 
 ## Health Check Status
 
-| Area | Status | Notes |
-|------|--------|-------|
-| Nix syntax validation | ✅ Pass | All configurations valid |
-| Flake outputs | ✅ Pass | 7 outputs validated |
-| Type safety | ✅ Pass | No evaluation errors |
-| Pre-commit hooks | ⚠️ Partial | nix-check fixed, alejandra stdin error (pre-existing) |
-| Code formatting | ✅ Pass | Alejandra compliant on modified files |
-| Git status | ✅ Clean | 4 files modified, ready to commit |
+| Area                  | Status     | Notes                                                 |
+| --------------------- | ---------- | ----------------------------------------------------- |
+| Nix syntax validation | ✅ Pass    | All configurations valid                              |
+| Flake outputs         | ✅ Pass    | 7 outputs validated                                   |
+| Type safety           | ✅ Pass    | No evaluation errors                                  |
+| Pre-commit hooks      | ⚠️ Partial | nix-check fixed, alejandra stdin error (pre-existing) |
+| Code formatting       | ✅ Pass    | Alejandra compliant on modified files                 |
+| Git status            | ✅ Clean   | 4 files modified, ready to commit                     |
 
 ---
 
 ## System Information
 
 ### Build Environment
+
 - **Platform**: macOS (aarch64-darwin)
 - **Nix Version**: 2.31.3
 - **Flake URL**: `.#Lars-MacBook-Air`
 - **Last Successful Build**: Session 029 (in progress when interrupted)
 
 ### TODO Registry Status
+
 - **Total active TODOs**: 10 items
 - **High Priority**: 3 items
 - **Medium Priority**: 4 items
@@ -430,15 +468,18 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 ## References
 
 **Documentation**:
+
 - `AGENTS.md` - Agent guidelines and project conventions
 - `docs/TODO-STATUS.md` - Comprehensive TODO registry
 - `docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md` - Deployment instructions
 
 **Related Issues**:
+
 - GitHub #483085: NixOS audit-rules service bug (Audit daemon issue)
 - `docs/reports/home-manager-users-workaround-bug-report.md` - User definition analysis
 
 **Nix Best Practices**:
+
 - [NixOS Modules](https://nixos.org/manual/nixos/stable/#chap-writing-modules)
 - [Nix Pills](https://nixos.org/guides/nix-pills/)
 - [Nix Flakes](https://nixos.wiki/wiki/Flakes)

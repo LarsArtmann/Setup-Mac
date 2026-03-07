@@ -8,37 +8,38 @@
 
 ### 1% → 51% IMPACT (Critical Path - Must Complete First)
 
-| Priority | Task | Impact | Effort | Time (min) | Why Critical |
-|----------|------|--------|--------|------------|--------------|
-| #1 | Fix Netdata Deployment - Complete interrupted installation | 51% | 45min | **30** | Core monitoring completely broken, blocks all reliability improvements |
-| #2 | Enable Home Manager Integration - Restore user-specific configs | 48% | 30min | **30** | Blocks all user-level customization and declarative management |
-| #3 | Resolve Security Tools Installation - Objective-See suite failures | 45% | 60min | **30** | Critical security gap, compromises system protection |
+| Priority | Task                                                               | Impact | Effort | Time (min) | Why Critical                                                           |
+| -------- | ------------------------------------------------------------------ | ------ | ------ | ---------- | ---------------------------------------------------------------------- |
+| #1       | Fix Netdata Deployment - Complete interrupted installation         | 51%    | 45min  | **30**     | Core monitoring completely broken, blocks all reliability improvements |
+| #2       | Enable Home Manager Integration - Restore user-specific configs    | 48%    | 30min  | **30**     | Blocks all user-level customization and declarative management         |
+| #3       | Resolve Security Tools Installation - Objective-See suite failures | 45%    | 60min  | **30**     | Critical security gap, compromises system protection                   |
 
 ### 4% → 64% IMPACT (High-Value Foundation)
 
-| Priority | Task | Impact | Effort | Time (min) | Strategic Value |
-|----------|------|--------|--------|------------|----------------|
-| #4 | Fish Shell Performance Regression - Restore 10ms startup | 40% | 45min | **30** | Core user experience, major performance degradation |
-| #5 | ntopng Network Monitoring Research & Implementation | 35% | 90min | **60** | Complete monitoring stack, network visibility |
-| #6 | Automated Health Check System - Continuous validation | 32% | 120min | **90** | Prevents regressions, enables proactive maintenance |
-| #7 | Documentation Accuracy - Align docs with reality | 28% | 60min | **60** | Critical for user trust and adoption |
-| #8 | Zero-Downtime Configuration Updates | 25% | 90min | **75** | Improves development workflow, reduces friction |
+| Priority | Task                                                     | Impact | Effort | Time (min) | Strategic Value                                     |
+| -------- | -------------------------------------------------------- | ------ | ------ | ---------- | --------------------------------------------------- |
+| #4       | Fish Shell Performance Regression - Restore 10ms startup | 40%    | 45min  | **30**     | Core user experience, major performance degradation |
+| #5       | ntopng Network Monitoring Research & Implementation      | 35%    | 90min  | **60**     | Complete monitoring stack, network visibility       |
+| #6       | Automated Health Check System - Continuous validation    | 32%    | 120min | **90**     | Prevents regressions, enables proactive maintenance |
+| #7       | Documentation Accuracy - Align docs with reality         | 28%    | 60min  | **60**     | Critical for user trust and adoption                |
+| #8       | Zero-Downtime Configuration Updates                      | 25%    | 90min  | **75**     | Improves development workflow, reduces friction     |
 
 ### 20% → 80% IMPACT (Professional Polish)
 
-| Priority | Task | Impact | Effort | Time (min) | Business Value |
-|----------|------|--------|--------|------------|----------------|
-| #9 | Performance Threshold Implementation & Alerting | 22% | 45min | **45** | Automated regression detection |
-| #10 | Simplified Onboarding Flow - Reduce manual steps | 20% | 75min | **60** | Improves user adoption, reduces support |
-| #11 | Cross-Platform Compatibility Research | 18% | 120min | **90** | Expands user base, future-proofing |
-| #12 | Team Deployment Templates | 15% | 150min | **120** | Enterprise readiness, scaling |
-| #13 | Advanced Monitoring Integration - Custom dashboards | 12% | 90min | **75** | Enhanced observability, professional features |
-| #14 | CI/CD Pipeline for Config Validation | 10% | 105min | **90** | Quality assurance, automated testing |
-| #15 | Automated Backup & Recovery System | 8% | 60min | **45** | Data safety, disaster recovery |
+| Priority | Task                                                | Impact | Effort | Time (min) | Business Value                                |
+| -------- | --------------------------------------------------- | ------ | ------ | ---------- | --------------------------------------------- |
+| #9       | Performance Threshold Implementation & Alerting     | 22%    | 45min  | **45**     | Automated regression detection                |
+| #10      | Simplified Onboarding Flow - Reduce manual steps    | 20%    | 75min  | **60**     | Improves user adoption, reduces support       |
+| #11      | Cross-Platform Compatibility Research               | 18%    | 120min | **90**     | Expands user base, future-proofing            |
+| #12      | Team Deployment Templates                           | 15%    | 150min | **120**    | Enterprise readiness, scaling                 |
+| #13      | Advanced Monitoring Integration - Custom dashboards | 12%    | 90min  | **75**     | Enhanced observability, professional features |
+| #14      | CI/CD Pipeline for Config Validation                | 10%    | 105min | **90**     | Quality assurance, automated testing          |
+| #15      | Automated Backup & Recovery System                  | 8%     | 60min  | **45**     | Data safety, disaster recovery                |
 
 ## 🚀 EXECUTION STRATEGY: START WITH 1%
 
 ### Phase 1: Critical Infrastructure (1% → 51% Impact)
+
 **Timeline: 90 minutes total | Blocks: Everything else**
 
 1. **Netdata Deployment Completion** (30min)
@@ -60,6 +61,7 @@
    - Test security alerting system
 
 ### Phase 2: Foundation Strengthening (4% → 64% Impact)
+
 **Timeline: 315 minutes total | Blocks: Advanced features**
 
 4. **Fish Shell Performance Fix** (30min)
@@ -69,6 +71,7 @@
 8. **Zero-Downtime Updates** (75min)
 
 ### Phase 3: Professional Excellence (20% → 80% Impact)
+
 **Timeline: 525 minutes total | Business value & scaling**
 
 9-15: Complete remaining high-value improvements
@@ -76,6 +79,7 @@
 ## 📊 IMPACT METRICS & SUCCESS CRITERIA
 
 ### Critical Success Indicators
+
 - **Netdata**: Web interface accessible, collecting real metrics
 - **Home Manager**: User configs apply declaratively via Nix
 - **Security Tools**: All protection active, no installation errors
@@ -83,6 +87,7 @@
 - **System Health**: Automated validation passes 100%
 
 ### Business Impact Targets
+
 - **User Success Rate**: From 60% → 95% on first setup
 - **Support Burden**: Reduced by 80% through automation
 - **Performance**: Shell startup <20ms, system alerts functional
@@ -234,11 +239,12 @@ graph TD
 97. Sales channel development - Revenue expansion
 98. Financial planning system - Business stability
 99. Investor relations setup - Funding preparation
-100. Exit strategy planning - Business outcomes
+100.  Exit strategy planning - Business outcomes
 
 ## 🎯 IMMEDIATE NEXT STEPS
 
 **TODAY (First 90 minutes):**
+
 1. Fix Netdata deployment (critical monitoring)
 2. Enable Home Manager (user configuration)
 3. Resolve security tools (system protection)
@@ -252,6 +258,7 @@ graph TD
 31-100: Strategic business value
 
 **Success Metrics:**
+
 - Working monitoring stack (Netdata + ntopng)
 - Declarative user configuration (Home Manager)
 - Functional security protection (Objective-See tools)
@@ -261,18 +268,21 @@ graph TD
 ## 📈 EXPECTED OUTCOMES
 
 ### After Phase 1 (1% → 51% Impact)
+
 - ✅ Complete monitoring infrastructure operational
 - ✅ Declarative user configuration restored
 - ✅ Full security protection active
 - ✅ Foundation stable for advanced features
 
 ### After Phase 2 (4% → 64% Impact)
+
 - ✅ Professional-grade user experience
 - ✅ Automated health monitoring
 - ✅ Network traffic analysis capabilities
 - ✅ Zero-downtime configuration updates
 
 ### After Phase 3 (20% → 80% Impact)
+
 - ✅ Enterprise-ready deployment capabilities
 - ✅ Comprehensive performance monitoring
 - ✅ Simplified onboarding experience

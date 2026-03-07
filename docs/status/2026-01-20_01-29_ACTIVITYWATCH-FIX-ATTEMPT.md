@@ -29,18 +29,21 @@ ActivityWatch LaunchAgent configuration was fixed (invalid `--background` flag r
 ## 🔍 Root Cause Analysis
 
 ### Initial Problem
+
 - **Symptom:** ActivityWatch not reporting programs in use on macOS
 - **Discovery:** Check `~/.local/share/activitywatch/stderr.log`
 - **Finding:** Repeated error: `Error: No such option: --background`
 - **Count:** ~100+ occurrences of the error (97,000 lines in log file)
 
 ### Root Cause
+
 - **Invalid Flag:** LaunchAgent was using `--background` flag which doesn't exist in `aw-qt`
 - **Location:** `platforms/darwin/services/launchagents.nix:26`
 - **Incorrect:** `<string>--background</string>`
 - **Correct:** `<string>--no-gui</string>`
 
 ### Why This Happened
+
 - The `aw-qt` command has changed over time
 - The `--background` flag was never valid for `aw-qt`
 - Valid flags per `aw-qt --help`:
@@ -55,8 +58,10 @@ ActivityWatch LaunchAgent configuration was fixed (invalid `--background` flag r
 ## 🔧 Actions Taken
 
 ### 1. Configuration Fix
+
 **File:** `platforms/darwin/services/launchagents.nix`
 **Change:** Line 26
+
 ```nix
 # Before
 <string>--background</string>
@@ -66,17 +71,22 @@ ActivityWatch LaunchAgent configuration was fixed (invalid `--background` flag r
 ```
 
 ### 2. Nix Configuration Applied
+
 **Command:** `just switch`
 **Result:** ✅ Success
+
 - LaunchAgent plist updated to `/Users/larsartmann/Library/LaunchAgents/net.activitywatch.ActivityWatch.plist`
 - Service reloaded automatically by nix-darwin
 
 ### 3. Process Cleanup
+
 **Commands:**
+
 ```bash
 pkill -9 -f "aw-(qt|server|watcher)"
 launchctl kickstart -k gui/$(id -u)/net.activitywatch.ActivityWatch
 ```
+
 **Result:** ✅ All zombie processes killed and restarted
 
 ---
@@ -84,22 +94,25 @@ launchctl kickstart -k gui/$(id -u)/net.activitywatch.ActivityWatch
 ## 📊 Current State
 
 ### Process Status ✅
+
 All 5 required processes are running:
 
-| PID | Process | State | Parent | Description |
-|-----|---------|-------|--------|-------------|
-| 23658 | aw-qt | R (running) | launchd | Main manager process |
-| - | aw-server | S (sleeping) | aw-qt | API server (Flask) |
-| - | aw-watcher-window | S (sleeping) | aw-qt | Window activity tracker |
-| - | aw-watcher-window-macos | S (sleeping) | aw-watcher-window | Swift subprocess |
-| - | aw-watcher-afk | S (sleeping) | aw-qt | AFK (keyboard/mouse) tracker |
+| PID   | Process                 | State        | Parent            | Description                  |
+| ----- | ----------------------- | ------------ | ----------------- | ---------------------------- |
+| 23658 | aw-qt                   | R (running)  | launchd           | Main manager process         |
+| -     | aw-server               | S (sleeping) | aw-qt             | API server (Flask)           |
+| -     | aw-watcher-window       | S (sleeping) | aw-qt             | Window activity tracker      |
+| -     | aw-watcher-window-macos | S (sleeping) | aw-watcher-window | Swift subprocess             |
+| -     | aw-watcher-afk          | S (sleeping) | aw-qt             | AFK (keyboard/mouse) tracker |
 
 ### Network Status ✅
+
 - **Port 5600:** ✅ LISTENING
 - **Server:** aw-server (Flask)
 - **Command:** `lsof -i :5600` confirms `aw-server 22872 larsartmann 8u IPv4 TCP localhost:esmmanager (LISTEN)`
 
 ### LaunchAgent Status ✅
+
 - **Label:** `net.activitywatch.ActivityWatch`
 - **Status:** Active (PID 23658)
 - **Launch Command:** `/Applications/ActivityWatch.app/Contents/MacOS/aw-qt --no-gui`
@@ -107,6 +120,7 @@ All 5 required processes are running:
 - **RunAtLoad:** Enabled
 
 ### Database Status ⚠️
+
 - **File:** `~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`
 - **Size:** 364 MB
 - **Last Modified:** 2026-01-20 01:08
@@ -114,6 +128,7 @@ All 5 required processes are running:
 - **Issue:** No updates in ~20 minutes (database not growing)
 
 ### Log Status ❌
+
 - **Stdout:** `~/.local/share/activitywatch/stdout.log` (52 bytes)
   - Last entry: `* Debug mode: off`
   - Status: ✅ Aw-server started
@@ -134,7 +149,9 @@ All 5 required processes are running:
 ## 🔬 Investigation Results
 
 ### Expected Behavior (Previous Working State)
+
 Looking at logs from 00:29-00:31, a working session showed:
+
 ```
 2026-01-20 00:29:47 [INFO ]: Starting module aw-watcher-window
 2026-01-20 00:31:01 [INFO ]: aw-watcher-window started  (aw_watcher_window.main:70)
@@ -143,7 +160,9 @@ Looking at logs from 00:29-00:31, a working session showed:
 ```
 
 ### Current Behavior (Not Working)
+
 Current session (01:08-01:29) shows:
+
 ```
 2026-01-20 01:08:46 [INFO ]: Starting module aw-watcher-window
 [NO "aw-watcher-window started" message]
@@ -152,45 +171,53 @@ Current session (01:08-01:29) shows:
 ```
 
 ### Key Differences
-| Behavior | Previous (Working) | Current (Broken) |
-|----------|-------------------|------------------|
-| aw-watcher-window starts | ✅ Yes | ✅ Yes |
-| "aw-watcher-window started" logged | ✅ Yes | ❌ No |
-| Swift strategy message | ✅ Yes | ❌ No |
-| Connection established | ✅ Yes | ❌ No |
-| Database updating | ✅ Yes | ❌ No |
+
+| Behavior                           | Previous (Working) | Current (Broken) |
+| ---------------------------------- | ------------------ | ---------------- |
+| aw-watcher-window starts           | ✅ Yes             | ✅ Yes           |
+| "aw-watcher-window started" logged | ✅ Yes             | ❌ No            |
+| Swift strategy message             | ✅ Yes             | ❌ No            |
+| Connection established             | ✅ Yes             | ❌ No            |
+| Database updating                  | ✅ Yes             | ❌ No            |
 
 ---
 
 ## 🚨 Identified Issues
 
 ### 1. Silent Watcher Failure ❌
+
 **Severity:** Critical
 **Description:** Watchers are running but not functioning
 **Evidence:**
+
 - Processes in S (sleeping) state
 - No "started" or "connection" logs
 - Database not updating
 - No program data being collected
 
 ### 2. Missing Startup Logs ❌
+
 **Severity:** High
 **Description:** Watcher startup sequence incomplete in logs
 **Expected:**
+
 ```
 aw-watcher-window started
 Using swift strategy
 Connection to aw-server established
 ```
+
 **Actual:** None of these messages appear
 
 ### 3. Log File Bloat ⚠️
+
 **Severity:** Medium
 **Description:** stderr.log is 2.1 MB with 97,100 lines
 **Issue:** Contains thousands of repeated `--background` errors
 **Risk:** File will continue growing without rotation
 
 ### 4. No Health Monitoring ❌
+
 **Severity:** High
 **Description:** No way to verify if ActivityWatch is actually tracking
 **Impact:** Silent failures go undetected for extended periods
@@ -200,53 +227,65 @@ Connection to aw-server established
 ## 🎯 Possible Root Causes (Current Tracking Issue)
 
 ### Hypothesis 1: macOS Permission Denied 🔐
+
 **Likelihood:** High
 **Explanation:** ActivityWatch requires Accessibility and Screen Recording permissions
 **Evidence:**
+
 - Swift strategy relies on macOS APIs
 - Silent failure is typical of permission issues
 - Previous successful runs may have had permissions
 
 **Verification Needed:**
+
 - Check System Preferences → Privacy & Security → Accessibility
 - Check System Preferences → Privacy & Security → Screen Recording
 - Look for denies in Console.app
 
 ### Hypothesis 2: Swift Strategy Failure 💻
+
 **Likelihood:** Medium
 **Explanation:** `aw-watcher-window` uses Swift strategy to track windows
 **Evidence:**
+
 - Last working log: `Using swift strategy`
 - Previous errors: `unrecognized arguments: --multiprocessing-fork`
 - Swift subprocess exists but may be failing silently
 
 **Verification Needed:**
+
 - Try JXA strategy as fallback: `--strategy jxa`
 - Check Swift binary compatibility with macOS version
 - Review ActivityWatch Swift strategy issues on GitHub
 
 ### Hypothesis 3: Database Lock/Corruption 💾
+
 **Likelihood:** Low
 **Explanation:** Database may be locked or corrupted
 **Evidence:**
+
 - Database not updating since 01:08
 - Previous "Address already in use" error for port 5600
 - 364 MB database (large but not suspicious)
 
 **Verification Needed:**
+
 - Check database locks: `lsof ~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`
 - Test database integrity with SQLite
 - Try stopping aw-server and checking locks
 
 ### Hypothesis 4: Version Incompatibility 🔄
+
 **Likelihood:** Medium
 **Explanation:** Homebrew-installed ActivityWatch may be outdated
 **Evidence:**
+
 - No current version checked
 - API changes may have introduced issues
 - Swift strategy may have changed
 
 **Verification Needed:**
+
 - Check ActivityWatch version: `/Applications/ActivityWatch.app/Contents/MacOS/aw-qt --version`
 - Compare with latest version on GitHub
 - Check if updates are available via Homebrew
@@ -256,12 +295,14 @@ Connection to aw-server established
 ## 📝 Next Steps (Priority Order)
 
 ### IMMEDIATE (Do Now)
+
 1. **Check macOS Permissions**
    - System Preferences → Privacy & Security → Accessibility
    - System Preferences → Privacy & Security → Screen Recording
    - Add ActivityWatch if not present
 
 2. **Verify ActivityWatch Version**
+
    ```bash
    /Applications/ActivityWatch.app/Contents/MacOS/aw-qt --version
    brew info activitywatch
@@ -282,6 +323,7 @@ Connection to aw-server established
    - Modify LaunchAgent to add: `<string>--strategy</string><string>jxa</string>`
 
 ### SHORT-TERM (Today)
+
 6. **Add Verbose Logging**
    - Add `--verbose` flag to LaunchAgent
    - Restart service
@@ -307,6 +349,7 @@ Connection to aw-server established
     - Or download latest version from GitHub
 
 ### MEDIUM-TERM (This Week)
+
 11. **Implement Log Rotation**
     - Add logrotate or similar mechanism
     - Prevent stderr.log from growing indefinitely
@@ -338,39 +381,43 @@ Connection to aw-server established
 ## 📊 Metrics & Observations
 
 ### Timeline of Events
-| Time (CET) | Event | Details |
-|------------|-------|---------|
-| 00:29:31 | Previous successful start | aw-qt started, all modules loaded |
-| 00:31:01 | aw-watcher-window started | Successful startup |
-| 00:31:06 | Connection established | Watcher connected to aw-server |
-| 00:31:16 | Port conflict error | "Address already in use" on port 5600 |
-| 00:31:33 | Watchers stopped | Module shutdown triggered |
-| 01:08:22 | New start attempt | After configuration fix |
-| 01:08:26 | aw-server started | Server module loaded |
-| 01:08:46 | aw-watcher-window started | Window watcher launched |
-| 01:08:48 | aw-watcher-afk started | AFK watcher launched |
-| 01:29:00 | Current time | No tracking for 21 minutes |
+
+| Time (CET) | Event                     | Details                               |
+| ---------- | ------------------------- | ------------------------------------- |
+| 00:29:31   | Previous successful start | aw-qt started, all modules loaded     |
+| 00:31:01   | aw-watcher-window started | Successful startup                    |
+| 00:31:06   | Connection established    | Watcher connected to aw-server        |
+| 00:31:16   | Port conflict error       | "Address already in use" on port 5600 |
+| 00:31:33   | Watchers stopped          | Module shutdown triggered             |
+| 01:08:22   | New start attempt         | After configuration fix               |
+| 01:08:26   | aw-server started         | Server module loaded                  |
+| 01:08:46   | aw-watcher-window started | Window watcher launched               |
+| 01:08:48   | aw-watcher-afk started    | AFK watcher launched                  |
+| 01:29:00   | Current time              | No tracking for 21 minutes            |
 
 ### Log File Analysis
-| File | Lines | Size | Last Entry | Status |
-|------|-------|------|------------|--------|
-| stdout.log | 1 | 52 B | `* Debug mode: off` | ✅ OK |
-| stderr.log | 97,100 | 2.1 MB | 01:08:48 | ❌ No new logs |
-| peewee-sqlite.v2.db | - | 364 MB | 01:08 | ❌ Not updating |
+
+| File                | Lines  | Size   | Last Entry          | Status          |
+| ------------------- | ------ | ------ | ------------------- | --------------- |
+| stdout.log          | 1      | 52 B   | `* Debug mode: off` | ✅ OK           |
+| stderr.log          | 97,100 | 2.1 MB | 01:08:48            | ❌ No new logs  |
+| peewee-sqlite.v2.db | -      | 364 MB | 01:08               | ❌ Not updating |
 
 ### Process Resource Usage
-| Process | CPU% | Memory | State | Duration |
-|---------|------|--------|-------|----------|
-| aw-qt | 0.0-0.2% | 12 MB | R/S | 21 min |
-| aw-server | 0.0-0.1% | 13 MB | S | 21 min |
-| aw-watcher-window | 0.0% | 8 KB | S | 21 min |
-| aw-watcher-afk | 0.0% | 12 KB | S | 21 min |
+
+| Process           | CPU%     | Memory | State | Duration |
+| ----------------- | -------- | ------ | ----- | -------- |
+| aw-qt             | 0.0-0.2% | 12 MB  | R/S   | 21 min   |
+| aw-server         | 0.0-0.1% | 13 MB  | S     | 21 min   |
+| aw-watcher-window | 0.0%     | 8 KB   | S     | 21 min   |
+| aw-watcher-afk    | 0.0%     | 12 KB  | S     | 21 min   |
 
 ---
 
 ## 🎯 Success Criteria
 
 ### Definition of Done
+
 - [x] LaunchAgent configuration fixed (no-gui instead of --background)
 - [x] All ActivityWatch processes running
 - [x] aw-server listening on port 5600
@@ -389,6 +436,7 @@ Connection to aw-server established
 ## 💡 Recommendations
 
 ### Immediate Actions
+
 1. **Grant macOS Permissions** - Highest priority
    - Accessibility permission for ActivityWatch
    - Screen Recording permission for ActivityWatch
@@ -403,6 +451,7 @@ Connection to aw-server established
    - Restart and analyze detailed output
 
 ### Long-term Improvements
+
 1. **Migrate to Nix Package** - Declarative management
    - Replace Homebrew installation with Nix package
    - Update `platforms/darwin/services/launchagents.nix` accordingly
@@ -428,9 +477,11 @@ Connection to aw-server established
 ## 📚 References
 
 ### Files Modified
+
 - `platforms/darwin/services/launchagents.nix:26` - Changed `--background` to `--no-gui`
 
 ### Files Referenced
+
 - `~/Library/LaunchAgents/net.activitywatch.ActivityWatch.plist` - Installed LaunchAgent
 - `~/.local/share/activitywatch/stderr.log` - Error logs (2.1 MB)
 - `~/.local/share/activitywatch/stdout.log` - Standard output logs
@@ -438,6 +489,7 @@ Connection to aw-server established
 - `~/Library/Application Support/activitywatch/aw-server/aw-server.toml` - Server configuration
 
 ### Commands Used
+
 ```bash
 # Investigation
 /Applications/ActivityWatch.app/Contents/MacOS/aw-qt --help
@@ -459,11 +511,13 @@ tail -30 ~/.local/share/activitywatch/stderr.log
 ## 📌 Conclusion
 
 **Configuration Fix:** ✅ Complete
+
 - Invalid `--background` flag replaced with `--no-gui`
 - LaunchAgent successfully updated
 - All processes running correctly
 
 **Tracking Issue:** ❌ Unresolved
+
 - Watchers running but not collecting data
 - Database not updating
 - No startup/connection logs

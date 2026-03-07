@@ -12,6 +12,7 @@
 Successfully migrated git configuration from mixed imperative/declarative approach to 100% declarative cross-platform configuration. Both macOS and NixOS now use identical git settings from `platforms/common/programs/git.nix`, with critical missing GPG format and LFS filter settings added.
 
 **Key Achievements:**
+
 - ✅ Added 5 missing critical git settings
 - ✅ Achieved cross-platform consistency
 - ✅ Eliminated imperative git configuration
@@ -29,6 +30,7 @@ Successfully migrated git configuration from mixed imperative/declarative approa
 **Goal:** Ensure both macOS and NixOS have identical, comprehensive git configuration via declarative Home Manager.
 
 **Deliverables:**
+
 - ✅ Analyzed macOS global git config vs NixOS Home Manager config
 - ✅ Identified 5 missing critical settings
 - ✅ Added all missing settings to shared configuration
@@ -44,6 +46,7 @@ Successfully migrated git configuration from mixed imperative/declarative approa
 ### Phase 1: Configuration Comparison
 
 **MacOS Global Git Config:**
+
 ```bash
 # 51 settings found via `git config --global --list`
 
@@ -57,6 +60,7 @@ Platform-specific pollution:
 ```
 
 **NixOS Home Manager Git Config:**
+
 ```nix
 # platforms/common/programs/git.nix
 
@@ -67,6 +71,7 @@ GPG format: Missing (critical gap)
 ```
 
 **Findings:**
+
 1. macOS was using BOTH declarative (Home Manager) AND imperative (`git config --global`)
 2. NixOS and macOS shared identical base configuration from `platforms/common/programs/git.nix`
 3. 5 critical settings were missing from declarative configuration
@@ -79,6 +84,7 @@ GPG format: Missing (critical gap)
 #### Missing Critical Settings
 
 **GPG Configuration:**
+
 ```nix
 # Missing:
 gpg.format = "openpgp"
@@ -90,6 +96,7 @@ gpg.format = "openpgp"
 ```
 
 **LFS Configuration:**
+
 ```nix
 # Missing:
 filter.lfs.clean = "git-lfs clean -- %f"
@@ -107,6 +114,7 @@ filter.lfs.smudge = "git-lfs smudge -- %f"
 #### Platform-Specific Pollution
 
 **Safe Directory Entries:**
+
 ```nix
 # Problem in shared config:
 safe.directory = [
@@ -129,6 +137,7 @@ safe.directory = [
 **1. platforms/common/programs/git.nix**
 
 **Changes:**
+
 ```nix
 # Added GPG format specification:
 gpg = {
@@ -152,6 +161,7 @@ filter = {
 ```
 
 **Function Signature Fix:**
+
 ```nix
 # Before (deadnix error):
 {pkgs, lib, ...}: {
@@ -166,6 +176,7 @@ _: {  # Empty parameter set, no unused warnings
 **2. platforms/common/home-base.nix**
 
 **Changes:**
+
 ```nix
 # Removed broken import:
 imports = [
@@ -174,6 +185,7 @@ imports = [
 ```
 
 **Reasoning:**
+
 - `crush.nix` was never created in `platforms/common/programs/`
 - Import caused Nix evaluation error
 - Had to remove to allow darwin-rebuild to complete
@@ -181,6 +193,7 @@ imports = [
 **3. Security Cleanup**
 
 **Removed Files:**
+
 ```bash
 # Deleted:
 platforms/common/programs/crush.nix  # Exposed API key
@@ -196,6 +209,7 @@ GIT-SSH-CONFIG-ANALYSIS.md           # Temporary analysis document
 ### macOS Verification ✅
 
 **Git Configuration Active:**
+
 ```bash
 $ git config --global --list | grep -E "^gpg\.format|^filter\.lfs"
 gpg.format=openpgp
@@ -208,6 +222,7 @@ filter.lfs.smudge=git-lfs smudge -- %f
 ```
 
 **Full Configuration Check:**
+
 ```bash
 $ git config --global user.name
 Lars Artmann
@@ -234,6 +249,7 @@ rebase
 ```
 
 **Git Town Aliases:**
+
 ```bash
 $ git config --get-regexp "^alias\." | wc -l
 16
@@ -242,6 +258,7 @@ $ git config --get-regexp "^alias\." | wc -l
 ```
 
 **Declarative Configuration:**
+
 ```bash
 $ ls -la ~/.gitconfig ~/.config/git/config
 lrwxr-xr-x 1 larsartmann staff 81 Jan 14 03:13 /Users/larsartmann/.config/git/config -> /nix/store/pjxfczfv3b49fx139h3lczxybzhliii6-home-manager-files/.config/git/config
@@ -255,11 +272,13 @@ lrwxr-xr-x 1 larsartmann staff 81 Jan 14 03:13 /Users/larsartmann/.config/git/co
 **Status:** PENDING
 
 **Reason:**
+
 - Changes committed to repository
 - Not yet pulled to NixOS PC (evo-x2)
 - Can't verify without physical access to machine
 
 **Required Steps:**
+
 ```bash
 # 1. Pull latest changes
 cd ~/Desktop/Setup-Mac
@@ -273,6 +292,7 @@ git config --global --list | grep -E "^gpg\.format|^filter\.lfs"
 ```
 
 **Expected Result:**
+
 - GPG format and LFS filters identical to macOS
 - All 16 Git Town aliases operational
 - Cross-platform consistency achieved
@@ -286,6 +306,7 @@ git config --global --list | grep -E "^gpg\.format|^filter\.lfs"
 #### 1. SQLite Database Locks
 
 **Problem:**
+
 ```bash
 $ just switch
 error: SQLite database '/nix/var/nix/db/db.sqlite' is busy
@@ -294,28 +315,33 @@ error: SQLite database '/nix/var/nix/db/db.sqlite' is busy
 ```
 
 **Impact:**
+
 - Unable to apply git configuration changes
 - Multiple rebuild attempts failed
 - Development workflow blocked
 
 **Attempted Solutions:**
+
 ```bash
 $ pkill -9 darwin-rebuild  # No effect
 $ sleep 180                 # No effect
 ```
 
 **Resolution:**
+
 - Processes eventually released after ~1 hour
 - Configuration applied on second attempt
 - Root cause unclear (possible Nix bug on ARM)
 
 **Prevention:**
+
 - Need SQLite health check in justfile
 - Need procedure for handling locked databases
 
 #### 2. Configuration Regression Cycle
 
 **Problem:**
+
 ```bash
 # Initial attempt with wrong signature:
 {pkgs, lib, ...}: {
@@ -328,15 +354,18 @@ _: {
 ```
 
 **Impact:**
+
 - Multiple edit cycles required
 - Time wasted on lint errors
 
 **Root Cause:**
+
 - Added parameters anticipating platform conditionals
 - Didn't use them in this iteration
 - deadnix caught unused patterns
 
 **Resolution:**
+
 - Simplified to empty parameter set
 - Future iterations will add parameters only when needed
 
@@ -345,6 +374,7 @@ _: {
 #### 3. Platform-Specific Safe Directories
 
 **Problem:**
+
 ```nix
 # Removed from shared config:
 safe.directory = [
@@ -354,15 +384,18 @@ safe.directory = [
 ```
 
 **Issue:**
+
 - Safe directories needed on macOS (ownership problems)
 - Not needed on NixOS
 - Now removed entirely from shared config
 
 **Impact:**
+
 - May have ownership issues on macOS in those directories
 - Workaround: `git config --global --add safe.directory <path>`
 
 **Proper Solution:**
+
 ```nix
 # Should be:
 extraConfig = {
@@ -380,6 +413,7 @@ extraConfig = {
 #### 4. Unrelated Configuration Drift
 
 **Problem:**
+
 ```bash
 # base.nix had unrelated changes:
 + oxfmt  # JavaScript formatter
@@ -388,10 +422,12 @@ extraConfig = {
 ```
 
 **Resolution:**
+
 - Reverted base.nix to clean state
 - Only committed git config changes
 
 **Lesson:**
+
 - Check git status before committing
 - Review all diffs, not just target files
 
@@ -400,6 +436,7 @@ extraConfig = {
 #### 5. Gitleaks False Positive
 
 **Problem:**
+
 ```bash
 $ gitleaks detect --source .
 leaks found: 1
@@ -409,16 +446,19 @@ leaks found: 1
 ```
 
 **Resolution:**
+
 - Removed crush.nix file
 - Removed import from home-base.nix
 
 **Prevention:**
+
 - Never commit files with secrets
 - Add gitleaks exception for test keys
 
 #### 6. Deadnix Warnings
 
 **Problem:**
+
 ```bash
 $ deadnix
 Warning: Unused declarations:
@@ -427,6 +467,7 @@ Warning: Unused declarations:
 ```
 
 **Resolution:**
+
 - Changed function signature from `{pkgs, lib, ...}: {` to `_: {`
 
 ---
@@ -435,27 +476,27 @@ Warning: Unused declarations:
 
 ### Time Investment
 
-| Activity | Time Spent | Notes |
-|-----------|-------------|-------|
-| Configuration analysis | 30 min | Deep dive into git config |
-| Gap identification | 15 min | Compared macOS vs NixOS |
-| Code changes | 20 min | Added GPG/LFS settings |
-| Testing & verification | 45 min | Multiple verification steps |
-| Troubleshooting SQLite locks | 60 min | Critical blocker |
-| Pre-commit fixes | 20 min | Security/lint issues |
-| Documentation | 30 min | This report |
-| **Total** | **220 min** | **~3.7 hours** |
+| Activity                     | Time Spent  | Notes                       |
+| ---------------------------- | ----------- | --------------------------- |
+| Configuration analysis       | 30 min      | Deep dive into git config   |
+| Gap identification           | 15 min      | Compared macOS vs NixOS     |
+| Code changes                 | 20 min      | Added GPG/LFS settings      |
+| Testing & verification       | 45 min      | Multiple verification steps |
+| Troubleshooting SQLite locks | 60 min      | Critical blocker            |
+| Pre-commit fixes             | 20 min      | Security/lint issues        |
+| Documentation                | 30 min      | This report                 |
+| **Total**                    | **220 min** | **~3.7 hours**              |
 
 ### Success Metrics
 
-| Metric | Target | Actual | Status |
-|---------|---------|---------|--------|
-| Missing settings added | 5 | 5 | ✅ 100% |
-| Platform-specific pollution removed | Yes | Yes | ✅ Complete |
-| Declarative configuration | 100% | 100% | ✅ Achieved |
-| Cross-platform consistency | Identical | Identical | ✅ Achieved |
-| Pre-commit hooks passing | 0 failures | 0 failures | ✅ Clean |
-| Documentation complete | Comprehensive | Comprehensive | ✅ Complete |
+| Metric                              | Target        | Actual        | Status      |
+| ----------------------------------- | ------------- | ------------- | ----------- |
+| Missing settings added              | 5             | 5             | ✅ 100%     |
+| Platform-specific pollution removed | Yes           | Yes           | ✅ Complete |
+| Declarative configuration           | 100%          | 100%          | ✅ Achieved |
+| Cross-platform consistency          | Identical     | Identical     | ✅ Achieved |
+| Pre-commit hooks passing            | 0 failures    | 0 failures    | ✅ Clean    |
+| Documentation complete              | Comprehensive | Comprehensive | ✅ Complete |
 
 ---
 
@@ -512,6 +553,7 @@ Warning: Unused declarations:
 ### Process Improvements Needed 📝
 
 1. **Pre-Rebuild Checklist**
+
    ```bash
    # Should run before `just switch`:
    just pre-rebuild-check
@@ -522,6 +564,7 @@ Warning: Unused declarations:
    ```
 
 2. **Configuration Verification**
+
    ```bash
    # Should run after `just switch`:
    just verify-git-config
@@ -555,6 +598,7 @@ Warning: Unused declarations:
 ### Immediate Priority (This Week) 🔴
 
 1. **NixOS Deployment**
+
    ```bash
    # On evo-x2:
    cd ~/Desktop/Setup-Mac
@@ -562,9 +606,11 @@ Warning: Unused declarations:
    sudo nixos-rebuild switch --flake .#evo-x2
    git config --global --list | grep -E "^gpg\.format|^filter\.lfs"
    ```
+
    **Goal:** Apply git configuration to NixOS
 
 2. **Fix Safe Directory Architecture**
+
    ```nix
    # Add to git.nix:
    extraConfig = {
@@ -579,9 +625,11 @@ Warning: Unused declarations:
      };
    };
    ```
+
    **Goal:** Platform-specific safe directories
 
 3. **Create Verification Command**
+
    ```bash
    # Add to justfile:
    verify-git-config:
@@ -591,9 +639,11 @@ Warning: Unused declarations:
      echo "LFS filters: $(git config filter.lfs.required)"
      git config --global --list | grep "^alias\." | wc -l
    ```
+
    **Goal:** Automated configuration verification
 
 4. **Test GPG Signing**
+
    ```bash
    # Create test commit with signature:
    git checkout -b test/gpg-signing
@@ -602,6 +652,7 @@ Warning: Unused declarations:
    git commit -S -m "test: verify GPG signing"
    git log --show-signature -1
    ```
+
    **Goal:** Verify GPG signing works end-to-end
 
 5. **Test LFS**
@@ -627,6 +678,7 @@ Warning: Unused declarations:
    - List all shared vs platform-specific configs
 
 7. **Add SQLite Health Check**
+
    ```bash
    # Add to justfile:
    pre-rebuild-check:
@@ -640,6 +692,7 @@ Warning: Unused declarations:
      fi
      echo "✅ SQLite database available"
    ```
+
    **Goal:** Prevent SQLite lock issues
 
 8. **Create Git Town Workflow Docs**
@@ -649,6 +702,7 @@ Warning: Unused declarations:
    - Include troubleshooting section
 
 9. **Add Credential Helper Conditionals**
+
    ```nix
    # Add to git.nix:
    credential = {
@@ -656,6 +710,7 @@ Warning: Unused declarations:
        ++ lib.optionals pkgs.stdenv.isLinux "libsecret";
    };
    ```
+
    **Goal:** Platform-appropriate credential storage
 
 10. **Automate Cross-Platform Testing**
@@ -733,12 +788,14 @@ Warning: Unused declarations:
 **Q1: How to resolve SQLite database locks without root access?**
 
 **Context:**
+
 - Multiple darwin-rebuild processes stuck with SQLite lock
 - Can't kill processes without sudo
 - No documented Nix command to release locks
 - Workflow blocked for 1+ hours
 
 **Need:**
+
 - SQLite lock release procedure
 - Alternative to darwin-rebuild when locked
 - Pre-flight check to detect locks
@@ -749,12 +806,14 @@ Warning: Unused declarations:
 **Q2: Best practice for platform-specific settings in shared configs?**
 
 **Options:**
+
 1. `lib.optionals pkgs.stdenv.isDarwin [...]` (current approach)
 2. Separate platform-specific files with imports
 3. Conditional extraConfig vs settings
 4. Platform module system with overrides
 
 **Need:**
+
 - Guidance on Home Manager best practices
 - Trade-off analysis for each approach
 - Examples from production systems
@@ -764,11 +823,13 @@ Warning: Unused declarations:
 **Q3: Can we reduce git configuration evaluation time?**
 
 **Context:**
+
 - Home Manager generates git config on every switch
 - Large configs may slow down activation
 - Current config: 51 settings, 224 lines
 
 **Need:**
+
 - Performance benchmarks
 - Optimization techniques
 - Lazy evaluation options
@@ -797,7 +858,7 @@ Warning: Unused declarations:
 
 - **28287e1:** "feat(git): enhance Git configuration with GPG format and LFS filter settings"
   - Added gpg.format = "openpgp"
-  - Added all 4 filter.lfs.* settings
+  - Added all 4 filter.lfs.\* settings
   - Removed platform-specific safe.directory entries
   - Fixed function signature
 
@@ -820,6 +881,7 @@ Warning: Unused declarations:
 Git configuration migration is **SUCCESSFULLY COMPLETED** on macOS with all critical settings added and verified. Both macOS and NixOS now share identical declarative configuration from `platforms/common/programs/git.nix`.
 
 **Key Achievements:**
+
 - ✅ 5 missing critical settings added (GPG format + 4 LFS filters)
 - ✅ 100% declarative configuration (no imperative git config)
 - ✅ Cross-platform consistency achieved
@@ -827,6 +889,7 @@ Git configuration migration is **SUCCESSFULLY COMPLETED** on macOS with all crit
 - ✅ Comprehensive documentation created
 
 **Remaining Work:**
+
 - ⚠️ NixOS deployment pending (requires physical access to evo-x2)
 - ⚠️ Safe directory architecture needs improvement (platform conditionals)
 - ⚠️ GPG signing and LFS need functional testing
@@ -834,12 +897,14 @@ Git configuration migration is **SUCCESSFULLY COMPLETED** on macOS with all crit
 ### Impact
 
 **Immediate Benefits:**
+
 - LFS now properly configured on both platforms (when NixOS updated)
 - GPG signing has explicit format specification
 - Git Town fully operational with all 16 aliases
 - Single source of truth for git configuration
 
 **Long-term Benefits:**
+
 - Reduced configuration drift between platforms
 - Easier maintenance and updates
 - Reproducible git setup on any machine
@@ -848,33 +913,39 @@ Git configuration migration is **SUCCESSFULLY COMPLETED** on macOS with all crit
 ### Risk Assessment
 
 **Low Risk:**
+
 - Configuration changes are additive only
 - No breaking changes to existing functionality
 - All changes are revertable via git
 
 **Medium Risk:**
+
 - Safe directory removal may cause ownership issues on macOS
 - SQLite lock issues may recur (need mitigation)
 - NixOS verification pending (unknown compatibility)
 
 **High Risk:**
+
 - None identified
 
 ### Recommendations
 
 **Immediate Actions:**
+
 1. Deploy to NixOS as soon as possible
 2. Add platform-conditional safe directories
 3. Create verification command in justfile
 4. Test GPG signing and LFS functionality
 
 **Process Improvements:**
+
 1. Add pre-rebuild health check (SQLite, processes, git status)
 2. Create automated cross-platform testing
 3. Document disaster recovery procedures
 4. Improve platform-specific abstraction
 
 **Next Steps:**
+
 1. Pull changes to evo-x2
 2. Run `sudo nixos-rebuild switch --flake .#evo-x2`
 3. Verify git configuration matches macOS

@@ -13,12 +13,13 @@
 The actual implementation matches the ADR-002 documented architecture **almost perfectly**. All core components are implemented correctly, with only minor issues found.
 
 **Key Findings:**
+
 - ✅ Shared aliases module exists and works correctly
 - ✅ All three shells (Fish, Zsh, Bash) import shared aliases
 - ✅ Platform-specific overrides implemented for both Darwin and NixOS
 - ✅ No Nix code duplication (single source of truth)
 - ✅ Architecture follows documented pattern exactly
-- ⚠️  One minor issue: LaunchAgents configuration needs fixing
+- ⚠️ One minor issue: LaunchAgents configuration needs fixing
 
 ---
 
@@ -27,6 +28,7 @@ The actual implementation matches the ADR-002 documented architecture **almost p
 ### ✅ Component 1: Shared Aliases Module
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/common/programs/shell-aliases.nix
 _: {
@@ -74,6 +76,7 @@ _: {
 ### ✅ Component 2: Fish Configuration
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/common/programs/fish.nix
 {config, ...}: let
@@ -122,6 +125,7 @@ in {
 ### ✅ Component 3: Zsh Configuration
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/common/programs/zsh.nix
 {config, ...}: let
@@ -186,6 +190,7 @@ in {
 ### ✅ Component 4: Bash Configuration
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/common/programs/bash.nix
 {config, ...}: let
@@ -230,6 +235,7 @@ in {
 ### ✅ Component 5: Darwin Platform Overrides
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/darwin/programs/shells.nix
 programs.fish.shellAliases = lib.mkAfter {
@@ -318,6 +324,7 @@ programs.fish.shellAliases = lib.mkAfter {
 **Status:** ✅ VERIFIED - Platform-specific overrides work correctly
 
 **Aliases:**
+
 - `nixup` → `darwin-rebuild switch --flake .`
 - `nixbuild` → `darwin-rebuild build --flake .`
 - `nixcheck` → `darwin-rebuild check --flake .`
@@ -327,6 +334,7 @@ programs.fish.shellAliases = lib.mkAfter {
 ### ✅ Component 6: NixOS Platform Overrides
 
 **ADR-002 Documentation:**
+
 ```nix
 # platforms/nixos/programs/shells.nix
 programs.fish.shellAliases = lib.mkAfter {
@@ -426,11 +434,13 @@ programs.fish.shellAliases = lib.mkAfter {
 **Status:** ✅ VERIFIED - Platform-specific overrides work correctly
 
 **Aliases:**
+
 - `nixup` → `sudo nixos-rebuild switch --flake .`
 - `nixbuild` → `sudo nixos-rebuild build --flake .`
 - `nixcheck` → `sudo nixos-rebuild test --flake .`
 
 **Additional Features:**
+
 - Bash overrides (not in Darwin)
 - NixOS-specific completions paths
 - Shell-specific init content
@@ -442,6 +452,7 @@ programs.fish.shellAliases = lib.mkAfter {
 ### ✅ File Structure Matches ADR-002
 
 **ADR-002 Documented Structure:**
+
 ```
 platforms/common/programs/
 ├── shell-aliases.nix      # Single source of truth for common aliases
@@ -523,6 +534,7 @@ Use '--all-systems' to check all.
 **Status:** ⚠️ NON-BLOCKING (file commented out)
 
 **Error Message:**
+
 ```
 error: The option `launchd.userAgents' does not exist. Definition values:
 - In `/nix/store/...-source/platforms/darwin/services/launchagents.nix':
@@ -530,12 +542,14 @@ error: The option `launchd.userAgents' does not exist. Definition values:
 
 **Root Cause:**
 The `launchd.userAgents` option does not exist in nix-darwin. This is likely because:
+
 1. The option name is incorrect
 2. nix-darwin version doesn't support this option yet
 3. The option is in a different location
 
 **Current Workaround:**
 The file is commented out in `platforms/darwin/default.nix` line 14:
+
 ```nix
 #    ./services/launchagents.nix  # TEMP: Commented for testing
 ```
@@ -551,27 +565,27 @@ Research correct LaunchAgents configuration for nix-darwin or remove the file if
 
 ### ✅ Core Features - 100% Complete
 
-| Feature | ADR-002 | Implementation | Status |
-|---------|----------|----------------|--------|
+| Feature               | ADR-002     | Implementation | Status      |
+| --------------------- | ----------- | -------------- | ----------- |
 | Shared aliases module | ✅ Required | ✅ Implemented | ✅ Complete |
-| Fish imports shared | ✅ Required | ✅ Implemented | ✅ Complete |
-| Zsh imports shared | ✅ Required | ✅ Implemented | ✅ Complete |
-| Bash imports shared | ✅ Required | ✅ Implemented | ✅ Complete |
-| Darwin overrides | ✅ Required | ✅ Implemented | ✅ Complete |
-| NixOS overrides | ✅ Required | ✅ Implemented | ✅ Complete |
-| lib.mkAfter usage | ✅ Required | ✅ Implemented | ✅ Complete |
-| No Nix duplication | ✅ Required | ✅ Verified | ✅ Complete |
+| Fish imports shared   | ✅ Required | ✅ Implemented | ✅ Complete |
+| Zsh imports shared    | ✅ Required | ✅ Implemented | ✅ Complete |
+| Bash imports shared   | ✅ Required | ✅ Implemented | ✅ Complete |
+| Darwin overrides      | ✅ Required | ✅ Implemented | ✅ Complete |
+| NixOS overrides       | ✅ Required | ✅ Implemented | ✅ Complete |
+| lib.mkAfter usage     | ✅ Required | ✅ Implemented | ✅ Complete |
+| No Nix duplication    | ✅ Required | ✅ Verified    | ✅ Complete |
 
 ### ✅ Benefits Achieved - 100% Complete
 
-| Benefit | ADR-002 Claim | Implementation | Status |
-|---------|---------------|----------------|--------|
-| No Nix duplication | ✅ "Define once, use everywhere" | ✅ Verified (8 aliases, 0 duplication) | ✅ Achieved |
-| Single source of truth | ✅ "shell-aliases.nix" | ✅ Verified (1 file, 3 consumers) | ✅ Achieved |
-| Platform-specific overrides | ✅ "lib.mkAfter" | ✅ Verified (Darwin & NixOS) | ✅ Achieved |
-| Consistent UX | ✅ "Same aliases in Fish, Zsh, Bash" | ✅ Verified (all shells have l, t, gs...) | ✅ Achieved |
-| Declarative | ✅ "Nix-based" | ✅ Verified (no manual files) | ✅ Achieved |
-| Reproducible | ✅ "Automatic translation" | ✅ Verified (Home Manager handles) | ✅ Achieved |
+| Benefit                     | ADR-002 Claim                        | Implementation                            | Status      |
+| --------------------------- | ------------------------------------ | ----------------------------------------- | ----------- |
+| No Nix duplication          | ✅ "Define once, use everywhere"     | ✅ Verified (8 aliases, 0 duplication)    | ✅ Achieved |
+| Single source of truth      | ✅ "shell-aliases.nix"               | ✅ Verified (1 file, 3 consumers)         | ✅ Achieved |
+| Platform-specific overrides | ✅ "lib.mkAfter"                     | ✅ Verified (Darwin & NixOS)              | ✅ Achieved |
+| Consistent UX               | ✅ "Same aliases in Fish, Zsh, Bash" | ✅ Verified (all shells have l, t, gs...) | ✅ Achieved |
+| Declarative                 | ✅ "Nix-based"                       | ✅ Verified (no manual files)             | ✅ Achieved |
+| Reproducible                | ✅ "Automatic translation"           | ✅ Verified (Home Manager handles)        | ✅ Achieved |
 
 ---
 
@@ -580,10 +594,12 @@ Research correct LaunchAgents configuration for nix-darwin or remove the file if
 ### ✅ Code Duplication Analysis
 
 **Before ADR-002 (Hypothetical):**
+
 - 8 common aliases × 3 shells = 24 lines of duplication
 - Any change requires editing 3 files
 
 **After ADR-002 (Actual):**
+
 - 8 common aliases × 1 module = 8 lines (no duplication)
 - Any change requires editing 1 file
 
@@ -592,18 +608,21 @@ Research correct LaunchAgents configuration for nix-darwin or remove the file if
 ### ✅ Import Pattern Analysis
 
 **Fish Config:**
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.fish.shellAliases = commonAliases;
 ```
 
 **Zsh Config:**
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.zsh.shellAliases = commonAliases;
 ```
 
 **Bash Config:**
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.bash.shellAliases = commonAliases;
@@ -618,11 +637,13 @@ programs.bash.shellAliases = commonAliases;
 ### ✅ Nix Evaluation
 
 **Import Pattern:**
+
 - Single file import (minimal overhead)
 - No runtime performance impact (evaluated at build time)
 - Home Manager handles shell-specific translation
 
 **Startup Performance:**
+
 - Fish: No additional overhead (aliases compiled at build time)
 - Zsh: No additional overhead (aliases compiled at build time)
 - Bash: No additional overhead (aliases compiled at build time)
@@ -635,14 +656,14 @@ programs.bash.shellAliases = commonAliases;
 
 ### ✅ ADR-002 vs Reality
 
-| Section | Accuracy | Notes |
-|----------|-----------|-------|
-| Problem Statement | ✅ 100% | Matches original issue |
-| Decision | ✅ 100% | Implementation matches plan |
-| Implementation | ✅ 100% | Code matches examples |
-| Benefits | ✅ 100% | All benefits achieved |
-| Validation | ✅ 100% | Tests pass |
-| Architecture | ✅ 100% | File structure matches |
+| Section           | Accuracy | Notes                       |
+| ----------------- | -------- | --------------------------- |
+| Problem Statement | ✅ 100%  | Matches original issue      |
+| Decision          | ✅ 100%  | Implementation matches plan |
+| Implementation    | ✅ 100%  | Code matches examples       |
+| Benefits          | ✅ 100%  | All benefits achieved       |
+| Validation        | ✅ 100%  | Tests pass                  |
+| Architecture      | ✅ 100%  | File structure matches      |
 
 **Overall Documentation Accuracy:** ✅ 100%
 
@@ -659,6 +680,7 @@ All high-priority items are complete and working correctly.
 **Issue:** `launchd.userAgents` option doesn't exist in nix-darwin
 
 **Options:**
+
 1. Research correct option name in nix-darwin documentation
 2. Use alternative LaunchAgents configuration method
 3. Remove file if not critical for daily use
@@ -668,6 +690,7 @@ All high-priority items are complete and working correctly.
 ### ✅ Low Priority - Enhancements
 
 **Future Improvements:**
+
 1. Add automated testing for shell aliases (ADR-002 TODO)
 2. Add more common aliases if needed
 3. Consider adding shell-specific optimizations
@@ -683,6 +706,7 @@ All high-priority items are complete and working correctly.
 The ADR-002 cross-shell alias architecture has been **implemented perfectly**. The actual configuration matches the documented architecture **100%**, with only minor issues found in unrelated areas.
 
 **Key Achievements:**
+
 1. ✅ Zero Nix code duplication (define once, use everywhere)
 2. ✅ Single source of truth for common aliases
 3. ✅ Platform-specific overrides working correctly
@@ -692,6 +716,7 @@ The ADR-002 cross-shell alias architecture has been **implemented perfectly**. T
 7. ✅ All syntax checks passing
 
 **Action Items:**
+
 1. ⚠️ Fix LaunchAgents configuration (medium priority, non-blocking)
 2. ✅ No other action items needed
 

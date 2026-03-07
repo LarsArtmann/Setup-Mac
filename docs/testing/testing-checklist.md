@@ -9,12 +9,14 @@
 ## 🎯 Testing Philosophy
 
 **Automate Everything Possible**
+
 - Use `just test` before `just switch`
 - Always run `just pre-commit-run` before committing
 - Validate with `nix flake check` for syntax and imports
 - Run `just health` for comprehensive validation
 
 **Test Hierarchy** (fastest → slowest):
+
 1. **Syntax Check**: `nix flake check` (< 1 min)
 2. **Pre-commit**: `just pre-commit-run` (~2-3 min)
 3. **Build Test**: `just test` (~5-10 min)
@@ -28,6 +30,7 @@
 **Must pass before ANY commit:**
 
 - [ ] **Syntax Validation**
+
   ```bash
   nix flake check
   # Expected: All outputs evaluate successfully
@@ -35,6 +38,7 @@
   ```
 
 - [ ] **Pre-commit Hooks**
+
   ```bash
   just pre-commit-run
   # Expected: All hooks pass (gitleaks, trailing whitespace, Nix linters)
@@ -57,6 +61,7 @@
 **Must pass before applying changes to system:**
 
 - [ ] **Configuration Build Test** (Darwin)
+
   ```bash
   just test
   # Expected: Build completes successfully
@@ -64,6 +69,7 @@
   ```
 
 - [ ] **Configuration Build Test** (NixOS)
+
   ```bash
   sudo nixos-rebuild test --flake .#evo-x2
   # Expected: Build completes successfully
@@ -84,18 +90,21 @@
 **Verify after applying changes to system:**
 
 - [ ] **System Build** (Darwin)
+
   ```bash
   just switch
   # Expected: New generation activated successfully
   ```
 
 - [ ] **System Build** (NixOS)
+
   ```bash
   sudo nixos-rebuild switch --flake .#evo-x2
   # Expected: New generation activated successfully
   ```
 
 - [ ] **Package Availability** (spot check)
+
   ```bash
   # Test critical packages:
   git --version    # Version control
@@ -117,6 +126,7 @@
 ### Darwin (macOS) Testing
 
 **Critical Areas:**
+
 - [ ] Homebrew integration works
 - [ ] Touch ID for sudo enabled
 - [ ] System services (if any) running
@@ -124,6 +134,7 @@
 - [ ] File associations work (duti)
 
 **Commands:**
+
 ```bash
 # Test Homebrew
 brew --version
@@ -141,6 +152,7 @@ duti -e com.sublimetext.4 .txt
 ### NixOS Testing
 
 **Critical Areas:**
+
 - [ ] Display manager starts (SDDM)
 - [ ] Hyprland/Wayland sessions available
 - [ ] GPU acceleration works (AMD ROCm)
@@ -150,6 +162,7 @@ duti -e com.sublimetext.4 .txt
 - [ ] Monitoring services active (Netdata, ntopng)
 
 **Commands:**
+
 ```bash
 # Test GPU
 rocminfo | head -20
@@ -180,30 +193,35 @@ curl http://localhost:3000  # ntopng (should login page)
 **When things fail:**
 
 ### Syntax Errors
+
 - [ ] Check error message for file path and line number
 - [ ] Look for missing braces, commas, or quotes
 - [ ] Verify variable names are spelled correctly
 - [ ] Check import paths are correct
 
 ### Import Errors
+
 - [ ] Verify imported file exists at specified path
 - [ ] Check for circular dependencies
 - [ ] Ensure file has correct `.nix` extension
 - [ ] Verify file has correct function signature
 
 ### Build Errors
+
 - [ ] Check package availability with `nix search nixpkgs <package>`
 - [ ] Verify package names are correct (may need to rename)
 - [ ] Check for conflicting packages
 - [ ] Review error log for missing dependencies
 
 ### Runtime Errors
+
 - [ ] Check service status: `systemctl status <service>`
 - [ ] Review journal logs: `journalctl -xeu <service>`
 - [ ] Verify environment variables: `systemctl show <service> -p Environment`
 - [ ] Check permissions and user groups
 
 ### Darwin Build Errors
+
 - [ ] Check for `boost::too_few_args` errors (format string issues)
 - [ ] Verify all referenced variables are in scope
 - [ ] Check for undefined variables (`pkgs`, `lib`, etc.)
@@ -214,6 +232,7 @@ curl http://localhost:3000  # ntopng (should login page)
 ## 🔄 Continuous Testing Workflow
 
 **Daily Testing (during development):**
+
 1. Make configuration changes
 2. Run `just format` (if Nix files changed)
 3. Run `just pre-commit-run`
@@ -225,6 +244,7 @@ curl http://localhost:3000  # ntopng (should login page)
 9. Spot-check critical packages/services
 
 **Weekly Testing:**
+
 1. Run `just update` (update packages and flake inputs)
 2. Run full testing workflow above
 3. Run `just benchmark-all` to check performance
@@ -232,6 +252,7 @@ curl http://localhost:3000  # ntopng (should login page)
 5. Create backup with `just backup`
 
 **Monthly Testing:**
+
 1. Run full daily + weekly testing
 2. Run `just clean` to remove old generations
 3. Test on both platforms (Darwin + NixOS)
@@ -248,31 +269,38 @@ curl http://localhost:3000  # ntopng (should login page)
 ## Test Results (YYYY-MM-DD)
 
 ### Syntax Validation
+
 - Status: ✅ PASS / ❌ FAIL
 - Details: [Notes]
 
 ### Pre-commit Hooks
+
 - Status: ✅ PASS / ❌ FAIL
 - Details: [Notes]
 
 ### Build Test (Darwin)
+
 - Status: ✅ PASS / ❌ FAIL
 - Details: [Notes]
 
 ### Build Test (NixOS)
+
 - Status: ✅ PASS / ❌ FAIL
 - Details: [Notes]
 
 ### Health Check
+
 - Status: ✅ PASS / ❌ FAIL
 - Details: [Notes]
 
 ### Post-Apply Verification
+
 - [ ] All packages available
 - [ ] Services running
 - [ ] Configuration valid
 
 ### Issues Found
+
 - [ ] Issue 1: [Description]
 - [ ] Issue 2: [Description]
 ```
@@ -347,5 +375,5 @@ just rollback                 # Emergency rollback
 
 ---
 
-*This checklist should be updated as new testing requirements are discovered.*
-*Last updated: 2025-12-26*
+_This checklist should be updated as new testing requirements are discovered._
+_Last updated: 2025-12-26_

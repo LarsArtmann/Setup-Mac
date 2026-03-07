@@ -54,6 +54,7 @@ extra-sandbox-paths = [
 ```
 
 **Why These Are Essential:**
+
 - `/System/Library/Frameworks`: Required for all macOS-native applications
 - `/System/Library/PrivateFrameworks`: Many Apple APIs use private frameworks
 - `/usr/lib`: Core system libraries (libSystem.B.dylib, libc++, etc.)
@@ -70,6 +71,7 @@ extra-sandbox-paths = [
 ```
 
 **Why These Are Common:**
+
 - `/private/tmp` & `/private/var/tmp`: Most build systems need temp directories
 - `/usr/bin/env`: Required by many build systems to find utilities
 - `/usr/include`: Critical for building C/C++ packages with native dependencies
@@ -86,6 +88,7 @@ extra-sandbox-paths = [
 ```
 
 **When Needed:**
+
 - `/Library/Developer/CommandLineTools`: Building packages that need Xcode SDKs
 - `/usr/local/lib`: Mixed Nix/Homebrew setups
 - `/usr/bin/xcode-select` & `/usr/bin/xcrun`: Cross-compilation, iOS/macOS native builds
@@ -101,6 +104,7 @@ extra-sandbox-paths = [
 ```
 
 **When Needed:**
+
 - `/System/Library/Fonts`: GUI applications that need system fonts
 - `/System/Library/ColorSync/Profiles`: Graphics applications, video processing
 - `/Library`: Complex GUI applications (use sparingly, security risk)
@@ -113,6 +117,7 @@ extra-sandbox-paths = [
 ```
 
 **Security Implications:**
+
 - `/dev`: Allows access to hardware devices (disks, cameras, audio, GPUs)
 - Only enable if you're building kernel drivers, device utilities, or GPU-accelerated apps
 
@@ -261,35 +266,35 @@ extra-sandbox-paths = [
 
 ### Most Common Paths (90%+ of configs)
 
-| Path | Frequency | Platform | Use Case |
-|------|-----------|-----------|-----------|
-| `/System/Library/Frameworks` | 95% | macOS | Core frameworks |
-| `/System/Library/PrivateFrameworks` | 90% | macOS | Private APIs |
-| `/usr/lib` | 92% | macOS | System libraries |
-| `/private/tmp` | 88% | macOS | Temp directory |
-| `/private/var/tmp` | 85% | macOS | Var temp |
-| `/usr/bin/env` | 82% | macOS | Environment |
+| Path                                | Frequency | Platform | Use Case         |
+| ----------------------------------- | --------- | -------- | ---------------- |
+| `/System/Library/Frameworks`        | 95%       | macOS    | Core frameworks  |
+| `/System/Library/PrivateFrameworks` | 90%       | macOS    | Private APIs     |
+| `/usr/lib`                          | 92%       | macOS    | System libraries |
+| `/private/tmp`                      | 88%       | macOS    | Temp directory   |
+| `/private/var/tmp`                  | 85%       | macOS    | Var temp         |
+| `/usr/bin/env`                      | 82%       | macOS    | Environment      |
 
 ### Common Paths (50-90% of configs)
 
-| Path | Frequency | Platform | Use Case |
-|------|-----------|-----------|-----------|
-| `/usr/include` | 78% | macOS | C/C++ headers |
-| `/bin/sh` | 65% | Both | Shell interpreter |
-| `/bin/bash` | 60% | Both | Bash shell |
-| `/Library/Developer/CommandLineTools` | 55% | macOS | Xcode tools |
-| `/System/Library/Fonts` | 52% | macOS | GUI apps |
-| `/usr/local/lib` | 48% | macOS | Homebrew |
+| Path                                  | Frequency | Platform | Use Case          |
+| ------------------------------------- | --------- | -------- | ----------------- |
+| `/usr/include`                        | 78%       | macOS    | C/C++ headers     |
+| `/bin/sh`                             | 65%       | Both     | Shell interpreter |
+| `/bin/bash`                           | 60%       | Both     | Bash shell        |
+| `/Library/Developer/CommandLineTools` | 55%       | macOS    | Xcode tools       |
+| `/System/Library/Fonts`               | 52%       | macOS    | GUI apps          |
+| `/usr/local/lib`                      | 48%       | macOS    | Homebrew          |
 
 ### Use-Case Specific Paths (<50% of configs)
 
-| Path | Frequency | Platform | Use Case |
-|------|-----------|-----------|-----------|
-| `/var/cache/ccache` | 35% | NixOS | Build caching |
-| `/System/Library/ColorSync/Profiles` | 30% | macOS | Graphics |
-| `/nix/mirror/aosp` | 25% | NixOS | Android dev |
-| `/var/cache/sccache` | 20% | NixOS | Build caching |
-| `/dev` | 15% | Both | Hardware (rare) |
+| Path                                 | Frequency | Platform | Use Case        |
+| ------------------------------------ | --------- | -------- | --------------- |
+| `/var/cache/ccache`                  | 35%       | NixOS    | Build caching   |
+| `/System/Library/ColorSync/Profiles` | 30%       | macOS    | Graphics        |
+| `/nix/mirror/aosp`                   | 25%       | NixOS    | Android dev     |
+| `/var/cache/sccache`                 | 20%       | NixOS    | Build caching   |
+| `/dev`                               | 15%       | Both     | Hardware (rare) |
 
 ---
 
@@ -324,6 +329,7 @@ extra-sandbox-paths = [
 ```
 
 **Why This Works:**
+
 - Covers 95% of build scenarios
 - No hardware access (secure)
 - Good balance of security and convenience
@@ -347,6 +353,7 @@ extra-sandbox-paths = [
 ```
 
 **Why This Works:**
+
 - Minimal paths (web dev doesn't need system fonts)
 - High security
 - Good build success rate (~90%)
@@ -377,6 +384,7 @@ extra-sandbox-paths = [
 ```
 
 **Why This Works:**
+
 - Supports GUI applications (Electron, native macOS apps)
 - Includes font and color management
 - Good for graphics/video applications
@@ -395,6 +403,7 @@ extra-sandbox-paths = [
 ```
 
 **Why This Works:**
+
 - Minimal paths (pure Nix build)
 - Explicit shell binding avoids issues
 - Works across architectures
@@ -419,6 +428,7 @@ in {
 ```
 
 **Why This Works:**
+
 - Maps remote URLs to local mirrors
 - Allows offline builds
 - Faster Android development workflow
@@ -439,6 +449,7 @@ error: while setting up build environment:
 **Cause:** `/usr/lib` not in sandbox paths
 
 **Solution:**
+
 ```nix
 extra-sandbox-paths = [ "/usr/lib" ];
 ```
@@ -453,6 +464,7 @@ error: while setting up build environment:
 **Cause:** `/usr/include` not in sandbox paths
 
 **Solution:**
+
 ```nix
 extra-sandbox-paths = [ "/usr/include" ];
 ```
@@ -466,6 +478,7 @@ error: getting status of /nix/var/nix/daemon-socket/socket: Operation not permit
 **Cause:** Nix daemon issue
 
 **Solution:**
+
 ```bash
 sudo launchctl stop org.nixos.nix-daemon
 sudo launchctl start org.nixos.nix-daemon
@@ -482,6 +495,7 @@ nix.settings = {
 ```
 
 **View logs:**
+
 ```bash
 log show --predicate 'eventMessage contains "nix-sandbox"' --last 1h
 ```
@@ -513,11 +527,13 @@ nix show-config | grep -E "(sandbox|sandbox-paths)"
 ### Source Configurations
 
 #### macOS (Darwin)
+
 - [LnL7/nix-darwin](https://github.com/nix-darwin/nix-darwin)
 - [khaneliman/khanelinix](https://github.com/khaneliman/khanelinix)
 - [berbiche/dotfiles](https://github.com/berbiche/dotfiles)
 
 #### NixOS
+
 - [Arcanyx/NiXium](https://github.com/Arcanyx-org/NiXium)
 - [danielfullmer/nixos-configs](https://github.com/danielfullmer/nixos-configs)
 - [nix-community/robotnix](https://github.com/nix-community/robotnix)
@@ -595,18 +611,21 @@ nix show-config | grep -E "(sandbox|sandbox-paths)"
 This research provides a comprehensive foundation for configuring Nix sandbox on both macOS (Darwin) and NixOS.
 
 **Key Findings:**
+
 1. Most macOS configs use the same 6 core paths (90%+ frequency)
 2. Security can be balanced with convenience through careful path selection
 3. Use-case-specific additions (dev tools, GUI support, etc.) are common
 4. `/dev` exposure is a significant security risk (use with caution)
 
 **Your Configuration:**
+
 - Comprehensive but security-conscious
 - Well-documented with categories
 - Ready for desktop development on macOS
 - Balanced for 95%+ build success rate
 
 **Next Steps:**
+
 1. Test the updated configuration
 2. Enable sandbox violation logging if issues occur
 3. Adjust paths based on specific build failures

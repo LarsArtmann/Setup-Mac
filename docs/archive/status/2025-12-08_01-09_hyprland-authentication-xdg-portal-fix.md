@@ -1,6 +1,9 @@
 # Hyprland Authentication & XDG Portal Integration Fix
+
 ## Date: 2025-12-08 01:09 CET
+
 ## Status: COMPLETE ✅
+
 ## Target System: evo-x2 (NixOS)
 
 ---
@@ -8,6 +11,7 @@
 ## 🎯 MISSION OBJECTIVE
 
 Fix critical Hyprland integration issues on evo-x2 PC:
+
 - ❌ **Authentication Agent Missing**: No authentication UI for privileged operations
 - ❌ **XDG Desktop Portal Missing**: No desktop integration (file dialogs, screenshots)
 
@@ -16,6 +20,7 @@ Fix critical Hyprland integration issues on evo-x2 PC:
 ## 📋 PROBLEM ANALYSIS
 
 ### Root Cause Investigation
+
 The evo-x2 system had incomplete Hyprland configuration missing essential desktop environment components:
 
 1. **Authentication Framework**: Missing polkit + GNOME authentication agent
@@ -24,6 +29,7 @@ The evo-x2 system had incomplete Hyprland configuration missing essential deskto
 4. **Package Dependencies**: Missing Qt Wayland support and essential utilities
 
 ### Impact Analysis
+
 - **User Experience**: Authentication prompts never appeared
 - **Application Integration**: File dialogs, screenshots broken
 - **Desktop Environment**: Incomplete Wayland experience
@@ -36,6 +42,7 @@ The evo-x2 system had incomplete Hyprland configuration missing essential deskto
 ### Configuration Changes Made
 
 #### 1. Enhanced Hyprland Module Configuration
+
 ```nix
 programs.hyprland = {
   enable = true;
@@ -47,6 +54,7 @@ programs.hyprland = {
 ```
 
 #### 2. Authentication System Integration
+
 ```nix
 # Polkit framework
 security.polkit.enable = true;
@@ -63,6 +71,7 @@ systemd.user.services.polkit-gnome-authentication-agent-1 = {
 ```
 
 #### 3. XDG Desktop Portal Configuration
+
 ```nix
 xdg.portal = {
   enable = true;
@@ -73,6 +82,7 @@ xdg.portal = {
 ```
 
 #### 4. Essential System Packages
+
 ```nix
 environment.systemPackages = with pkgs; [
   polkit_gnome          # Authentication UI
@@ -84,6 +94,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 #### 5. User Group Permissions
+
 ```nix
 users.users.lars.extraGroups = [
   "networkmanager" "wheel" "docker"
@@ -94,7 +105,9 @@ users.users.lars.extraGroups = [
 ### Additional Fixes
 
 #### Flake Deprecation Warnings
+
 Fixed deprecated `system` parameter usage:
+
 ```nix
 # Before (deprecated)
 system = "x86_64-linux"
@@ -108,6 +121,7 @@ localSystem.system = "x86_64-linux"
 ## 🧪 TESTING & VALIDATION
 
 ### Configuration Validation
+
 ```bash
 # Syntax verification
 nix flake check --quiet
@@ -117,6 +131,7 @@ nix flake check --quiet
 ```
 
 ### Pre-Deployment Status
+
 - ✅ **Syntax Valid**: No configuration errors
 - ✅ **Dependencies Resolved**: All packages available
 - ✅ **Module Integration**: Proper NixOS module usage
@@ -128,6 +143,7 @@ nix flake check --quiet
 ## 🚀 DEPLOYMENT INSTRUCTIONS
 
 ### On evo-x2 System:
+
 ```bash
 # Navigate to Setup-Mac directory
 cd /path/to/Setup-Mac
@@ -140,6 +156,7 @@ sudo reboot
 ```
 
 ### Post-Deployment Verification:
+
 ```bash
 # Check authentication agent
 systemctl --user status polkit-gnome-authentication-agent-1
@@ -160,6 +177,7 @@ gtk-launch file-dialog-test
 ## 📊 EXPECTED OUTCOMES
 
 ### Fixed Issues:
+
 - ✅ **Authentication dialogs** will appear for privileged operations
 - ✅ **File dialogs** will work in Wayland applications
 - ✅ **Screenshots** will function properly
@@ -167,6 +185,7 @@ gtk-launch file-dialog-test
 - ✅ **System services** will start automatically in user session
 
 ### Improved User Experience:
+
 - **Seamless desktop integration** with proper portal support
 - **Visual authentication feedback** for security operations
 - **Application compatibility** through Qt Wayland libraries
@@ -177,6 +196,7 @@ gtk-launch file-dialog-test
 ## 🔄 ROLLBACK PROCEDURE
 
 If issues occur:
+
 ```bash
 # Emergency rollback to previous generation
 sudo nixos-rebuild rollback
@@ -193,12 +213,14 @@ sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 ## 📈 PERFORMANCE IMPACT
 
 ### Resource Usage:
+
 - **Polkit Agent**: Minimal user-space service (~5-10MB)
 - **XDG Portals**: Lightweight D-Bus services (~2-5MB each)
 - **Qt Libraries**: Shared libraries loaded on-demand
 - **Systemd Services**: Startup time impact < 1 second
 
 ### System Load:
+
 - **Startup**: Slightly increased initialization time
 - **Runtime**: Negligible impact during normal use
 - **Memory**: ~50-100MB additional baseline usage
@@ -208,16 +230,19 @@ sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 ## 🔮 FUTURE IMPROVEMENTS
 
 ### Automated Testing:
+
 - Implement CI/CD for NixOS configuration validation
 - Add integration tests for desktop environments
 - Create automated deployment verification
 
 ### Configuration Management:
+
 - Develop configuration templates for new systems
 - Add comprehensive validation schemas
 - Implement backup/restore automation
 
 ### Monitoring & Maintenance:
+
 - Add system health monitoring
 - Implement performance tracking
 - Create alerting for critical services
@@ -227,12 +252,14 @@ sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 ## 📋 CHECKLIST
 
 ### Pre-Deployment:
+
 - [x] Configuration syntax validated
 - [x] Dependencies verified available
 - [x] Documentation updated
 - [x] Rollback procedure documented
 
 ### Post-Deployment:
+
 - [ ] Authentication dialogs working
 - [ ] File dialogs functional
 - [ ] Screenshots working
@@ -240,6 +267,7 @@ sudo nix-env --list-generations --profile /nix/var/nix/profiles/system
 - [ ] Services running correctly
 
 ### Long-term:
+
 - [ ] Automated testing pipeline
 - [ ] Performance monitoring
 - [ ] Configuration templates
@@ -259,6 +287,6 @@ The comprehensive fix for Hyprland authentication and XDG desktop portal issues 
 
 ---
 
-*Generated: 2025-12-08 01:09 CET*
-*Configuration: Setup-Mac v2.0*
-*Target: evo-x2 NixOS System*
+_Generated: 2025-12-08 01:09 CET_
+_Configuration: Setup-Mac v2.0_
+_Target: evo-x2 NixOS System_

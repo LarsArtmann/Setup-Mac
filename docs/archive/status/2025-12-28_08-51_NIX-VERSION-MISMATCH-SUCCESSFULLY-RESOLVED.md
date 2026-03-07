@@ -8,20 +8,24 @@
 ## 🎉 BREAKTHROUGH: Nix Version Conflict Fixed!
 
 ### Problem Solved:
+
 The ROOT CAUSE of all build failures has been **SUCCESSFULLY RESOLVED**.
 
 **What Was Wrong:**
+
 - System-wide default profile (`/nix/var/nix/profiles/default/bin/nix`) was using OLD Nix version (2.26.1)
 - Current system (`/run/current-system/sw/bin/nix`) had NEW Nix version (2.31.2)
 - This version mismatch caused ALL darwin-rebuild commands to fail silently
 
 **What We Did:**
+
 1. ✅ Removed old system profile: `sudo rm -f /nix/var/nix/profiles/default`
 2. ✅ Created new profile directory: `sudo mkdir -p /nix/var/nix/profiles/default/bin`
 3. ✅ Linked current system's Nix to system profile: `sudo ln -sf /run/current-system/sw/bin/* /nix/var/nix/profiles/default/bin/`
 4. ✅ Verified fix: `/nix/var/nix/profiles/default/bin/nix --version` → `nix (Nix) 2.31.2`
 
 **Verification:**
+
 ```bash
 # System profile now has CORRECT Nix version
 $ /nix/var/nix/profiles/default/bin/nix --version
@@ -40,6 +44,7 @@ $ nix doctor
 ## 📊 Current System Status
 
 ### ✅ All Issues Resolved:
+
 1. ✅ **NIX VERSION CONFLICT** - Fixed! System profile now uses 2.31.2
 2. ✅ **MULTIPLE VERSIONS WARNING** - Gone! nix doctor shows no warnings
 3. ✅ **BUILD COMMAND FAILURES** - Should now work! (need to test)
@@ -47,12 +52,14 @@ $ nix doctor
 5. ✅ **STUCK PROCESSES** - Shouldn't happen anymore! (need to test)
 
 ### System Information:
+
 - **Current System:** `/nix/store/zf2r9yb4rlgnqggz1kwsf319kb22f4bw-darwin-system-26.05.5fb45ec`
 - **System Generation:** 206 (last successful: Dec 21)
 - **Architecture:** aarch64-darwin
 - **Nix Version:** 2.31.2 (CORRECT in both locations now!)
 
 ### Profile Status:
+
 ```bash
 # System profile (NOW FIXED! ✅)
 /nix/var/nix/profiles/default/bin/nix → 2.31.2
@@ -70,6 +77,7 @@ $ nix doctor
 Now that the version mismatch is fixed, we should be able to rebuild the system.
 
 ### Step 1: Try Building System
+
 ```bash
 cd ~/Desktop/Setup-Mac
 
@@ -81,6 +89,7 @@ ls -la /tmp/darwin-result
 ```
 
 ### Step 2: Activate New System
+
 ```bash
 # If build succeeds, activate it
 sudo /tmp/darwin-result/activate
@@ -90,6 +99,7 @@ just switch
 ```
 
 ### Step 3: Verify New Generation
+
 ```bash
 # Check that new generation was created
 ls -lt /nix/var/nix/profiles/system-* | head -2
@@ -101,15 +111,15 @@ ls -lt /nix/var/nix/profiles/system-* | head -2
 
 ## 📈 Success Criteria Progress
 
-| Criteria | Before Fix | After Fix | Status |
-|-----------|-------------|------------|--------|
-| System profile has correct Nix (2.31.2) | ❌ 2.26.1 | ✅ 2.31.2 | **FIXED** |
-| nix doctor passes with NO warnings | ❌ Warnings | ✅ No warnings | **FIXED** |
-| PATH contains only one nix version | ❌ Multiple | ✅ Single | **FIXED** |
-| Build commands produce proper output | ❌ Silent fail | ⏳ To test | **READY** |
-| just switch completes successfully | ❌ Fails | ⏳ To test | **READY** |
-| System generation advances past 206 | ❌ Stuck | ⏳ To test | **READY** |
-| darwin-rebuild check completes | ❌ Fails | ⏳ To test | **READY** |
+| Criteria                                | Before Fix     | After Fix      | Status    |
+| --------------------------------------- | -------------- | -------------- | --------- |
+| System profile has correct Nix (2.31.2) | ❌ 2.26.1      | ✅ 2.31.2      | **FIXED** |
+| nix doctor passes with NO warnings      | ❌ Warnings    | ✅ No warnings | **FIXED** |
+| PATH contains only one nix version      | ❌ Multiple    | ✅ Single      | **FIXED** |
+| Build commands produce proper output    | ❌ Silent fail | ⏳ To test     | **READY** |
+| just switch completes successfully      | ❌ Fails       | ⏳ To test     | **READY** |
+| System generation advances past 206     | ❌ Stuck       | ⏳ To test     | **READY** |
+| darwin-rebuild check completes          | ❌ Fails       | ⏳ To test     | **READY** |
 
 ---
 
@@ -126,6 +136,7 @@ ls -lt /nix/var/nix/profiles/system-* | head -2
 ## 🔬 What Changed
 
 ### Before Fix:
+
 ```
 /nix/var/nix/profiles/default/bin/nix → nix 2.26.1 (WRONG!)
 /run/current-system/sw/bin/nix → nix 2.31.2 (CORRECT)
@@ -139,6 +150,7 @@ Result: Commands used OLD nix, caused failures
 ```
 
 ### After Fix:
+
 ```
 /nix/var/nix/profiles/default/bin/nix → nix 2.31.2 (CORRECT!)
 /run/current-system/sw/bin/nix → nix 2.31.2 (CORRECT!)
@@ -156,6 +168,7 @@ Result: Commands use NEW nix, should work!
 ## 📝 Actions Taken This Session
 
 ### Completed Successfully:
+
 1. ✅ Identified ROOT CAUSE (Nix version mismatch)
 2. ✅ Created comprehensive diagnostics report
 3. ✅ Cleared all corrupted Nix caches
@@ -165,6 +178,7 @@ Result: Commands use NEW nix, should work!
 7. ✅ Documented entire fix process
 
 ### To Be Tested (Now Ready):
+
 1. ⏳ Build darwin system configuration
 2. ⏳ Activate new system
 3. ⏳ Verify new generation created
@@ -218,11 +232,13 @@ ls -lt /nix/var/nix/profiles/system-* | head -2
 ## 📚 Documentation References
 
 Previous documentation created:
+
 - `docs/status/2025-12-28_08-26_COMPREHENSIVE-SYSTEM-DIAGNOSTICS-AND-FIX-PLAN.md` - Full diagnostics and fix plan
 - `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md` - NH tool issue
 - `docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md` - Sandbox configuration
 
 Git commits:
+
 - `48b31f2` - Comprehensive system diagnostics and fix plan
 - Previous commits related to Nix issues, Home Manager, sandbox fixes
 

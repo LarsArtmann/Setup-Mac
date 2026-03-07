@@ -12,6 +12,7 @@
 This session successfully resolved ALL critical terminal issues affecting fish shell, starship prompt, and Go binary accessibility. Three major problems were identified and fixed through systematic investigation and proper use of nix-darwin's native configuration options.
 
 **Final Result:**
+
 - ✅ Fish shell starts with NO errors
 - ✅ Starship prompt displays perfectly with NO warnings
 - ✅ All 85 Go binaries accessible via PATH
@@ -22,13 +23,16 @@ This session successfully resolved ALL critical terminal issues affecting fish s
 ## Problems Identified & Resolved
 
 ### Problem 1: Fish/Starship Wrapper Conflicts
+
 **Symptoms:**
+
 - mkdir errors on fish startup (4x)
 - Wrapper scripts not being used
 - System using unwrapped binaries
 
 **Root Cause:**
 Custom `fishWrapper` conflicted with nix-darwin's `programs.fish` module. When both were present:
+
 1. fishWrapper added to systemPackages
 2. fishWrapper depends on pkgs.fish
 3. Nix added BOTH to system
@@ -36,29 +40,35 @@ Custom `fishWrapper` conflicted with nix-darwin's `programs.fish` module. When b
 5. Wrapper never executed
 
 **Solution (Commit 64c6022):**
+
 - Removed fishWrapper from systemPackages
 - Kept programs.fish as sole configuration method
 - programs.fish handles all fish configuration properly
 
 **Files Modified:**
+
 - `dotfiles/nix/wrappers/default.nix` (commented out fishWrapper)
 
 ---
 
 ### Problem 2: Starship Configuration & mkdir Errors
+
 **Symptoms:**
+
 ```
 [WARN] - (starship::config): Error in 'StarshipRoot' at 'go': Unknown key
 mkdir: cannot create directory '': No such file or directory (4x)
 ```
 
 **Root Causes (Multiple):**
+
 1. **Wrong module name:** Config used `[go]` instead of `[golang]`
 2. **Disabled wrapper:** starshipWrapper was commented out, config not deployed
 3. **Env variable quoting:** Values had escaped quotes causing empty paths
 4. **preHook timing:** Ran BEFORE environment variables were exported
 
 **Investigation Timeline:**
+
 ```
 13:13 - User reports starship warnings and mkdir errors
 13:15 - Identified [go] should be [golang] via Starship docs
@@ -72,6 +82,7 @@ mkdir: cannot create directory '': No such file or directory (4x)
 **Solutions (Commit 86934e6):**
 
 **Fix #1: Starship Module Name**
+
 ```nix
 # Before (starship.nix:73)
 [go]
@@ -83,6 +94,7 @@ format = "via [$symbol$version]($style) "
 ```
 
 **Fix #2: Re-enabled Wrapper**
+
 ```nix
 # Before (default.nix:26)
 # starshipWrapper.starship  # REMOVED: Conflicts...
@@ -92,6 +104,7 @@ starshipWrapper.starship  # NEEDED: Deploys starship.toml
 ```
 
 **Fix #3: Environment Variable Quoting**
+
 ```nix
 # Before (starship.nix:110-112)
 env = {
@@ -109,6 +122,7 @@ env = {
 ```
 
 **Fix #4: PreHook Execution Order**
+
 ```nix
 # Before (starship.nix:114-117)
 preHook = ''
@@ -121,6 +135,7 @@ preHook = ''
 
 **Technical Explanation:**
 The `wrapWithConfig` function executes in this order:
+
 1. preHook (variables not yet available!)
 2. Environment variable exports
 3. Config file setup
@@ -129,13 +144,16 @@ The `wrapWithConfig` function executes in this order:
 This caused `mkdir -p "$STARSHIP_CACHE"` to expand to `mkdir -p ""`, resulting in the error messages.
 
 **Files Modified:**
+
 - `dotfiles/nix/wrappers/shell/starship.nix` (3 fixes)
 - `dotfiles/nix/wrappers/default.nix` (re-enabled wrapper)
 
 ---
 
 ### Problem 3: Go Binaries Not in PATH
+
 **Symptoms:**
+
 ```fish
 ~ ➜ templ
 fish: Unknown command: templ
@@ -147,12 +165,14 @@ fish: Unknown command: templ
 
 **Root Cause:**
 home-manager is **DISABLED** in `flake.nix` (line 174):
+
 ```nix
 # Home Manager integration - temporarily disabled to migrate configs
 # home-manager.darwinModules.home-manager
 ```
 
 This meant `home.sessionPath` in `home.nix` was completely ignored:
+
 ```nix
 # home.nix - NOT APPLIED!
 home.sessionPath = [
@@ -163,6 +183,7 @@ home.sessionPath = [
 ```
 
 **Investigation Process:**
+
 ```
 13:03 - User reports: "templ: Unknown command"
 13:05 - Checked PATH: go/bin missing
@@ -187,6 +208,7 @@ environment.systemPath = [
 ```
 
 **Why This Works:**
+
 - `environment.systemPath` is nix-darwin's native PATH management
 - Works WITHOUT home-manager (which is disabled)
 - Applied to ALL shells (fish, zsh, bash)
@@ -194,6 +216,7 @@ environment.systemPath = [
 - Proper integration with nix profiles
 
 **Files Modified:**
+
 - `dotfiles/nix/environment.nix` (added systemPath)
 
 ---
@@ -201,6 +224,7 @@ environment.systemPath = [
 ## Verification & Testing
 
 ### Test 1: Fresh Fish Shell
+
 ```fish
 # Before
 ~/go/bin at 13:14:25 ➜ fish
@@ -213,6 +237,7 @@ mkdir: cannot create directory '': No such file or directory (4x)
 ```
 
 ### Test 2: Starship Configuration
+
 ```fish
 # Before
 fish -c 'starship prompt'
@@ -224,6 +249,7 @@ fish -c 'starship prompt'
 ```
 
 ### Test 3: Go Binaries in PATH
+
 ```fish
 # Before
 ~ ➜ echo $PATH
@@ -244,6 +270,7 @@ v0.3.960  # ✅ Works!
 ```
 
 ### Test 4: Configuration Builds
+
 ```bash
 just test   # ✅ Passed
 just switch # ✅ Applied successfully
@@ -254,9 +281,11 @@ just switch # ✅ Applied successfully
 ## Commits Summary
 
 ### Commit 64c6022: Remove Fish/Starship Wrapper Conflicts
+
 **Message:** `fix: Remove conflicting fish/starship wrappers in favor of nix-darwin programs.fish module`
 
 **Changes:**
+
 - Removed fishWrapper from systemPackages (conflicted with programs.fish)
 - Kept starshipWrapper (manages starship.toml config)
 - Updated comments explaining why wrappers were removed/kept
@@ -266,15 +295,18 @@ just switch # ✅ Applied successfully
 ---
 
 ### Commit 86934e6: Fix Starship Configuration
+
 **Message:** `fix: Fix starship configuration and eliminate all mkdir errors`
 
 **Changes:**
+
 1. Renamed `[go]` to `[golang]` in starship config
 2. Re-enabled starshipWrapper for config deployment
 3. Fixed environment variable quoting (removed escaped quotes)
 4. Removed problematic preHook that ran before env vars
 
 **Impact:**
+
 - Eliminated starship "[WARN] Unknown key 'go'" error
 - Eliminated all 4 mkdir errors from shell startup
 - Starship prompt now works perfectly
@@ -282,14 +314,17 @@ just switch # ✅ Applied successfully
 ---
 
 ### Commit d873aad: Add User Paths to System PATH
+
 **Message:** `fix: Add go/bin and other user paths to environment.systemPath`
 
 **Changes:**
+
 - Added `environment.systemPath` with 5 user directories
 - Includes go/bin, .local/bin, .bun/bin, .turso, .orbstack/bin
 - Uses nix-darwin's native PATH management
 
 **Impact:**
+
 - All 85 Go binaries now accessible
 - templ, air, and other tools work in all shells
 - Proper PATH configuration without home-manager
@@ -301,6 +336,7 @@ just switch # ✅ Applied successfully
 ### Key Learnings
 
 **1. nix-darwin vs home-manager**
+
 - home-manager is currently DISABLED in this configuration
 - Must use nix-darwin native options when home-manager is off
 - `environment.systemPath` replaces `home.sessionPath`
@@ -308,6 +344,7 @@ just switch # ✅ Applied successfully
 
 **2. Wrapper Execution Order**
 The `wrapWithConfig` function has a critical flaw:
+
 ```nix
 writeShellScriptBin name ''
   ${preHook}      # ❌ Line 1: Variables not available yet!
@@ -321,32 +358,37 @@ writeShellScriptBin name ''
 **Recommendation:** Refactor to run env exports BEFORE preHook
 
 **3. Starship Module Names**
+
 - Starship uses `[golang]` not `[go]` for Go module
 - Always check official docs for correct module names
 - Invalid module names cause "Unknown key" warnings
 
 **4. Configuration Priority**
 When both wrapper and program module exist:
+
 1. Nix resolves package dependencies
 2. Both wrapper AND dependency added to systemPackages
 3. Original package gets symlinked (higher priority)
 4. Wrapper never executes
 
-**Solution:** Don't use wrappers when programs.* modules exist
+**Solution:** Don't use wrappers when programs.\* modules exist
 
 ### Architecture Decisions
 
 **Decision 1: Use programs.fish over fishWrapper**
+
 - **Rationale:** programs.fish is nix-darwin's official way
 - **Alternative:** Custom wrapper with complex deployment
 - **Outcome:** Simpler, more maintainable, works correctly
 
 **Decision 2: Keep starshipWrapper for config**
+
 - **Rationale:** Starship config needs deployment, wrapper doesn't conflict
 - **Alternative:** Manual config file management
 - **Outcome:** Declarative config deployment works well
 
 **Decision 3: Use environment.systemPath over home.sessionPath**
+
 - **Rationale:** home-manager is disabled, need nix-darwin native
 - **Alternative:** Enable home-manager (more complex)
 - **Outcome:** Simple, works immediately, proper integration
@@ -380,12 +422,12 @@ When both wrapper and program module exist:
 
 5. **Create wrapper decision guide**
    - When to use custom wrappers
-   - When to use programs.* modules
+   - When to use programs.\* modules
    - Decision tree for developers
 
 6. **Architecture documentation**
    - Document wrapper system
-   - Explain programs.* vs wrappers
+   - Explain programs.\* vs wrappers
    - Add execution flow diagrams
 
 ### Long-term (Nice to Have)
@@ -410,6 +452,7 @@ When both wrapper and program module exist:
 ## Metrics & Statistics
 
 **Session Metrics:**
+
 - Duration: ~3 hours
 - Commits: 3
 - Files Modified: 4
@@ -417,12 +460,14 @@ When both wrapper and program module exist:
 - Issues Fixed: 7
 
 **Problem Resolution:**
+
 - mkdir errors: 4 → 0 ✅
 - Starship warnings: 1 → 0 ✅
 - Go binaries accessible: 0 → 85 ✅
 - Terminal errors: Multiple → None ✅
 
 **Testing:**
+
 - Configuration builds tested: 3/3 passed ✅
 - Fresh shell tests: 4/4 passed ✅
 - Go binary tests: 100% working ✅
@@ -433,6 +478,7 @@ When both wrapper and program module exist:
 ## User Impact
 
 **Before This Session:**
+
 ```fish
 # Every new terminal:
 mkdir: cannot create directory '': No such file or directory
@@ -449,6 +495,7 @@ fish: Unknown command: air
 ```
 
 **After This Session:**
+
 ```fish
 # Clean startup, beautiful prompt
 ~ via 🥟 v1.3.2 at 13:30:48 ➜ templ version
@@ -459,6 +506,7 @@ v0.3.960
 ```
 
 **Developer Experience:**
+
 - ✅ Fast, clean terminal startup
 - ✅ Beautiful starship prompt
 - ✅ All Go development tools accessible

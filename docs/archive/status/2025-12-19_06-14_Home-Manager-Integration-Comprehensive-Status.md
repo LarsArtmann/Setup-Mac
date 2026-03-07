@@ -12,6 +12,7 @@
 **Current State:** The Setup-Mac project has declared home-manager as a dependency but has **completely failed to integrate it** into the actual configuration system. This represents a critical architectural gap resulting in configuration fragmentation, maintenance overhead, and missed optimization opportunities.
 
 **Impact Assessment:**
+
 - 🔴 **CRITICAL**: Competing configuration systems creating potential conflicts
 - 🔴 **MAINTENANCE**: Fragmented configurations across 59 .nix files
 - 🔴 **CROSS-PLATFORM**: Inconsistent approaches between macOS and NixOS
@@ -24,6 +25,7 @@
 ## 🏗️ PROJECT ARCHITECTURE ANALYSIS
 
 ### Current Configuration Hierarchy
+
 ```
 Setup-Mac/
 ├── flake.nix                    # ❌ Home-manager declared but not used
@@ -46,15 +48,15 @@ Setup-Mac/
 
 ### Integration Status Matrix
 
-| Component | Status | Issues | Priority |
-|-----------|--------|--------|----------|
-| flake.nix home-manager imports | ❌ **BROKEN** | Declared but not used in system configs | 🚨 URGENT |
-| darwin.nix integration | ❌ **MISSING** | No home-manager configuration block | 🚨 URGENT |
-| configuration.nix integration | ❌ **MISSING** | No home-manager configuration block | 🚨 URGENT |
-| Shell configurations | ⚠️ **FRAGMENTED** | System and user configs mixed | 🔴 HIGH |
-| Custom program system | ❌ **CONFLICTING** | Competes with home-manager | 🔴 HIGH |
-| Cross-platform consistency | ⚠️ **INCONSISTENT** | Different approaches per platform | 🔴 HIGH |
-| Testing framework | ❌ **MISSING** | Zero validation of configurations | 🟡 MEDIUM |
+| Component                      | Status              | Issues                                  | Priority  |
+| ------------------------------ | ------------------- | --------------------------------------- | --------- |
+| flake.nix home-manager imports | ❌ **BROKEN**       | Declared but not used in system configs | 🚨 URGENT |
+| darwin.nix integration         | ❌ **MISSING**      | No home-manager configuration block     | 🚨 URGENT |
+| configuration.nix integration  | ❌ **MISSING**      | No home-manager configuration block     | 🚨 URGENT |
+| Shell configurations           | ⚠️ **FRAGMENTED**   | System and user configs mixed           | 🔴 HIGH   |
+| Custom program system          | ❌ **CONFLICTING**  | Competes with home-manager              | 🔴 HIGH   |
+| Cross-platform consistency     | ⚠️ **INCONSISTENT** | Different approaches per platform       | 🔴 HIGH   |
+| Testing framework              | ❌ **MISSING**      | Zero validation of configurations       | 🟡 MEDIUM |
 
 ---
 
@@ -63,18 +65,21 @@ Setup-Mac/
 ### Files Analysis (59 Total .nix Files)
 
 **Fully Functional (12 files):**
+
 - ✅ `platforms/common/home-base.nix` - Good foundation
 - ✅ Core type safety system files
 - ✅ Basic platform-specific configurations
 - ✅ Package definitions
 
 **Partially Functional (18 files):**
+
 - ⚠️ `platforms/darwin/home.nix` - Partial home config
 - ⚠️ `platforms/nixos/users/home.nix` - Partial home config
 - ⚠️ Various program configurations
 - ⚠️ Environment and system settings
 
 **Critical Issues (29 files):**
+
 - ❌ `flake.nix` - Missing home-manager module imports
 - ❌ `platforms/darwin/darwin.nix` - No integration
 - ❌ `platforms/nixos/system/configuration.nix` - No integration
@@ -85,12 +90,14 @@ Setup-Mac/
 ### Key Findings
 
 **Critical Integration Gaps:**
+
 1. **Home-Manager Declaration vs Usage**: Imported in flake.nix but never actually used
 2. **Missing Module Imports**: Both darwin.nix and configuration.nix lack home-manager imports
 3. **Competing Systems**: Custom program integration system directly conflicts with home-manager's native capabilities
 4. **Configuration Fragmentation**: Shell configs scattered across system-level and user-level files
 
 **Architecture Anti-Patterns:**
+
 1. **Mixed Responsibilities**: System-level and user-level configurations interleaved
 2. **Duplication**: Similar configurations implemented multiple times
 3. **Inconsistent Patterns**: Different approaches for darwin vs nixos
@@ -101,10 +108,12 @@ Setup-Mac/
 ## 🚨 CRITICAL ISSUES IDENTIFIED
 
 ### 1. HOME-MANAGER INTEGRATION FAILURE (CRITICAL)
+
 **Location:** `flake.nix:141, 153`
 **Issue:** Home-manager imported as dependency but modules not imported into system configurations
 **Impact:** All home-manager functionality is unavailable
 **Fix Required:**
+
 ```nix
 # Add to darwin system config
 imports = [
@@ -118,18 +127,21 @@ imports = [
 ```
 
 ### 2. COMPETING CONFIGURATION SYSTEMS (HIGH)
+
 **Location:** `programs/default.nix` vs home-manager native capabilities
 **Issue:** Custom program integration system duplicates and conflicts with home-manager
 **Impact:** Potential configuration conflicts, maintenance overhead
 **Decision Required:** Migrate, integrate, or maintain separation
 
 ### 3. SHELL CONFIGURATION FRAGMENTATION (HIGH)
+
 **Location:** `platforms/darwin/programs/shells.nix` + multiple other files
 **Issue:** Shell configurations scattered across system and user contexts
 **Impact:** Inconsistent shell environments, maintenance difficulty
 **Fix Required:** Consolidate under home-manager shell programs
 
 ### 4. CROSS-PLATFORM INCONSISTENCY (HIGH)
+
 **Location:** darwin vs nixos configuration approaches
 **Issue:** Different patterns for managing user configurations
 **Impact:** Maintenance overhead, potential platform drift
@@ -140,6 +152,7 @@ imports = [
 ## 🎯 PRIORITIZED ACTION PLAN
 
 ### PHASE 1: CRITICAL INTEGRATION (Items 1-5)
+
 **Timeline:** IMMEDIATE - Next 24 hours
 **Risk:** HIGH - Core system integration required
 
@@ -169,6 +182,7 @@ imports = [
    - Document integration decisions
 
 ### PHASE 2: CONSOLIDATION (Items 6-15)
+
 **Timeline:** Next 3-5 days
 **Risk:** MEDIUM - Requires careful migration
 
@@ -181,9 +195,10 @@ imports = [
 12. **Neovim Migration** → home-manager programs.neovim
 13. **Tmux Configuration** → home-manager programs.tmux
 14. **Desktop Applications** → home-manager where applicable
-15. **Services Integration** → home-manager services.*
+15. **Services Integration** → home-manager services.\*
 
 ### PHASE 3: OPTIMIZATION (Items 16-25)
+
 **Timeline:** Next 1-2 weeks
 **Risk:** LOW - Optimization and maintenance
 
@@ -205,6 +220,7 @@ imports = [
 ### Immediate Actions (Next 24 Hours)
 
 **Step 1: Safety First**
+
 ```bash
 # Create backup branch
 git checkout -b home-manager-integration
@@ -215,6 +231,7 @@ just backup
 ```
 
 **Step 2: Critical Integration**
+
 ```nix
 # Fix flake.nix imports
 # Add to darwin system config at line ~141
@@ -231,6 +248,7 @@ imports = [
 ```
 
 **Step 3: Configure Home-Manager Blocks**
+
 ```nix
 # Add to both platform configurations
 home-manager = {
@@ -241,6 +259,7 @@ home-manager = {
 ```
 
 **Step 4: Testing & Validation**
+
 ```bash
 # Test darwin configuration
 darwin-rebuild test --flake .#Lars-MacBook-Air
@@ -255,16 +274,19 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 ### Decision Points Requiring Resolution
 
 **1. Custom Program System Strategy**
+
 - **Option A:** Migrate completely to home-manager (high risk, clean result)
 - **Option B:** Integrate both systems (moderate risk, complex maintenance)
 - **Option C:** Layered approach (low risk, clear separation)
 
 **2. Migration Timeline**
+
 - **Aggressive:** Complete migration within 3 days
 - **Conservative:** Phased migration over 2 weeks
 - **Incremental:** Feature-by-feature migration over 1 month
 
 **3. Cross-Platform Standardization**
+
 - **Unified:** Single configuration approach for both platforms
 - **Hybrid:** Platform-specific with shared core
 - **Divergent:** Platform-optimized with common patterns
@@ -274,6 +296,7 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 ## 📈 SUCCESS METRICS
 
 ### Immediate Success Indicators (Phase 1)
+
 - ✅ `darwin-rebuild test` passes without errors
 - ✅ `nixos-rebuild test` passes without errors
 - ✅ Home-manager configurations loaded successfully
@@ -281,6 +304,7 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 - ✅ Shell environments consistent across platforms
 
 ### Intermediate Success Indicators (Phase 2)
+
 - ✅ All shell configurations consolidated under home-manager
 - ✅ Git configuration unified across platforms
 - ✅ Custom program system integration decision implemented
@@ -288,6 +312,7 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 - ✅ Environment variables centralized
 
 ### Long-term Success Indicators (Phase 3)
+
 - ✅ Cross-platform configuration consistency
 - ✅ Automated testing framework in place
 - ✅ Documentation complete and accurate
@@ -299,22 +324,26 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 ## 🚨 RISK ASSESSMENT
 
 ### HIGH RISK ITEMS
+
 1. **System Integration Failure** - Could break existing configurations
 2. **Shell Environment Regression** - Could impact developer workflow
 3. **Cross-Platform Breakage** - Could render one platform unusable
 
 **Mitigation Strategy:**
+
 - Comprehensive testing before applying changes
 - Backup configurations before any modifications
 - Rollback plan for each integration step
 - Branch-based development for safe iteration
 
 ### MEDIUM RISK ITEMS
+
 1. **Custom Program System Migration** - Unknown dependencies
 2. **Performance Degradation** - Increased build times
 3. **Learning Curve** - Team adaptation to new patterns
 
 **Mitigation Strategy:**
+
 - Incremental migration with validation at each step
 - Performance benchmarking throughout integration
 - Documentation and training for new patterns
@@ -324,15 +353,18 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 ## 📚 RESOURCES & REFERENCES
 
 ### Home-Manager Documentation
+
 - [Official Home-Manager Manual](https://nix-community.github.io/home-manager/)
 - [Home-Manager Options Search](https://mipmip.github.io/home-manager-option-search/)
 - [NixOS Wiki Home-Manager](https://nixos.wiki/wiki/Home_Manager)
 
 ### Integration Examples
+
 - [Home-Manager Flake Integration Examples](https://github.com/nix-community/home-manager/blob/master/modules/flake-modules.nix)
 - [Cross-Platform Home-Manager Configurations](https://github.com/nix-community/home-manager/issues/2401)
 
 ### Project-Specific Resources
+
 - Setup-Mac Architecture Documentation
 - Cross-Platform Configuration Patterns
 - Custom Program Integration Documentation
@@ -342,12 +374,14 @@ darwin-rebuild switch --flake .#Lars-MacBook-Air
 ## 📞 NEXT STEPS
 
 ### Immediate Actions Required
+
 1. **Approve Integration Strategy** - Confirm approach for home-manager integration
 2. **Resolve Custom System Decision** - Determine fate of programs/default.nix
 3. **Allocate Development Resources** - Ensure availability for critical integration work
 4. **Schedule Risk Mitigation** - Plan for potential system interruptions during integration
 
 ### Contact & Coordination
+
 - **Project Lead:** Integration strategy approval
 - **Development Team:** Implementation capacity allocation
 - **System Administration:** Risk mitigation planning

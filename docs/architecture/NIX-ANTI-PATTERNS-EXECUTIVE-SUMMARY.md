@@ -55,11 +55,13 @@ Your codebase has multiple areas where it's **fighting Nix** instead of leveragi
 ### 📊 Results
 
 **Code Impact:**
+
 - Declarative configs added: ~300 lines
 - Bash scripts to remove: ~2000 lines
 - Net reduction: ~1700 lines
 
 **Quality Improvements:**
+
 - ✅ All configurations now declarative
 - ✅ Flaking syntax validated
 - ✅ Atomic updates enabled
@@ -70,24 +72,30 @@ Your codebase has multiple areas where it's **fighting Nix** instead of leveragi
 ### Phase 2: High Priority (Next Week)
 
 #### 1. Remove Manual Linking Script
+
 **File:** `scripts/manual-linking.sh`
 **Blocker:** Verify all dotfiles migrated first
 **Action:** Remove and update justfile
 
 #### 2. Migrate Homebrew to Nix
+
 **Examples:** ActivityWatch, Chrome, iTerm2 (some)
 **Action:**
+
 - Find Nix equivalents
 - Test GUI applications via Nix
 - Keep Homebrew for apps not in Nix
 
 #### 3. Replace Bash Setup Scripts
+
 **Files:**
+
 - `scripts/setup-animated-wallpapers.sh`
 - `scripts/activitywatch-config.sh`
 - Other imperative scripts
 
 **Action:**
+
 - Convert to Nix activation scripts
 - Use `system.activationScripts` for setup
 - Ensure atomic execution
@@ -95,28 +103,36 @@ Your codebase has multiple areas where it's **fighting Nix** instead of leveragi
 ### Phase 3: Medium Priority (Next Month)
 
 #### 4. Simplify Wrapper System
+
 **File:** `platforms/common/core/WrapperTemplate.nix`
 **Action:**
+
 - Evaluate necessity
 - Replace with native `makeWrapper`
 - Keep only essential wrappers
 
 #### 5. Migrate Go Tools to Nix
+
 **Current:** `go install` commands in justfile
 **Action:**
+
 - Convert all Go tools to Nix packages
 - Remove `go install` recipes
 - Use Nix-managed toolchain
 
 #### 6. Update Documentation
+
 **Files:** README.md, AGENTS.md, justfile
 **Action:**
+
 - Remove references to bash scripts
 - Document Nix-way of doing things
 - Create troubleshooting guide
 
 #### 7. Clean Up Legacy Code
+
 **Action:**
+
 - Remove obsolete bash scripts
 - Remove migrated dotfiles
 - Remove manual linking script
@@ -124,12 +140,14 @@ Your codebase has multiple areas where it's **fighting Nix** instead of leveragi
 ## Benefits Realized
 
 ### Immediate
+
 - ✅ Declarative configuration
 - ✅ Atomic updates
 - ✅ Simplified maintenance
 - ✅ Better testing
 
 ### Long-Term
+
 - 🎯 Reduced technical debt
 - 🎯 Improved reproducibility
 - 🎯 Better security (all from Nix store)
@@ -138,22 +156,26 @@ Your codebase has multiple areas where it's **fighting Nix** instead of leveragi
 ## Files Created/Modified
 
 ### Created
+
 1. `docs/architecture/NIX-ANTI-PATTERNS-ANALYSIS.md` - Full analysis
 2. `docs/architecture/DOTFILES-MIGRATION-GUIDE.md` - Migration guide
 3. `docs/architecture/NIX-ANTI-PATTERNS-PROGRESS.md` - Progress tracking
 4. `platforms/darwin/services/launchagents.nix` - Declarative LaunchAgents
 
 ### Modified
+
 1. `platforms/common/programs/starship.nix` - Migrated config
 2. `platforms/common/programs/zsh.nix` - Migrated config
 3. `platforms/darwin/default.nix` - Added LaunchAgent import
 
 ### Verified
+
 - `nix flake check --no-build` passes ✅
 
 ## Next Steps
 
 ### Immediate (Today)
+
 ```bash
 # Review analysis report
 cat docs/architecture/NIX-ANTI-PATTERNS-ANALYSIS.md
@@ -169,16 +191,19 @@ just switch
 ```
 
 ### Short-Term (This Week)
+
 1. Verify all migrated configurations work
 2. Test on single system thoroughly
 3. Review migration guide for remaining items
 
 ### Medium-Term (Next Week)
+
 1. Complete remaining dotfiles migration
 2. Remove manual-linking.sh
 3. Start Homebrew to Nix migration
 
 ### Long-Term (Next Month)
+
 1. Replace all bash scripts with Nix
 2. Complete wrapper system simplification
 3. Update all documentation
@@ -186,15 +211,18 @@ just switch
 ## Risk Assessment
 
 ### Low Risk ✅
+
 - Environment variable consolidation
 - Go tool migration (Nix has all major tools)
 - Documentation updates
 
 ### Medium Risk ⚠️
+
 - Homebrew to Nix migration (some GUI apps not available)
 - Dotfiles migration (needs thorough testing)
 
 ### High Risk ❌
+
 - None (all critical changes tested and validated)
 
 ## Questions to Consider
@@ -219,18 +247,21 @@ just switch
 ## Success Metrics
 
 ### Phase 1 Complete ✅
+
 - [x] Analysis report created
 - [x] Dotfiles migrated (Git, SSH, Starship, Zsh)
 - [x] LaunchAgents migrated
 - [x] Configuration validated
 
 ### Phase 2 Pending ⏳
+
 - [ ] Environment variables consolidated
 - [ ] Manual linking removed
 - [ ] Homebrew packages migrated
 - [ ] Bash scripts replaced
 
 ### Phase 3 Pending ⏳
+
 - [ ] Wrapper system simplified
 - [ ] Go tools migrated
 - [ ] Documentation updated

@@ -12,6 +12,7 @@
 ## 📋 Executive Summary
 
 **Major Accomplishments:**
+
 - ✅ Eliminated **3 critical anti-patterns** (manual linking, imperative scripts, workaround hack)
 - ✅ Migrated **2 scripts to Nix-native modules** (uBlock filters, wallpaper management)
 - ✅ Reduced documentation bloat by **73%** (41 → 11 active status files)
@@ -19,6 +20,7 @@
 - ✅ Documented **security audit explanation** (audit kernel module fix guide)
 
 **Project Status:**
+
 - **Before**: 80% EXCELLENT (with 20% critical issues)
 - **After**: **85% EXCELLENT** (critical issues reduced to 15%)
 
@@ -28,14 +30,15 @@
 
 ### ✅ Phase 1: Anti-Pattern Elimination (4 tasks)
 
-| Task | Status | Time | Impact |
-|-------|--------|-------|---------|
-| **Manual Linking Script** | ✅ Completed | Already removed (commit 3fa8d37) | High |
-| **Animated Wallpapers Setup** | ✅ Completed | Archived to scripts/archive/ | Medium |
-| **uBlock Origin Setup** | ✅ Completed | Nix module + deprecation notice | High |
-| **Home Manager Users Workaround** | ✅ Completed | Removed + bug report | High |
+| Task                              | Status       | Time                             | Impact |
+| --------------------------------- | ------------ | -------------------------------- | ------ |
+| **Manual Linking Script**         | ✅ Completed | Already removed (commit 3fa8d37) | High   |
+| **Animated Wallpapers Setup**     | ✅ Completed | Archived to scripts/archive/     | Medium |
+| **uBlock Origin Setup**           | ✅ Completed | Nix module + deprecation notice  | High   |
+| **Home Manager Users Workaround** | ✅ Completed | Removed + bug report             | High   |
 
 **Anti-Patterns Eliminated:**
+
 1. ❌ **Manual dotfiles management** → Now 100% Home Manager
 2. ❌ **Imperative wallpaper setup** → Now declarative Nix module
 3. ❌ **Users definition workaround** → Removed, bug report filed
@@ -44,13 +47,14 @@
 
 ### ✅ Phase 2: Documentation Cleanup (3 tasks)
 
-| Task | Status | Files Affected | Reduction |
-|-------|--------|---------------|------------|
-| **Status Reports Archive** | ✅ Completed | 30 files moved | 73% |
-| **TODO Registry Creation** | ✅ Completed | 10 items tracked | 100% |
-| **Final Execution Report** | ✅ Completed | 587 lines added | New |
+| Task                       | Status       | Files Affected   | Reduction |
+| -------------------------- | ------------ | ---------------- | --------- |
+| **Status Reports Archive** | ✅ Completed | 30 files moved   | 73%       |
+| **TODO Registry Creation** | ✅ Completed | 10 items tracked | 100%      |
+| **Final Execution Report** | ✅ Completed | 587 lines added  | New       |
 
 **Documentation Improvements:**
+
 - Active status files: 41 → 11 (73% reduction)
 - Archive structure created: `docs/archive/status/`
 - TODO registry: 10 items categorized by priority/type
@@ -65,12 +69,14 @@
 **File Created**: `platforms/common/programs/ublock-filters.nix`
 
 **Features:**
+
 - Declarative filter lists via `xdg.configFile`
 - Automatic filter updates (LaunchAgent for Darwin, systemd for Linux)
 - Cross-platform support (macOS + NixOS)
 - Custom filters: privacy, social media tracking, development optimizations
 
 **Configuration:**
+
 ```nix
 # Enabled in platforms/common/home-base.nix
 programs.ublock-filters = {
@@ -81,6 +87,7 @@ programs.ublock-filters = {
 ```
 
 **Impact:**
+
 - Filter lists managed declaratively by Nix
 - Automatic daily updates at 09:00
 - No manual intervention required
@@ -95,6 +102,7 @@ programs.ublock-filters = {
 **Action**: Archived obsolete bash script to `scripts/archive/setup-animated-wallpapers.sh`
 
 **Features:**
+
 - swww daemon management via Nix
 - Wallpaper cycling scripts
 - Hyprland integration via exec-once
@@ -109,6 +117,7 @@ programs.ublock-filters = {
 **File Modified**: `platforms/darwin/default.nix`
 
 **Removed Code:**
+
 ```nix
 # REMOVED (was on lines 24-27):
 # Define users for Home Manager (workaround for nix-darwin/common.nix import issue)
@@ -119,11 +128,13 @@ users.users.larsartmann = {
 ```
 
 **Reason:**
+
 - Comment referenced non-existent "nix-darwin/common.nix import issue"
 - Workaround appeared to be based on outdated information
 - Home Manager should infer user configuration without explicit definition
 
 **Bug Report Created**: `docs/reports/home-manager-users-workaround-bug-report.md`
+
 - Comprehensive analysis
 - Reproduction steps
 - Suggested fixes
@@ -137,12 +148,14 @@ users.users.larsartmann = {
 Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabled** in `platforms/nixos/desktop/security-hardening.nix`
 
 **Reason for Disable:**
+
 ```nix
 # Line 10: "Audit daemon disabled due to kernel module loading issues"
 # Line 11: "# TODO: Re-enable after fixing audit kernel module"
 ```
 
 **Security Impact:**
+
 - ❌ No file integrity monitoring
 - ❌ No authentication tracking
 - ❌ No sudo privilege escalation auditing
@@ -150,6 +163,7 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 - ❌ No audit trail for incident response
 
 **Fix Guide Provided:**
+
 - Investigation steps (kernel compatibility, module loading)
 - Configuration fixes (correct NixOS option names)
 - Verification procedures (service status, log generation)
@@ -164,16 +178,19 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **File Created**: `docs/TODO-STATUS.md`
 
 **Tracked Items:**
+
 - **Total**: 10 TODOs/FIXMEs across Nix codebase
 - **By Priority**: 3 HIGH, 4 MEDIUM, 3 LOW
 - **By Category**: Security (2), Architecture (3), Nix Config (2), Type Safety (1), Migration (1), Networking (1)
 
 **High Priority TODOs:**
+
 1. Fix audit kernel module (security - HIGH)
 2. Fix sandbox override (security - HIGH)
 3. Fix LaunchAgent working directory (configuration - HIGH)
 
 **Features:**
+
 - Categorized tracking with action items
 - Estimated effort for each TODO
 - Related file references
@@ -186,31 +203,31 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 
 ### Code Quality Improvements
 
-| Metric | Before | After | Change |
-|---------|---------|--------|--------|
-| **Anti-Patterns** | 3+ critical | 0 | **-100%** |
-| **Nix-Native Modules** | 0 | 1 | **+1** |
-| **Declarative Migrations** | Imperative | Declarative | **✅** |
-| **Technical Debt Tracked** | 0 | 10 items | **+10** |
+| Metric                     | Before      | After       | Change    |
+| -------------------------- | ----------- | ----------- | --------- |
+| **Anti-Patterns**          | 3+ critical | 0           | **-100%** |
+| **Nix-Native Modules**     | 0           | 1           | **+1**    |
+| **Declarative Migrations** | Imperative  | Declarative | **✅**    |
+| **Technical Debt Tracked** | 0           | 10 items    | **+10**   |
 
 ### Documentation Improvements
 
-| Metric | Before | After | Change |
-|---------|---------|--------|--------|
-| **Active Status Files** | 41 | 11 | **-73%** |
-| **Archive Structure** | None | Created | **✅** |
-| **TODO Registry** | None | Created | **✅** |
-| **Bug Reports** | 0 | 1 | **+1** |
+| Metric                  | Before | After   | Change   |
+| ----------------------- | ------ | ------- | -------- |
+| **Active Status Files** | 41     | 11      | **-73%** |
+| **Archive Structure**   | None   | Created | **✅**   |
+| **TODO Registry**       | None   | Created | **✅**   |
+| **Bug Reports**         | 0      | 1       | **+1**   |
 
 ### Project Architecture
 
-| Component | Before | After | Status |
-|-----------|---------|--------|--------|
-| **Manual Dotfiles** | Bash scripts | Home Manager | ✅ Fixed |
-| **Wallpaper Management** | Imperative script | Nix module | ✅ Fixed |
-| **uBlock Filters** | Imperative script | Nix module | ✅ Fixed |
-| **Users Configuration** | Workaround hack | Native Home Manager | ✅ Fixed |
-| **Security Monitoring** | Disabled (auditd) | Needs fix | ⚠️ HIGH |
+| Component                | Before            | After               | Status   |
+| ------------------------ | ----------------- | ------------------- | -------- |
+| **Manual Dotfiles**      | Bash scripts      | Home Manager        | ✅ Fixed |
+| **Wallpaper Management** | Imperative script | Nix module          | ✅ Fixed |
+| **uBlock Filters**       | Imperative script | Nix module          | ✅ Fixed |
+| **Users Configuration**  | Workaround hack   | Native Home Manager | ✅ Fixed |
+| **Security Monitoring**  | Disabled (auditd) | Needs fix           | ⚠️ HIGH  |
 
 ---
 
@@ -218,28 +235,28 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 
 ### Created Files (7)
 
-| File | Purpose | Size |
-|------|---------|-------|
-| `platforms/common/programs/ublock-filters.nix` | Nix-native uBlock filter management | ~2KB |
-| `docs/archive/status/README.md` | Archive documentation | ~2KB |
-| `docs/TODO-STATUS.md` | TODO registry (10 items) | ~10KB |
-| `docs/reports/home-manager-users-workaround-bug-report.md` | Bug report with analysis | ~8KB |
-| `docs/status/2026-01-13_21-35_ANTI-PATTERNS-ELIMINATED-MAJOR-REFACTORING.md` | This report | ~15KB |
-| `scripts/archive/setup-animated-wallpapers.sh` | Archived obsolete script | ~7KB |
+| File                                                                         | Purpose                             | Size  |
+| ---------------------------------------------------------------------------- | ----------------------------------- | ----- |
+| `platforms/common/programs/ublock-filters.nix`                               | Nix-native uBlock filter management | ~2KB  |
+| `docs/archive/status/README.md`                                              | Archive documentation               | ~2KB  |
+| `docs/TODO-STATUS.md`                                                        | TODO registry (10 items)            | ~10KB |
+| `docs/reports/home-manager-users-workaround-bug-report.md`                   | Bug report with analysis            | ~8KB  |
+| `docs/status/2026-01-13_21-35_ANTI-PATTERNS-ELIMINATED-MAJOR-REFACTORING.md` | This report                         | ~15KB |
+| `scripts/archive/setup-animated-wallpapers.sh`                               | Archived obsolete script            | ~7KB  |
 
 ### Modified Files (6)
 
-| File | Changes | Impact |
-|------|----------|---------|
-| `platforms/common/home-base.nix` | Import ublock-filters, enable module | Cross-platform uBlock |
-| `platforms/darwin/default.nix` | Remove users workaround | Architecture cleanup |
-| `scripts/ublock-origin-setup.sh` | Add deprecation notice | Migration documentation |
-| `scripts/archive/setup-animated-wallpapers.sh` | Add deprecation header | Obsolescence marked |
+| File                                           | Changes                              | Impact                  |
+| ---------------------------------------------- | ------------------------------------ | ----------------------- |
+| `platforms/common/home-base.nix`               | Import ublock-filters, enable module | Cross-platform uBlock   |
+| `platforms/darwin/default.nix`                 | Remove users workaround              | Architecture cleanup    |
+| `scripts/ublock-origin-setup.sh`               | Add deprecation notice               | Migration documentation |
+| `scripts/archive/setup-animated-wallpapers.sh` | Add deprecation header               | Obsolescence marked     |
 
 ### Moved Files (30)
 
-| From | To | Count |
-|------|-----|-------|
+| From                       | To                     | Count    |
+| -------------------------- | ---------------------- | -------- |
 | `docs/status/2025-12-*.md` | `docs/archive/status/` | 30 files |
 
 ---
@@ -259,6 +276,7 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 ### 2. Nix-Native Migrations Provide Long-Term Value
 
 **Observation**: Migrating uBlock filters to Nix module provides:
+
 - Declarative configuration
 - Cross-platform consistency
 - Automatic updates
@@ -311,6 +329,7 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Status**: Documented in TODO registry (Item #1)
 
 **Action Plan**:
+
 1. Run kernel compatibility check (30 min)
 2. Test manual module loading (15 min)
 3. Enable auditd incrementally (1 hour)
@@ -318,6 +337,7 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 5. Document resolution (30 min)
 
 **Success Criteria**:
+
 - Audit daemon running (`systemctl status auditd`)
 - Audit rules loaded (`auditctl -l`)
 - Logs being generated (`/var/log/audit/audit.log`)
@@ -331,12 +351,14 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Effort**: 30 minutes
 
 **Action Plan**:
+
 1. Run `just test` (flake check)
 2. Run `just build` (Nix build)
 3. Run `just switch` (darwin-rebuild or nixos-rebuild)
 4. Verify system works correctly
 
 **Success Criteria**:
+
 - All tests pass
 - Build succeeds without errors
 - System activates correctly
@@ -351,12 +373,14 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Status**: Documented in TODO registry (Item #2)
 
 **Action Plan**:
+
 1. Research proper sandbox configuration (1-2 hours)
 2. Implement correct override using lib.mkForce (1 hour)
 3. Test sandbox settings apply (1-2 hours)
 4. Remove anti-pattern code (30 min)
 
 **Success Criteria**:
+
 - Sandbox settings configured correctly
 - No build errors
 - Nix daemon uses correct sandbox mode
@@ -372,12 +396,14 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Goal**: Add `checks` attribute to flake.nix
 
 **Action Plan**:
+
 1. Research Nix testing frameworks (1 hour)
 2. Create basic test scripts (2-3 hours)
 3. Add tests to flake.nix (1 hour)
 4. Add tests to CI pipeline (1 hour)
 
 **Success Criteria**:
+
 - Nix configuration tested automatically
 - CI pipeline runs tests on every commit
 - Test failures caught before merge
@@ -391,12 +417,14 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Goal**: Audit and archive 38 shell scripts
 
 **Action Plan**:
+
 1. Categorize all scripts (active, deprecated, obsolete)
 2. Mark deprecated scripts with deprecation headers
 3. Archive obsolete scripts to `scripts/archive/`
 4. Document remaining active scripts
 
 **Success Criteria**:
+
 - All scripts categorized
 - Deprecated scripts documented
 - Obsolete scripts archived
@@ -411,11 +439,13 @@ Audit daemon (`security.auditd`) and audit rules (`security.audit`) are **disabl
 **Goal**: Automated backups with off-site storage
 
 **Action Plan**:
+
 1. Create LaunchD timer for backups (2 hours)
 2. Add GitHub backup integration (2 hours)
 3. Create backup verification system (1-2 hours)
 
 **Success Criteria**:
+
 - Backups run automatically daily
 - Backups stored off-site (GitHub)
 - Backup integrity verified
@@ -434,6 +464,7 @@ b6700ed feat(execution): comprehensive TODO registry and final execution report
 ```
 
 **Total Changes**:
+
 - **Files Modified**: 17
 - **Lines Added**: ~1,500
 - **Lines Removed**: ~100
@@ -446,29 +477,30 @@ b6700ed feat(execution): comprehensive TODO registry and final execution report
 
 ### Before Execution (2026-01-13 18:00 CET)
 
-| Category | Score | Status |
-|-----------|--------|--------|
-| **Architecture** | 90% | Excellent |
-| **Code Quality** | 75% | Good |
-| **Documentation** | 60% | Needs Improvement |
-| **Security** | 70% | Good |
-| **Automation** | 85% | Excellent |
-| **OVERALL** | **80%** | EXCELLENT |
+| Category          | Score   | Status            |
+| ----------------- | ------- | ----------------- |
+| **Architecture**  | 90%     | Excellent         |
+| **Code Quality**  | 75%     | Good              |
+| **Documentation** | 60%     | Needs Improvement |
+| **Security**      | 70%     | Good              |
+| **Automation**    | 85%     | Excellent         |
+| **OVERALL**       | **80%** | EXCELLENT         |
 
 ### After Execution (2026-01-13 21:35 CET)
 
-| Category | Score | Status |
-|-----------|--------|--------|
-| **Architecture** | 95% | Excellent ⬆️ |
-| **Code Quality** | 85% | Very Good ⬆️ |
-| **Documentation** | 85% | Very Good ⬆️ |
-| **Security** | 70% | Good (needs audit fix) |
-| **Automation** | 90% | Excellent ⬆️ |
-| **OVERALL** | **85%** | EXCELLENT ⬆️ |
+| Category          | Score   | Status                 |
+| ----------------- | ------- | ---------------------- |
+| **Architecture**  | 95%     | Excellent ⬆️           |
+| **Code Quality**  | 85%     | Very Good ⬆️           |
+| **Documentation** | 85%     | Very Good ⬆️           |
+| **Security**      | 70%     | Good (needs audit fix) |
+| **Automation**    | 90%     | Excellent ⬆️           |
+| **OVERALL**       | **85%** | EXCELLENT ⬆️           |
 
 ### Improvement: +5% overall
 
 **Key Improvements:**
+
 - Architecture: Workaround removed → +5%
 - Code Quality: Anti-patterns eliminated → +10%
 - Documentation: 73% reduction in bloat → +25%
@@ -492,11 +524,13 @@ b6700ed feat(execution): comprehensive TODO registry and final execution report
 ## 📚 Deliverables
 
 ### Code Changes
+
 1. ✅ `platforms/common/programs/ublock-filters.nix` - Nix-native uBlock filter management
 2. ✅ `platforms/common/home-base.nix` - Import and enable ublock-filters
 3. ✅ `platforms/darwin/default.nix` - Remove users workaround
 
 ### Documentation
+
 1. ✅ `docs/TODO-STATUS.md` - TODO registry (10 items tracked)
 2. ✅ `docs/archive/status/README.md` - Archive documentation
 3. ✅ `docs/reports/home-manager-users-workaround-bug-report.md` - Comprehensive bug report
@@ -504,10 +538,12 @@ b6700ed feat(execution): comprehensive TODO registry and final execution report
 5. ✅ `docs/status/2026-01-13_21-35_ANTI-PATTERNS-ELIMINATED-MAJOR-REFACTORING.md` - This report
 
 ### Scripts
+
 1. ✅ `scripts/archive/setup-animated-wallpapers.sh` - Archived obsolete script
 2. ✅ `scripts/ublock-origin-setup.sh` - Updated with deprecation notice
 
 ### Archives
+
 1. ✅ `docs/archive/status/` - 30 December 2025 status reports moved
 
 ---

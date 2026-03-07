@@ -21,6 +21,7 @@ Conducted comprehensive research into the feasibility of rebuilding Qubes OS arc
 **Deliverable:** `docs/research/REBUILDING-QUBES-IN-NIXOS.md` (complete)
 
 **Topics Covered:**
+
 - Qubes OS architecture (Xen hypervisor, dom0, qubes, isolation mechanisms)
 - NixOS virtualization capabilities (KVM/libvirt, Xen support, containers)
 - Existing integration projects (evq/qubes-nixos-template, CertainLach/nixos-qubes)
@@ -29,6 +30,7 @@ Conducted comprehensive research into the feasibility of rebuilding Qubes OS arc
 - Three implementation roadmaps with effort estimates
 
 **Key Findings:**
+
 - NixOS **does support Xen** (as of 24.11) but **no UEFI boot** (critical blocker)
 - **Two active projects** exist with different approaches:
   - evq/qubes-nixos-template: NixOS as TemplateVM (working)
@@ -45,12 +47,14 @@ Conducted comprehensive research into the feasibility of rebuilding Qubes OS arc
 **Project:** `CertainLach/nixos-qubes` (34 stars)
 
 **Status:**
+
 - Originally part of NixOS PR #341215 (Sep 2024)
 - Extracted to separate repo (Feb 2025) due to maintenance complexity
 - **Currently functional** for basic dom0 operations on NixOS
 - Active development, working toward upstream merge
 
 **Technical Capabilities:**
+
 - ✅ Full Qubes dom0 running on NixOS
 - ✅ Complete Qubes package set compiled for NixOS (9 packages)
 - ✅ Qubes manager with VM creation/control
@@ -62,6 +66,7 @@ Conducted comprehensive research into the feasibility of rebuilding Qubes OS arc
 - ⚠️ TemplateVM support unclear
 
 **Architecture:**
+
 ```nix
 virtualisation.qubes = {
   dom0.enable = true;
@@ -78,6 +83,7 @@ virtualisation.qubes = {
 ```
 
 **Strategic Value:**
+
 - Most advanced Qubes/NixOS integration to date
 - Demonstrates technical feasibility of NixOS dom0
 - Provides real-world testing ground
@@ -93,6 +99,7 @@ virtualisation.qubes = {
 **Topic:** Why Qubes OS dom0 is Fedora-based
 
 **Key Reasons:**
+
 1. **Hardware & Graphics Support** (most important)
    - Up-to-date graphics drivers (NVIDIA, AMD, Intel)
    - Newer kernel versions for hardware compatibility
@@ -119,6 +126,7 @@ virtualisation.qubes = {
    - Professional security team maintaining base system
 
 **Evidence of Correct Decision:**
+
 - dom0 has upgraded through 5+ Fedora versions without major breakage
 - Hardware Compatibility List includes hundreds of working systems
 - Supports modern GPUs, Thunderbolt 4, Wi-Fi 7 (Qubes 4.3)
@@ -225,6 +233,7 @@ virtualisation.qubes = {
 **Immediate Actions (Next 1-2 weeks):**
 
 1. **Test nixos-qubes in VM**
+
    ```bash
    # Create test VM with legacy BIOS boot
    # Install NixOS

@@ -14,11 +14,13 @@
 A critical build failure occurred on the Darwin (macOS) configuration due to `netscanner` package being placed in the cross-platform common packages despite depending on the Linux-only `iw-6.17` wireless tool. This caused all Darwin builds to fail with a platform mismatch error.
 
 **Impact:**
+
 - Darwin builds completely broken
 - Unable to apply system updates
 - Development workflow blocked
 
 **Resolution:**
+
 - Moved `netscanner` to NixOS-specific security-hardening module
 - Darwin builds now succeed
 - Cross-platform integrity restored
@@ -203,19 +205,19 @@ nix search nixpkgs netscanner
 
 ### Current Build Status
 
-| Platform | Status | Last Tested | Notes |
-|----------|--------|-------------|-------|
-| **Darwin (macOS)** | ✅ PASSING | 2026-01-24 06:11 | Build succeeds, `netscanner` removed |
-| **NixOS (Linux)** | ✅ PASSING | Not tested | Will have `netscanner` in security-hardening |
+| Platform           | Status     | Last Tested      | Notes                                        |
+| ------------------ | ---------- | ---------------- | -------------------------------------------- |
+| **Darwin (macOS)** | ✅ PASSING | 2026-01-24 06:11 | Build succeeds, `netscanner` removed         |
+| **NixOS (Linux)**  | ✅ PASSING | Not tested       | Will have `netscanner` in security-hardening |
 
 ### Package Platform Matrix
 
-| Package | Common | Darwin | NixOS | Notes |
-|---------|--------|--------|-------|-------|
-| **netscanner** | ❌ | ❌ | ✅ | Depends on `iw` (Linux-only) |
-| iw | ❌ | ❌ | ✅ | Linux wireless tool |
-| aircrack-ng | ❌ | ✅ | ✅ | Available on both platforms |
-| wireshark | ❌ | ✅ | ✅ | Available on both platforms |
+| Package        | Common | Darwin | NixOS | Notes                        |
+| -------------- | ------ | ------ | ----- | ---------------------------- |
+| **netscanner** | ❌     | ❌     | ✅    | Depends on `iw` (Linux-only) |
+| iw             | ❌     | ❌     | ✅    | Linux wireless tool          |
+| aircrack-ng    | ❌     | ✅     | ✅    | Available on both platforms  |
+| wireshark      | ❌     | ✅     | ✅    | Available on both platforms  |
 
 ### Recent Commits
 
@@ -237,6 +239,7 @@ eb4f253 fix(starship): Eliminate extra spaces when modules are disabled
 ### Immediate Actions
 
 1. **Apply Configuration Changes**
+
    ```bash
    # Darwin
    just switch
@@ -246,6 +249,7 @@ eb4f253 fix(starship): Eliminate extra spaces when modules are disabled
    ```
 
 2. **Verify Package Availability**
+
    ```bash
    # Darwin - netscanner should NOT be available
    which netscanner
@@ -292,11 +296,11 @@ eb4f253 fix(starship): Eliminate extra spaces when modules are disabled
 
 ## Critical Packages
 
-| Package | Linux | Darwin | Notes |
-|---------|-------|--------|-------|
-| netscanner | ✅ | ❌ | Depends on iw (Linux-only) |
-| iw | ✅ | ❌ | Linux wireless tool |
-| aircrack-ng | ✅ | ✅ | Cross-platform support |
+| Package     | Linux | Darwin | Notes                      |
+| ----------- | ----- | ------ | -------------------------- |
+| netscanner  | ✅    | ❌     | Depends on iw (Linux-only) |
+| iw          | ✅    | ❌     | Linux wireless tool        |
+| aircrack-ng | ✅    | ✅     | Cross-platform support     |
 
 ## Dependency Chains
 
@@ -338,6 +342,7 @@ verify-platforms:
 ```
 
 **Usage:**
+
 ```bash
 # Check a package before adding to common
 just check-deps netscanner
@@ -354,7 +359,7 @@ just verify-platforms
 
 **Solution:** Add to `CONTRIBUTING.md` or `AGENTS.md`
 
-```markdown
+````markdown
 ## Cross-Platform Package Guidelines
 
 ### Adding Packages to Common Configuration
@@ -365,13 +370,16 @@ Before adding a package to `platforms/common/packages/`, you MUST:
    ```bash
    nix eval nixpkgs#<package-name>.meta.platforms --json
    ```
+````
 
 2. **Check Transitive Dependencies**
+
    ```bash
    nix show-derivation nixpkgs#<package-name> 2>&1 | rg "error:"
    ```
 
 3. **Dry-Run Build Test**
+
    ```bash
    just verify-platforms
    ```
@@ -387,6 +395,7 @@ Before adding a package to `platforms/common/packages/`, you MUST:
 - Packages requiring systemd on Linux
 - Hardware-specific drivers (amdgpu_top, corectrl)
 - GUI applications with platform-specific bindings
+
 ```
 
 **Benefit:** Clear process prevents future errors
@@ -473,3 +482,4 @@ The `netscanner` dependency conflict was successfully resolved by moving the pac
 
 *Generated: 2026-01-24 06:11 UTC*
 *Generated with Crush*
+```

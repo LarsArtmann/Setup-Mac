@@ -15,6 +15,7 @@
 **Critical Blocker:** Build verification processes are hung in background, preventing validation of the implementation.
 
 **Progress:**
+
 - ✅ Research & Architecture Analysis: 100%
 - ✅ Implementation: 90% (files created, flake.nix updated)
 - 🟡 Testing: 0% (blocked by process issues)
@@ -63,6 +64,7 @@
 #### 1.1 Comprehensive Architecture Research
 
 **Sources Analyzed:**
+
 - ✅ NixOS Home Manager integration in `flake.nix` (lines 127-139)
 - ✅ Existing Home Manager modules in `platforms/common/programs/`
 - ✅ NixOS Home Manager configuration in `platforms/nixos/users/home.nix`
@@ -72,13 +74,13 @@
 
 **Key Findings:**
 
-| Capability | nix-darwin | Home Manager | Decision |
-|------------|---------------|---------------|------------|
-| Shell configuration (fish) | ✅ `programs.fish` | ✅ `programs.fish` | Home Manager for user programs |
-| Starship prompt | ❌ No native support | ✅ `programs.starship` | Home Manager ONLY |
-| Tmux configuration | ❌ No native support | ✅ `programs.tmux` | Home Manager ONLY |
-| File management | ❌ No `home.file` | ✅ `home.file` | Home Manager ONLY |
-| Session variables | ✅ `environment.variables` | ✅ `home.sessionVariables` | Home Manager for user vars |
+| Capability                 | nix-darwin                 | Home Manager               | Decision                       |
+| -------------------------- | -------------------------- | -------------------------- | ------------------------------ |
+| Shell configuration (fish) | ✅ `programs.fish`         | ✅ `programs.fish`         | Home Manager for user programs |
+| Starship prompt            | ❌ No native support       | ✅ `programs.starship`     | Home Manager ONLY              |
+| Tmux configuration         | ❌ No native support       | ✅ `programs.tmux`         | Home Manager ONLY              |
+| File management            | ❌ No `home.file`          | ✅ `home.file`             | Home Manager ONLY              |
+| Session variables          | ✅ `environment.variables` | ✅ `home.sessionVariables` | Home Manager for user vars     |
 
 #### 1.2 Architecture Decision
 
@@ -113,15 +115,16 @@
 
 **Trade-offs Considered:**
 
-| Approach | Pros | Cons | Decision |
-|-----------|--------|--------|----------|
-| Pure nix-darwin | Simpler system | Limited capabilities, manual config | ❌ Rejected |
-| Home Manager | Full capabilities, code reuse | Additional complexity | ✅ **Selected** |
-| Manual configuration | Maximum control | No validation, hard to maintain | ❌ Rejected |
+| Approach             | Pros                          | Cons                                | Decision        |
+| -------------------- | ----------------------------- | ----------------------------------- | --------------- |
+| Pure nix-darwin      | Simpler system                | Limited capabilities, manual config | ❌ Rejected     |
+| Home Manager         | Full capabilities, code reuse | Additional complexity               | ✅ **Selected** |
+| Manual configuration | Maximum control               | No validation, hard to maintain     | ❌ Rejected     |
 
 #### 1.3 Directory Structure Analysis
 
 **Current State (VALID):**
+
 ```
 platforms/
 ├── common/
@@ -152,6 +155,7 @@ platforms/
    - Shared: `common/home-base.nix`, `common/programs/`
 
 2. **Module Hierarchy**
+
    ```
    Platform Home Manager Config (darwin/home.nix)
        ↓
@@ -207,12 +211,12 @@ platforms/
 
 **Migration from Old Structure:**
 
-| Old Location | New Location | Status |
-|--------------|----------------|----------|
-| `darwin/programs/shells.nix` | `darwin/home.nix` | ✅ Migrated |
-| `darwing/programs/shells.nix` imports | `home-base.nix` imports | ✅ Simplified |
-| Manual starship init | Home Manager starship.nix | ✅ Automated |
-| Manual Fish config | Home Manager fish.nix | ✅ Automated |
+| Old Location                          | New Location              | Status        |
+| ------------------------------------- | ------------------------- | ------------- |
+| `darwin/programs/shells.nix`          | `darwin/home.nix`         | ✅ Migrated   |
+| `darwing/programs/shells.nix` imports | `home-base.nix` imports   | ✅ Simplified |
+| Manual starship init                  | Home Manager starship.nix | ✅ Automated  |
+| Manual Fish config                    | Home Manager fish.nix     | ✅ Automated  |
 
 #### 2.2 Updated flake.nix
 
@@ -251,6 +255,7 @@ darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
 ```
 
 **Implementation Pattern:**
+
 - Mirrors NixOS configuration exactly (lines 127-139)
 - Adds Home Manager module BEFORE system configuration
 - Configures Home Manager with standard settings
@@ -258,12 +263,12 @@ darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
 
 **Key Settings:**
 
-| Setting | Value | Purpose |
-|----------|-------|---------|
-| `useGlobalPkgs` | `true` | Share nixpkgs with system (reduced build time) |
-| `useUserPackages` | `true` | Install user packages to ~/.nix-profile |
-| `backupFileExtension` | `"backup"` | Backup existing files with .backup extension |
-| `overwriteBackup` | `true` | Always backup before overwriting |
+| Setting               | Value      | Purpose                                        |
+| --------------------- | ---------- | ---------------------------------------------- |
+| `useGlobalPkgs`       | `true`     | Share nixpkgs with system (reduced build time) |
+| `useUserPackages`     | `true`     | Install user packages to ~/.nix-profile        |
+| `backupFileExtension` | `"backup"` | Backup existing files with .backup extension   |
+| `overwriteBackup`     | `true`     | Always backup before overwriting               |
 
 #### 2.3 Updated Darwin System Configuration
 
@@ -281,6 +286,7 @@ darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
 ```
 
 **Rationale:**
+
 - Eliminates configuration duplication
 - Fish now managed through Home Manager (consistent with NixOS)
 - System config remains focused on system-level settings
@@ -289,6 +295,7 @@ darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
 **Removed Configuration:**
 
 The old `darwin/programs/shells.nix` contained:
+
 - ❌ System-level fish config (moved to Home Manager)
 - ❌ Manual starship initialization (moved to Home Manager)
 - ❌ Manual carapace integration (moved to Home Manager)
@@ -309,15 +316,16 @@ Program Modules (common/programs/fish.nix, starship.nix, tmux.nix)
 
 **Files Created/Modified:**
 
-| File | Status | Type |
-|-------|----------|------|
-| `platforms/darwin/home.nix` | ✅ Staged | New file |
-| `flake.nix` | 🟡 Modified | Home Manager integration |
-| `platforms/darwin/default.nix` | 🟡 Modified | Removed shells.nix import |
-| `platforms/common/home-base.nix` | 🟡 Modified | (auto-staged) |
-| `platforms/common/programs/*.nix` | 🟡 Modified | (auto-staged) |
+| File                              | Status      | Type                      |
+| --------------------------------- | ----------- | ------------------------- |
+| `platforms/darwin/home.nix`       | ✅ Staged   | New file                  |
+| `flake.nix`                       | 🟡 Modified | Home Manager integration  |
+| `platforms/darwin/default.nix`    | 🟡 Modified | Removed shells.nix import |
+| `platforms/common/home-base.nix`  | 🟡 Modified | (auto-staged)             |
+| `platforms/common/programs/*.nix` | 🟡 Modified | (auto-staged)             |
 
 **Git Status:**
+
 ```bash
 Changes to be committed:
   new file:   platforms/darwin/home.nix
@@ -345,23 +353,27 @@ darwin-rebuild check --flake .  # → Hung in background
 ```
 
 **Processes Running:**
+
 - PID 30900: `nix flake update` (stuck for 15+ minutes)
 - PID 31177: `just test` (moved to background)
 - Background processes preventing restart and verification
 
 **Impact:**
+
 - 🔴 Cannot verify configuration builds
 - 🔴 Cannot test starship/tmux/fish
 - 🔴 Cannot commit changes
 - 🔴 Cannot proceed to documentation
 
 **Root Cause (Suspected):**
+
 1. Nix flake cache not invalidating
 2. Files not being picked up by Nix evaluation
 3. Possible network issue with flake inputs
 4. Missing Nix store refresh
 
 **Next Required Actions:**
+
 1. Kill hung background processes
 2. Clear Nix flake cache
 3. Retry build verification
@@ -425,13 +437,13 @@ darwin-rebuild check --flake .  # → Hung in background
 
 **Metrics:**
 
-| Metric | Before | After | Improvement |
-|---------|----------|---------|-------------|
-| Starship config locations | 2 | 1 | 50% reduction |
-| Tmux config locations | 1 | 1 | Consistency gain |
-| Fish config locations | 2 | 1 | 50% reduction |
-| Manual configuration | High | None | 100% automation |
-| Configuration drift | High risk | Low risk | Significantly reduced |
+| Metric                    | Before    | After    | Improvement           |
+| ------------------------- | --------- | -------- | --------------------- |
+| Starship config locations | 2         | 1        | 50% reduction         |
+| Tmux config locations     | 1         | 1        | Consistency gain      |
+| Fish config locations     | 2         | 1        | 50% reduction         |
+| Manual configuration      | High      | None     | 100% automation       |
+| Configuration drift       | High risk | Low risk | Significantly reduced |
 
 ---
 
@@ -447,6 +459,7 @@ darwin-rebuild check --flake .  # → Hung in background
 Build verification commands are hanging indefinitely in background, preventing validation of the Home Manager integration implementation.
 
 **Symptoms:**
+
 ```bash
 $ just test
 # Command moves to background instead of executing
@@ -459,6 +472,7 @@ $ ps aux | grep nix
 ```
 
 **Impact:**
+
 - Cannot verify configuration builds
 - Cannot apply switch
 - Cannot test programs
@@ -466,6 +480,7 @@ $ ps aux | grep nix
 - Cannot proceed to documentation
 
 **Attempted Solutions:**
+
 - ❌ Multiple test attempts with same result
 - ❌ Adding files to git (doesn't help)
 - ❌ Checking file permissions (correct)
@@ -489,6 +504,7 @@ $ ps aux | grep nix
    - Standard output capture not working
 
 **Required Actions:**
+
 1. Kill all hung Nix processes
 2. Clear Nix flake cache completely
 3. Restart with clean state
@@ -505,12 +521,14 @@ $ ps aux | grep nix
 No incremental validation steps for testing Nix configurations. All tests run full build which takes time and makes debugging difficult.
 
 **Required Improvements:**
+
 1. Fast syntax validation (seconds)
 2. Module import validation (seconds)
 3. Configuration merge validation (minutes)
 4. Full build test (10+ minutes)
 
 **Impact Without Fix:**
+
 - Slow feedback loop for changes
 - Difficult to debug specific issues
 - Time wasted on full rebuilds
@@ -525,6 +543,7 @@ No incremental validation steps for testing Nix configurations. All tests run fu
 No architecture documentation for the Home Manager integration pattern, making it difficult for future modifications or adding new platforms.
 
 **Required Documentation:**
+
 1. Architecture Decision Record (ADR)
 2. Module development guidelines
 3. Testing procedures
@@ -538,6 +557,7 @@ No architecture documentation for the Home Manager integration pattern, making i
 ### 🔴 CRITICAL (Must Complete First)
 
 **1. Resolve Build Verification Blocker**
+
 ```bash
 # Kill hung processes
 pkill -9 nix
@@ -553,6 +573,7 @@ just test
 ```
 
 **2. Verify Build Success**
+
 ```bash
 # Run check command
 darwin-rebuild check --flake .
@@ -562,6 +583,7 @@ darwin-rebuild check --flake .
 ```
 
 **3. Apply Configuration**
+
 ```bash
 # Apply Home Manager integration
 just switch
@@ -572,6 +594,7 @@ darwin-rebuild switch --flake .
 ### 🟡 HIGH (After Build Works)
 
 **4. Verify Program Functionality**
+
 ```bash
 # Test Starship
 starship --version
@@ -590,6 +613,7 @@ fish
 ```
 
 **5. Validate Environment Variables**
+
 ```bash
 echo $EDITOR  # Should be: micro
 echo $LANG   # Should be: en_GB.UTF-8
@@ -597,6 +621,7 @@ echo $LANG   # Should be: en_GB.UTF-8
 ```
 
 **6. Test NixOS Configuration**
+
 ```bash
 # On NixOS machine (evo-x2)
 sudo nixos-rebuild check --flake .#evo-x2
@@ -604,6 +629,7 @@ sudo nixos-rebuild check --flake .#evo-x2
 ```
 
 **7. Commit and Push Changes**
+
 ```bash
 git add flake.nix platforms/darwin/default.nix platforms/darwin/home.nix
 git commit -m "feat: add Home Manager to Darwin for cross-platform program management"
@@ -613,26 +639,31 @@ git push
 ### 🟢 MEDIUM (After Commit)
 
 **8. Create Architecture Decision Record**
+
 - Document why Home Manager was chosen
 - Record trade-offs and alternatives
 - Provide future reference
 
 **9. Update AGENTS.md**
+
 - Add Home Manager integration rules
 - Module development guidelines
 - Architecture patterns
 
 **10. Create Module Templates**
+
 - nix-darwin module template
 - Home Manager module template
 - Platform-specific override template
 
 **11. Create Troubleshooting Guide**
+
 - Common issues and solutions
 - Debugging techniques
 - Nix cache management
 
 **12. Add Pre-commit Validation**
+
 - Check for invalid option usage
 - Validate import patterns
 - Prevent architecture violations
@@ -640,16 +671,19 @@ git push
 ### 🔵 LOW (Nice to Have)
 
 **13. Create Visual Architecture Diagram**
+
 - Module dependency graph
 - Configuration flow
 - Platform comparison
 
 **14. Improve Build Times**
+
 - Better caching strategy
 - Incremental builds
 - Parallel evaluation
 
 **15. Add Automated Testing**
+
 - CI pipeline for Darwin
 - CI pipeline for NixOS
 - Cross-platform validation tests
@@ -729,34 +763,34 @@ git push
 
 ### Implementation Progress
 
-| Phase | Status | Progress |
-|--------|----------|-----------|
-| Research & Analysis | ✅ Complete | 100% |
-| Architecture Decision | ✅ Complete | 100% |
-| Implementation | 🟡 In Progress | 90% |
-| Testing | 🔴 Blocked | 0% |
-| Documentation | ⏳ Not Started | 0% |
-| Total | 🟡 | ~50% |
+| Phase                 | Status         | Progress |
+| --------------------- | -------------- | -------- |
+| Research & Analysis   | ✅ Complete    | 100%     |
+| Architecture Decision | ✅ Complete    | 100%     |
+| Implementation        | 🟡 In Progress | 90%      |
+| Testing               | 🔴 Blocked     | 0%       |
+| Documentation         | ⏳ Not Started | 0%       |
+| Total                 | 🟡             | ~50%     |
 
 ### File Changes
 
-| Type | Count | Status |
-|-------|--------|--------|
-| Files Created | 1 | ✅ Staged |
-| Files Modified | 2 | 🟡 Modified |
-| Lines Added | ~100 | ✅ Written |
-| Lines Removed | ~20 | ✅ Removed |
-| Net Change | +~80 | ✅ Positive |
+| Type           | Count | Status      |
+| -------------- | ----- | ----------- |
+| Files Created  | 1     | ✅ Staged   |
+| Files Modified | 2     | 🟡 Modified |
+| Lines Added    | ~100  | ✅ Written  |
+| Lines Removed  | ~20   | ✅ Removed  |
+| Net Change     | +~80  | ✅ Positive |
 
 ### Configuration Impact
 
-| Area | Before | After | Change |
-|-------|----------|---------|---------|
-| Program Config Locations | 4 | 2 | -50% |
-| Cross-Platform Consistency | Low | High | Significant |
-| Type Safety | None | Full | Complete |
-| Maintenance Effort | High | Low | Significant |
-| Feature Parity | No | Yes | Complete |
+| Area                       | Before | After | Change      |
+| -------------------------- | ------ | ----- | ----------- |
+| Program Config Locations   | 4      | 2     | -50%        |
+| Cross-Platform Consistency | Low    | High  | Significant |
+| Type Safety                | None   | Full  | Complete    |
+| Maintenance Effort         | High   | Low   | Significant |
+| Feature Parity             | No     | Yes   | Complete    |
 
 ---
 

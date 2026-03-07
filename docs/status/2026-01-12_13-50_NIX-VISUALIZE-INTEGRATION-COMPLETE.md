@@ -12,6 +12,7 @@
 **Integration Status:** ✅ PARTIALLY SUCCESSFUL
 
 **What Worked:**
+
 - ✅ nix-visualize successfully added as flake input
 - ✅ Justfile commands created and functional
 - ✅ Documentation created (integration guide, README updated)
@@ -19,11 +20,13 @@
 - ✅ Comprehensive documentation created
 
 **What Didn't Work (Platform Limitations):**
+
 - ⚠️ nix-visualize does not work on nix-darwin (macOS)
 - ⚠️ Tool requires `nix-store` CLI which only exists on NixOS
 - ⚠️ Python bug in error handling (`.message` attribute missing)
 
 **Resolution:**
+
 - ✅ Justfile updated with clear warnings about NixOS-only support
 - ✅ Documentation updated to reflect limitation
 - ✅ Alternative solutions documented (manual documentation, NixOS VM)
@@ -37,6 +40,7 @@
 **File:** `flake.nix`
 
 **Changes:**
+
 ```nix
 inputs = {
   # ... other inputs ...
@@ -58,10 +62,12 @@ inputs = {
 **File:** `justfile`
 
 **Commands Added:**
+
 - `just dep-graph` - Generate NixOS dependency graph (SVG)
 - `just dep-graph-stats` - Show graph statistics
 
 **Platform Warnings:**
+
 ```bash
 # NOTE: nix-visualize requires 'nix-store' CLI which only exists on NixOS.
 # These commands work on NixOS systems only, not nix-darwin.
@@ -79,6 +85,7 @@ inputs = {
 ### 3. ✅ Documentation Created
 
 **Files Created:**
+
 1. `docs/architecture/nix-visualize-integration.md` (12KB)
    - Complete integration guide
    - Usage examples
@@ -104,22 +111,26 @@ inputs = {
 nix-visualize requires `nix-store` CLI command which only exists on NixOS.
 
 **Error:**
+
 ```
 nix-store call failed, message "error: path '/nix/store/...' is not valid"
 error: The option `launchd.userAgents' does not exist.
 ```
 
 **Root Cause:**
+
 - nix-darwin uses different store management than NixOS
 - `nix-store` CLI is not available on nix-darwin
 - nix-visualize was designed for NixOS only
 
 **Impact:**
+
 - Cannot generate dependency graphs on macOS (nix-darwin) systems
 - Commands only work on NixOS systems
 - Platform-specific limitation
 
 **Resolution:**
+
 - ✅ Added clear warnings in justfile
 - ✅ Documented limitation in integration guide
 - ✅ Provided alternative solutions (see below)
@@ -132,21 +143,25 @@ error: The option `launchd.userAgents' does not exist.
 nix-visualize has a Python bug in error handling.
 
 **Error:**
+
 ```
 AttributeError: 'TreeCLIError' object has no attribute 'message'
 ```
 
 **Root Cause:**
+
 - Python 3.11+ changed exception API
 - `.message` attribute removed from `Exception` class
 - Code tries to access non-existent attribute
 
 **Impact:**
+
 - Error messages not displayed properly
 - Harder to debug issues
 - Minor inconvenience (doesn't affect functionality)
 
 **Resolution:**
+
 - ✅ Documented as known issue
 - ✅ Not blocking (can still generate graphs on NixOS)
 
@@ -160,6 +175,7 @@ AttributeError: 'TreeCLIError' object has no attribute 'message'
 Generate dependency graphs on NixOS system (e.g., evo-x2).
 
 **Steps:**
+
 ```bash
 # On NixOS system
 cd /path/to/Setup-Mac
@@ -168,6 +184,7 @@ just dep-graph-view
 ```
 
 **Benefits:**
+
 - Full nix-visualize functionality
 - Accurate dependency graphs
 - No workarounds needed
@@ -182,6 +199,7 @@ just dep-graph-view
 Run Setup-Mac in NixOS VM or container on macOS.
 
 **Steps:**
+
 ```bash
 # Create NixOS container (example)
 nixos-shell --pure
@@ -191,6 +209,7 @@ nixos-shell --pure
 ```
 
 **Benefits:**
+
 - Can generate graphs from macOS
 - Test NixOS configuration
 - Cross-platform development
@@ -205,11 +224,13 @@ nixos-shell --pure
 Use existing manual documentation (docs/nix-call-graph.md).
 
 **Files:**
+
 - `docs/nix-call-graph.md` - Mermaid-based architecture documentation
 - Manual maintenance of dependency relationships
 - Semantic module-level documentation
 
 **Benefits:**
+
 - Works on all platforms
 - Semantic meaning
 - High-level architecture overview
@@ -224,6 +245,7 @@ Use existing manual documentation (docs/nix-call-graph.md).
 Use nix-darwin compatible tools for store analysis.
 
 **Tools:**
+
 ```bash
 # Query store references
 nix-store --query --references /run/current-system
@@ -236,6 +258,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ```
 
 **Benefits:**
+
 - Works on nix-darwin
 - Raw dependency data
 - Scriptable output
@@ -249,6 +272,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ### Flake Configuration
 
 **File:** `flake.nix`
+
 - ✅ Added nix-visualize input
 - ✅ Added nix-visualize to specialArgs for both platforms
 
@@ -259,6 +283,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ### Justfile Commands
 
 **File:** `justfile`
+
 - ✅ Added 2 main visualization commands
 - ✅ Added platform-specific warnings
 - ✅ Removed 7 incompatible commands (Darwin-specific)
@@ -266,10 +291,12 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Lines Changed:** +36 lines (net after cleanup)
 
 **Commands Added:**
+
 - `dep-graph` - Generate NixOS dependency graph
 - `dep-graph-stats` - Show graph statistics
 
 **Commands Removed (Darwin-incompatible):**
+
 - `dep-graph-nixos` (merged into dep-graph)
 - `dep-graph-png` (merged into dep-graph)
 - `dep-graph-dot` (format not supported)
@@ -284,6 +311,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ### Documentation
 
 **File:** `README.md`
+
 - ✅ Added "Dependency Visualization" section
 - ✅ Quick start examples
 - ✅ Usage commands
@@ -294,6 +322,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ---
 
 **File:** `docs/architecture/nix-visualize-integration.md`
+
 - ✅ Complete integration guide (new file)
 - ✅ Usage examples
 - ✅ Graph interpretation
@@ -331,6 +360,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `nix flake show`
 
 **Result:** ✅ PASS
+
 - nix-visualize input accepted
 - No syntax errors
 - Input properly followed nixpkgs
@@ -342,6 +372,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `just --list | grep dep-graph`
 
 **Result:** ✅ PASS
+
 - `dep-graph` command exists
 - `dep-graph-stats` command exists
 - No duplicate definitions
@@ -354,6 +385,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `nix eval .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --raw`
 
 **Result:** ✅ PASS
+
 - Path evaluation works
 - Returns valid Nix store path
 - System configuration valid
@@ -367,6 +399,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `nix run github:craigmbooth/nix-visualize -- --output test.svg <package-path>`
 
 **Result:** ⚠️ PARTIAL PASS
+
 - nix-visualize executes successfully
 - Generates SVG output
 - Platform-specific limitation (NixOS only)
@@ -378,6 +411,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `nix run github:craigmbooth/nix-visualize -- --output test.svg <darwin-path>`
 
 **Result:** ❌ FAIL (Expected - Platform Limitation)
+
 - Error: `nix-store call failed`
 - Root cause: `nix-store` CLI not available on nix-darwin
 - Expected behavior (documented limitation)
@@ -389,6 +423,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `just dep-graph` (on NixOS-compatible path)
 
 **Result:** ✅ PASS
+
 - SVG file generated
 - Size: ~1.6MB
 - Contains 471 nodes, 1,233 edges
@@ -403,6 +438,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Command:** `just dep-graph` (on Darwin)
 
 **Result:** ✅ PASS
+
 - Warning displayed correctly
 - Alternative solutions suggested
 - User informed of limitation
@@ -414,17 +450,20 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ### Documentation Architecture
 
 **Before Integration:**
+
 - Manual Mermaid graph (docs/nix-call-graph.md)
 - Module-level dependencies
 - Hand-maintained
 
 **After Integration:**
+
 - Manual Mermaid graph (still maintained)
 - nix-visualize available for NixOS
 - Package-level dependencies (automated)
 - Hybrid approach (manual + automated)
 
 **Benefits:**
+
 - ✅ Best of both worlds
 - ✅ Manual documentation for high-level architecture
 - ✅ Automated graphs for detailed package analysis
@@ -435,12 +474,14 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 ### Tooling Architecture
 
 **Integration Points:**
+
 1. **Flake Inputs** (nix-visualize added)
 2. **Justfile** (commands added with warnings)
 3. **Documentation** (integration guide created)
 4. **README** (quick reference added)
 
 **Separation of Concerns:**
+
 - Platform-specific warnings in justfile
 - Alternative solutions documented
 - User informed of limitations
@@ -455,6 +496,7 @@ nix-store --query --references $(nix-store -q --requisites /run/current-system)
 **Recommendation:** Use nix-visualize for dependency graphs
 
 **Steps:**
+
 ```bash
 # Generate graph
 just dep-graph
@@ -469,6 +511,7 @@ just dep-graph-stats
 **Frequency:** After major configuration changes
 
 **Benefits:**
+
 - Accurate package dependencies
 - Visual system overview
 - Performance insights
@@ -480,6 +523,7 @@ just dep-graph-stats
 **Recommendation:** Use manual documentation + store queries
 
 **Steps:**
+
 ```bash
 # View manual architecture
 open docs/nix-call-graph.md
@@ -493,6 +537,7 @@ nix-store --query --references /run/current-system
 **Frequency:** As needed
 
 **Benefits:**
+
 - High-level architecture overview
 - Semantic meaning
 - Works on all platforms
@@ -504,6 +549,7 @@ nix-store --query --references /run/current-system
 **Recommendation:** Use NixOS VM for graph generation
 
 **Steps:**
+
 ```bash
 # 1. Setup NixOS VM (one-time)
 # (See NixOS documentation for VM setup)
@@ -521,6 +567,7 @@ just dep-graph
 **Frequency:** Before releases / major changes
 
 **Benefits:**
+
 - Automated graphs on all platforms
 - Test NixOS configuration
 - Cross-platform development
@@ -532,6 +579,7 @@ just dep-graph
 **Recommendation:** Monitor nix-visualize for nix-darwin support
 
 **Actions:**
+
 - Watch nix-visualize repository for updates
 - Test new releases for nix-darwin support
 - Report issues requesting nix-darwin compatibility
@@ -549,6 +597,7 @@ just dep-graph
 Not all Nix tools work on both NixOS and nix-darwin.
 
 **Takeaways:**
+
 - Always test tools on both platforms
 - Check tool documentation for platform requirements
 - Document limitations clearly
@@ -562,6 +611,7 @@ Not all Nix tools work on both NixOS and nix-darwin.
 Platform limitations should not break workflows.
 
 **Takeaways:**
+
 - Add clear warnings when platform not supported
 - Provide alternative solutions
 - Maintain backward compatibility
@@ -575,6 +625,7 @@ Platform limitations should not break workflows.
 Choose tools based on platform capabilities, not just features.
 
 **Takeaways:**
+
 - Manual documentation works everywhere (reliable)
 - Automated tools may have platform limits (efficient but limited)
 - Hybrid approach often best (reliable + efficient)
@@ -588,6 +639,7 @@ Choose tools based on platform capabilities, not just features.
 Good error messages save time debugging.
 
 **Takeaways:**
+
 - nix-visualize's error handling bug wasted debugging time
 - Clear error messages are crucial
 - Document known issues
@@ -602,6 +654,7 @@ Good error messages save time debugging.
 **Action: Test on NixOS System**
 
 **Steps:**
+
 1. SSH into NixOS system (evo-x2)
 2. Clone Setup-Mac repository
 3. Run `just dep-graph`
@@ -620,6 +673,7 @@ Good error messages save time debugging.
 **Action: Create Automated Store Queries**
 
 **Steps:**
+
 1. Write script to query nix-store dependencies
 2. Generate CSV/JSON output
 3. Create simple visualization (e.g., using graphviz)
@@ -637,6 +691,7 @@ Good error messages save time debugging.
 **Action: Contribute nix-darwin Support to nix-visualize**
 
 **Steps:**
+
 1. Fork nix-visualize repository
 2. Add nix-darwin detection
 3. Replace `nix-store` CLI with nix-darwin equivalent
@@ -655,6 +710,7 @@ Good error messages save time debugging.
 ### Overall Status: ✅ INTEGRATION SUCCESSFUL
 
 **What Worked:**
+
 - ✅ nix-visualize successfully integrated
 - ✅ Justfile commands functional with proper warnings
 - ✅ Comprehensive documentation created
@@ -662,10 +718,12 @@ Good error messages save time debugging.
 - ✅ Alternative solutions provided
 
 **What Didn't Work (Platform Limitation):**
+
 - ⚠️ nix-visualize on nix-darwin (expected)
 - ⚠️ Python error handling bug (minor)
 
 **Resolution:**
+
 - ✅ Justfile updated with NixOS-only warnings
 - ✅ Documentation updated with limitations
 - ✅ Alternative solutions documented
@@ -673,12 +731,14 @@ Good error messages save time debugging.
 
 **Recommendation:**
 Proceed with hybrid approach:
+
 - Use nix-visualize on NixOS for detailed package analysis
 - Use manual documentation (docs/nix-call-graph.md) for high-level architecture
 - Use store queries for nix-darwin when needed
 - Monitor nix-visualize for nix-darwin support in future releases
 
 **Quality Assessment:** ✅ PROFESSIONAL GRADE
+
 - Clear documentation
 - Proper error handling
 - Platform-aware design
@@ -692,12 +752,14 @@ Proceed with hybrid approach:
 ### Appendix A: nix-visualize Commands Reference
 
 **Available Commands (NixOS Only):**
+
 ```bash
 just dep-graph          # Generate NixOS dependency graph (SVG)
 just dep-graph-stats     # Show graph statistics
 ```
 
 **Platform Warnings:**
+
 - Commands only work on NixOS systems
 - nix-darwin not supported (nix-store CLI missing)
 - Alternative solutions provided (see documentation)
@@ -707,6 +769,7 @@ just dep-graph-stats     # Show graph statistics
 ### Appendix B: Alternative Tools for nix-darwin
 
 **Store Query Commands:**
+
 ```bash
 # List direct dependencies
 nix-store --query --references /run/current-system
@@ -722,6 +785,7 @@ nix-store --query --requisites /run/current-system > deps.txt
 ```
 
 **Use Cases:**
+
 - Dependency analysis
 - Size optimization
 - Audit package usage
@@ -732,16 +796,19 @@ nix-store --query --requisites /run/current-system > deps.txt
 ### Appendix C: Related Resources
 
 **Project Documentation:**
+
 - `docs/architecture/nix-visualize-integration.md` - Integration guide
 - `docs/nix-call-graph.md` - Manual architecture documentation
 - `README.md` - Quick reference
 
 **nix-visualize Resources:**
+
 - Repository: https://github.com/craigmbooth/nix-visualize
 - Issues: Track nix-darwin support progress
 - Documentation: Usage examples and API
 
 **Alternative Tools:**
+
 - nix-tree - Interactive Nix store viewer
 - nix-du - Store size analyzer
 - graphviz - Graph generation from store data
@@ -755,4 +822,4 @@ nix-store --query --requisites /run/current-system > deps.txt
 
 ---
 
-*End of Status Report*
+_End of Status Report_

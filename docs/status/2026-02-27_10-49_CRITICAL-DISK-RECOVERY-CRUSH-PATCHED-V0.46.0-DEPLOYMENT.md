@@ -16,6 +16,7 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 ## A) FULLY DONE ✅
 
 ### 1. Critical Disk Space Recovery
+
 - **Initial State:** `/nix/store` at 100% capacity (229G/229G used, only 205M free)
 - **Root Cause:** Accumulated nix store garbage from failed builds and old generations
 - **Action Taken:** Emergency garbage collection via `nix-store --gc --max-freed 5G`
@@ -23,27 +24,31 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 - **Impact:** System was completely non-functional; could not update, build, or modify nix profiles
 
 ### 2. crush-patched v0.46.0 Migration
+
 - **Previous Version:** v0.45.0 (with PR #2070 grep UI fix patch)
 - **Target Version:** v0.46.0 (with same PR #2070 patch)
 - **Status:** ✅ Successfully deployed
 
 #### Hash Corrections Applied:
 
-| Component | Old Hash | New Hash | Status |
-|-----------|----------|----------|--------|
-| Source Tarball | `sha256:00s8c4dpyly5yx68cbk6pqbgfxm2fp57w7ygc3z9zxfn8p4caydn` | `sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=` | ✅ Fixed |
+| Component        | Old Hash                                                      | New Hash                                              | Status   |
+| ---------------- | ------------------------------------------------------------- | ----------------------------------------------------- | -------- |
+| Source Tarball   | `sha256:00s8c4dpyly5yx68cbk6pqbgfxm2fp57w7ygc3z9zxfn8p4caydn` | `sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=` | ✅ Fixed |
 | Patch (PR #2070) | `sha256:03fm5x8w80m9ghb2ccilhz0aqlzf76avr8cmfaqb0bb4ggzy1sgd` | `sha256-3G73sqv4UdwNZHs6HKr9mCYO8WWplJAnLrurDpEiK20=` | ✅ Fixed |
-| vendorHash | `sha256-toatZYuXDn6aJXhgcMWXqvGVnp7+85K6QNYCNwIZfQY=` | `sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=` | ✅ Fixed |
+| vendorHash       | `sha256-toatZYuXDn6aJXhgcMWXqvGVnp7+85K6QNYCNwIZfQY=`         | `sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=` | ✅ Fixed |
 
 #### Files Modified:
+
 - `pkgs/crush-patched/package.nix` (10 line changes: version, 3 hashes, description)
 
 ### 3. Flake Dependencies Update
+
 - **homebrew-cask:** Updated to `89004e54acc06e66c59378f47c7390ca7a21d32a`
 - **NUR (Nix User Repository):** Updated to `94873fd011eed9ac6def4a88bb69feeca23822da`
 - **Status:** ✅ Both inputs updated successfully
 
 ### 4. System Update Execution
+
 - **Command:** `just update`
 - **Duration:** ~4m25s (after disk recovery)
 - **Outcome:** ✅ Completed without errors
@@ -54,6 +59,7 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 ## B) PARTIALLY DONE ⚠️
 
 ### 1. PR #2070 Patch Verification
+
 - **Applied:** Patch hash updated to match v0.46.0 source
 - **Note:** Patch comments in file still reference "v0.45.0" - purely cosmetic documentation issue
 - **Action Needed:** Update comments to reflect v0.46.0
@@ -63,11 +69,13 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 ## C) NOT STARTED ⏸️
 
 ### 1. `just switch` Execution
+
 - **Status:** Pending user execution
 - **Impact:** Changes are staged but not yet applied to system
 - **Risk:** Low - system is in consistent state
 
 ### 2. Verification After Switch
+
 - Test crush CLI functionality
 - Verify PR #2070 grep UI fix is active
 - Confirm all binaries execute correctly
@@ -77,12 +85,14 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 ## D) TOTALLY FUCKED UP ❌
 
 ### 1. Initial Disk Crisis (RESOLVED)
+
 - **Severity:** CRITICAL - System was non-operational
 - **Impact:** All nix operations failed with "No space left on device"
 - **Recovery Time:** ~12 minutes for GC to complete
 - **Lesson:** `/nix` partition needs monitoring and regular maintenance
 
 ### 2. Hash Mismatch Cascade (RESOLVED)
+
 - **Issue:** Auto-update script rolled back from v0.46.0 due to hash mismatches
 - **Root Cause:** Multiple hashes needed updating simultaneously (src, patch, vendor)
 - **Fix:** Manual intervention with correct hashes from build logs
@@ -184,22 +194,26 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 **Question:** Why does the **source tarball hash** (`sha256-BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=`) exactly match the **vendorHash** for crush-patched v0.46.0?
 
 **Evidence:**
+
 - Source tarball hash: `BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=`
 - vendorHash: `BMQyEMWRS4QCcgF07cHh3QCUOCK3vMnN6RMFP4f0CyQ=`
 - Both are exactly the same base64-encoded SHA256
 
 **Possible Explanations:**
+
 1. **Coincidence** - Extremely unlikely with SHA256 (2^-256 probability)
 2. **Deterministic Vendor Directory** - Go modules might hash to same value as source in some edge case
 3. **Build System Quirk** - The way `buildGoModule` computes vendorHash might be related
 4. **Copy-Paste Error** - Did I accidentally copy the same hash? (need to verify)
 
 **Why This Matters:**
+
 - If these should be different, the build might be incorrect
 - If this is expected behavior, we should document it
 - Could indicate a deeper issue with how we're packaging crush
 
 **Action Needed:**
+
 - Verify the actual vendor directory hash with `nix-prefetch-url --unpack`
 - Check if crush v0.45.0 had different hashes for src vs vendor
 - Research if this is a known pattern in `buildGoModule`
@@ -208,13 +222,13 @@ Successfully recovered from a **CRITICAL SYSTEM FAILURE** (100% disk utilization
 
 ## System Health Snapshot
 
-| Metric | Value | Status |
-|--------|-------|--------|
-| `/nix/store` Usage | 217G/229G (95%) | ⚠️ High but manageable |
-| Available Space | 13GB | ✅ Adequate |
-| Flake Status | Updated | ✅ Current |
-| crush-patched | v0.46.0 | ✅ Latest |
-| Git Status | 2 modified files | ⏸️ Uncommitted |
+| Metric             | Value            | Status                 |
+| ------------------ | ---------------- | ---------------------- |
+| `/nix/store` Usage | 217G/229G (95%)  | ⚠️ High but manageable |
+| Available Space    | 13GB             | ✅ Adequate            |
+| Flake Status       | Updated          | ✅ Current             |
+| crush-patched      | v0.46.0          | ✅ Latest              |
+| Git Status         | 2 modified files | ⏸️ Uncommitted         |
 
 ---
 
@@ -286,6 +300,6 @@ Assisted-by: Crush AI via Crush <crush@charm.land>
 
 ---
 
-*Report generated: 2026-02-27 10:49*
-*System: Lars-MacBook-Air (nix-darwin)*
-*Status: RESOLVED - Ready for user action*
+_Report generated: 2026-02-27 10:49_
+_System: Lars-MacBook-Air (nix-darwin)_
+_Status: RESOLVED - Ready for user action_

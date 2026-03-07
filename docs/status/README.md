@@ -11,16 +11,19 @@ This directory contains status reports documenting the development progress, cha
 ### Historical Path References
 
 **Many documents in this directory reference the old project path:**
+
 - ❌ `~/Desktop/Setup-Mac` (old - deprecated)
 - ❌ `/Users/larsartmann/Desktop/Setup-Mac` (old - deprecated)
 
 **Current project path:**
+
 - ✅ `~/projects/SystemNix`
 - ✅ `/Users/larsartmann/projects/SystemNix`
 
 ### Historical Context Preserved
 
 These status reports are maintained **as-is** to preserve historical context of the project's evolution, including:
+
 - Migration from Setup-Mac to SystemNix
 - Cross-platform architecture decisions (Darwin + NixOS)
 - Type safety system implementation
@@ -30,12 +33,14 @@ These status reports are maintained **as-is** to preserve historical context of 
 ### When to Use This Directory
 
 ✅ **Appropriate uses:**
+
 - Researching project evolution and decisions
 - Understanding historical challenges and solutions
 - Learning from past implementation approaches
 - Analyzing development patterns over time
 
 ❌ **Inappropriate uses:**
+
 - Following setup/deployment instructions (use main docs/)
 - Resolving current issues (use docs/troubleshooting/)
 - Understanding current architecture (use docs/architecture/)
@@ -68,6 +73,7 @@ For the **most recent** and **accurate** project status, please refer to:
 **Decision Made**: 2026-02-09
 
 **Guidelines**:
+
 - Path references preserved for historical accuracy
 - New status reports use current paths
 - Only update factual errors, not historical context

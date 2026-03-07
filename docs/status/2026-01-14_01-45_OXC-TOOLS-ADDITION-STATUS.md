@@ -6,12 +6,14 @@
 ## Summary
 
 Successfully added two Oxc project tools to the Nix configuration:
+
 - ✅ **oxlint** - Fast JavaScript/TypeScript linter (Rust-based)
 - ✅ **tsgolint** - TypeScript-aware linter for oxlint (Go-based)
 
 ## Tools Added
 
 ### 1. oxlint
+
 - **Purpose**: Ultra-fast JavaScript/TypeScript linter
 - **Language**: Rust
 - **Status**: ✅ Available in nixpkgs, added to `developmentPackages`
@@ -19,6 +21,7 @@ Successfully added two Oxc project tools to the Nix configuration:
 - **Location**: `platforms/common/packages/base.nix`
 
 ### 2. tsgolint
+
 - **Purpose**: Type-aware linting for oxlint
 - **Language**: Go
 - **Status**: ✅ Available in nixpkgs, added to `developmentPackages`
@@ -27,6 +30,7 @@ Successfully added two Oxc project tools to the Nix configuration:
 - **Location**: `platforms/common/packages/base.nix`
 
 ### 3. oxfmt
+
 - **Purpose**: Fast JavaScript/TypeScript formatter (Prettier-compatible)
 - **Language**: Rust
 - **Status**: ✅ Available in nixpkgs, added to `developmentPackages`
@@ -36,9 +40,11 @@ Successfully added two Oxc project tools to the Nix configuration:
 ## Configuration Changes
 
 ### Modified Files
+
 - `platforms/common/packages/base.nix`
 
 ### Changes Made
+
 ```nix
 # Added to developmentPackages section:
 oxlint      # Fast JS/TS linter
@@ -65,11 +71,13 @@ oxfmt       # Fast JS/TS formatter
 ## Next Steps
 
 ### Immediate (ALL COMPLETE ✅)
+
 1. ✅ Complete current rebuild
 2. ✅ Verify oxlint, tsgolint, and oxfmt installation
 3. ✅ Test basic functionality
 
 ### Future
+
 1. Create comprehensive Oxc tools integration test
 2. Test Prettier compatibility with oxfmt
 3. Add pre-commit hook for oxfmt formatting
@@ -79,12 +87,14 @@ oxfmt       # Fast JS/TS formatter
 ## Benefits of This Addition
 
 ### oxlint
+
 - **50-100x faster** than ESLint
 - **570+ rules** out of the box
 - **Zero configuration** needed for basic use
 - **Type-aware** when combined with tsgolint
 
 ### tsgolint
+
 - Enables **true type-aware linting** for oxlint
 - Built from **oxc-project/tsgolint** Go package
 - Automatically **wrapped** by oxlint for easy use
@@ -92,12 +102,14 @@ oxfmt       # Fast JS/TS formatter
 ## Architecture Alignment
 
 ✅ **Follows established patterns**:
+
 - Tools added to `developmentPackages` in `base.nix`
 - Cross-platform (macOS and NixOS)
 - No platform-specific configuration needed
 - Maintains declarative package management via nixpkgs
 
 ### oxfmt
+
 - **Prettier-compatible** formatter with Rust performance
 - **50-100x faster** than Prettier
 - **Zero configuration** needed for basic use

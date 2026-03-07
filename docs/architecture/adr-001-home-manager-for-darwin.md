@@ -1,9 +1,11 @@
 # ADR-001: Use Home Manager for Cross-Platform User Configuration
 
 ## Status
+
 **Accepted**
 
 ## Date
+
 2025-12-27
 
 ## Context
@@ -11,12 +13,14 @@
 ### Problem Statement
 
 **Previous Architecture:**
+
 - Separate user configurations for Darwin (macOS) and NixOS (Linux)
 - Code duplication: ~80% for shared programs (Fish, Starship, Tmux)
 - Inconsistent configuration: Different aliases, packages, settings across platforms
 - High maintenance cost: Changes needed in multiple places
 
 **Pain Points:**
+
 1. **Duplication**: Fish shell aliases defined separately for each platform
 2. **Inconsistency**: Starship prompt settings differed between Darwin and NixOS
 3. **Maintenance**: Adding new tool required editing multiple configuration files
@@ -99,6 +103,7 @@ flake.nix
 #### Import Paths
 
 **Darwin Home Manager**:
+
 ```nix
 // File: platforms/darwin/home.nix
 imports = [
@@ -107,6 +112,7 @@ imports = [
 ```
 
 **NixOS Home Manager**:
+
 ```nix
 // File: platforms/nixos/users/home.nix
 imports = [
@@ -119,6 +125,7 @@ imports = [
 #### Platform Conditionals
 
 **ActivityWatch** (Linux only):
+
 ```nix
 // File: platforms/common/programs/activitywatch.nix
 services.activitywatch = {
@@ -131,6 +138,7 @@ services.activitywatch = {
 ```
 
 **Platform Aliases** (different commands, same names):
+
 ```nix
 // File: platforms/darwin/home.nix
 programs.fish.shellAliases = {
@@ -231,14 +239,17 @@ programs.fish.shellAliases = {
 ## Alternatives Considered
 
 ### Alternative 1: Continue with Separate Configurations
+
 **Approach**: Maintain separate user configurations for Darwin and NixOS
 
 **Pros**:
+
 - No learning curve (existing approach)
 - No dependency on Home Manager
 - No unknown issues
 
 **Cons**:
+
 - 80% code duplication remains
 - Inconsistent configuration across platforms
 - High maintenance cost
@@ -247,13 +258,16 @@ programs.fish.shellAliases = {
 **Decision**: ❌ REJECTED - Too much duplication and inconsistency
 
 ### Alternative 2: Symlink Shared Files
+
 **Approach**: Create symlinks from platform-specific configs to shared files
 
 **Pros**:
+
 - Eliminates duplication (files exist in one place)
 - No dependency on Home Manager
 
 **Cons**:
+
 - Symlinks break on Windows
 - Platform-specific overrides complex (need to override symlinks)
 - No type safety or validation
@@ -262,13 +276,16 @@ programs.fish.shellAliases = {
 **Decision**: ❌ REJECTED - Too complex, no type safety
 
 ### Alternative 3: Custom Shared Configuration System
+
 **Approach**: Build custom configuration system for shared modules
 
 **Pros**:
+
 - Full control over architecture
 - No dependency on Home Manager
 
 **Cons**:
+
 - High development cost (need to build from scratch)
 - Re-inventing the wheel (Home Manager already does this)
 - No community support
@@ -277,13 +294,16 @@ programs.fish.shellAliases = {
 **Decision**: ❌ REJECTED - Too much development effort
 
 ### Alternative 4: Stow/Nix-Symlink-Dirs
+
 **Approach**: Use GNU Stow or nix-symlink-dirs for dotfiles
 
 **Pros**:
+
 - No dependency on Home Manager
 - Popular tool with community support
 
 **Cons**:
+
 - No type safety or validation
 - Declarative but not integrated with Nix
 - Platform-specific overrides complex
@@ -358,18 +378,21 @@ programs.fish.shellAliases = {
 ## Metrics
 
 ### Code Duplication Reduction
+
 - **Before**: 100% duplication (separate configs for each platform)
 - **After**: ~20% duplication (shared modules for 80% of config)
 - **Reduction**: ~80%
 - **Shared Lines of Code**: 200+ lines
 
 ### Module Statistics
+
 - **Shared Modules**: 4 (fish.nix, starship.nix, tmux.nix, activitywatch.nix)
 - **Platform-Specific Overrides**: Minimal
 - **Shared Packages**: All in `platforms/common/packages/base.nix`
 - **Platform-Specific Packages**: Minimal
 
 ### Documentation Coverage
+
 - **Build Verification**: ✅ Complete
 - **Deployment Guide**: ✅ Complete
 - **Verification Template**: ✅ Complete
@@ -380,11 +403,13 @@ programs.fish.shellAliases = {
 ## References
 
 ### Documentation
+
 - [Home Manager Manual](https://nix-community.github.io/home-manager/)
 - [Home Manager Options Search](https://mipmiana.github.io/home-manager-option-search/)
 - [NixOS Wiki](https://nixos.wiki/)
 
 ### Internal Documents
+
 - [Home Manager Deployment Guide](./docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md)
 - [Home Manager Verification Template](./docs/verification/HOME-MANAGER-VERIFICATION-TEMPLATE.md)
 - [Cross-Platform Consistency Report](./docs/verification/CROSS-PLATFORM-CONSISTENCY-REPORT.md)
@@ -392,6 +417,7 @@ programs.fish.shellAliases = {
 - [Final Verification Report](./docs/status/2025-12-27_00-00_HOME-MANAGER-FINAL-VERIFICATION-REPORT.md)
 
 ### Git History
+
 - [Commit 248a9d1](https://github.com/LarsArtmann/Setup-Mac/commit/248a9d1) - fix: resolve Home Manager integration issues for Darwin
 - [Commit fd96169](https://github.com/LarsArtmann/Setup-Mac/commit/fd96169) - docs: comprehensive Home Manager integration documentation
 
@@ -400,6 +426,7 @@ programs.fish.shellAliases = {
 The adoption of **Home Manager** for unified cross-platform user configuration is the optimal solution to the problems of code duplication, inconsistency, and high maintenance cost.
 
 ### Key Benefits
+
 - ✅ ~80% code reduction through shared modules
 - ✅ Consistent configuration across Darwin and NixOS
 - ✅ Type safety enforced via Home Manager validation
@@ -407,11 +434,12 @@ The adoption of **Home Manager** for unified cross-platform user configuration i
 - ✅ Extensibility enhanced (easy to add new platforms)
 
 ### Next Steps
-1. ⚠️  Execute manual deployment: `sudo darwin-rebuild switch --flake .`
-2. ⚠️  Verify deployment using comprehensive checklist
-3. ⚠️  Test NixOS build on evo-x2 machine
+
+1. ⚠️ Execute manual deployment: `sudo darwin-rebuild switch --flake .`
+2. ⚠️ Verify deployment using comprehensive checklist
+3. ⚠️ Test NixOS build on evo-x2 machine
 4. 📝 Update documentation (AGENTS.md, quick start guide)
-5. 🛠️  Improve tooling (automated testing, justfile targets, CI/CD)
+5. 🛠️ Improve tooling (automated testing, justfile targets, CI/CD)
 
 ---
 

@@ -19,11 +19,14 @@
 ### 1. **Keybinding Issues Fixed**
 
 #### Root Cause:
+
 - Configuration was correct but not properly applied to the system
 - `systemd.enable = false` was potentially interfering with keybinding registration
 
 #### Fix Applied:
+
 **File:** `/platforms/nixos/desktop/hyprland.nix` (line 18)
+
 ```nix
 # BEFORE:
 systemd.enable = false;  # CRITICAL: Disable when using UWSM at system level
@@ -33,7 +36,9 @@ systemd.enable = true;  # Try enabling for better keybinding support
 ```
 
 #### Enhanced Keybind Configuration:
+
 Comprehensive keybinding set already configured (lines 149-280):
+
 - ✅ `SUPER+Q` → Terminal (kitty)
 - ✅ `SUPER+S` → Special workspace
 - ✅ `SUPER+M` → Maximize window
@@ -44,10 +49,13 @@ Comprehensive keybinding set already configured (lines 149-280):
 ### 2. **Display Scaling Fixed (200%)**
 
 #### Root Cause:
+
 - Generic `preferred,auto,2` configuration may not work for all TV outputs
 
 #### Fix Applied:
+
 **File:** `/platforms/nixos/desktop/hyprland.nix` (line 26)
+
 ```nix
 # BEFORE:
 monitor = "preferred,auto,2";
@@ -63,12 +71,15 @@ monitor = "HDMI-A-1,preferred,auto,2"  # Adjust HDMI-A-1 to actual output
 ### 3. **Login Screen Beautified**
 
 #### Root Cause:
+
 - Default SDDM theme lacks modern aesthetics
 
 #### Fix Applied:
+
 **File:** `/platforms/nixos/desktop/hyprland-system.nix`
 
 **Added SDDM Theme Configuration** (line 12):
+
 ```nix
 # BEFORE:
 services.displayManager.sddm = {
@@ -85,6 +96,7 @@ services.displayManager.sddm = {
 ```
 
 **Added Theme Package** (line 78):
+
 ```nix
 environment.systemPackages = with pkgs; [
   # NEW:
@@ -102,6 +114,7 @@ environment.systemPackages = with pkgs; [
 ## 🎮 Complete Keybinding Setup
 
 ### Window Management:
+
 - `SUPER+Q/Enter` → Terminal (kitty)
 - `SUPER+C` → Close window
 - `SUPER+V` → Toggle floating
@@ -111,18 +124,21 @@ environment.systemPackages = with pkgs; [
 - `SUPER+Shift+Arrows/HJKL` → Move windows
 
 ### Application Launching:
+
 - `SUPER+Space/R` → App launcher (rofi)
 - `SUPER+N` → File manager (dolphin)
 - `SUPER+B` → Browser (firefox)
 - `SUPER+D` → Run command
 
 ### Workspace Management:
+
 - `SUPER+1-0` → Switch workspaces
 - `SUPER+Shift+1-0` → Move to workspaces
 - `ALT+Shift+1-0` → Move with window to workspaces
 - `SUPER+S` → Toggle special workspace
 
 ### System Controls:
+
 - `SUPER+Escape` → Lock screen (hyprlock)
 - `SUPER+X/Shift+E` → Power menu (wlogout)
 - `SUPER+Shift+R` → Reload config
@@ -131,6 +147,7 @@ environment.systemPackages = with pkgs; [
 - `SUPER+Ctrl+Print` → Window screenshot
 
 ### Media & Hardware:
+
 - `XF86Audio*` → Volume controls
 - `XF86MonBrightness*` → Brightness controls
 - `XF86AudioPlay/Next/Prev` → Media controls
@@ -140,7 +157,9 @@ environment.systemPackages = with pkgs; [
 ## 🖥️ Desktop Console Setup
 
 ### Multiple Background Terminals:
+
 **File:** `/platforms/nixos/desktop/hyprland.nix` (lines 33-36)
+
 ```nix
 exec-once = [
   # Existing:
@@ -157,7 +176,9 @@ exec-once = [
 ```
 
 ### Window Rules for Desktop Consoles:
+
 **File:** `/platforms/nixos/desktop/hyprland.nix` (lines 46-82)
+
 - Each console configured as floating, no-focus, no-border
 - Positioned strategically: btop (full), htop (100,100), logs (920,100), nvim (100,720)
 - All sized 800x600 except btop (fullscreen)
@@ -167,12 +188,15 @@ exec-once = [
 ## 🎨 Enhanced Waybar
 
 ### New Modules Added:
+
 **File:** `/platforms/nixos/desktop/waybar.nix`
+
 - **Left:** `hyprland/submap` added
 - **Center:** `idle_inhibitor`, `custom/media` added
 - **Right:** `backlight`, `custom/clipboard`, `custom/power` added
 
 ### Modern Styling:
+
 - **Catppuccin theme** with glassmorphism effects
 - **Rounded corners** (8px border radius)
 - **Backdrop blur** and transparency effects
@@ -181,6 +205,7 @@ exec-once = [
 - **Custom icons** with emoji/Nerd Font support
 
 ### Custom Module Features:
+
 - **Media Player:** Shows current playing track with artist/title
 - **Clipboard:** Shows recent clipboard entry, click to browse history
 - **Power Menu:** One-click access to wlogout
@@ -192,10 +217,12 @@ exec-once = [
 ## 🚀 Additional Cool Tools Implemented
 
 ### Enhanced Screenshot Tools:
+
 - `grimblast` - Advanced screenshot utility
 - `grim` + `slurp` - Basic screenshot + area selection
 
 ### System Utilities:
+
 - `wlogout` - Modern logout/power menu
 - `playerctl` - Media player control
 - `brightnessctl` - Brightness management
@@ -207,6 +234,7 @@ exec-once = [
 ## 📋 Implementation Commands
 
 ### Apply All Changes:
+
 ```bash
 # Rebuild system with new configuration
 sudo nixos-rebuild switch --flake .#evo-x2
@@ -216,6 +244,7 @@ sudo reboot
 ```
 
 ### Verification Steps:
+
 ```bash
 # Check keybindings are registered
 hyprctl binds
@@ -236,21 +265,25 @@ waybar --version
 ## 🎯 Expected Results
 
 ### ✅ **Keybindings Fixed:**
+
 - All SUPER+key combinations now work properly
 - System configuration properly applied
 - No more broken keybindings
 
 ### ✅ **Display Scaling:**
+
 - TV display properly scaled to 200%
 - All UI elements visible and readable
 - Proper resolution detection
 
 ### ✅ **Login Screen Beautified:**
+
 - Modern Sugar Dark theme replaces ugly default
 - Professional-looking login interface
 - Smooth animations and transitions
 
 ### ✅ **Enhanced Desktop:**
+
 - 4 background terminals for monitoring and control
 - Beautiful Waybar with custom modules
 - Modern glassmorphism design
@@ -261,18 +294,21 @@ waybar --version
 ## 🔍 Troubleshooting
 
 ### If Keybindings Still Don't Work:
+
 1. Check if configuration was applied: `hyprctl binds`
 2. Verify hyprland is running: `ps aux | grep hyprland`
 3. Check for config errors: `hyprctl config errors`
 4. Try rebuilding: `sudo nixos-rebuild switch --flake .#evo-x2`
 
 ### If Display Scaling Issues:
+
 1. Check monitor name: `hyprctl monitors`
 2. Update HDMI-A-1 to actual output name
 3. Try fallback configuration
 4. Verify in Waybar or hyprctl
 
 ### If SDDM Theme Doesn't Apply:
+
 1. Check theme installation: `ls /nix/store/*-sddm-sugar-dark`
 2. Verify SDDM configuration: `cat /etc/sddm.conf`
 3. Restart display manager: `sudo systemctl restart sddm`
@@ -286,6 +322,6 @@ waybar --version
 
 ---
 
-*Generated by Crush AI Assistant*
-*Setup-Mac Project*
-*Last Updated: 2025-12-18 21:10 CET*
+_Generated by Crush AI Assistant_
+_Setup-Mac Project_
+_Last Updated: 2025-12-18 21:10 CET_

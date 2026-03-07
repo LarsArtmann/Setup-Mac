@@ -19,14 +19,17 @@
 ## 📁 Package Files Analyzed
 
 ### Cross-Platform Files
+
 1. **platforms/common/packages/base.nix** - Core system packages
 2. **platforms/common/packages/fonts.nix** - Font configuration
 3. **platforms/common/home-base.nix** - Home Manager base (empty packages)
 
 ### Darwin-Specific Files
+
 4. **platforms/darwin/environment.nix** - macOS environment packages
 
 ### NixOS-Specific Files
+
 5. **platforms/nixos/system/configuration.nix** - System configuration packages
 6. **platforms/nixos/users/home.nix** - User-level packages
 7. **platforms/nixos/desktop/hyprland.nix** - Hyprland window manager packages
@@ -44,6 +47,7 @@
 ### 1. platforms/common/packages/base.nix (System Packages)
 
 #### essentialPackages (39 packages)
+
 ```
 # Version control
 git, git-town
@@ -92,6 +96,7 @@ cliphist
 ```
 
 #### developmentPackages (7-8 packages)
+
 ```
 # JavaScript/TypeScript
 bun
@@ -111,6 +116,7 @@ swww (Linux-only, conditional)
 ```
 
 #### guiPackages (1-2 packages)
+
 ```
 # Import Helium browser (cross-platform)
 helium (from ./helium.nix)
@@ -119,6 +125,7 @@ google-chrome (Darwin-only, conditional)
 ```
 
 #### aiPackages (0-1 packages)
+
 ```
 crush (conditional, from llm-agents)
 ```
@@ -150,11 +157,13 @@ iterm2
 ### 4. platforms/nixos/system/configuration.nix
 
 #### User packages
+
 ```
 firefox
 ```
 
 #### Fonts
+
 ```
 jetbrains-mono (DUPLICATE - also in fonts.nix)
 ```
@@ -197,6 +206,7 @@ brightnessctl # Brightness control
 **Total hyprland.nix Packages:** 13 packages
 
 **Note:** Many packages moved to other modules to avoid duplication:
+
 - kdePackages.dolphin → multi-wm.nix
 - rofi → multi-wm.nix (but also in home.nix - DUPLICATE)
 - waybar → multi-wm.nix
@@ -239,6 +249,7 @@ iftop              # Network bandwidth
 **Total monitoring.nix Packages:** 6 packages
 
 **Note:**
+
 - btop moved to base.nix (available cross-platform)
 - amdgpu_top moved to amd-gpu.nix (available system-wide)
 
@@ -259,6 +270,7 @@ python311     # Python for AI/ML development
 **Total ai-stack.nix Packages:** 7 packages
 
 **Service:**
+
 - ollama-rocm (service package, with GPU support)
 
 ---
@@ -303,6 +315,7 @@ lynis
 **Total security-hardening.nix Packages:** 33 packages
 
 **Note:**
+
 - xdg-utils is DUPLICATE with home.nix
 
 ---
@@ -310,6 +323,7 @@ lynis
 ### 11. platforms/nixos/desktop/multi-wm.nix
 
 #### Sway extra packages
+
 ```
 swaylock
 swayidle
@@ -319,6 +333,7 @@ foot
 ```
 
 #### System packages
+
 ```
 foot          # Common terminal for all WMs (DUPLICATE - also in sway extra packages)
 wofi          # Application launcher for all WMs (DUPLICATE - also in sway extra packages)
@@ -334,6 +349,7 @@ wl-clipboard  # Clipboard
 **Total multi-wm.nix Packages:** 9 unique packages
 
 **Duplications Within File:**
+
 - foot (listed in sway extra packages AND system packages)
 - wofi (listed in sway extra packages AND system packages)
 - swaylock (listed in sway extra packages AND system packages)
@@ -355,6 +371,7 @@ glib
 ## 🔴 CONFIRMED DUPLICATIONS
 
 ### 1. jetbrains-mono
+
 - **File 1:** platforms/common/packages/fonts.nix
 - **File 2:** platforms/nixos/system/configuration.nix (line 58)
 - **Impact:** Low (font duplication, harmless)
@@ -363,6 +380,7 @@ glib
 - **Priority:** Low
 
 ### 2. xdg-utils
+
 - **File 1:** platforms/nixos/users/home.nix (line 30)
 - **File 2:** platforms/nixos/desktop/security-hardening.nix (line 38)
 - **Impact:** Medium (duplicate installation)
@@ -371,6 +389,7 @@ glib
 - **Priority:** Medium
 
 ### 3. rofi
+
 - **File 1:** platforms/nixos/users/home.nix (line 27)
 - **File 2:** platforms/nixos/desktop/multi-wm.nix (line 55)
 - **Impact:** Low (duplicate installation)
@@ -379,6 +398,7 @@ glib
 - **Priority:** Low
 
 ### 4. pavucontrol
+
 - **File 1:** platforms/nixos/users/home.nix (line 26)
 - **File 2:** platforms/nixos/desktop/hyprland.nix (commented on line 339)
 - **Impact:** Low (only one active instance)
@@ -391,11 +411,13 @@ glib
 ## 🟡 INTERNAL DUPLICATIONS (Within Same File)
 
 ### multi-wm.nix Internal Duplications
+
 - **foot:** Listed twice (lines 15 and 52)
 - **wofi:** Listed twice (lines 14 and 55)
 - **swaylock:** Listed twice (lines 11 and 58)
 
 **Note:** This is actually by design! These packages are listed twice:
+
 1. In `programs.sway.extraPackages` (Sway-specific)
 2. In `environment.systemPackages` (available to all WMs)
 
@@ -409,6 +431,7 @@ glib
 ## 🟢 POTENTIAL DUPLICATIONS (Further Investigation Needed)
 
 ### 1. waybar
+
 - **File 1:** platforms/nixos/desktop/hyprland.nix (imported at line 3)
 - **File 2:** platforms/nixos/desktop/multi-wm.nix (line 13)
 - **Status:** Potentially duplicate import
@@ -418,6 +441,7 @@ glib
 - **Priority:** Medium
 
 ### 2. swaylock
+
 - **File 1:** platforms/nixos/desktop/hyprland.nix (uses hyprlock instead)
 - **File 2:** platforms/nixos/desktop/multi-wm.nix (uses swaylock)
 - **Status:** Different lockers for different WMs
@@ -427,6 +451,7 @@ glib
 - **Priority:** None
 
 ### 3. Notification Daemons
+
 - **File 1:** platforms/nixos/desktop/hyprland.nix (dunst)
 - **File 2:** platforms/nixos/desktop/multi-wm.nix (mako)
 - **Status:** Different daemons for different WMs
@@ -440,6 +465,7 @@ glib
 ## 🎯 EASY WINS (Low Effort, High Value)
 
 ### Priority 1 (Immediate - 20 minutes total)
+
 1. **Remove jetbrains-mono from configuration.nix** (5 min)
    - Keep only in fonts.nix
    - Value: Clean up duplication
@@ -453,6 +479,7 @@ glib
    - Value: Cross-platform consistency
 
 ### Priority 2 (Medium - 15 minutes total)
+
 4. **Add clarifying comment for pavucontrol** (2 min)
    - Document why it's in home.nix
    - Value: Clear documentation
@@ -466,6 +493,7 @@ glib
 ## 📊 Package Statistics
 
 ### Total Package Count by Category
+
 - **Base System Packages:** 48-51 packages
 - **Font Packages:** 1 package
 - **Darwin Packages:** 1 package
@@ -482,6 +510,7 @@ glib
 **Total Unique Packages:** ~130 packages (after deduplication)
 
 ### Duplication Rate
+
 - **Confirmed Duplications:** 4 packages
 - **Internal Duplications:** 3 packages (by design)
 - **Potential Duplications:** 1 package
@@ -492,16 +521,19 @@ glib
 ## 💡 Recommendations
 
 ### Immediate Actions (M2 Task)
+
 1. ✅ **Remove jetbrains-mono from configuration.nix**
 2. ✅ **Move xdg-utils to base.nix**
 3. ✅ **Remove rofi from home.nix**
 4. ✅ **Add documentation for pavucontrol**
 
 ### Medium Priority (M3 Task)
+
 1. **Investigate waybar duplication**
 2. **Review cross-platform package consistency**
 
 ### Low Priority
+
 1. **Add more packages to base.nix** (if commonly used)
 2. **Consider consolidating monitoring tools**
 
@@ -510,6 +542,7 @@ glib
 ## 🎉 Positive Findings
 
 ### What's Working Well
+
 1. **Good separation of concerns** - Packages organized by function
 2. **Cross-platform sharing** - base.nix for common packages
 3. **Platform-specific isolation** - NixOS-only packages in dedicated modules
@@ -517,6 +550,7 @@ glib
 5. **Low duplication rate** - Only ~3% duplication (excellent!)
 
 ### Architecture Strengths
+
 1. **Modular organization** - Easy to maintain
 2. **Clear boundaries** - Each module has specific purpose
 3. **Cross-platform support** - Shared base with platform-specific overlays
@@ -546,11 +580,13 @@ glib
 ## 📈 Quality Metrics
 
 **Before Optimization:**
+
 - Total packages: ~133 packages
 - Confirmed duplications: 4
 - Duplication rate: 3%
 
 **After Optimization (Projected):**
+
 - Total packages: ~130 packages
 - Confirmed duplications: 0
 - Duplication rate: 0%
@@ -559,6 +595,6 @@ glib
 
 ---
 
-*Audit completed: 2025-12-26 20:30 CET*
-*Total time: ~30 minutes*
-*Status: ✅ READY FOR DE-DUPLICATION*
+_Audit completed: 2025-12-26 20:30 CET_
+_Total time: ~30 minutes_
+_Status: ✅ READY FOR DE-DUPLICATION_

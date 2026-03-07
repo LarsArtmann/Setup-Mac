@@ -9,12 +9,15 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### Problem
+
 `nh darwin switch` fails on macOS with error:
+
 ```
 error: getting status of '/private/var/folders/.../T/nh-xxx/result': No such file or directory
 ```
 
 ### Root Cause (100% Confirmed)
+
 - **nh** creates temp file as regular user: `/var/folders/{uid}/.../T/nh-xxx/result`
 - Then elevates to root via `sudo` to set the system profile
 - **macOS security model** prevents root from accessing user temp directories
@@ -22,9 +25,11 @@ error: getting status of '/private/var/folders/.../T/nh-xxx/result': No such fil
 - The temp file becomes inaccessible or gets deleted during the privilege transition
 
 ### Working Solution (Already Available)
+
 ```bash
 just switch
 ```
+
 - Uses `darwin-rebuild` directly (bypasses nh temp issue)
 - Works perfectly and is already implemented
 - All documentation and setup is complete
@@ -36,19 +41,23 @@ just switch
 ### Technical Deep Dive
 
 #### Step 1: Build Phase (SUCCEEDS)
+
 ```bash
 nix build '.#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel'
 --out-link /var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T/nh-osslW3wu/result
 ```
+
 - Creates temp symlink in user's per-user temp directory
 - Build completes successfully
 - Temp file is owned by `larsartmann`
 
 #### Step 2: Elevation Phase (FAILS)
+
 ```bash
 sudo env ... nix build --no-link --profile /nix/var/nix/profiles/system
 /var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T/nh-osslW3wu/result
 ```
+
 - Elevates to root via `sudo`
 - sudo resets HOME to `/var/root` (root's home on macOS)
 - Warning message confirms this: `warning: $HOME ('/Users/larsartmann') is not owned by you, falling back to the one defined in the 'passwd' file ('/var/root')`
@@ -64,6 +73,7 @@ sudo env ... nix build --no-link --profile /nix/var/nix/profiles/system
    - This is macOS sandbox security at work
 
 2. **sudo Environment Changes:**
+
    ```
    Before sudo:
    - USER: larsartmann
@@ -106,11 +116,13 @@ just switch
 ```
 
 Which executes:
+
 ```bash
 sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
 ```
 
 **Advantages:**
+
 - ✅ No temp directory issues
 - ✅ Official tool for nix-darwin
 - ✅ More reliable and predictable
@@ -118,6 +130,7 @@ sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
 - ✅ Already in your justfile
 
 **Disadvantages:**
+
 - None significant
 
 **Recommendation:** USE THIS - It's already perfect!
@@ -129,6 +142,7 @@ sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
 **Status:** ⚠️ May help with HOME, but unlikely to fix temp issue
 
 Modify justfile to preserve environment:
+
 ```justfile
 switch:
     @echo "🔄 Applying Nix configuration..."
@@ -137,10 +151,12 @@ switch:
 ```
 
 **Flags:**
+
 - `-H`: Set HOME to target user's home directory
 - `-E`: Preserve current user's environment variables
 
 **Testing:**
+
 ```bash
 # Verify HOME is preserved
 sudo -E sh -c 'echo HOME=$HOME'
@@ -148,6 +164,7 @@ sudo -E sh -c 'echo HOME=$HOME'
 ```
 
 **Expected Outcome:**
+
 - Solves HOME directory issue
 - **Likely still fails** on temp directory access (macOS security is fundamental)
 
@@ -163,6 +180,7 @@ nh darwin switch .#darwinConfigurations.Lars-MacBook-Air
 ```
 
 **Available Environment Variables:**
+
 ```bash
 # Show activation logs for debugging
 export NH_SHOW_ACTIVATION_LOGS=1
@@ -175,6 +193,7 @@ export NH_ELEVATION_PROGRAM=sudo  # or doas, run0, pkexec
 ```
 
 **Expected Outcome:**
+
 - May help with some environment variable issues
 - **Unlikely** to solve the core temp directory access problem
 - The macOS temp directory security model is fundamental and can't be bypassed easily
@@ -194,11 +213,13 @@ nix run .#activate
 ```
 
 **Advantages:**
+
 - Lightweight alternative to deployment tools
 - Simple `activate` command
 - Avoids nh's temp directory issues
 
 **Disadvantages:**
+
 - Requires adding new flake input
 - Less feature-rich than nh
 - Not officially maintained by nix-darwin team
@@ -216,11 +237,13 @@ deploy .#Lars-MacBook-Air
 ```
 
 **Advantages:**
+
 - Full-featured deployment tool
 - Rollback support
 - Works across NixOS and nix-darwin
 
 **Disadvantages:**
+
 - More complex setup
 - May be overkill for single-system configuration
 - Steeper learning curve
@@ -238,10 +261,12 @@ colmena apply --on Lars-MacBook-Air
 ```
 
 **Advantages:**
+
 - Hive-like deployment
 - Good for multiple systems
 
 **Disadvantages:**
+
 - Designed for NixOS clusters
 - May have nix-darwin limitations
 - Not ideal for single-machine setup
@@ -263,12 +288,14 @@ sudo "$SYSTEM_PATH/activate"
 ```
 
 **Advantages:**
+
 - Shows each step explicitly
 - Good for understanding the process
 - Can debug individual steps
 - No temp directory issues
 
 **Disadvantages:**
+
 - More complex
 - Requires multiple commands
 - Not recommended for regular use
@@ -278,15 +305,15 @@ sudo "$SYSTEM_PATH/activate"
 
 ## 📊 COMPARISON TABLE
 
-| Solution | Complexity | Reliability | Features | Temp Issue | Recommendation |
-|----------|------------|-------------|----------|------------|----------------|
-| `just switch` (darwin-rebuild) | Low | ✅ HIGH | Full | ✅ FIXED | ⭐ **USE THIS** |
-| nh with NH_PRESERVE_ENV | Low | ⚠️ MEDIUM | Full | ❌ BROKEN | Try if nh essential |
-| sudo -H -E | Low | ⚠️ MEDIUM | Full | ✅ FIXED | Test first |
-| nixos-unified activate | Medium | ✅ HIGH | Medium | ✅ FIXED | Consider |
-| deploy-rs | High | ✅ HIGH | Full | ✅ FIXED | Alternative |
-| colmena | High | ✅ HIGH | Full | ✅ FIXED | NixOS focus |
-| Manual build | High | ✅ HIGH | Low | ✅ FIXED | Debug only |
+| Solution                       | Complexity | Reliability | Features | Temp Issue | Recommendation      |
+| ------------------------------ | ---------- | ----------- | -------- | ---------- | ------------------- |
+| `just switch` (darwin-rebuild) | Low        | ✅ HIGH     | Full     | ✅ FIXED   | ⭐ **USE THIS**     |
+| nh with NH_PRESERVE_ENV        | Low        | ⚠️ MEDIUM   | Full     | ❌ BROKEN  | Try if nh essential |
+| sudo -H -E                     | Low        | ⚠️ MEDIUM   | Full     | ✅ FIXED   | Test first          |
+| nixos-unified activate         | Medium     | ✅ HIGH     | Medium   | ✅ FIXED   | Consider            |
+| deploy-rs                      | High       | ✅ HIGH     | Full     | ✅ FIXED   | Alternative         |
+| colmena                        | High       | ✅ HIGH     | Full     | ✅ FIXED   | NixOS focus         |
+| Manual build                   | High       | ✅ HIGH     | Low      | ✅ FIXED   | Debug only          |
 
 ---
 
@@ -339,6 +366,7 @@ switch-preserve-env:
 ### If You Must Use nh:
 
 1. Try with `NH_PRESERVE_ENV=1`:
+
    ```bash
    export NH_PRESERVE_ENV=1
    nh darwin switch .#darwinConfigurations.Lars-MacBook-Air
@@ -363,16 +391,19 @@ switch-preserve-env:
 ## 📚 REFERENCES & DOCUMENTATION
 
 ### Primary Documentation:
+
 - **Root Cause Analysis**: `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md`
 - **nh GitHub repository**: https://github.com/viperML/nh
 - **nix-darwin documentation**: https://daiderd.com/nix-darwin/
 
 ### Related Issues:
+
 - nh tempdir race condition: Fixed in recent nh update
 - macOS temp directory permissions: Core macOS security feature
 - sudo environment handling: Standard macOS behavior
 
 ### Technical Resources:
+
 - macOS temp directory structure: https://developer.apple.com/
 - Nix build flags: https://nixos.org/manual/nix/stable/command-ref/new-cli/nix3-build.html
 - darwin-rebuild documentation: https://daiderd.com/nix-darwin/manual/
@@ -382,6 +413,7 @@ switch-preserve-env:
 ## ✅ VERIFICATION CHECKLIST
 
 ### Research Completed:
+
 - [x] Root cause identified: macOS temp directory security model
 - [x] Working solution confirmed: `just switch` (darwin-rebuild)
 - [x] Multiple solutions investigated and documented
@@ -390,6 +422,7 @@ switch-preserve-env:
 - [x] Final recommendations provided
 
 ### Documentation Created:
+
 - [x] Comprehensive root cause analysis (355 lines)
 - [x] This executive summary (detailed, actionable)
 - [x] Comparison table for all solutions
@@ -397,6 +430,7 @@ switch-preserve-env:
 - [x] References and further reading
 
 ### Git Commits:
+
 - [x] Root cause analysis committed (630a3d9)
 - [x] Documentation pushed to remote repository
 
@@ -441,6 +475,7 @@ switch-preserve-env:
 The `nh darwin switch` failure is due to a **fundamental macOS security feature** that prevents cross-user temp directory access. This is **not a bug in your configuration** - it's a macOS design choice that nh hasn't accounted for properly.
 
 **The best solution is already available:**
+
 ```bash
 just switch
 ```

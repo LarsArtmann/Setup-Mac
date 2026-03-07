@@ -10,9 +10,11 @@
 ## Executive Summary
 
 ### 🚨 Critical Issue Resolved
+
 Successfully identified and removed ZFS kernel extension (`org.openzfsonosx.zfs 2.3.0`) as the primary suspect causing system-wide kernel panics on macOS 15.7.2.
 
 ### 📊 Impact Assessment
+
 - **Duration:** 24 hours (Feb 8-9, 2026)
 - **Panic Count:** 4+ documented kernel panics
 - **Root Cause:** Watchdog timeout → system freeze → kernel panic
@@ -20,6 +22,7 @@ Successfully identified and removed ZFS kernel extension (`org.openzfsonosx.zfs 
 - **Status:** Monitoring phase (awaiting 24-48h stability confirmation)
 
 ### ✅ Key Achievements
+
 1. ZFS kernel extension fully unloaded and removed
 2. Comprehensive panic log analysis completed
 3. System cleanup verified
@@ -31,17 +34,20 @@ Successfully identified and removed ZFS kernel extension (`org.openzfsonosx.zfs 
 ## Problem Statement
 
 ### Initial Symptoms
+
 ```
 panic(cpu 2 caller 0xfffffe002d94240c): watchdog timeout: no checkins from watchdogd in 90 seconds (399 total checkins since monitoring last enabled)
 ```
 
 **User Report:**
+
 - MacBook crashed 4 times in 24 hours
 - System freezes completely
 - Requires hard reboot to recover
 - Recent crash logs show consistent pattern
 
 ### System Information
+
 - **OS:** macOS 15.7.2 (Sequoia)
 - **Build:** 24G325
 - **Kernel:** Darwin 24.6.0
@@ -56,7 +62,9 @@ panic(cpu 2 caller 0xfffffe002d94240c): watchdog timeout: no checkins from watch
 ### Phase 1: Crash Log Analysis
 
 #### Panic Log Pattern
+
 All crashes shared identical characteristics:
+
 1. **Panic Type:** Watchdog timeout
 2. **Cause:** System freeze → watchdogd stops checking in
 3. **Timeout:** 90-92 seconds before watchdog expiration
@@ -64,6 +72,7 @@ All crashes shared identical characteristics:
 5. **Implicated Process:** `Helium Helper (Renderer)` (PID 1941)
 
 #### Third-Party Kernel Extensions Detected
+
 ```
 org.openzfsonosx.zfs (2.3.0) 9E2FA6E2-51CE-3EF6-8568-B6519A85DCDA
 ```
@@ -73,6 +82,7 @@ org.openzfsonosx.zfs (2.3.0) 9E2FA6E2-51CE-3EF6-8568-B6519A85DCDA
 ### Phase 2: System Analysis
 
 #### Memory Status
+
 ```
 Compressor Info: 31% of compressed pages limit (OK)
                 79% of segments limit (OK)
@@ -82,6 +92,7 @@ Compressor Info: 31% of compressed pages limit (OK)
 **Observation:** System under memory pressure but not critical
 
 #### Helium Application Status
+
 ```
 Process: Helium (PID 695)
 Renderer Processes: 25+ Helium Helper (Renderer) instances
@@ -92,6 +103,7 @@ Total Memory: ~2.5GB for Helium alone
 **Assessment:** High process count but within normal for browser
 
 #### ZFS Configuration
+
 ```bash
 $ /usr/local/zfs/bin/zpool list
 no pools available
@@ -109,18 +121,21 @@ $ /usr/local/zfs/bin/zfs list
 ### ✅ Action 1: ZFS Kernel Extension Removal
 
 #### Step 1: Unload Kernel Extension
+
 ```bash
 sudo kextunload -b org.openzfsonosx.zfs
 # Result: Success (8 seconds)
 ```
 
 #### Step 2: Stop ZFS Processes
+
 ```bash
 sudo killall zconfigd InvariantDisks
 # Result: Processes terminated
 ```
 
 #### Step 3: Remove ZFS Files
+
 ```bash
 sudo rm -rf /Library/Extensions/zfs.kext
 sudo rm -rf /usr/local/zfs
@@ -128,6 +143,7 @@ sudo rm -rf /usr/local/zfs
 ```
 
 #### Step 4: Cleanup Launch Daemons
+
 ```bash
 sudo launchctl unload -w /Library/LaunchDaemons/org.openzfsonosx.*
 # Result: Daemons unloaded
@@ -136,18 +152,21 @@ sudo launchctl unload -w /Library/LaunchDaemons/org.openzfsonosx.*
 ### ✅ Action 2: Verification
 
 #### Kernel Extension Status
+
 ```bash
 $ kextstat | grep zfs
 # Result: No output (ZFS not loaded)
 ```
 
 #### Process Status
+
 ```bash
 $ ps aux | grep zfs | grep -v grep
 # Result: No output (ZFS processes stopped)
 ```
 
 #### File System Cleanup
+
 ```bash
 $ ls -la /Library/Extensions/ | grep zfs
 # Result: No output (kext files removed)
@@ -159,6 +178,7 @@ $ ls -la /usr/local/zfs
 ### ✅ Action 3: NVRAM Telemetry Analysis
 
 #### Current NVRAM State
+
 ```bash
 $ nvram -p | grep panic
 panicmedic-telemetry      <binary data present>
@@ -166,6 +186,7 @@ panicmedic-timestamps    0:64a58c84c190f
 ```
 
 **Interpretation:**
+
 - Panic telemetry data present (normal after crashes)
 - Timestamps recorded for crash history
 - `ota-conv-panic-indicator` variable NOT found (good - no OTA update crashes)
@@ -175,6 +196,7 @@ panicmedic-timestamps    0:64a58c84c190f
 **User Decision:** Keep Helium in Nix configuration
 
 **Status:**
+
 - ✅ Helium preserved in `flake.nix`
 - ✅ Helium package definitions intact
 - ✅ Configuration unchanged
@@ -238,6 +260,7 @@ panicmedic-timestamps    0:64a58c84c190f
 **Confidence Level:** HIGH (85%)
 
 **Reasoning:**
+
 - ZFS is third-party kext (known risk factor)
 - Unused but loaded (unnecessary risk)
 - Consistent watchdog timeout pattern (kernel-level issue)
@@ -250,6 +273,7 @@ panicmedic-timestamps    0:64a58c84c190f
 ### Post-Removal Status
 
 #### Kernel Extensions
+
 ```bash
 $ kextstat | grep -v apple
 # Result: Only standard Apple kexts loaded
@@ -258,6 +282,7 @@ $ kextstat | grep -v apple
 **Status:** ✅ Clean - no third-party kexts
 
 #### System Performance
+
 ```
 Uptime: 31 minutes (since ZFS removal)
 Load Average: 23.26, 35.78, 31.47 (HIGH but expected during recovery)
@@ -268,6 +293,7 @@ Swap: 6 swapfiles, LOW space (improving)
 **Status:** ⚠️ High load (expected post-crash recovery)
 
 #### Application Status
+
 ```bash
 $ ps aux | grep -i helium | grep -v grep | wc -l
 # Result: 25+ processes
@@ -276,6 +302,7 @@ $ ps aux | grep -i helium | grep -v grep | wc -l
 **Status:** ✅ Helium running normally
 
 #### NVRAM State
+
 ```bash
 $ nvram -p | grep panic
 panicmedic-telemetry      <binary data>
@@ -291,11 +318,13 @@ panicmedic-timestamps    0:64a58c84c190f
 ### Phase 1: Immediate Monitoring (Next 24h)
 
 #### Objectives
+
 1. Confirm system stability without ZFS
 2. Detect any new kernel panics
 3. Monitor system performance metrics
 
 #### Monitoring Commands
+
 ```bash
 # 1. Check uptime every hour
 watch -n 3600 'uptime'
@@ -314,12 +343,14 @@ just health
 ```
 
 #### Success Criteria
+
 - ✅ No kernel panics for 24 hours
 - ✅ Uptime exceeds 12 hours consistently
 - ✅ No system freezes or hangs
 - ✅ Load average stabilizes (<10)
 
 #### Failure Criteria
+
 - ❌ New kernel panic occurs
 - ❌ System freezes require hard reboot
 - ❌ Watchdog timeout logs appear
@@ -328,6 +359,7 @@ just health
 ### Phase 2: Extended Monitoring (24-48h)
 
 #### Additional Metrics
+
 - Memory pressure trends
 - Swap file usage
 - Application crash logs
@@ -336,6 +368,7 @@ just health
 ### Phase 3: Long-Term Monitoring (7 days)
 
 #### Trends to Track
+
 - Frequency of panics (should be 0)
 - System performance baselines
 - Memory usage patterns
@@ -348,12 +381,15 @@ just health
 ### Immediate Actions (TODAY)
 
 #### 1. Reboot System ⚠️ CRITICAL
+
 ```bash
 sudo reboot
 ```
+
 **Why:** Clear kernel cache, apply ZFS removal, clean memory
 
 #### 2. Document Baseline Metrics
+
 ```bash
 # Record current state for comparison
 uptime > ~/system-baseline-uptime.txt
@@ -362,6 +398,7 @@ kextstat > ~/system-baseline-kexts.txt
 ```
 
 #### 3. Set Up Monitoring
+
 ```bash
 # Create monitoring script
 cat > ~/monitor-system.sh << 'EOF'
@@ -381,12 +418,14 @@ nohup ~/monitor-system.sh &
 ### Short-Term Actions (Next 24-48h)
 
 #### 4. Monitor for Panics
+
 ```bash
 # Run every 6 hours
 log show --predicate "eventMessage CONTAINS 'panic'" --last 6h --info
 ```
 
 #### 5. Check System Stability
+
 ```bash
 # Verify uptime targets
 # Target: >12 hours continuous uptime
@@ -394,6 +433,7 @@ uptime
 ```
 
 #### 6. Run Health Checks
+
 ```bash
 just health
 ```
@@ -401,6 +441,7 @@ just health
 ### Medium-Term Actions (Next Week)
 
 #### 7. If Stable: Archive Panic Logs
+
 ```bash
 # Move panic logs to archive
 mkdir -p ~/Documents/PanicLogs/Archived/
@@ -408,12 +449,14 @@ mv /Library/Logs/DiagnosticReports/panic*.panic ~/Documents/PanicLogs/Archived/
 ```
 
 #### 8. If Unstable: Deeper Investigation
+
 - Enable kernel debug mode
 - Set up crash analysis tools
 - Consider removing Helium as test
 - Run Apple Hardware Diagnostics
 
 #### 9. Document Procedures
+
 - Create panic response SOP
 - Document kernel extension audit process
 - Set up automated monitoring alerts
@@ -432,9 +475,11 @@ mv /Library/Logs/DiagnosticReports/panic*.panic ~/Documents/PanicLogs/Archived/
 ### For Long-Term System Health
 
 5. **Audit All Third-Party Kexts**
+
    ```bash
    kextstat | grep -v apple
    ```
+
    - Remove any unnecessary kernel extensions
    - Document required kexts and their purposes
 
@@ -477,6 +522,7 @@ mv /Library/Logs/DiagnosticReports/panic*.panic ~/Documents/PanicLogs/Archived/
 ### Kernel Panic Log Excerpts
 
 #### Panic #1: Feb 8, 2026 @ 23:47:17
+
 ```
 panic(cpu 4 caller 0xfffffe0028c2240c): watchdog timeout: no checkins from watchdogd in 92 seconds (66 total checkins since monitoring last enabled)
 Debugger message: panic
@@ -484,6 +530,7 @@ Memory ID: 0x6
 ```
 
 #### Panic #2: Feb 9, 2026 @ 00:57:31 (User-Provided)
+
 ```
 panic(cpu 2 caller 0xfffffe002d94240c): watchdog timeout: no checkins from watchdogd in 90 seconds (399 total checkins since monitoring last enabled)
 Debugger message: panic
@@ -500,6 +547,7 @@ panicmedic-timestamps    0:64a58c84c190f
 ```
 
 **Interpretation:**
+
 - `panicmedic-telemetry`: Binary crash data (encrypted/encoded)
 - `panicmedic-timestamps`: Unix timestamps of panic events
 - `ota-conv-panic-indicator`: NOT FOUND (no OTA update crashes)
@@ -507,12 +555,14 @@ panicmedic-timestamps    0:64a58c84c190f
 ### Kernel Extension Configuration
 
 #### Before Removal
+
 ```
 org.openzfsonosx.zfs    2.3.0    9E2FA6E2-51CE-3EF6-8568-B6519A85DCDA
 └── com.apple.driver.AppleARMPlatform (1.0.2)
 ```
 
 #### After Removal
+
 ```
 $ kextstat | grep zfs
 # (No output - ZFS not loaded)
@@ -521,6 +571,7 @@ $ kextstat | grep zfs
 ### System Metrics
 
 #### Memory Pressure
+
 ```
 Compressor Info: 31% of compressed pages limit (OK)
                 79% of segments limit (OK)
@@ -528,6 +579,7 @@ Compressor Info: 31% of compressed pages limit (OK)
 ```
 
 #### Process Analysis
+
 ```
 Total Processes: ~500 (normal)
 Zombie Processes: 0
@@ -568,15 +620,18 @@ Load Average: 23.26, 35.78, 31.47 (HIGH)
 ## Open Questions & Unknowns
 
 ### Primary Question
+
 **What caused watchdogd to stop checking in?**
 
 **Knowns:**
+
 - ZFS was loaded (now removed)
 - System froze completely
 - Watchdog timeout occurred after 90-92 seconds
 - Consistent pattern across all crashes
 
 **Unknowns:**
+
 - Did ZFS directly cause kernel lockup?
 - Did ZFS interact poorly with another kext?
 - Was it a race condition or memory corruption?
@@ -621,6 +676,7 @@ Successfully identified and removed ZFS kernel extension as the primary suspect 
 ### Contingency Plans
 
 **If Panics Continue:**
+
 1. Remove Helium browser temporarily (test)
 2. Enable kernel debug mode (detailed logs)
 3. Run Apple Hardware Diagnostics
@@ -634,6 +690,7 @@ Successfully identified and removed ZFS kernel extension as the primary suspect 
 ### Appendix A: Commands Used
 
 #### Investigation Commands
+
 ```bash
 # Check kernel extensions
 kextstat | grep -i zfs
@@ -652,6 +709,7 @@ ps aux | grep -i helium | grep -v grep
 ```
 
 #### Removal Commands
+
 ```bash
 # Unload kernel extension
 sudo kextunload -b org.openzfsonosx.zfs
@@ -668,6 +726,7 @@ sudo launchctl unload -w /Library/LaunchDaemons/org.openzfsonosx.*
 ```
 
 #### Monitoring Commands
+
 ```bash
 # Check uptime
 uptime
@@ -682,12 +741,14 @@ log show --predicate "eventMessage CONTAINS 'panic'" --last 6h --info
 ### Appendix B: Reference Documentation
 
 #### macOS Kernel Panic Types
+
 - **Watchdog Timeout:** System freeze → watchdog expiration
 - **Memory Fault:** Invalid memory access → kernel panic
 - **I/O Error:** Disk/SSD failure → kernel panic
 - **Trap:** CPU exception → kernel panic
 
 #### Third-Party Kernel Extension Risks
+
 - Runs in kernel space (full system access)
 - Can cause complete system freeze
 - Bypasses many security protections
@@ -696,11 +757,13 @@ log show --predicate "eventMessage CONTAINS 'panic'" --last 6h --info
 ### Appendix C: Contact & Support
 
 #### Apple Support
+
 - **Phone:** 1-800-275-2273
 - **Website:** https://support.apple.com
 - **Diagnostic Mode:** Hold D on boot (Apple Diagnostics)
 
 #### System Logs Location
+
 ```
 /Library/Logs/DiagnosticReports/panic*.panic
 /var/log/system.log

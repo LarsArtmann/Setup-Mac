@@ -4,7 +4,7 @@
 **Classification:** CRITICAL - Strategic Assessment  
 **Branch:** master  
 **Commit:** 663a0d9  
-**Status:** STABLE - Homebrew Migration Analysis Complete  
+**Status:** STABLE - Homebrew Migration Analysis Complete
 
 ---
 
@@ -20,36 +20,36 @@ SystemNix remains operationally stable with comprehensive tooling. This update f
 
 ### Core Infrastructure (18 items)
 
-| Component | Status | Evidence |
-|-----------|--------|----------|
-| **Nix Flake Architecture** | ✅ COMPLETE | Multi-platform outputs, 15+ inputs |
-| **macOS (Darwin) System** | ✅ COMPLETE | `darwin-rebuild switch` functional |
-| **NixOS (evo-x2) System** | ✅ COMPLETE | System boots, Hyprland operational |
-| **Home Manager Integration** | ✅ COMPLETE | Cross-platform user configs unified |
-| **ActivityWatch Core** | ✅ COMPLETE | Window URL fix, utilization watcher deployed |
-| **Sublime Text Configuration** | ✅ COMPLETE | Backup system with 8 daily snapshots |
-| **Git Configuration** | ✅ COMPLETE | SSH, GPG, git-town integration |
-| **Shell Environment** | ✅ COMPLETE | Fish + Starship + Tmux unified |
-| **Crush-Patched Tool** | ✅ COMPLETE | v0.46.1 with auto-update |
-| **Just Task Runner** | ✅ COMPLETE | 150+ commands |
-| **Pre-commit Hooks** | ✅ COMPLETE | Gitleaks, statix, trailing-whitespace |
-| **Backup System** | ✅ COMPLETE | `just backup` with rotation |
-| **Health Checks** | ✅ COMPLETE | `just health` comprehensive validation |
-| **Documentation** | ✅ COMPLETE | 60+ status reports, AGENTS.md (1004 lines) |
-| **Status Report v1** | ✅ COMPLETE | `2026-03-05_01-56_COMPREHENSIVE-EXECUTIVE-STATUS-UPDATE.md` |
-| **File Organization** | ✅ COMPLETE | 12 files moved from root |
-| **Nix Syntax Validation** | ✅ COMPLETE | `just test-fast` passing |
-| **Flake Check** | ✅ COMPLETE | `nix flake check --no-build` clean |
+| Component                      | Status      | Evidence                                                    |
+| ------------------------------ | ----------- | ----------------------------------------------------------- |
+| **Nix Flake Architecture**     | ✅ COMPLETE | Multi-platform outputs, 15+ inputs                          |
+| **macOS (Darwin) System**      | ✅ COMPLETE | `darwin-rebuild switch` functional                          |
+| **NixOS (evo-x2) System**      | ✅ COMPLETE | System boots, Hyprland operational                          |
+| **Home Manager Integration**   | ✅ COMPLETE | Cross-platform user configs unified                         |
+| **ActivityWatch Core**         | ✅ COMPLETE | Window URL fix, utilization watcher deployed                |
+| **Sublime Text Configuration** | ✅ COMPLETE | Backup system with 8 daily snapshots                        |
+| **Git Configuration**          | ✅ COMPLETE | SSH, GPG, git-town integration                              |
+| **Shell Environment**          | ✅ COMPLETE | Fish + Starship + Tmux unified                              |
+| **Crush-Patched Tool**         | ✅ COMPLETE | v0.46.1 with auto-update                                    |
+| **Just Task Runner**           | ✅ COMPLETE | 150+ commands                                               |
+| **Pre-commit Hooks**           | ✅ COMPLETE | Gitleaks, statix, trailing-whitespace                       |
+| **Backup System**              | ✅ COMPLETE | `just backup` with rotation                                 |
+| **Health Checks**              | ✅ COMPLETE | `just health` comprehensive validation                      |
+| **Documentation**              | ✅ COMPLETE | 60+ status reports, AGENTS.md (1004 lines)                  |
+| **Status Report v1**           | ✅ COMPLETE | `2026-03-05_01-56_COMPREHENSIVE-EXECUTIVE-STATUS-UPDATE.md` |
+| **File Organization**          | ✅ COMPLETE | 12 files moved from root                                    |
+| **Nix Syntax Validation**      | ✅ COMPLETE | `just test-fast` passing                                    |
+| **Flake Check**                | ✅ COMPLETE | `nix flake check --no-build` clean                          |
 
 ### Recent Achievements (Last 48 Hours)
 
-| Date | Achievement | Commit |
-|------|-------------|--------|
-| 2026-03-05 | Comprehensive status report v1 | 663a0d9 |
-| 2026-03-04 | Sublime Text backup system | 4711280 |
+| Date       | Achievement                       | Commit  |
+| ---------- | --------------------------------- | ------- |
+| 2026-03-05 | Comprehensive status report v1    | 663a0d9 |
+| 2026-03-04 | Sublime Text backup system        | 4711280 |
 | 2026-03-02 | ActivityWatch utilization watcher | d74f326 |
-| 2026-03-02 | Darwin Home Manager fix | 6303cb7 |
-| 2026-02-28 | Crush-patched v0.46.1 update | 28cb3b4 |
+| 2026-03-02 | Darwin Home Manager fix           | 6303cb7 |
+| 2026-02-28 | Crush-patched v0.46.1 update      | 28cb3b4 |
 
 ---
 
@@ -57,46 +57,46 @@ SystemNix remains operationally stable with comprehensive tooling. This update f
 
 ### ActivityWatch Ecosystem (70% COMPLETE)
 
-| Component | Status | Blocker |
-|-----------|--------|---------|
-| Core watchers (afk, window, web) | ✅ Working | - |
-| Utilization watcher | ✅ Deployed | LaunchAgent (CLI args fixed) |
-| Input watcher | ⚠️ Available | Not auto-started |
-| Enhanced watcher (AI/OCR) | ⚠️ Analyzed | Requires Ollama setup |
-| Screenshot watcher | ⚠️ Analyzed | Storage planning needed |
-| Spotify watcher | ⚠️ Available | Beta status |
-| Anki watcher | ⚠️ Available | Only if using Anki |
+| Component                        | Status       | Blocker                      |
+| -------------------------------- | ------------ | ---------------------------- |
+| Core watchers (afk, window, web) | ✅ Working   | -                            |
+| Utilization watcher              | ✅ Deployed  | LaunchAgent (CLI args fixed) |
+| Input watcher                    | ⚠️ Available | Not auto-started             |
+| Enhanced watcher (AI/OCR)        | ⚠️ Analyzed  | Requires Ollama setup        |
+| Screenshot watcher               | ⚠️ Analyzed  | Storage planning needed      |
+| Spotify watcher                  | ⚠️ Available | Beta status                  |
+| Anki watcher                     | ⚠️ Available | Only if using Anki           |
 
 ### Homebrew Configuration (ANALYSIS COMPLETE, MIGRATION PENDING)
 
-| Aspect | Current | Target | Status |
-|--------|---------|--------|--------|
-| **Prefix** | `/usr/local` (Intel) | `/opt/homebrew` (Apple Silicon) | ⚠️ Migration planned |
-| **Git Origin** | Missing | `github.com/Homebrew/brew` | ⚠️ Will auto-fix with migration |
-| **Tier Status** | Tier 3 (limited) | Tier 1 (full support) | ⚠️ Migration required |
-| **Deprecated Tap** | `homebrew/bundle` | Remove (now in core) | ⚠️ Fix ready |
-| **Directory Perms** | Root-owned | User-owned | ⚠️ Will auto-fix |
+| Aspect              | Current              | Target                          | Status                          |
+| ------------------- | -------------------- | ------------------------------- | ------------------------------- |
+| **Prefix**          | `/usr/local` (Intel) | `/opt/homebrew` (Apple Silicon) | ⚠️ Migration planned            |
+| **Git Origin**      | Missing              | `github.com/Homebrew/brew`      | ⚠️ Will auto-fix with migration |
+| **Tier Status**     | Tier 3 (limited)     | Tier 1 (full support)           | ⚠️ Migration required           |
+| **Deprecated Tap**  | `homebrew/bundle`    | Remove (now in core)            | ⚠️ Fix ready                    |
+| **Directory Perms** | Root-owned           | User-owned                      | ⚠️ Will auto-fix                |
 
 **Analysis Complete:** Migration path identified. Decision required from user.
 
 ### NixOS evo-x2 (80% COMPLETE)
 
-| Component | Status | Issue |
-|-----------|--------|-------|
-| Base System | ✅ Working | - |
-| Hyprland Desktop | ✅ Working | - |
-| Home Manager | ✅ Working | - |
-| Bluetooth Audio | ⚠️ Configured | Pending testing with Nest Audio |
-| Security Hardening | ⚠️ Partial | Audit rules disabled (kernel conflict) |
+| Component          | Status        | Issue                                  |
+| ------------------ | ------------- | -------------------------------------- |
+| Base System        | ✅ Working    | -                                      |
+| Hyprland Desktop   | ✅ Working    | -                                      |
+| Home Manager       | ✅ Working    | -                                      |
+| Bluetooth Audio    | ⚠️ Configured | Pending testing with Nest Audio        |
+| Security Hardening | ⚠️ Partial    | Audit rules disabled (kernel conflict) |
 
 ### Code Quality (75% COMPLETE)
 
-| Check | Status | Issues |
-|-------|--------|--------|
-| Nix syntax | ✅ Passing | No eval errors |
-| Flake check | ✅ Passing | Clean |
-| Statix linting | ⚠️ Warnings | W20, W04, W23 |
-| Gitleaks secrets | ⚠️ Flagged | 6 potential secrets need review |
+| Check            | Status      | Issues                          |
+| ---------------- | ----------- | ------------------------------- |
+| Nix syntax       | ✅ Passing  | No eval errors                  |
+| Flake check      | ✅ Passing  | Clean                           |
+| Statix linting   | ⚠️ Warnings | W20, W04, W23                   |
+| Gitleaks secrets | ⚠️ Flagged  | 6 potential secrets need review |
 
 ---
 
@@ -104,37 +104,37 @@ SystemNix remains operationally stable with comprehensive tooling. This update f
 
 ### High-Priority (P0-P1)
 
-| Item | Priority | Impact | Dependencies |
-|------|----------|--------|--------------|
-| **Homebrew Migration** | P0 | HIGH | User decision |
-| **Program Discovery System** | P0 | HIGH | None |
-| **VS Code Full Integration** | P1 | HIGH | Program discovery |
-| **Cross-platform CLI Tool** | P1 | HIGH | None |
-| **Automated Testing Framework** | P1 | HIGH | None |
-| **Gitleaks Review** | P1 | HIGH | None |
-| **Statix Warnings Fix** | P1 | MEDIUM | None |
-| **NixOS Bluetooth Testing** | P1 | MEDIUM | Hardware access |
+| Item                            | Priority | Impact | Dependencies      |
+| ------------------------------- | -------- | ------ | ----------------- |
+| **Homebrew Migration**          | P0       | HIGH   | User decision     |
+| **Program Discovery System**    | P0       | HIGH   | None              |
+| **VS Code Full Integration**    | P1       | HIGH   | Program discovery |
+| **Cross-platform CLI Tool**     | P1       | HIGH   | None              |
+| **Automated Testing Framework** | P1       | HIGH   | None              |
+| **Gitleaks Review**             | P1       | HIGH   | None              |
+| **Statix Warnings Fix**         | P1       | MEDIUM | None              |
+| **NixOS Bluetooth Testing**     | P1       | MEDIUM | Hardware access   |
 
 ### Medium-Priority (P2)
 
-| Item | Priority | Impact |
-|------|----------|--------|
-| **Documentation Consolidation** | P2 | LOW |
-| **Path Constants Library** | P2 | MEDIUM |
-| **File Organization Automation** | P2 | MEDIUM |
-| **iOS App Research** | P2 | MEDIUM |
-| **aw-sync Multi-device** | P2 | MEDIUM |
-| **InfluxDB/Grafana Export** | P3 | LOW |
-| **AI/LLM Integration (MCP)** | P3 | LOW |
+| Item                             | Priority | Impact |
+| -------------------------------- | -------- | ------ |
+| **Documentation Consolidation**  | P2       | LOW    |
+| **Path Constants Library**       | P2       | MEDIUM |
+| **File Organization Automation** | P2       | MEDIUM |
+| **iOS App Research**             | P2       | MEDIUM |
+| **aw-sync Multi-device**         | P2       | MEDIUM |
+| **InfluxDB/Grafana Export**      | P3       | LOW    |
+| **AI/LLM Integration (MCP)**     | P3       | LOW    |
 
 ### Low-Priority (P3-P4)
 
-| Item | Priority | Impact |
-|------|----------|--------|
-| **Screenshot Watcher Deploy** | P3 | MEDIUM |
-| **Self-reflection (aw-ask)** | P3 | LOW |
-| **Standing Desk Hardware** | P4 | LOW |
-| **Anki Watcher** | P4 | LOW |
+| Item                          | Priority | Impact |
+| ----------------------------- | -------- | ------ |
+| **Screenshot Watcher Deploy** | P3       | MEDIUM |
+| **Self-reflection (aw-ask)**  | P3       | LOW    |
+| **Standing Desk Hardware**    | P4       | LOW    |
+| **Anki Watcher**              | P4       | LOW    |
 
 ---
 
@@ -142,17 +142,18 @@ SystemNix remains operationally stable with comprehensive tooling. This update f
 
 ### Critical Issues (REQUIRING IMMEDIATE ATTENTION)
 
-| Issue | Severity | Details | Fix Status |
-|-------|----------|---------|------------|
-| **Homebrew Tier 3** | 🔴 HIGH | `/usr/local` on Apple Silicon = limited bottles | **Analyzed, ready to fix** |
-| **Homebrew Git Origin** | 🔴 HIGH | Missing origin remote, updates may fail | **Will auto-fix with migration** |
-| **Deprecated homebrew/bundle Tap** | 🟡 MEDIUM | Now in core, causes warnings | **Fix ready** |
-| **6 Gitleaks Findings** | 🟡 MEDIUM | Potential secrets need review | **Pending user review** |
-| **TODO_LIST.md Stale** | 🟡 MEDIUM | Last updated 2026-02-10 | **Pending update** |
+| Issue                              | Severity  | Details                                         | Fix Status                       |
+| ---------------------------------- | --------- | ----------------------------------------------- | -------------------------------- |
+| **Homebrew Tier 3**                | 🔴 HIGH   | `/usr/local` on Apple Silicon = limited bottles | **Analyzed, ready to fix**       |
+| **Homebrew Git Origin**            | 🔴 HIGH   | Missing origin remote, updates may fail         | **Will auto-fix with migration** |
+| **Deprecated homebrew/bundle Tap** | 🟡 MEDIUM | Now in core, causes warnings                    | **Fix ready**                    |
+| **6 Gitleaks Findings**            | 🟡 MEDIUM | Potential secrets need review                   | **Pending user review**          |
+| **TODO_LIST.md Stale**             | 🟡 MEDIUM | Last updated 2026-02-10                         | **Pending update**               |
 
 ### Homebrew Deep Dive (THE BIG ONE)
 
 **Current State (WRONG for Apple Silicon):**
+
 ```
 Architecture: arm64 (Apple Silicon) ✅
 Brew Prefix:  /usr/local (Intel location) ❌
@@ -162,6 +163,7 @@ Git Origin:   MISSING ❌
 ```
 
 **Target State (CORRECT):**
+
 ```
 Architecture: arm64 (Apple Silicon) ✅
 Brew Prefix:  /opt/homebrew (Apple Silicon location) ✅
@@ -171,11 +173,13 @@ Git Origin:   github.com/Homebrew/brew ✅
 ```
 
 **Why This Happened:**
+
 - `nix-homebrew` with `autoMigrate = true` inherited existing Homebrew
 - Existing Homebrew was installed at `/usr/local` (likely from Intel era or old install)
 - nix-homebrew kept it there instead of migrating to `/opt/homebrew`
 
 **Impact of NOT Fixing:**
+
 - Slower installs (build from source vs. download bottles)
 - Some packages may not have bottles available
 - Potential compatibility issues
@@ -243,48 +247,48 @@ Git Origin:   github.com/Homebrew/brew ✅
 
 ### P0 - Critical (This Week) ⭐
 
-| # | Task | Effort | Impact | Status |
-|---|------|--------|--------|--------|
-| 1 | **Homebrew Migration Decision** | 15m | CRITICAL | ⏳ User decision pending |
-| 2 | Execute Homebrew migration (if approved) | 30m | CRITICAL | ⏳ Blocked on #1 |
-| 3 | Review gitleaks findings | 45m | HIGH | ⏳ Pending |
-| 4 | Fix statix linting warnings | 30m | MEDIUM | ⏳ Pending |
-| 5 | Test NixOS Bluetooth with Nest Audio | 60m | MEDIUM | ⏳ Pending |
+| #   | Task                                     | Effort | Impact   | Status                   |
+| --- | ---------------------------------------- | ------ | -------- | ------------------------ |
+| 1   | **Homebrew Migration Decision**          | 15m    | CRITICAL | ⏳ User decision pending |
+| 2   | Execute Homebrew migration (if approved) | 30m    | CRITICAL | ⏳ Blocked on #1         |
+| 3   | Review gitleaks findings                 | 45m    | HIGH     | ⏳ Pending               |
+| 4   | Fix statix linting warnings              | 30m    | MEDIUM   | ⏳ Pending               |
+| 5   | Test NixOS Bluetooth with Nest Audio     | 60m    | MEDIUM   | ⏳ Pending               |
 
 ### P1 - High Priority (This Month)
 
-| # | Task | Effort | Impact | Dependencies |
-|---|------|--------|--------|--------------|
-| 6 | Implement programs/discovery.nix | 2h | HIGH | None |
-| 7 | Install Ollama and test aw-watcher-enhanced | 1h | HIGH | None |
-| 8 | Create scripts/lib/paths.sh constants | 1h | MEDIUM | None |
-| 9 | Merge Bluetooth documentation | 30m | LOW | None |
-| 10 | Create `just organize` command | 2h | MEDIUM | None |
-| 11 | Deploy aw-watcher-input | 30m | MEDIUM | None |
-| 12 | Add automated flake update check | 1h | MEDIUM | None |
+| #   | Task                                        | Effort | Impact | Dependencies |
+| --- | ------------------------------------------- | ------ | ------ | ------------ |
+| 6   | Implement programs/discovery.nix            | 2h     | HIGH   | None         |
+| 7   | Install Ollama and test aw-watcher-enhanced | 1h     | HIGH   | None         |
+| 8   | Create scripts/lib/paths.sh constants       | 1h     | MEDIUM | None         |
+| 9   | Merge Bluetooth documentation               | 30m    | LOW    | None         |
+| 10  | Create `just organize` command              | 2h     | MEDIUM | None         |
+| 11  | Deploy aw-watcher-input                     | 30m    | MEDIUM | None         |
+| 12  | Add automated flake update check            | 1h     | MEDIUM | None         |
 
 ### P2 - Medium Priority (This Quarter)
 
-| # | Task | Effort | Impact | Dependencies |
-|---|------|--------|--------|--------------|
-| 13 | Build cross-platform CLI tool | 4h | HIGH | Program discovery |
-| 14 | Create tests/ framework | 3h | HIGH | None |
-| 15 | Set up aw-sync multi-device | 2h | MEDIUM | None |
-| 16 | Deploy aw-watcher-spotify | 30m | LOW | None |
-| 17 | Add InfluxDB export option | 2h | LOW | None |
-| 18 | Research iOS integration | 2h | MEDIUM | None |
-| 19 | Create file organization pre-commit hook | 1h | MEDIUM | None |
-| 20 | Update TODO_LIST.md | 30m | LOW | None |
+| #   | Task                                     | Effort | Impact | Dependencies      |
+| --- | ---------------------------------------- | ------ | ------ | ----------------- |
+| 13  | Build cross-platform CLI tool            | 4h     | HIGH   | Program discovery |
+| 14  | Create tests/ framework                  | 3h     | HIGH   | None              |
+| 15  | Set up aw-sync multi-device              | 2h     | MEDIUM | None              |
+| 16  | Deploy aw-watcher-spotify                | 30m    | LOW    | None              |
+| 17  | Add InfluxDB export option               | 2h     | LOW    | None              |
+| 18  | Research iOS integration                 | 2h     | MEDIUM | None              |
+| 19  | Create file organization pre-commit hook | 1h     | MEDIUM | None              |
+| 20  | Update TODO_LIST.md                      | 30m    | LOW    | None              |
 
 ### P3 - Low Priority (Backlog)
 
-| # | Task | Effort | Impact | Dependencies |
-|---|------|--------|--------|--------------|
-| 21 | Deploy aw-watcher-screenshot | 1h | MEDIUM | Storage planning |
-| 22 | Set up aw-watcher-ask | 30m | LOW | None |
-| 23 | Move AGENTS.md to docs/ | 15m | LOW | None |
-| 24 | Create onboarding checklist | 1h | LOW | None |
-| 25 | Research standing desk hardware | 2h | LOW | None |
+| #   | Task                            | Effort | Impact | Dependencies     |
+| --- | ------------------------------- | ------ | ------ | ---------------- |
+| 21  | Deploy aw-watcher-screenshot    | 1h     | MEDIUM | Storage planning |
+| 22  | Set up aw-watcher-ask           | 30m    | LOW    | None             |
+| 23  | Move AGENTS.md to docs/         | 15m    | LOW    | None             |
+| 24  | Create onboarding checklist     | 1h     | LOW    | None             |
+| 25  | Research standing desk hardware | 2h     | LOW    | None             |
 
 ---
 
@@ -297,6 +301,7 @@ Git Origin:   github.com/Homebrew/brew ✅
 ### Context:
 
 **Current Configuration:**
+
 ```nix
 nix-homebrew = {
   enable = true;
@@ -311,6 +316,7 @@ nix-homebrew = {
 ```
 
 **System Facts:**
+
 - Architecture: `arm64` (Apple Silicon) ✅
 - Current prefix: `/usr/local` (WRONG - Intel prefix) ❌
 - Expected prefix: `/opt/homebrew` (Apple Silicon prefix) ✅
@@ -359,35 +365,35 @@ nix-homebrew = {
 
 ### Build Health
 
-| Metric | Status |
-|--------|--------|
-| `just test-fast` | ✅ Passing |
-| `nix flake check --no-build` | ✅ Passing |
-| `just pre-commit-run` | ⚠️ 6 gitleaks findings |
-| `darwin-rebuild switch` | ✅ Working |
-| `nixos-rebuild switch` | ✅ Working (evo-x2) |
+| Metric                       | Status                 |
+| ---------------------------- | ---------------------- |
+| `just test-fast`             | ✅ Passing             |
+| `nix flake check --no-build` | ✅ Passing             |
+| `just pre-commit-run`        | ⚠️ 6 gitleaks findings |
+| `darwin-rebuild switch`      | ✅ Working             |
+| `nixos-rebuild switch`       | ✅ Working (evo-x2)    |
 
 ### ActivityWatch Status
 
-| Watcher | Platform | Status |
-|---------|----------|--------|
-| aw-watcher-afk | Darwin/NixOS | ✅ Active |
-| aw-watcher-window | Darwin/NixOS | ✅ Fixed (permissions) |
-| aw-watcher-web-chrome | Darwin/NixOS | ✅ Active |
-| aw-watcher-utilization | Darwin | ✅ Active (LaunchAgent) |
-| aw-watcher-input | Available | ⚠️ Not deployed |
-| aw-watcher-enhanced | Research | ⚠️ Ready for testing |
-| aw-watcher-screenshot | Research | ❌ Not started |
+| Watcher                | Platform     | Status                  |
+| ---------------------- | ------------ | ----------------------- |
+| aw-watcher-afk         | Darwin/NixOS | ✅ Active               |
+| aw-watcher-window      | Darwin/NixOS | ✅ Fixed (permissions)  |
+| aw-watcher-web-chrome  | Darwin/NixOS | ✅ Active               |
+| aw-watcher-utilization | Darwin       | ✅ Active (LaunchAgent) |
+| aw-watcher-input       | Available    | ⚠️ Not deployed         |
+| aw-watcher-enhanced    | Research     | ⚠️ Ready for testing    |
+| aw-watcher-screenshot  | Research     | ❌ Not started          |
 
 ### Homebrew Status
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Prefix | `/usr/local` ❌ | `/opt/homebrew` ✅ |
-| Architecture | arm64 ✅ | arm64 ✅ |
-| Git Origin | Missing ❌ | github.com/Homebrew/brew ✅ |
-| Tier Status | Tier 3 ❌ | Tier 1 ✅ |
-| Deprecated Tap | Present ❌ | Removed ✅ |
+| Metric         | Current         | Target                      |
+| -------------- | --------------- | --------------------------- |
+| Prefix         | `/usr/local` ❌ | `/opt/homebrew` ✅          |
+| Architecture   | arm64 ✅        | arm64 ✅                    |
+| Git Origin     | Missing ❌      | github.com/Homebrew/brew ✅ |
+| Tier Status    | Tier 3 ❌       | Tier 1 ✅                   |
+| Deprecated Tap | Present ❌      | Removed ✅                  |
 
 ### Recent Commits (Last 5)
 
@@ -401,13 +407,13 @@ d74f326 fix(darwin): remove unsupported CLI args from aw-watcher-utilization Lau
 
 ### File Statistics
 
-| Category | Count |
-|----------|-------|
-| Status Reports | 60+ files |
-| Nix Configuration | 50+ files |
-| Shell Scripts | 15+ files |
-| Documentation | 100+ .md files |
-| Git Commits | 500+ total |
+| Category          | Count          |
+| ----------------- | -------------- |
+| Status Reports    | 60+ files      |
+| Nix Configuration | 50+ files      |
+| Shell Scripts     | 15+ files      |
+| Documentation     | 100+ .md files |
+| Git Commits       | 500+ total     |
 
 ---
 

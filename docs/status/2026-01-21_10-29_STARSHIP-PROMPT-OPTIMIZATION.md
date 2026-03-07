@@ -16,6 +16,7 @@ Successfully implemented and fixed Starship prompt configuration to improve git 
 **Current Status:** ✅ **WORKING PERFECTLY** - All issues resolved, professional prompt appearance
 
 **Key Achievements:**
+
 1. ✅ Git status indicators now display in red for better visibility
 2. ✅ Visual separation between git branch and status via color contrast
 3. ✅ No extra spaces when optional modules (Go, Node.js) are disabled
@@ -45,6 +46,7 @@ Git status indicators were displayed in the same green color as the git branch n
 ### Issue 1: Git Status Visibility
 
 **Problem:**
+
 ```bash
 # Before (same color, hard to read):
 ~ master+✘? via 🐹 v1.26rc2 ❯
@@ -64,6 +66,7 @@ git_status = {
 ```
 
 **Result:**
+
 ```bash
 # After (red status indicators):
 ~ master [+✘?] via 🐹 v1.26rc2 ❯
@@ -77,11 +80,13 @@ git_status = {
 User requested: "Can we e.g. add [] or so, I don't know it's a big cramped right next to the git branch name"
 
 **First Attempt (FAILED):**
+
 ```nix
 format = "[ [$all_status] ]($style)";  # ❌ ERROR
 ```
 
 **Error Message:**
+
 ```
 [WARN] - (starship::modules::git_status): Error in module `git_status`:
  --> 1:15
@@ -93,16 +98,19 @@ format = "[ [$all_status] ]($style)";  # ❌ ERROR
 ```
 
 **Root Cause:**
+
 - Starship format string parser interprets `[]` as style group delimiters
 - Nested brackets with spaces `[[ ]]` are not valid syntax
 - The parser expected variables, strings, or textgroups, not literal brackets in this context
 
 **Second Attempt (ALSO FAILED):**
+
 ```nix
 format = "[[$all_status]]($style)";  # ❌ Still causes error
 ```
 
 **Error Message:**
+
 ```
 [WARN] - (starship::modules::git_status): Error in module `git_status`:
  --> 1:14
@@ -114,11 +122,13 @@ format = "[[$all_status]]($style)";  # ❌ Still causes error
 ```
 
 **Root Cause:**
+
 - Double brackets `[[ ]]` are ambiguous in Starship's parser
 - The parser cannot distinguish between style group delimiters and literal brackets
 - Escaping brackets in Nix strings is complex and error-prone
 
 **Final Solution (SUCCESS):**
+
 ```nix
 format = "[$all_status]($style)";  # ✅ Works perfectly
 # Main format string provides visual separation:
@@ -126,12 +136,14 @@ format = "$directory $git_branch $git_status$golang$nodejs$cmd_duration$characte
 ```
 
 **Result:**
+
 ```bash
 # Clean output with proper spacing:
 ~ master [+✘?] via 🐹 v1.26rc2 ❯
 ```
 
 **Lesson Learned:**
+
 - Starship's format syntax is more restrictive than TOML documentation suggests
 - Use main format string for module separation, not module-level format strings
 - Literal brackets require complex escaping or should be avoided
@@ -150,6 +162,7 @@ format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$chara
 ```
 
 **Observed Behavior:**
+
 ```bash
 # Directory without Go and Node.js:
 ~ master [+✘?]   took 52s ❯
@@ -157,6 +170,7 @@ format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$chara
 ```
 
 **Root Cause:**
+
 - Spaces in main format string are **literal** characters
 - When a module is disabled/not detected, it renders **nothing**
 - Literal spaces remain visible as gaps
@@ -166,6 +180,7 @@ format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$chara
 Moved spacing logic into individual module format strings:
 
 **Before:**
+
 ```nix
 # Main format with literal spaces
 format = "$directory $git_branch $git_status $golang $nodejs $cmd_duration$character";
@@ -177,6 +192,7 @@ git_status.format = "[$all_status]($style)";
 ```
 
 **After:**
+
 ```nix
 # Main format without spaces (modules control their own spacing)
 format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
@@ -191,20 +207,22 @@ cmd_duration.format = "took [$duration]($style) ";
 ```
 
 **How It Works:**
+
 1. **Module Active:** Module renders content + trailing space
 2. **Module Inactive:** Module renders nothing (no content, no space)
 3. **Result:** Dynamic spacing that adapts to which modules are active
 
 **Visual Results:**
 
-| Scenario | Prompt | Notes |
-|----------|--------|-------|
-| All modules active | `~ master [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯` | Full prompt |
-| No Go, no Node.js | `~ master [+✘?] took 52s ❯` | Clean, no gaps |
-| Clean git repo | `~ master took 52s ❯` | No status indicator |
-| Fast command | `~ master [+✘?] ❯` | No duration |
+| Scenario           | Prompt                                                     | Notes               |
+| ------------------ | ---------------------------------------------------------- | ------------------- |
+| All modules active | `~ master [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯` | Full prompt         |
+| No Go, no Node.js  | `~ master [+✘?] took 52s ❯`                                | Clean, no gaps      |
+| Clean git repo     | `~ master took 52s ❯`                                      | No status indicator |
+| Fast command       | `~ master [+✘?] ❯`                                         | No duration         |
 
 **Lesson Learned:**
+
 - Put spacing control in module format strings, not main format string
 - This creates conditional spacing that adapts to module state
 - Follows Starship best practices for module configuration
@@ -215,12 +233,14 @@ cmd_duration.format = "took [$duration]($style) ";
 
 **Problem:**
 Git push showed deprecation warning:
+
 ```
 remote: This repository moved. Please use the new location:
 remote:   git@github.com:LarsArtmann/SystemNix.git
 ```
 
 **Solution:**
+
 ```bash
 git remote set-url origin git@github.com:LarsArtmann/SystemNix.git
 ```
@@ -234,6 +254,7 @@ git remote set-url origin git@github.com:LarsArtmann/SystemNix.git
 ### File: `platforms/common/programs/starship.nix`
 
 #### Change 1: Main Format String
+
 ```nix
 # Initial:
 format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
@@ -246,6 +267,7 @@ format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character"
 ```
 
 #### Change 2: Git Status Style
+
 ```nix
 # Initial:
 style = "bold #${colors.base0B}";  # Green
@@ -255,6 +277,7 @@ style = "bold #${colors.base08}";  # Red
 ```
 
 #### Change 3: Module Format Strings
+
 ```nix
 # Directory - Added trailing space
 directory.format = "[$path]($style) ";
@@ -282,12 +305,14 @@ cmd_duration.format = "took [$duration]($style) ";
 ### Format String Basics
 
 Starship format strings support:
+
 - **Variables:** `$git_branch`, `$git_status`, etc.
 - **Literal Text:** Characters like `via`, `took`, etc.
 - **Style Groups:** `[content]($style)` for styling
 - **Conditional Display:** `(content)` - only renders if content is not empty
 
 ### Special Characters (Must Be Escaped)
+
 - `$` - Variable prefix
 - `[ ]` - Style group delimiters
 - `( )` - Style delimiters
@@ -296,17 +321,20 @@ Starship format strings support:
 ### Module Format Best Practices
 
 **✅ Correct:**
+
 ```nix
 format = "[$content]($style) ";  # Trailing space in module
 ```
 
 **❌ Incorrect:**
+
 ```nix
 format = "[ [$content] ]($style)";  # Nested brackets cause parsing errors
 format = "[[$content]]($style)";    # Ambiguous syntax
 ```
 
 **Spacing Strategy:**
+
 - **Method 1:** Add trailing space to module format (preferred)
 - **Method 2:** Add leading space to next module format
 - **❌ Avoid:** Spaces in main format string (causes gaps when modules are disabled)
@@ -316,6 +344,7 @@ format = "[[$content]]($style)";    # Ambiguous syntax
 ## Testing Results
 
 ### Test 1: Nix Flake Validation
+
 ```bash
 $ nix flake check
 ✅ All checks passed
@@ -326,37 +355,48 @@ $ nix flake check
 ### Test 2: Prompt in Various Scenarios
 
 **Scenario 1: Git Repository with Changes, Go and Node.js Active**
+
 ```bash
 ~/paid-engagements/Rolls-Royce/mtuGoHelpCenter-App/
 main [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯
 ```
+
 ✅ Clean spacing, red git status visible
 
 **Scenario 2: Git Repository without Go/Node.js**
+
 ```bash
 ~ master [+✘?] took 52s ❯
 ```
+
 ✅ No extra spaces where modules would be
 
 **Scenario 3: Clean Git Repository**
+
 ```bash
 ~ master took 52s ❯
 ```
+
 ✅ No git_status indicator (as expected), no gaps
 
 **Scenario 4: Fast Command (< 2s)**
+
 ```bash
 ~ master ❯
 ```
+
 ✅ No duration, clean prompt
 
 **Scenario 5: Non-Git Directory**
+
 ```bash
 ~ ❯
 ```
+
 ✅ Minimal prompt, as expected
 
 ### Test 3: Color Verification
+
 - Directory: Blue (`base0C`) ✅
 - Git Branch: Green (`base0B`) ✅
 - Git Status: Red (`base08`) ✅
@@ -370,10 +410,12 @@ main [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯
 ## Commits Made
 
 ### Commit 1: Initial Configuration
+
 **SHA:** `d8fa519`
 **Message:** feat(starship): Improve git status visibility and configure private Go modules
 
 **Changes:**
+
 - Changed git_status color from green to red
 - Added space separators in main format string
 - Configured GOPRIVATE and GONOSUMDB for Go modules
@@ -383,10 +425,12 @@ main [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯
 ---
 
 ### Commit 2: First Fix Attempt (Failed)
+
 **SHA:** `29b5488`
 **Message:** fix(starship): Correct git_status format syntax to resolve parsing error
 
 **Changes:**
+
 - Attempted to fix brackets syntax
 - Changed from `[ [$all_status] ]($style)` to `[[$all_status]]($style)`
 
@@ -395,10 +439,12 @@ main [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯
 ---
 
 ### Commit 3: Working Solution
+
 **SHA:** `38292d9`
 **Message:** fix(starship): Resolve git_status parsing error and improve visual separation
 
 **Changes:**
+
 - Simplified format to `[$all_status]($style)`
 - Added spaces in main format string for module separation
 
@@ -407,10 +453,12 @@ main [+✘?] via 🐹 v1.26rc2 via ⬢ v18.19.0 took 52s ❯
 ---
 
 ### Commit 4: Final Fix
+
 **SHA:** `eb4f253`
 **Message:** fix(starship): Eliminate extra spaces when modules are disabled
 
 **Changes:**
+
 - Removed spaces from main format string
 - Added trailing/leading spaces to individual module formats
 - Implemented dynamic spacing system
@@ -434,21 +482,25 @@ d8fa519 feat(starship): Improve git status visibility and configure private Go m
 ## Key Lessons Learned
 
 ### 1. Starship Format String Syntax
+
 - **Be Careful with Brackets:** `[content]($style)` is valid, `[[content]]` is not
 - **Escape Special Characters:** `$`, `[`, `]`, `(`, `)` have special meaning
 - **Test Incrementally:** Validate syntax with `nix flake check` before applying
 
 ### 2. Module Spacing Strategy
+
 - **Dynamic Spacing:** Put spaces in module formats, not main format
 - **Conditional Display:** Spaces only appear when modules are active
 - **Trailing vs Leading:** Use trailing spaces for most modules, leading for special cases (like git_status)
 
 ### 3. Color Contrast for Visibility
+
 - **Different Colors:** Use different colors for related but distinct elements (git branch vs status)
 - **Meaningful Colors:** Red for warnings/changes, green for success, blue for metadata
 - **Consistency:** Follow established color schemes (Catppuccin in this case)
 
 ### 4. Iterative Problem Solving
+
 - **Multiple Attempts:** First attempt failed, second failed, third succeeded
 - **Research Thoroughly:** Consulted official Starship documentation
 - **Test Extensively:** Verified behavior in multiple scenarios
@@ -461,16 +513,19 @@ d8fa519 feat(starship): Improve git status visibility and configure private Go m
 ### Best Practices
 
 1. **Always Use Trailing Spaces in Module Formats**
+
    ```nix
    module.format = "[$content]($style) ";  # ✅ Recommended
    ```
 
 2. **Avoid Spaces in Main Format String**
+
    ```nix
    format = "$module1$module2$module3";  # ✅ Recommended
    ```
 
 3. **Test Configuration Before Applying**
+
    ```bash
    nix flake check  # ✅ Always run first
    ```
@@ -484,11 +539,13 @@ d8fa519 feat(starship): Improve git status visibility and configure private Go m
 ### Anti-Patterns to Avoid
 
 1. **❌ Nested Brackets**
+
    ```nix
    format = "[ [$content] ]($style)";  # ❌ Don't do this
    ```
 
 2. **❌ Spaces in Main Format String**
+
    ```nix
    format = "$module1 $module2 $module3";  # ❌ Don't do this
    ```
@@ -536,6 +593,7 @@ None - All issues resolved. ✅
 Successfully optimized Starship prompt configuration to improve git status visibility and eliminate spacing issues. The final implementation uses dynamic spacing via module format strings, ensuring clean, professional prompt appearance in all directory scenarios.
 
 **Current State:**
+
 - ✅ Git status displays in red for clear visibility
 - ✅ No extra spaces when modules are disabled
 - ✅ Clean, consistent spacing across all scenarios

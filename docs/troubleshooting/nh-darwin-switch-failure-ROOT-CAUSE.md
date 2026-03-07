@@ -13,10 +13,12 @@
 When running `nh darwin switch`, the tool follows this sequence:
 
 1. **Build Phase (SUCCEEDS):**
+
    ```bash
    nix build '.#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel'
    --out-link /var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T/nh-osslW3wu/result
    ```
+
    - Creates temp symlink in user's per-user temp directory
    - Build completes successfully
 
@@ -25,6 +27,7 @@ When running `nh darwin switch`, the tool follows this sequence:
    sudo env ... nix build --no-link --profile /nix/var/nix/profiles/system
    /var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T/nh-osslW3wu/result
    ```
+
    - Elevates to root via sudo
    - Tries to access the temp symlink created as regular user
    - **FAILS**: `No such file or directory`
@@ -37,10 +40,12 @@ When running `nh darwin switch`, the tool follows this sequence:
    - **NOT** accessible by other users, even root
 
 2. **sudo Environment Behavior:**
+
    ```bash
    warning: $HOME ('/Users/larsartmann') is not owned by you,
    falling back to the one defined in the 'passwd' file ('/var/root')
    ```
+
    - sudo resets HOME to `/var/root` (root's home on macOS)
    - Changes user context from `larsartmann` to `root`
    - User temp directory becomes inaccessible
@@ -57,6 +62,7 @@ When running `nh darwin switch`, the tool follows this sequence:
 ### Why darwin-rebuild Works
 
 `darwin-rebuild` handles this differently:
+
 ```bash
 sudo darwin-rebuild switch --flake ./
 ```
@@ -80,17 +86,20 @@ just switch
 ```
 
 Which executes:
+
 ```bash
 sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
 ```
 
 **Advantages:**
+
 - No temp directory issues
 - Official tool for nix-darwin
 - More reliable and predictable
 - All features work (rollback, list, check, etc.)
 
 **Disadvantages:**
+
 - None significant
 
 ---
@@ -106,10 +115,12 @@ sudo -H -E /run/current-system/sw/bin/darwin-rebuild switch --flake ./
 ```
 
 **Flags:**
+
 - `-H`: Set HOME environment variable to target user's home directory
 - `-E`: Preserve the current user's environment variables
 
 **Or modify justfile:**
+
 ```justfile
 switch:
     @echo "🔄 Applying Nix configuration..."
@@ -118,6 +129,7 @@ switch:
 ```
 
 **Testing:**
+
 ```bash
 # Verify HOME is preserved
 sudo -E sh -c 'echo HOME=$HOME'
@@ -125,6 +137,7 @@ sudo -E sh -c 'echo HOME=$HOME'
 ```
 
 **Expected Outcome:**
+
 - This solves the HOME directory issue but **may not** solve the temp directory access issue
 - The underlying macOS temp directory security model still applies
 
@@ -140,6 +153,7 @@ nh darwin switch .#darwinConfigurations.Lars-MacBook-Air
 ```
 
 **Available Environment Variables:**
+
 ```bash
 # Show activation logs for debugging
 export NH_SHOW_ACTIVATION_LOGS=1
@@ -152,6 +166,7 @@ export NH_ELEVATION_PROGRAM=sudo  # or doas, run0, pkexec
 ```
 
 **Expected Outcome:**
+
 - May help with some environment variable issues
 - **Unlikely** to solve the core temp directory access problem
 - The macOS temp directory security model is fundamental
@@ -171,11 +186,13 @@ nix run .#activate
 ```
 
 **Advantages:**
+
 - Lightweight alternative to deployment tools
 - Simple `activate` command
 - Avoids nh's temp directory issues
 
 **Disadvantages:**
+
 - Requires adding new flake input
 - Less feature-rich than nh
 
@@ -190,11 +207,13 @@ deploy .#Lars-MacBook-Air
 ```
 
 **Advantages:**
+
 - Full-featured deployment tool
 - Rollback support
 - Works across NixOS and nix-darwin
 
 **Disadvantages:**
+
 - More complex setup
 - May be overkill for single-system configuration
 
@@ -209,10 +228,12 @@ colmena apply --on Lars-MacBook-Air
 ```
 
 **Advantages:**
+
 - Hive-like deployment
 - Good for multiple systems
 
 **Disadvantages:**
+
 - Designed for NixOS clusters
 - May have nix-darwin limitations
 
@@ -233,11 +254,13 @@ sudo "$SYSTEM_PATH/activate"
 ```
 
 **Advantages:**
+
 - Shows each step explicitly
 - Good for understanding the process
 - Can debug individual steps
 
 **Disadvantages:**
+
 - More complex
 - Requires multiple commands
 - Not recommended for regular use
@@ -246,15 +269,15 @@ sudo "$SYSTEM_PATH/activate"
 
 ## 📊 COMPARISON TABLE
 
-| Solution | Complexity | Reliability | Features | Recommendation |
-|----------|------------|-------------|----------|----------------|
-| `just switch` (darwin-rebuild) | Low | ✅ HIGH | Full | ⭐ **RECOMMENDED** |
-| nh with NH_PRESERVE_ENV | Low | ⚠️ MEDIUM | Full | Try if nh essential |
-| sudo -H -E | Low | ⚠️ MEDIUM | Full | Test first |
-| nixos-unified activate | Medium | ✅ HIGH | Medium | Consider |
-| deploy-rs | High | ✅ HIGH | Full | Alternative |
-| colmena | High | ✅ HIGH | Full | NixOS focus |
-| Manual build | High | ✅ HIGH | Low | Debug only |
+| Solution                       | Complexity | Reliability | Features | Recommendation      |
+| ------------------------------ | ---------- | ----------- | -------- | ------------------- |
+| `just switch` (darwin-rebuild) | Low        | ✅ HIGH     | Full     | ⭐ **RECOMMENDED**  |
+| nh with NH_PRESERVE_ENV        | Low        | ⚠️ MEDIUM   | Full     | Try if nh essential |
+| sudo -H -E                     | Low        | ⚠️ MEDIUM   | Full     | Test first          |
+| nixos-unified activate         | Medium     | ✅ HIGH     | Medium   | Consider            |
+| deploy-rs                      | High       | ✅ HIGH     | Full     | Alternative         |
+| colmena                        | High       | ✅ HIGH     | Full     | NixOS focus         |
+| Manual build                   | High       | ✅ HIGH     | Low      | Debug only          |
 
 ---
 
@@ -307,6 +330,7 @@ switch-preserve-env:
 ### If You Must Use nh:
 
 1. Try with `NH_PRESERVE_ENV=1`:
+
    ```bash
    export NH_PRESERVE_ENV=1
    nh darwin switch .#darwinConfigurations.Lars-MacBook-Air

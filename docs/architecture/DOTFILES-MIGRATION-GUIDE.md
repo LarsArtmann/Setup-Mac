@@ -119,6 +119,7 @@ This guide documents the migration of manually managed dotfiles to declarative H
 ## Migration Steps
 
 ### Step 1: Test Current Configurations
+
 ```bash
 # Verify Home Manager configuration works
 just test
@@ -131,6 +132,7 @@ just switch
 ```
 
 ### Step 2: Verify Migrated Configurations
+
 ```bash
 # Test Starship prompt
 starship prompt
@@ -146,9 +148,11 @@ ssh -G github.com
 ```
 
 ### Step 3: Update justfile
+
 Remove or update `just link` recipe to no longer call `manual-linking.sh`
 
 ### Step 4: Clean Up Migrated Files
+
 ```bash
 # After verification, remove migrated dotfiles
 trash dotfiles/.gitconfig
@@ -158,31 +162,37 @@ trash dotfiles/.zshrc
 ```
 
 ### Step 5: Migrate Remaining Files
+
 Follow the pending items above to migrate remaining configurations.
 
 ## Benefits of Migration
 
 ### 1. Declarative Configuration
+
 - **Before**: Imperative bash script (`manual-linking.sh`)
 - **After**: Declarative Nix configuration
 - **Benefit**: Reproducible, testable, version-controlled
 
 ### 2. Atomic Updates
+
 - **Before**: Manual symlinks can break during updates
 - **After**: All updates applied atomically or rolled back
 - **Benefit**: No broken intermediate states
 
 ### 3. Single Source of Truth
+
 - **Before**: Configuration scattered across multiple files
 - **After**: All configuration in Nix modules
 - **Benefit**: Easier to maintain and understand
 
 ### 4. Platform Consistency
+
 - **Before**: Different configurations for macOS and Linux
 - **After**: Shared configurations in `platforms/common/`
 - **Benefit**: Consistent experience across platforms
 
 ### 5. Rollback Capability
+
 - **Before**: Manual changes difficult to undo
 - **After**: `nix-env --rollback` to previous generation
 - **Benefit**: Safety net for configuration changes

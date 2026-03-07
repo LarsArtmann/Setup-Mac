@@ -26,11 +26,13 @@ This status report documents the resolution of a critical cross-platform build f
 **Problem:** `netscanner` package added to `platforms/common/packages/base.nix` (commit dcb5c3d) caused complete Darwin build failure due to Linux-only dependency `iw-6.17`.
 
 **Impact:**
+
 - 🔴 All Darwin builds broken for ~15-30 minutes
 - 🔴 Development workflow completely blocked
 - 🔴 Cannot apply system updates or configuration changes
 
 **Root Cause Analysis:**
+
 ```
 netscanner (in common packages)
   └─> iw-6.17 (Linux wireless tool, Darwin-incompatible)
@@ -38,6 +40,7 @@ netscanner (in common packages)
 ```
 
 **Resolution Applied:**
+
 ```nix
 # REMOVED from platforms/common/packages/base.nix:60
 - netscanner
@@ -47,6 +50,7 @@ netscanner (in common packages)
 ```
 
 **Verification:**
+
 ```bash
 nix build '.#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel' --dry-run
 # Result: ✅ SUCCESS - 12 derivations will be built, no platform errors
@@ -64,6 +68,7 @@ nix flake check
 **Problem:** `golangci-lint` built with Go 1.25.5 while system Go is 1.26rc2, causing toolchain inconsistency.
 
 **Discovery:**
+
 ```bash
 go version
 # Output: go version go1.26rc2 darwin/arm64
@@ -74,11 +79,13 @@ golangci-lint version
 ```
 
 **Root Cause:**
+
 - `platforms/darwin/default.nix` overlays `go` to version 1.26rc2
 - `golangci-lint` in nixpkgs uses `buildGo125Module` (hardcoded to Go 1.25.5)
 - Go module builders do NOT dynamically reference `pkgs.go` - they use hardcoded versions for reproducibility
 
 **Resolution Applied:**
+
 ```nix
 # platforms/darwin/default.nix - Added second overlay
 (final: prev: {
@@ -91,11 +98,13 @@ golangci-lint version
 ```
 
 **How It Works:**
+
 - Overrides the `buildGo125Module` argument passed to golangci-lint
 - Replaces it with `buildGo126Module` which uses Go 1.26rc2
 - Forces golangci-lint to compile using the correct Go version
 
 **Verification:**
+
 ```bash
 nix build '.#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel' --dry-run
 # Result: ✅ SUCCESS - Fetches golangci-lint with updated dependencies
@@ -103,6 +112,7 @@ nix build '.#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel'
 ```
 
 **Expected Result After Deployment:**
+
 ```bash
 golangci-lint version
 # Should show: golangci-lint has version 2.8.0 built with go1.26rc2
@@ -228,26 +238,32 @@ golangci-lint version
    - Rationale: Prevent divergence, document changes, enable deployment
 
 2. **Deploy Darwin Configuration**
+
    ```bash
    just switch
    ```
+
    - Apply Go overlay and network scanner fix
    - Restart shell to load new environment
    - Verify no build errors
 
 3. **Verify golangci-lint Go Version**
+
    ```bash
    golangci-lint version
    # Expected: built with go1.26rc2 (NOT go1.25.5)
    ```
+
    - Confirm override worked correctly
    - Test golangci-lint functionality: `golangci-lint run --help`
 
 4. **Verify netscanner Removal on Darwin**
+
    ```bash
    which netscanner
    # Expected: no output (command not found)
    ```
+
    - Confirm package no longer in Darwin system
    - Check system path for netscanner references
 
@@ -255,6 +271,7 @@ golangci-lint version
    ```bash
    just health
    ```
+
    - Full system validation
    - Identify any new issues from changes
 
@@ -263,15 +280,18 @@ golangci-lint version
 ### HIGH PRIORITY (This Week)
 
 6. **Deploy NixOS Configuration**
+
    ```bash
    sudo nixos-rebuild switch --flake .#evo-x2
    ```
+
    - Apply changes to AMD Ryzen AI Max+ 395 system
    - Verify netscanner available in NixOS: `which netscanner`
    - Confirm security-hardening module loads correctly
 
 7. **Create Pre-commit Hooks**
    Add to `.pre-commit-config.yaml`:
+
    ```yaml
    - repo: local
      hooks:
@@ -287,11 +307,13 @@ golangci-lint version
          pass_filenames: false
          language: system
    ```
+
    - Prevent future cross-platform contamination
    - Test hooks locally before committing
 
 8. **Create Just Commands for Dependency Checking**
    Add to `justfile`:
+
    ```makefile
    # Check package dependencies and platform support
    check-deps PACKAGE:
@@ -309,6 +331,7 @@ golangci-lint version
        @echo "✅ NixOS build successful"
        @echo "✅ All platforms verified!"
    ```
+
    - Enable manual but fast dependency checking
    - Test on both platforms
 
@@ -327,6 +350,7 @@ golangci-lint version
       nix eval nixpkgs#$pkg.meta.platforms --json | jq .
     done
     ```
+
     - Identify other potential cross-platform issues
     - Document findings in platform matrix
 
@@ -438,11 +462,13 @@ golangci-lint version
 We override `go` to version 1.26rc2 in `platforms/darwin/default.nix`, yet packages using `buildGo125Module` still compile with Go 1.25.5. This requires per-package overrides, which doesn't scale.
 
 **Current Understanding:**
+
 - `buildGo125Module` is a hardcoded function in nixpkgs that uses Go 1.25.5
 - It doesn't reference `pkgs.go` dynamically
 - This is intentional for reproducibility - nixpkgs pins exact versions
 
 **Current Workaround:**
+
 ```nix
 # Per-package override (doesn't scale)
 golangci-lint = prev.golangci-lint.override {
@@ -451,12 +477,14 @@ golangci-lint = prev.golangci-lint.override {
 ```
 
 **Problems:**
+
 1. Only fixes one package at a time
 2. Brittle - breaks if nixpkgs updates package to use different builder
 3. Doesn't apply to all Go packages in system
 4. Manual process for each new Go package
 
 **Desired Solution (Pseudo-code):**
+
 ```nix
 # Wish this worked (doesn't)
 (final: prev: {
@@ -467,18 +495,21 @@ golangci-lint = prev.golangci-lint.override {
 ```
 
 **Why This Matters:**
+
 - **Cross-platform consistency:** All Go packages must use same Go version
 - **Scalability:** Can't manually override dozens of packages
 - **Maintainability:** Single source of truth for Go version
 - **Correctness:** Toolchain consistency prevents subtle bugs
 
 **Research Already Done:**
+
 - ✅ Reviewed nixpkgs `buildGoModule` implementation
 - ✅ Tested multiple overlay approaches (all failed)
 - ✅ Checked nixpkgs documentation
 - ✅ Searched for similar issues in Nix community
 
 **Potential Solutions to Investigate:**
+
 1. **Override at nixpkgs level:** Can we replace `buildGo125Module` globally?
 2. **Use `callPackage` pattern:** Does `prev.callPackage` help here?
 3. **Custom builder wrapper:** Create wrapper that forces specific Go version?
@@ -488,6 +519,7 @@ golangci-lint = prev.golangci-lint.override {
 What's the "Nix way" to ensure ALL Go packages in a system use the SAME Go version without manually overriding each one? Is there a pattern for toolchain consistency across an entire nixpkgs closure?
 
 **Impact of Not Solving This:**
+
 - Continued manual per-package overrides
 - Risk of version mismatches
 - Technical debt accumulation
@@ -534,16 +566,19 @@ dcb5c3d feat(common): Add netscanner package to cross-platform base packages  # 
 ### Option A: Single Comprehensive Commit
 
 **Pros:**
+
 - Single atomic change unit
 - Easier to revert if needed
 - Clear scope: "Go version alignment and build fixes"
 
 **Cons:**
+
 - Large commit (flake.lock + overlay + documentation)
 - Harder to review
 - Mixes concerns (dependencies + code + docs)
 
 **Commit Message:**
+
 ```bash
 git commit -m "$(cat <<'EOF'
 fix(go): Align golangci-lint Go version and document netscanner fix
@@ -602,17 +637,20 @@ EOF
 ### Option B: Multiple Focused Commits
 
 **Pros:**
+
 - Smaller, focused commits
 - Easier to review and understand
 - Better for bisecting
 - Follows single-responsibility principle
 
 **Cons:**
+
 - More commits to manage
 - Need to ensure correct order
 - Each commit should be buildable
 
 **Commit 1: Update flake dependencies**
+
 ```bash
 git commit -m "$(cat <<'EOF'
 chore(deps): Update flake inputs (llm-agents.nix, NUR)
@@ -634,7 +672,8 @@ EOF
 ```
 
 **Commit 2: Fix golangci-lint Go version**
-```bash
+
+````bash
 git commit -m "$(cat <<'EOF'
 fix(go): Align golangci-lint with system Go version (1.26rc2)
 
@@ -653,7 +692,7 @@ Add overlay that replaces buildGo125Module with buildGo126Module for golangci-li
 golangci-lint = prev.golangci-lint.override {
   buildGo125Module = prev.buildGo126Module;
 };
-```
+````
 
 ## Verification
 
@@ -667,14 +706,12 @@ golangci-lint = prev.golangci-lint.override {
 
 💘 Generated with Crush
 
-
-
 Assisted-by: Kimi K2 Thinking via Crush <crarm.land>
-
 
 EOF
 )"
-```
+
+````
 
 **Commit 3: Document netscanner build fix**
 ```bash
@@ -714,7 +751,7 @@ Assisted-by: Kimi K2 Thinking via Crush <crush@charm.land>
 
 EOF
 )"
-```
+````
 
 ---
 
@@ -725,12 +762,14 @@ EOF
 ## 🎯 IMMEDIATE NEXT ACTIONS (PRIORITY ORDER)
 
 ### Step 1: Commit Changes (NOW)
+
 - [ ] Choose commit strategy (single vs. multiple - recommend multiple)
 - [ ] Stage changes: `git add flake.lock platforms/darwin/default.nix docs/status/`
 - [ ] Create commit(s) with detailed messages (examples provided above)
 - [ ] Push to origin: `git push`
 
 ### Step 2: Deploy Darwin Configuration (< 5 minutes)
+
 - [ ] Run: `just switch`
 - [ ] Wait for build to complete
 - [ ] Open new terminal session
@@ -738,18 +777,21 @@ EOF
 - [ ] Verify: `which netscanner` (should show nothing)
 
 ### Step 3: Deploy NixOS Configuration (when on evo-x2)
+
 - [ ] Run: `sudo nixos-rebuild switch --flake .#evo-x2`
 - [ ] Wait for build to complete
 - [ ] Verify: `which netscanner` (should show /run/current-system/sw/bin/netscanner)
 - [ ] Run: `netscanner --help` to confirm functionality
 
 ### Step 4: Verification (5 minutes)
+
 - [ ] Run: `just health`
 - [ ] Check for any errors or warnings
 - [ ] Verify both platform builds: `just verify-platforms` (if implemented)
 - [ ] Confirm no regressions introduced
 
 ### Step 5: Create Follow-up Tasks
+
 - [ ] Add pre-commit hooks for platform verification
 - [ ] Create package platform matrix documentation
 - [ ] Add Just commands for dependency checking
@@ -760,17 +802,20 @@ EOF
 ## 📈 SUCCESS METRICS
 
 ### Build Status
+
 - [ ] Darwin build dry-run: ✅ PASSED
 - [ ] NixOS build dry-run: ⏳ PENDING (to be tested)
 - [ ] Flake check: ✅ PASSED
 
 ### Functionality Verification
+
 - [ ] golangci-lint uses Go 1.26rc2: ⏳ PENDING
 - [ ] netscanner NOT on Darwin: ⏳ PENDING
 - [ ] netscanner IS on NixOS: ⏳ PENDING
 - [ ] No system regressions: ⏳ PENDING
 
 ### Process Improvements
+
 - [ ] Pre-commit hooks added: ❌ NOT STARTED
 - [ ] Platform matrix documented: ❌ NOT STARTED
 - [ ] Just commands created: ❌ NOT STARTED
@@ -813,11 +858,13 @@ EOF
 **Current Risk Level:** 🟡 MEDIUM
 
 **Risks:**
+
 - Changes not yet deployed - risk of system inconsistency
 - Go version override pattern not ideal (technical debt)
 - Missing automated protection against future similar issues
 
 **Mitigations:**
+
 - All changes have been dry-run tested
 - Comprehensive documentation created
 - Clear verification procedures defined
@@ -833,8 +880,8 @@ EOF
 
 ---
 
-*This status report was generated on 2026-01-26 08:10:04 UTC*
-*Comprehensive documentation of Go version alignment and build fix implementation*
-*Ready for deployment pending commit approval*
+_This status report was generated on 2026-01-26 08:10:04 UTC_
+_Comprehensive documentation of Go version alignment and build fix implementation_
+_Ready for deployment pending commit approval_
 
 **Next Status Report:** After deployment and verification (expected 2026-01-26)

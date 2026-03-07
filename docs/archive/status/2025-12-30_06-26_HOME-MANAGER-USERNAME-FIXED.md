@@ -11,6 +11,7 @@
 **Root Cause:** Home Manager was configured to activate for user `lars`, but the actual macOS username is `larsartmann`.
 
 **Error Observed:**
+
 ```bash
 Activating home-manager configuration for lars
 id: 'lars': no such user: Invalid argument
@@ -19,6 +20,7 @@ sudo: error initializing audit plugin sudoers_audit
 ```
 
 **Investigation:**
+
 - System username verified: `larsartmann` (via `whoami`)
 - Home Manager configured: `users.lars`
 - Nix-darwin user definition: `users.users.lars`
@@ -29,18 +31,23 @@ sudo: error initializing audit plugin sudoers_audit
 ## 🔧 Fixes Applied
 
 ### 1. Updated `flake.nix` (Line 96)
+
 **Before:**
+
 ```nix
 users.lars = import ./platforms/darwin/home.nix;
 ```
 
 **After:**
+
 ```nix
 users.larsartmann = import ./platforms/darwin/home.nix;
 ```
 
 ### 2. Updated `platforms/darwin/default.nix` (Lines 23-26)
+
 **Before:**
+
 ```nix
 users.users.lars = {
   name = "lars";
@@ -49,6 +56,7 @@ users.users.lars = {
 ```
 
 **After:**
+
 ```nix
 users.users.larsartmann = {
   name = "larsartmann";
@@ -61,17 +69,20 @@ users.users.larsartmann = {
 ## ✅ Build Verification
 
 **Build Command:**
+
 ```bash
 darwin-rebuild build --flake . --show-trace
 ```
 
 **Build Result:**
+
 ```bash
 building '/nix/store/2ybnrk5an1hbbbssp657z7zdl3f4nn9y-activation-larsartmann.drv'...
 building '/nix/store/v6ndwvyiqnc89xhnwzf1ns9smsvyry3q-darwin-system-26.05.f0c8e1f.drv'...
 ```
 
 **Status:** ✅ **BUILD SUCCESSFUL**
+
 - Exit code: 0
 - Home Manager activation script: `activation-larsartmann.drv` (CORRECT USERNAME)
 - Output: `/nix/store/yc3mq5bpp0jyp5r6g58j78f27nn36xm5-darwin-system-26.05.f0c8e1f`
@@ -83,17 +94,21 @@ building '/nix/store/v6ndwvyiqnc89xhnwzf1ns9smsvyry3q-darwin-system-26.05.f0c8e1
 The build succeeded but activation requires sudo privileges (blocked in current environment).
 
 ### Step 1: Activate System
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake .
 ```
 
 ### Step 2: Open New Terminal
+
 **IMPORTANT:** Open a new terminal window for shell changes to take effect:
+
 - Press `Cmd+N` in Terminal/iTerm2
 - Or quit and reopen Terminal
 
 ### Step 3: Verify Home Manager Activation
+
 ```bash
 # Check Home Manager generation
 ls -lt ~/.local/state/nix/profiles/home-manager* | head -3
@@ -102,6 +117,7 @@ ls -lt ~/.local/state/nix/profiles/home-manager* | head -3
 ```
 
 ### Step 4: Verify Shell Configuration
+
 ```bash
 # Check Fish prompt (should show Starship prompt)
 # Open new terminal first!
@@ -120,6 +136,7 @@ cat ~/.config/tmux/tmux.conf
 ```
 
 ### Step 5: Verify System Generation
+
 ```bash
 # Check Darwin system generation
 ls -lt /nix/var/nix/profiles/system-* | head -3
@@ -128,6 +145,7 @@ ls -lt /nix/var/nix/profiles/system-* | head -3
 ```
 
 ### Step 6: Complete Health Check
+
 ```bash
 just health
 # Run comprehensive system health check
@@ -138,17 +156,20 @@ just health
 ## 📋 Expected Behavior After Activation
 
 ### Fish Shell
+
 - **Prompt:** Starship prompt with git branch, status indicators
 - **Aliases:** `nixup`, `nixbuild`, `nixcheck` available
 - **Greeting:** Disabled (faster startup)
 - **History:** Extended history limit
 
 ### Starship Prompt
+
 - **Format:** Shows all available modules
 - **Newline:** Disabled for compact display
 - **Fish Integration:** Automatic (no manual init needed)
 
 ### Tmux
+
 - **Mouse:** Enabled (click to select panes/windows)
 - **Clock:** 24-hour format
 - **Base Index:** 1 (0-indexing disabled)
@@ -156,11 +177,13 @@ just health
 - **Terminal:** screen-256color
 
 ### Environment Variables
+
 - `EDITOR`: Set to preferred editor
 - `LANG`: Set to UTF-8 locale
 - Platform-specific variables (Darwin only)
 
 ### Home Manager
+
 - **Backup:** Old configs backed up with `.backup` extension
 - **Symlinks:** `~/.config/fish`, `~/.config/starship.toml`, etc.
 - **Generation:** New generation created and activated
@@ -170,6 +193,7 @@ just health
 ## 🔍 Troubleshooting
 
 ### If Starship Prompt Doesn't Appear
+
 ```bash
 # Restart shell
 exec fish
@@ -182,6 +206,7 @@ which starship
 ```
 
 ### If Fish Aliases Don't Work
+
 ```bash
 # Reload Fish config
 source ~/.config/fish/config.fish
@@ -194,6 +219,7 @@ ls -l ~/.local/state/nix/profiles/home-manager
 ```
 
 ### If System Generation Stuck at 206
+
 ```bash
 # Check activation logs
 sudo log show --predicate 'process == "darwin-rebuild"' --last 10m
@@ -204,6 +230,7 @@ sudo darwin-rebuild switch --flake . --show-trace
 ```
 
 ### If Activation Fails Again
+
 ```bash
 # Check error details
 sudo darwin-rebuild switch --flake . --show-trace 2>&1 | tail -50
@@ -260,4 +287,4 @@ grep "users.users.larsartmann" platforms/darwin/default.nix
 
 ---
 
-*Status report generated: 2025-12-30 06:26:00 CET*
+_Status report generated: 2025-12-30 06:26:00 CET_

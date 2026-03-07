@@ -10,22 +10,25 @@
 ## Executive Summary
 
 ### ✅ Audit Findings
+
 Comprehensive audit of all kernel extensions and system extensions completed. **No active security concerns detected.** All loaded drivers are Apple-signed and legitimate.
 
 ### 📊 Audit Scope
+
 - **System Kernel Extensions (`/System/Library/Extensions/`):** 707 items
 - **Third-Party Kernel Extensions (`/Library/Extensions/`):** 3 items
 - **Active System Extensions:** 4 items
 - **Loaded Kernel Extensions:** 245 (all Apple-signed)
 
 ### 🔐 Security Assessment
-| Category | Count | Risk Level | Status |
-|----------|-------|------------|--------|
-| Apple Kernel Extensions | 464 | ✅ None | Active & Required |
-| Third-Party Kexts (disk) | 3 | ✅ Inactive | Legacy Remnants |
-| Active System Extensions | 2 | ✅ Legitimate | Verified Tools |
-| Disabled System Extensions | 2 | ⚠️ Review | Not Currently Active |
-| Loaded Non-Apple Kexts | 0 | ✅ None | Clean |
+
+| Category                   | Count | Risk Level    | Status               |
+| -------------------------- | ----- | ------------- | -------------------- |
+| Apple Kernel Extensions    | 464   | ✅ None       | Active & Required    |
+| Third-Party Kexts (disk)   | 3     | ✅ Inactive   | Legacy Remnants      |
+| Active System Extensions   | 2     | ✅ Legitimate | Verified Tools       |
+| Disabled System Extensions | 2     | ⚠️ Review     | Not Currently Active |
+| Loaded Non-Apple Kexts     | 0     | ✅ None       | Clean                |
 
 ---
 
@@ -34,6 +37,7 @@ Comprehensive audit of all kernel extensions and system extensions completed. **
 ### 1. System Kernel Extensions Analysis
 
 #### Volume & Ownership
+
 ```
 Total Extensions: 707
 Apple-Prefixed:   464 (65.6%)
@@ -44,9 +48,11 @@ Timestamps:       October 25, 2025 (macOS update)
 **Key Observation:** All extensions are properly signed by Apple Inc. and part of the standard macOS distribution.
 
 #### GPU Architecture Diversity
+
 The system contains drivers for **three concurrent GPU architectures** (universal macOS image):
 
 **Apple Silicon (AGX - Currently Active):**
+
 ```
 AGXG14G.kext                    ← M2 GPU driver (ACTIVE)
 AppleM2ScalerCSCDriver.kext     ← M2 display scaler (ACTIVE)
@@ -55,6 +61,7 @@ IOGPUFamily.kext                ← Core GPU framework (ACTIVE)
 ```
 
 **AMD Radeon (Present but NOT Active):**
+
 ```
 X4000, X5000, X6000 series
 OpenGL/Metal/VA driver bundles
@@ -62,19 +69,23 @@ Status: NOT LOADED (universal image compatibility)
 ```
 
 **Intel Graphics (Legacy Support):**
+
 ```
 CFL (Coffee Lake), ICL (Ice Lake), KBL (Kaby Lake) remnants
 Status: NOT LOADED (Intel Mac compatibility)
 ```
 
 **Why AMD/Intel Drivers on M2?**
+
 1. Universal macOS installer supports all Mac models
 2. Migration Assistant requires drivers from source Mac
 3. External GPU (eGPU) support via Thunderbolt
 4. Virtualization guest OS support
 
 #### Apple Silicon Transition Evidence
+
 Chip-specific USB controllers reveal device generations:
+
 ```
 T8xxx series:  Older Apple Silicon (iPhone/iPad chips)
 T8101/T8103:   M1 generation
@@ -84,6 +95,7 @@ AppleA7IOP-*:  A7 I/O processor wrappers (v1-v6)
 ```
 
 #### Security Infrastructure
+
 ```
 Sandbox.kext      ← macOS app sandboxing
 Quarantine.kext   ← Downloaded file quarantine
@@ -96,13 +108,14 @@ KextAudit.kext    ← Kernel extension audit/approval
 
 #### Location: `/Library/Extensions/`
 
-| Kext | Vendor | Version | Status | Purpose | Risk |
-|------|--------|---------|--------|---------|------|
-| `HighPointIOP.kext` | HighPoint Technologies | 4.4.5 | **NOT LOADED** | RAID controller driver | ✅ Inactive |
-| `HighPointRR.kext` | HighPoint Technologies | 4.4.5 | **NOT LOADED** | RAID driver companion | ✅ Inactive |
-| `SoftRAID.kext` | SoftRAID (OWC) | 6.3.1 | **NOT LOADED** | Software RAID utility | ✅ Inactive |
+| Kext                | Vendor                 | Version | Status         | Purpose                | Risk        |
+| ------------------- | ---------------------- | ------- | -------------- | ---------------------- | ----------- |
+| `HighPointIOP.kext` | HighPoint Technologies | 4.4.5   | **NOT LOADED** | RAID controller driver | ✅ Inactive |
+| `HighPointRR.kext`  | HighPoint Technologies | 4.4.5   | **NOT LOADED** | RAID driver companion  | ✅ Inactive |
+| `SoftRAID.kext`     | SoftRAID (OWC)         | 6.3.1   | **NOT LOADED** | Software RAID utility  | ✅ Inactive |
 
 #### HighPoint Technologies Analysis
+
 ```
 Bundle ID:    com.highpoint-tech.kext.HighPointIOP
 Signed by:    Developer ID Application: HighPoint Technologies, Inc (DX6G69M9N2)
@@ -114,6 +127,7 @@ Architecture: x86_64 (Intel-only)
 **Assessment:** Legitimate hardware vendor. Kext is properly signed and notarized. Intel-only architecture explains why it's not loaded on Apple Silicon.
 
 #### SoftRAID Analysis
+
 ```
 Bundle ID:    com.softraid.driver.SoftRAID
 Vendor:       OWC (Other World Computing)
@@ -125,6 +139,7 @@ Purpose:      Software RAID management
 **Assessment:** Reputable storage vendor. Common for users with external storage arrays.
 
 #### Security Verdict
+
 - **Active Risk:** NONE (no third-party kexts loaded)
 - **Code Signing:** All valid Developer ID signatures
 - **Notarization:** HighPoint properly notarized
@@ -138,19 +153,20 @@ macOS replaced kernel extensions with **System Extensions** — these run in use
 
 #### Active Extensions
 
-| Status | Extension | Vendor | Purpose | Assessment |
-|--------|-----------|--------|---------|------------|
-| ✅ Active | `io.tailscale.ipn.macsys.network-extension` | Tailscale | Mesh VPN | Legitimate tool |
-| ✅ Active | `com.alix-sarl.TripMode.FilterExtension` | TripMode | Bandwidth limiting | Legitimate tool |
+| Status    | Extension                                   | Vendor    | Purpose            | Assessment      |
+| --------- | ------------------------------------------- | --------- | ------------------ | --------------- |
+| ✅ Active | `io.tailscale.ipn.macsys.network-extension` | Tailscale | Mesh VPN           | Legitimate tool |
+| ✅ Active | `com.alix-sarl.TripMode.FilterExtension`    | TripMode  | Bandwidth limiting | Legitimate tool |
 
 #### Inactive/Waiting Extensions
 
-| Status | Extension | Vendor | Purpose | Assessment |
-|--------|-----------|--------|---------|------------|
-| ⏳ Waiting | `com.objective-see.lulu.extension` | Objective-See | **LuLu Firewall** | Awaiting user approval |
-| ⚠️ Disabled | `org.mitmproxy.macos-redirector` | mitmproxy | HTTPS proxy | Disabled by user |
+| Status      | Extension                          | Vendor        | Purpose           | Assessment             |
+| ----------- | ---------------------------------- | ------------- | ----------------- | ---------------------- |
+| ⏳ Waiting  | `com.objective-see.lulu.extension` | Objective-See | **LuLu Firewall** | Awaiting user approval |
+| ⚠️ Disabled | `org.mitmproxy.macos-redirector`   | mitmproxy     | HTTPS proxy       | Disabled by user       |
 
 #### LuLu Firewall (Waiting for Approval)
+
 ```
 Developer:    Patrick Wardle (Objective-See)
 Purpose:      Open-source outbound firewall
@@ -162,6 +178,7 @@ Version:      4.2.0
 **Action Required:** Enable in System Settings → Privacy & Security → Extensions
 
 #### mitmproxy (Disabled)
+
 ```
 Purpose:      HTTPS interception/debugging proxy
 Status:       Disabled
@@ -177,6 +194,7 @@ Security:     Legitimate dev tool, disable when not needed
 ### Kernel Extension Types
 
 #### `.kext` Files (Traditional)
+
 ```
 Count: ~650 files
 Location: /System/Library/Extensions/
@@ -185,6 +203,7 @@ Modern Status: Deprecated for third-party use
 ```
 
 #### `.bundle` Files (Loadable Drivers)
+
 ```
 Examples: AGXMetalG*.bundle, AMDRadeon*.bundle
 Purpose: GPU drivers, Metal shaders
@@ -193,6 +212,7 @@ Signature: Required (Apple-signed only)
 ```
 
 #### `.plugin` Files (Specialized)
+
 ```
 Examples: NVMeSMARTLib.plugin, SMARTLib.plugin
 Purpose: Hardware monitoring, SMART data
@@ -212,6 +232,7 @@ AGXFirmwareKextG14GRTBuddy.kext (1)  ← Firmware interface
 ```
 
 **Key Metrics:**
+
 - GPU Family: IOGPUFamily v104.6.3
 - Driver Version: AGXG14G v329.2
 - Firmware: G14G RTBuddy v1
@@ -220,6 +241,7 @@ AGXFirmwareKextG14GRTBuddy.kext (1)  ← Firmware interface
 ### File System Extensions
 
 Standard macOS filesystem drivers present:
+
 ```
 apfs.kext      ← Apple File System (primary)
 hfs.kext       ← HFS+ (legacy support)
@@ -245,6 +267,7 @@ cddafs.kext    ← CD audio
 ### Optional Cleanup (Low Priority)
 
 #### Remove Legacy RAID Drivers
+
 ```bash
 # If external RAID not used, safe to remove:
 sudo rm -rf /Library/Extensions/HighPointIOP.kext
@@ -257,11 +280,13 @@ sudo rm -rf /Library/Extensions/SoftRAID.kext
 ### Enable Security Tools
 
 #### LuLu Firewall (Recommended)
+
 1. Open System Settings → Privacy & Security → Extensions
 2. Find "LuLu" and enable
 3. Configure rules as needed
 
 **Benefits:**
+
 - Outbound connection monitoring
 - Per-application network control
 - Open-source (auditable)
@@ -269,6 +294,7 @@ sudo rm -rf /Library/Extensions/SoftRAID.kext
 ### Monitoring Recommendations
 
 #### Monthly Audit Script
+
 ```bash
 #!/bin/bash
 # Save as ~/bin/monthly-kext-audit.sh
@@ -298,6 +324,7 @@ log show --predicate "eventMessage CONTAINS 'panic'" --last 24h --info 2>/dev/nu
 ## Comparison: Pre/Post ZFS Removal
 
 ### Previous State (Feb 8-9, 2026)
+
 ```
 Third-Party Kexts Loaded: 1 (org.openzfsonosx.zfs)
 Kernel Panics: 4+ in 24 hours
@@ -305,6 +332,7 @@ Root Cause: ZFS kext instability
 ```
 
 ### Current State (Feb 9, 2026 @ 06:15)
+
 ```
 Third-Party Kexts Loaded: 0
 System Extensions Active: 2 (Tailscale, TripMode)
@@ -313,6 +341,7 @@ Status: STABLE
 ```
 
 ### Improvement
+
 - **Security Posture:** Improved (no third-party kexts in kernel)
 - **System Stability:** Improved (no panics since removal)
 - **Attack Surface:** Reduced (fewer kernel components)
@@ -324,6 +353,7 @@ Status: STABLE
 ### Appendix A: Commands Used
 
 #### Kernel Extension Audit
+
 ```bash
 # List all system kexts
 ls /System/Library/Extensions/
@@ -345,6 +375,7 @@ codesign -d -vv "/path/to/kext"
 ```
 
 #### System Extensions
+
 ```bash
 # List all system extensions
 systemextensionsctl list
@@ -354,6 +385,7 @@ sqlite3 /var/db/SystemPolicyConfiguration/KextPolicy "SELECT * FROM kext_policy;
 ```
 
 #### GPU Verification
+
 ```bash
 # Check active GPU
 system_profiler SPDisplaysDataType
@@ -368,39 +400,45 @@ system_profiler SPDisplaysDataType | grep -i metal
 ### Appendix B: File Locations
 
 #### Kernel Extensions
-| Location | Purpose |
-|----------|---------|
-| `/System/Library/Extensions/` | Apple system kexts (read-only) |
-| `/Library/Extensions/` | Third-party kexts (admin writable) |
-| `/System/Library/DriverExtensions/` | DriverKit extensions (modern) |
+
+| Location                            | Purpose                            |
+| ----------------------------------- | ---------------------------------- |
+| `/System/Library/Extensions/`       | Apple system kexts (read-only)     |
+| `/Library/Extensions/`              | Third-party kexts (admin writable) |
+| `/System/Library/DriverExtensions/` | DriverKit extensions (modern)      |
 
 #### Configuration Files
-| File | Purpose |
-|------|---------|
-| `/var/db/SystemPolicyConfiguration/KextPolicy` | Kext approval database |
-| `/Library/Preferences/com.apple.security.kext.policy` | Kext policy settings |
+
+| File                                                  | Purpose                |
+| ----------------------------------------------------- | ---------------------- |
+| `/var/db/SystemPolicyConfiguration/KextPolicy`        | Kext approval database |
+| `/Library/Preferences/com.apple.security.kext.policy` | Kext policy settings   |
 
 #### Logs
-| Location | Content |
-|----------|---------|
-| `/Library/Logs/DiagnosticReports/panic*.panic` | Kernel panic logs |
-| `log show --predicate "eventMessage CONTAINS 'panic'"` | Panic history |
-| `kextstat` | Currently loaded kexts |
+
+| Location                                               | Content                |
+| ------------------------------------------------------ | ---------------------- |
+| `/Library/Logs/DiagnosticReports/panic*.panic`         | Kernel panic logs      |
+| `log show --predicate "eventMessage CONTAINS 'panic'"` | Panic history          |
+| `kextstat`                                             | Currently loaded kexts |
 
 ### Appendix C: Reference Documentation
 
 #### Security Frameworks
+
 - **Sandbox.kext:** macOS app sandboxing (since 10.7)
 - **Quarantine.kext:** Downloaded file quarantine (since 10.5)
 - **KextAudit.kext:** Kernel extension approval system (since 10.13)
 - **EndpointSecurity.kext:** Modern security framework (since 10.15)
 
 #### GPU Architecture
+
 - **AGX:** Apple GPU architecture (Apple Silicon)
 - **G13/G14/G15/G16:** GPU generations (M1/M2/M3/M4)
 - **RTBuddy:** Firmware interface for GPU
 
 #### System Extension Types
+
 - **Network Extensions:** VPN, firewall, content filtering
 - **Endpoint Security:** Antivirus, EDR, monitoring
 - **DriverKit:** Modern driver framework (user space)
@@ -410,9 +448,11 @@ system_profiler SPDisplaysDataType | grep -i metal
 ## Conclusion
 
 ### Summary
+
 Comprehensive kernel extension audit completed. System shows **excellent security posture** with no active threats, no loaded third-party kernel extensions, and only legitimate signed system extensions active.
 
 ### Key Findings
+
 1. **707 system kexts** — all Apple-signed, standard macOS distribution
 2. **3 third-party kexts on disk** — all inactive, properly signed
 3. **2 active system extensions** — Tailscale (VPN) and TripMode (bandwidth)
@@ -420,6 +460,7 @@ Comprehensive kernel extension audit completed. System shows **excellent securit
 5. **0 loaded non-Apple kexts** — clean kernel space
 
 ### Security Score: 9.5/10
+
 - ✅ No active third-party kexts
 - ✅ All signatures valid
 - ✅ System extensions in user space
@@ -427,11 +468,12 @@ Comprehensive kernel extension audit completed. System shows **excellent securit
 - ⚠️ Legacy kexts on disk (inactive, low risk)
 
 ### Recommended Actions
-| Priority | Action | Effort | Impact |
-|----------|--------|--------|--------|
-| Low | Remove inactive RAID drivers | 5 min | Cleanup |
-| Low | Enable LuLu firewall | 2 min | Security |
-| Low | Set up monthly audit script | 10 min | Monitoring |
+
+| Priority | Action                       | Effort | Impact     |
+| -------- | ---------------------------- | ------ | ---------- |
+| Low      | Remove inactive RAID drivers | 5 min  | Cleanup    |
+| Low      | Enable LuLu firewall         | 2 min  | Security   |
+| Low      | Set up monthly audit script  | 10 min | Monitoring |
 
 ---
 

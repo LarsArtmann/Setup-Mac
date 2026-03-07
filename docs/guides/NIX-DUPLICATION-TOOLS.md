@@ -8,6 +8,7 @@
 ## Available Tools
 
 ### 1. **deadnix** (Already in use)
+
 Finds unused variables, dead code, and redundant bindings.
 
 ```bash
@@ -15,6 +16,7 @@ nix shell nixpkgs#deadnix --command deadnix
 ```
 
 **Current findings**:
+
 - `platforms/common/programs/starship.nix:4` - Unused `config` parameter
 - `platforms/common/programs/tmux.nix:3` - Unused `config` parameter
 - `platforms/common/packages/base.nix:29` - Unused `crush` binding
@@ -27,6 +29,7 @@ nix shell nixpkgs#deadnix --command deadnix
 ---
 
 ### 2. **statix** (Already in use)
+
 Linter for Nix anti-patterns and style issues.
 
 ```bash
@@ -38,6 +41,7 @@ nix shell nixpkgs#statix --command statix check
 ---
 
 ### 3. **find-nix-duplicates.sh** (NEW)
+
 File-level and pattern duplication detection.
 
 ```bash
@@ -47,14 +51,16 @@ File-level and pattern duplication detection.
 **Key findings**:
 
 #### Similar File Names (Cross-Platform)
-| File | Darwin | NixOS | Status |
-|------|--------|-------|--------|
-| `shells.nix` | ✅ | ✅ | **DUPLICATION** - Can be merged |
-| `home.nix` | ✅ | ✅ | Different purposes (OK) |
-| `settings.nix` | ✅ | ✅ | Different contents (OK) |
-| `default.nix` | 5 files | 5 files | Stub files (OK) |
+
+| File           | Darwin  | NixOS   | Status                          |
+| -------------- | ------- | ------- | ------------------------------- |
+| `shells.nix`   | ✅      | ✅      | **DUPLICATION** - Can be merged |
+| `home.nix`     | ✅      | ✅      | Different purposes (OK)         |
+| `settings.nix` | ✅      | ✅      | Different contents (OK)         |
+| `default.nix`  | 5 files | 5 files | Stub files (OK)                 |
 
 #### Repeated Attribute Patterns
+
 ```
  9× imports = [
  7× environment.systemPackages = with pkgs; [
@@ -67,6 +73,7 @@ File-level and pattern duplication detection.
 ```
 
 **Recommendations**:
+
 - Extract `colors` definition to common module (4 repetitions)
 - Review `imports` patterns for common sequences
 - Consider `environment.systemPackages` consolidation
@@ -74,6 +81,7 @@ File-level and pattern duplication detection.
 ---
 
 ### 4. **find-nix-semantic-dupes.sh** (NEW)
+
 AST-level semantic duplication detection.
 
 ```bash
@@ -83,6 +91,7 @@ AST-level semantic duplication detection.
 **Key findings**:
 
 #### Semantically Identical Files
+
 ```
 Hash: 54d4b952ec940ceb8db16d021a1bb278
   → ./platforms/darwin/networking/default.nix
@@ -98,6 +107,7 @@ Both are empty stub files (`_: { ... }`). Not true duplicates (different purpose
 ### 1. **Shell Configuration Duplication** 🔴
 
 **Files**:
+
 - `platforms/darwin/programs/shells.nix` (120 lines)
 - `platforms/nixos/programs/shells.nix` (74 lines)
 
@@ -136,11 +146,13 @@ Both are empty stub files (`_: { ... }`). Not true duplicates (different purpose
 ### 2. **Color Scheme Duplication** 🟡
 
 **Pattern found**: 4 repetitions
+
 ```nix
 colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
 ```
 
 **Files affected**:
+
 - Search with: `grep -rn "catppuccin-mocha.palette" --include="*.nix" .`
 
 **Solution**: Add to `platforms/common/core/nix-settings.nix` or create theme module:
@@ -160,6 +172,7 @@ colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
 ### 3. **Helium Package Duplication** 🟡
 
 **Files**:
+
 - `platforms/darwin/packages/helium.nix`
 - `platforms/common/packages/helium-linux.nix`
 
@@ -186,19 +199,20 @@ pkgs.stdenv.mkDerivation rec {
 
 ## Tool Comparison
 
-| Tool | Purpose | Speed | Finds | Status |
-|------|---------|-------|-------|--------|
-| **deadnix** | Dead code | Fast | Unused variables | ✅ Use regularly |
-| **statix** | Anti-patterns | Fast | Style issues | ✅ Use regularly |
-| **alejandra** | Formatting | Fast | Format violations | ✅ Pre-commit |
-| **find-nix-duplicates.sh** | File patterns | Medium | Similar names | ✅ New tool |
-| **find-nix-semantic-dupes.sh** | AST comparison | Slow | Exact duplicates | ✅ New tool |
+| Tool                           | Purpose        | Speed  | Finds             | Status           |
+| ------------------------------ | -------------- | ------ | ----------------- | ---------------- |
+| **deadnix**                    | Dead code      | Fast   | Unused variables  | ✅ Use regularly |
+| **statix**                     | Anti-patterns  | Fast   | Style issues      | ✅ Use regularly |
+| **alejandra**                  | Formatting     | Fast   | Format violations | ✅ Pre-commit    |
+| **find-nix-duplicates.sh**     | File patterns  | Medium | Similar names     | ✅ New tool      |
+| **find-nix-semantic-dupes.sh** | AST comparison | Slow   | Exact duplicates  | ✅ New tool      |
 
 ---
 
 ## Recommended Workflow
 
 ### Regular (Weekly)
+
 ```bash
 # 1. Remove dead code
 nix shell nixpkgs#deadnix --command deadnix --edit .
@@ -211,6 +225,7 @@ just test-fast
 ```
 
 ### Monthly Deep Clean
+
 ```bash
 # Full semantic analysis
 ./scripts/find-nix-semantic-dupes.sh
@@ -251,6 +266,7 @@ duplication-check:
 ## Summary
 
 **Current duplication debt**:
+
 - ~200 lines of duplicate shell configuration
 - ~120 lines of duplicate package definitions (Helium)
 - 4 repetitions of color scheme definition
@@ -260,6 +276,7 @@ duplication-check:
 **Potential savings**: ~350 lines (5% of total codebase)
 
 **Next actions**:
+
 1. Run `deadnix --edit .` to remove dead code
 2. Consolidate `shells.nix` into common module
 3. Merge Helium packages into single file

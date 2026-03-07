@@ -7,6 +7,7 @@
 ## Root Cause
 
 In Wayland (Hyprland), cursor size **cannot be set via environment variables**:
+
 - ❌ `XCURSOR_SIZE` = X11 only, doesn't work in Wayland
 - ❌ `gtk.cursorTheme.size` = Only affects GTK apps, not compositor
 - ❌ No Hyprland setting for cursor scaling
@@ -22,6 +23,7 @@ Use a cursor theme with **extra-large (XL) cursor variants** built-in.
 ### File: `platforms/nixos/users/home.nix`
 
 #### 1. Install Bibata Cursor Theme
+
 ```nix
 home.packages = with pkgs; [
   bibata-cursors  # Has XL size (96px)
@@ -31,6 +33,7 @@ home.packages = with pkgs; [
 **Bibata includes sizes**: 16, 24, 32, 48, 64, **96**
 
 #### 2. Set Cursor Theme
+
 ```nix
 home.sessionVariables = {
   XCURSOR_THEME = "Bibata-Modern-Classic";
@@ -39,6 +42,7 @@ home.sessionVariables = {
 ```
 
 #### 3. Removed Ineffective Settings
+
 ```nix
 # REMOVED - Doesn't work in Wayland:
 # gtk.cursorTheme.size = "384";
@@ -86,30 +90,36 @@ This should be **clearly visible** from 2 meters away.
 If Bibata isn't large enough, try these:
 
 ### Phinger Cursors
+
 ```nix
 home.packages = [ phinger-cursors ];
 home.sessionVariables = {
   XCURSOR_THEME = "phinger-cursors";
 };
 ```
+
 - Sizes: 18, 24, 36, 48, 64, 72, 96
 
 ### Volantes Cursors
+
 ```nix
 home.packages = [ volantes-cursors ];
 home.sessionVariables = {
   XCURSOR_THEME = "Volantes";
 };
 ```
+
 - Sizes: 18, 24, 36, 48, 72
 
 ### Capitaine Cursors
+
 ```nix
 home.packages = [ capitaine-cursors ];
 home.sessionVariables = {
   XCURSOR_THEME = "capitaine-cursors";
 };
 ```
+
 - Sizes: 24, 30, 36, 48, 60, 72
 
 ## Test After Applying
@@ -128,9 +138,11 @@ ls ~/.local/share/icons/Bibata-Modern-Classic/cursors/left_ptr
 ## If Still Too Small
 
 ### Option 1: Use Largest Available Theme
+
 Try `phinger-cursors` - has **96px and 108px** variants.
 
 ### Option 2: Scale Entire Display (Affects Everything)
+
 Increase DPI scaling in Hyprland:
 
 ```nix
@@ -147,21 +159,25 @@ wayland.windowManager.hyprland.settings = {
 **Note**: No direct DPI setting in Hyprland. Would need to use GPU scaling.
 
 ### Option 3: Create Custom XL Cursor Theme
+
 Use Bibata as base and scale to 128-192px manually.
 
 ## Why Previous Attempts Failed
 
 ### XCURSOR_SIZE Variable
+
 ```bash
 export XCURSOR_SIZE=384  # ❌ X11 only, Wayland ignores this
 ```
 
 ### GTK Cursor Size
+
 ```nix
 gtk.cursorTheme.size = 384  # ❌ Only affects GTK apps, not compositor cursor
 ```
 
 ### Environment Variable Location
+
 ```nix
 # ❌ System-level doesn't help if compositor doesn't support it
 environment.sessionVariables.XCURSOR_SIZE = "384";
@@ -186,6 +202,7 @@ environment.sessionVariables.XCURSOR_SIZE = "384";
 ## Key Takeaway
 
 **In Hyprland (Wayland):**
+
 - ❌ Cannot scale cursor
 - ❌ Cannot set cursor size via config
 - ✅ Must use cursor theme with XL variants built-in
@@ -193,4 +210,4 @@ environment.sessionVariables.XCURSOR_SIZE = "384";
 
 ---
 
-*Last updated: January 14, 2026*
+_Last updated: January 14, 2026_

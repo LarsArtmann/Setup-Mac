@@ -54,6 +54,7 @@ ps aux | grep nix-daemon
 ```
 
 **Expected Output:**
+
 - Daemon should stop and start successfully
 - You should see `nix-daemon` process running
 - No error messages
@@ -75,6 +76,7 @@ just switch
 ```
 
 **Expected Behavior:**
+
 - Build should take 5-10 minutes
 - You should see build progress (not silent failure)
 - iTerm2 should be installed with system packages
@@ -106,6 +108,7 @@ open /run/current-system/Applications/iTerm2.app
 ```
 
 **Expected Output:**
+
 - iTerm2.app should be listed in Applications
 - Should open without errors
 
@@ -129,11 +132,13 @@ nix run nixpkgs#iterm2
 ```
 
 **Pros:**
+
 - Immediate iTerm2 access
 - Doesn't require system switch
 - Works even if system config is broken
 
 **Cons:**
+
 - iTerm2 only for current user, not system-wide
 - Needs to be reinstalled after system switch
 - Not the "correct" Nix approach
@@ -155,6 +160,7 @@ open -a Terminal
 ```
 
 **Once in a working terminal:**
+
 1. Follow "Step 1: Restart Nix Daemon"
 2. Follow "Step 2: Apply System Configuration"
 3. Follow "Step 3: Verify iTerm2 Installation"
@@ -181,6 +187,7 @@ sudo /nix/store/56rzl70zs58bj33hy35gi30gg3hf1m9z-darwin-system-26.05.5fb45ec/act
 **Note:** Generation 205 is from Dec 19, generation 206 is current (from Dec 21).
 
 **Check Generations:**
+
 ```bash
 # List all generations (if available)
 ls -la /nix/var/nix/profiles/system-*-link
@@ -193,6 +200,7 @@ ls -la /nix/var/nix/profiles/system-*-link
 ### Issue: "just switch" Fails Silently
 
 **Symptoms:**
+
 - Command runs but produces no output
 - No error messages
 - Builds appear to start but never finish
@@ -203,17 +211,20 @@ Build might be stuck or waiting for input.
 **Solutions:**
 
 1. **Check if process is running:**
+
    ```bash
    ps aux | grep -E "(nix build|darwin-rebuild)" | grep -v grep
    ```
 
 2. **Check build logs:**
+
    ```bash
    # In another terminal, monitor Nix logs
    log show --predicate 'eventMessage contains "nix"' --last 5m
    ```
 
 3. **Try with verbose output:**
+
    ```bash
    sudo /run/current-system/sw/bin/darwin-rebuild switch \
      --flake ./ \
@@ -222,6 +233,7 @@ Build might be stuck or waiting for input.
    ```
 
 4. **Kill stuck processes and retry:**
+
    ```bash
    # Kill any stuck Nix processes
    pkill -9 -f "nix build"
@@ -236,6 +248,7 @@ Build might be stuck or waiting for input.
 ### Issue: Sandbox Path Errors
 
 **Symptoms:**
+
 - Error: "getting attributes of required path '/usr/lib': No such file or directory"
 - Error: "getting attributes of required path '/usr/include': No such file or directory"
 
@@ -246,9 +259,11 @@ Sandbox paths not applied yet.
 
 1. **Restart Nix daemon** (see Step 1 above)
 2. **Verify sandbox configuration:**
+
    ```bash
    nix show-config | grep sandbox-paths
    ```
+
    Should show all paths we added.
 
 3. **Check if you're a trusted user:**
@@ -262,6 +277,7 @@ Sandbox paths not applied yet.
 ### Issue: Build Takes Too Long
 
 **Symptoms:**
+
 - Build running for >30 minutes
 - No progress visible
 
@@ -271,12 +287,14 @@ Network download or large package compilation.
 **Solutions:**
 
 1. **Check if it's downloading:**
+
    ```bash
    # Monitor network usage
    nettop
    ```
 
 2. **Check Nix build queue:**
+
    ```bash
    nix-store --query --references /nix/var/nix/profiles/system
    ```
@@ -370,6 +388,7 @@ Network download or large package compilation.
    - `docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md` (sandbox config)
 
 2. **Check Git History:**
+
    ```bash
    # See recent commits
    git log --oneline -10
@@ -380,6 +399,7 @@ Network download or large package compilation.
    ```
 
 3. **Rollback to Working State:**
+
    ```bash
    # Rollback to Dec 19 generation
    just rollback

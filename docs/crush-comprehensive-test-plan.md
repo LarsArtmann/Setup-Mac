@@ -26,6 +26,7 @@ This document provides a comprehensive test plan for the crush-patched automatio
 **Test**: Verify automatic version detection from GitHub
 
 **Steps**:
+
 ```bash
 # Run version detection logic
 LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname \
@@ -48,6 +49,7 @@ echo "Latest version: $LATEST_VERSION"
 **Test**: Verify version comparison logic
 
 **Steps**:
+
 ```bash
 # Test 1: Same version
 CURRENT="v0.39.1"
@@ -76,6 +78,7 @@ LATEST="v0.39.1"
 **Test**: Verify source hash prefetch
 
 **Steps**:
+
 ```bash
 # Test with known valid version
 SOURCE_URL="https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.1.tar.gz"
@@ -97,6 +100,7 @@ echo "Hash: $SOURCE_HASH"
 **Test**: Verify sed patterns update Nix file correctly
 
 **Steps**:
+
 ```bash
 # Create test file with exact formatting
 cat > /tmp/test-nix-unit.nix <<'TESTNIX'
@@ -142,6 +146,7 @@ rm -f /tmp/test-nix-unit.nix*
 **Test**: Verify backup file is created correctly
 
 **Steps**:
+
 ```bash
 # Create test file
 TEST_FILE="/tmp/test-backup-unit.txt"
@@ -172,6 +177,7 @@ rm -f "$TEST_FILE" "$BACKUP_FILE"
 **Test**: Verify backup restoration works
 
 **Steps**:
+
 ```bash
 # Create test file
 TEST_FILE="/tmp/test-restore.txt"
@@ -207,10 +213,12 @@ rm -f "$TEST_FILE" "$BACKUP_FILE"
 **Test**: Verify workflow when already at latest version
 
 **Prerequisites**:
+
 - Current version: v0.39.1
 - Latest version: v0.39.1
 
 **Steps**:
+
 ```bash
 # Run update script
 ./pkgs/update-crush-patched.sh
@@ -233,11 +241,13 @@ ls pkgs/crush-patched.nix.backup-* 2>/dev/null && echo "No backup: ❌ FAIL" || 
 **Test**: Verify complete update workflow when newer version available
 
 **Prerequisites**:
+
 - Disk space available (>20GB)
 - Current version: v0.39.1
 - Latest version: v0.39.3
 
 **Steps**:
+
 ```bash
 # 1. Backup current state
 cp pkgs/crush-patched.nix pkgs/crush-patched.nix.pre-test
@@ -272,9 +282,11 @@ rm -f pkgs/crush-patched.nix.backup-*
 **Test**: Verify rollback mechanism when build fails
 
 **Prerequisites**:
+
 - Intentionally break build (e.g., invalid patch)
 
 **Steps**:
+
 ```bash
 # 1. Backup current working state
 cp pkgs/crush-patched.nix pkgs/crush-patched.nix.pre-fail-test
@@ -306,6 +318,7 @@ rm -f pkgs/crush-patched.nix.bak pkgs/crush-patched.nix.pre-fail-test
 **Test**: Verify `just update` command runs crush-patched update
 
 **Steps**:
+
 ```bash
 # Run just update (includes crush-patched update)
 just update
@@ -327,6 +340,7 @@ grep 'version = "v0.39.1"' pkgs/crush-patched.nix && echo "Version: ✅ PASS" ||
 **Test**: Verify handling of network failure
 
 **Steps**:
+
 ```bash
 # Test with invalid URL
 LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname \
@@ -348,6 +362,7 @@ LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname \
 **Test**: Verify rejection of invalid version strings
 
 **Steps**:
+
 ```bash
 # Test various invalid formats
 for VERSION in "invalid" "0.39.1" "v0.39" "v0.39.1.2"; do
@@ -370,6 +385,7 @@ done
 **Test**: Verify handling of version that doesn't exist
 
 **Steps**:
+
 ```bash
 # Try to fetch non-existent version
 SOURCE_URL="https://github.com/charmbracelet/crush/archive/refs/tags/v0.99.99.tar.gz"
@@ -390,6 +406,7 @@ SOURCE_HASH=$(nix-prefetch-url --type sha256 "$SOURCE_URL" 2>&1)
 **Test**: Verify handling of malformed Nix file
 
 **Steps**:
+
 ```bash
 # 1. Backup original
 cp pkgs/crush-patched.nix pkgs/crush-patched.nix.backup-corrupt-test
@@ -419,6 +436,7 @@ rm -f pkgs/crush-patched.nix.backup-corrupt-test
 **Test**: Verify handling when vendorHash cannot be extracted
 
 **Steps**:
+
 ```bash
 # 1. Backup
 cp pkgs/crush-patched.nix pkgs/crush-patched.nix.backup-vendorhash-test
@@ -443,6 +461,7 @@ rm -f pkgs/crush-patched.nix.backup-vendorhash-test
 **Test**: Verify handling of multiple simultaneous updates
 
 **Steps**:
+
 ```bash
 # Run two updates simultaneously
 ./pkgs/update-crush-patched.sh v0.39.3 &
@@ -473,6 +492,7 @@ EXIT2=$?
 **Test**: Ensure v0.39.1 continues to work after any changes
 
 **Steps**:
+
 ```bash
 # Ensure version is v0.39.1
 sed -i.bak 's|version = ".*"|version = "v0.39.1"|' pkgs/crush-patched.nix
@@ -496,6 +516,7 @@ result/bin/crush --version | grep "v0.39.1" && echo "v0.39.1 version: ✅ PASS" 
 **Test**: Verify backup files cleaned up on success
 
 **Steps**:
+
 ```bash
 # Run successful update (e.g., to same version)
 ./pkgs/update-crush-patched.sh
@@ -515,6 +536,7 @@ ls pkgs/crush-patched.nix.backup-* 2>/dev/null && echo "Cleanup: ❌ FAIL (files
 **Test**: Ensure Nix flake configuration is valid
 
 **Steps**:
+
 ```bash
 nix flake check --no-build && echo "Flake check: ✅ PASS" || echo "Flake check: ❌ FAIL"
 ```
@@ -532,6 +554,7 @@ nix flake check --no-build && echo "Flake check: ✅ PASS" || echo "Flake check:
 **Test**: Measure version detection time
 
 **Steps**:
+
 ```bash
 time LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname \
   https://github.com/charmbracelet/crush.git \
@@ -551,6 +574,7 @@ echo "Version: $LATEST_VERSION"
 **Test**: Measure source download time
 
 **Steps**:
+
 ```bash
 time SOURCE_HASH=$(nix-prefetch-url --type sha256 \
   https://github.com/charmbracelet/crush/archive/refs/tags/v0.39.1.tar.gz)
@@ -569,15 +593,18 @@ echo "Hash: $SOURCE_HASH"
 **Test**: Measure complete update time
 
 **Prerequisites**:
+
 - Disk space available
 - v0.39.1 → v0.39.3 upgrade
 
 **Steps**:
+
 ```bash
 time ./pkgs/update-crush-patched.sh
 ```
 
 **Expected**:
+
 - Version detection: < 5s
 - Source download: < 30s
 - First build: < 10 min
@@ -593,21 +620,21 @@ time ./pkgs/update-crush-patched.sh
 
 ### Completed Tests (✅)
 
-| Test ID | Name | Status | Date |
-|---------|------|--------|------|
-| UT-1 | Version Detection | ✅ PASS | 2026-02-06 |
-| UT-2 | Version Comparison | ✅ PASS | 2026-02-06 |
-| UT-3 | Source Hash Calculation | ✅ PASS | 2026-02-06 |
-| UT-4 | Sed Pattern Matching | ✅ PASS | 2026-02-06 |
-| UT-5 | Backup File Creation | ✅ PASS | 2026-02-06 |
-| UT-6 | Backup Restoration | ✅ PASS | 2026-02-06 |
-| IT-4 | Just Update Command | ✅ PASS | 2026-02-06 |
-| EC-1 | Network Failure | ✅ PASS | 2026-02-06 |
-| EC-2 | Invalid Version Format | ✅ PASS | 2026-02-06 |
-| EC-3 | Non-Existent Version | ✅ PASS | 2026-02-06 |
-| RT-3 | Flake Check | ✅ PASS | 2026-02-06 |
-| PT-1 | Version Detection Speed | ✅ PASS | 2026-02-06 |
-| PT-2 | Source Download Speed | ✅ PASS | 2026-02-06 |
+| Test ID | Name                    | Status  | Date       |
+| ------- | ----------------------- | ------- | ---------- |
+| UT-1    | Version Detection       | ✅ PASS | 2026-02-06 |
+| UT-2    | Version Comparison      | ✅ PASS | 2026-02-06 |
+| UT-3    | Source Hash Calculation | ✅ PASS | 2026-02-06 |
+| UT-4    | Sed Pattern Matching    | ✅ PASS | 2026-02-06 |
+| UT-5    | Backup File Creation    | ✅ PASS | 2026-02-06 |
+| UT-6    | Backup Restoration      | ✅ PASS | 2026-02-06 |
+| IT-4    | Just Update Command     | ✅ PASS | 2026-02-06 |
+| EC-1    | Network Failure         | ✅ PASS | 2026-02-06 |
+| EC-2    | Invalid Version Format  | ✅ PASS | 2026-02-06 |
+| EC-3    | Non-Existent Version    | ✅ PASS | 2026-02-06 |
+| RT-3    | Flake Check             | ✅ PASS | 2026-02-06 |
+| PT-1    | Version Detection Speed | ✅ PASS | 2026-02-06 |
+| PT-2    | Source Download Speed   | ✅ PASS | 2026-02-06 |
 
 **Total Completed**: 13 tests
 
@@ -615,17 +642,17 @@ time ./pkgs/update-crush-patched.sh
 
 ### Pending Tests (⏸️)
 
-| Test ID | Name | Status | Blocking |
-|---------|------|--------|----------|
-| IT-1 | Full Update (same version) | ⏸️ PENDING | None |
-| IT-2 | Full Update (v0.39.1 → v0.39.3) | ⏸️ PENDING | Disk space + vendor fix |
-| IT-3 | Rollback on Build Failure | ⏸️ PENDING | Execution |
-| EC-4 | Corrupt Nix File | ⏸️ PENDING | Execution |
-| EC-5 | VendorHash Extraction Failure | ⏸️ PENDING | Custom build mocking |
-| EC-6 | Concurrent Update Attempts | ⏸️ PENDING | Execution |
-| RT-1 | v0.39.1 Still Builds | ⏸️ PENDING | Disk space |
-| RT-2 | Backup Files Cleanup | ⏸️ PENDING | Execution |
-| PT-3 | Full Update Time | ⏸️ PENDING | Disk space + vendor fix |
+| Test ID | Name                            | Status     | Blocking                |
+| ------- | ------------------------------- | ---------- | ----------------------- |
+| IT-1    | Full Update (same version)      | ⏸️ PENDING | None                    |
+| IT-2    | Full Update (v0.39.1 → v0.39.3) | ⏸️ PENDING | Disk space + vendor fix |
+| IT-3    | Rollback on Build Failure       | ⏸️ PENDING | Execution               |
+| EC-4    | Corrupt Nix File                | ⏸️ PENDING | Execution               |
+| EC-5    | VendorHash Extraction Failure   | ⏸️ PENDING | Custom build mocking    |
+| EC-6    | Concurrent Update Attempts      | ⏸️ PENDING | Execution               |
+| RT-1    | v0.39.1 Still Builds            | ⏸️ PENDING | Disk space              |
+| RT-2    | Backup Files Cleanup            | ⏸️ PENDING | Execution               |
+| PT-3    | Full Update Time                | ⏸️ PENDING | Disk space + vendor fix |
 
 **Total Pending**: 9 tests
 
@@ -634,12 +661,14 @@ time ./pkgs/update-crush-patched.sh
 ## 🎯 Test Execution Priority
 
 ### High Priority (Can Run Now)
+
 1. ✅ UT-1 through UT-6 - Unit tests
 2. ✅ EC-1 through EC-3 - Basic edge cases
 3. ✅ RT-3 - Flake check
 4. ✅ PT-1, PT-2 - Performance tests
 
 ### Medium Priority (Requires Safe Execution)
+
 1. IT-1 - Same version update
 2. IT-3 - Rollback test
 3. EC-4 - Corrupt file test
@@ -647,6 +676,7 @@ time ./pkgs/update-crush-patched.sh
 5. RT-2 - Backup cleanup
 
 ### Low Priority (Requires External Conditions)
+
 1. IT-2 - Full upgrade (needs disk space + vendor fix)
 2. RT-1 - v0.39.1 build (needs disk space)
 3. PT-3 - Full update time (needs disk space + vendor fix)
@@ -657,6 +687,7 @@ time ./pkgs/update-crush-patched.sh
 ## 📝 Test Automation
 
 ### Run All High Priority Tests
+
 ```bash
 # Run unit tests
 ./tests/run-unit-tests.sh
@@ -669,6 +700,7 @@ time ./pkgs/update-crush-patched.sh
 ```
 
 ### Run Specific Test Category
+
 ```bash
 # Run only unit tests
 ./tests/run-unit-tests.sh
@@ -681,6 +713,7 @@ time ./pkgs/update-crush-patched.sh
 ```
 
 ### Generate Test Report
+
 ```bash
 ./tests/generate-test-report.sh
 ```
@@ -690,7 +723,9 @@ time ./pkgs/update-crush-patched.sh
 ## 🚨 Known Limitations
 
 ### Disk Space Constraints
+
 Several tests cannot be run due to disk space limitations:
+
 - IT-2: Full upgrade requires ~20GB
 - RT-1: v0.39.1 build requires ~5GB
 - PT-3: Full update requires ~20GB
@@ -698,14 +733,18 @@ Several tests cannot be run due to disk space limitations:
 **Workaround**: Free disk space first with `just clean-aggressive`
 
 ### Vendor Directory Issues
+
 Tests involving v0.39.3 build are blocked:
+
 - IT-2: v0.39.3 has broken vendor directory
 - PT-3: Same issue
 
 **Workaround**: Wait for upstream fix or use vendor-free strategy
 
 ### Build Mocking
+
 Some tests require custom build mocking:
+
 - EC-5: VendorHash extraction failure
 
 **Workaround**: Manually create mock build scenarios
@@ -725,10 +764,12 @@ Some tests require custom build mocking:
 ## ✅ Conclusion
 
 **Current Status**:
+
 - ✅ 13/22 tests completed (59%)
 - ⏸️ 9/22 tests pending (41%)
 
 **Test Coverage**:
+
 - Unit tests: 100% complete
 - Integration tests: 25% complete (IT-4 done, IT-1/2/3 pending)
 - Edge cases: 50% complete (EC-1/2/3 done, EC-4/5/6 pending)
@@ -736,6 +777,7 @@ Some tests require custom build mocking:
 - Performance tests: 67% complete (PT-1/2 done, PT-3 pending)
 
 **Next Steps**:
+
 1. Execute pending tests when disk space available
 2. Resolve vendor directory issue (wait for upstream fix or use vendor-free)
 3. Create automated test runner

@@ -9,6 +9,7 @@
 ## Executive Summary
 
 Technitium DNS Server is **already configured** in your Setup-Mac repository with:
+
 - ✅ Local DNS server for evo-x2 (`platforms/nixos/system/dns-config.nix`)
 - ✅ Private cloud DNS configuration (`platforms/nixos/private-cloud/dns.nix`)
 - ✅ Comprehensive documentation (`platforms/nixos/system/dns.md`)
@@ -24,6 +25,7 @@ Technitium DNS Server is **already configured** in your Setup-Mac repository wit
 ### What's Already Implemented
 
 **1. NixOS Laptop (evo-x2) - Local DNS**
+
 ```nix
 # platforms/nixos/system/dns-config.nix
 services.technitium-dns-server = {
@@ -35,12 +37,14 @@ networking.nameservers = ["127.0.0.1"];
 
 **Status:** ✅ **ENABLED** - Ready for deployment
 **Features:**
+
 - Local DNS caching
 - Ad blocking (via blocklists)
 - Web console at http://localhost:5380
 - System DNS configured to use local server
 
 **2. Private Cloud - Network-Wide DNS**
+
 ```nix
 # platforms/nixos/private-cloud/dns.nix
 services.technitium-dns-server = {
@@ -53,12 +57,14 @@ services.technitium-dns-server = {
 
 **Status:** ✅ **READY** - Configuration complete, awaiting deployment
 **Features:**
+
 - Network-wide DNS service
 - DoH/DoT support (ports 443/853)
 - Web console accessible from network
 - Ready for router DHCP configuration
 
 **3. Documentation**
+
 - ✅ `dns.md` - Comprehensive setup guide (323 lines)
 - ✅ `TECHNITIUM-DNS-EVALUATION.md` - 771-line analysis
 - ✅ `TECHNITIUM-DNS-MIGRATION-GUIDE.md` - Step-by-step migration
@@ -71,11 +77,13 @@ services.technitium-dns-server = {
 ### Approach 1: NixOS Module Only (Current Approach)
 
 **How it works:**
+
 - Use NixOS module to enable Technitium DNS
 - Configure via web console at http://localhost:5380
 - Settings stored in `/var/lib/technitium-dns-server/`
 
 **Pros:**
+
 - ✅ Simple and straightforward
 - ✅ Native NixOS integration
 - ✅ Automatic service management (systemd)
@@ -84,6 +92,7 @@ services.technitium-dns-server = {
 - ✅ Web UI is user-friendly
 
 **Cons:**
+
 - ❌ Not fully declarative (web console config not in Nix)
 - ❌ Manual setup required after deployment
 - ❌ Configuration not tracked in git
@@ -91,6 +100,7 @@ services.technitium-dns-server = {
 - ❌ Requires manual intervention for config changes
 
 **Best for:**
+
 - Personal/homelab use
 - Small deployments (< 10 devices)
 - Quick deployment with minimal automation
@@ -100,11 +110,13 @@ services.technitium-dns-server = {
 ### Approach 2: NixOS Module + HTTP API Automation (Recommended Enhancement)
 
 **How it works:**
+
 - Use NixOS module for service deployment
 - Use Technitium HTTP API for configuration
 - Create NixOS module to apply config via API on startup
 
 **Example Implementation:**
+
 ```nix
 { config, pkgs, ... }:
 let
@@ -154,6 +166,7 @@ in
 ```
 
 **Pros:**
+
 - ✅ Declarative configuration (in Nix)
 - ✅ Version-controlled DNS settings
 - ✅ Automated setup (no manual web console)
@@ -162,6 +175,7 @@ in
 - ✅ Integrates with NixOS workflow
 
 **Cons:**
+
 - ❌ Requires API token management
 - ❌ More complex setup
 - ❌ Depends on API stability
@@ -169,6 +183,7 @@ in
 - ❌ Need to manage secrets (API tokens)
 
 **Best for:**
+
 - Production deployments
 - Multiple servers
 - Teams with version control requirements
@@ -179,11 +194,13 @@ in
 ### Approach 3: NixOS Module + Config File Management (Advanced)
 
 **How it works:**
+
 - Generate Technitium config files from Nix
 - Mount config files into state directory
 - Apply config on service start
 
 **Example Implementation:**
+
 ```nix
 { config, pkgs, lib, ... }:
 let
@@ -229,6 +246,7 @@ in
 ```
 
 **Pros:**
+
 - ✅ Fully declarative
 - ✅ No API dependencies
 - ✅ Direct file control
@@ -236,6 +254,7 @@ in
 - ✅ Reproducible
 
 **Cons:**
+
 - ❌ Complex XML config (error-prone)
 - ❌ Requires understanding internal config format
 - ❌ May break with software updates
@@ -243,6 +262,7 @@ in
 - ❌ Difficult to troubleshoot
 
 **Best for:**
+
 - Users comfortable with XML
 - Single-server deployments
 - Simple configurations
@@ -252,12 +272,14 @@ in
 ### Approach 4: NixOS Module + Secrets Management (Most Secure)
 
 **How it works:**
+
 - Use NixOS module for deployment
 - Use sops-nix for secrets (API tokens, passwords)
 - Use HTTP API for configuration
 - Store sensitive data securely
 
 **Example Implementation:**
+
 ```nix
 { config, pkgs, ... }:
 {
@@ -298,6 +320,7 @@ in
 ```
 
 **Pros:**
+
 - ✅ Secure secrets management
 - ✅ Declarative configuration
 - ✅ Git-compatible (secrets encrypted)
@@ -305,12 +328,14 @@ in
 - ✅ Production-ready security
 
 **Cons:**
+
 - ❌ Complex setup (sops-nix integration)
 - ❌ Requires GPG/AGE key management
 - ❌ Higher learning curve
 - ❌ More dependencies
 
 **Best for:**
+
 - Production environments
 - Teams with security requirements
 - Multi-server deployments
@@ -325,24 +350,28 @@ in
 **Recommendation: Hybrid Approach - Start Simple, Evolve to Automation**
 
 #### Phase 1: Current Approach (Immediate - This Week)
+
 - Use existing NixOS module + web console
 - Focus on getting DNS working
 - Document all configuration steps
 - **Estimated time:** 1-2 hours
 
 #### Phase 2: Justfile Automation (Next Week)
+
 - Create just commands for common tasks
 - Automate backup/restore
 - Add health check commands
 - **Estimated time:** 2-3 hours
 
 #### Phase 3: HTTP API Automation (Month 2)
+
 - Create API configuration scripts
 - Add to NixOS systemd services
 - Test automation thoroughly
 - **Estimated time:** 4-6 hours
 
 #### Phase 4: Secrets Management (Month 3 - Optional)
+
 - Integrate sops-nix
 - Encrypt API tokens and passwords
 - Git-secrets integration
@@ -355,6 +384,7 @@ in
 ### Recommendation 1: Keep Current Approach (For Now)
 
 **Rationale:**
+
 - ✅ Configuration already exists and works
 - ✅ Web console is user-friendly
 - ✅ Simple and maintainable
@@ -362,12 +392,14 @@ in
 - ✅ Documentation is comprehensive
 
 **When to Use:**
+
 - Personal use (evo-x2 laptop)
 - Learning/testing phase
 - Homelab experimentation
 - Small network (< 5 devices)
 
 **Enhancements to Add:**
+
 ```nix
 # platforms/nixos/system/dns-config.nix (ENHANCED)
 { config, pkgs, ... }:
@@ -424,12 +456,14 @@ in
 ### Recommendation 2: HTTP API Automation (For Production)
 
 **Rationale:**
+
 - ✅ Declarative configuration
 - ✅ Version-controlled
 - ✅ Automated deployment
 - ✅ Reproducible
 
 **When to Use:**
+
 - Production deployments (private cloud)
 - Multiple servers
 - Team collaboration
@@ -438,6 +472,7 @@ in
 **Implementation Plan:**
 
 **Step 1: Create API Configuration Module**
+
 ```nix
 # platforms/nixos/modules/technitium-dns-api.nix (NEW FILE)
 { config, lib, pkgs, ... }:
@@ -588,6 +623,7 @@ in
 ```
 
 **Step 2: Use API Module in Configuration**
+
 ```nix
 # platforms/nixos/system/dns-config.nix (UPDATED)
 { config, pkgs, ... }:
@@ -633,6 +669,7 @@ in
 ```
 
 **Step 3: Create Secret with sops-nix**
+
 ```yaml
 # secrets/technitium-secrets.yaml
 api_token: "ENC[AES256_GCM,data:...,tag:...,iv:...,...]"
@@ -650,6 +687,7 @@ sops -e --input-type yaml secrets/technitium-secrets.yaml > secrets/technitium-s
 ### Enhancement 1: Automated Backups
 
 **Add to configuration:**
+
 ```nix
 # Automated daily backups
 systemd.timers.technitium-dns-backup = {
@@ -678,6 +716,7 @@ systemd.services.technitium-dns-backup = {
 ### Enhancement 2: Monitoring Integration
 
 **Add Prometheus exporter:**
+
 ```nix
 services.prometheus.exporters = {
   node = { enable = true; };
@@ -699,6 +738,7 @@ systemd.services.technitium-dns-metrics = {
 ### Enhancement 3: Justfile Commands
 
 **Add to justfile:**
+
 ```makefile
 # DNS Management
 dns-console:
@@ -735,6 +775,7 @@ dns-health:
 ### Best Practices
 
 **1. Web Console Access**
+
 - Keep firewall closed for web console (localhost only)
 - Use reverse proxy with authentication for remote access
 - Enable HTTPS (port 53443) if remote access needed
@@ -742,18 +783,21 @@ dns-health:
 - Enable TOTP 2FA
 
 **2. API Security**
+
 - Use encrypted secrets (sops-nix)
 - Rotate API tokens regularly
 - Restrict API access to localhost
 - Use TLS for API calls
 
 **3. Network Security**
+
 - Use DNS-over-TLS/HTTPS for forwarders
 - Enable DNSSEC validation
 - Block malicious domains via blocklists
 - Monitor query logs for suspicious activity
 
 **4. Service Hardening**
+
 - NixOS module already includes:
   - Dynamic user (no root)
   - Private devices, mounts, tmp
@@ -765,12 +809,12 @@ dns-health:
 
 ## Comparison Summary
 
-| Approach | Declarative | Automation | Security | Complexity | Best For |
-|----------|-------------|------------|-----------|------------|----------|
-| **NixOS Module Only** | ❌ | ❌ | ⭐⭐⭐ | ⭐ (Low) | Personal use, homelab |
-| **NixOS + HTTP API** | ✅ | ✅ | ⭐⭐⭐ | ⭐⭐⭐ (Medium) | Production, teams |
-| **NixOS + Config Files** | ✅ | ⭐ | ⭐⭐ | ⭐⭐⭐⭐ (High) | Advanced users |
-| **NixOS + Secrets** | ✅ | ✅ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ (Very High) | Enterprise, security |
+| Approach                 | Declarative | Automation | Security   | Complexity             | Best For              |
+| ------------------------ | ----------- | ---------- | ---------- | ---------------------- | --------------------- |
+| **NixOS Module Only**    | ❌          | ❌         | ⭐⭐⭐     | ⭐ (Low)               | Personal use, homelab |
+| **NixOS + HTTP API**     | ✅          | ✅         | ⭐⭐⭐     | ⭐⭐⭐ (Medium)        | Production, teams     |
+| **NixOS + Config Files** | ✅          | ⭐         | ⭐⭐       | ⭐⭐⭐⭐ (High)        | Advanced users        |
+| **NixOS + Secrets**      | ✅          | ✅         | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ (Very High) | Enterprise, security  |
 
 ---
 
@@ -794,6 +838,7 @@ dns-health:
 ```
 
 **Why:**
+
 - Simple and maintainable
 - Personal use (1 user)
 - Web console is sufficient
@@ -822,6 +867,7 @@ dns-health:
 ```
 
 **Why:**
+
 - Network-wide service (affects multiple devices)
 - Production environment
 - Version control important
@@ -832,22 +878,26 @@ dns-health:
 ## Implementation Timeline
 
 ### Week 1 (Immediate)
+
 - ✅ Deploy on evo-x2 (current approach)
 - ✅ Test and verify
 - ✅ Add just commands (already done)
 - ✅ Create backup automation
 
 ### Week 2
+
 - Deploy on private cloud (current approach)
 - Test with network devices
 - Monitor performance
 
 ### Month 2
+
 - Create HTTP API automation module
 - Test API configuration
 - Document API approach
 
 ### Month 3 (Optional)
+
 - Integrate sops-nix for secrets
 - Add monitoring integration
 - Optimize configuration
@@ -857,10 +907,12 @@ dns-health:
 ## Files to Create/Modify
 
 ### New Files (HTTP API Approach)
+
 1. `platforms/nixos/modules/technitium-dns-api.nix` - API configuration module
 2. `secrets/technitium-secrets.yaml` - Encrypted secrets
 
 ### Modified Files
+
 1. `platforms/nixos/system/dns-config.nix` - Add backup automation
 2. `platforms/nixos/private-cloud/dns.nix` - Import API module
 3. `justfile` - Add DNS management commands (already done)
@@ -878,11 +930,13 @@ For **production deployments** (private cloud), consider adding HTTP API automat
 ---
 
 **Questions?**
+
 - Which approach should we start with?
 - Do you want to implement HTTP API automation now or later?
 - Should we focus on deployment first, then add automation?
 
 **Next Steps:**
+
 1. Deploy on evo-x2 (current approach) - 1-2 hours
 2. Test and verify - 30 minutes
 3. Plan private cloud deployment - 30 minutes

@@ -96,15 +96,15 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 
 ### Key Architectural Differences
 
-| Aspect | Qubes OS | NixOS |
-|--------|----------|-------|
-| **Hypervisor** | Xen (Type-1, microkernel) | KVM (Type-2, kernel module) |
-| **Isolation** | Hardware-level, Xen domains | Kernel-level, namespaces |
-| **dom0** | Minimal, no networking | Full-featured, networking enabled |
-| **VM Management** | qrexec, custom protocols | libvirt, systemd services |
-| **GUI** | Cross-VM virtualization | Standard X11/Wayland |
-| **Configuration** | Imperative tools | Declarative Nix expressions |
-| **Package Mgmt** | Template-based + RPM | Declarative Nix store |
+| Aspect            | Qubes OS                    | NixOS                             |
+| ----------------- | --------------------------- | --------------------------------- |
+| **Hypervisor**    | Xen (Type-1, microkernel)   | KVM (Type-2, kernel module)       |
+| **Isolation**     | Hardware-level, Xen domains | Kernel-level, namespaces          |
+| **dom0**          | Minimal, no networking      | Full-featured, networking enabled |
+| **VM Management** | qrexec, custom protocols    | libvirt, systemd services         |
+| **GUI**           | Cross-VM virtualization     | Standard X11/Wayland              |
+| **Configuration** | Imperative tools            | Declarative Nix expressions       |
+| **Package Mgmt**  | Template-based + RPM        | Declarative Nix store             |
 
 ---
 
@@ -130,11 +130,13 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ### Critical Limitation: UEFI Boot
 
 🚨 **BLOCKER:** NixOS Xen does **not support UEFI boot**
+
 - GitHub Issue: #127404
 - Restriction: `config.boot.loader.grub.efiSupport == false`
 - Impact: Modern systems (2015+) default to UEFI
 
 **Workarounds:**
+
 1. Legacy BIOS boot mode (may require BIOS settings change)
 2. Wait for upstream fix (active issue, no timeline)
 3. Use KVM/libvirt instead (loses Xen-specific features)
@@ -161,9 +163,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ### High-Priority Components (Security-Critical)
 
 #### 1. **qrexec Inter-VM Communication Framework**
+
 **Status:** ❌ Does not exist in NixOS
 **Complexity:** High (8/10)
 **Components:**
+
 - vchan-based communication library (Xen-specific)
 - qrexec-daemon (dom0 listener)
 - qrexec-agent (VM connector)
@@ -176,9 +180,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 2. **GUI Virtualization System**
+
 **Status:** ❌ Does not exist in NixOS
 **Complexity:** Very High (9/10)
 **Components:**
+
 - qubes-gui (VM-side window composer)
 - qubes-guid (dom0 window manager)
 - Custom X drivers: `dummyqsb_drv`, `qubes_drv`
@@ -192,9 +198,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 3. **Security Policy Management**
+
 **Status:** ❌ Does not exist in NixOS
 **Complexity:** Medium (6/10)
 **Components:**
+
 - Policy database (`/etc/qubes/policy.d/`)
 - Rule evaluation engine with hierarchical override
 - VM specification (tags, types, targets)
@@ -207,9 +215,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 4. **Agent System**
+
 **Status:** ❌ Does not exist in NixOS
 **Complexity:** Medium-High (7/10)
 **Components:**
+
 - qubes-core-agent-linux (base integration)
 - Service-specific agents (networking, updates, file operations)
 - RPC service implementations (`/etc/qubes-rpc/`)
@@ -223,9 +233,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ### Medium-Priority Components
 
 #### 5. **Template System**
+
 **Status:** ⚠️ Partially possible via Nix modules
 **Complexity:** Medium (5/10)
 **Required Features:**
+
 - Read-only root filesystem sharing
 - Template-based AppVM creation
 - DisposableVM templates
@@ -236,9 +248,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 6. **Disposable VM Management**
+
 **Status:** ⚠️ Partially possible via microvm.nix
 **Complexity:** Medium (5/10)
 **Required Features:**
+
 - Stateless VM creation
 - Unnamed disposables (auto-shutdown)
 - Named disposables (manual shutdown)
@@ -249,9 +263,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 7. **ServiceVM Framework**
+
 **Status:** ⚠️ Partially possible via containers/VMs
 **Complexity:** Low-Medium (4/10)
 **Required Features:**
+
 - sys-net, sys-usb, sys-firewall templates
 - Named disposable service VMs
 - Device assignment (PCI passthrough)
@@ -264,9 +280,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ### Low-Priority Components
 
 #### 8. **USB Device Sandboxing**
+
 **Status:** ✅ Possible with libvirt + IOMMU
 **Complexity:** Medium (5/10)
 **Required Features:**
+
 - USB controller passthrough
 - Device hotplug handling
 - ServiceVM-based isolation
@@ -276,9 +294,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 9. **Networking Proxy System**
+
 **Status:** ⚠️ Partially possible via iptables/nftables
 **Complexity:** Medium (5/10)
 **Required Features:**
+
 - VM-specific firewall rules
 - Network policy enforcement
 - Whonix integration
@@ -288,9 +308,11 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 ---
 
 #### 10. **GUI Security Markers**
+
 **Status:** ⚠️ Partially possible with compositor
 **Complexity:** Low-Medium (3/10)
 **Required Features:**
+
 - Colored window borders by VM
 - VM name prefix in window titles
 - Spoofing prevention
@@ -303,24 +325,25 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 
 ### Feasibility Matrix
 
-| Component | NixOS Capability | Gap | Complexity | Timeline |
-|-----------|------------------|-----|------------|----------|
-| Xen Hypervisor | ✅ Supported | None | Low | N/A |
-| UEFI Boot Support | ❌ Blocked | Critical | High | Unknown |
-| qrexec Framework | ❌ None | Complete | High | 6-12mo |
-| GUI Virtualization | ❌ None | Complete | Very High | 12-24mo |
-| Security Policy | ❌ None | Complete | Medium | 4-8mo |
-| Agent System | ❌ None | Complete | Medium-High | 6-10mo |
-| Template System | ⚠️ Partial | Medium | Medium | 2-4mo |
-| DisposableVMs | ⚠️ Partial | Medium | Medium | 2-4mo |
-| ServiceVMs | ⚠️ Partial | Low | Low-Medium | 1-3mo |
-| USB Sandboxing | ✅ Possible | Minor | Medium | 1-2mo |
-| Network Proxy | ⚠️ Partial | Medium | Medium | 2-4mo |
-| GUI Markers | ⚠️ Partial | Low | Low | 1-2mo |
+| Component          | NixOS Capability | Gap      | Complexity  | Timeline |
+| ------------------ | ---------------- | -------- | ----------- | -------- |
+| Xen Hypervisor     | ✅ Supported     | None     | Low         | N/A      |
+| UEFI Boot Support  | ❌ Blocked       | Critical | High        | Unknown  |
+| qrexec Framework   | ❌ None          | Complete | High        | 6-12mo   |
+| GUI Virtualization | ❌ None          | Complete | Very High   | 12-24mo  |
+| Security Policy    | ❌ None          | Complete | Medium      | 4-8mo    |
+| Agent System       | ❌ None          | Complete | Medium-High | 6-10mo   |
+| Template System    | ⚠️ Partial       | Medium   | Medium      | 2-4mo    |
+| DisposableVMs      | ⚠️ Partial       | Medium   | Medium      | 2-4mo    |
+| ServiceVMs         | ⚠️ Partial       | Low      | Low-Medium  | 1-3mo    |
+| USB Sandboxing     | ✅ Possible      | Minor    | Medium      | 1-2mo    |
+| Network Proxy      | ⚠️ Partial       | Medium   | Medium      | 2-4mo    |
+| GUI Markers        | ⚠️ Partial       | Low      | Low         | 1-2mo    |
 
 ### Overall Feasibility: **Medium** (with caveats)
 
 **Reasons for Feasibility:**
+
 - NixOS supports Xen hypervisor (non-UEFI)
 - NixOS has strong declarative VM/container management
 - Microvm.nix provides lightweight VM foundation
@@ -328,6 +351,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 - Existing projects demonstrate integration is possible
 
 **Reasons Against Feasibility:**
+
 - UEFI boot blocker (critical for modern systems)
 - GUI virtualization is extremely complex (requires deep X11/Wayland knowledge)
 - qrexec framework must be ported from Xen to work with NixOS ecosystem
@@ -345,18 +369,21 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Team Size:** 5-10 developers with Xen/X11 expertise
 
 #### Phase 1: Foundation (Months 1-6)
+
 - **Fix UEFI boot support** for Xen on NixOS (BLOCKER)
 - **Implement declarative domU management** in NixOS
 - **Port qrexec framework** to NixOS (vchan + RPC)
 - **Create agent system** skeleton
 
 #### Phase 2: Core Components (Months 6-12)
+
 - **Build security policy engine**
 - **Implement template system** with Nix modules
 - **Create disposable VM management**
 - **Port GUI agents** from Qubes OS
 
 #### Phase 3: GUI Virtualization (Months 12-24)
+
 - **Implement qubes-gui** (VM-side compositor)
 - **Implement qubes-guid** (dom0 window manager)
 - **Port custom X drivers** (dummyqsb_drv, qubes_drv)
@@ -364,12 +391,14 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 - **Integrate with NixOS desktop** (GNOME/KDE)
 
 #### Phase 4: Integration (Months 24-30)
+
 - **Port ServiceVM framework**
 - **Implement USB sandboxing**
 - **Create networking proxy system**
 - **Add GUI security markers**
 
 #### Phase 5: Polish (Months 30-36)
+
 - **Performance optimization**
 - **Security audit**
 - **Documentation**
@@ -388,18 +417,21 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Team Size:** 2-3 developers
 
 #### Phase 1: Enhance Existing Template (Months 1-2)
+
 - **Fix proxy configuration** issues in evq/qubes-nixos-template
 - **Improve memory handling** (resolve Firefox crashes)
 - **Add more NixOS templates** (different configurations)
 - **Optimize package management** (better Nix integration)
 
 #### Phase 2: NixOS dom0 (Months 2-4)
+
 - **Replace Fedora dom0** with NixOS
 - **Implement qrexec daemon** in NixOS
 - **Create NixOS qubes-core-agent**
 - **Port security policies** to Nix expressions
 
 #### Phase 3: Enhanced Workflow (Months 4-6)
+
 - **Create declarative qube definitions**
   ```nix
   qubes = {
@@ -431,21 +463,25 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Team Size:** 3-5 developers
 
 #### Phase 1: Use KVM/libvirt Instead of Xen
+
 - **Leverage existing NixOS KVM support**
 - **Implement similar qube isolation** via libvirt
 - **No UEFI boot issues**
 
 #### Phase 2: Replace qrexec with Native IPC
+
 - **Use systemd socket activation**
 - **Implement secure IPC** over UNIX domain sockets + namespaces
 - **Create policy engine** using Nix expressions
 
 #### Phase 3: Replace GUI Virtualization
+
 - **Use Wayland compositor protocols**
 - **Implement window forwarding** via Pipewire + portals
 - **Add security markers** via compositor plugins
 
 #### Phase 4: Implement Qube Management
+
 - **Create NixOS modules** for qube definitions
 - **Use microvm.nix** for lightweight qubes
 - **Implement disposable qubes** via temporary VMs
@@ -463,6 +499,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Problem:** NixOS Xen does not support UEFI boot
 **Impact:** Blocks development on modern hardware (2015+)
 **Solutions:**
+
 1. **Wait for upstream fix** (unknown timeline)
 2. **Implement fix yourself** (requires bootloader expertise)
 3. **Use legacy BIOS mode** (may not work on all systems)
@@ -479,6 +516,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Problem:** Requires deep X11/Wayland integration
 **Impact:** 12-24 month development timeline
 **Solutions:**
+
 - Start with simpler approach (separate X servers per VM)
 - Gradually implement zero-copy rendering
 - Consider Wayland alternative (more modern, better security)
@@ -488,6 +526,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Problem:** qrexec uses Xen-specific vchan library
 **Impact:** Cannot use with KVM/libvirt
 **Solutions:**
+
 - Port vchan to work with KVM (very difficult)
 - Replace with native IPC (requires redesign)
 - Stick with Xen hypervisor (UEFI blocker)
@@ -497,6 +536,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Problem:** All components depend on each other
 **Impact:** Cannot build incrementally, requires full system
 **Solutions:**
+
 - Build simulation framework first
 - Mock dependent components during development
 - Parallelize development with careful interface definition
@@ -593,6 +633,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Recommended Approach:** **Roadmap B (Hybrid Integration)**
 
 **Why:**
+
 - **Leverages existing Qubes OS security model** (proven, battle-tested)
 - **Adds NixOS declarative configuration** (huge usability improvement)
 - **Minimal rebuild** (only templates and dom0)
@@ -600,6 +641,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 - **Faster time-to-value** (3-6 months)
 
 **Next Steps:**
+
 1. **Fork evq/qubes-nixos-template**
 2. **Fix known issues** (proxy, memory)
 3. **Add NixOS dom0** (replace Fedora)
@@ -613,6 +655,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 **Recommended Approach:** **Roadmap C (Alternative Architecture)**
 
 **Why:**
+
 - **Avoids UEFI boot blocker**
 - **Uses native NixOS technologies** (KVM/libvirt)
 - **Still provides strong isolation** (namespaces, containers, VMs)
@@ -620,6 +663,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 - **Faster than complete rebuild** (12-18 months)
 
 **Next Steps:**
+
 1. **Define qube management layer** in NixOS
 2. **Replace qrexec with systemd socket IPC**
 3. **Use Wayland compositor** for GUI forwarding
@@ -627,6 +671,7 @@ Rebuilding Qubes OS entirely in NixOS is **technically possible but highly compl
 5. **Build policy engine** with Nix expressions
 
 **Why NOT Roadmap A:**
+
 - **UEFI boot blocker** is critical for modern hardware
 - **GUI virtualization** is prohibitively complex (12-24 months)
 - **Tight coupling** makes incremental development impossible
@@ -694,6 +739,7 @@ xl create -c /etc/xen/test-vm.cfg
 ### Summary Answer to "What Would It Take?"
 
 **Complete Rebuild (Roadmap A):**
+
 - **5-10 developers** with Xen/X11 expertise
 - **18-36 months** of development
 - **$1.87M - $3.65M** budget
@@ -701,6 +747,7 @@ xl create -c /etc/xen/test-vm.cfg
 - **High risk** (UEFI blocker, GUI complexity)
 
 **Hybrid Integration (Roadmap B - Recommended):**
+
 - **2-3 developers** with NixOS expertise
 - **3-6 months** of development
 - **$300k - $750k** budget
@@ -708,6 +755,7 @@ xl create -c /etc/xen/test-vm.cfg
 - **Low risk** (builds on working foundation)
 
 **Alternative Architecture (Roadmap C):**
+
 - **3-5 developers** with Linux/VM expertise
 - **12-18 months** of development
 - **$750k - $1.5M** budget
@@ -717,6 +765,7 @@ xl create -c /etc/xen/test-vm.cfg
 ### Final Recommendation
 
 **Start with Roadmap B (Hybrid Integration):**
+
 1. Enhance existing `evq/qubes-nixos-template`
 2. Fix proxy and memory issues
 3. Replace Fedora dom0 with NixOS
@@ -724,6 +773,7 @@ xl create -c /etc/xen/test-vm.cfg
 5. Release as "NixOS-powered Qubes OS"
 
 **Long-Term Vision:**
+
 - Learn from hybrid integration
 - Evaluate if Roadmap A or C makes sense
 - Potentially migrate to pure NixOS architecture over time
@@ -738,6 +788,7 @@ xl create -c /etc/xen/test-vm.cfg
 - **No UEFI support**: All attempts blocked by NixOS Xen limitations
 
 **Why Not?**
+
 - **Complexity:** 15-20 interdependent components
 - **UEFI blocker:** Critical limitation for modern systems
 - **No clear benefit:** Hybrid integration provides most advantages
@@ -748,6 +799,7 @@ xl create -c /etc/xen/test-vm.cfg
 ## Appendix A: References & Resources
 
 ### Official Documentation
+
 - [Qubes OS Architecture](https://doc.qubes-os.org/en/latest/developer/system/architecture.html)
 - [Qubes GUI System](https://doc.qubes-os.org/en/latest/developer/system/gui.html)
 - [Qubes qrexec RPC](https://doc.qubes-os.org/en/latest/developer/services/qrexec.html)
@@ -755,15 +807,18 @@ xl create -c /etc/xen/test-vm.cfg
 - [NixOS Virtualization](https://nixos.wiki/wiki/Virtualization)
 
 ### Existing Projects
+
 - [evq/qubes-nixos-template](https://github.com/evq/qubes-nixos-template)
 - [CertainLach/nixos-qubes](https://github.com/CertainLach/nixos-qubes)
 - [astro/microvm.nix](https://github.com/astro/microvm.nix)
 
 ### Key Issues
+
 - [NixOS Xen UEFI Boot](https://github.com/NixOS/nixpkgs/issues/127404)
 - [NixOS qubes Integration](https://github.com/NixOS/nixpkgs/issues/341215)
 
 ### Community Discussions
+
 - [Qubes OS Forum - NixOS Templates](https://forum.qubes-os.org/t/starting-work-on-nixos-template/25591)
 - [Hacker News - Marrying NixOS and Qubes](https://news.ycombinator.com/item?id=15734704)
 
@@ -771,4 +826,4 @@ xl create -c /etc/xen/test-vm.cfg
 
 **End of Analysis**
 
-*This document provides a comprehensive technical assessment of rebuilding Qubes OS in NixOS. All research was conducted in January 2026 and reflects the current state of both projects.*
+_This document provides a comprehensive technical assessment of rebuilding Qubes OS in NixOS. All research was conducted in January 2026 and reflects the current state of both projects._

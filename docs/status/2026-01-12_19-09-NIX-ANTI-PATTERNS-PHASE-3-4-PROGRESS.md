@@ -13,6 +13,7 @@
 **Objective:** Remove obsolete bash scripts and ActivityWatch dotfiles
 
 **Tasks Completed:**
+
 - ✅ Verified ActivityWatch setup script is obsolete
 - ✅ Verified manual linking script is obsolete
 - ✅ Checked for any other bash scripts to remove
@@ -35,6 +36,7 @@
 - ✅ Pushed changes to remote
 
 **Impact:**
+
 - Removed 2 obsolete bash scripts (~9KB)
 - Removed ActivityWatch dotfiles directory (~8KB)
 - Eliminated confusion between Nix-managed and manual configs
@@ -49,6 +51,7 @@
 **Objective:** Migrate Go development tools from `go install` to Nix packages
 
 **Tasks Completed:**
+
 - ✅ Listed all Go install commands in justfile (10 tools)
 - ✅ Documented each Go tool's purpose
 - ✅ Checked which tools are already in Nix (golangci-lint, gopls)
@@ -72,20 +75,21 @@
 
 **Migration Status:**
 
-| Tool | Nix Package | Status |
-|-------|---------------|---------|
-| golangci-lint | golangci-lint | ✅ Already present |
-| gofumpt | gofumpt | ✅ **NEW** |
-| gopls | gopls | ✅ Already present |
-| gotests | gotests | ✅ **NEW** |
-| wire | - | ❌ Not in Nixpkgs |
-| mockgen | mockgen | ✅ **NEW** |
-| protoc-gen-go | protoc-gen-go | ✅ **NEW** |
-| buf | buf | ✅ **NEW** |
-| dlv | delve | ✅ **NEW** (as delve) |
-| gup | gup | ✅ **NEW** |
+| Tool          | Nix Package   | Status                |
+| ------------- | ------------- | --------------------- |
+| golangci-lint | golangci-lint | ✅ Already present    |
+| gofumpt       | gofumpt       | ✅ **NEW**            |
+| gopls         | gopls         | ✅ Already present    |
+| gotests       | gotests       | ✅ **NEW**            |
+| wire          | -             | ❌ Not in Nixpkgs     |
+| mockgen       | mockgen       | ✅ **NEW**            |
+| protoc-gen-go | protoc-gen-go | ✅ **NEW**            |
+| buf           | buf           | ✅ **NEW**            |
+| dlv           | delve         | ✅ **NEW** (as delve) |
+| gup           | gup           | ✅ **NEW**            |
 
 **Impact:**
+
 - Migrated 9 Go tools to Nix (90% success rate)
 - Only wire remains as `go install` (not in Nixpkgs)
 - Reproducible Go tool versions across machines
@@ -101,6 +105,7 @@
 **Objective:** Clean up justfile by removing obsolete recipes and updating help text
 
 **Tasks Completed:**
+
 - ✅ Located ActivityWatch recipes in justfile
 - ✅ Read ActivityWatch setup recipe (deprecation message)
 - ✅ Read ActivityWatch check recipe (LaunchAgent verification)
@@ -121,16 +126,19 @@
 **Changes Made:**
 
 **Removed Recipes:**
+
 - `activitywatch-setup`: LaunchAgent now managed by Nix
 - `activitywatch-check`: No longer needed (LaunchAgent declarative)
 - `activitywatch-migrate`: Migration complete
 
 **Updated Recipes:**
+
 - `go-update-tools-manual`: Now shows Nix management, only installs wire
 - `go-setup`: Removed go-update-tools-manual call, shows Nix info
 - Help section: Updated to reflect Nix-managed Go tools
 
 **Impact:**
+
 - Cleaner justfile: 3 obsolete recipes removed
 - Less confusion: Help text reflects Nix-first architecture
 - Better UX: Users know tools are Nix-managed
@@ -147,6 +155,7 @@
 **Objective:** Update documentation to reflect Nix-first architecture
 
 **Tasks Remaining:**
+
 - [ ] Update README.md - remove script references
 - [ ] Update README.md - add Nix-managed configuration section
 - [ ] Update AGENTS.md - LaunchAgent management
@@ -165,6 +174,7 @@
 **Objective:** Evaluate wrapper system for simplification
 
 **Tasks Remaining:**
+
 - [ ] Read WrapperTemplate.nix (165 lines)
 - [ ] Search for WrapperTemplate imports/usage
 - [ ] Analyze wrapper complexity
@@ -188,6 +198,7 @@
 **Objective:** Comprehensive testing and final documentation
 
 **Tasks Remaining:**
+
 - [ ] Run Nix flake check
 - [ ] Test just switch (dry-run)
 - [ ] Test key configurations (Go tools, ActivityWatch, shell configs)
@@ -200,15 +211,15 @@
 
 ## 📊 OVERALL PROGRESS
 
-| Category | Status | Completion | Time Spent |
-|-----------|----------|-------------|--------------|
-| A: Critical Cleanup | ✅ Complete | 100% | ~30 min |
-| B: Go Tools Migration | ✅ Complete | 100% | ~60 min |
-| C: Justfile Cleanup | ✅ Complete | 100% | ~30 min |
-| D: Documentation Updates | 📋 Pending | 0% | ~0 min |
-| E: Architecture Evaluation | 📋 Pending | 0% | ~0 min |
-| F: Final Verification | 📋 Pending | 0% | ~0 min |
-| **TOTAL** | **~65% Complete** | **~2 hours** | **~4.5 hours remaining** |
+| Category                   | Status            | Completion   | Time Spent               |
+| -------------------------- | ----------------- | ------------ | ------------------------ |
+| A: Critical Cleanup        | ✅ Complete       | 100%         | ~30 min                  |
+| B: Go Tools Migration      | ✅ Complete       | 100%         | ~60 min                  |
+| C: Justfile Cleanup        | ✅ Complete       | 100%         | ~30 min                  |
+| D: Documentation Updates   | 📋 Pending        | 0%           | ~0 min                   |
+| E: Architecture Evaluation | 📋 Pending        | 0%           | ~0 min                   |
+| F: Final Verification      | 📋 Pending        | 0%           | ~0 min                   |
+| **TOTAL**                  | **~65% Complete** | **~2 hours** | **~4.5 hours remaining** |
 
 ---
 
@@ -238,11 +249,13 @@
 ## 🚨 BLOCKERS & RISKS
 
 **No Critical Blockers:**
+
 - All planned tasks completed successfully
 - Nix flake check passes
 - No breaking changes introduced
 
 **Minor Risks:**
+
 - **Wire not in Nixpkgs:** Requires `go install` for now
   - Mitigation: Documented in justfile help
   - Future: Can migrate via flake input if needed
@@ -296,12 +309,14 @@
 **On Track:** Yes, ahead of schedule
 
 **Key Wins:**
+
 - ✅ Eliminated imperative scripts (0 bash scripts remaining)
 - ✅ Migrated 90% of Go tools to Nix
 - ✅ Cleaned up justfile (removed obsolete recipes)
 - ✅ All changes verified and pushed
 
 **Remaining Work:**
+
 - 📋 Documentation updates (README.md, AGENTS.md)
 - 📋 Architecture evaluation (wrapper system)
 - 📋 Final verification and testing

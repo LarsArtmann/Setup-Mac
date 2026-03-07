@@ -8,6 +8,7 @@
 ## 🚨 CURRENT SITUATION
 
 ### What We Fixed Today:
+
 1. ✅ **NIX VERSION MISMATCH RESOLVED**
    - System profile now correctly points to Nix 2.31.2
    - Verified with `nix doctor` - no warnings
@@ -19,18 +20,23 @@
    - Ran garbage collection
 
 ### What's STILL BROKEN:
+
 1. ❌ **NH DARWIN SWITCH STILL FAILS**
+
    ```
    error: getting status of '/private/var/folders/07/.../T/nh-osGNKViU/result': No such file or directory
    ```
+
    **Status:** KNOWN ISSUE (documented in nh-darwin-switch-failure-ROOT-CAUSE.md)
    **Root Cause:** macOS temp directory security prevents sudo from accessing user temp files
 
 2. ❌ **JUST SWITCH STILL FAILS**
+
    ```
    building the system configuration...
    error: Recipe `switch` failed on line 32 with exit code 1
    ```
+
    **Status:** CONCERNING - Should work now that Nix is fixed
    **Investigation:** Needed
 
@@ -46,57 +52,67 @@
 
 ## 📅 TIMELINE OF EVENTS
 
-| Date | Event | Impact |
-|-------|--------|---------|
-| Dec 21 | Last successful build (generation 206) | ✅ System working |
-| Dec 23 | iTerm2 recovery changes | ❓ Possible issue? |
-| Dec 23 | Emergency recovery guide created | 📝 Documentation |
-| Dec 24 | Sandbox paths research | 📝 Research |
-| Dec 26 | Comprehensive sandbox paths | ⚠️ Potential issue? |
-| Dec 28 | Nix version mismatch identified & fixed | ✅ Problem solved |
-| Dec 28 | Tests show builds STILL failing | ❌ New problem? |
+| Date   | Event                                   | Impact              |
+| ------ | --------------------------------------- | ------------------- |
+| Dec 21 | Last successful build (generation 206)  | ✅ System working   |
+| Dec 23 | iTerm2 recovery changes                 | ❓ Possible issue?  |
+| Dec 23 | Emergency recovery guide created        | 📝 Documentation    |
+| Dec 24 | Sandbox paths research                  | 📝 Research         |
+| Dec 26 | Comprehensive sandbox paths             | ⚠️ Potential issue? |
+| Dec 28 | Nix version mismatch identified & fixed | ✅ Problem solved   |
+| Dec 28 | Tests show builds STILL failing         | ❌ New problem?     |
 
 ---
 
 ## 🤔 POSSIBLE CAUSES OF CONTINUED FAILURES
 
 ### 1. Configuration Issue Introduced Since Dec 21
+
 **Likelihood:** MEDIUM
 **Evidence:**
+
 - Last successful build was Dec 21
 - Multiple changes made Dec 23-28
 - Changes include: iTerm2 recovery, sandbox paths, Nix settings
 
 **Files Modified:**
+
 - `platforms/darwin/default.nix` - Added users.users.lars config
 - `platforms/darwin/nix/settings.nix` - Added comprehensive sandbox paths
 - `platforms/darwin/test-darwin.nix` - Created for testing
 
 **Potential Issues:**
+
 - Circular dependency in configuration
 - Syntax error in one of the modified files
 - Invalid sandbox path (but sandbox = false, so this shouldn't matter)
 - `users.users.lars` configuration issue
 
 ### 2. Nix-Darwin Internal Issue
+
 **Likelihood:** LOW
 **Evidence:**
+
 - Nix version is now correct (2.31.2)
 - nix doctor passes without warnings
 - nix flake check passes
 
 **Possible Issues:**
+
 - nix-darwin version incompatibility
 - darwin-rebuild script bug
 - Build process hang
 
 ### 3. System/Permission Issue
+
 **Likelihood:** LOW-MEDIUM
 **Evidence:**
+
 - Commands run with sudo
 - System profile is now correct
 
 **Possible Issues:**
+
 - Permission denied on some directory
 - File system issue
 - nix-daemon problem
@@ -106,6 +122,7 @@
 ## 🔍 INVESTIGATION NEEDED
 
 ### Critical Questions:
+
 1. **Why does `darwin-rebuild switch` fail silently?**
    - Is there a syntax error in configuration?
    - Is there a circular dependency?
@@ -122,6 +139,7 @@
    - Need to actually try to build
 
 ### Diagnostic Commands to Run:
+
 ```bash
 # Check for syntax errors
 nix-instantiate --eval platforms/darwin/default.nix
@@ -141,22 +159,26 @@ cat /var/log/system.log | grep -i "nix\|darwin"
 ## 📊 CURRENT SYSTEM STATE
 
 ### System Information:
+
 - **Current Generation:** 206 (Dec 21)
 - **Current System:** `/nix/store/zf2r9yb4rlgnqggz1kwsf319kb22f4bw-darwin-system-26.05.5fb45ec`
 - **Architecture:** aarch64-darwin
 - **Hostname:** Lars-MacBook-Air ✅
 
 ### Nix Status:
+
 - **Current System Nix:** 2.31.2 ✅
 - **System Profile Nix:** 2.31.2 ✅ (FIXED TODAY)
 - **nix doctor:** PASS ✅ (No warnings)
 
 ### Configuration Status:
+
 - **nix flake check:** PASS ✅
 - **Configuration Files:** 59 total
 - **Modified Since Dec 21:** Yes (iTerm2, sandbox paths)
 
 ### Build Status:
+
 - **nh darwin switch:** FAIL (temp directory issue - KNOWN)
 - **just switch:** FAIL (silent failure - UNKNOWN)
 - **darwin-rebuild switch:** FAIL (silent failure - UNKNOWN)
@@ -167,6 +189,7 @@ cat /var/log/system.log | grep -i "nix\|darwin"
 ## ⚠️ CONCERNS
 
 ### High Priority:
+
 1. **Why did `just switch` start working after fixing Nix version?**
    - Nix version mismatch was ROOT CAUSE
    - Fix should have resolved issue
@@ -178,6 +201,7 @@ cat /var/log/system.log | grep -i "nix\|darwin"
    - Need to identify which change
 
 ### Medium Priority:
+
 3. **Is the system generation actually broken?**
    - Last successful build was Dec 21
    - System still works (we're using it)
@@ -193,9 +217,11 @@ cat /var/log/system.log | grep -i "nix\|darwin"
 ## 🎯 NEXT STEPS
 
 ### Step 1: Isolate the Problem
+
 **Goal:** Determine if it's configuration issue or Nix issue
 
 **Actions:**
+
 ```bash
 # Try absolute minimal configuration
 cd ~/Desktop/Setup-Mac
@@ -208,9 +234,11 @@ nix-build '<nixpkgs>' -A hello
 ```
 
 ### Step 2: Check Configuration Changes
+
 **Goal:** Identify if any change since Dec 21 broke something
 
 **Actions:**
+
 ```bash
 # Review changes since Dec 21
 cd ~/Desktop/Setup-Mac
@@ -225,9 +253,11 @@ nix-instantiate --eval platforms/darwin/nix/settings.nix
 ```
 
 ### Step 3: Try Building with Verbose Output
+
 **Goal:** See actual error messages
 
 **Actions:**
+
 ```bash
 # Build with maximum verbosity
 nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel \
@@ -237,9 +267,11 @@ nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel \
 ```
 
 ### Step 4: Check for Circular Dependencies
+
 **Goal:** Identify if configuration has circular references
 
 **Actions:**
+
 ```bash
 # Evaluate configuration (will fail if circular)
 nix eval ".#darwinConfigurations.Lars-MacBook-Air"
@@ -252,9 +284,11 @@ cat default.nix | grep -A 10 "imports ="
 ```
 
 ### Step 5: Rollback Suspected Changes
+
 **Goal:** If change is identified as culprit, revert it
 
 **Actions:**
+
 ```bash
 # Identify problematic commit
 cd ~/Desktop/Setup-Mac
@@ -297,12 +331,14 @@ nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel
 ## 📝 ACTIONS TAKEN TODAY
 
 ### Completed Successfully:
+
 1. ✅ Fixed Nix version mismatch
 2. ✅ Verified fix with nix doctor
 3. ✅ Cleared all caches
 4. ✅ Created comprehensive status reports
 
 ### Ongoing Issues:
+
 1. ❌ Build commands still failing
 2. ❌ Root cause of continued failures unknown
 3. ❌ Need to investigate configuration changes

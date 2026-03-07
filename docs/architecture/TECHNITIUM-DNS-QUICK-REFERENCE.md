@@ -68,6 +68,7 @@ dig @<private-cloud-ip> doubleclick.net  # Should be blocked
 **Location:** `platforms/nixos/system/dns-config.nix`
 
 **Configuration:**
+
 ```nix
 services.technitium-dns-server = {
   enable = true;
@@ -81,6 +82,7 @@ networking.nameservers = ["127.0.0.1"];
 ```
 
 **Features:**
+
 - ✅ Local DNS caching
 - ✅ Ad blocking (via blocklists)
 - ✅ Web console at http://localhost:5380
@@ -93,6 +95,7 @@ networking.nameservers = ["127.0.0.1"];
 **Location:** `platforms/nixos/private-cloud/dns.nix`
 
 **Configuration:**
+
 ```nix
 services.technitium-dns-server = {
   enable = true;
@@ -104,6 +107,7 @@ networking.nameservers = ["127.0.0.1"];
 ```
 
 **Features:**
+
 - ✅ Network-wide DNS service
 - ✅ DoH/DoT support (ports 443/853)
 - ✅ Web console accessible from network
@@ -156,24 +160,29 @@ just dns-diagnostics
 ## Web Console Configuration
 
 ### Access
+
 - **Local:** http://localhost:5380
 - **Private Cloud:** http://<private-cloud-ip>:5380
 - **HTTPS:** https://<server-ip>:53443 (after configuring SSL)
 
 ### Default Credentials
+
 - **Username:** admin
 - **Password:** admin (CHANGE IMMEDIATELY!)
 
 ### Key Sections
 
 #### 1. Settings > General
+
 - Change admin password
 - Configure web console port
 - Enable HTTPS (port 53443)
 - Set timezone
 
 #### 2. DNS Settings > Forwarders
+
 Add DNS forwarders (in order of priority):
+
 ```
 Primary:   Quad9 (9.9.9.10, 9.9.9.11) - Protocol: DoT
 Secondary: Cloudflare (1.1.1.1, 1.0.0.1) - Protocol: DoH
@@ -182,7 +191,9 @@ Secondary: Cloudflare (1.1.1.1, 1.0.0.1) - Protocol: DoH
 Enable **DNS-over-TLS/HTTPS** for privacy.
 
 #### 3. Block Lists
+
 Add popular blocklists:
+
 ```
 1. StevenBlack (hosts) - General ad blocking
 2. AdGuard DNS filter - Ads and trackers
@@ -194,16 +205,19 @@ Add popular blocklists:
 Click **Download** to fetch blocklists (auto-updates daily).
 
 #### 4. DNS Settings > Cache
+
 - **Enable Persistent Cache** - Cache DNS to disk (faster startup)
 - **Cache Size** - 200MB (laptop) / 500MB (private cloud)
 - **Enable Serve Stale** - Return stale entries if upstream unreachable
 - **Enable Prefetching** - Pre-fetch popular domains
 
 #### 5. DNS Settings > DNSSEC
+
 - **Enable DNSSEC Validation** - Validate DNS responses
 - **Validation Mode** - Strict (recommended)
 
 #### 6. Settings > Logging
+
 - **Log Queries** - Enable query logging
 - **Log Responses** - Log DNS responses
 - **Log Errors** - Log errors and warnings
@@ -213,6 +227,7 @@ Click **Download** to fetch blocklists (auto-updates daily).
 ## DNS Resolution Testing
 
 ### Basic Tests
+
 ```bash
 # Test basic resolution
 dig google.com
@@ -229,6 +244,7 @@ time dig github.com  # Should be ~1-5ms (cached)
 ```
 
 ### Performance Benchmarks
+
 ```bash
 # Uncached query (first run)
 time dig google.com
@@ -248,12 +264,14 @@ dig doubleclick.net
 ## Monitoring
 
 ### Web Console Monitoring
+
 - **Dashboard:** Real-time statistics
 - **Query Log:** Live DNS requests
 - **Statistics:** Request rates, cache hit rate, blocked queries
 - **Blocked Domains:** Which domains are being blocked
 
 ### System Monitoring
+
 ```bash
 # Check service status
 systemctl status technitium-dns-server
@@ -266,6 +284,7 @@ htop  # Look for technitium-dns-server process
 ```
 
 ### Health Checks
+
 - Automatic health checks every 5 minutes
 - DNS queries to google.com verify server is responding
 - Logs health check results to systemd journal
@@ -275,12 +294,14 @@ htop  # Look for technitium-dns-server process
 ## Backup & Restore
 
 ### Automated Backups
+
 - **Frequency:** Daily at 2 AM
 - **Retention:** 7 days
 - **Location:** `/var/backups/technitium-dns/`
 - **Content:** Entire Technitium DNS state directory
 
 ### Manual Backup
+
 ```bash
 # Create backup
 just dns-backup
@@ -290,6 +311,7 @@ just dns-backup-list
 ```
 
 ### Manual Restore
+
 ```bash
 # Restore from backup
 just dns-restore backups/technitium-dns-backup-20260113-123456.tar.gz
@@ -298,6 +320,7 @@ just dns-restore backups/technitium-dns-backup-20260113-123456.tar.gz
 ```
 
 ### Emergency Restore
+
 ```bash
 # If backup fails, restore manually
 sudo systemctl stop technitium-dns-server
@@ -310,6 +333,7 @@ sudo systemctl start technitium-dns-server
 ## Troubleshooting
 
 ### DNS Resolution Fails
+
 ```bash
 # Check service status
 just dns-status
@@ -328,6 +352,7 @@ cat /etc/resolv.conf
 ```
 
 ### Web Console Inaccessible
+
 ```bash
 # Check if service is running
 systemctl status technitium-dns-server
@@ -340,6 +365,7 @@ just dns-restart
 ```
 
 ### Ad Blocking Not Working
+
 ```bash
 # Check blocklists in web console
 # Block Lists tab > Verify lists are downloaded
@@ -352,6 +378,7 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### Performance Issues
+
 ```bash
 # Check cache hit rate (via web console)
 # Dashboard > Statistics
@@ -368,6 +395,7 @@ dig @127.0.0.1 doubleclick.net
 ## Security Considerations
 
 ### Web Console Access
+
 - **Default:** Localhost only (http://localhost:5380)
 - **Remote Access:** NOT recommended (exposes management interface)
 - **If Remote Access Needed:**
@@ -377,11 +405,13 @@ dig @127.0.0.1 doubleclick.net
   - Enable TOTP 2FA
 
 ### DNS Over HTTPS/TLS
+
 - Encrypts DNS traffic between server and forwarders
 - Prevents ISP/Network snooping
 - Recommended for privacy
 
 ### Firewall Configuration
+
 - **Laptop:** Localhost only (no firewall ports open)
 - **Private Cloud:** Network access (firewall ports 53, 5380, 53443, 443, 853)
 - **Recommendation:** Use VPN for remote DNS access
@@ -391,17 +421,20 @@ dig @127.0.0.1 doubleclick.net
 ## Performance Tuning
 
 ### Cache Settings
+
 - **Cache Size:** 200MB (laptop) / 500MB (private cloud)
 - **Persistent Cache:** Enabled (faster startup)
 - **Prefetching:** Enabled (pre-populates cache)
 
 ### Blocklist Optimization
+
 - Too many blocklists = slower DNS resolution
 - Start with 3-5 popular blocklists
 - Monitor performance and adjust
 - Remove unnecessary blocklists
 
 ### Concurrent Queries
+
 - Default: 100 concurrent queries
 - Increase for high-traffic networks
 - Decrease for low-resource systems
@@ -411,6 +444,7 @@ dig @127.0.0.1 doubleclick.net
 ## Integration with Other Services
 
 ### Docker DNS Configuration
+
 ```nix
 # platforms/nixos/services/default.nix
 virtualisation.docker = {
@@ -420,6 +454,7 @@ virtualisation.docker = {
 ```
 
 ### Systemd Services DNS Configuration
+
 ```bash
 # For services that don't use system DNS
 # Add to service unit:
@@ -428,6 +463,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ```
 
 ### VPN Configuration
+
 ```bash
 # Configure VPN to use local DNS
 # Prevents DNS leaks via VPN
@@ -438,12 +474,14 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Documentation
 
 ### Comprehensive Guides
+
 - **Evaluation:** `docs/architecture/TECHNITIUM-DNS-EVALUATION.md` (771 lines)
 - **Migration:** `docs/architecture/TECHNITIUM-DNS-MIGRATION-GUIDE.md`
 - **Summary:** `docs/architecture/TECHNITIUM-DNS-SUMMARY.md`
 - **Best Configuration:** `docs/architecture/TECHNITIUM-DNS-BEST-CONFIGURATION.md` (NEW)
 
 ### Configuration Docs
+
 - **Laptop:** `platforms/nixos/system/dns.md` (323 lines)
 - **Private Cloud:** `platforms/nixos/private-cloud/README.md`
 
@@ -452,6 +490,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Status Summary
 
 ### ✅ Complete
+
 - NixOS module configuration
 - Local DNS setup (evo-x2)
 - Private cloud DNS setup
@@ -462,10 +501,12 @@ Environment="DNS_SERVER=127.0.0.1"
 - Firewall configuration
 
 ### 📋 Ready for Deployment
+
 - NixOS Laptop (evo-x2) - Deploy now
 - Private Cloud - Deploy after hardware setup
 
 ### 🔄 Future Enhancements (Optional)
+
 - HTTP API automation (declarative config)
 - Secrets management (sops-nix)
 - Monitoring integration (Prometheus/Grafana)
@@ -476,6 +517,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Next Steps
 
 ### Immediate (This Week)
+
 1. ✅ Review documentation
 2. ✅ Deploy on NixOS Laptop (evo-x2)
 3. ✅ Configure via web console
@@ -483,12 +525,14 @@ Environment="DNS_SERVER=127.0.0.1"
 5. ✅ Monitor performance
 
 ### Next Week
+
 1. Deploy on NixOS Private Cloud
 2. Configure router DHCP
 3. Test with network devices
 4. Monitor performance
 
 ### Optional (Future)
+
 1. Implement HTTP API automation
 2. Integrate secrets management
 3. Add monitoring dashboards
@@ -499,6 +543,7 @@ Environment="DNS_SERVER=127.0.0.1"
 ## Support
 
 ### For Issues Specific to Setup-Mac
+
 ```bash
 # Check DNS configuration
 cat platforms/nixos/system/dns-config.nix
@@ -511,6 +556,7 @@ just dns-diagnostics
 ```
 
 ### For General Technitium DNS Issues
+
 - Check logs: `just dns-logs`
 - Web Console Help: http://localhost:5380/help.html
 - GitHub Issues: https://github.com/TechnitiumSoftware/DnsServer/issues

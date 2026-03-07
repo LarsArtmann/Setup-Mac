@@ -28,6 +28,7 @@
 ### Research Methods
 
 Used 4 parallel agents to investigate:
+
 1. **Systemd service environment variable inheritance** - System services vs user services
 2. **AMD ROCm environment variable configuration** - Where and how to set GPU variables
 3. **NixOS Ollama service configuration** - Official module support for GPU access
@@ -88,11 +89,11 @@ systemd.user.services.pipewire.environment.ALSA_CONFIG_UCM2 = config.environment
 
 **Reasoning:**
 
-| Option | Scope | Correctness | Recommendation |
-|--------|-------|-------------|----------------|
-| `environment.variables` | System-wide | ⭐⭐ | ❌ Not recommended - affects all processes |
-| `home.sessionVariables` | User-level | ⭐ | ❌ **BROKEN** - system services can't see it |
-| `services.ollama.environmentVariables` | Service-level | ⭐⭐⭐⭐⭐ | ✅ **RECOMMENDED** - correct pattern |
+| Option                                 | Scope         | Correctness | Recommendation                               |
+| -------------------------------------- | ------------- | ----------- | -------------------------------------------- |
+| `environment.variables`                | System-wide   | ⭐⭐        | ❌ Not recommended - affects all processes   |
+| `home.sessionVariables`                | User-level    | ⭐          | ❌ **BROKEN** - system services can't see it |
+| `services.ollama.environmentVariables` | Service-level | ⭐⭐⭐⭐⭐  | ✅ **RECOMMENDED** - correct pattern         |
 
 **Why Service-Level is Best:**
 
@@ -103,6 +104,7 @@ systemd.user.services.pipewire.environment.ALSA_CONFIG_UCM2 = config.environment
 5. **Maintainability** - Clear ownership of variables
 
 **Example:**
+
 ```nix
 services.ollama = {
   enable = true;
@@ -134,6 +136,7 @@ services.ollama = {
 5. **Avoid `environment.variables`** for service variables - Too broad scope
 
 **Complete GPU Service Pattern:**
+
 ```nix
 { config, pkgs, ... }: {
   # Enable ROCm support
@@ -183,13 +186,14 @@ systemd.services.my-service.serviceConfig = {
 
 **Answer:** Use **system services** for daemons/servers, use **user services** for user-specific apps.
 
-| Use Case | Service Type | Reason |
-|----------|-------------|--------|
-| Database, web server, system monitoring | `services.x` (system) | Root access, privileged ports, system-wide |
-| Personal apps (Dropbox, Slack), development tools | `systemd.user.services` (user) | User-specific, no root needed |
-| AI workloads with GPU | `services.x` (system) | GPU device access requires system service |
+| Use Case                                          | Service Type                   | Reason                                     |
+| ------------------------------------------------- | ------------------------------ | ------------------------------------------ |
+| Database, web server, system monitoring           | `services.x` (system)          | Root access, privileged ports, system-wide |
+| Personal apps (Dropbox, Slack), development tools | `systemd.user.services` (user) | User-specific, no root needed              |
+| AI workloads with GPU                             | `services.x` (system)          | GPU device access requires system service  |
 
 **Key Finding:** Ollama should run as a **system service** when using GPU because:
+
 - System services can be configured with proper device permissions
 - System services have access to GPU devices via SupplementaryGroups
 - User services with DynamicUser have limited device access
@@ -197,13 +201,13 @@ systemd.services.my-service.serviceConfig = {
 
 **Environment Variable Access:**
 
-| Variable Type | System Services | User Services | Interactive Shells |
-|--------------|----------------|---------------|-------------------|
-| `environment.variables` | ✅ YES | ❌ NO | ❌ NO |
-| `home.sessionVariables` | ❌ NO | ✅ YES* | ✅ YES |
-| `systemd.user.sessionVariables` | ❌ NO | ✅ YES | ❌ NO |
+| Variable Type                   | System Services | User Services | Interactive Shells |
+| ------------------------------- | --------------- | ------------- | ------------------ |
+| `environment.variables`         | ✅ YES          | ❌ NO         | ❌ NO              |
+| `home.sessionVariables`         | ❌ NO           | ✅ YES\*      | ✅ YES             |
+| `systemd.user.sessionVariables` | ❌ NO           | ✅ YES        | ❌ NO              |
 
-*\* Only for user systemd services, not system services*
+_\* Only for user systemd services, not system services_
 
 **Conclusion:** Ollama must remain a system service and use service-level environment variables.
 
@@ -216,6 +220,7 @@ systemd.services.my-service.serviceConfig = {
 **Implementation:**
 
 **Remove from `platforms/nixos/users/home.nix`:**
+
 ```nix
 # DELETE these lines:
 # home.sessionVariables = {
@@ -227,6 +232,7 @@ systemd.services.my-service.serviceConfig = {
 ```
 
 **Add to `platforms/nixos/desktop/ai-stack.nix`:**
+
 ```nix
 services.ollama = {
   enable = true;
@@ -244,6 +250,7 @@ services.ollama = {
 ```
 
 **Pros:**
+
 - ✅ **Correct architecture** - Variables scoped to service only
 - ✅ **Ollama will definitely see them** - Service-level variables work
 - ✅ **Best practice** - Follows NixOS patterns
@@ -251,6 +258,7 @@ services.ollama = {
 - ✅ **Uses official module** - `services.ollama` properly configured
 
 **Cons:**
+
 - ❌ Requires reverting part of Phase 1 changes
 - ❌ Need to test Ollama service after changes
 
@@ -261,11 +269,13 @@ services.ollama = {
 **Implementation:**
 
 **Remove from `platforms/nixos/users/home.nix`:**
+
 ```nix
 # DELETE these lines from home.sessionVariables
 ```
 
 **Add to `platforms/nixos/system/configuration.nix`:**
+
 ```nix
 environment.variables = {
   HIP_VISIBLE_DEVICES = "0";
@@ -276,11 +286,13 @@ environment.variables = {
 ```
 
 **Pros:**
+
 - ✅ System services WILL see these variables
 - ✅ Simple to implement
 - ✅ Works immediately
 
 **Cons:**
+
 - ❌ **Global pollution** - Affects ALL processes on system
 - ❌ **Bad practice** - Variables scoped too broadly
 - ❌ **Confusing** - Other tools may pick up GPU variables unintentionally
@@ -294,6 +306,7 @@ environment.variables = {
 **Implementation:**
 
 **Keep in `platforms/nixos/users/home.nix`:**
+
 ```nix
 home.sessionVariables = {
   HIP_VISIBLE_DEVICES = "0";
@@ -307,6 +320,7 @@ systemd.user.sessionVariables = config.home.sessionVariables;
 ```
 
 **Add user service configuration:**
+
 ```nix
 # In platforms/nixos/users/home.nix or NixOS config
 systemd.user.services.ollama = {
@@ -328,10 +342,12 @@ users.users.larsartmann.linger = true;
 ```
 
 **Pros:**
+
 - ✅ Variables stay user-level (matches current design)
 - ✅ User service CAN see `home.sessionVariables`
 
 **Cons:**
+
 - ❌ **Not recommended** - Ollama designed for system service
 - ❌ **Complexity** - Need to configure GPU device access manually
 - ❌ **Missing features** - May lose some NixOS module features
@@ -379,6 +395,7 @@ users.users.larsartmann.linger = true;
 **File: `platforms/nixos/users/home.nix`**
 
 Remove these lines from `home.sessionVariables`:
+
 ```nix
 # DELETE:
 #   HIP_VISIBLE_DEVICES = "0";
@@ -390,6 +407,7 @@ Remove these lines from `home.sessionVariables`:
 **File: `platforms/nixos/desktop/ai-stack.nix`**
 
 Ensure `services.ollama` configuration includes:
+
 ```nix
 services.ollama = {
   enable = true;
@@ -413,6 +431,7 @@ services.ollama = {
 Ensure these are configured in NixOS (should already be there):
 
 **File: `platforms/nixos/system/configuration.nix` or `hardware/` module**
+
 ```nix
 hardware.graphics = {
   enable = true;
@@ -424,6 +443,7 @@ nixpkgs.config.rocmSupport = true;
 ```
 
 **File: `platforms/nixos/desktop/ai-stack.nix` or `hardware/amd-gpu.nix`**
+
 ```nix
 # Verify Ollama service has render group (should be automatic from module)
 # If not, need to add:
@@ -446,6 +466,7 @@ nix flake check
 ```
 
 **Expected Results:**
+
 - ✅ All flake checks pass
 - ✅ NixOS configuration builds successfully
 - ✅ No warnings about missing or duplicate options
@@ -508,8 +529,9 @@ git push origin master
 
 Update Task 1.3 section to note the correction:
 
-```markdown
+````markdown
 **Task 1.3: Move AI variables to Home Manager** ⚠️ LATER CORRECTED
+
 - **Initial (INCORRECT)**: Moved to `platforms/nixos/users/home.nix`:
   ```nix
   home.sessionVariables = {
@@ -519,10 +541,12 @@ Update Task 1.3 section to note the correction:
     PYTORCH_ROCM_ARCH = "gfx1100";
   };
   ```
+````
 
 - **Problem**: System services (like Ollama) cannot see `home.sessionVariables`
 
 - **Corrected (2025-12-26_17-06)**: Moved to `services.ollama.environmentVariables`:
+
   ```nix
   services.ollama = {
     enable = true;
@@ -541,6 +565,7 @@ Update Task 1.3 section to note the correction:
 - **See Status Report**: `docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`
 
 - **Impact**: High - Fixes GPU access for Ollama service (CRITICAL)
+
 ```
 
 ---
@@ -566,24 +591,26 @@ Update Task 1.3 section to note the correction:
 
 **Environment Variable Inheritance:**
 ```
+
 environment.variables (system-level)
-  ↓
-systemd.services.* (system services)
-  ↓
+↓
+systemd.services.\* (system services)
+↓
 ✅ Variables visible
 
 home.sessionVariables (user-level)
-  ↓
+↓
 ~/.profile, ~/.zprofile (user shell)
-  ↓
+↓
 ✅ Variables visible in user shells
-systemd.user.services.* (user services)
-  ↓
+systemd.user.services._ (user services)
+↓
 ✅ Variables visible (if systemd.user.sessionVariables set)
-systemd.services.* (system services)
-  ↓
+systemd.services._ (system services)
+↓
 ❌ Variables NOT visible (different systemd instance)
-```
+
+````
 
 **Proof from NixOS Configs:**
 ```nix
@@ -594,7 +621,7 @@ systemd.services.* (system services)
       lib.removeAttrs config.home-manager.users.balsoft.home.sessionVariables [ "GIO_EXTRA_MODULES" ]
     );
 }
-```
+````
 
 This shows that variables must be **explicitly copied** from Home Manager to system-level if you want them available to system services.
 
@@ -606,6 +633,7 @@ This shows that variables must be **explicitly copied** from Home Manager to sys
 `/nixos/modules/services/misc/ollama.nix`
 
 **Service Definition:**
+
 ```nix
 systemd.services.ollama = {
   description = "Server for local large language models";
@@ -628,6 +656,7 @@ systemd.services.ollama = {
 ```
 
 **Key Attributes:**
+
 - `package`: Either `pkgs.ollama` (CPU), `pkgs.ollama-cuda` (NVIDIA), or `pkgs.ollama-rocm` (AMD)
 - `rocmOverrideGfx`: Sets `HSA_OVERRIDE_GFX_VERSION` automatically
 - `environmentVariables`: Type `types.attrsOf types.str`, merged with default variables
@@ -641,16 +670,17 @@ systemd.services.ollama = {
 
 **Variables and Their Purposes:**
 
-| Variable | Purpose | Example Value | Required? |
-|----------|---------|---------------|-----------|
-| `HIP_VISIBLE_DEVICES` | Select which GPUs are visible to HIP | `"0"` or `"0,1"` or `"all"` | Recommended |
-| `ROCM_PATH` | Path to ROCm installation | `"/opt/rocm"` or package path | Required for some tools |
-| `HSA_OVERRIDE_GFX_VERSION` | Override GPU architecture detection | `"11.0.0"` for gfx1100 | Required if auto-detection fails |
-| `PYTORCH_ROCM_ARCH` | PyTorch-specific GPU architecture | `"gfx1100"` | Required for PyTorch workloads |
-| `OLLAMA_FLASH_ATTENTION` | Enable flash attention optimization | `"1"` | Optional (performance) |
-| `OLLAMA_NUM_PARALLEL` | Parallel request processing | `"10"` | Optional (performance) |
+| Variable                   | Purpose                              | Example Value                 | Required?                        |
+| -------------------------- | ------------------------------------ | ----------------------------- | -------------------------------- |
+| `HIP_VISIBLE_DEVICES`      | Select which GPUs are visible to HIP | `"0"` or `"0,1"` or `"all"`   | Recommended                      |
+| `ROCM_PATH`                | Path to ROCm installation            | `"/opt/rocm"` or package path | Required for some tools          |
+| `HSA_OVERRIDE_GFX_VERSION` | Override GPU architecture detection  | `"11.0.0"` for gfx1100        | Required if auto-detection fails |
+| `PYTORCH_ROCM_ARCH`        | PyTorch-specific GPU architecture    | `"gfx1100"`                   | Required for PyTorch workloads   |
+| `OLLAMA_FLASH_ATTENTION`   | Enable flash attention optimization  | `"1"`                         | Optional (performance)           |
+| `OLLAMA_NUM_PARALLEL`      | Parallel request processing          | `"10"`                        | Optional (performance)           |
 
 **Common GFX Version Mappings:**
+
 - `gfx1010` → `10.1.0` (RX 5700 XT, RX 5500 XT)
 - `gfx1030` → `10.3.0` (RX 6800, RX 6900 XT)
 - `gfx1100` → `11.0.0` (RX 7900 XTX, RX 7900 XT)
@@ -658,6 +688,7 @@ systemd.services.ollama = {
 - `gfx1102` → `11.0.2` (RX 7900 GRE)
 
 **For Your System (evo-x2 - AMD Ryzen AI Max+ 395):**
+
 - Use `rocmOverrideGfx = "11.0.0"` or `"11.0.1"` (verify with `rocm-smi -showinfo`)
 - Use `PYTORCH_ROCM_ARCH = "gfx1100"` or `"gfx1101"`
 - Use `HIP_VISIBLE_DEVICES = "0"` (single integrated GPU)
@@ -669,6 +700,7 @@ systemd.services.ollama = {
 ### Warning 1: Current Configuration is Broken
 
 **Current State:**
+
 ```nix
 # platforms/nixos/users/home.nix
 home.sessionVariables = {
@@ -680,6 +712,7 @@ home.sessionVariables = {
 ```
 
 **Problem:**
+
 - Ollama service runs as system service (`systemd.services.ollama`)
 - System services run in isolated environment (PID 1 systemd)
 - Cannot access `home.sessionVariables` (user-level)
@@ -687,6 +720,7 @@ home.sessionVariables = {
 - Falls back to CPU-only inference (very slow)
 
 **Impact:**
+
 - All AI/ML workloads will be 10-100x slower
 - LLM inference will be unusable
 - GPU acceleration completely broken
@@ -698,6 +732,7 @@ home.sessionVariables = {
 ### Warning 2: Don't Use Global Variables
 
 **Option 2 (system-level variables) is tempting but wrong:**
+
 ```nix
 # DON'T DO THIS:
 environment.variables = {
@@ -708,6 +743,7 @@ environment.variables = {
 ```
 
 **Why Wrong:**
+
 - Affects ALL processes on the system
 - Other tools may pick up GPU variables unintentionally
 - Confusing for future debugging
@@ -721,12 +757,14 @@ environment.variables = {
 ### Warning 3: Don't Use User Services for Ollama
 
 **Option 3 (user service) is overcomplicated:**
+
 ```nix
 # DON'T DO THIS:
 systemd.user.services.ollama = { ... };
 ```
 
 **Why Wrong:**
+
 - Ollama official module is for system service
 - Need to manually configure GPU access
 - Need to enable lingering (complex)
@@ -742,22 +780,26 @@ systemd.user.services.ollama = { ... };
 ### After Fix is Applied
 
 **Configuration Validation:**
+
 - ✅ `nix flake check --all-systems` passes
 - ✅ `nixos-rebuild build --flake .#evo-x2` succeeds
 - ✅ No warnings about missing or duplicate options
 - ✅ No warnings about system.stateVersion
 
 **File State:**
+
 - ✅ `platforms/nixos/users/home.nix` - No GPU variables in `home.sessionVariables`
 - ✅ `platforms/nixos/desktop/ai-stack.nix` - GPU variables in `services.ollama.environmentVariables`
 - ✅ Working tree clean after commit
 
 **Documentation:**
+
 - ✅ Status report written (`docs/status/2025-12-26_17-06_critical-ollama-gpu-variable-scope-fix.md`)
 - ✅ Phase 1 documentation updated with correction note
 - ✅ Commit message clearly documents the fix
 
 **Future Testing (on NixOS system):**
+
 - ✅ Ollama service starts successfully
 - ✅ Ollama detects AMD GPU (check `journalctl -u ollama` or `ollama list`)
 - ✅ GPU inference works (run `ollama run llama2` and verify GPU usage with `rocm-smi`)
@@ -770,27 +812,32 @@ systemd.user.services.ollama = { ... };
 **Session Date:** 2025-12-26
 **Session Time:** 09:35 - 17:06 CET (7.5 hours total, 1.5 hours for this research)
 **Previous Work:**
+
 - De-duplication analysis and implementation (Phase 1 & 2 complete)
 - Fixed system.stateVersion issue
 - All flake checks passing
 
 **Critical Issue Found:**
+
 - 🔴 Ollama service environment variables in wrong scope
 - 🔴 GPU access broken - will prevent AI/ML functionality
 - 🔴 Must fix before deploying to NixOS system
 
 **Research Completed:**
+
 - ✅ Systemd service environment variable inheritance
 - ✅ AMD ROCm configuration patterns
 - ✅ NixOS Ollama service module details
 - ✅ User services vs system services comparison
 
 **Solution Identified:**
+
 - ✅ Option 1 (service-level variables) is correct approach
 - ✅ Simple 10-minute fix
 - ✅ Zero risk, high confidence
 
 **Next Steps:**
+
 1. ⏭ **Await user approval** for Option 1 fix
 2. ⏭ **Apply fix** (remove from home.nix, add to ai-stack.nix)
 3. ⏭ **Test configuration** (flake check, build)
@@ -806,6 +853,7 @@ systemd.user.services.ollama = { ... };
 ## 📚 References
 
 **NixOS Documentation:**
+
 - `environment.variables` - system.nix(5)
 - `environment.sessionVariables` - environment.nix(5)
 - `home.sessionVariables` - home-manager(5)
@@ -813,6 +861,7 @@ systemd.user.services.ollama = { ... };
 - `services.ollama` - NixOS Options search
 
 **Source Code Referenced:**
+
 - `/nixos/modules/services/misc/ollama.nix` - Official Ollama module
 - `github.com/LunNova/nixos-configs` - Environment variable patterns
 - `github.com/balsoft/nixos-config` - Home Manager sync patterns
@@ -820,6 +869,7 @@ systemd.user.services.ollama = { ... };
 - `github.com/JManch/nixos/modules/home-manager/desktop/uwsm.nix` - Display manager env issues
 
 **External Documentation:**
+
 - https://github.com/ollama/ollama/blob/main/docs/gpu.md - Ollama GPU support
 - systemd.service(5) - Environment variable inheritance
 
@@ -830,6 +880,7 @@ systemd.user.services.ollama = { ... };
 ### 1. Do you approve Option 1 (service-level variables)?
 
 This is my strong recommendation. The fix is:
+
 - Correct architecture
 - Simple to implement (10 minutes)
 - Zero risk
@@ -839,6 +890,7 @@ This is my strong recommendation. The fix is:
 ### 2. Should I proceed with the fix immediately?
 
 This is a **CRITICAL** issue that will prevent GPU access. Without this fix:
+
 - Ollama will not use AMD GPU
 - AI/ML workloads will be 10-100x slower
 - GPU acceleration will be completely broken
@@ -862,8 +914,8 @@ The Phase 1 status report currently documents the incorrect user-level variable 
 
 ---
 
-*Status Report Completed: 2025-12-26 17:06 CET*
-*Prepared by: Crush AI Assistant*
-*Priority: CRITICAL*
-*Status: AWAITING USER APPROVAL FOR FIX* 🔴
-*Working Tree: CLEAN, UP TO DATE* ✨
+_Status Report Completed: 2025-12-26 17:06 CET_
+_Prepared by: Crush AI Assistant_
+_Priority: CRITICAL_
+_Status: AWAITING USER APPROVAL FOR FIX_ 🔴
+_Working Tree: CLEAN, UP TO DATE_ ✨

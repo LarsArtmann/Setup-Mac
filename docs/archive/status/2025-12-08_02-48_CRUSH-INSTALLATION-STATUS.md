@@ -15,6 +15,7 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 ## 🔍 INVESTIGATION FINDINGS
 
 ### WORK COMPLETED
+
 - [x] **Identified root cause**: crush is not being installed due to configuration error
 - [x] **Verified availability**: Confirmed crush 0.21.0 is available for x86_64-linux via nix-ai-tools
 - [x] **Located exact issue**: Module parameter mismatch in flake.nix lines 253-267
@@ -22,6 +23,7 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 - [x] **Identified fix path**: Module needs to access nix-ai-tools via inputs, not direct parameter
 
 ### NOT STARTED
+
 - [ ] Apply the configuration fix
 - [ ] Test evo-x2 configuration evaluation
 - [ ] Verify crush availability in NixOS environment
@@ -32,6 +34,7 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 ## 🐛 ROOT CAUSE ANALYSIS
 
 ### The Problem
+
 ```nix
 # BROKEN CODE in flake.nix lines 253-267
 ({ pkgs, inputs, nix-ai-tools, lib, ... }: {
@@ -43,11 +46,13 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 ```
 
 ### Why It Fails
+
 1. **Parameter Mismatch**: Module requests `nix-ai-tools` but doesn't receive it
 2. **Wrong Access Pattern**: Even if received, package access syntax is incorrect
 3. **Missing Inputs**: Module doesn't access `inputs.nix-ai-tools` which IS available
 
 ### The Fix
+
 ```nix
 # WORKING CODE - Replace lines 253-267
 ({ pkgs, inputs, lib, ... }: {
@@ -72,6 +77,7 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 ## 📊 VERIFICATION DETAILS
 
 ### nix-ai-tools Status
+
 - **Input URL**: `git+ssh://git@github.com/numtide/nix-ai-tools`
 - **Commit**: `b6f6693bc2b970af3d2220845d13009c63faad2f`
 - **Last Updated**: 1765146731 (Dec 7, 2025)
@@ -79,6 +85,7 @@ Install crush AI assistant on the evo-x2 NixOS system (GMKtec AMD Ryzen AI Max+ 
 - **crush Package**: ✅ Version 0.21.0 available
 
 ### Package Access Patterns
+
 ```bash
 # WORKING - Verified available
 inputs.nix-ai-tools.packages.x86_64-linux.crush
@@ -92,11 +99,13 @@ nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush"
 ## 🛠️ NEXT STEPS
 
 ### Immediate Action Required
+
 1. **Apply fix** to `/Users/larsartmann/Desktop/Setup-Mac/flake.nix`
    - Replace lines 253-267 with working code
    - Use `inputs.nix-ai-tools` instead of parameter
 
 ### Verification Process
+
 1. **Test configuration**: `nix flake check --system x86_64-linux`
 2. **Build test**: `nix build --no-link --system x86_64-linux .#nixosConfigurations.evo-x2.config.system.build.toplevel`
 3. **Deploy to evo-x2**: `sudo nixos-rebuild switch --flake .#evo-x2`
@@ -106,11 +115,13 @@ nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush"
 ## 🚨 BLOCKERS
 
 ### Technical Debt
+
 - Configuration inconsistency between modules
 - Missing parameter validation
 - No automated testing for package availability
 
 ### Process Issues
+
 - Manual configuration without validation
 - No CI/CD for cross-platform compatibility
 
@@ -119,12 +130,14 @@ nix-ai-tools.packages.${pkgs.stdenv.hostPlatform.system} or {}."crush"
 ## 🎯 SUCCESS CRITERIA
 
 ### Definition of Done
+
 - [ ] crush 0.21.0 is included in evo-x2 system packages
 - [ ] Configuration evaluates without errors for x86_64-linux
 - [ ] `which crush` returns valid path on evo-x2
 - [ ] `crush --version` returns version 0.21.0
 
 ### Acceptance Testing
+
 ```bash
 # On evo-x2 system:
 $ which crush
@@ -139,11 +152,13 @@ crush 0.21.0
 ## 💡 IMPROVEMENT OPPORTUNITIES
 
 ### Short-term (Next 24 hours)
+
 - [ ] Implement package validation in flake checks
 - [ ] Add automated testing for all supported architectures
 - [ ] Document package access patterns in project wiki
 
 ### Long-term (Next week)
+
 - [ ] Create type-safe wrapper for nix-ai-tools integration
 - [ ] Implement cross-platform package availability checks
 - [ ] Add monitoring for package update failures
@@ -153,6 +168,7 @@ crush 0.21.0
 ## 🔍 DEEP DIVE: nix-ai-tools Integration
 
 ### Current Implementation Analysis
+
 ```nix
 # Line 239: specialArgs include nix-ai-tools
 specialArgs = {
@@ -165,6 +181,7 @@ specialArgs = {
 ```
 
 ### Recommended Architecture
+
 ```nix
 # Create dedicated module for AI tools
 {
@@ -180,11 +197,13 @@ specialArgs = {
 ## 📋 TECHNICAL NOTES
 
 ### File Locations
+
 - **Primary config**: `/Users/larsartmann/Desktop/Setup-Mac/flake.nix`
 - **Target lines**: 253-267 (module definition)
 - **Special args**: Line 239 (nix-ai-tools included)
 
 ### Dependencies
+
 - `nix-ai-tools` input (confirmed working)
 - `lib` for optional package inclusion
 - `pkgs.stdenv.hostPlatform.system` for architecture detection

@@ -20,6 +20,7 @@ Project root directory has been analyzed and cleaned. Organized 15 loose files i
 ### ✅ Phase 1: Analysis (COMPLETE)
 
 **Root File Inventory:**
+
 - **Loose scripts (6 files, 345 lines)**
   - `cast-all-audio.sh` (66 lines) - Audio streaming to Google Nest
   - `fix-dns.sh` (40 lines) - DNS configuration fix
@@ -52,6 +53,7 @@ Project root directory has been analyzed and cleaned. Organized 15 loose files i
 ### ✅ Phase 2: Categorization (COMPLETE)
 
 Categorized files into logical groups:
+
 1. **scripts/** (already exists, 29 files) - System automation
 2. **bin/** (NEW) - Operational/runtime scripts
 3. **docs/** (exists, 60+ files) - Documentation
@@ -61,10 +63,12 @@ Categorized files into logical groups:
 ### ✅ Phase 3: Broken Code Detection (COMPLETE)
 
 **Identified and removed broken Go implementation:**
+
 - `cast-audio.go` - Failed import, broken since creation
 - `go.mod` - Empty module, no dependencies
 
 **Diagnosis:**
+
 - Import error: `could not import github.com/vishen/go-chromecast`
 - Module lacked dependencies: `go.mod` was 2 lines
 - Code unused, non-functional
@@ -100,6 +104,7 @@ Categorized files into logical groups:
 ```
 
 **Files to keep at root:**
+
 - `AGENTS.md` (1,004 lines) - AI behavior guide (project root)
 - `README.md` (730 lines) - Main documentation (project root)
 - `README.test.md` (300 lines) - Test documentation (project root)
@@ -108,17 +113,20 @@ Categorized files into logical groups:
 ### ⚠️ Phase 5: File Organization (IN PROGRESS - 70%)
 
 **Completed:**
+
 - ✅ Created 4 new directories with proper permissions
 - ✅ Removed broken Go files (cast-audio.go, go.mod)
 - ✅ Documented all file moves
 - ✅ Preserved executable permissions on scripts
 
 **In Progress:**
+
 - ⏳ Moving 13 files to new locations
 - ⏳ Updating file paths in references
 - ⏳ Verifying script functionality
 
 **Next Actions:**
+
 - Move files to new directories
 - Run `just test` to verify configuration
 - Run `just pre-commit-run` to catch issues
@@ -129,6 +137,7 @@ Categorized files into logical groups:
 ## Current Directory Structure
 
 ### Before Cleanup
+
 ```
 /Users/larsartmann/Desktop/Setup-Mac/
 ├── 15 loose files in root (2,125 lines)
@@ -137,6 +146,7 @@ Categorized files into logical groups:
 ```
 
 ### Target After Cleanup
+
 ```
 /Users/larsartmann/Desktop/Setup-Mac/
 ├── 4 files at root (AI docs, READMEs, symlink)
@@ -156,12 +166,14 @@ Categorized files into logical groups:
 ### 🔴 CRITICAL (P0)
 
 **1. Root Directory Clutter Crisis**
+
 - **Severity:** P0 - Major organizational debt
 - **Impact:** Cognitive overload, maintenance burden
 - **Evidence:** 15 files, 2,125 lines in project root
 - **Root Cause:** No file organization workflow
 
 **2. Broken Development Artifacts**
+
 - **Severity:** P0 - Dead code causing confusion
 - **Impact:** Wasted analysis time, false dependencies
 - **Evidence:** cast-audio.go (222 lines) broken since creation
@@ -171,6 +183,7 @@ Categorized files into logical groups:
 ### 🟡 MAJOR (P1)
 
 **3. Documentation Proliferation**
+
 - **Severity:** P1 - Information scattered
 - **Impact:** Redundancy, outdated content risk
 - **Evidence:** 8 docs files, 1,379 lines (Bluetooth docs alone: 1,191 lines)
@@ -178,6 +191,7 @@ Categorized files into logical groups:
 - **Recommendation:** Merge 3 Bluetooth docs into 1
 
 **4. Hardcoded Paths in Scripts**
+
 - **Severity:** P1 - Scripts not portable
 - **Impact:** Breaks when directory structure changes
 - **Evidence:** apply-config.sh hardcoded `/home/lars/Setup-Mac`
@@ -185,6 +199,7 @@ Categorized files into logical groups:
 - **Recommendation:** Implement path constants
 
 **5. Permission Inconsistency**
+
 - **Severity:** P1 - Confusing permissions
 - **Impact:** Unclear which files are meant to run
 - **Evidence:** All scripts executable (except fix-dns.sh had issues)
@@ -194,9 +209,11 @@ Categorized files into logical groups:
 ### 🟢 MINOR (P2)
 
 **6. Missing Go Dependencies**
+
 - **Status:** ✅ RESOLVED - Files removed
 
 **7. Unnecessary Files**
+
 - **Evidence:** README.test.md (300 lines) vs README.md (730 lines)
 - **Recommendation:** Merge or clarify purpose of test docs
 
@@ -220,6 +237,7 @@ Categorized files into logical groups:
    - New file: `docs/bluetooth-audio-casting.md`
 
 7. **Implement `just organize` command:**
+
    ```bash
    just organize     # Auto-sort loose files into directories
    ```
@@ -229,6 +247,7 @@ Categorized files into logical groups:
    - Enforce file organization standards
 
 9. **Create path constants library:**
+
    ```bash
    # scripts/lib/paths.sh
    PROJECT_ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -244,6 +263,7 @@ Categorized files into logical groups:
 11. **Audit all Nix files for hardcoded paths**
 12. **Implement automated artifact cleanup** (30-day rule)
 13. **Add file organization metrics to health check:**
+
     ```bash
     just check-organization  # Count files at root, report issues
     ```
@@ -285,6 +305,7 @@ Categorized files into logical groups:
 ### Files Pending Move (13 files)
 
 **bin/ (6 files, 269 lines):**
+
 - `cast-all-audio.sh` ✏️ Pending
 - `fix-dns.sh` ✏️ Pending
 - `fix-network-deep.sh` ✏️ Pending
@@ -293,19 +314,23 @@ Categorized files into logical groups:
 - `my-project-remote-install.sh` ✏️ Pending
 
 **dev/testing/ (2 files, 294 lines):**
+
 - `benchmark_ollama.py` ✏️ Pending
 - `test_streaming.py` ✏️ Pending
 
 **docs/archives/ (4 files, 1,379 lines):**
+
 - `AUDIO_CASTING_HISTORY.md` ✏️ Pending
 - `BLUETOOTH_SETUP_GUIDE.md` ✏️ Pending
 - `BLUETOOTH_QUICK_SUMMARY.md` ✏️ Pending
 - `gpt-oss-benchmark-report.md` ✏️ Pending
 
 **tools/ (1 file, 86 lines):**
+
 - `paths that can be cleaned.txt` ✏️ Pending
 
 ### Files Remaining at Root (4 files, 2,034 lines)
+
 - `AGENTS.md` (1,004 lines) ✓ Keep at root
 - `README.md` (730 lines) ✓ Keep at root
 - `README.test.md` (300 lines) ✓ Keep at root (for now)
@@ -318,12 +343,14 @@ Categorized files into logical groups:
 ### 🔴 HIGH RISK
 
 **If file moves break references:**
+
 - Nix configuration may fail to build
 - Scripts may not find other scripts
 - Home-manager activation may fail
 - Documentation links may break
 
 **Mitigation:**
+
 - Test thoroughly after each move
 - Keep backup of original structure
 - Test critical paths first
@@ -332,11 +359,13 @@ Categorized files into logical groups:
 ### 🟡 MEDIUM RISK
 
 **Documentation becomes outdated:**
+
 - Users may reference old paths
 - Links in documentation may break
 - AGENTS.md may reference moved files
 
 **Mitigation:**
+
 - Update AGENTS.md with new paths
 - Update README.md structure section
 - Add migration notes to CHANGELOG
@@ -345,10 +374,12 @@ Categorized files into logical groups:
 ### 🟢 LOW RISK
 
 **Symlink disruption:**
+
 - `hm-activate` symlink may break
 - Home-manager may need regeneration
 
 **Mitigation:**
+
 - Keep symlink at root
 - Test home-manager activation
 - Have just switch ready if needed

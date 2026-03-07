@@ -9,13 +9,13 @@
 
 ## Quick Summary
 
-| Metric | Value |
-|--------|-------|
-| Commits ahead of origin | 0 (all pushed) |
-| Working tree status | Clean |
-| Pre-commit hooks | All 6 passing |
-| Last successful build | crush-patched v0.41.0 |
-| Pending system switch | Yes (needs `just switch`) |
+| Metric                  | Value                     |
+| ----------------------- | ------------------------- |
+| Commits ahead of origin | 0 (all pushed)            |
+| Working tree status     | Clean                     |
+| Pre-commit hooks        | All 6 passing             |
+| Last successful build   | crush-patched v0.41.0     |
+| Pending system switch   | Yes (needs `just switch`) |
 
 ---
 
@@ -24,16 +24,19 @@
 ### 1. Git Commits (3 total)
 
 #### Commit 1: `7d5f67b` - Pre-commit & LaunchAgent Fixes
+
 - Fixed alejandra pre-commit hook stdin error
 - Migrated sublime-text LaunchAgent to Nix
 - Discovered ublock LaunchAgent already migrated
 
 #### Commit 2: `a33c734` - Formatting & Tools
+
 - Applied alejandra formatting to 14 Nix files
 - Added duplication detection scripts
 - Created documentation
 
 #### Commit 3: `4cf39a6` - Crush Upgrade
+
 - Upgraded crush-patched: v0.39.3 → v0.41.0
 - Applied 3 critical upstream patches
 - Updated documentation
@@ -43,6 +46,7 @@
 ## Current System State
 
 ### Git Repository
+
 ```
 Branch: master
 Status: Your branch is up to date with 'origin/master'.
@@ -50,6 +54,7 @@ Working tree: clean
 ```
 
 ### Recent History
+
 ```
 4cf39a6 feat(pkgs): upgrade crush-patched to v0.41.0 with critical upstream patches
 a33c734 style(formatting): apply alejandra formatting to all nix files
@@ -63,11 +68,13 @@ feb9d23 chore(nix-config): resolve critical TODOs and improve Nix idiomatic patt
 ## Pending Actions
 
 ### Critical (Next Session)
+
 1. **Run `just switch`** to apply crush upgrade
 2. **Verify LaunchAgents** load correctly
 3. **Test crush v0.41.0** binary
 
 ### Medium Priority
+
 4. Archive old bash scripts to `scripts/archive/`
 5. Update TODO-STATUS.md
 6. Run `just health` for full verification
@@ -77,6 +84,7 @@ feb9d23 chore(nix-config): resolve critical TODOs and improve Nix idiomatic patt
 ## File Manifest (New/Created Today)
 
 ### Documentation
+
 ```
 docs/status/2026-02-10_18-52_COMPREHENSIVE-TODO-COMPLETION-REPORT.md
 docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
@@ -84,12 +92,14 @@ docs/status/2026-02-10_21-57_POST-COMMIT-SYSTEM-STATE.md (this file)
 ```
 
 ### Scripts
+
 ```
 scripts/find-nix-duplicates.sh
 scripts/find-nix-semantic-dupes.sh
 ```
 
 ### Patches
+
 ```
 patches/2161-regex-cache-reset.patch
 patches/2180-lsp-files-outside-cwd.patch
@@ -101,14 +111,16 @@ patches/2181-sqlite-busy-timeout.patch
 ## Configuration Changes Applied
 
 ### Pre-commit Hooks
+
 ```yaml
 # .pre-commit-config.yaml
 - id: alejandra
-  entry: bash -c 'alejandra --check .'  # Fixed: added explicit path
-  pass_filenames: false                  # Fixed: was true
+  entry: bash -c 'alejandra --check .' # Fixed: added explicit path
+  pass_filenames: false # Fixed: was true
 ```
 
 ### LaunchAgents (Darwin)
+
 ```nix
 # platforms/darwin/services/launchagents.nix
 "com.larsartmann.sublime-sync" = {
@@ -119,6 +131,7 @@ patches/2181-sqlite-busy-timeout.patch
 ```
 
 ### Crush Package
+
 ```nix
 # pkgs/crush-patched.nix
 version = "v0.41.0";
@@ -164,4 +177,3 @@ just pre-commit-run
 
 **Report Generated:** 2026-02-10 21:57
 **Status:** ✅ All changes committed and pushed
-

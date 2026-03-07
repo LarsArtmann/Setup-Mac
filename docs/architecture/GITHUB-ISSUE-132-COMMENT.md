@@ -202,12 +202,14 @@ All files are ready. Let me know if you need any enhancements!
 ## How to Add Comment to GitHub Issue #132
 
 ### Option 1: Via GitHub Web Interface
+
 1. Open issue: https://github.com/YOUR_USERNAME/Setup-Mac/issues/132
 2. Scroll to bottom comment box
 3. Paste the comment text
 4. Click "Comment"
 
 ### Option 2: Via GitHub CLI (If Authentication Works)
+
 ```bash
 # Authenticate first
 gh auth login
@@ -217,6 +219,7 @@ gh issue comment 132 --body "$(cat docs/architecture/GITHUB-ISSUE-132-COMMENT.md
 ```
 
 ### Option 3: Via API (If You Have a Personal Access Token)
+
 ```bash
 curl -X POST \
   -H "Authorization: token YOUR_GITHUB_TOKEN" \
@@ -232,10 +235,12 @@ curl -X POST \
 ✅ **Technitium DNS Server configuration is COMPLETE**
 
 📋 **Ready for deployment on:**
+
 - evo-x2 (NixOS Laptop) - Deploy now
 - Private Cloud - Deploy when hardware is ready
 
 📝 **Documentation:**
+
 - 2000+ lines of comprehensive guides
 - 12 just commands for DNS management
 - Multiple architecture documents

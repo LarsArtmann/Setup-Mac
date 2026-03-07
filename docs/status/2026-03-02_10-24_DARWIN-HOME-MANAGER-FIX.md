@@ -23,6 +23,7 @@ The `platforms/darwin/default.nix` had the Home Manager user workaround commente
 ```
 
 This caused Home Manager to fail because:
+
 1. Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix`
 2. This NixOS-specific module requires `config.users.users.<name>.home` to be defined
 3. Without the explicit definition, `home.homeDirectory` evaluates to `null`
@@ -49,6 +50,7 @@ users.users.larsartmann = {
 ## Verification
 
 ### Build Output
+
 ```
 [U.] darwin-system 26.05.3mbfa436 -> 26.05.52d0615
 [U*] sd 1.0.0 -> 1.1.0
@@ -60,6 +62,7 @@ DIFF: 1.12 MiB
 ```
 
 ### Activation Success
+
 ```
 Activating home-manager configuration for larsartmann
 Starting Home Manager activation
@@ -74,6 +77,7 @@ Activating setupLaunchAgents
 ```
 
 ### Binary Verification
+
 ```bash
 $ crush --version
 crush version v0.46.1
@@ -96,13 +100,13 @@ crush version v0.46.1
 
 ## Impact Assessment
 
-| Component | Before | After |
-|-----------|--------|-------|
-| `nh darwin switch` | ❌ Failed | ✅ Works |
-| `just switch` | ❌ Failed | ✅ Works |
-| `just test` | ❌ Failed | ✅ Works |
-| Home Manager activation | ❌ Error | ✅ Success |
-| crush-patched | ❌ v0.46.0 | ✅ v0.46.1 |
+| Component               | Before     | After      |
+| ----------------------- | ---------- | ---------- |
+| `nh darwin switch`      | ❌ Failed  | ✅ Works   |
+| `just switch`           | ❌ Failed  | ✅ Works   |
+| `just test`             | ❌ Failed  | ✅ Works   |
+| Home Manager activation | ❌ Error   | ✅ Success |
+| crush-patched           | ❌ v0.46.0 | ✅ v0.46.1 |
 
 ---
 
@@ -120,6 +124,7 @@ This fix completes the crush-patched v0.46.1 update chain:
 ## Technical Details
 
 ### Error Chain
+
 ```
 home-manager.users.larsartmann.home.homeDirectory
   → null (undefined)
@@ -129,6 +134,7 @@ home-manager.users.larsartmann.home.homeDirectory
 ```
 
 ### Why This Happens
+
 Home Manager's Darwin module reuses the NixOS common module for user configuration, but macOS doesn't use `/etc/passwd` in the same way. The explicit `users.users` definition provides the metadata Home Manager needs.
 
 ---
@@ -136,14 +142,17 @@ Home Manager's Darwin module reuses the NixOS common module for user configurati
 ## Recommendations
 
 ### Immediate
+
 - ✅ **DONE** - Restore workaround with better documentation
 
 ### Short-term
+
 - Monitor Home Manager issues for permanent fix
 - Consider pinning Home Manager version if this regresses
 - Add CI check that validates `nh darwin switch` succeeds
 
 ### Long-term
+
 - Upstream fix to Home Manager to handle macOS user detection
 - Separate Darwin-specific user module that doesn't require explicit definition
 

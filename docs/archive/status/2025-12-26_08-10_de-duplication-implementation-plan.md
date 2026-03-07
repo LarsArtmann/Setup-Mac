@@ -138,45 +138,54 @@ graph TD
 ---
 
 ## Phase 1: Quick Wins (1% Impact)
+
 **Estimated Time:** 15 minutes
 **Risk Level:** Very Low
 
 ### Task 1.1: Import common Nix settings in NixOS configuration
+
 **Time:** 5 minutes
 **Impact:** High (eliminates duplicate Nix configuration)
 **Risk:** Very Low (common settings already tested on Darwin)
 
 **Steps:**
+
 1. Open `platforms/nixos/system/configuration.nix`
 2. Add import: `../../common/core/nix-settings.nix` (line 12)
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/system/configuration.nix` (1 import added)
 
 ---
 
 ### Task 1.2: Remove inline experimental-features from NixOS configuration
+
 **Time:** 2 minutes
 **Impact:** High (eliminates duplicate experimental-features)
 **Risk:** Very Low (now imported from common)
 
 **Steps:**
+
 1. Open `platforms/nixos/system/configuration.nix`
 2. Delete line 56: `nix.settings.experimental-features = ["nix-command" "flakes"];`
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/system/configuration.nix` (1 line deleted)
 
 ---
 
 ### Task 1.3: Move AI variables from ai-stack.nix to Home Manager
+
 **Time:** 10 minutes
 **Impact:** High (fixes variable scope issue)
 **Risk:** Low (Ollama service runs as user, user-level variables correct)
 
 **Steps:**
+
 1. Open `platforms/nixos/users/home.nix`
 2. Add at line 38 (after sessionVariables):
    ```nix
@@ -193,17 +202,20 @@ graph TD
 5. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/users/home.nix` (sessionVariables added)
 - `platforms/nixos/desktop/ai-stack.nix` (environment.variables deleted)
 
 ---
 
 ### Task 1.4: Update Darwin Fish config to use common pattern
+
 **Time:** 5 minutes
 **Impact:** High (reduces shell configuration duplication)
 **Risk:** Very Low (common pattern already tested)
 
 **Steps:**
+
 1. Open `platforms/darwin/programs/shells.nix`
 2. Replace entire content with:
    ```nix
@@ -220,18 +232,22 @@ graph TD
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/darwin/programs/shells.nix` (complete refactor)
 
 ---
 
 ### Phase 1 Verification
+
 **Time:** 5 minutes
 **Commands:**
+
 ```bash
 nix flake check
 ```
 
 **Success Criteria:**
+
 - Flake syntax check passes
 - No duplicate experimental-features
 - AI variables in Home Manager scope
@@ -240,17 +256,21 @@ nix flake check
 ---
 
 ## Phase 2: Structural Improvements (4% Impact)
+
 **Estimated Time:** 45 minutes
 **Risk Level:** Low
 
 ### Task 2.1: Create common/fonts.nix module
+
 **Time:** 10 minutes
 **Impact:** High (enables cross-platform fonts)
 **Risk:** Low (simple module creation)
 
 **Steps:**
+
 1. Create file: `platforms/common/packages/fonts.nix`
 2. Add content:
+
    ```nix
    {pkgs, ...}: {
      fonts.packages = with pkgs; [
@@ -265,19 +285,23 @@ nix flake check
      };
    }
    ```
+
 3. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/fonts.nix` (new)
 
 ---
 
 ### Task 2.2: Import fonts in both systems
+
 **Time:** 5 minutes
 **Impact:** High (cross-platform font consistency)
 **Risk:** Very Low (simple import)
 
 **Steps:**
+
 1. Open `platforms/nixos/system/configuration.nix`
 2. Add import: `../../common/packages/fonts.nix` (line 12)
 3. Delete lines 69-79 (inline font configuration)
@@ -286,17 +310,20 @@ nix flake check
 6. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/system/configuration.nix` (import added, 11 lines deleted)
 - `platforms/darwin/default.nix` (import added)
 
 ---
 
 ### Task 2.3: Add Hyprland cache to common Nix settings
+
 **Time:** 5 minutes
 **Impact:** Medium (better cache coverage)
 **Risk:** Very Low (cache addition is safe)
 
 **Steps:**
+
 1. Open `platforms/common/core/nix-settings.nix`
 2. Add "https://hyprland.cachix.org" to substituters (line 23)
 3. Add key to trusted-public-keys (line 27):
@@ -304,16 +331,19 @@ nix flake check
 4. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/common/core/nix-settings.nix` (substituters updated, key added)
 
 ---
 
 ### Task 2.4: Update NixOS to import Nix settings and override caches
+
 **Time:** 10 minutes
 **Impact:** High (consistent Nix configuration)
 **Risk:** Low (imports common settings with Hyprland cache override)
 
 **Steps:**
+
 1. Open `platforms/nixos/system/configuration.nix`
 2. Replace lines 59-65 (inline nix.settings) with:
    ```nix
@@ -326,28 +356,34 @@ nix flake check
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/system/configuration.nix` (nix.settings replaced with mkForce override)
 
 ---
 
 ### Task 2.5: Remove pavucontrol duplicate from multi-wm.nix
+
 **Time:** 5 minutes
 **Impact:** Low (code cleanup)
 **Risk:** Zero (still in home.nix for user access)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/multi-wm.nix`
 2. Delete line 76: `pavucontrol # Audio control`
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/multi-wm.nix` (1 line deleted)
 
 ---
 
 ### Phase 2 Verification
+
 **Time:** 10 minutes
 **Commands:**
+
 ```bash
 nix flake check
 # On NixOS:
@@ -357,6 +393,7 @@ darwin-rebuild build --flake .
 ```
 
 **Success Criteria:**
+
 - Flake syntax check passes
 - NixOS builds successfully
 - Darwin builds successfully
@@ -366,15 +403,18 @@ darwin-rebuild build --flake .
 ---
 
 ## Phase 3: Organizational Refactoring (20% Impact)
+
 **Estimated Time:** 3 hours
 **Risk Level:** Medium (module creation requires testing)
 
 ### Task 3.1: Create common/packages/monitoring/gpu.nix
+
 **Time:** 15 minutes
 **Impact:** Medium (better GPU monitoring organization)
 **Risk:** Low (consolidates existing packages)
 
 **Steps:**
+
 1. Create directory: `platforms/common/packages/monitoring/`
 2. Create file: `platforms/common/packages/monitoring/gpu.nix`
 3. Add content:
@@ -391,16 +431,19 @@ darwin-rebuild build --flake .
 4. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/monitoring/gpu.nix` (new)
 
 ---
 
 ### Task 3.2: Create common/packages/desktop/launchers.nix
+
 **Time:** 15 minutes
 **Impact:** Medium (clearer launcher module)
 **Risk:** Low (consolidates existing packages)
 
 **Steps:**
+
 1. Create directory: `platforms/common/packages/desktop/`
 2. Create file: `platforms/common/packages/desktop/launchers.nix`
 3. Add content:
@@ -416,16 +459,19 @@ darwin-rebuild build --flake .
 4. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/desktop/launchers.nix` (new)
 
 ---
 
 ### Task 3.3: Create common/packages/desktop/notifications.nix
+
 **Time:** 10 minutes
 **Impact:** Medium (clearer notifications module)
 **Risk:** Low (consolidates existing packages)
 
 **Steps:**
+
 1. Create file: `platforms/common/packages/desktop/notifications.nix`
 2. Add content:
    ```nix
@@ -441,16 +487,19 @@ darwin-rebuild build --flake .
 3. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/desktop/notifications.nix` (new)
 
 ---
 
 ### Task 3.4: Create common/packages/desktop/screenshots.nix
+
 **Time:** 15 minutes
 **Impact:** Medium (clearer screenshot module)
 **Risk:** Low (consolidates existing packages)
 
 **Steps:**
+
 1. Create file: `platforms/common/packages/desktop/screenshots.nix`
 2. Add content:
    ```nix
@@ -466,16 +515,19 @@ darwin-rebuild build --flake .
 3. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/desktop/screenshots.nix` (new)
 
 ---
 
 ### Task 3.5: Create common/packages/desktop/terminals.nix
+
 **Time:** 10 minutes
 **Impact:** Medium (clearer terminals module)
 **Risk:** Low (consolidates existing packages)
 
 **Steps:**
+
 1. Create file: `platforms/common/packages/desktop/terminals.nix`
 2. Add content:
    ```nix
@@ -492,16 +544,19 @@ darwin-rebuild build --flake .
 3. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/desktop/terminals.nix` (new)
 
 ---
 
 ### Task 3.6: Create common/packages/ai/core.nix and ai/inference.nix
+
 **Time:** 20 minutes
 **Impact:** Medium (better AI module organization)
 **Risk:** Low (reorganizes existing packages)
 
 **Steps:**
+
 1. Create directory: `platforms/common/packages/ai/`
 2. Create file: `platforms/common/packages/ai/core.nix`:
    ```nix
@@ -529,17 +584,20 @@ darwin-rebuild build --flake .
 4. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/ai/core.nix` (new)
 - `platforms/common/packages/ai/inference.nix` (new)
 
 ---
 
 ### Task 3.7: Create common/packages/security/ subdirectory modules
+
 **Time:** 20 minutes
 **Impact:** Medium (better security module organization)
 **Risk:** Low (reorganizes existing packages)
 
 **Steps:**
+
 1. Create directory: `platforms/common/packages/security/`
 2. Create file: `platforms/common/packages/security/authentication.nix`:
    ```nix
@@ -582,6 +640,7 @@ darwin-rebuild build --flake .
 5. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/packages/security/authentication.nix` (new)
 - `platforms/common/packages/security/network.nix` (new)
 - `platforms/common/packages/security/system.nix` (new)
@@ -589,27 +648,32 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 3.8: Remove inline AI variables from ai-stack.nix
+
 **Time:** 5 minutes
 **Impact:** Medium (fixes variable scope)
 **Risk:** Zero (already moved to Home Manager in 1.3)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/ai-stack.nix`
 2. Verify lines 4-9 are deleted (environment.variables)
 3. If not, delete them
 4. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/ai-stack.nix` (cleanup if needed)
 
 ---
 
 ### Task 3.9: Update system/configuration.nix imports
+
 **Time:** 10 minutes
 **Impact:** High (use new monitoring and security modules)
 **Risk:** Low (simple import updates)
 
 **Steps:**
+
 1. Open `platforms/nixos/system/configuration.nix`
 2. Add imports (line 12):
    ```nix
@@ -625,96 +689,115 @@ darwin-rebuild build --flake .
 4. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/system/configuration.nix` (7 imports added, 1 deleted)
 
 ---
 
 ### Task 3.10: Update monitoring.nix to remove GPU packages
+
 **Time:** 5 minutes
 **Impact:** Medium (cleaner monitoring module)
 **Risk:** Zero (GPU packages moved to dedicated module)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/monitoring.nix`
 2. Delete lines 4-7 (GPU monitoring packages)
 3. Keep only system/network monitoring (lines 9-19)
 4. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/monitoring.nix` (4 lines deleted)
 
 ---
 
 ### Task 3.11: Update multi-wm.nix to remove launcher packages
+
 **Time:** 5 minutes
 **Impact:** Medium (cleaner multi-wm module)
 **Risk:** Zero (launcher packages moved to dedicated module)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/multi-wm.nix`
 2. Delete lines 55 (wofi)
 3. Delete line 67 (mako)
 4. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/multi-wm.nix` (2 lines deleted)
 
 ---
 
 ### Task 3.12: Update multi-wm.nix to remove screenshot packages
+
 **Time:** 5 minutes
 **Impact:** Medium (cleaner multi-wm module)
 **Risk:** Zero (screenshot packages moved to dedicated module)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/multi-wm.nix`
 2. Delete lines 79-80 (grim, slurp)
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/multi-wm.nix` (2 lines deleted)
 
 ---
 
 ### Task 3.13: Remove empty default.nix from desktop
+
 **Time:** 2 minutes
 **Impact:** Low (code cleanup)
 **Risk:** Zero (file is unused)
 
 **Steps:**
+
 1. Delete file: `platforms/nixos/desktop/default.nix`
 2. Test: `nix flake check`
 
 **Files Deleted:**
+
 - `platforms/nixos/desktop/default.nix` (unused placeholder)
 
 ---
 
 ### Task 3.14: Remove empty xserver config from hyprland-config.nix
+
 **Time:** 5 minutes
 **Impact:** Low (code cleanup)
 **Risk:** Zero (config is empty)
 
 **Steps:**
+
 1. Open `platforms/nixos/desktop/hyprland-config.nix`
 2. Delete lines 6-12 (empty xserver config)
 3. Test: `nix flake check`
 
 **Files Modified:**
+
 - `platforms/nixos/desktop/hyprland-config.nix` (7 lines deleted)
 
 ---
 
 ### Task 3.15: Create environment/variables/common.nix
+
 **Time:** 10 minutes
 **Impact:** Medium (clearer variable organization)
 **Risk:** Low (reorganizes existing variables)
 
 **Steps:**
+
 1. Create directory: `platforms/common/environment/variables/`
 2. Move content of `platforms/common/environment/variables.nix` to:
    `platforms/common/environment/variables/common.nix`
 3. Update `platforms/common/environment/variables.nix` to import:
+
    ```nix
    {pkgs, lib, ...}: {
      imports = [./variables/common.nix];
@@ -722,19 +805,24 @@ darwin-rebuild build --flake .
      environment.variables = commonEnvVars;
    }
    ```
+
 4. Test: `nix flake check`
 
 **Files Created:**
+
 - `platforms/common/environment/variables/common.nix` (new)
 
 **Files Modified:**
+
 - `platforms/common/environment/variables.nix` (refactored)
 
 ---
 
 ### Phase 3 Verification
+
 **Time:** 20 minutes
 **Commands:**
+
 ```bash
 nix flake check
 # On NixOS:
@@ -744,6 +832,7 @@ darwin-rebuild build --flake .
 ```
 
 **Success Criteria:**
+
 - Flake syntax check passes
 - NixOS test build succeeds
 - Darwin build succeeds
@@ -754,15 +843,18 @@ darwin-rebuild build --flake .
 ---
 
 ## Phase 4: Validation & Cleanup (10% Impact)
+
 **Estimated Time:** 30 minutes
 **Risk Level:** Very Low
 
 ### Task 4.1: Run nix flake check
+
 **Time:** 2 minutes
 **Impact:** High (validates all changes)
 **Risk:** Zero (read-only validation)
 
 **Steps:**
+
 1. Run: `nix flake check`
 2. Fix any errors found
 3. Re-run until clean
@@ -770,11 +862,13 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 4.2: Run just test for NixOS
+
 **Time:** 5 minutes
 **Impact:** High (validates NixOS configuration)
 **Risk:** Zero (read-only validation)
 
 **Steps:**
+
 1. Run: `just test` (on NixOS or with NixOS target)
 2. Fix any errors found
 3. Re-run until clean
@@ -782,11 +876,13 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 4.3: Test Darwin switch (if on macOS)
+
 **Time:** 5 minutes
 **Impact:** High (validates Darwin configuration)
 **Risk:** Zero (dry-run validation)
 
 **Steps:**
+
 1. Run: `just test` (on Darwin or with Darwin target)
 2. Fix any errors found
 3. Re-run until clean
@@ -794,11 +890,13 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 4.4: Run just health
+
 **Time:** 5 minutes
 **Impact:** High (comprehensive system check)
 **Risk:** Zero (read-only validation)
 
 **Steps:**
+
 1. Run: `just health`
 2. Review output for issues
 3. Address any problems found
@@ -806,11 +904,13 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 4.5: Run just pre-commit-run
+
 **Time:** 3 minutes
 **Impact:** Medium (code quality check)
 **Risk:** Zero (read-only validation)
 
 **Steps:**
+
 1. Run: `just pre-commit-run`
 2. Fix any issues found (formatting, trailing whitespace, gitleaks)
 3. Re-run until clean
@@ -818,44 +918,53 @@ darwin-rebuild build --flake .
 ---
 
 ### Task 4.6: Update documentation
+
 **Time:** 8 minutes
 **Impact:** Medium (documentation completeness)
 **Risk:** Zero (documentation only)
 
 **Steps:**
+
 1. Update `AGENTS.md` with new package structure
 2. Document de-duplication patterns used
 3. Update package organization section
 
 **Files Modified:**
+
 - `AGENTS.md` (documentation updates)
 
 ---
 
 ### Task 4.7: Create status report
+
 **Time:** 2 minutes
 **Impact:** Medium (project documentation)
 **Risk:** Zero (documentation only)
 
 **Steps:**
+
 1. Create: `docs/status/2025-12-26_XX-XX_de-duplication-implementation-complete.md`
 2. Document all changes made
 3. Include metrics (duplications removed, files created/deleted)
 
 **Files Created:**
+
 - `docs/status/2025-12-26_XX-XX_de-duplication-implementation-complete.md` (new)
 
 ---
 
 ### Phase 4 Verification
+
 **Time:** 5 minutes
 **Commands:**
+
 ```bash
 git status
 git diff --stat
 ```
 
 **Success Criteria:**
+
 - All validations pass
 - Documentation updated
 - Status report created
@@ -866,11 +975,13 @@ git diff --stat
 ## Final Commit & Push
 
 ### Commit Strategy
+
 1. Commit in logical groups (Phase 1, Phase 2, etc.)
 2. Use descriptive commit messages following Conventional Commits
 3. Include attribution and Crush signature
 
 ### Commit Message Template
+
 ```
 refactor(phase): description
 
@@ -892,6 +1003,7 @@ Assisted-by: GLM-4.7 via Crush <crush@charm.land>
 ```
 
 ### Push Commands
+
 ```bash
 git add -A
 git commit -m "..."
@@ -903,6 +1015,7 @@ git push
 ## Success Metrics
 
 ### Duplications Eliminated
+
 - [ ] 0 GPU monitoring tool duplicates
 - [ ] 0 wallpaper tool duplicates
 - [ ] 0 desktop tool duplicates
@@ -912,6 +1025,7 @@ git push
 - [ ] 0 environment variable duplicates
 
 ### Module Organization
+
 - [ ] All packages in focused, single-purpose modules
 - [ ] Clear module boundaries (<50 lines each)
 - [ ] Platform guards used appropriately
@@ -919,6 +1033,7 @@ git push
 - [ ] No empty placeholder files
 
 ### Quality Metrics
+
 - [ ] `nix flake check` passes
 - [ ] `just test` passes on both platforms
 - [ ] `just health` shows no critical issues
@@ -926,6 +1041,7 @@ git push
 - [ ] Documentation up-to-date
 
 ### Project Health
+
 - [ ] Working tree clean
 - [ ] All commits pushed to remote
 - [ ] Status report created
@@ -936,17 +1052,21 @@ git push
 ## Risk Mitigation
 
 ### Backup Strategy
+
 - Nix generations provide automatic rollback
 - Use `just rollback` if switch fails
 - Git commit after each phase (incremental)
 
 ### Testing Strategy
+
 - Test after each phase
 - Use dry-run (`just test` or `darwin-rebuild build`)
 - Full switch only after all phases complete
 
 ### Rollback Plan
+
 If critical issue occurs:
+
 1. `just rollback` (previous generation)
 2. `git reset --hard HEAD` (undo changes)
 3. Document issue and adjust plan
@@ -956,6 +1076,7 @@ If critical issue occurs:
 ## Timeline
 
 ### Phase 1: Quick Wins (15 min)
+
 - Task 1.1: 5 min
 - Task 1.2: 2 min
 - Task 1.3: 10 min
@@ -963,6 +1084,7 @@ If critical issue occurs:
 - Verification: 5 min
 
 ### Phase 2: Structural (45 min)
+
 - Task 2.1: 10 min
 - Task 2.2: 5 min
 - Task 2.3: 5 min
@@ -971,11 +1093,13 @@ If critical issue occurs:
 - Verification: 10 min
 
 ### Phase 3: Refactoring (3 hours)
+
 - Task 3.1-3.7: 90 min
 - Task 3.8-3.15: 90 min
 - Verification: 20 min
 
 ### Phase 4: Validation (30 min)
+
 - Task 4.1-4.7: 30 min
 
 **Total Estimated Time:** 4.5 hours
@@ -995,6 +1119,6 @@ If critical issue occurs:
 
 ---
 
-*Plan created: 2025-12-26 08:10 CET*
-*Prepared by: Crush AI Assistant*
-*Status: Ready for Execution*
+_Plan created: 2025-12-26 08:10 CET_
+_Prepared by: Crush AI Assistant_
+_Status: Ready for Execution_

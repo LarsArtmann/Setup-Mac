@@ -13,10 +13,12 @@ This directory contains historical documentation from the SystemNix project's de
 ### Path References
 
 **All documents in this directory reference the old project path:**
+
 - ❌ `~/Desktop/Setup-Mac`
 - ❌ `/Users/larsartmann/Desktop/Setup-Mac`
 
 **Current project path is:**
+
 - ✅ `~/projects/SystemNix`
 - ✅ `/Users/larsartmann/projects/SystemNix`
 
@@ -33,12 +35,14 @@ These documents are preserved as-is to maintain the historical accuracy of the m
 ### When to Use This Archive
 
 ✅ **Appropriate uses:**
+
 - Researching migration decisions and architecture changes
 - Understanding the evolution of the project structure
 - Learning from previous challenges and solutions
 - Historical analysis and documentation
 
 ❌ **Inappropriate uses:**
+
 - Following setup or deployment instructions (use main docs/)
 - Resolving current system issues (use docs/troubleshooting/)
 - Implementing new features (use current configuration)
@@ -48,6 +52,7 @@ These documents are preserved as-is to maintain the historical accuracy of the m
 ## 📂 Archive Contents
 
 ### Status Reports
+
 Location: `docs/archive/status/`
 
 Contains historical status reports documenting the development progress, challenges encountered, and solutions implemented during the project's evolution.
@@ -55,6 +60,7 @@ Contains historical status reports documenting the development progress, challen
 **Time Period**: December 2025 - February 2026
 
 **Key Topics Covered**:
+
 - Home Manager integration and deployment
 - Cross-platform configuration (Darwin + NixOS)
 - Type safety system implementation

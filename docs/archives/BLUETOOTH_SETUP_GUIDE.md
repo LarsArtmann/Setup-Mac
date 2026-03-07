@@ -9,6 +9,7 @@
 ## Configuration Changes Made
 
 ### 1. Created Bluetooth Configuration
+
 **File:** `/home/lars/Setup-Mac/platforms/nixos/hardware/bluetooth.nix`
 
 ```nix
@@ -38,6 +39,7 @@
 ```
 
 ### 2. Added Bluetooth Module to System Configuration
+
 **File:** `/home/lars/Setup-Mac/platforms/nixos/system/configuration.nix`
 **Line 13:** Added `../hardware/bluetooth.nix` to imports
 
@@ -46,12 +48,14 @@
 ## Step 1: Rebuild NixOS System
 
 **Run on evo-x2:**
+
 ```bash
 cd /home/lars/Setup-Mac
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 **Expected Output:**
+
 - Configuration builds successfully
 - Bluetooth service enabled
 - Blueman installed
@@ -62,6 +66,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ## Step 2: Reboot System
 
 **Required for Bluetooth kernel modules to load:**
+
 ```bash
 sudo reboot
 ```
@@ -85,6 +90,7 @@ bluetoothctl power on
 ```
 
 **Expected Output:**
+
 ```
 # bluetoothctl power on
 Changing power on succeeded
@@ -98,6 +104,7 @@ Changing power on succeeded
 ### Option A: Using Bluetooth GUI (Recommended)
 
 1. **Open Bluetooth Manager:**
+
    ```bash
    blueman-manager
    ```
@@ -143,6 +150,7 @@ bluetoothctl trust 00:11:22:33:44:55
 ```
 
 **Expected Pairing Output:**
+
 ```
 # bluetoothctl pair 00:11:22:33:44:55
 Attempting to pair with 00:11:22:33:44:55
@@ -161,6 +169,7 @@ Connection successful
 ## Step 5: Set Nest Audio as Default Audio Output
 
 ### Using Blueman Manager (GUI):
+
 1. Open `blueman-manager`
 2. Right-click on "Google Nest Audio"
 3. Select "Audio Profile"
@@ -168,6 +177,7 @@ Connection successful
 5. Click "Set as Default Audio Device" if available
 
 ### Using PipeWire CLI:
+
 ```bash
 # List all audio sinks
 pactl list short sinks
@@ -185,9 +195,11 @@ wpctl set-default bluez_sink.00_11_22_33_44_55.a2dp_sink
 ```
 
 ### Using Pavucontrol (GUI):
+
 ```bash
 pavucontrol
 ```
+
 1. Go to "Playback" tab
 2. Select "Nest Audio" from the dropdown
 3. All audio will now route to Nest Audio
@@ -197,6 +209,7 @@ pavucontrol
 ## Step 6: Test Audio Streaming
 
 ### Test with System Sounds:
+
 ```bash
 # Play test sound
 paplay /usr/share/sounds/freedesktop/stereo/complete.oga
@@ -207,11 +220,13 @@ vlc /path/to/music.mp3
 ```
 
 ### Test with YouTube/Music:
+
 1. Open ungoogled-chromium (Helium)
 2. Play any audio/video
 3. Verify sound comes from Nest Audio
 
 ### Test with System Audio:
+
 - All system sounds should route to Nest Audio
 - Notifications, music, videos, games - everything
 
@@ -222,10 +237,12 @@ vlc /path/to/music.mp3
 To make Nest Audio auto-connect on boot:
 
 ### Using Blueman Manager:
+
 1. Right-click on "Google Nest Audio"
 2. Check "Auto-connect"
 
 ### Using Command Line:
+
 ```bash
 bluetoothctl trust 00:11:22:33:44:55
 bluetoothctl connect 00:11:22:33:44:55
@@ -238,6 +255,7 @@ The device will now automatically connect when in range and Bluetooth is on.
 ## Troubleshooting
 
 ### Bluetooth Not Starting
+
 ```bash
 # Check service status
 systemctl status bluetooth
@@ -250,6 +268,7 @@ sudo systemctl enable bluetooth
 ```
 
 ### Device Not Found During Scan
+
 ```bash
 # Make sure Bluetooth is on
 bluetoothctl power on
@@ -264,6 +283,7 @@ bluetoothctl power on
 ```
 
 ### Pairing Fails
+
 ```bash
 # Remove existing pairing (if any)
 bluetoothctl remove 00:11:22:33:44:55
@@ -275,6 +295,7 @@ bluetoothctl pair 00:11:22:33:44:55
 ```
 
 ### Connection Drops
+
 ```bash
 # Check signal strength
 bluetoothctl info 00:11:22:33:44:55
@@ -288,6 +309,7 @@ bluetoothctl connect 00:11:22:33:44:55
 ```
 
 ### Audio Quality Issues
+
 ```bash
 # Use A2DP profile (better quality than HSP/HFP)
 # Blueman Manager: Right-click Nest Audio → Audio Profile → High Fidelity Playback (A2DP Sink)
@@ -300,6 +322,7 @@ pactl list cards | grep -A 20 "Nest Audio"
 ```
 
 ### No Audio Output
+
 ```bash
 # Check if Nest Audio is selected as output
 pactl list short sinks
@@ -316,9 +339,11 @@ pavucontrol
 ```
 
 ### Audio Latency/Delay
+
 Bluetooth audio typically has 50-200ms latency. This is normal.
 
 If latency is unacceptable:
+
 1. Use wired connection (not possible with Nest Audio)
 2. Accept Bluetooth delay (normal behavior)
 3. Google Cast would have similar or worse latency (2-5 seconds)
@@ -328,6 +353,7 @@ If latency is unacceptable:
 ## Why Bluetooth Instead of Google Cast?
 
 ### Bluetooth Advantages:
+
 ✅ **Native Support:** Nest Audio has built-in Bluetooth
 ✅ **Simple:** No complex streaming setup
 ✅ **Reliable:** No protocol issues
@@ -338,6 +364,7 @@ If latency is unacceptable:
 ✅ **No Internet Required:** Works offline
 
 ### Google Cast Disadvantages:
+
 ❌ **Protocol Limitation:** Not designed for live system audio
 ❌ **Complex:** Requires capture → encode → stream → cast chain
 ❌ **High Latency:** 2-5 seconds delay
@@ -416,5 +443,5 @@ sudo systemctl restart bluetooth
 
 ---
 
-*Created: 2025-12-31*
-*Author: Crush AI Assistant*
+_Created: 2025-12-31_
+_Author: Crush AI Assistant_

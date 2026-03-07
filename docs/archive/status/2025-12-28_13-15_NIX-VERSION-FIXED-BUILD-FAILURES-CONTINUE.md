@@ -13,6 +13,7 @@
 Successfully resolved Nix version mismatch (2.26.1 → 2.31.2) that was causing silent build failures. However, darwin-rebuild continues to fail silently with exit code 1, producing no error messages even with maximum debugging enabled. iTerm2 package build fails due to `/usr/include` requirement that doesn't exist on modern macOS Sequoia. Simple packages build fine, but full system configuration rebuilds are completely blocked.
 
 **Current State:**
+
 - System Generation: 206 (stuck since Dec 21)
 - Nix Version: 2.31.2 ✅ FIXED
 - iTerm2: DISABLED (build failures)
@@ -25,6 +26,7 @@ Successfully resolved Nix version mismatch (2.26.1 → 2.31.2) that was causing 
 ### 1. Nix Version Mismatch Resolution ✅
 
 **Problem:**
+
 ```bash
 $ nix doctor
 [FALL] Multiple versions of nix found in PATH:
@@ -33,11 +35,13 @@ $ nix doctor
 ```
 
 **Root Cause:**
+
 - System profile `/nix/var/nix/profiles/default/bin/nix` pointed to old Nix 2.26.1
 - Current system `/run/current-system/sw/bin/nix` used correct Nix 2.31.2
 - Wrong Nix version being used by commands, causing silent build failures
 
 **Solution Applied:**
+
 ```bash
 # Removed incorrect symlink
 sudo rm -f /nix/var/nix/profiles/default
@@ -50,6 +54,7 @@ sudo ln -sf /run/current-system/sw/bin/* /nix/var/nix/profiles/default/bin/
 ```
 
 **Verification:**
+
 ```bash
 $ /nix/var/nix/profiles/default/bin/nix --version
 nix (Nix) 2.31.2  # ✅ CORRECT
@@ -62,6 +67,7 @@ $ nix doctor
 ```
 
 **Impact:**
+
 - Nix commands now use correct version
 - `nix doctor` passes all validation checks
 - Build process now consistent with system configuration
@@ -73,21 +79,27 @@ $ nix doctor
 **File:** `platforms/darwin/nix/settings.nix`
 
 **Changes Made:**
+
 1. **Removed `/usr/include` reference** (Line 20):
+
    ```nix
    # "/usr/include"  <-- REMOVED: Doesn't exist on modern macOS
    ```
+
    Reason: `/usr/include` doesn't exist on macOS 15.4 Sequoia (aarch64-darwin)
 
 2. **Added Xcode SDK paths** (Lines 24-26):
+
    ```nix
    "/Library/Developer/CommandLineTools"
    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
    "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
    ```
+
    Reason: System headers moved to Xcode SDK in modern macOS
 
 3. **Added impureHostDeps** (Lines 9-17):
+
    ```nix
    # FIX: Add SDK paths as impureHostDeps to allow packages to access system headers
    # This is required for packages that need /usr/include but it doesn't exist on modern macOS
@@ -99,6 +111,7 @@ $ nix doctor
      "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
    ];
    ```
+
    Reason: Allow packages to access SDK headers outside sandbox
 
 4. **Disabled sandbox** (Line 8):
@@ -114,6 +127,7 @@ $ nix doctor
 ### 3. iTerm2 Issue Investigation ✅
 
 **Problem:**
+
 ```bash
 $ nix build nixpkgs#iterm2 --show-trace
 error:
@@ -122,12 +136,14 @@ error:
 ```
 
 **Root Cause:**
+
 - iTerm2 derivation explicitly requires `/usr/include`
 - Modern macOS (Sequoia 15.4, aarch64-darwin) doesn't have `/usr/include`
 - System headers located at: `/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk/usr/include`
 - Nix sandbox setup fails when required path doesn't exist
 
 **System Analysis:**
+
 ```bash
 $ ls -la /usr/include
 # No such file or directory
@@ -144,6 +160,7 @@ drwxr-xr-x 7 root wheel  224 Oct 21 12:27 MacOSX26.1.sdk
 ```
 
 **Solutions Attempted:**
+
 1. ✅ Removed `/usr/include` from sandbox paths → FAILED
 2. ✅ Added SDK paths to `extra-sandbox-paths` → FAILED
 3. ✅ Added SDK paths to `impureHostDeps` → FAILED
@@ -152,6 +169,7 @@ drwxr-xr-x 7 root wheel  224 Oct 21 12:27 MacOSX26.1.sdk
 6. ❌ Tried creating symlink `/usr/include` → BLOCKED by SIP (System Integrity Protection)
 
 **Temporary Workaround:**
+
 ```nix
 # File: platforms/darwin/environment.nix
 # Disabled iTerm2 installation
@@ -161,6 +179,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 **Impact:**
+
 - iTerm2 cannot be installed via Nix
 - Other complex GUI packages may have same issue
 - Simple packages (hello, neovim, libffi) build fine
@@ -171,6 +190,7 @@ environment.systemPackages = with pkgs; [
 ### 4. Build Testing ✅
 
 **Successful Builds:**
+
 ```bash
 # Simple package - WORKS
 $ nix build nixpkgs#hello
@@ -186,6 +206,7 @@ $ nix build nixpkgs#neovim
 ```
 
 **Failed Builds:**
+
 ```bash
 # GUI application needing system headers - FAILS
 $ nix build nixpkgs#iterm2
@@ -200,6 +221,7 @@ exit code 1
 ```
 
 **Conclusion:**
+
 - Basic Nix functionality works ✅
 - Simple packages build successfully ✅
 - Complex packages with system headers fail ❌
@@ -231,6 +253,7 @@ Use '--all-systems' to check all.
 ```
 
 **Conclusion:**
+
 - Configuration structure is correct
 - All imports resolve properly
 - Syntax is valid
@@ -246,6 +269,7 @@ Use '--all-systems' to check all.
 **Status:** UNRESOLVED
 
 **Symptom:**
+
 ```bash
 $ just switch
 🔄 Applying Nix configuration...
@@ -267,6 +291,7 @@ exit code 1
 ```
 
 **Debugging Attempts:**
+
 1. ✅ Added `--show-trace` → No additional output
 2. ✅ Added `--keep-going` → No additional output
 3. ✅ Set `NIX_DEBUG=7` → No additional output
@@ -277,6 +302,7 @@ exit code 1
 8. ✅ Checked gcroots → No new generations created
 
 **Investigation:**
+
 ```bash
 # Check available generations
 $ ls -lat /nix/var/nix/profiles/
@@ -296,12 +322,14 @@ $ ps aux | grep nix | grep build | grep -v grep
 ```
 
 **Impact:**
+
 - **Cannot apply any configuration changes**
 - System stuck at generation 206 (from Dec 21)
 - No way to debug or diagnose the failure
 - Cannot fix the issue without error messages
 
 **Why This is Critical:**
+
 1. Silent failures prevent troubleshooting
 2. No error messages means we don't know what's failing
 3. System configuration cannot be updated
@@ -316,6 +344,7 @@ $ ps aux | grep nix | grep build | grep -v grep
 **Status:** TEMPORARILY WORKED AROUND
 
 **Error:**
+
 ```bash
 $ nix build nixpkgs#iterm2 --show-trace
 error:
@@ -324,6 +353,7 @@ error:
 ```
 
 **Root Cause:**
+
 - iTerm2 derivation in nixpkgs hardcodes `/usr/include` as required path
 - macOS Sequoia 15.4 (aarch64-darwin) doesn't have `/usr/include`
 - System headers moved to Xcode SDK: `/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk/usr/include`
@@ -332,43 +362,54 @@ error:
 **Why Solutions Failed:**
 
 **Attempt 1: Removed `/usr/include` from sandbox paths**
+
 ```nix
 # platforms/darwin/nix/settings.nix
 # "/usr/include"  <-- REMOVED
 ```
+
 Result: ❌ Failed - iTerm2 derivation still requires it
 
 **Attempt 2: Added SDK paths to sandbox**
+
 ```nix
 extra-sandbox-paths = [
   "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
   "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
 ];
 ```
+
 Result: ❌ Failed - Not the same as `/usr/include`
 
 **Attempt 3: Added SDK paths to impureHostDeps**
+
 ```nix
 impureHostDeps = [
   "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
   "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
 ];
 ```
+
 Result: ❌ Failed - iTerm2 derivation still checks `/usr/include`
 
 **Attempt 4: Disabled sandbox globally**
+
 ```nix
 sandbox = false;
 ```
+
 Result: ❌ Failed - Error still occurs in environment setup
 
 **Attempt 5: Created symlink (would-be solution)**
+
 ```bash
 sudo ln -s /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include /usr/include
 ```
+
 Result: ❌ BLOCKED - SIP (System Integrity Protection) prevents creating files in /usr
 
 **Workaround:**
+
 ```nix
 # File: platforms/darwin/environment.nix
 environment.systemPackages = with pkgs; [
@@ -377,6 +418,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 **Impact:**
+
 - iTerm2 not available via Nix
 - Need to install via Homebrew or direct download
 - Other GUI packages may have same issue
@@ -392,11 +434,13 @@ environment.systemPackages = with pkgs; [
 **Priority:** MEDIUM
 
 **Need:**
+
 - Install iTerm2 via Homebrew as alternative workaround
 - `/opt/homebrew/bin/brew` exists but points to Nix package (broken)
 - Need functional Homebrew installation
 
 **Commands:**
+
 ```bash
 # Would try (not executed yet):
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -413,12 +457,14 @@ brew install --cask iterm2
 **Priority:** HIGH
 
 **Need:**
+
 - File bug report with nixpkgs repository
 - Include full diagnostics
 - Document attempted solutions
 - Get guidance from Nix team
 
 **Content Prepared:**
+
 - Error message: `error: getting attributes of required path '/usr/include': No such file or directory`
 - System info: macOS 15.4 Sequoia (aarch64-darwin)
 - Nix version: 2.31.2
@@ -435,6 +481,7 @@ brew install --cask iterm2
 **Priority:** LOW
 
 **Options:**
+
 1. Download iTerm2 directly from iterm2.com
 2. Try older nixpkgs version that doesn't require `/usr/include`
 3. Create custom iTerm2 derivation override
@@ -448,15 +495,18 @@ brew install --cask iterm2
 **Priority:** MEDIUM
 
 **Need:**
+
 - Consider rolling back changes made between Dec 21-28
 - Test if configuration from Dec 21 builds
 - Identify which change caused build failures
 
 **Available Generations:**
+
 - Generation 206: Dec 21 (current, works)
 - Generation 205: Dec 19 (previous, may work)
 
 **Commands:**
+
 ```bash
 # Would try (not executed yet):
 sudo darwin-rebuild switch --rollback
@@ -471,6 +521,7 @@ sudo nix-env --switch-profile /nix/var/nix/profiles/system-205-link
 ## 📊 SYSTEM STATUS
 
 ### Environment Details
+
 ```bash
 System:        macOS 15.4 Sequoia (aarch64-darwin)
 Architecture:  Apple Silicon
@@ -484,6 +535,7 @@ SIP:           ENABLED (prevents /usr modifications)
 ```
 
 ### Build Status
+
 ```bash
 Simple packages:     ✅ WORKING (hello, libffi)
 Complex packages:    ✅ WORKING (neovim)
@@ -493,6 +545,7 @@ Flake validation:    ✅ WORKING
 ```
 
 ### Package Status
+
 ```bash
 iTerm2:              ❌ DISABLED (build errors)
 Neovim:              ✅ INSTALLED (from cache)
@@ -502,6 +555,7 @@ Spotify:             ✅ INSTALLED (outside Nix)
 ```
 
 ### Nix Configuration
+
 ```bash
 Sandbox:             false (disabled for debugging)
 Experimental:        nix-command flakes (enabled)
@@ -517,18 +571,21 @@ Cores:               0 (unlimited)
 ### Successful Fix: Nix Version Mismatch
 
 **Root Cause:**
+
 - System profile symlink pointed to old Nix version
 - Commands used old Nix 2.26.1 instead of current 2.31.2
 - Version mismatch caused unpredictable build behavior
 - Silent failures with no error messages
 
 **Why It Caused Issues:**
+
 1. Different Nix versions have different bug fixes
 2. Some features may work differently
 3. Build environment setup can vary
 4. Error handling may differ between versions
 
 **Resolution:**
+
 - Updated system profile to point to correct Nix version
 - Verified with `nix doctor`
 - All validation checks now pass
@@ -565,12 +622,14 @@ Cores:               0 (unlimited)
    - File descriptor limit
 
 **Why Debugging Fails:**
+
 1. Error occurs before logging starts
 2. Debug flags not effective at that stage
 3. Error handling catches and suppresses errors
 4. No telemetry for early setup failures
 
 **What We Know:**
+
 - Individual package builds work ✅
 - System builds fail ❌
 - No error messages ❌
@@ -583,6 +642,7 @@ Cores:               0 (unlimited)
 ### Unresolved: iTerm2 Build Failure
 
 **Root Cause:**
+
 - nixpkgs iTerm2 derivation hardcodes `/usr/include` requirement
 - Modern macOS doesn't have `/usr/include`
 - Headers moved to Xcode SDK location
@@ -611,6 +671,7 @@ Cores:               0 (unlimited)
    - Source must equal destination on Darwin
 
 **Why Solutions Failed:**
+
 - Configuration changes only affect sandbox, not derivation requirements
 - impureHostDeps adds access but doesn't change required paths
 - Sandbox disable doesn't bypass environment setup validation
@@ -705,6 +766,7 @@ Cores:               0 (unlimited)
     - Get community input on debugging approach
 
 13. **[MEDIUM] Create Custom iTerm2 Derivation Override**
+
     ```nix
     environment.systemPackages = with pkgs; [
       (iterm2.overrideAttrs (old: {
@@ -717,6 +779,7 @@ Cores:               0 (unlimited)
       }))
     ];
     ```
+
     - Test if override works
     - Document successful approach
     - Consider contributing to nixpkgs
@@ -802,18 +865,21 @@ Cores:               0 (unlimited)
 ## 🚨 CRITICAL BLOCKER
 
 **Current Situation:**
+
 - System builds fail silently with no error messages
 - Cannot apply configuration changes
 - Cannot debug or diagnose the failure
 - System stuck at generation 206
 
 **Why This is Critical:**
+
 1. Security updates cannot be applied
 2. New packages cannot be installed
 3. Configuration changes cannot be tested
 4. Issue cannot be fixed without error messages
 
 **Immediate Decision Needed:**
+
 - **Option A**: Continue debugging silent failures (hours more investigation)
 - **Option B**: Workaround iTerm2 with Homebrew, proceed with other tasks
 - **Option C**: Roll back configuration to Dec 21, test if system builds
@@ -824,6 +890,7 @@ Cores:               0 (unlimited)
 **Option B** - Workaround iTerm2 with Homebrew installation, document the issue thoroughly, and proceed with other improvements that don't require system rebuilds. Continue monitoring for Nix community solutions to the build failures.
 
 **REASONING:**
+
 - Debugging silent failures is extremely time-consuming without error messages
 - Workaround allows iTerm2 to be functional
 - Documenting issue helps others with same problem
@@ -835,6 +902,7 @@ Cores:               0 (unlimited)
 ## 📚 DOCUMENTATION CREATED
 
 ### Session Documentation
+
 1. `docs/status/2025-12-28_08-26_COMPREHENSIVE-SYSTEM-DIAGNOSTICS-AND-FIX-PLAN.md`
    - Initial diagnostic session
    - Nix version mismatch discovery
@@ -860,6 +928,7 @@ Cores:               0 (unlimited)
    - All work, issues, and next steps documented
 
 ### Existing Documentation Referenced
+
 - `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md` - nh tool temp directory issue
 - `docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md` - 50+ nix-darwin sandbox paths researched
 
@@ -868,6 +937,7 @@ Cores:               0 (unlimited)
 ## 📈 PROGRESS TRACKING
 
 ### Time Investment
+
 - **Session Duration:** ~2 hours
 - **Issues Resolved:** 1 (Nix version mismatch)
 - **Issues Partially Resolved:** 2 (iTerm2 disabled, darwin-rebuild under investigation)
@@ -875,6 +945,7 @@ Cores:               0 (unlimited)
 - **Issues Documented:** 5 status reports
 
 ### Success Metrics
+
 - Nix Version Fix: ✅ 100%
 - Flake Validation: ✅ 100%
 - Simple Package Builds: ✅ 100%
@@ -884,6 +955,7 @@ Cores:               0 (unlimited)
 - Error Visibility: ❌ 0%
 
 ### Attempted Solutions
+
 - iTerm2: 5+ solutions attempted, 0 successful
 - Silent Failures: 8+ debug attempts, 0 successful
 - Configuration: 4 changes made, 0 resolved core issue
@@ -894,6 +966,7 @@ Cores:               0 (unlimited)
 ## 🎯 FINAL SUMMARY
 
 ### What Went Well
+
 1. ✅ **Nix version mismatch successfully resolved** - System now uses consistent Nix 2.31.2
 2. ✅ **Configuration cleanup completed** - Removed invalid paths, added SDK paths
 3. ✅ **Comprehensive documentation created** - 5 detailed status reports
@@ -902,12 +975,14 @@ Cores:               0 (unlimited)
 6. ✅ **Basic Nix functionality** - Simple packages build successfully
 
 ### What's Blocked
+
 1. ❌ **Darwin-rebuild silent failures** - Cannot apply configuration changes
 2. ❌ **iTunes build errors** - Cannot install via Nix
 3. ❌ **Error visibility** - No debug output to diagnose issues
 4. ❌ **System updates** - Cannot advance past generation 206
 
 ### What's Working
+
 1. ✅ Nix commands use correct version
 2. ✅ nix doctor passes all checks
 3. ✅ Flake is valid and well-structured
@@ -915,7 +990,9 @@ Cores:               0 (unlimited)
 5. ✅ Current system (generation 206) is stable
 
 ### Critical Decision Point
+
 **IMMEDIATE ACTION REQUIRED:**
+
 - Accept workaround for iTerm2 (Homebrew installation)
 - Continue with other improvements that don't require system rebuilds
 - Monitor for Nix community solutions to build failures
@@ -926,12 +1003,14 @@ Cores:               0 (unlimited)
 ## 📞 NEXT STEPS
 
 **Wait for user instruction on:**
+
 1. Which option to choose for darwin-rebuild failures (A, B, C, D, or E)
 2. Whether to proceed with Homebrew workaround for iTerm2
 3. What other improvements to focus on while build issues are investigated
 4. Whether to file nixpkgs bug report now or wait
 
 **Recommended:**
+
 1. Install iTerm2 via Homebrew (takes ~5 minutes)
 2. Document workaround in troubleshooting guide
 3. Continue with other tasks that don't require system rebuilds

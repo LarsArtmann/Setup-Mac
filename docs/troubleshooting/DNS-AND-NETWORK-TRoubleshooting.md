@@ -3,6 +3,7 @@
 ## Quick Diagnostics
 
 Run the diagnostic script on evo-x2:
+
 ```bash
 ./scripts/dns-diagnostics.sh
 ```
@@ -12,10 +13,12 @@ Run the diagnostic script on evo-x2:
 ### 1. File Descriptor Limits
 
 **Symptoms:**
+
 - `error: opening directory "/nix/store": Too many open files`
 - Multiple cache timeouts simultaneously
 
 **Fix:** Add to `platforms/nixos/system/networking.nix`:
+
 ```nix
 # Increase file descriptor limits for Nix builds
 systemd.extraConfig = ''
@@ -27,16 +30,19 @@ systemd.extraConfig = ''
 ### 2. systemd-resolved Conflicts
 
 **Symptoms:**
+
 - Router DNS (10.43.255.55) still being used
 - DNS switching between Quad9 and router
 - Inconsistent resolution
 
 **Fix A:** Disable systemd-resolved in `platforms/nixos/system/networking.nix`:
+
 ```nix
 services.resolved.enable = false;
 ```
 
 **Fix B:** Configure NetworkManager to use systemd-resolved (preferred):
+
 ```nix
 networking.networkmanager.dns = "systemd-resolved";
 ```
@@ -44,10 +50,12 @@ networking.networkmanager.dns = "systemd-resolved";
 ### 3. IPv6 Link-Local DNS
 
 **Symptoms:**
+
 - `/etc/resolv.conf` contains `nameserver fe80::...`
 - DNS tries IPv6 first, times out, then falls back to IPv4
 
 **Fix A:** Force IPv4-only DNS in `platforms/nixos/system/networking.nix`:
+
 ```nix
 networking.networkmanager = {
   dns = "none";
@@ -56,6 +64,7 @@ networking.networkmanager = {
 ```
 
 **Fix B:** Disable IPv6 completely in DNS (already done):
+
 ```nix
 networking.enableIPv6 = false;
 ```
@@ -63,11 +72,13 @@ networking.enableIPv6 = false;
 ### 4. MTU Fragmentation Issues
 
 **Symptoms:**
+
 - Large DNS responses fail
 - Intermittent DNS timeouts
 - Works for simple queries, fails for complex ones
 
 **Fix:** Set correct MTU in `platforms/nixos/hardware/hardware-configuration.nix`:
+
 ```nix
 networking.interfaces.eno1.mtu = 1500;
 # Or for WiFi
@@ -77,16 +88,19 @@ networking.interfaces.wlp...mtu = 1400;
 ### 5. Nix Daemon Settings Not Applied
 
 **Symptoms:**
+
 - Settings changed but timeouts still occur
 - Daemon using old configuration
 
 **Fix:** Reload Nix daemon after config changes:
+
 ```bash
 sudo systemctl reload nix-daemon.socket
 sudo systemctl restart nix-daemon
 ```
 
 Or add systemd restart to apply changes:
+
 ```nix
 systemd.services.nix-daemon.restartIfChanged = true;
 ```
@@ -94,11 +108,13 @@ systemd.services.nix-daemon.restartIfChanged = true;
 ### 6. Security Services Interference
 
 **Symptoms:**
+
 - ClamAV updater hammering network
 - Fail2ban blocking legitimate requests
 - Network storms from security tools
 
 **Fix:** Configure update intervals in `platforms/nixos/desktop/security-hardening.nix`:
+
 ```nix
 services.clamav = {
   updater = {
@@ -112,10 +128,12 @@ services.clamav = {
 ### 7. Docker Network Conflicts
 
 **Symptoms:**
+
 - Docker using different DNS than host
 - DNS works outside Docker but fails inside containers
 
 **Fix:** Configure Docker DNS in `platforms/nixos/services/default.nix`:
+
 ```nix
 virtualisation.docker = {
   enable = true;
@@ -126,10 +144,12 @@ virtualisation.docker = {
 ### 8. DNSSEC Delays
 
 **Symptoms:**
+
 - 5+ second delays on DNS queries
 - Multiple DNS round-trips per request
 
 **Fix:** Disable DNSSEC for faster resolution (optional security trade-off):
+
 ```nix
 services.resolved = {
   enable = true;
@@ -140,6 +160,7 @@ services.resolved = {
 ## Recommended Fixes Priority
 
 ### High Priority (Implement First)
+
 1. ✅ Increase Nix connect-timeout to 60s (DONE)
 2. ✅ Reduce http-connections to 10 (DONE)
 3. ✅ Add NetworkManager DNS override (DONE)
@@ -147,17 +168,20 @@ services.resolved = {
 5. **NEW:** Disable or properly configure systemd-resolved
 
 ### Medium Priority
+
 6. **NEW:** Configure IPv4-only DNS in NetworkManager
 7. **NEW:** Verify MTU settings match network
 8. **NEW:** Configure Docker DNS to use Quad9
 
 ### Low Priority (Optional)
+
 9. **NEW:** Adjust ClamAV update intervals
 10. **NEW:** Consider DNSSEC vs speed trade-off
 
 ## Testing After Fixes
 
 After applying fixes, test with:
+
 ```bash
 # Test flake check
 nix flake check
@@ -198,6 +222,7 @@ curl -I https://hyprland.cachix.org/
 ## Monitoring
 
 Watch for DNS/network issues:
+
 ```bash
 # Monitor Nix daemon
 journalctl -u nix-daemon -f
@@ -219,6 +244,7 @@ ss -tun | grep :53
 ## Emergency Rollback
 
 If fixes make things worse:
+
 ```bash
 # Rollback to previous generation
 sudo nixos-rebuild switch --rollback
@@ -230,6 +256,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system -p /nix/var/nix
 ## Documentation
 
 For more information:
+
 - NixOS DNS: https://nixos.org/manual/nixos/stable/#opt-networking.nameservers
 - NetworkManager: https://networkmanager.dev/docs/
 - DNSSEC: https://www.dnssec.net/

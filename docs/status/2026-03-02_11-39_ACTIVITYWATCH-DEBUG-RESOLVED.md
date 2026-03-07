@@ -12,6 +12,7 @@ All ActivityWatch watchers are now working correctly after debugging and fixing 
 ### 1. aw-watcher-window (Python multiprocessing fork errors)
 
 **Problem:** Watcher was showing errors:
+
 ```
 aw-watcher-window: error: unrecognized arguments: --multiprocessing-fork tracker_fd=8 pipe_handle=10
 ```
@@ -35,6 +36,7 @@ aw-watcher-window: error: unrecognized arguments: --multiprocessing-fork tracker
 ### 3. aw-watcher-utilization (LaunchAgent crash loop)
 
 **Problem:** LaunchAgent was in crash loop with error:
+
 ```
 error: unrecognized arguments: --host localhost --port 5600 --poll-time 5
 ```
@@ -47,13 +49,13 @@ error: unrecognized arguments: --host localhost --port 5600 --poll-time 5
 
 ## Current Bucket Status
 
-| Bucket | Status | Last Event |
-|--------|--------|-----------|
-| aw-watcher-afk | ✅ Active | 2026-03-02T10:36:54 |
-| aw-watcher-window | ✅ Active | 2026-03-02T10:38:25 |
-| aw-watcher-web-chrome | ✅ Active | 2026-03-02T10:38:26 |
-| aw-watcher-web-helium | ✅ Active | 2026-03-02T10:37:23 |
-| aw-watcher-input | ✅ Active | 2026-03-02T10:32:20 |
+| Bucket                 | Status    | Last Event          |
+| ---------------------- | --------- | ------------------- |
+| aw-watcher-afk         | ✅ Active | 2026-03-02T10:36:54 |
+| aw-watcher-window      | ✅ Active | 2026-03-02T10:38:25 |
+| aw-watcher-web-chrome  | ✅ Active | 2026-03-02T10:38:26 |
+| aw-watcher-web-helium  | ✅ Active | 2026-03-02T10:37:23 |
+| aw-watcher-input       | ✅ Active | 2026-03-02T10:32:20 |
 | aw-watcher-utilization | ✅ Active | 2026-03-02T10:38:19 |
 
 ## Files Modified

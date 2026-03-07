@@ -17,6 +17,7 @@ Helium privacy browser has been successfully added to macOS configuration but Ni
 ## 📊 CURRENT STATUS BY SYSTEM
 
 ### macOS (Darwin) - ✅ READY TO DEPLOY
+
 ```
 ✅ Package Definition: /dotfiles/nix/packages/helium.nix
 ✅ Flake Overlay: Configured in flake.nix (lines 73-74, 114)
@@ -26,6 +27,7 @@ Helium privacy browser has been successfully added to macOS configuration but Ni
 ```
 
 ### NixOS (GMKtec EVO-X2) - ❌ COMPLETELY BROKEN
+
 ```
 ❌ Configuration Import: Missing dotfiles/nixos/home.nix file
 ❌ Flake Build: Fails with path does not exist error
@@ -38,6 +40,7 @@ Helium privacy browser has been successfully added to macOS configuration but Ni
 ## 🔧 TECHNICAL IMPLEMENTATION DETAILS
 
 ### Helium Package Configuration
+
 - **Source:** https://github.com/imputnet/helium-macos/releases
 - **Version:** 0.4.5.1
 - **Architecture:** ARM64/x86_64 support
@@ -45,6 +48,7 @@ Helium privacy browser has been successfully added to macOS configuration but Ni
 - **Platform:** Currently macOS-only (Darwin-specific paths)
 
 ### Integration Architecture
+
 ```nix
 # macOS (Darwin) - WORKING
 flake.nix → heliumOverlay → environment.nix → systemPackages
@@ -59,18 +63,21 @@ flake.nix → configuration.nix → imports home.nix (MISSING)
 ## 🚨 CRITICAL ISSUES IDENTIFIED
 
 ### 1. NIXOS CONFIGURATION IS COMPLETELY BROKEN
+
 - **Error:** `path '/nix/store/...-source/dotfiles/nixos/home.nix' does not exist`
 - **Impact:** Cannot build or update NixOS PC
 - **Priority:** CRITICAL - System blocking issue
 - **Location:** flake.nix line 235 references non-existent file
 
 ### 2. ARCHITECTURAL INCONSISTENCY BETWEEN PLATFORMS
+
 - **macOS:** Uses direct system packages via environment.nix
 - **NixOS:** Attempts Home Manager integration (broken)
 - **Problem:** No unified package management approach
 - **Impact:** Different behavior, maintenance complexity
 
 ### 3. HELIUM PACKAGE PLATFORM LIMITATIONS
+
 - **Current:** macOS-only implementation
 - **Problem:** Hardcoded Darwin paths and DMG extraction
 - **Impact:** Cannot work on NixOS without Linux-specific version
@@ -81,6 +88,7 @@ flake.nix → configuration.nix → imports home.nix (MISSING)
 ## 📈 COMPLETION METRICS
 
 ### Implementation Progress
+
 ```
 Package Definition: ████████████████████ 100% ✅
 macOS Integration:  ████████████████████ 100% ✅
@@ -90,6 +98,7 @@ Documentation:      ░░░░░░░░░░░░░░░░░░  0%  
 ```
 
 ### Critical Success Factors
+
 ```
 ✅ Package properly defined and working
 ✅ Flake overlay correctly configured
@@ -104,6 +113,7 @@ Documentation:      ░░░░░░░░░░░░░░░░░░  0%  
 ## 🛠️ ARCHITECTURAL RECOMMENDATIONS
 
 ### 1. UNIFIED PACKAGE MANAGEMENT SYSTEM
+
 ```
 Recommendation: Single source of truth for packages
 Implementation:
@@ -113,6 +123,7 @@ Implementation:
 ```
 
 ### 2. MISSING FILE RESOLUTION
+
 ```
 Immediate Action Required:
 1. Create dotfiles/nixos/home.nix
@@ -122,6 +133,7 @@ Immediate Action Required:
 ```
 
 ### 3. CROSS-PLATFORM PACKAGE STRATEGY
+
 ```
 Recommendation: Multi-architecture package definitions
 Implementation:
@@ -136,18 +148,21 @@ Implementation:
 ## 🚀 NEXT STEPS (Priority Ranked)
 
 ### CRITICAL (Do Immediately - System Breaking)
+
 1. **CREATE `dotfiles/nixos/home.nix`** - This is blocking everything
 2. Test NixOS configuration builds without errors
 3. Decide on unified package management architecture
 4. Fix flake.nix imports to match actual file structure
 
 ### HIGH PRIORITY (Do Today - Stability)
+
 5. Verify helium deployment works on macOS
 6. Create cross-platform package testing
 7. Implement configuration validation
 8. Add rollback mechanisms for broken configs
 
 ### MEDIUM PRIORITY (Do This Week - Enhancement)
+
 9. Create Linux-specific helium package
 10. Implement auto-update mechanism
 11. Add package documentation
@@ -158,7 +173,9 @@ Implementation:
 ## 🤔 CRITICAL DECISION POINTS
 
 ### 1. NixOS Package Management Approach
+
 **Question:** Should NixOS use:
+
 - **Option A:** Same system packages as macOS (environment.systemPackages)
 - **Option B:** Home Manager for user-level packages
 - **Option C:** Hybrid approach (system core + user extras)
@@ -166,7 +183,9 @@ Implementation:
 **Impact:** Determines entire NixOS architecture and future package management
 
 ### 2. Cross-Platform Package Strategy
+
 **Question:** How should helium work on both systems?
+
 - **Option A:** Single package with platform detection
 - **Option B:** Separate Darwin/Linux package definitions
 - **Option C:** Linux alternative browser for NixOS
@@ -174,7 +193,9 @@ Implementation:
 **Impact:** Maintenance complexity vs. functionality
 
 ### 3. Configuration File Organization
+
 **Question:** How to organize shared vs platform-specific configs?
+
 - **Option A:** Central common with platform overrides
 - **Option B:** Separate configurations with shared imports
 - **Option C:** Monolithic configuration with conditionals
@@ -186,6 +207,7 @@ Implementation:
 ## 📋 IMMEDIATE ACTION ITEMS
 
 ### Today (Critical Path)
+
 - [ ] Create missing `dotfiles/nixos/home.nix` file
 - [ ] Decide on NixOS package management approach
 - [ ] Test NixOS configuration builds successfully
@@ -193,6 +215,7 @@ Implementation:
 - [ ] Create unified package testing procedure
 
 ### This Week (Stability)
+
 - [ ] Implement cross-platform package strategy
 - [ ] Add configuration validation in flake.nix
 - [ ] Create rollback procedures for broken configs
@@ -204,12 +227,14 @@ Implementation:
 ## 💭 ARCHITECTURAL INSIGHTS
 
 ### Lessons Learned
+
 1. **Configuration Consistency is Critical** - Mixed architectures cause system-breaking issues
 2. **Testing Before Deployment Essential** - Missing imports should be caught earlier
 3. **Cross-Platform Planning Required** - macOS-only packages need Linux counterparts
 4. **Unified Management Preferred** - Separate systems double maintenance work
 
 ### Future Improvements
+
 1. **Configuration Validation Layer** - Prevent missing file imports
 2. **Automated Cross-Platform Testing** - Test all systems on every change
 3. **Package Abstraction Layer** - Unified interface for platform differences
@@ -220,12 +245,14 @@ Implementation:
 ## 🔍 TECHNICAL DEBT ANALYSIS
 
 ### High-Impact Debt
+
 1. **Split Brain Architecture** - Different patterns between systems
 2. **Missing Validation** - No checks for required configuration files
 3. **No Testing Infrastructure** - Can't verify changes work
 4. **Incomplete Cross-Platform Support** - Platform-specific assumptions
 
 ### Medium-Impact Debt
+
 1. **Manual Package Management** - No automation for updates
 2. **No Documentation** - Users can't understand system architecture
 3. **No Rollback Procedures** - Broken configs are hard to recover
@@ -236,11 +263,13 @@ Implementation:
 ## 📊 RESOURCE REQUIREMENTS
 
 ### Immediate Needs
+
 - **Time:** 2-4 hours to fix NixOS configuration
 - **Testing:** Full deployment test on both systems
 - **Decision:** Architectural direction for unified management
 
 ### Future Needs
+
 - **Documentation:** Architecture diagrams and deployment guides
 - **Testing:** Automated cross-platform test suite
 - **Monitoring:** Configuration health monitoring
@@ -250,6 +279,7 @@ Implementation:
 ## 🎯 SUCCESS METRICS
 
 ### Completion Criteria
+
 - [ ] NixOS configuration builds without errors
 - [ ] Helium launches correctly on both systems
 - [ ] Unified package management approach implemented
@@ -257,6 +287,7 @@ Implementation:
 - [ ] Documentation explains architecture decisions
 
 ### Quality Metrics
+
 - **Configuration Success Rate:** 100% (both systems build)
 - **Package Availability:** 100% (helium on both systems)
 - **Documentation Coverage:** 100% (architecture explained)
@@ -267,6 +298,7 @@ Implementation:
 ## 📞 CONTACT POINTS
 
 For decisions needed:
+
 1. **NixOS Package Management Approach** - Choose Option A/B/C
 2. **Cross-Platform Package Strategy** - Determine helium Linux support
 3. **Configuration Architecture** - Set long-term direction
@@ -275,6 +307,6 @@ For decisions needed:
 
 ---
 
-*Report generated by Crush AI Assistant*
-*Generated on: 2025-12-06 04:42 CET*
-*Status: Partially Complete - Critical Blockers Identified*
+_Report generated by Crush AI Assistant_
+_Generated on: 2025-12-06 04:42 CET_
+_Status: Partially Complete - Critical Blockers Identified_

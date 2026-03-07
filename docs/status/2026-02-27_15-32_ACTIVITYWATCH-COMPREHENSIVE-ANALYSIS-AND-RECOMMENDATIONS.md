@@ -19,22 +19,22 @@ Following the successful resolution of ActivityWatch's window URL tracking issue
 
 ### ✅ Resolved Issues
 
-| Issue | Solution Applied | Status |
-|-------|------------------|--------|
-| Empty URLs in `aw-watcher-window` | `just activitywatch-fix-permissions` | ✅ Fixed |
-| macOS Accessibility permissions | TCC reset + manual GUI approval | ✅ Complete |
-| Permission persistence | TCC configuration profile created | ✅ Documented |
+| Issue                             | Solution Applied                     | Status        |
+| --------------------------------- | ------------------------------------ | ------------- |
+| Empty URLs in `aw-watcher-window` | `just activitywatch-fix-permissions` | ✅ Fixed      |
+| macOS Accessibility permissions   | TCC reset + manual GUI approval      | ✅ Complete   |
+| Permission persistence            | TCC configuration profile created    | ✅ Documented |
 
 ### 📊 Current Active Watchers
 
 Based on system configuration, the following watchers are operational:
 
-| Watcher | Type | Data Captured | Status |
-|---------|------|---------------|--------|
-| `aw-watcher-afk` | Core | Mouse/keyboard inactivity (3min AFK) | ✅ Active |
-| `aw-watcher-window` | Core | Window title, app name, URL | ✅ Fixed |
-| `aw-watcher-web-chrome` | Browser | Tab title, URL, audio state, incognito | ✅ Active |
-| `aw-watcher-input` | System | Keystroke count, mouse distance | ✅ Available |
+| Watcher                 | Type    | Data Captured                          | Status       |
+| ----------------------- | ------- | -------------------------------------- | ------------ |
+| `aw-watcher-afk`        | Core    | Mouse/keyboard inactivity (3min AFK)   | ✅ Active    |
+| `aw-watcher-window`     | Core    | Window title, app name, URL            | ✅ Fixed     |
+| `aw-watcher-web-chrome` | Browser | Tab title, URL, audio state, incognito | ✅ Active    |
+| `aw-watcher-input`      | System  | Keystroke count, mouse distance        | ✅ Available |
 
 ---
 
@@ -49,22 +49,22 @@ Based on system configuration, the following watchers are operational:
 
 #### Capabilities
 
-| Feature | Technology | Performance |
-|---------|------------|-------------|
-| **Smart OCR** | Apple Vision (macOS) / Windows OCR / Tesseract | ~100-800ms |
-| **LLM Context** | Ollama (local) / Claude / OpenAI | ~2-3s analysis |
-| **Smart Idle** | Activity detection | Reduces resource usage |
-| **Remote Desktop** | RDP/Citrix/TeamViewer support | Full tracking |
-| **Multi-Monitor** | All displays captured | Synchronized |
+| Feature            | Technology                                     | Performance            |
+| ------------------ | ---------------------------------------------- | ---------------------- |
+| **Smart OCR**      | Apple Vision (macOS) / Windows OCR / Tesseract | ~100-800ms             |
+| **LLM Context**    | Ollama (local) / Claude / OpenAI               | ~2-3s analysis         |
+| **Smart Idle**     | Activity detection                             | Reduces resource usage |
+| **Remote Desktop** | RDP/Citrix/TeamViewer support                  | Full tracking          |
+| **Multi-Monitor**  | All displays captured                          | Synchronized           |
 
 #### OCR Technology Stack
 
-| Platform | Library | Speed | Accuracy |
-|----------|---------|-------|----------|
-| macOS | Apple Vision (`ocrmac`) | ~100ms | ⭐⭐⭐⭐⭐ |
-| Windows | Windows OCR API (`winocr`) | ~200ms | ⭐⭐⭐⭐ |
-| Windows Alt | RapidOCR | ~400ms | ⭐⭐⭐⭐ |
-| Fallback | Tesseract | ~800ms | ⭐⭐⭐ |
+| Platform    | Library                    | Speed  | Accuracy   |
+| ----------- | -------------------------- | ------ | ---------- |
+| macOS       | Apple Vision (`ocrmac`)    | ~100ms | ⭐⭐⭐⭐⭐ |
+| Windows     | Windows OCR API (`winocr`) | ~200ms | ⭐⭐⭐⭐   |
+| Windows Alt | RapidOCR                   | ~400ms | ⭐⭐⭐⭐   |
+| Fallback    | Tesseract                  | ~800ms | ⭐⭐⭐     |
 
 #### LLM Context Extraction
 
@@ -78,6 +78,7 @@ Screen Capture → OCR Text → LLM Analysis → Structured JSON
 ```
 
 **Extracted Fields:**
+
 - `document` - Filename, webpage title, repo name
 - `client` - Client codes (e.g., "ACME01")
 - `project` - Project name, ticket ID, task
@@ -86,6 +87,7 @@ Screen Capture → OCR Text → LLM Analysis → Structured JSON
 - `keywords` - 3-5 topic descriptors
 
 **Example Output:**
+
 ```json
 {
   "app": "Microsoft Excel",
@@ -107,12 +109,12 @@ Screen Capture → OCR Text → LLM Analysis → Structured JSON
 
 #### Performance
 
-| Metric | Value |
-|--------|-------|
-| Memory | ~50-100MB |
-| CPU | <5% average |
-| OCR | ~100ms (Apple Silicon Neural Engine) |
-| LLM | ~2-3s per analysis |
+| Metric         | Value                                                |
+| -------------- | ---------------------------------------------------- |
+| Memory         | ~50-100MB                                            |
+| CPU            | <5% average                                          |
+| OCR            | ~100ms (Apple Silicon Neural Engine)                 |
+| LLM            | ~2-3s per analysis                                   |
 | Diff Detection | 85% similarity threshold (skips redundant LLM calls) |
 
 #### Recommendation
@@ -130,13 +132,13 @@ Screen Capture → OCR Text → LLM Analysis → Structured JSON
 
 #### Capabilities
 
-| Feature | Implementation | Notes |
-|---------|----------------|-------|
-| **Multi-Monitor** | Hot-plug detection | Handles monitor changes at runtime |
-| **Smart Filtering** | Perceptual hashing (dhash) | Skips unchanged screens |
-| **Compression** | WebP encoding | Lossy/lossless, quality adjustable |
-| **Storage** | Local cache + Optional S3 | S3/R2/MinIO compatible |
-| **Integration** | ActivityWatch heartbeats | Tracks when screenshots taken |
+| Feature             | Implementation             | Notes                              |
+| ------------------- | -------------------------- | ---------------------------------- |
+| **Multi-Monitor**   | Hot-plug detection         | Handles monitor changes at runtime |
+| **Smart Filtering** | Perceptual hashing (dhash) | Skips unchanged screens            |
+| **Compression**     | WebP encoding              | Lossy/lossless, quality adjustable |
+| **Storage**         | Local cache + Optional S3  | S3/R2/MinIO compatible             |
+| **Integration**     | ActivityWatch heartbeats   | Tracks when screenshots taken      |
 
 #### Pipeline Architecture
 
@@ -165,10 +167,10 @@ enabled = false          # Keep local only for privacy
 #### Storage Implications
 
 | Interval | Screenshots/Hour | WebP Size (est.) | Daily Storage |
-|----------|------------------|------------------|---------------|
-| 2s | 1,800 | ~50KB | ~86MB |
-| 5s | 720 | ~50KB | ~34MB |
-| 60s | 60 | ~50KB | ~3MB |
+| -------- | ---------------- | ---------------- | ------------- |
+| 2s       | 1,800            | ~50KB            | ~86MB         |
+| 5s       | 720              | ~50KB            | ~34MB         |
+| 60s      | 60               | ~50KB            | ~3MB          |
 
 **⚠️ Warning:** Fast intervals accumulate significant storage. Plan for 1-3GB/month at 2-second intervals.
 
@@ -216,6 +218,7 @@ aw-watcher-ask run \
 ```
 
 **Question Types:**
+
 - `question` - Yes/No dialog
 - `entry` - Text input
 - `scale` - Numeric rating
@@ -271,14 +274,15 @@ Stored in `aw-watcher-ask_localhost.localdomain` bucket:
 
 #### Hardware Requirements
 
-| Component | Cost | Purpose |
-|-----------|------|---------|
-| ESP8266 | €6.50 | WiFi microcontroller |
-| HC-SR04 Sensor | €5.16 | Ultrasonic distance measurement |
-| 3D Printed Case | ~€0.25 | Mounting enclosure |
-| **Total** | **~€12** | |
+| Component       | Cost     | Purpose                         |
+| --------------- | -------- | ------------------------------- |
+| ESP8266         | €6.50    | WiFi microcontroller            |
+| HC-SR04 Sensor  | €5.16    | Ultrasonic distance measurement |
+| 3D Printed Case | ~€0.25   | Mounting enclosure              |
+| **Total**       | **~€12** |                                 |
 
 **Pin Configuration (ESP8266):**
+
 - `TRIGGER_PIN` → D5 (GPIO 14)
 - `ECHO_PIN` → D6 (GPIO 12)
 
@@ -366,30 +370,30 @@ Anki → Tools → Add-ons → Get Add-ons → Enter code
 
 ### System Monitoring
 
-| Watcher | Repository | What It Tracks | Recommendation |
-|---------|------------|----------------|----------------|
-| **aw-watcher-utilization** | `Alwinator/aw-watcher-utilization` | CPU, RAM, disk, network, sensors | ⭐ HIGH - Production ready (100 stars, active Oct 2024) |
-| **aw-watcher-netstatus** | `sameersismail/aw-watcher-netstatus` | Online/offline status | ⚠️ LOW - Minimal, stale (Jan 2023) |
+| Watcher                    | Repository                           | What It Tracks                   | Recommendation                                          |
+| -------------------------- | ------------------------------------ | -------------------------------- | ------------------------------------------------------- |
+| **aw-watcher-utilization** | `Alwinator/aw-watcher-utilization`   | CPU, RAM, disk, network, sensors | ⭐ HIGH - Production ready (100 stars, active Oct 2024) |
+| **aw-watcher-netstatus**   | `sameersismail/aw-watcher-netstatus` | Online/offline status            | ⚠️ LOW - Minimal, stale (Jan 2023)                      |
 
 **Note:** `aw-watcher-utilization` is recommended over `aw-watcher-netstatus` since it includes network I/O counters plus comprehensive system metrics.
 
 ### Media Tracking
 
-| Watcher | Repository | Platform | Status |
-|---------|------------|----------|--------|
-| **aw-watcher-spotify** | Official | All | Beta - Web API integration |
-| **aw-watcher-lastfm** | `brayo-pip/aw-watcher-lastfm` | All | Cross-platform music |
-| **aw-watcher-media-player** | `2e3s/aw-watcher-media-player` | Linux | MPRIS system integration |
+| Watcher                     | Repository                     | Platform | Status                     |
+| --------------------------- | ------------------------------ | -------- | -------------------------- |
+| **aw-watcher-spotify**      | Official                       | All      | Beta - Web API integration |
+| **aw-watcher-lastfm**       | `brayo-pip/aw-watcher-lastfm`  | All      | Cross-platform music       |
+| **aw-watcher-media-player** | `2e3s/aw-watcher-media-player` | Linux    | MPRIS system integration   |
 
 ### Editor Integration (If Not Already Configured)
 
-| Editor | Repository | Status |
-|--------|------------|--------|
+| Editor                           | Repository                         | Status                |
+| -------------------------------- | ---------------------------------- | --------------------- |
 | **JetBrains** (GoLand, IntelliJ) | `OlivierMary/aw-watcher-jetbrains` | ⭐ HIGHLY RECOMMENDED |
-| **Neovim** | `lowitea/aw-watcher.nvim` | Lua-based, modern |
-| **VS Code** | Official | Marketplace available |
-| **Zed** | `sachk/aw-watcher-zed` | New editor support |
-| **Emacs** | `pauldub/activity-watch-mode` | Emacs Lisp |
+| **Neovim**                       | `lowitea/aw-watcher.nvim`          | Lua-based, modern     |
+| **VS Code**                      | Official                           | Marketplace available |
+| **Zed**                          | `sachk/aw-watcher-zed`             | New editor support    |
+| **Emacs**                        | `pauldub/activity-watch-mode`      | Emacs Lisp            |
 
 ---
 
@@ -397,27 +401,27 @@ Anki → Tools → Add-ons → Get Add-ons → Enter code
 
 ### Phase 1: Immediate (High Impact, Low Effort)
 
-| Watcher | Effort | Impact | Action |
-|---------|--------|--------|--------|
-| `aw-watcher-utilization` | Low | High | `pip install aw-watcher-utilization` |
-| `aw-watcher-jetbrains` | Low | High | Install via JetBrains Marketplace |
-| `aw-watcher-ask` | Low | Medium | `pip install git+https://github.com/bcbernardo/aw-watcher-ask.git` |
+| Watcher                  | Effort | Impact | Action                                                             |
+| ------------------------ | ------ | ------ | ------------------------------------------------------------------ |
+| `aw-watcher-utilization` | Low    | High   | `pip install aw-watcher-utilization`                               |
+| `aw-watcher-jetbrains`   | Low    | High   | Install via JetBrains Marketplace                                  |
+| `aw-watcher-ask`         | Low    | Medium | `pip install git+https://github.com/bcbernardo/aw-watcher-ask.git` |
 
 ### Phase 2: Short Term (High Impact, Medium Effort)
 
-| Watcher | Effort | Impact | Considerations |
-|---------|--------|--------|----------------|
+| Watcher               | Effort | Impact    | Considerations                       |
+| --------------------- | ------ | --------- | ------------------------------------ |
 | `aw-watcher-enhanced` | Medium | Very High | Requires Ollama setup, AI processing |
-| `aw-watcher-spotify` | Low | Medium | Only if you use Spotify |
-| `aw-watcher-neovim` | Low | High | If you use Neovim |
+| `aw-watcher-spotify`  | Low    | Medium    | Only if you use Spotify              |
+| `aw-watcher-neovim`   | Low    | High      | If you use Neovim                    |
 
 ### Phase 3: Experimental (High Impact, High Effort)
 
-| Watcher | Effort | Impact | Considerations |
-|---------|--------|--------|----------------|
-| `aw-watcher-screenshot` | Medium | High | Storage planning required |
-| `aw-watcher-table` | High | Medium | DIY hardware assembly |
-| `aw-watcher-anki` | Low | Low | Only if you use Anki |
+| Watcher                 | Effort | Impact | Considerations            |
+| ----------------------- | ------ | ------ | ------------------------- |
+| `aw-watcher-screenshot` | Medium | High   | Storage planning required |
+| `aw-watcher-table`      | High   | Medium | DIY hardware assembly     |
+| `aw-watcher-anki`       | Low    | Low    | Only if you use Anki      |
 
 ---
 
@@ -471,14 +475,15 @@ Anki → Tools → Add-ons → Get Add-ons → Enter code
 
 ## Privacy & Security Considerations
 
-| Watcher | Privacy Level | Data Sensitivity | Mitigation |
-|---------|---------------|------------------|------------|
-| `aw-watcher-enhanced` | Medium | OCR captures all on-screen text | Local LLM (Ollama) keeps data on-device |
-| `aw-watcher-screenshot` | High | Full screen captures | Keep local only (disable S3), encrypt cache |
-| `aw-watcher-ask` | Low | Self-reported answers | Stored locally in ActivityWatch |
-| `aw-watcher-window` | Low | Window titles, URLs | Already active, standard tracking |
+| Watcher                 | Privacy Level | Data Sensitivity                | Mitigation                                  |
+| ----------------------- | ------------- | ------------------------------- | ------------------------------------------- |
+| `aw-watcher-enhanced`   | Medium        | OCR captures all on-screen text | Local LLM (Ollama) keeps data on-device     |
+| `aw-watcher-screenshot` | High          | Full screen captures            | Keep local only (disable S3), encrypt cache |
+| `aw-watcher-ask`        | Low           | Self-reported answers           | Stored locally in ActivityWatch             |
+| `aw-watcher-window`     | Low           | Window titles, URLs             | Already active, standard tracking           |
 
 **Recommendations:**
+
 - Use **Ollama (local LLM)** for `aw-watcher-enhanced` to avoid cloud processing
 - Disable **S3 upload** in `aw-watcher-screenshot` unless cloud backup required
 - Regularly **audit screenshot cache** for sensitive information
@@ -488,13 +493,13 @@ Anki → Tools → Add-ons → Get Add-ons → Enter code
 
 ## Resource Requirements Summary
 
-| Watcher | Memory | CPU | Disk | Network |
-|---------|--------|-----|------|---------|
-| `aw-watcher-enhanced` | 50-100MB | <5% | Minimal | Local only |
-| `aw-watcher-screenshot` | ~50MB | <5% | 1-3GB/month | If S3 enabled |
-| `aw-watcher-utilization` | ~20MB | <2% | Minimal | None |
-| `aw-watcher-ask` | ~10MB | <1% | Minimal | None |
-| `aw-watcher-table` | ~15MB | <1% | Minimal | Local WiFi |
+| Watcher                  | Memory   | CPU | Disk        | Network       |
+| ------------------------ | -------- | --- | ----------- | ------------- |
+| `aw-watcher-enhanced`    | 50-100MB | <5% | Minimal     | Local only    |
+| `aw-watcher-screenshot`  | ~50MB    | <5% | 1-3GB/month | If S3 enabled |
+| `aw-watcher-utilization` | ~20MB    | <2% | Minimal     | None          |
+| `aw-watcher-ask`         | ~10MB    | <1% | Minimal     | None          |
+| `aw-watcher-table`       | ~15MB    | <1% | Minimal     | Local WiFi    |
 
 ---
 
@@ -521,6 +526,7 @@ Anki → Tools → Add-ons → Get Add-ons → Enter code
 ### Key Insight
 
 ActivityWatch has evolved from a simple time tracker to a **comprehensive activity intelligence platform**. The combination of:
+
 - ✅ Fixed window/URL tracking (done)
 - 🔄 AI-powered context extraction (aw-watcher-enhanced)
 - 🔄 Visual documentation (aw-watcher-screenshot)

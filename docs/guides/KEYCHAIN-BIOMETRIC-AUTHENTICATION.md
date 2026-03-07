@@ -12,12 +12,14 @@ This guide covers KeyChain Touch ID/fingerprint authentication for **keys and ap
 ## What's Included in KeyChain
 
 ### Keys
+
 - **SSH keys:** For Git, remote servers, authentication
 - **Signing keys:** Code signing, document signing
 - **Encryption keys:** PGP, file encryption, secure messaging
 - **Application keys:** API tokens, service credentials, secrets
 
 ### Other Data
+
 - **Certificates:** SSL/TLS certificates, code signing certificates
 - **Identities:** Certificate + private key pairs
 - **Passwords:** WiFi passwords, app credentials (optional)
@@ -27,12 +29,14 @@ This guide covers KeyChain Touch ID/fingerprint authentication for **keys and ap
 ### What IS Configurable via nix-darwin
 
 **Touch ID for sudo** (Already Configured):
+
 ```nix
 # platforms/darwin/security/pam.nix
 security.pam.services.sudo_local.touchIdAuth = true;
 ```
 
 This enables Touch ID authentication for:
+
 - `sudo` commands in Terminal
 - Requires Touch ID once per 5 minutes (configurable timeout)
 - Works in tmux sessions with `reattach` option
@@ -40,6 +44,7 @@ This enables Touch ID authentication for:
 ### What Requires Manual Configuration
 
 **KeyChain Item Touch ID** (Per-Item Only):
+
 - Touch ID requirements are embedded in individual KeyChain items
 - No system-wide defaults or configuration files
 - Must be set when items are created or modified
@@ -51,6 +56,7 @@ This enables Touch ID authentication for:
 **File:** `platforms/darwin/security/keychain.nix`
 
 Automatically configures KeyChain security settings on activation:
+
 - Locks KeyChain after 5 minutes of inactivity
 - Validates login keychain existence
 - Provides consistent security baseline
@@ -162,6 +168,7 @@ just keychain-list
 ### KeyChain Security Model
 
 KeyChain uses the **Access Control Framework**:
+
 - **kSecAttrAccessControl**: Controls item accessibility
 - **kSecAccessControlTouchIDAny**: Requires any enrolled fingerprint
 - **kSecAccessControlTouchIDCurrentSet**: Requires currently enrolled fingers
@@ -194,6 +201,7 @@ security add-generic-password \
 ```
 
 **Flags:**
+
 - `-a`: Account name
 - `-s`: Service name
 - `-w`: Password
@@ -207,6 +215,7 @@ security add-generic-password \
 **Problem:** KeyChain item doesn't prompt for Touch ID
 
 **Solutions:**
+
 1. Verify Touch ID is enrolled in System Settings
 2. Check item Access Control in Keychain Access app
 3. Ensure item was created with `--require-biometry`
@@ -217,6 +226,7 @@ security add-generic-password \
 **Problem:** Cannot unlock KeyChain
 
 **Solutions:**
+
 1. Use `just keychain-unlock` (requires password)
 2. Check if login keychain exists: `ls ~/Library/Keychains/`
 3. Verify correct password for login keychain
@@ -227,6 +237,7 @@ security add-generic-password \
 **Problem:** sudo doesn't prompt for Touch ID
 
 **Solutions:**
+
 1. Check status: `just keychain-status`
 2. Verify `/etc/pam.d/sudo_local` exists
 3. Ensure `pam_tid.so` is enabled
@@ -237,6 +248,7 @@ security add-generic-password \
 **Problem:** `just keychain-list` shows no items
 
 **Solutions:**
+
 1. Check if login keychain exists: `security list-keychains`
 2. Ensure you're using correct keychain (login vs system)
 3. Try manual search: `security dump-keychain -r login.keychain-db`
@@ -284,26 +296,31 @@ ssh user@server
 ```
 
 **Enabling Touch ID for SSH Keys:**
+
 1. Add key with `just keychain-ssh-add`
 2. First use prompts for Touch ID
 3. Key is cached for configurable duration
 4. Use Keychain Access to adjust key access controls
 
 ### ActivityWatch
+
 - Application data managed via KeyChain
 - Use `just keychain-add` for credentials
 
 ### Git Signing
+
 - Git signing keys can be stored in KeyChain
 - Touch ID prompt on signed commits
 - Configure with `git config gpg.format ssh`
 
 ### Browser Passwords
+
 - Safari uses KeyChain natively
 - Chrome can import/export KeyChain passwords
 - Enable "Touch ID for autofill" in Safari preferences
 
 ### Developer Tools
+
 - Code signing keys: Touch ID prompt on signing
 - Notarization certificates: KeyChain managed
 - API tokens: Store as application keys

@@ -19,6 +19,7 @@
 ### What Needs to Happen Next
 
 **YOU (USER) need to:**
+
 1. Open Terminal.app (NOT iTerm2 - it's not installed yet)
 2. Navigate to: `cd ~/projects/SystemNix`
 3. Restart Nix daemon (see: EMERGENCY-RECOVERY-GUIDE.md)
@@ -41,6 +42,7 @@
 **Your Request:** "I think the result was actually not created but we switch over anyways and thereby fucked up our config. I want my iterm2 back!"
 
 **What Happened:**
+
 1. `nh darwin switch` failed due to macOS temp directory bug
 2. `just switch` may have failed silently
 3. System configuration might be incomplete
@@ -63,6 +65,7 @@
 **File:** `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md`
 
 **Content:**
+
 - 355-line comprehensive analysis
 - Detailed explanation of macOS temp directory bug
 - Why `nh darwin switch` fails
@@ -70,6 +73,7 @@
 - Technical deep dive into the issue
 
 **Key Findings:**
+
 - nh creates temp files as user, tries to access as root
 - macOS security prevents cross-user temp directory access
 - This is a security FEATURE, not a bug
@@ -82,6 +86,7 @@
 **File:** `docs/troubleshooting/nh-darwin-switch-EXECUTIVE-SUMMARY.md`
 
 **Content:**
+
 - 457-line executive summary
 - Actionable recommendations
 - Complete solution matrix ordered by preference
@@ -89,6 +94,7 @@
 - Key takeaways and learning points
 
 **Key Recommendations:**
+
 1. Continue using `just switch` (darwin-rebuild directly) - ALREADY WORKING
 2. Ignore `nh darwin switch` failures - Known macOS security issue
 3. Monitor nh releases for future fixes
@@ -100,11 +106,13 @@
 **File:** `platforms/darwin/nix/settings.nix`
 
 **Change:**
+
 - Added `/usr/include` to sandbox paths
 - Critical for building C/C++ packages
 - Enables iTerm2 and other packages to build
 
 **Impact:**
+
 - Fixes "getting attributes of required path '/usr/include': No such file or directory"
 - Enables building native packages on macOS
 - Critical for iTerm2 installation
@@ -116,12 +124,14 @@
 **File:** `platforms/darwin/nix/settings.nix`
 
 **Change:**
+
 - Added comprehensive macOS sandbox paths based on research
 - Organized paths by category (core, temp, shell, dev, desktop)
 - Added detailed comments explaining each path
 - Removed `/dev` exposure (security risk)
 
 **Paths Added:**
+
 - **Core System:** Frameworks, PrivateFrameworks, /usr/lib, /usr/include, /usr/bin/env
 - **Temp Directories:** /private/tmp, /private/var/tmp
 - **Shell Interpreters:** /bin/sh, /bin/bash, /bin/zsh
@@ -136,6 +146,7 @@
 **File:** `docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md`
 
 **Content:**
+
 - 619-line comprehensive research document
 - Analysis of 50+ configurations
 - Security analysis with 4 levels
@@ -144,6 +155,7 @@
 - Troubleshooting guide for common errors
 
 **Research Scope:**
+
 1. macOS (Darwin) configurations
 2. NixOS configurations
 3. Official Nix sandbox documentation
@@ -151,6 +163,7 @@
 5. Security implications
 
 **Key Findings:**
+
 - 90%+ of macOS configs use same 6 core paths
 - `/usr/include` appears in 78% of configs
 - `/dev` exposure is a high security risk
@@ -163,6 +176,7 @@
 **File:** `docs/troubleshooting/EMERGENCY-RECOVERY-GUIDE.md`
 
 **Content:**
+
 - 426-line actionable recovery guide
 - Step-by-step instructions to fix system
 - Multiple alternative approaches
@@ -171,6 +185,7 @@
 - Next steps in priority order
 
 **Guide Sections:**
+
 1. Current Situation Analysis
 2. Immediate Action Required (3 steps)
 3. Alternative Approaches (3 options)
@@ -208,18 +223,21 @@
 ### About the nh Tool Failure
 
 **Root Cause:**
+
 - nh creates temp file as regular user: `/var/folders/{uid}/.../T/nh-xxx/result`
 - Then elevates to root via `sudo` to set system profile
 - macOS security prevents root from accessing user temp directories
 - This is a **security FEATURE**, not a bug
 
 **Why darwin-rebuild Works:**
+
 - Manages build and activation in single privileged context
 - Uses system-wide directories or avoids temp files
 - No cross-user temp directory access required
 - Official tool designed specifically for nix-darwin
 
 **Best Solution:**
+
 - Continue using `just switch` (darwin-rebuild directly)
 - Already implemented and working
 - No temp directory issues
@@ -229,17 +247,20 @@
 ### About Nix Sandbox Configuration
 
 **What Sandbox Does:**
+
 - Isolates builds from host system
 - Blocks access to most filesystem paths
 - Blocks network access (except for fixed-output derivations)
 - Ensures reproducible builds
 
 **What extra-sandbox-paths Does:**
+
 - Exposes specific host paths to sandbox
 - Required for system resources (frameworks, libraries, headers)
 - Balances security with build compatibility
 
 **macOS Essential Paths (90%+ of configs):**
+
 - `/System/Library/Frameworks` - Core frameworks
 - `/System/Library/PrivateFrameworks` - Private Apple APIs
 - `/usr/lib` - System libraries
@@ -248,12 +269,14 @@
 - `/usr/bin/env` - Environment utility
 
 **macOS Common Paths (50-90% of configs):**
+
 - `/usr/include` - C/C++ headers (CRITICAL for iTerm2)
 - `/Library/Developer/CommandLineTools` - Xcode tools
 - `/System/Library/Fonts` - System fonts (GUI apps)
 - `/usr/local/lib` - Homebrew libraries
 
 **Security Considerations:**
+
 - `/dev` exposure = HIGH RISK (hardware access)
 - Read-only system paths = SAFE
 - Temporary directories = LOW RISK
@@ -264,17 +287,20 @@
 ### About Your Current Situation
 
 **What's Broken:**
+
 - iTerm2 not installed
 - System configuration may be incomplete
 - Builds failing due to missing sandbox paths
 
 **What's Working:**
+
 - Nix is installed and running
 - Git repository is up to date
 - Flake configuration is valid (nix flake check passes)
 - Sandbox paths are configured (just need to apply)
 
 **What You Need to Do:**
+
 1. Restart Nix daemon (apply new sandbox paths)
 2. Run `just switch` (apply system configuration)
 3. Verify iTerm2 is installed
@@ -288,6 +314,7 @@
 **Don't use iTerm2** - it's not installed yet. Use default Terminal.app.
 
 **Shortcut:**
+
 - Press `Cmd + Space`
 - Type "Terminal"
 - Press Enter
@@ -301,6 +328,7 @@ cd ~/projects/SystemNix
 ```
 
 **Verify location:**
+
 ```bash
 pwd
 # Should output: /Users/larsartmann/projects/SystemNix
@@ -327,6 +355,7 @@ ps aux | grep nix-daemon
 ```
 
 **Expected Output:**
+
 - No error messages
 - You should see `nix-daemon` process running
 
@@ -341,11 +370,13 @@ just switch
 ```
 
 **Expected Behavior:**
+
 - Build should take 5-15 minutes
 - You should see build progress (not silent failure)
 - No error messages
 
 **If This Fails:**
+
 - See: `docs/troubleshooting/EMERGENCY-RECOVERY-GUIDE.md`
 - Try alternative approaches listed there
 
@@ -364,6 +395,7 @@ open /run/current-system/Applications/iTerm2.app
 ```
 
 **Expected Output:**
+
 - iTerm2.app should be listed
 - Should open without errors
 - iTerm2 should be in /Applications
@@ -385,10 +417,12 @@ open ~/Applications/iTerm2.app
 ```
 
 **Pros:**
+
 - Immediate iTerm2 access
 - Doesn't require system switch
 
 **Cons:**
+
 - Only for current user, not system-wide
 - Needs to be reinstalled after system switch
 
@@ -407,10 +441,12 @@ sudo /nix/store/56rzl70zs58bj33hy35gi30gg3hf1m9z-darwin-system-26.05.5fb45ec/act
 ```
 
 **Pros:**
+
 - Restores previous working state
 - Should have iTerm2 if it was installed before
 
 **Cons:**
+
 - Loses recent changes
 - Doesn't fix underlying sandbox issue
 
@@ -430,10 +466,12 @@ sudo result/activate
 ```
 
 **Pros:**
+
 - Shows each step explicitly
 - Good for debugging
 
 **Cons:**
+
 - More complex
 - More error-prone
 
@@ -469,12 +507,12 @@ sudo result/activate
 
 ### Quick Reference
 
-| Guide | Purpose | Length | When to Use |
-|--------|---------|----------|--------------|
-| ROOT-CAUSE.md | Understand issue | 355 lines | Research/learning |
-| EXECUTIVE-SUMMARY.md | Quick overview | 457 lines | Get fast answers |
-| SANDBOX-PATHS-RESEARCH.md | Detailed config | 619 lines | Configure sandbox |
-| EMERGENCY-RECOVERY-GUIDE.md | Fix system now | 426 lines | Recovery/fix |
+| Guide                       | Purpose          | Length    | When to Use       |
+| --------------------------- | ---------------- | --------- | ----------------- |
+| ROOT-CAUSE.md               | Understand issue | 355 lines | Research/learning |
+| EXECUTIVE-SUMMARY.md        | Quick overview   | 457 lines | Get fast answers  |
+| SANDBOX-PATHS-RESEARCH.md   | Detailed config  | 619 lines | Configure sandbox |
+| EMERGENCY-RECOVERY-GUIDE.md | Fix system now   | 426 lines | Recovery/fix      |
 
 ---
 
@@ -526,18 +564,21 @@ sudo result/activate
 ### Summary of Work Completed
 
 **Research:**
+
 1. Investigated `nh darwin switch` failure (4 parallel agents)
 2. Researched 50+ NixOS and macOS sandbox configurations
 3. Analyzed security implications
 4. Compiled best practices
 
 **Configuration:**
+
 1. Fixed sandbox configuration (added `/usr/include`)
 2. Added comprehensive macOS paths (organized by category)
 3. Removed security risks (`/dev` exposure)
 4. Documented all paths with comments
 
 **Documentation:**
+
 1. Root cause analysis (355 lines)
 2. Executive summary (457 lines)
 3. Sandbox paths research (619 lines)
@@ -545,6 +586,7 @@ sudo result/activate
 5. This summary (work completed)
 
 **Git:**
+
 1. 6 commits created
 2. All commits pushed to master
 3. Repository up to date
@@ -569,6 +611,7 @@ sudo result/activate
 ### Difficulty Level
 
 **Overall:** 🟢 EASY
+
 - Just follow steps in EMERGENCY-RECOVERY-GUIDE.md
 - Commands are provided (copy-paste ready)
 - Troubleshooting guide available if issues occur
@@ -576,6 +619,7 @@ sudo result/activate
 ### Success Criteria
 
 **You'll know it worked when:**
+
 - [ ] iTerm2 launches without errors
 - [ ] iTerm2 is in /Applications
 - [ ] All expected packages are available
@@ -593,6 +637,7 @@ sudo result/activate
    - `nh-darwin-switch-ROOT-CAUSE.md` (for learning)
 
 2. **Check Git History:**
+
    ```bash
    cd ~/projects/SystemNix
    git log --oneline -6

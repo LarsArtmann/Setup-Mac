@@ -12,6 +12,7 @@
 This session conducted a comprehensive audit of the SystemNix repository to identify and update obsolete `Desktop/Setup-Mac` path references following the project relocation from `~/Desktop/Setup-Mac` to `~/projects/SystemNix`.
 
 **Key Findings:**
+
 - **100+ matches** of old path references found across the codebase
 - **19 files** updated with corrected paths (core documentation and scripts)
 - **~80 references** remaining in archived/historical documentation
@@ -19,6 +20,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 - **Critical decision required** regarding historical document preservation policy
 
 **Session Outcome:**
+
 - ✅ All functional paths updated (justfile, scripts, core docs)
 - 🔄 Documentation paths partially updated (guides updated, archives pending decision)
 - 📝 Comprehensive status baseline established
@@ -31,6 +33,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ### 1. Core Path Updates (19 Files Updated)
 
 #### Production Scripts (2 files)
+
 - **justfile**
   - ✅ Updated `tmux-dev` session: `Setup-Mac` → `SystemNix`
   - ✅ Updated `tmux-attach` session: `Setup-Mac` → `SystemNix`
@@ -43,6 +46,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - **Impact:** Automation setup script references correct project location
 
 #### Project Documentation (3 files)
+
 - **AGENTS.md**
   - ✅ Updated macOS deployment instructions
   - ✅ Changed `cd ~/Desktop/Setup-Mac` → `cd ~/projects/SystemNix`
@@ -58,6 +62,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - **Impact:** Test README uses correct paths
 
 #### Verification & Deployment Guides (3 files)
+
 - **docs/verification/QUICK-START.md**
   - ✅ Updated 5 instances of path references
   - **Impact:** Quick start guide uses correct paths for all commands
@@ -71,6 +76,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - **Impact:** Architecture documentation uses correct paths
 
 #### Operational Guides (5 files)
+
 - **docs/SESSION-SUMMARY-NEXT-STEPS.md**
   - ✅ Updated deployment instructions
   - **Impact:** Session summary uses correct paths
@@ -92,6 +98,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - **Impact:** UI restoration guide uses correct script paths
 
 #### Technical Implementation Guides (1 file)
+
 - **docs/sddm-implementation-steps.md**
   - ✅ Updated target file path (2 instances)
   - **Impact:** SDDM implementation documentation uses correct file paths
@@ -99,6 +106,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ### 2. Pre-Existing Architecture (Confirmed Working)
 
 #### Cross-Platform Home Manager Integration
+
 - ✅ 80% code reduction via `platforms/common/` shared modules
 - ✅ Fish shell config unified across Darwin (macOS) and NixOS (Linux)
 - ✅ Starship prompt config unified (identical on both platforms)
@@ -109,23 +117,27 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 - ✅ User definition workaround in `platforms/darwin/default.nix`
 
 #### Type Safety System
+
 - ✅ Core validation framework: `core/TypeSafetySystem.nix`
 - ✅ State management: `core/State.nix`
 - ✅ Validation logic: `core/Validation.nix`
 - ✅ Type definitions: `core/Types.nix`
 
 #### Go Toolchain Migration
+
 - ✅ All Go tools migrated to Nix packages (90% success rate)
 - ✅ Tools: gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup, modernize
 - ✅ No `go install` required (except wire - not in Nixpkgs)
 
 #### LaunchAgent Management (macOS)
+
 - ✅ ActivityWatch declarative LaunchAgent: `net.activitywatch.ActivityWatch`
 - ✅ Just commands: `just activitywatch-start` / `just activitywatch-stop`
 - ✅ Logs: `~/.local/share/activitywatch/stdout.log` and `stderr.log`
 - ✅ Bash scripts removed and deprecated
 
 #### Documentation Architecture
+
 - ✅ ADR-003: OpenZFS banned on macOS (kernel panics)
 - ✅ Cross-platform consistency reports
 - ✅ Home Manager deployment guides
@@ -137,6 +149,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 🔄 PARTIALLY DONE
 
 ### 1. Path Reference Cleanup
+
 - **Status**: ~20/100 references updated this session
 - **Completed**: Core functional paths (justfile, scripts, AGENTS.md, README, guides)
 - **Remaining**: ~80 references in historical/archival documentation
@@ -147,6 +160,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - `docs/archive/status/*.md` - Archived historical documents
 
 ### 2. NixOS evo-x2 Desktop Environment
+
 - **Status**: Configuration complete, deployment unverified
 - **Completed**: SDDM configuration, Hyprland setup, Waybar, Kitty, Rofi configured
 - **Remaining**: Hardware testing, UI verification, network configuration testing
@@ -154,6 +168,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 - **Unknowns**: Is evo-x2 actually running? Is the UI working?
 
 ### 3. Testing Infrastructure
+
 - **Status**: Commands exist, execution unverified
 - **Completed**: Command definitions in justfile (`just test`, `just test-fast`, `just health`)
 - **Remaining**: Verify actual test execution, measure coverage, establish baselines
@@ -164,6 +179,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## ❌ NOT STARTED
 
 ### 1. Historical Documentation Path Updates
+
 **Scope**: ~80 references across 3 directory trees
 
 - **docs/archive/** (~60 files)
@@ -182,6 +198,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
   - Decision needed: Which to update, which to preserve
 
 ### 2. evo-x2 Deployment Verification
+
 - Current build status unknown
 - UI restoration documented but not tested on actual hardware
 - SDDM functionality unverified
@@ -189,18 +206,21 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 - SSH key configuration status unknown
 
 ### 3. Performance Monitoring Setup
+
 - ActivityWatch data exists but no analysis performed
 - Netdata monitoring: Configuration done, operational status unknown
 - ntopng network monitoring: Configuration done, operational status unknown
 - Shell startup baseline: Command exists, no measurements taken
 
 ### 4. Security Audit
+
 - Gitleaks: Hook configured, last run status unknown
 - Secret scanning: No recent audit performed
 - Firewall rules: Configuration exists, audit not performed
 - Certificate management: No recent review performed
 
 ### 5. Testing & Quality Assurance
+
 - Automated test suite: Not implemented
 - Coverage measurement: Not established
 - Build verification: Commands exist, execution unverified
@@ -211,9 +231,11 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 🚨 ISSUES FOUND
 
 ### Critical Issues
+
 **NONE** - All functional code paths updated, no breakages detected.
 
 ### Medium Priority Issues
+
 1. **Inconsistent Documentation State**
    - Some docs use `~/projects/SystemNix`, others use `~/Desktop/Setup-Mac`
    - Confusing for users following guides
@@ -225,6 +247,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
    - No verification of whether UI actually works
 
 ### Low Priority Issues
+
 1. **Historical Documentation Ambiguity**
    - Archive docs contain old paths (intentionally historical?)
    - No clear policy on whether to update or preserve
@@ -242,23 +265,27 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ### Question: Historical Documentation Path Policy
 
 **Context:**
+
 - Found ~80 `Desktop/Setup-Mac` references in historical documentation
 - These are archive documents from Dec 2025 - Feb 2026 documenting the migration journey
 - Three options for handling:
 
 **Option A: Update All References**
+
 - **Action**: Update all ~80 references to `projects/SystemNix`
 - **Cost**: ~2 hours of manual editing
 - **Benefit**: Documentation consistency across entire repo
 - **Drawback**: Loses historical accuracy of migration context
 
 **Option B: Preserve Historical Accuracy**
+
 - **Action**: Leave archives as-is, add README note explaining historical context
 - **Cost**: 5 minutes to write note
 - **Benefit**: Preserves migration history and context
 - **Drawback**: Inconsistent paths, potential confusion
 
 **Option C: Selective Update**
+
 - **Action**: Update `docs/troubleshooting/` (functional guides), preserve `docs/archive/` (historical)
 - **Cost**: ~30 minutes
 - **Benefit**: Operational docs accurate, history preserved
@@ -267,6 +294,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 **Recommendation**: Option C - Update functional docs, preserve historical docs
 
 **Rationale**:
+
 - Troubleshooting guides are actively used and should be accurate
 - Archive docs are historical records and should preserve context
 - Adds README to archive explaining policy
@@ -378,24 +406,28 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 📈 METRICS & BASELINES
 
 ### Code Quality
+
 - **Total Path References Found**: 100+
 - **References Updated This Session**: 19 files, ~20 references
 - **References Remaining**: ~80 (pending decision)
 - **Files Updated**: 19 (justfile, scripts, core docs)
 
 ### Documentation Status
+
 - **Total Documentation Files**: 100+ (estimated)
 - **Files Updated This Session**: 19
 - **Files Remaining**: ~80 (pending decision)
 - **Documentation Coverage**: Estimated 80% complete (pending decision)
 
 ### Testing Status
+
 - **Test Commands Available**: Yes (just test, test-fast, health)
 - **Test Execution Status**: Unknown
 - **Coverage Measurement**: Not established
 - **Baseline Metrics**: Not established
 
 ### System Health
+
 - **Known Critical Issues**: 0
 - **Known Breaking Changes**: 0
 - **Configuration Drift**: Minimal (path references only)
@@ -437,18 +469,21 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 💡 KEY INSIGHTS
 
 ### Technical Insights
+
 1. **Migration Impact**: The project migration was mostly complete, but documentation lagged behind code
 2. **Path Fragmentation**: 100+ old path references created significant documentation debt
 3. **Selective Updates**: Not all documents need updating - context matters (operational vs historical)
 4. **Search Tool Power**: `grep` with pattern matching is highly effective for this type of audit
 
 ### Process Insights
+
 1. **Debt Accumulation**: Path references accumulated over 2+ months without detection
 2. **Tooling Gap**: No automated check for path reference consistency
 3. **Documentation Maintenance**: Lack of clear policy led to inconsistent updates
 4. **Audit Value**: Comprehensive audit revealed previously unknown issues
 
 ### Architecture Insights
+
 1. **Modular Design Helped**: Clear directory structure made updates systematic
 2. **Shared Code Reduces Debt**: Cross-platform common modules reduced update burden
 3. **Documentation Hierarchy Matters**: Differentiating operational vs historical docs is critical
@@ -458,6 +493,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 🎯 SUCCESS CRITERIA
 
 ### Session Success
+
 - ✅ All production code paths updated
 - ✅ All core documentation updated
 - ✅ Comprehensive status report created
@@ -465,6 +501,7 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 - ✅ Action plan defined for remaining work
 
 ### Full Project Success (Pending)
+
 - 🔄 All functional documentation updated (pending decision)
 - 🔄 Testing infrastructure verified and working
 - 🔄 evo-x2 deployment confirmed operational
@@ -478,18 +515,21 @@ This session conducted a comprehensive audit of the SystemNix repository to iden
 ## 📝 NOTES
 
 ### Session Notes
+
 - Session focused on systematic path reference cleanup
 - Decision to prioritize functional docs over historical docs
 - Created comprehensive status baseline for future work
 - Established clear action plan with priorities
 
 ### Technical Notes
+
 - All edits performed with exact string matching (no approximate replacements)
 - Each file read before editing to verify exact context
 - No build/test errors introduced by path updates
 - All changes are non-breaking (documentation only)
 
 ### Decision Notes
+
 - Historical documentation policy is primary blocker
 - Recommendation is Option C (selective update)
 - User approval required before executing remaining updates

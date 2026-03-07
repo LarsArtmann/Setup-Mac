@@ -7,6 +7,7 @@ Netdata is a real-time performance monitoring tool that provides comprehensive s
 ## Current Installation Status
 
 Netdata is installed via Nix in `environment.nix`:
+
 ```nix
 netdata # Real-time performance monitoring tool
 ```
@@ -14,6 +15,7 @@ netdata # Real-time performance monitoring tool
 ## Quick Start
 
 ### 1. Launch Netdata
+
 ```bash
 # Start netdata daemon
 sudo netdata
@@ -23,11 +25,13 @@ sudo netdata -c /opt/netdata/etc/netdata/netdata.conf
 ```
 
 ### 2. Access Web Interface
+
 - Default URL: `http://localhost:19999`
 - Real-time dashboard with automatic refresh
 - No authentication required by default (localhost only)
 
 ### 3. Basic Commands
+
 ```bash
 # Check if netdata is running
 pgrep netdata
@@ -45,12 +49,14 @@ sudo netdata -D
 ## Configuration
 
 ### Configuration File Locations
+
 - Main config: `/opt/netdata/etc/netdata/netdata.conf`
 - Custom config: `/usr/local/etc/netdata/netdata.conf`
 - Log files: `/var/log/netdata/`
 - Data storage: `/var/cache/netdata/`
 
 ### Generate Configuration File
+
 ```bash
 # Generate configuration with current settings
 sudo netdata -W set 2>/dev/null
@@ -62,6 +68,7 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ### Key Configuration Options
 
 #### Performance Optimization
+
 ```ini
 [global]
     # Reduce memory usage for development machines
@@ -77,6 +84,7 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ```
 
 #### Security Settings
+
 ```ini
 [web]
     # Bind to localhost only for security
@@ -89,6 +97,7 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ```
 
 #### Data Retention
+
 ```ini
 [global]
     # Adjust based on available disk space
@@ -99,6 +108,7 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ### macOS-Specific Configuration
 
 #### System Monitoring
+
 ```ini
 [plugin:macos]
     # Enable macOS-specific metrics
@@ -111,6 +121,7 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ```
 
 #### Network Monitoring
+
 ```ini
 [plugin:tc]
     # Traffic control monitoring
@@ -120,7 +131,9 @@ sudo /opt/netdata/usr/sbin/netdata -c /opt/netdata/etc/netdata/netdata.conf -W s
 ## Advanced Setup
 
 ### Custom Dashboard Configuration
+
 Create `/opt/netdata/etc/netdata/health.d/custom.conf`:
+
 ```ini
 # Custom health monitoring
 template: cpu_usage_high
@@ -139,6 +152,7 @@ component: CPU
 ### Plugin Configuration
 
 #### Enable Python Plugins
+
 ```bash
 # Install required Python modules
 pip3 install psutil python-socketio
@@ -151,6 +165,7 @@ pip3 install psutil python-socketio
 ```
 
 #### Go Plugins (Recommended)
+
 ```ini
 [plugin:go.d]
     # More efficient than Python plugins
@@ -161,7 +176,9 @@ pip3 install psutil python-socketio
 ## Integration with Development Workflow
 
 ### Just Task Integration
+
 Add to `justfile`:
+
 ```bash
 # Monitor system performance
 monitor:
@@ -179,7 +196,9 @@ monitor-dev:
 ```
 
 ### Automated Startup (LaunchAgent)
+
 Create `~/Library/LaunchAgents/com.netdata.agent.plist`:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -207,6 +226,7 @@ Create `~/Library/LaunchAgents/com.netdata.agent.plist`:
 ```
 
 Load the agent:
+
 ```bash
 launchctl load ~/Library/LaunchAgents/com.netdata.agent.plist
 ```
@@ -214,18 +234,21 @@ launchctl load ~/Library/LaunchAgents/com.netdata.agent.plist
 ## Key Metrics for Development
 
 ### System Performance Metrics
+
 - **CPU Usage**: Per-core utilization, load average
 - **Memory**: Used, cached, swap usage
 - **Disk I/O**: Read/write operations, latency
 - **Network**: Interface statistics, traffic patterns
 
 ### Development-Specific Metrics
+
 - **Build Performance**: Monitor during compilation
 - **Process Monitoring**: Track resource usage of development tools
 - **Docker Metrics**: Container resource consumption
 - **Database Performance**: Connection pools, query performance
 
 ### Custom Metrics Collection
+
 ```bash
 # Create custom chart for development metrics
 echo "BEGIN development.build_time"
@@ -236,6 +259,7 @@ echo "END"
 ## Performance Optimization
 
 ### Resource Usage Optimization
+
 ```ini
 [global]
     # Reduce CPU usage
@@ -250,6 +274,7 @@ echo "END"
 ```
 
 ### Metric Selection
+
 ```ini
 [plugin:proc]
     # Disable metrics not needed for development
@@ -261,16 +286,19 @@ echo "END"
 ## Security Considerations
 
 ### Network Security
+
 - Default configuration binds to localhost only
 - No authentication required for local access
 - Consider firewall rules for remote access
 
 ### Data Privacy
+
 - Metrics stored locally by default
 - No data transmitted to external services
 - Configure data retention policies
 
 ### Access Control
+
 ```ini
 [web]
     # Restrict access to specific IPs
@@ -285,6 +313,7 @@ echo "END"
 ### Common Issues
 
 #### Netdata Won't Start
+
 ```bash
 # Check for existing process
 pgrep netdata
@@ -298,6 +327,7 @@ sudo netdata -D -d 2>&1 | tee netdata.log
 ```
 
 #### Permission Issues
+
 ```bash
 # Fix ownership
 sudo chown -R netdata:netdata /var/cache/netdata
@@ -308,6 +338,7 @@ sudo chmod 755 /opt/netdata/usr/sbin/netdata
 ```
 
 #### High Resource Usage
+
 ```ini
 [global]
     # Reduce update frequency
@@ -321,6 +352,7 @@ sudo chmod 755 /opt/netdata/usr/sbin/netdata
 ```
 
 #### Missing Metrics
+
 ```bash
 # Check plugin status
 curl http://localhost:19999/api/v1/info
@@ -330,6 +362,7 @@ sudo /opt/netdata/usr/libexec/netdata/plugins.d/go.d.plugin debug
 ```
 
 ### Debug Commands
+
 ```bash
 # Configuration verification
 sudo netdata -t
@@ -349,12 +382,14 @@ tail -f /var/log/netdata/access.log
 ## Performance Monitoring Best Practices
 
 ### Development Workflow Integration
+
 1. **Baseline Monitoring**: Establish performance baselines before changes
 2. **Build Monitoring**: Track compilation times and resource usage
 3. **Testing Impact**: Monitor system during test runs
 4. **Continuous Monitoring**: Keep netdata running during development
 
 ### Alert Configuration
+
 ```ini
 # Custom alerts for development environment
 template: high_build_cpu
@@ -368,6 +403,7 @@ template: high_build_cpu
 ```
 
 ### Data Export
+
 ```bash
 # Export metrics for analysis
 curl -s "http://localhost:19999/api/v1/data?chart=system.cpu&format=json" > cpu_metrics.json
@@ -379,6 +415,7 @@ curl -s "http://localhost:19999/api/v1/data?chart=system.cpu&after=-3600&format=
 ## Integration with Other Tools
 
 ### Grafana Integration
+
 ```bash
 # Add Netdata as Grafana data source
 # URL: http://localhost:19999
@@ -386,6 +423,7 @@ curl -s "http://localhost:19999/api/v1/data?chart=system.cpu&after=-3600&format=
 ```
 
 ### Prometheus Integration
+
 ```ini
 [backend]
     enabled = yes
@@ -395,6 +433,7 @@ curl -s "http://localhost:19999/api/v1/data?chart=system.cpu&after=-3600&format=
 ```
 
 ### API Usage Examples
+
 ```bash
 # Get all available charts
 curl http://localhost:19999/api/v1/charts

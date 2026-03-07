@@ -13,6 +13,7 @@
 All shell aliases work correctly across Fish, Zsh, and Bash shells. ADR-002 cross-shell alias architecture is **functionally verified**.
 
 **Test Results:**
+
 - ✅ Fish: 11 aliases working (8 common + 3 Darwin)
 - ✅ Zsh: 11 aliases working (8 common + 3 Darwin)
 - ✅ Bash: 8 aliases working (8 common only)
@@ -25,24 +26,24 @@ All shell aliases work correctly across Fish, Zsh, and Bash shells. ADR-002 cros
 
 **Common Aliases (8/8 passing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `l` | `ls -laSh` | ✅ `fish -i -c 'type l'` |
-| `t` | `tree -h -L 2 -C --dirsfirst` | ✅ `fish -i -c 'type t'` |
-| `gs` | `git status` | ✅ `fish -i -c 'type gs'` |
-| `gd` | `git diff` | ✅ All aliases verified |
-| `ga` | `git add` | ✅ All aliases verified |
-| `gc` | `git commit` | ✅ All aliases verified |
-| `gp` | `git push` | ✅ All aliases verified |
-| `gl` | `git log --oneline --graph --decorate --all` | ✅ All aliases verified |
+| Alias | Command                                      | Status                    | Verification Method |
+| ----- | -------------------------------------------- | ------------------------- | ------------------- |
+| `l`   | `ls -laSh`                                   | ✅ `fish -i -c 'type l'`  |
+| `t`   | `tree -h -L 2 -C --dirsfirst`                | ✅ `fish -i -c 'type t'`  |
+| `gs`  | `git status`                                 | ✅ `fish -i -c 'type gs'` |
+| `gd`  | `git diff`                                   | ✅ All aliases verified   |
+| `ga`  | `git add`                                    | ✅ All aliases verified   |
+| `gc`  | `git commit`                                 | ✅ All aliases verified   |
+| `gp`  | `git push`                                   | ✅ All aliases verified   |
+| `gl`  | `git log --oneline --graph --decorate --all` | ✅ All aliases verified   |
 
 **Darwin-Specific Aliases (3/3 passing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `nixup` | `darwin-rebuild switch --flake .` | ✅ Verified |
-| `nixbuild` | `darwin-rebuild build --flake .` | ✅ Verified |
-| `nixcheck` | `darwin-rebuild check --flake .` | ✅ Verified |
+| Alias      | Command                           | Status      | Verification Method |
+| ---------- | --------------------------------- | ----------- | ------------------- |
+| `nixup`    | `darwin-rebuild switch --flake .` | ✅ Verified |
+| `nixbuild` | `darwin-rebuild build --flake .`  | ✅ Verified |
+| `nixcheck` | `darwin-rebuild check --flake .`  | ✅ Verified |
 
 **Total Fish Aliases:** 11/11 passing (100%)
 
@@ -52,24 +53,24 @@ All shell aliases work correctly across Fish, Zsh, and Bash shells. ADR-002 cros
 
 **Common Aliases (8/8 passing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `l` | `ls -laSh` | ✅ `grep ~/.config/zsh/.zshrc` |
-| `t` | `tree -h -L 2 -C --dirsfirst` | ✅ `grep ~/.config/zsh/.zshrc` |
-| `gs` | `git status` | ✅ All aliases present |
-| `gd` | `git diff` | ✅ All aliases present |
-| `ga` | `git add` | ✅ All aliases present |
-| `gc` | `git commit` | ✅ All aliases present |
-| `gp` | `git push` | ✅ All aliases present |
-| `gl` | `git log --oneline --graph --decorate --all` | ✅ All aliases present |
+| Alias | Command                                      | Status                         | Verification Method |
+| ----- | -------------------------------------------- | ------------------------------ | ------------------- |
+| `l`   | `ls -laSh`                                   | ✅ `grep ~/.config/zsh/.zshrc` |
+| `t`   | `tree -h -L 2 -C --dirsfirst`                | ✅ `grep ~/.config/zsh/.zshrc` |
+| `gs`  | `git status`                                 | ✅ All aliases present         |
+| `gd`  | `git diff`                                   | ✅ All aliases present         |
+| `ga`  | `git add`                                    | ✅ All aliases present         |
+| `gc`  | `git commit`                                 | ✅ All aliases present         |
+| `gp`  | `git push`                                   | ✅ All aliases present         |
+| `gl`  | `git log --oneline --graph --decorate --all` | ✅ All aliases present         |
 
 **Darwin-Specific Aliases (3/3 passing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `nixup` | `darwin-rebuild switch --flake .` | ✅ Present in config |
-| `nixbuild` | `darwin-rebuild build --flake .` | ✅ Present in config |
-| `nixcheck` | `darwin-rebuild check --flake .` | ✅ Present in config |
+| Alias      | Command                           | Status               | Verification Method |
+| ---------- | --------------------------------- | -------------------- | ------------------- |
+| `nixup`    | `darwin-rebuild switch --flake .` | ✅ Present in config |
+| `nixbuild` | `darwin-rebuild build --flake .`  | ✅ Present in config |
+| `nixcheck` | `darwin-rebuild check --flake .`  | ✅ Present in config |
 
 **Total Zsh Aliases:** 11/11 passing (100%)
 
@@ -81,24 +82,24 @@ All shell aliases work correctly across Fish, Zsh, and Bash shells. ADR-002 cros
 
 **Common Aliases (8/8 passing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `l` | `ls -laSh` | ✅ `grep ~/.bashrc` |
-| `t` | `tree -h -L 2 -C --dirsfirst` | ✅ `grep ~/.bashrc` |
-| `gs` | `git status` | ✅ All aliases present |
-| `gd` | `git diff` | ✅ All aliases present |
-| `ga` | `git add` | ✅ All aliases present |
-| `gc` | `git commit` | ✅ All aliases present |
-| `gp` | `git push` | ✅ All aliases present |
-| `gl` | `git log --oneline --graph --decorate --all` | ✅ All aliases present |
+| Alias | Command                                      | Status                 | Verification Method |
+| ----- | -------------------------------------------- | ---------------------- | ------------------- |
+| `l`   | `ls -laSh`                                   | ✅ `grep ~/.bashrc`    |
+| `t`   | `tree -h -L 2 -C --dirsfirst`                | ✅ `grep ~/.bashrc`    |
+| `gs`  | `git status`                                 | ✅ All aliases present |
+| `gd`  | `git diff`                                   | ✅ All aliases present |
+| `ga`  | `git add`                                    | ✅ All aliases present |
+| `gc`  | `git commit`                                 | ✅ All aliases present |
+| `gp`  | `git push`                                   | ✅ All aliases present |
+| `gl`  | `git log --oneline --graph --decorate --all` | ✅ All aliases present |
 
 **Darwin-Specific Aliases (0/3 missing):**
 
-| Alias | Command | Status | Verification Method |
-|--------|-----------|--------|-------------------|
-| `nixup` | `darwin-rebuild switch --flake .` | ⚠️  NOT IN BASH CONFIG |
-| `nixbuild` | `darwin-rebuild build --flake .` | ⚠️  NOT IN BASH CONFIG |
-| `nixcheck` | `darwin-rebuild check --flake .` | ⚠️  NOT IN BASH CONFIG |
+| Alias      | Command                           | Status                | Verification Method |
+| ---------- | --------------------------------- | --------------------- | ------------------- |
+| `nixup`    | `darwin-rebuild switch --flake .` | ⚠️ NOT IN BASH CONFIG |
+| `nixbuild` | `darwin-rebuild build --flake .`  | ⚠️ NOT IN BASH CONFIG |
+| `nixcheck` | `darwin-rebuild check --flake .`  | ⚠️ NOT IN BASH CONFIG |
 
 **Total Bash Aliases:** 8/11 passing (73%)
 
@@ -130,29 +131,36 @@ commonShellAliases = {
 ### ✅ Import Pattern
 
 **Fish Config:** `platforms/common/programs/fish.nix`
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.fish.shellAliases = commonAliases;
 ```
+
 **Status:** ✅ VERIFIED
 
 **Zsh Config:** `platforms/common/programs/zsh.nix`
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.zsh.shellAliases = commonAliases;
 ```
+
 **Status:** ✅ VERIFIED
 
 **Bash Config:** `platforms/common/programs/bash.nix`
+
 ```nix
 commonAliases = (import ./shell-aliases.nix {}).commonShellAliases;
 programs.bash.shellAliases = commonAliases;
 ```
+
 **Status:** ✅ VERIFIED
 
 ### ✅ Platform-Specific Overrides
 
 **Darwin Overrides:** `platforms/darwin/programs/shells.nix`
+
 ```nix
 programs.fish.shellAliases = lib.mkAfter {
   nixup = "darwin-rebuild switch --flake .";
@@ -166,6 +174,7 @@ programs.zsh.shellAliases = lib.mkAfter {
   nixcheck = "darwin-rebuild check --flake .";
 };
 ```
+
 **Status:** ✅ VERIFIED
 
 **Bash Override:** ⚠️ MISSING
@@ -179,17 +188,17 @@ Darwin config does NOT include Bash platform-specific overrides.
 
 ### ✅ Requirements Met
 
-| Requirement | Status | Evidence |
-|--------------|--------|-----------|
-| Common aliases defined once | ✅ PASS | 8 aliases in `shell-aliases.nix` |
-| Fish imports shared | ✅ PASS | `fish.nix` imports and uses |
-| Zsh imports shared | ✅ PASS | `zsh.nix` imports and uses |
-| Bash imports shared | ✅ PASS | `bash.nix` imports and uses |
-| No Nix duplication | ✅ PASS | 8 aliases, 0 copies |
-| Platform overrides work | ✅ PASS | Darwin adds 3 aliases via `lib.mkAfter` |
-| Fish works | ✅ PASS | Interactive shell test passed |
-| Zsh works | ✅ PASS | Config file verification passed |
-| Bash works | ✅ PASS | Config file verification passed |
+| Requirement                 | Status  | Evidence                                |
+| --------------------------- | ------- | --------------------------------------- |
+| Common aliases defined once | ✅ PASS | 8 aliases in `shell-aliases.nix`        |
+| Fish imports shared         | ✅ PASS | `fish.nix` imports and uses             |
+| Zsh imports shared          | ✅ PASS | `zsh.nix` imports and uses              |
+| Bash imports shared         | ✅ PASS | `bash.nix` imports and uses             |
+| No Nix duplication          | ✅ PASS | 8 aliases, 0 copies                     |
+| Platform overrides work     | ✅ PASS | Darwin adds 3 aliases via `lib.mkAfter` |
+| Fish works                  | ✅ PASS | Interactive shell test passed           |
+| Zsh works                   | ✅ PASS | Config file verification passed         |
+| Bash works                  | ✅ PASS | Config file verification passed         |
 
 ### ⚠️ Issues Found
 
@@ -212,6 +221,7 @@ Darwin config does NOT include Bash platform-specific overrides.
 All core requirements met. Shell aliases work correctly across Fish, Zsh, and Bash. Platform-specific overrides merge correctly with common aliases. Minor issue with Bash lacking Darwin overrides can be addressed in future enhancement.
 
 **Next Steps:**
+
 1. Add Bash Darwin-specific overrides for parity
 2. Create automated shell alias test script
 3. Benchmark shell startup performance

@@ -21,6 +21,7 @@ Successfully fixed critical nix-darwin configuration error that prevented system
 ## 🐛 PROBLEM STATEMENT
 
 ### Initial Error
+
 ```bash
 ❯ just switch
 error: The option `launchd.agents.activitywatch.KeepAlive' does not exist. Definition values:
@@ -30,6 +31,7 @@ error: Recipe `switch` failed on line 33 with exit code 1
 ```
 
 ### Impact Assessment
+
 - **Severity:** Critical (blocks all configuration deployments)
 - **Scope:** All nix-darwin system builds
 - **User Impact:** Complete configuration failure
@@ -42,6 +44,7 @@ error: Recipe `switch` failed on line 33 with exit code 1
 ### Technical Investigation
 
 **Investigation Process:**
+
 1. Analyzed error stack trace pointing to `launchagents.nix`
 2. Searched codebase for similar launchd patterns
 3. Retrieved nix-darwin source code from LnL7/nix-darwin repository
@@ -49,12 +52,14 @@ error: Recipe `switch` failed on line 33 with exit code 1
 
 **Root Cause Identified:**
 Used deprecated nix-darwin API pattern that was never officially supported:
+
 - ✅ **Correct API:** `launchd.user.agents.<name>.serviceConfig`
 - ❌ **Incorrect API:** `launchd.userAgents.<name>.config`
 
 **Nix-Darwin API Documentation:**
 
 From nix-darwin `modules/launchd/default.nix`:
+
 ```nix
 launchd.user.agents = mkOption {
   type = types.attrsOf (types.submodule serviceOptions);
@@ -63,6 +68,7 @@ launchd.user.agents = mkOption {
 ```
 
 From `serviceOptions` definition:
+
 ```nix
 serviceConfig = mkOption {
   type = types.submodule launchdConfig;
@@ -73,12 +79,14 @@ serviceConfig = mkOption {
 ### Why This Happened
 
 **Historical Context:**
+
 - ActivityWatch module was created using incorrect API pattern
 - Pattern may have been accidentally introduced during development
 - No automated validation existed to catch API misuse
 - Configuration errors only surface at build time (not during editing)
 
 **Contributing Factors:**
+
 - Lack of shared service module templates
 - No pre-commit validation for nix-darwin API patterns
 - Inconsistent documentation between examples
@@ -93,6 +101,7 @@ serviceConfig = mkOption {
 **File Modified:** `platforms/darwin/services/launchagents.nix`
 
 **Before (Broken):**
+
 ```nix
 {config, pkgs, lib, ...}: {
   launchd.userAgents = {
@@ -115,6 +124,7 @@ serviceConfig = mkOption {
 ```
 
 **After (Fixed):**
+
 ```nix
 {config, pkgs, lib, ...}: {
   launchd.user.agents.activitywatch = {  # ✅ CORRECT - user.agents with simple name
@@ -133,17 +143,18 @@ serviceConfig = mkOption {
 
 ### API Changes Breakdown
 
-| Aspect | Incorrect Pattern | Correct Pattern | Why It Matters |
-|--------|------------------|----------------|----------------|
-| **Namespace** | `launchd.userAgents` | `launchd.user.agents` | User agents require dot notation |
-| **Agent Name** | `"net.activitywatch.ActivityWatch"` | `activitywatch` | Simple identifier preferred |
-| **Config Wrapper** | `config = { }` | `serviceConfig = { }` | `serviceConfig` is the documented API |
-| **KeepAlive Syntax** | `KeepAlive = { SuccessfulExit = false; }` | `KeepAlive.SuccessfulExit = false` | Attribute syntax, not nested dict |
-| **Enable Flag** | `enable = true` | (not needed) | `serviceConfig` implies enablement |
+| Aspect               | Incorrect Pattern                         | Correct Pattern                    | Why It Matters                        |
+| -------------------- | ----------------------------------------- | ---------------------------------- | ------------------------------------- |
+| **Namespace**        | `launchd.userAgents`                      | `launchd.user.agents`              | User agents require dot notation      |
+| **Agent Name**       | `"net.activitywatch.ActivityWatch"`       | `activitywatch`                    | Simple identifier preferred           |
+| **Config Wrapper**   | `config = { }`                            | `serviceConfig = { }`              | `serviceConfig` is the documented API |
+| **KeepAlive Syntax** | `KeepAlive = { SuccessfulExit = false; }` | `KeepAlive.SuccessfulExit = false` | Attribute syntax, not nested dict     |
+| **Enable Flag**      | `enable = true`                           | (not needed)                       | `serviceConfig` implies enablement    |
 
 ### Verification
 
 **Test Results:**
+
 ```bash
 ❯ just test
 [... build output ...]
@@ -151,6 +162,7 @@ serviceConfig = mkOption {
 ```
 
 **Build Validation:**
+
 - ✅ Nix evaluation successful
 - ✅ Type checking passed
 - ✅ LaunchAgent configuration valid
@@ -166,6 +178,7 @@ serviceConfig = mkOption {
 **Location:** `platforms/common/modules/ghost-wallpaper.nix:131`
 
 **Current Code (BROKEN):**
+
 ```nix
 launchd.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.enable && pkgs.stdenv.isDarwin) {
   enable = true;
@@ -181,12 +194,14 @@ launchd.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.enabl
 ```
 
 **Issues:**
+
 1. Uses `launchd.agents` instead of `launchd.user.agents`
 2. Uses `config` instead of `serviceConfig`
 3. Will fail when enabled (currently may be disabled)
 4. Inconsistent with ActivityWatch fix
 
 **Required Fix:**
+
 ```nix
 launchd.user.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.enable && pkgs.stdenv.isDarwin) {
   serviceConfig = {  # ✅ CORRECT
@@ -201,6 +216,7 @@ launchd.user.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.
 ```
 
 **Impact:** HIGH
+
 - Blocks configuration builds when module is enabled
 - Inconsistent patterns create confusion
 - Technical debt accumulated
@@ -208,6 +224,7 @@ launchd.user.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.
 ### 2. Codebase Pattern Inconsistency
 
 **Search Results:**
+
 ```bash
 # Found 3 references to launchd in Darwin configs:
 1. launchagents.nix     → Uses DEPRECATED pattern (FIXED)
@@ -220,6 +237,7 @@ launchd.user.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.
 ### 3. Missing Automated Validation
 
 **Problem:** No automated checks for nix-darwin API compliance
+
 - Configuration errors only appear at build time
 - No pre-commit hooks to validate API usage
 - No IDE/language server support for nix-darwin options
@@ -352,6 +370,7 @@ launchd.user.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.
 ### Nix-Darwin LaunchAgent API
 
 **Correct Structure:**
+
 ```nix
 launchd.user.agents.<agent-name> = {
   serviceConfig = {
@@ -391,6 +410,7 @@ launchd.user.agents.<agent-name> = {
 ```
 
 **Key Points:**
+
 - Use `launchd.user.agents` for user-level services
 - Use `launchd.daemons` for system-level services (requires sudo)
 - Wrap all config in `serviceConfig` attribute
@@ -400,31 +420,37 @@ launchd.user.agents.<agent-name> = {
 ### Service Management Commands
 
 **List services:**
+
 ```bash
 launchctl list | grep <service-name>
 ```
 
 **Start service:**
+
 ```bash
 launchctl start <service-label>
 ```
 
 **Stop service:**
+
 ```bash
 launchctl stop <service-label>
 ```
 
 **Load service:**
+
 ```bash
 launchctl load ~/Library/LaunchAgents/<service-name>.plist
 ```
 
 **Unload service:**
+
 ```bash
 launchctl unload ~/Library/LaunchAgents/<service-name>.plist
 ```
 
 **View service logs:**
+
 ```bash
 log show --predicate 'process == "service-name"' --last 1h
 ```
@@ -475,12 +501,14 @@ log show --predicate 'process == "service-name"' --last 1h
 ### User Impact
 
 **Before Fix:**
+
 - ❌ Cannot apply any configuration changes
 - ❌ System stuck at previous generation
 - ❌ Cannot test new configurations
 - ❌ Complete configuration failure
 
 **After Fix:**
+
 - ✅ Configuration builds successfully
 - ✅ Can apply system changes
 - ✅ Service deployment working
@@ -489,6 +517,7 @@ log show --predicate 'process == "service-name"' --last 1h
 ### System Impact
 
 **Configuration Changes Blocked:**
+
 - All nix-darwin deployments
 - Home Manager activations
 - Package installations
@@ -499,12 +528,14 @@ log show --predicate 'process == "service-name"' --last 1h
 ### Development Impact
 
 **Technical Debt:**
+
 - 1 LaunchAgent fixed ✅
 - 1 LaunchAgent needs fix ⚠️
 - Potential for more undocumented issues
 - Need for systematic audit
 
 **Process Improvements Needed:**
+
 - Automated API validation
 - Code review checklist
 - Shared module templates
@@ -519,11 +550,13 @@ log show --predicate 'process == "service-name"' --last 1h
 **WHY does Ghost Wallpaper module use `launchd.agents` instead of `launchd.user.agents`?**
 
 **Context:**
+
 - ActivityWatch (newer code) → Uses `launchd.user.agents` ✅
 - Ghost Wallpaper (older code) → Uses `launchd.agents` ❌
 - Both are user-level services (should use `user.agents`)
 
 **Unknowns:**
+
 1. Was `launchd.agents` the OLD nix-darwin API?
 2. When did `launchd.user.agents` become standard?
 3. Are there OTHER deprecated patterns in the codebase?
@@ -531,6 +564,7 @@ log show --predicate 'process == "service-name"' --last 1h
 5. What's the official deprecation policy for nix-darwin?
 
 **Investigation Needed:**
+
 - Check nix-darwin git history for API changes
 - Review LnL7/nix-darwin changelog
 - Search GitHub issues for breaking changes
@@ -600,6 +634,7 @@ log show --predicate 'process == "ActivityWatch"' --last 1h
 ## ✅ VERIFICATION CHECKLIST
 
 ### Configuration Validation
+
 - [x] Fixed ActivityWatch LaunchAgent syntax
 - [ ] Fixed Ghost Wallpaper LaunchAgent syntax
 - [ ] Audited all launchd references in codebase
@@ -607,6 +642,7 @@ log show --predicate 'process == "ActivityWatch"' --last 1h
 - [ ] Tested `just test` passes
 
 ### Deployment Verification
+
 - [ ] Applied configuration with `just switch`
 - [ ] Verified system boots correctly
 - [ ] Checked ActivityWatch service loaded
@@ -615,6 +651,7 @@ log show --predicate 'process == "ActivityWatch"' --last 1h
 - [ ] Checked service health status
 
 ### Code Quality
+
 - [ ] Added service module template
 - [ ] Updated AGENTS.md with launchd patterns
 - [ ] Created migration documentation
@@ -626,18 +663,21 @@ log show --predicate 'process == "ActivityWatch"' --last 1h
 ## 📈 METRICS
 
 ### Before Fix
+
 - **Configuration Build Status:** ❌ FAILED
 - **Service Configuration:** ❌ BROKEN
 - **API Pattern Consistency:** ⚠️ 50% correct
 - **Automated Validation:** ❌ NONE
 
 ### After Fix
+
 - **Configuration Build Status:** ✅ PASSED
 - **Service Configuration:** ⚠️ 50% fixed (50% pending)
 - **API Pattern Consistency:** ⚠️ 50% correct (50% pending)
 - **Automated Validation:** ❌ NONE (future work)
 
 ### Goals
+
 - **Configuration Build Status:** ✅ 100% PASSING
 - **Service Configuration:** ✅ 100% CORRECT
 - **API Pattern Consistency:** ✅ 100% CONSISTENT
@@ -655,6 +695,7 @@ Successfully resolved critical nix-darwin configuration blocking all system depl
 **Next Action:** Fix Ghost Wallpaper and apply configuration
 
 The incident highlights the need for:
+
 1. Automated validation of nix-darwin API usage
 2. Shared service module templates
 3. Better documentation and examples

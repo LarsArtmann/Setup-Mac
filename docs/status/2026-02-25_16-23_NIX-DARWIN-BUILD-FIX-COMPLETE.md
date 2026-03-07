@@ -45,6 +45,7 @@ Did you mean buildGo126Module?
 - Homebrew bundle complete (headlamp)
 
 **Packages Rebuilt:**
+
 - terraform-1.14.5
 - yq-go-4.52.4
 - otel-tui-v0.7.1
@@ -65,6 +66,7 @@ Did you mean buildGo126Module?
 ```
 
 **Files Changed:**
+
 - `platforms/darwin/default.nix` - buildGo125Module → buildGo126Module
 - `docs/status/2026-02-25_15-04_NIX-DARWIN-BUILD-FIX-GO-MODULE-BUILDER-MISMATCH.md` - Status report
 
@@ -72,11 +74,11 @@ Did you mean buildGo126Module?
 
 ## Current System State
 
-| Component | Version |
-|-----------|---------|
-| Go | 1.26rc2 (from previous generation) |
-| golangci-lint | 2.8.0 (built with go1.26rc2) |
-| darwin-rebuild | 26.05.3bfa436 |
+| Component      | Version                            |
+| -------------- | ---------------------------------- |
+| Go             | 1.26rc2 (from previous generation) |
+| golangci-lint  | 2.8.0 (built with go1.26rc2)       |
+| darwin-rebuild | 26.05.3bfa436                      |
 
 **Note:** Go 1.26.0 stable is configured but may require new shell session to reflect updated version.
 

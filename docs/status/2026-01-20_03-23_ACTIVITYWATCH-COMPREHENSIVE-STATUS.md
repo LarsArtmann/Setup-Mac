@@ -38,6 +38,7 @@ ActivityWatch on macOS was **NOT reporting programs** due to massive database lo
 **File:** `platforms/darwin/services/launchagents.nix` (Line 26)
 
 **Change:**
+
 ```nix
 # Before:
 <string>--background</string>
@@ -55,6 +56,7 @@ ActivityWatch on macOS was **NOT reporting programs** due to massive database lo
 ### 2. Database Optimization
 
 #### 2.1 WAL Mode Enablement
+
 ```sql
 PRAGMA journal_mode=WAL;           -- Write-Ahead Logging enabled
 PRAGMA synchronous=NORMAL;         -- Relaxed sync for performance
@@ -82,6 +84,7 @@ WHERE timestamp < datetime('now', '-90 days');
 ```
 
 **Results:**
+
 - Events reduced: 1,474,183 → 483,813 (67% reduction)
 - Archive count: 990,598 events
 - Recent events retained (last 90 days)
@@ -91,6 +94,7 @@ WHERE timestamp < datetime('now', '-90 days');
 **Action:** Full VACUUM operation to reclaim space
 
 **Results:**
+
 - Database size: 353MB → 308MB (45MB saved, 13% reduction)
 - Duration: ~45 seconds
 - Database file: `~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`
@@ -100,6 +104,7 @@ WHERE timestamp < datetime('now', '-90 days');
 ### 3. Database File Changes
 
 **Before:**
+
 ```
 -rw-r--r-- 353M peewee-sqlite.v2.db
 -rw-r--r--   32K peewee-sqlite.v2.db-shm
@@ -107,6 +112,7 @@ WHERE timestamp < datetime('now', '-90 days');
 ```
 
 **After:**
+
 ```
 -rw-r--r-- 308M peewee-sqlite.v2.db
 -rw-r--r--   32K peewee-sqlite.v2.db-shm
@@ -114,6 +120,7 @@ WHERE timestamp < datetime('now', '-90 days');
 ```
 
 **New Tables:**
+
 - `eventmodel_archive` (990,598 archived events)
 
 ---
@@ -123,6 +130,7 @@ WHERE timestamp < datetime('now', '-90 days');
 ### Service Status (03:23:51 CET)
 
 **Processes Running:**
+
 ```
 aw-qt (PID 53951) - Manager process
 aw-server (PID 53982) - Flask API server
@@ -133,12 +141,14 @@ aw-watcher-window (PIDs 54004, 54005) - Multiprocessing subprocesses (erroring)
 ```
 
 **Network:**
+
 - Port 5600: LISTENING
 - Active connections: 6 ESTABLISHED
 
 ### Database State
 
 **Metrics:**
+
 - Active events: 483,813
 - Archived events: 990,598
 - Total events: 1,474,411
@@ -148,6 +158,7 @@ aw-watcher-window (PIDs 54004, 54005) - Multiprocessing subprocesses (erroring)
 - Last checkpoint: 208 frames pending
 
 **Bucket Distribution:**
+
 ```
 Bucket ID | Events | Latest Event | Last 7 Days
 ----------|--------|--------------|-------------
@@ -166,11 +177,13 @@ Bucket ID | Events | Latest Event | Last 7 Days
 ### Historical Errors (Before Fix)
 
 **Database Lock Errors:**
+
 - Count: **686+** occurrences
 - Pattern: `sqlite3.OperationalError: database is locked`
 - Impact: Watchers unable to insert events → service crashes
 
 **Timeline of Crashes:**
+
 - 01:18:25 - Started
 - 02:13:27 - Restarted (crash)
 - 02:15:14 - Restarted (crash)
@@ -184,23 +197,27 @@ Bucket ID | Events | Latest Event | Last 7 Days
 ### Current Errors (After Fix)
 
 **Swift Watcher Timeouts:**
+
 ```
 NSURLErrorDomain Code=-1001 "The request timed out."
 URL: http://127.0.0.1:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local/heartbeat
 ```
 
 **Multiprocessing Errors:**
+
 ```
 aw-watcher-window: error: unrecognized arguments: --multiprocessing-fork tracker_fd=8 pipe_handle=10
 aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessing.resource_tracker import main;main(7)
 ```
 
 **HTTP Errors:**
+
 ```
 400 (127.0.0.1): POST /api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local/heartbeat
 ```
 
 **Recent Error Count (last 30 minutes):**
+
 - Database lock errors: **0** ✓ RESOLVED
 - Swift timeouts: **1** (significant improvement)
 - Multiprocessing errors: Ongoing (doesn't affect functionality)
@@ -219,12 +236,14 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ```
 
 **Programs Detected:**
+
 - ✓ aw-watcher-window (Python watcher)
 - ✓ aw-watcher-afk (AFK detector)
 - ✓ aw-watcher-web-chrome (Chrome browser)
 - ⚠️ aw-watcher-window-macos (Swift binary) - timeouts
 
 **Insertion Gaps:**
+
 - Gap 1: 03:16:53 → 03:17:41 (48 seconds)
 - Gap 2: 03:17:41 → 03:19:34 (113 seconds)
 - **Status:** Intermittent, not continuous tracking
@@ -234,12 +253,14 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ## WAL Mode Performance
 
 **Configuration:**
+
 - Mode: WAL (Write-Ahead Logging)
 - Sync: NORMAL
 - Autocheckpoint: 1000 frames
 - Timeout: 5000ms
 
 **Current Status:**
+
 - Checkpoint status: 208 frames pending
 - WAL file size: 0B (fresh after restart)
 - Database locks: 0
@@ -247,13 +268,13 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 
 **Comparison Before/After:**
 
-| Metric | Before Fix | After Fix |
-|--------|-------------|-----------|
-| Lock errors | 686+ | 0 |
-| Database size | 353MB | 308MB |
-| Active events | 1.47M | 483K |
-| Service uptime | 5-15 min | 7+ min (ongoing) |
-| WAL checkpoint | 1262 frames | 208 frames |
+| Metric         | Before Fix  | After Fix        |
+| -------------- | ----------- | ---------------- |
+| Lock errors    | 686+        | 0                |
+| Database size  | 353MB       | 308MB            |
+| Active events  | 1.47M       | 483K             |
+| Service uptime | 5-15 min    | 7+ min (ongoing) |
+| WAL checkpoint | 1262 frames | 208 frames       |
 
 ---
 
@@ -262,6 +283,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ### 1. Swift Watcher Timeout Root Cause
 
 **Symptom:** Swift watcher requests timeout to aw-server despite:
+
 - ✓ Server running and listening
 - ✓ Python watcher connecting successfully
 - ✓ API responding with redirects
@@ -269,6 +291,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 - ✓ ESTABLISHED TCP connections visible in `lsof`
 
 **Possible Causes:**
+
 - URLSession timeout configuration too aggressive
 - Flask development server concurrent request limit
 - Database write contention (even with WAL)
@@ -283,6 +306,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 **Question:** Are ALL programs being tracked correctly?
 
 **Evidence:**
+
 - ✓ Chrome events detected
 - ✓ Window watcher (Python) inserting events
 - ✗ Swift watcher timeouts (unknown impact)
@@ -294,6 +318,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 **Question:** Will service remain stable without database locks?
 
 **Evidence:**
+
 - ✓ 7+ minutes stable (vs 5-15 min crashes before)
 - ✓ Zero lock errors after archival
 - ⚠️ 1 Swift timeout (better than 100+ before)
@@ -392,6 +417,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ### If Database Performance Degrades
 
 1. Stop ActivityWatch:
+
    ```bash
    pkill -9 -f "aw-(qt|server|watcher)"
    ```
@@ -399,6 +425,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 2. Restore from backup (if available)
 
 3. Revert LaunchAgent config:
+
    ```bash
    git checkout platforms/darwin/services/launchagents.nix
    just switch
@@ -469,16 +496,19 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ### Risk Assessment
 
 **LOW Risk:**
+
 - Database lock errors (eliminated)
 - Service crashes (eliminated)
 - Configuration issues (fixed)
 
 **MEDIUM Risk:**
+
 - Swift watcher timeouts (ongoing, mitigated)
 - Program tracking accuracy (unknown, needs testing)
 - Long-term stability (needs monitoring)
 
 **HIGH Risk:**
+
 - Automated archival not implemented (manual one-time only)
 - No alerting system (manual monitoring required)
 - Swift watcher root cause unknown (may degrade)
@@ -501,6 +531,7 @@ aw-watcher-window: error: unrecognized arguments: -B -S -I -c from multiprocessi
 ### B. Commands Used
 
 **Investigation:**
+
 ```bash
 tail -100 ~/.local/share/activitywatch/stderr.log
 ps aux | grep -E "aw-(qt|server|watcher)"
@@ -509,6 +540,7 @@ sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.
 ```
 
 **Fix Implementation:**
+
 ```bash
 just switch
 sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.db "PRAGMA journal_mode=WAL;"
@@ -516,6 +548,7 @@ sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.
 ```
 
 **Service Management:**
+
 ```bash
 pkill -9 -f "aw-(qt|server|watcher)"
 launchctl unload ~/Library/LaunchAgents/net.activitywatch.ActivityWatch.plist

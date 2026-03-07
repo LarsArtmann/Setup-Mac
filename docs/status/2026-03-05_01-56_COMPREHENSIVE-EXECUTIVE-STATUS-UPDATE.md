@@ -4,7 +4,7 @@
 **Classification:** CRITICAL - Strategic Assessment  
 **Branch:** master  
 **Commit:** 4711280  
-**Status:** STABLE WITH KNOWN ISSUES  
+**Status:** STABLE WITH KNOWN ISSUES
 
 ---
 
@@ -18,37 +18,37 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 
 ### Core Infrastructure (COMPLETE)
 
-| Component | Status | Evidence |
-|-----------|--------|----------|
-| **Nix Flake Architecture** | ✅ COMPLETE | `flake.nix` with 15+ inputs, multi-platform outputs |
-| **macOS (Darwin) System** | ✅ COMPLETE | `darwin-rebuild switch` functional, ActivityWatch working |
-| **NixOS (evo-x2) System** | ✅ COMPLETE | System boots, Hyprland operational |
-| **Home Manager Integration** | ✅ COMPLETE | Cross-platform user configs unified |
-| **ActivityWatch Window URL Fix** | ✅ COMPLETE | Permissions resolved via `just activitywatch-fix-permissions` |
-| **ActivityWatch Utilization Watcher** | ✅ COMPLETE | LaunchAgent deployed, CPU/RAM/disk monitoring active |
-| **Sublime Text Configuration** | ✅ COMPLETE | Backup system operational, 8 daily backups preserved |
-| **Git Configuration** | ✅ COMPLETE | SSH keys, GPG signing, git-town integration |
-| **Shell Environment** | ✅ COMPLETE | Fish + Starship + Tmux unified across platforms |
-| **Crush-Patched Tool** | ✅ COMPLETE | v0.46.1 deployed with automated update mechanism |
+| Component                             | Status      | Evidence                                                      |
+| ------------------------------------- | ----------- | ------------------------------------------------------------- |
+| **Nix Flake Architecture**            | ✅ COMPLETE | `flake.nix` with 15+ inputs, multi-platform outputs           |
+| **macOS (Darwin) System**             | ✅ COMPLETE | `darwin-rebuild switch` functional, ActivityWatch working     |
+| **NixOS (evo-x2) System**             | ✅ COMPLETE | System boots, Hyprland operational                            |
+| **Home Manager Integration**          | ✅ COMPLETE | Cross-platform user configs unified                           |
+| **ActivityWatch Window URL Fix**      | ✅ COMPLETE | Permissions resolved via `just activitywatch-fix-permissions` |
+| **ActivityWatch Utilization Watcher** | ✅ COMPLETE | LaunchAgent deployed, CPU/RAM/disk monitoring active          |
+| **Sublime Text Configuration**        | ✅ COMPLETE | Backup system operational, 8 daily backups preserved          |
+| **Git Configuration**                 | ✅ COMPLETE | SSH keys, GPG signing, git-town integration                   |
+| **Shell Environment**                 | ✅ COMPLETE | Fish + Starship + Tmux unified across platforms               |
+| **Crush-Patched Tool**                | ✅ COMPLETE | v0.46.1 deployed with automated update mechanism              |
 
 ### Tooling & Automation (COMPLETE)
 
-| Tool | Status | Location |
-|------|--------|----------|
-| **Just Task Runner** | ✅ COMPLETE | 150+ commands in `justfile` |
-| **Pre-commit Hooks** | ✅ COMPLETE | Gitleaks, statix, trailing-whitespace |
-| **Backup System** | ✅ COMPLETE | `just backup` with automatic rotation |
-| **Health Checks** | ✅ COMPLETE | `just health` comprehensive system validation |
-| **ActivityWatch Control** | ✅ COMPLETE | `activitywatch-start/stop/fix-permissions` |
+| Tool                      | Status      | Location                                      |
+| ------------------------- | ----------- | --------------------------------------------- |
+| **Just Task Runner**      | ✅ COMPLETE | 150+ commands in `justfile`                   |
+| **Pre-commit Hooks**      | ✅ COMPLETE | Gitleaks, statix, trailing-whitespace         |
+| **Backup System**         | ✅ COMPLETE | `just backup` with automatic rotation         |
+| **Health Checks**         | ✅ COMPLETE | `just health` comprehensive system validation |
+| **ActivityWatch Control** | ✅ COMPLETE | `activitywatch-start/stop/fix-permissions`    |
 
 ### Documentation (COMPLETE)
 
-| Document | Status | Lines |
-|----------|--------|-------|
-| **AGENTS.md** | ✅ COMPLETE | 1,004 lines - comprehensive AI behavior guidelines |
-| **README.md** | ✅ COMPLETE | Project overview, installation, troubleshooting |
-| **Status Reports** | ✅ COMPLETE | 60+ reports in `docs/status/` |
-| **Architecture Decision Records** | ✅ COMPLETE | ADR-001, ADR-002, ADR-003 documented |
+| Document                          | Status      | Lines                                              |
+| --------------------------------- | ----------- | -------------------------------------------------- |
+| **AGENTS.md**                     | ✅ COMPLETE | 1,004 lines - comprehensive AI behavior guidelines |
+| **README.md**                     | ✅ COMPLETE | Project overview, installation, troubleshooting    |
+| **Status Reports**                | ✅ COMPLETE | 60+ reports in `docs/status/`                      |
+| **Architecture Decision Records** | ✅ COMPLETE | ADR-001, ADR-002, ADR-003 documented               |
 
 ---
 
@@ -56,46 +56,46 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 
 ### ActivityWatch Ecosystem (70% COMPLETE)
 
-| Component | Status | Blocker |
-|-----------|--------|---------|
-| **Core Watchers (afk, window, web)** | ✅ Working | - |
-| **Utilization Watcher** | ✅ Deployed | LaunchAgent (removed unsupported CLI args) |
-| **Input Watcher** | ⚠️ Available | Not auto-started |
-| **Enhanced Watcher (AI/OCR)** | ⚠️ Researched | Requires Ollama setup |
-| **Screenshot Watcher** | ⚠️ Researched | Storage planning needed |
-| **Spotify Watcher** | ⚠️ Available | Beta status, needs testing |
-| **Anki Watcher** | ⚠️ Available | Only if using Anki |
+| Component                            | Status        | Blocker                                    |
+| ------------------------------------ | ------------- | ------------------------------------------ |
+| **Core Watchers (afk, window, web)** | ✅ Working    | -                                          |
+| **Utilization Watcher**              | ✅ Deployed   | LaunchAgent (removed unsupported CLI args) |
+| **Input Watcher**                    | ⚠️ Available  | Not auto-started                           |
+| **Enhanced Watcher (AI/OCR)**        | ⚠️ Researched | Requires Ollama setup                      |
+| **Screenshot Watcher**               | ⚠️ Researched | Storage planning needed                    |
+| **Spotify Watcher**                  | ⚠️ Available  | Beta status, needs testing                 |
+| **Anki Watcher**                     | ⚠️ Available  | Only if using Anki                         |
 
 ### NixOS evo-x2 (80% COMPLETE)
 
-| Component | Status | Issue |
-|-----------|--------|-------|
-| **Base System** | ✅ Working | Boots, networking, SSH |
-| **Hyprland Desktop** | ✅ Working | Wayland compositor operational |
-| **Home Manager** | ✅ Working | User configs applied |
-| **Bluetooth Audio** | ⚠️ Configured | Pending testing with Nest Audio |
-| **Security Hardening** | ⚠️ Partial | Audit rules disabled (kernel module conflict) |
-| **ActivityWatch** | ✅ Working | NixOS native service |
+| Component              | Status        | Issue                                         |
+| ---------------------- | ------------- | --------------------------------------------- |
+| **Base System**        | ✅ Working    | Boots, networking, SSH                        |
+| **Hyprland Desktop**   | ✅ Working    | Wayland compositor operational                |
+| **Home Manager**       | ✅ Working    | User configs applied                          |
+| **Bluetooth Audio**    | ⚠️ Configured | Pending testing with Nest Audio               |
+| **Security Hardening** | ⚠️ Partial    | Audit rules disabled (kernel module conflict) |
+| **ActivityWatch**      | ✅ Working    | NixOS native service                          |
 
 ### File Organization (85% COMPLETE)
 
-| Action | Status | Files |
-|--------|--------|-------|
-| **Root directory cleanup** | ✅ Done | 12 files moved |
-| **Script organization** | ✅ Done | 6 scripts → `bin/` |
-| **Documentation archives** | ✅ Done | 4 docs → `docs/archives/` |
+| Action                     | Status         | Files                       |
+| -------------------------- | -------------- | --------------------------- |
+| **Root directory cleanup** | ✅ Done        | 12 files moved              |
+| **Script organization**    | ✅ Done        | 6 scripts → `bin/`          |
+| **Documentation archives** | ✅ Done        | 4 docs → `docs/archives/`   |
 | **Path constants library** | ⚠️ Not started | Hardcoded paths still exist |
-| **Just organize command** | ⚠️ Not started | Automation pending |
+| **Just organize command**  | ⚠️ Not started | Automation pending          |
 
 ### Code Quality (75% COMPLETE)
 
-| Check | Status | Issues |
-|-------|--------|--------|
-| **Nix syntax** | ✅ Passing | No eval errors |
-| **Flake check** | ✅ Passing | `nix flake check --no-build` clean |
-| **Statix linting** | ⚠️ Warnings | W20, W04, W23 warnings |
-| **Gitleaks secrets** | ⚠️ Flagged | 6 potential secrets need review |
-| **Type safety** | ✅ Passing | Core validation system operational |
+| Check                | Status      | Issues                             |
+| -------------------- | ----------- | ---------------------------------- |
+| **Nix syntax**       | ✅ Passing  | No eval errors                     |
+| **Flake check**      | ✅ Passing  | `nix flake check --no-build` clean |
+| **Statix linting**   | ⚠️ Warnings | W20, W04, W23 warnings             |
+| **Gitleaks secrets** | ⚠️ Flagged  | 6 potential secrets need review    |
+| **Type safety**      | ✅ Passing  | Core validation system operational |
 
 ---
 
@@ -103,35 +103,35 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 
 ### High-Priority (Never Started)
 
-| Item | Priority | Impact |
-|------|----------|--------|
-| **Program Discovery System** | P0 | Automate program integration |
-| **VS Code Full Integration** | P1 | Currently partial |
-| **Cross-platform CLI Tool** | P1 | `setup-mac` shell script |
-| **Automated Testing Framework** | P1 | No test suite exists |
-| **Documentation Consolidation** | P2 | 3 Bluetooth docs need merging |
-| **Path Constants Library** | P2 | Prevent hardcoded paths |
-| **File Organization Automation** | P2 | `just organize` command |
+| Item                             | Priority | Impact                        |
+| -------------------------------- | -------- | ----------------------------- |
+| **Program Discovery System**     | P0       | Automate program integration  |
+| **VS Code Full Integration**     | P1       | Currently partial             |
+| **Cross-platform CLI Tool**      | P1       | `setup-mac` shell script      |
+| **Automated Testing Framework**  | P1       | No test suite exists          |
+| **Documentation Consolidation**  | P2       | 3 Bluetooth docs need merging |
+| **Path Constants Library**       | P2       | Prevent hardcoded paths       |
+| **File Organization Automation** | P2       | `just organize` command       |
 
 ### Medium-Priority (Never Started)
 
-| Item | Priority | Impact |
-|------|----------|--------|
-| **iOS App Research** | P2 | ActivityWatch mobile gap |
-| **aw-sync Multi-device** | P2 | Cross-device time tracking |
-| **InfluxDB/Grafana Export** | P3 | Advanced analytics |
-| **AI/LLM Integration (MCP)** | P3 | Natural language queries |
-| **Screenshot Watcher Deploy** | P3 | Visual documentation |
-| **Self-reflection (aw-ask)** | P3 | Experience sampling |
+| Item                          | Priority | Impact                     |
+| ----------------------------- | -------- | -------------------------- |
+| **iOS App Research**          | P2       | ActivityWatch mobile gap   |
+| **aw-sync Multi-device**      | P2       | Cross-device time tracking |
+| **InfluxDB/Grafana Export**   | P3       | Advanced analytics         |
+| **AI/LLM Integration (MCP)**  | P3       | Natural language queries   |
+| **Screenshot Watcher Deploy** | P3       | Visual documentation       |
+| **Self-reflection (aw-ask)**  | P3       | Experience sampling        |
 
 ### Low-Priority (Backlog)
 
-| Item | Priority | Impact |
-|------|----------|--------|
-| **Standing Desk Hardware** | P3 | DIY sensor project |
-| **Anki Watcher** | P4 | Only if using Anki |
-| **Chromecast Watcher** | P4 | WIP, not working |
-| **OpenVR Watcher** | P4 | WIP, not working |
+| Item                       | Priority | Impact             |
+| -------------------------- | -------- | ------------------ |
+| **Standing Desk Hardware** | P3       | DIY sensor project |
+| **Anki Watcher**           | P4       | Only if using Anki |
+| **Chromecast Watcher**     | P4       | WIP, not working   |
+| **OpenVR Watcher**         | P4       | WIP, not working   |
 
 ---
 
@@ -139,32 +139,32 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 
 ### Critical Issues (REQUIRING IMMEDIATE ATTENTION)
 
-| Issue | Severity | Details |
-|-------|----------|---------|
-| **Homebrew Tier 3 Configuration** | 🔴 HIGH | Wrong prefix (/usr/local vs /opt/homebrew), missing git origin, deprecated taps |
-| **Flake.lock Update Needed** | 🟡 MEDIUM | Multiple inputs outdated (nixpkgs, home-manager, darwin) |
-| **Pre-commit Hook Failures** | 🟡 MEDIUM | Gitleaks detects 6 potential secrets; statix warnings |
-| **TODO List Stale** | 🟡 MEDIUM | Last updated 2026-02-10, many items outdated |
-| **NixOS Bluetooth Untested** | 🟡 MEDIUM | Configuration complete but never validated with hardware |
+| Issue                             | Severity  | Details                                                                         |
+| --------------------------------- | --------- | ------------------------------------------------------------------------------- |
+| **Homebrew Tier 3 Configuration** | 🔴 HIGH   | Wrong prefix (/usr/local vs /opt/homebrew), missing git origin, deprecated taps |
+| **Flake.lock Update Needed**      | 🟡 MEDIUM | Multiple inputs outdated (nixpkgs, home-manager, darwin)                        |
+| **Pre-commit Hook Failures**      | 🟡 MEDIUM | Gitleaks detects 6 potential secrets; statix warnings                           |
+| **TODO List Stale**               | 🟡 MEDIUM | Last updated 2026-02-10, many items outdated                                    |
+| **NixOS Bluetooth Untested**      | 🟡 MEDIUM | Configuration complete but never validated with hardware                        |
 
 ### Architectural Debt (TECHNICAL DEBT)
 
-| Debt | Impact | Effort |
-|------|--------|--------|
-| **Hardcoded paths throughout** | 🔴 HIGH | Medium - Need path constants library |
-| **Duplicate documentation** | 🟡 MEDIUM | Low - 3 Bluetooth docs should be 1 |
-| **No automated file organization** | 🟡 MEDIUM | Medium - `just organize` needed |
-| **Missing program discovery** | 🟡 MEDIUM | High - Architectural change |
-| **AGENTS.md in root** | 🟢 LOW | Low - Should move to docs/ |
+| Debt                               | Impact    | Effort                               |
+| ---------------------------------- | --------- | ------------------------------------ |
+| **Hardcoded paths throughout**     | 🔴 HIGH   | Medium - Need path constants library |
+| **Duplicate documentation**        | 🟡 MEDIUM | Low - 3 Bluetooth docs should be 1   |
+| **No automated file organization** | 🟡 MEDIUM | Medium - `just organize` needed      |
+| **Missing program discovery**      | 🟡 MEDIUM | High - Architectural change          |
+| **AGENTS.md in root**              | 🟢 LOW    | Low - Should move to docs/           |
 
 ### Build/Deploy Issues
 
-| Issue | Status | Workaround |
-|-------|--------|------------|
-| **darwin-rebuild eval time** | ⚠️ Slow | ~30-60 seconds |
-| **Flake input updates** | ⚠️ Manual | `just update` works but not automated |
-| **ActivityWatch LaunchAgent** | ⚠️ Fixed | Removed unsupported CLI args |
-| **Home Manager user workaround** | ⚠️ In place | Explicit user definition required |
+| Issue                            | Status      | Workaround                            |
+| -------------------------------- | ----------- | ------------------------------------- |
+| **darwin-rebuild eval time**     | ⚠️ Slow     | ~30-60 seconds                        |
+| **Flake input updates**          | ⚠️ Manual   | `just update` works but not automated |
+| **ActivityWatch LaunchAgent**    | ⚠️ Fixed    | Removed unsupported CLI args          |
+| **Home Manager user workaround** | ⚠️ In place | Explicit user definition required     |
 
 ---
 
@@ -274,48 +274,48 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 
 ### P0 - Critical (Do This Week)
 
-| # | Task | Effort | Impact | Owner |
-|---|------|--------|--------|-------|
-| 1 | Fix Homebrew git origin and Tier 3 warnings | 30 min | HIGH | User |
-| 2 | Update flake.lock (`just update`) | 15 min | HIGH | User |
-| 3 | Review and resolve gitleaks findings | 45 min | HIGH | User |
-| 4 | Fix statix linting warnings | 30 min | MEDIUM | AI/User |
-| 5 | Test NixOS Bluetooth with Nest Audio | 60 min | MEDIUM | User |
+| #   | Task                                        | Effort | Impact | Owner   |
+| --- | ------------------------------------------- | ------ | ------ | ------- |
+| 1   | Fix Homebrew git origin and Tier 3 warnings | 30 min | HIGH   | User    |
+| 2   | Update flake.lock (`just update`)           | 15 min | HIGH   | User    |
+| 3   | Review and resolve gitleaks findings        | 45 min | HIGH   | User    |
+| 4   | Fix statix linting warnings                 | 30 min | MEDIUM | AI/User |
+| 5   | Test NixOS Bluetooth with Nest Audio        | 60 min | MEDIUM | User    |
 
 ### P1 - High Priority (This Month)
 
-| # | Task | Effort | Impact | Owner |
-|---|------|--------|--------|-------|
-| 6 | Implement programs/discovery.nix | 2 hrs | HIGH | AI |
-| 7 | Install Ollama and test aw-watcher-enhanced | 1 hr | HIGH | User |
-| 8 | Create scripts/lib/paths.sh constants | 1 hr | MEDIUM | AI |
-| 9 | Merge Bluetooth documentation | 30 min | LOW | AI |
-| 10 | Create `just organize` command | 2 hrs | MEDIUM | AI |
-| 11 | Deploy aw-watcher-input (keystrokes) | 30 min | MEDIUM | User |
-| 12 | Add automated flake update check | 1 hr | MEDIUM | AI |
+| #   | Task                                        | Effort | Impact | Owner |
+| --- | ------------------------------------------- | ------ | ------ | ----- |
+| 6   | Implement programs/discovery.nix            | 2 hrs  | HIGH   | AI    |
+| 7   | Install Ollama and test aw-watcher-enhanced | 1 hr   | HIGH   | User  |
+| 8   | Create scripts/lib/paths.sh constants       | 1 hr   | MEDIUM | AI    |
+| 9   | Merge Bluetooth documentation               | 30 min | LOW    | AI    |
+| 10  | Create `just organize` command              | 2 hrs  | MEDIUM | AI    |
+| 11  | Deploy aw-watcher-input (keystrokes)        | 30 min | MEDIUM | User  |
+| 12  | Add automated flake update check            | 1 hr   | MEDIUM | AI    |
 
 ### P2 - Medium Priority (This Quarter)
 
-| # | Task | Effort | Impact | Owner |
-|---|------|--------|--------|-------|
-| 13 | Build cross-platform CLI tool | 4 hrs | HIGH | AI |
-| 14 | Create tests/ framework | 3 hrs | HIGH | AI |
-| 15 | Set up aw-sync multi-device | 2 hrs | MEDIUM | User |
-| 16 | Deploy aw-watcher-spotify | 30 min | LOW | User |
-| 17 | Add InfluxDB export option | 2 hrs | LOW | AI |
-| 18 | Research iOS integration | 2 hrs | MEDIUM | AI |
-| 19 | Create file organization pre-commit hook | 1 hr | MEDIUM | AI |
-| 20 | Update TODO_LIST.md (stale) | 30 min | LOW | AI |
+| #   | Task                                     | Effort | Impact | Owner |
+| --- | ---------------------------------------- | ------ | ------ | ----- |
+| 13  | Build cross-platform CLI tool            | 4 hrs  | HIGH   | AI    |
+| 14  | Create tests/ framework                  | 3 hrs  | HIGH   | AI    |
+| 15  | Set up aw-sync multi-device              | 2 hrs  | MEDIUM | User  |
+| 16  | Deploy aw-watcher-spotify                | 30 min | LOW    | User  |
+| 17  | Add InfluxDB export option               | 2 hrs  | LOW    | AI    |
+| 18  | Research iOS integration                 | 2 hrs  | MEDIUM | AI    |
+| 19  | Create file organization pre-commit hook | 1 hr   | MEDIUM | AI    |
+| 20  | Update TODO_LIST.md (stale)              | 30 min | LOW    | AI    |
 
 ### P3 - Low Priority (Backlog)
 
-| # | Task | Effort | Impact | Owner |
-|---|------|--------|--------|-------|
-| 21 | Deploy aw-watcher-screenshot | 1 hr | MEDIUM | User |
-| 22 | Set up aw-watcher-ask | 30 min | LOW | User |
-| 23 | Move AGENTS.md to docs/ | 15 min | LOW | AI |
-| 24 | Create onboarding checklist | 1 hr | LOW | AI |
-| 25 | Research standing desk hardware | 2 hrs | LOW | User |
+| #   | Task                            | Effort | Impact | Owner |
+| --- | ------------------------------- | ------ | ------ | ----- |
+| 21  | Deploy aw-watcher-screenshot    | 1 hr   | MEDIUM | User  |
+| 22  | Set up aw-watcher-ask           | 30 min | LOW    | User  |
+| 23  | Move AGENTS.md to docs/         | 15 min | LOW    | AI    |
+| 24  | Create onboarding checklist     | 1 hr   | LOW    | AI    |
+| 25  | Research standing desk hardware | 2 hrs  | LOW    | User  |
 
 ---
 
@@ -328,6 +328,7 @@ SystemNix is a sophisticated cross-platform Nix configuration system managing bo
 ### Context:
 
 This issue is documented in:
+
 - `README.md` line 162-165
 - `AGENTS.md` line 280-290
 - `docs/status/2026-03-02_10-24_DARWIN-HOME-MANAGER-FIX.md`
@@ -367,24 +368,24 @@ This issue is documented in:
 
 ### Build Health
 
-| Metric | Status |
-|--------|--------|
-| `just test-fast` | ✅ Passing |
-| `nix flake check --no-build` | ✅ Passing |
-| `just pre-commit-run` | ⚠️ 6 gitleaks findings |
-| `darwin-rebuild switch` | ✅ Working |
-| `nixos-rebuild switch` | ✅ Working (evo-x2) |
+| Metric                       | Status                 |
+| ---------------------------- | ---------------------- |
+| `just test-fast`             | ✅ Passing             |
+| `nix flake check --no-build` | ✅ Passing             |
+| `just pre-commit-run`        | ⚠️ 6 gitleaks findings |
+| `darwin-rebuild switch`      | ✅ Working             |
+| `nixos-rebuild switch`       | ✅ Working (evo-x2)    |
 
 ### ActivityWatch Status
 
-| Watcher | Platform | Status |
-|---------|----------|--------|
-| aw-watcher-afk | Darwin/NixOS | ✅ Active |
-| aw-watcher-window | Darwin/NixOS | ✅ Fixed (permissions resolved) |
-| aw-watcher-web-chrome | Darwin/NixOS | ✅ Active |
-| aw-watcher-utilization | Darwin | ✅ Active (LaunchAgent) |
-| aw-watcher-input | Available | ⚠️ Not deployed |
-| aw-watcher-enhanced | Research | ⚠️ Ready for testing |
+| Watcher                | Platform     | Status                          |
+| ---------------------- | ------------ | ------------------------------- |
+| aw-watcher-afk         | Darwin/NixOS | ✅ Active                       |
+| aw-watcher-window      | Darwin/NixOS | ✅ Fixed (permissions resolved) |
+| aw-watcher-web-chrome  | Darwin/NixOS | ✅ Active                       |
+| aw-watcher-utilization | Darwin       | ✅ Active (LaunchAgent)         |
+| aw-watcher-input       | Available    | ⚠️ Not deployed                 |
+| aw-watcher-enhanced    | Research     | ⚠️ Ready for testing            |
 
 ### Recent Commits (Last 10)
 
@@ -403,13 +404,13 @@ bd7d4c6 docs(status): add status report for Darwin Home Manager user workaround 
 
 ### File Statistics
 
-| Category | Count |
-|----------|-------|
-| Status Reports | 60+ files |
-| Nix Configuration | 50+ files |
-| Shell Scripts | 15+ files |
-| Documentation | 100+ .md files |
-| Git Commits | 500+ total |
+| Category          | Count          |
+| ----------------- | -------------- |
+| Status Reports    | 60+ files      |
+| Nix Configuration | 50+ files      |
+| Shell Scripts     | 15+ files      |
+| Documentation     | 100+ .md files |
+| Git Commits       | 500+ total     |
 
 ---
 

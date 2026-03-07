@@ -1,9 +1,11 @@
 # ADR-003: Ban OpenZFS on macOS Due to Kernel Stability Issues
 
 ## Status
+
 **Accepted** - Effective Immediately
 
 ## Date
+
 2026-02-09
 
 ## Context
@@ -13,6 +15,7 @@
 OpenZFS on macOS (`org.openzfsonosx.zfs`) caused **4+ kernel panics in 24 hours**, rendering the system unusable. The kernel extension triggered watchdog timeouts, causing complete system freezes requiring hard reboots.
 
 **Evidence:**
+
 - Panic type: `watchdog timeout: no checkins from watchdogd in 92 seconds`
 - Culprit: `org.openzfsonosx.zfs 2.3.0` (OpenZFS macOS port)
 - Last stopped kext in panic log: ZFS
@@ -21,19 +24,20 @@ OpenZFS on macOS (`org.openzfsonosx.zfs`) caused **4+ kernel panics in 24 hours*
 
 ### Why ZFS Was Problematic on macOS
 
-| Factor | Linux ZFS | macOS OpenZFS |
-|--------|-----------|---------------|
-| **Codebase** | ZFS on Linux (production) | OpenZFS OSX port (separate) |
-| **Maintenance** | Active, enterprise-grade | Sporadic, Apple Silicon issues |
-| **Stability** | Production-stable | Known kernel panic issues |
-| **Maturity** | 10+ years production | Less mature, platform-specific bugs |
-| **Apple Silicon** | N/A | Known compatibility issues |
+| Factor            | Linux ZFS                 | macOS OpenZFS                       |
+| ----------------- | ------------------------- | ----------------------------------- |
+| **Codebase**      | ZFS on Linux (production) | OpenZFS OSX port (separate)         |
+| **Maintenance**   | Active, enterprise-grade  | Sporadic, Apple Silicon issues      |
+| **Stability**     | Production-stable         | Known kernel panic issues           |
+| **Maturity**      | 10+ years production      | Less mature, platform-specific bugs |
+| **Apple Silicon** | N/A                       | Known compatibility issues          |
 
 **Root Cause:** The macOS OpenZFS port is a separate implementation from Linux ZFS. While Linux ZFS is battle-tested in enterprise environments (Proxmox, TrueNAS, cloud providers), the macOS port has known stability issues, particularly on Apple Silicon.
 
 ### What Worked on Linux
 
 ZFS on NixOS (`evo-x2`) remains **unaffected** by this decision:
+
 - Uses mature ZFS on Linux codebase
 - Production-stable and widely deployed
 - Properly integrated with NixOS kernel
@@ -46,10 +50,10 @@ ZFS on NixOS (`evo-x2`) remains **unaffected** by this decision:
 
 #### Scope
 
-| Platform | ZFS Status | Reason |
-|----------|------------|--------|
-| **macOS (Darwin)** | ❌ **BANNED** | Kernel panic risk, unstable kext |
-| **NixOS (Linux)** | ✅ **Allowed** | Production-stable, mature codebase |
+| Platform           | ZFS Status     | Reason                             |
+| ------------------ | -------------- | ---------------------------------- |
+| **macOS (Darwin)** | ❌ **BANNED**  | Kernel panic risk, unstable kext   |
+| **NixOS (Linux)**  | ✅ **Allowed** | Production-stable, mature codebase |
 
 #### Rationale
 

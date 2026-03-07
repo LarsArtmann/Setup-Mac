@@ -12,6 +12,7 @@
 ### Overall Status: 🔶 PARTIALLY DONE
 
 **Progress Made**:
+
 - ✅ Identified root cause: Wayland packages being evaluated on Darwin
 - ✅ Fixed evaluation errors by creating platform-specific packages
 - ✅ Build now starts successfully (was failing at eval phase)
@@ -19,6 +20,7 @@
 - ❌ Unknown specific error blocking completion
 
 **Critical Blocker**:
+
 - Cannot identify actual build failure reason
 - Build runs in background, error capture is difficult
 - Need to see specific error message to proceed
@@ -28,25 +30,31 @@
 ## ✅ FULLY DONE
 
 ### 1. Root Cause Identification
+
 **Problem**: Wayland packages (`wl-clipboard`, `wayland`) being evaluated on `aarch64-darwin`
 
 **Status**: FIXED ✅
+
 - Identified that `micro-full` includes Wayland dependencies
 - Discovered `ghost-wallpaper` module had unguarded Wayland config
 - Found `helium.nix` was pulling in Wayland buildInputs even on Darwin
 
 ### 2. Platform-Specific Package Separation
+
 **Problem**: Single `helium.nix` file trying to serve both platforms
 
 **Status**: FIXED ✅
+
 - Created `helium-darwin.nix` (macOS-only, no Wayland deps)
 - Created `helium-linux.nix` (Linux-only, includes Wayland)
 - Modified `base.nix` to conditionally import correct package
 
 ### 3. Ghost-Wallpaper Module Fix
+
 **Problem**: Module evaluated Wayland options on all platforms
 
 **Status**: FIXED ✅
+
 - Added guard: `mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable)`
 - Wayland config now only evaluates on Linux with Hyprland
 
@@ -54,22 +62,24 @@
 
 **Status**: IDENTIFIED ✅
 
-| Package | Problem | Status |
-|----------|-----------|--------|
+| Package      | Problem                                      | Status   |
+| ------------ | -------------------------------------------- | -------- |
 | `micro-full` | Contains `wl-clipboard` (Wayland) dependency | Disabled |
-| `cliphist` | Wayland clipboard manager | Disabled |
-| `helium.nix` | Single package for both platforms | Split |
+| `cliphist`   | Wayland clipboard manager                    | Disabled |
+| `helium.nix` | Single package for both platforms            | Split    |
 
 ### 5. Nix Settings Cleanup
 
 **Status**: FIXED ✅
 
 **Issues Fixed**:
+
 - Removed duplicate `substituters` entries (cache.nixos.org was duplicated)
 - Removed duplicate `trusted-public-keys`
 - Removed conflicting `impure-host-deps` that were breaking build
 
 **Changes Made**:
+
 - Set `sandbox = false` to match working generation 205
 - Removed all custom `impure-host-deps` paths
 - Removed all custom `extra-sandbox-paths`
@@ -78,12 +88,14 @@
 ### 6. Sandbox Configuration
 
 **Status**: ADJUSTED ✅
+
 - Disabled sandbox to match known-good configuration
 - Will re-enable incrementally once build succeeds
 
 ### 7. Build Evaluation Fixed
 
 **Status**: FIXED ✅
+
 - Build now starts successfully
 - 64 derivations queued for building
 - No more "Package 'wayland-1.24.0' is not available" errors
@@ -95,6 +107,7 @@
 ### 1. darwin-rebuild Build Process
 
 **Current State**:
+
 - ✅ **Evaluation Phase**: Works perfectly
   - No more Wayland errors
   - No more platform incompatibility errors
@@ -135,9 +148,11 @@
 ## 💀 TOTALLY FUCKED UP
 
 ### 1. Git Repository State
+
 **Problem**: Repository is cluttered with "temp" commits
 
 **Impact**:
+
 - Hard to track what's actually fixed vs experimental
 - Difficult to rollback to specific working state
 - Unprofessional git history
@@ -145,9 +160,11 @@
 **Fix Needed**: Squash all "temp" commits before finalizing
 
 ### 2. Scorched Earth Approach
+
 **Problem**: Disabled EVERYTHING to get build to start
 
 **Impact**:
+
 - Lost track of what packages are actually needed
 - Ad-hoc fixes instead of systematic approach
 - May have broken working configurations
@@ -155,9 +172,11 @@
 **Risk**: System may be missing essential packages when finally activated
 
 ### 3. No Error Visibility
+
 **Problem**: Build runs in background, can't see actual failure reason
 
 **Impact**:
+
 - Can't diagnose specific error
 - Trial-and-error approach is inefficient
 - Wasting time on blind fixes
@@ -165,9 +184,11 @@
 **Fix Needed**: Capture full build output in file, don't background
 
 ### 4. No Systematic Fix
+
 **Problem**: Ad-hoc fixes instead of proper platform package management
 
 **Impact**:
+
 - Not scalable
 - Will encounter same issues with new packages
 - No clear pattern for future debugging
@@ -175,9 +196,11 @@
 **Fix Needed**: Create systematic approach for platform-specific packages
 
 ### 5. Broken Rollback
+
 **Problem**: No clear path back to working state if this fails
 
 **Impact**:
+
 - Risk of breaking current working generation
 - No safety net
 - Downtime if new build fails
@@ -189,49 +212,61 @@
 ## 📈 WHAT WE SHOULD IMPROVE
 
 ### 1. Systematic Platform Separation
+
 **Current State**: Ad-hoc fixes per package
 
 **Needed**:
+
 - Clear system for marking Linux-only vs Darwin-only packages
 - Automated validation that Darwin-only config doesn't reference Linux packages
 - Standardized pattern for platform-specific imports
 
 ### 2. Clean Git History
+
 **Current State**: Multiple "temp" experimental commits
 
 **Needed**:
+
 - Squash all temp commits into logical feature commits
 - Write clear commit messages with rationale
 - Tag working configurations
 
 ### 3. Better Error Tracking
+
 **Current State**: Build output lost in background execution
 
 **Needed**:
+
 - Always capture build output to file
 - Use `--keep-failed` flag
 - Parse errors systematically
 
 ### 4. Incremental Testing
+
 **Current State**: Disabled everything, enabling one by one blindly
 
 **Needed**:
+
 - Fix ONE thing at a time
 - Test after each change
 - Verify build still works before next change
 
 ### 5. Working Rollback Strategy
+
 **Current State**: No systematic rollback plan
 
 **Needed**:
+
 - Always keep known-good generation accessible
 - Document rollback commands
 - Test rollback procedure
 
 ### 6. Error Message Capture
+
 **Current State**: "builder failed with exit code 1" is all we see
 
 **Needed**:
+
 - System should show actual compilation/linking error
 - Parse and surface meaningful error messages
 - Link to troubleshooting documentation
@@ -281,6 +316,7 @@
 **Question**: WHY does darwin-rebuild keep failing even after we've removed all obvious Wayland/Platform-specific evaluation errors?
 
 **Details**:
+
 - Build evaluation now works (was failing before with Wayland errors) ✅
 - Build process starts and runs for several minutes ✅
 - But it still fails with "builder failed with exit code 1" ❌
@@ -291,11 +327,13 @@
   - Is it configuration error?
 
 **Why This is Critical**:
+
 - Cannot fix the actual error without knowing what it is
 - Trial-and-error approach is wasting time
 - Need ACTUAL error message to proceed
 
 **Investigation Needed**:
+
 - Capture full build output (not just tail)
 - Check build logs in `/nix/var/log/nix/`
 - Use `--show-trace` to see full stack
@@ -344,6 +382,7 @@ Home Manager Version: Latest in flake
 ## Next Actions
 
 ### BLOCKING: Get Build Error
+
 ```bash
 # Capture full output
 darwin-rebuild build --flake ./. --show-trace --print-build-logs 2>&1 | tee /tmp/darwin-build-full.log
@@ -356,6 +395,7 @@ find /nix/var/log/nix -name "*.log" -exec tail -100 {} \;
 ```
 
 ### Once Error is Known
+
 1. Fix the specific error
 2. Test build again
 3. Repeat until successful

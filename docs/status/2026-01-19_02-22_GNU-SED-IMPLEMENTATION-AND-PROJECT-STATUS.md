@@ -19,23 +19,30 @@ Setup-Mac is a comprehensive, production-ready Nix-based configuration system fo
 ## Recent Implementation: GNU sed for macOS
 
 ### Overview
+
 Successfully implemented GNU sed as the default `sed` command on macOS, replacing the BSD sed that ships with macOS. This provides consistent behavior across macOS and NixOS systems.
 
 ### Changes Made
 
 #### 1. Package Configuration
+
 **File**: `platforms/common/packages/base.nix:77`
+
 ```nix
 gnused  # GNU sed 4.9
 ```
+
 - GNU sed 4.9 already installed in cross-platform packages
 - Available system-wide via Nix profile
 
 #### 2. Shell Alias Configuration
+
 **File**: `platforms/common/programs/shell-aliases.nix`
+
 ```nix
 # No alias needed - gnused provides GNU sed as default `sed` command
 ```
+
 - `gnused` package provides GNU sed 4.9 as the default `sed` command
 - No shell alias required - GNU sed is available system-wide
 - Applies to Fish, Zsh, Bash, Nushell automatically
@@ -86,12 +93,14 @@ sed --version | head -1
 ### Impact Assessment
 
 **Scope**: Low-risk, high-benefit change
+
 - No breaking changes to existing scripts
 - All existing functionality preserved
 - Improved compatibility with Linux workflows
 - Documentation updated in AGENTS.md
 
 **Fix Applied (2026-01-19)**:
+
 - **Issue**: `sed = "gsed"` alias caused Fish shell errors (`fish: Unknown command: gsed`)
 - **Root Cause**: `gnused` package provides GNU sed as `sed` command, not `gsed`
 - **Solution**: Removed the alias since GNU sed is already the default
@@ -136,17 +145,20 @@ Setup-Mac/
 ### Key Components
 
 #### Core Type Safety System
+
 - **Location**: `dotfiles/nix/core/`
 - **Components**: TypeSafetySystem.nix, State.nix, Validation.nix, Types.nix
 - **Features**: Compile-time validation, assertion frameworks, centralized state
 - **Benefits**: Makes impossible states unrepresentable
 
 #### Home Manager Integration
+
 - **Shared Modules**: 10+ common configurations
 - **Platform-Specific Overrides**: Minimal changes per platform
 - **Benefits**: 80% code reduction, cross-platform consistency
 
 #### Package Management
+
 - **Primary**: Nix packages (declarative, reproducible)
 - **Secondary**: Homebrew for macOS GUI apps (via nix-homebrew)
 - **Scope**: 177 lines in base.nix covering all essential tools
@@ -158,6 +170,7 @@ Setup-Mac/
 ### ✅ FULLY OPERATIONAL (Complete & Verified)
 
 #### 1. GNU sed Implementation
+
 - **Status**: ✅ Fully operational
 - **Package**: GNU sed 4.9 via gnused
 - **Configuration**: Shell alias in shared aliases
@@ -165,18 +178,21 @@ Setup-Mac/
 - **Documentation**: Updated in AGENTS.md
 
 #### 2. Cross-Platform Package Management
+
 - **Status**: ✅ Fully operational
 - **Location**: `platforms/common/packages/base.nix`
 - **Coverage**: All essential tools, development stack, monitoring
 - **Benefits**: 80% code reduction, declarative management
 
 #### 3. Home Manager Integration
+
 - **Status**: ✅ Fully operational
 - **Shared Modules**: Fish, Starship, Tmux, ActivityWatch, Git, FZF, SSH
 - **Platform Overrides**: Minimal per-platform customization
 - **Benefits**: Consistent configuration across platforms
 
 #### 4. Security Configuration
+
 - **Status**: ✅ Fully operational
 - **Components**:
   - Gitleaks: Pre-commit secret detection
@@ -186,6 +202,7 @@ Setup-Mac/
   - Age Encryption: Modern file encryption
 
 #### 5. Development Toolchain
+
 - **Status**: ✅ Fully operational
 - **Go**: gopls, golangci-lint, gofumpt, gotests, mockgen, buf, delve, gup
 - **TypeScript/Bun**: Bun runtime, oxlint, tsgolint
@@ -194,6 +211,7 @@ Setup-Mac/
 - **Testing**: Native test runners (Vitest)
 
 #### 6. Build & Deployment
+
 - **Status**: ✅ Fully operational
 - **Justfile**: 30+ commands
 - **macOS**: `darwin-rebuild switch` via `just switch`
@@ -202,12 +220,14 @@ Setup-Mac/
 - **Pre-commit**: Gitleaks, trailing whitespace, Nix syntax
 
 #### 7. Type Safety System
+
 - **Status**: ✅ Fully operational
 - **Location**: `dotfiles/nix/core/`
 - **Features**: Compile-time validation, assertions, centralized state
 - **Cross-Platform**: Identical on macOS and NixOS
 
 #### 8. Monitoring & Performance
+
 - **Status**: ✅ Fully operational
 - **ActivityWatch**: Automatic time tracking
 - **Netdata**: http://localhost:19999
@@ -215,6 +235,7 @@ Setup-Mac/
 - **Benchmarks**: `just benchmark-all`
 
 #### 9. Documentation
+
 - **Status**: ✅ Comprehensive
 - **Home Manager**: Deployment guide, verification template, cross-platform report
 - **Architecture**: ADR-001 for Home Manager architecture
@@ -222,6 +243,7 @@ Setup-Mac/
 - **Troubleshooting**: Common issues documented
 
 #### 10. Platform-Specific Features
+
 - **Status**: ✅ Fully operational
 - **Darwin**: Homebrew GUI apps, file association management (duti)
 - **NixOS**: Hyprland window manager, BTRFS snapshots, Technitium DNS
@@ -230,6 +252,7 @@ Setup-Mac/
 ### 🔶 PARTIALLY DONE (Working with improvements needed)
 
 #### 1. uBlock Origin Filter Management
+
 - **Status**: 🔶 Disabled due to time parsing issues
 - **Location**: `platforms/common/programs/ublock-filters.nix`
 - **Issue**: Time parsing causing build failures
@@ -237,6 +260,7 @@ Setup-Mac/
 - **Priority**: HIGH - Feature currently unavailable
 
 #### 2. ActivityWatch macOS Integration
+
 - **Status**: 🔶 Workaround implemented
 - **Issue**: No native macOS support
 - **Current Solution**: LaunchAgent management
@@ -244,12 +268,14 @@ Setup-Mac/
 - **Priority**: MEDIUM - Working, but not ideal
 
 #### 3. Cross-Platform Shell Aliases
+
 - **Status**: 🔶 90% complete
 - **Done**: Shared aliases for Git, basic commands
 - **Missing**: Platform-specific aliases not fully organized
 - **Priority**: LOW - Functional, could be better organized
 
 #### 4. GUI Application Management
+
 - **Status**: 🔶 Partial implementation
 - **Darwin**: Homebrew integration working
 - **NixOS**: Manual package installation
@@ -259,30 +285,35 @@ Setup-Mac/
 ### ❌ NOT STARTED (High priority items)
 
 #### 1. Comprehensive Test Suite
+
 - **Status**: ❌ Not started
 - **Need**: E2E testing for critical user paths
 - **Priority**: HIGH - Essential for production stability
 - **Recommendation**: Use Nix native testing framework
 
 #### 2. Automated Backup System
+
 - **Status**: ❌ Not started
 - **Need**: Scheduled automated backups
 - **Current**: Manual `just backup` only
 - **Priority**: HIGH - Data loss prevention
 
 #### 3. Disaster Recovery Documentation
+
 - **Status**: ❌ Not started
 - **Need**: Complete recovery procedures
 - **Current**: Basic rollback commands
 - **Priority**: HIGH - Production readiness
 
 #### 4. Performance Optimization
+
 - **Status**: ❌ Not started
 - **Need**: Shell startup optimization (< 2 seconds)
 - **Current**: No systematic profiling
 - **Priority**: MEDIUM - User experience
 
 #### 5. Continuous Integration
+
 - **Status**: ❌ Not started
 - **Need**: CI/CD pipeline for testing
 - **Current**: No automated testing
@@ -293,6 +324,7 @@ Setup-Mac/
 ## Known Issues & Workarounds
 
 ### 1. Home Manager NixOS Common Import
+
 - **Issue**: Darwin config imports `../nixos/common.nix` (NixOS-specific file)
 - **Impact**: Requires explicit user definition workaround
 - **Workaround**: Added `users.users.lars` in `platforms/darwin/default.nix`
@@ -300,6 +332,7 @@ Setup-Mac/
 - **Investigation Needed**: Root cause unclear, potential Home Manager architecture issue
 
 ### 2. uBlock Origin Time Parsing
+
 - **Issue**: Time parsing errors in filter management
 - **Impact**: Automated filter updates disabled
 - **Workaround**: Manual filter updates
@@ -307,6 +340,7 @@ Setup-Mac/
 - **Priority**: HIGH - Fix time parsing or use alternative format
 
 ### 3. ActivityWatch macOS Support
+
 - **Issue**: No native macOS support
 - **Impact**: Requires LaunchAgent workaround
 - **Workaround**: Manual control via just commands
@@ -318,29 +352,34 @@ Setup-Mac/
 ## Next Actions: Top 5 Priorities
 
 ### 1. Fix uBlock Origin Time Parsing (HIGH)
+
 - **File**: `platforms/common/programs/ublock-filters.nix`
 - **Action**: Investigate time format, fix parsing or use alternative
 - **Impact**: Re-enable automated filter updates
 
 ### 2. Add E2E Test Suite (HIGH)
+
 - **Action**: Implement comprehensive test coverage
 - **Scope**: Configuration changes, updates, rollbacks
 - **Tool**: Nix native testing framework or shell-based tests
 - **Impact**: Production stability
 
 ### 3. Implement Automated Backups (HIGH)
+
 - **Action**: Set up cron-based daily backups
 - **Retention**: 30-day retention policy
 - **Scope**: Nix configurations, Home Manager state
 - **Impact**: Data loss prevention
 
 ### 4. Document Disaster Recovery (HIGH)
+
 - **Action**: Create comprehensive recovery procedures
 - **Scope**: Complete system failure, partial failures, data corruption
 - **Format**: Step-by-step guides with scenarios
 - **Impact**: Production readiness
 
 ### 5. Optimize Shell Startup (MEDIUM)
+
 - **Action**: Profile and optimize shell initialization
 - **Target**: < 2 seconds startup time
 - **Tools**: Built-in profiling, timing scripts
@@ -351,6 +390,7 @@ Setup-Mac/
 ## Deployment Targets
 
 ### macOS (Lars-MacBook-Air)
+
 - **Platform**: nix-darwin
 - **Host**: aarch64-darwin
 - **Status**: ✅ Production ready
@@ -358,6 +398,7 @@ Setup-Mac/
 - **Home Manager**: `platforms/darwin/home.nix`
 
 ### NixOS (evo-x2)
+
 - **Platform**: NixOS
 - **Host**: x86_64-linux
 - **Hardware**: GMKtec AMD Ryzen AI Max+ 395
@@ -370,6 +411,7 @@ Setup-Mac/
 ## Metrics & Statistics
 
 ### Code Metrics
+
 - **Total Nix Modules**: 40+
 - **Shared Configuration**: 80% cross-platform
 - **Lines of Code**: 2000+ lines of Nix configuration
@@ -377,12 +419,14 @@ Setup-Mac/
 - **Documentation Files**: 15+ guides and reports
 
 ### Package Metrics
+
 - **Essential Packages**: 40+ in base.nix
 - **Development Tools**: 20+ Go, TypeScript, Python tools
 - **Security Tools**: 10+ security-focused packages
 - **Monitoring Tools**: 5+ monitoring and profiling tools
 
 ### Testing Status
+
 - **Syntax Checks**: ✅ Passing (`just test-fast`)
 - **Build Verification**: ✅ Passing (`just test`)
 - **Pre-commit Hooks**: ✅ All hooks passing
@@ -393,21 +437,25 @@ Setup-Mac/
 ## Risk Assessment
 
 ### Critical Risks: None ✅
+
 - No blocking issues
 - All core functionality operational
 - System stable on both platforms
 
 ### High Priority Risks
+
 1. **No automated backups**: Manual process only
 2. **No comprehensive testing**: Limited automated test coverage
 3. **uBlock Origin disabled**: Feature unavailable until fix
 
 ### Medium Priority Risks
+
 1. **No CI/CD**: Changes tested manually only
 2. **Performance not optimized**: Shell startup not profiled
 3. **Documentation gaps**: No user-friendly onboarding guide
 
 ### Low Priority Risks
+
 1. **ActivityWatch macOS**: Workaround in place
 2. **GUI app management**: Different approaches per platform
 3. **Home Manager import mystery**: Working workaround, unclear architecture
@@ -417,6 +465,7 @@ Setup-Mac/
 ## Recommendations
 
 ### Immediate Actions (This Week)
+
 1. Fix uBlock Origin time parsing
 2. Add comprehensive E2E test suite
 3. Implement automated daily backups
@@ -424,6 +473,7 @@ Setup-Mac/
 5. Profile and optimize shell startup
 
 ### Short-term Actions (This Month)
+
 6. Set up GitHub Actions CI/CD
 7. Create user-friendly onboarding guide
 8. Implement monitoring alerts
@@ -431,6 +481,7 @@ Setup-Mac/
 10. Consolidate shell aliases organization
 
 ### Long-term Actions (Next Quarter)
+
 11. Add scheduled automated updates
 12. Implement performance profiling system
 13. Unify GUI application management
@@ -444,6 +495,7 @@ Setup-Mac/
 Setup-Mac is a production-ready, comprehensive Nix-based configuration system for macOS and NixOS. The recent implementation of GNU sed for macOS provides improved cross-platform consistency and eliminates friction when working with Linux workflows.
 
 **Strengths**:
+
 - Comprehensive cross-platform configuration
 - Strong type safety and validation system
 - Excellent development toolchain
@@ -451,6 +503,7 @@ Setup-Mac is a production-ready, comprehensive Nix-based configuration system fo
 - Active maintenance and improvements
 
 **Areas for Improvement**:
+
 - Testing coverage (critical)
 - Automation (backups, updates, CI/CD)
 - User documentation (onboarding guide)
@@ -462,6 +515,6 @@ Setup-Mac is a production-ready, comprehensive Nix-based configuration system fo
 
 ---
 
-*Report Generated: 2026-01-19_02-22*
-*Author: Crush AI Assistant*
-*Version: 1.0*
+_Report Generated: 2026-01-19_02-22_
+_Author: Crush AI Assistant_
+_Version: 1.0_

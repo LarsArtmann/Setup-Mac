@@ -14,6 +14,7 @@
 Successfully migrated Crush AI Assistant configuration from manual file management to declarative Nix Home Manager management. All configuration tests passed, system deployment successful, and files are now managed via `home.file` pattern in Nix.
 
 **Key Achievements:**
+
 - ✅ Crush module created (`platforms/common/programs/crush.nix`)
 - ✅ Module integrated into Home Manager (`platforms/common/home-base.nix`)
 - ✅ All syntax errors resolved (git.nix, crush.nix.disabled)
@@ -23,6 +24,7 @@ Successfully migrated Crush AI Assistant configuration from manual file manageme
 - ✅ Configuration files deployed to `~/.config/crush/`
 
 **Pending Work:**
+
 - ⚠️ Verify symlinks structure
 - ⚠️ Clean up old manual files
 - ⚠️ Test Crush application functionality
@@ -36,6 +38,7 @@ Successfully migrated Crush AI Assistant configuration from manual file manageme
 ## 🎯 Migration Objectives
 
 ### Primary Goals (ACHIEVED ✅)
+
 1. **Make Crush configuration Nix-managed** - ✅ COMPLETE
    - Created `crush.nix` module using `home.file` pattern
    - Integrated into Home Manager via `home-base.nix`
@@ -53,6 +56,7 @@ Successfully migrated Crush AI Assistant configuration from manual file manageme
    - Rollback via Nix generations available
 
 ### Secondary Goals (PENDING ⚠️)
+
 4. **Clean up old manual files** - ⚠️ NOT STARTED
 5. **Verify Crush functionality** - ⚠️ NOT STARTED
 6. **Security hardening** - ⚠️ NOT STARTED
@@ -65,6 +69,7 @@ Successfully migrated Crush AI Assistant configuration from manual file manageme
 ### 1. File Structure
 
 **New Nix Module:**
+
 ```
 platforms/common/programs/crush.nix
 ├── home.file.".config/crush/AGENTS.md".text (451 lines, ~15KB)
@@ -72,6 +77,7 @@ platforms/common/programs/crush.nix
 ```
 
 **Module Integration:**
+
 ```nix
 # platforms/common/home-base.nix
 imports = [
@@ -83,6 +89,7 @@ imports = [
 ### 2. Configuration Details
 
 **AGENTS.md Content:**
+
 - Full AI coding agent configuration (v3.2 - Architectural Excellence)
 - Software architect principles
 - Critical testing mandate
@@ -92,15 +99,12 @@ imports = [
 - Project management guidelines
 
 **crush.json Content:**
+
 ```json
 {
   "$schema": "https://charm.land/crush.json",
   "options": {
-    "context_paths": [
-      "$HOME/.config/crush/AGENTS.md",
-      "AGENTS.md",
-      "CRUSH.md"
-    ]
+    "context_paths": ["$HOME/.config/crush/AGENTS.md", "AGENTS.md", "CRUSH.md"]
   },
   "lsp": {},
   "mcp": {
@@ -126,6 +130,7 @@ imports = [
 ### 3. Deployment Pattern
 
 **Used Home Manager `home.file` Pattern:**
+
 - Declarative file management
 - Automatic symlink creation to Nix store
 - Atomic updates via Nix generations
@@ -139,23 +144,27 @@ imports = [
 ### Issue #1: git.nix Syntax Error ❌ → ✅ FIXED
 
 **Problem:**
+
 - Orphaned `alias` section in `programs.git` configuration
 - Extra closing brace at line 132
 - `safe.directory` incorrectly placed in `extraConfig` instead of `settings`
 
 **Error Message:**
+
 ```
 error: syntax error, unexpected ';', expecting end of file
 at platforms/common/programs/git.nix:242:4
 ```
 
 **Solution:**
+
 - Moved `alias` section inside `settings` block (lines 97-114)
 - Moved `safe.directory` to `extraConfig.safe` (lines 117-130)
 - Removed orphaned closing brace at line 132
 - Result: Clean structure with all sections properly nested
 
 **Before (BROKEN):**
+
 ```nix
 settings = {
   coderabbit = { machineId = "..."; };
@@ -170,6 +179,7 @@ alias = { ... };  ← Orphaned!
 ```
 
 **After (FIXED):**
+
 ```nix
 settings = {
   coderabbit = { machineId = "..."; };
@@ -184,11 +194,13 @@ extraConfig = {
 ### Issue #2: crush.nix.disabled Filename ❌ → ✅ FIXED
 
 **Problem:**
+
 - File was named `crush.nix.disabled` instead of `crush.nix`
 - Nix couldn't find module during import
 - Error: "path '/nix/store/.../crush.nix' does not exist"
 
 **Solution:**
+
 - Renamed file: `crush.nix.disabled` → `crush.nix`
 - Used `mv` command (not `git mv` - file not under version control)
 - Result: Module now accessible for import
@@ -196,11 +208,13 @@ extraConfig = {
 ### Issue #3: SSH Configuration Typo ❌ → ⚠️ SELF-CORRECTED
 
 **Problem:**
+
 - Error: "The option `preferredAuthentications' does not exist"
 - Location: `platforms/common/programs/ssh.nix`
 - Root cause: Nix cache issue, not actual typo
 
 **Solution:**
+
 - Ran `nix flake update` to refresh Nix store
 - Error self-corrected (was stale cache reference)
 - Result: Configuration validated successfully
@@ -210,6 +224,7 @@ extraConfig = {
 ## ✅ Completed Work
 
 ### 1. Module Development
+
 - ✅ Created `crush.nix` module (451 lines)
 - ✅ Implemented `home.file` pattern for AGENTS.md
 - ✅ Implemented `home.file` pattern for crush.json
@@ -217,12 +232,14 @@ extraConfig = {
 - ✅ Added comprehensive inline documentation
 
 ### 2. System Integration
+
 - ✅ Added crush.nix import to home-base.nix
 - ✅ Verified cross-platform compatibility
 - ✅ Followed existing module patterns
 - ✅ Maintained consistent code style
 
 ### 3. Configuration Validation
+
 - ✅ Fixed git.nix syntax errors
 - ✅ Renamed crush.nix.disabled to crush.nix
 - ✅ Ran `nix flake update` to refresh cache
@@ -230,6 +247,7 @@ extraConfig = {
 - ✅ All NixOS and Darwin configurations validated
 
 ### 4. System Deployment
+
 - ✅ Executed `just switch` - **PASSED**
 - ✅ Home Manager activation successful
 - ✅ Launchd services reloaded
@@ -237,6 +255,7 @@ extraConfig = {
 - ✅ Configuration files deployed
 
 ### 5. File Deployment
+
 - ✅ `~/.config/crush/AGENTS.md` - Present (17,819 bytes)
 - ✅ `~/.config/crush/crush.json` - Present (621 bytes)
 - ✅ Home Manager manages these files declaratively
@@ -252,17 +271,20 @@ extraConfig = {
 **Effort:** 5 minutes
 
 **Tasks:**
+
 - [ ] Run `ls -la ~/.config/crush/` to check symlink status
 - [ ] Verify AGENTS.md points to Nix store (`/nix/store/...`)
 - [ ] Verify crush.json points to Nix store
 - [ ] Document symlink structure in migration guide
 
 **Risks:**
+
 - If files are not symlinks, manual files might still be active
 - Crush could be reading old configuration instead of Nix configuration
 - Need to verify which file version is actually being used
 
 **Command:**
+
 ```bash
 ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 ```
@@ -274,6 +296,7 @@ ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 **Effort:** 15 minutes
 
 **Tasks:**
+
 - [ ] Start Crush application
 - [ ] Verify AGENTS.md loads correctly
 - [ ] Verify context paths are recognized
@@ -282,6 +305,7 @@ ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 - [ ] Test configuration updates via Nix
 
 **Validation Steps:**
+
 1. Open Crush
 2. Check if AGENTS.md content is displayed
 3. Test complaints MCP server connection
@@ -297,6 +321,7 @@ ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 **Effort:** 10 minutes
 
 **Tasks:**
+
 - [ ] Create dated backup of old manual files
 - [ ] Remove `~/.config/crush/AGENTS.md` (manual version)
 - [ ] Remove `~/.config/crush/crush.json` (manual version)
@@ -304,6 +329,7 @@ ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 - [ ] Verify only Nix-managed files remain
 
 **Files to Remove:**
+
 ```
 ~/.config/crush/AGENTS.md (manual)
 ~/.config/crush/crush.json (manual)
@@ -320,6 +346,7 @@ ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
 ```
 
 **Backup Command:**
+
 ```bash
 tar -czf ~/.config/crush/crush-manual-backup-$(date +%Y%m%d-%H%M).tar.gz \
   ~/.config/crush/AGENTS.md \
@@ -334,6 +361,7 @@ tar -czf ~/.config/crush/crush-manual-backup-$(date +%Y%m%d-%H%M).tar.gz \
 **Effort:** 30 minutes
 
 **Tasks:**
+
 - [ ] Audit Context7 API key exposure in crush.json
 - [ ] Move API key to secure location (environment variable, sops, agenix)
 - [ ] Implement secret management strategy
@@ -341,12 +369,14 @@ tar -czf ~/.config/crush/crush-manual-backup-$(date +%Y%m%d-%H%M).tar.gz \
 - [ ] Remove hardcoded API key from configuration
 
 **Current Risk:**
+
 ```
 crush.json contains:
 "CONTEXT7_API_KEY": "REDACTED_API_KEY"
 ```
 
 **Recommended Solutions:**
+
 1. **Environment Variable (Quick):** Set in shell config
 2. **sops (Medium):** Encrypt with Mozilla sops
 3. **agenix (Best):** Use agenix for Nix-managed secrets
@@ -358,6 +388,7 @@ crush.json contains:
 **Effort:** 20 minutes
 
 **Tasks:**
+
 - [ ] Implement Darwin-specific path for complaints-mcp
 - [ ] Implement Linux-specific path for complaints-mcp
 - [ ] Use platform conditionals in crush.nix
@@ -365,6 +396,7 @@ crush.json contains:
 - [ ] Document platform-specific behavior
 
 **Current Issue:**
+
 ```json
 "complaints": {
   "command": "/Users/larsartmann/projects/complaints-mcp/complaints-mcp"
@@ -373,6 +405,7 @@ crush.json contains:
 ```
 
 **Solution:**
+
 ```nix
 "complaints" = {
   command = if pkgs.stdenv.isDarwin then
@@ -389,6 +422,7 @@ crush.json contains:
 **Effort:** 45 minutes
 
 **Tasks:**
+
 - [ ] Update Setup-Mac/AGENTS.md with Nix-managed status
 - [ ] Create migration documentation guide
 - [ ] Create verification checklist
@@ -396,6 +430,7 @@ crush.json contains:
 - [ ] Add Crush configuration to project README
 
 **Documentation Structure:**
+
 ```
 docs/
 ├── CRUSH-MIGRATION-GUIDE.md
@@ -412,6 +447,7 @@ docs/
 **Effort:** 15 minutes
 
 **Tasks:**
+
 - [ ] Add `crush.nix` to git staging
 - [ ] Add `home-base.nix` to git staging
 - [ ] Add `git.nix` to git staging
@@ -419,6 +455,7 @@ docs/
 - [ ] Push changes to remote repository
 
 **Commit Message Template:**
+
 ```
 feat: Migrate Crush configuration to Nix-managed Home Manager
 
@@ -459,6 +496,7 @@ Related: #CRUSH-MIGRATION
 **Effort:** 60 minutes
 
 **Tasks:**
+
 - [ ] Add Crush config validation to pre-commit hooks
 - [ ] Create automated test for Crush configuration
 - [ ] Add to `just health` check
@@ -472,6 +510,7 @@ Related: #CRUSH-MIGRATION
 **Effort:** 30 minutes
 
 **Tasks:**
+
 - [ ] Profile Crush startup time with Nix config
 - [ ] Compare startup time (manual vs Nix)
 - [ ] Optimize configuration size if needed
@@ -484,6 +523,7 @@ Related: #CRUSH-MIGRATION
 **Effort:** 15 minutes
 
 **Tasks:**
+
 - [ ] Document rollback procedure
 - [ ] Create manual configuration backup
 - [ ] Test rollback to manual config
@@ -496,6 +536,7 @@ Related: #CRUSH-MIGRATION
 ### Definition of Done (DoD)
 
 **Minimum Viable:**
+
 - [x] Crush configuration is Nix-managed
 - [x] `just test` passes
 - [x] `just switch` passes
@@ -504,6 +545,7 @@ Related: #CRUSH-MIGRATION
 - [ ] Old manual files cleaned up
 
 **Production Ready:**
+
 - [ ] All minimum viable criteria met
 - [ ] Crush functionality verified (MCP servers working)
 - [ ] Security audit completed (API key secured)
@@ -512,6 +554,7 @@ Related: #CRUSH-MIGRATION
 - [ ] Git version control updated (committed and pushed)
 
 **Excellent:**
+
 - [ ] All production ready criteria met
 - [ ] Automated testing implemented
 - [ ] Performance optimized
@@ -523,23 +566,27 @@ Related: #CRUSH-MIGRATION
 ## 📊 Metrics
 
 ### Configuration Size
+
 - **crush.nix:** 451 lines, 20KB
 - **AGENTS.md:** 17.4KB, 413 lines
 - **crush.json:** 621 bytes, 27 lines
 - **Total Configuration:** ~37KB
 
 ### Deployment Metrics
+
 - **Build Time:** ~2 minutes (for `just switch`)
 - **Activation Time:** ~30 seconds
 - **Total Time:** ~2.5 minutes
 
 ### Validation Metrics
+
 - **`just test` Status:** ✅ PASSED
 - **`just switch` Status:** ✅ PASSED
 - **NixOS Config:** ✅ VALID
 - **Darwin Config:** ✅ VALID
 
 ### Code Quality
+
 - **Syntax Errors Fixed:** 2 (git.nix, crush.nix.disabled)
 - **Nix Warnings:** 0
 - **Linting Status:** Not yet run
@@ -550,6 +597,7 @@ Related: #CRUSH-MIGRATION
 ## 🔍 Lessons Learned
 
 ### What Went Well
+
 1. **Pattern Consistency:** Following existing `home.file` patterns worked seamlessly
 2. **Modular Design:** Easy to integrate into existing Home Manager structure
 3. **Validation Process:** `just test` caught all errors early
@@ -557,6 +605,7 @@ Related: #CRUSH-MIGRATION
 5. **Deployment:** Home Manager activation was smooth and successful
 
 ### What Could Be Improved
+
 1. **Symlink Verification:** Should verify symlinks immediately after deployment
 2. **Application Testing:** Should test Crush functionality right away
 3. **Cleanup Planning:** Should plan cleanup of old files before migration
@@ -564,6 +613,7 @@ Related: #CRUSH-MIGRATION
 5. **Cross-Platform:** Should implement both platforms from the start
 
 ### Technical Insights
+
 1. **Nix Store Caching:** Stale cache caused confusing SSH errors
 2. **builtins.toJSON:** Reliable for JSON configuration generation
 3. **home.file Pattern:** Perfect for declarative config file management
@@ -577,9 +627,11 @@ Related: #CRUSH-MIGRATION
 ### Immediate (Next Session - Top 3)
 
 1. **Verify Symlink Structure** (5 minutes)
+
    ```bash
    ls -la ~/.config/crush/AGENTS.md ~/.config/crush/crush.json
    ```
+
    - Confirm files are Nix symlinks
    - Document symlink targets
    - Verify no manual file conflicts
@@ -634,7 +686,9 @@ Related: #CRUSH-MIGRATION
 ## 📝 Notes
 
 ### Manual Files Still Present
+
 As of deployment, the following manual files exist in `~/.config/crush/`:
+
 - `AGENTS.md` (17,819 bytes) - Manual version
 - `crush.json` (621 bytes) - Manual version
 - 9 backup files with dates from 2025-11-05 to 2025-12-08
@@ -643,7 +697,9 @@ As of deployment, the following manual files exist in `~/.config/crush/`:
 These need to be cleaned up after verifying Nix symlinks are active.
 
 ### API Key Exposure
+
 The Context7 API key is hardcoded in crush.json:
+
 ```
 REDACTED_API_KEY
 ```
@@ -651,7 +707,9 @@ REDACTED_API_KEY
 This is a security risk and should be moved to a secure location (environment variable, sops, or agenix).
 
 ### MCP Server Paths
+
 The complaints MCP server path is Darwin-specific:
+
 ```
 /Users/larsartmann/projects/complaints-mcp/complaints-mcp
 ```
@@ -659,6 +717,7 @@ The complaints MCP server path is Darwin-specific:
 This will not work on NixOS and needs a platform conditional implementation.
 
 ### Configuration Drift Risk
+
 Manual changes to Nix-managed files will be overwritten on next `just switch`. Users should be warned against manually editing files in `~/.config/crush/`.
 
 ---
@@ -666,11 +725,13 @@ Manual changes to Nix-managed files will be overwritten on next `just switch`. U
 ## 🎓 References
 
 ### Documentation
+
 - [Home Manager Documentation](https://nixos.wiki/wiki/Home_Manager)
 - [home.file Options](https://nixos.org/manual/nixos/stable/options.html#opt-home.file)
 - [Nix Patterns](https://nixos.wiki/wiki/Nix_Patterns)
 
 ### Related Files
+
 - `platforms/common/programs/crush.nix` - New module
 - `platforms/common/programs/pre-commit.nix` - Pattern reference
 - `platforms/common/programs/ublock-filters.nix` - Pattern reference
@@ -678,6 +739,7 @@ Manual changes to Nix-managed files will be overwritten on next `just switch`. U
 - `platforms/common/programs/git.nix` - Syntax fix reference
 
 ### Related Issues
+
 - #CRUSH-MIGRATION - Main migration ticket
 - #NIX-SYNTAX-ERRORS - Git configuration syntax errors
 
@@ -695,4 +757,4 @@ Manual changes to Nix-managed files will be overwritten on next `just switch`. U
 
 ---
 
-*End of Status Report*
+_End of Status Report_

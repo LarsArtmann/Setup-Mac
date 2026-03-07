@@ -9,12 +9,14 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### Current State
+
 - **Home Manager**: Completely disabled due to critical type validation failure
 - **System**: Nix-darwin functional but lacking user-space configuration management
 - **btop Wallpaper**: Manual implementation only (violates 100% Nix requirement)
 - **Goal**: Achieve 100% declarative Nix management without shell scripts
 
 ### Critical Blocker
+
 ```
 error: A definition for option `home-manager.users.larsartmann.home.homeDirectory' is not of type `absolute path'. Definition values:
 - In `/nix/store/li2qai8bdl740xrxpm27qm8nmshhngnz-source/nixos/common.nix': null
@@ -25,6 +27,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 🎯 REQUIREMENTS ANALYSIS
 
 ### Must-Have (100% Nix Management)
+
 - ✅ No manual `.sh` files or shell scripts
 - ✅ All configuration through Nix modules only
 - ✅ Declarative package management
@@ -33,6 +36,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 - ✅ Auto-start capability
 
 ### Technical Stack
+
 - **Core**: Nix-darwin + Home Manager (currently BROKEN)
 - **Target**: Home Manager version `d10a9b16b2a3ee28433f3d1c603f4e9f1fecb8e1` (Nov 2024)
 - **Alternative**: Native nix-darwin modules if Home Manager cannot be fixed
@@ -42,6 +46,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 🔍 ROOT CAUSE ANALYSIS
 
 ### Failed Approaches Attempted
+
 1. ❌ **UserConfig Integration**: `homeDirectory = userConfig.defaultUser.homeDir`
 2. ❌ **Direct Path**: `homeDirectory = "/Users/larsartmann"`
 3. ❌ **Minimal Configuration**: Removed all UserConfig dependencies
@@ -49,6 +54,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 5. ❌ **Type Variations**: Tried `types.path`, string, absolute path types
 
 ### Investigation Required
+
 - **Home Manager Version Compatibility**: Check against nix-darwin version
 - **Type System Changes**: Recent Home Manager type validation updates
 - **Module Loading Order**: Potential circular dependency issues
@@ -59,12 +65,14 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 📁 ARCHITECTURE ASSESSMENT
 
 ### Existing Components (Ready for Integration)
+
 - **Ghost Wallpaper Module**: ✅ Complete cross-platform implementation
 - **btop Configuration**: ✅ Minimalist wallpaper settings
 - **Launch Scripts**: ❌ Manual files (must be converted to Nix)
 - **Window Management**: ❌ SketchyBar dependency (requires Nix integration)
 
 ### Conversion Requirements
+
 - **Shell Scripts → Nix Derivations**: Convert all `.sh` files to Nix-managed scripts
 - **Manual Config → Nix Modules**: Move all config to declarative Nix
 - **Home Manager Integration**: Fix core blocker or implement alternative
@@ -75,6 +83,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 🛠️ TECHNICAL IMPLEMENTATION PATH
 
 ### Phase 1: Home Manager Recovery (Critical Path)
+
 1. **Deep Debug Investigation** (60 min)
    - Home Manager source analysis
    - Type validation trace
@@ -92,6 +101,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
    - Integration testing
 
 ### Phase 2: 100% Nix Conversion
+
 4. **Script Elimination** (40 min)
    - Convert all shell scripts to Nix derivations
    - Remove manual file management
@@ -108,6 +118,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
    - System service integration
 
 ### Phase 3: Optimization & Validation
+
 7. **Performance Optimization** (30 min)
    - Resource usage monitoring
    - Update rate optimization
@@ -123,6 +134,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 🎯 SUCCESS CRITERIA
 
 ### Technical Requirements
+
 - ✅ All configuration managed through Nix modules
 - ✅ Zero manual shell files or scripts
 - ✅ Home Manager functional integration
@@ -131,6 +143,7 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 - ✅ System stability and performance
 
 ### Validation Checklist
+
 - [ ] `darwin-rebuild switch` succeeds without errors
 - [ ] Home Manager activates user configuration
 - [ ] btop wallpaper launches automatically on login
@@ -144,16 +157,19 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 🚨 IMMEDIATE NEXT ACTIONS
 
 ### Priority 1: Home Manager Recovery
+
 1. **Systematic Debug Session**: Deep dive into Home Manager type validation
 2. **Version Compatibility Check**: Ensure nix-darwin + Home Manager alignment
 3. **Alternative Strategy Development**: Native nix-darwin approach if needed
 
 ### Priority 2: Nix-Only Implementation
+
 1. **Script Conversion**: Eliminate all manual shell files
 2. **Declarative Configuration**: Convert manual configs to Nix modules
 3. **System Integration**: Proper macOS service management
 
 ### Success Metrics
+
 - **Build Success**: `darwin-rebuild switch` completes without errors
 - **Functionality**: btop wallpaper launches on system start
 - **Purity**: 100% Nix-managed configuration
@@ -164,16 +180,19 @@ error: A definition for option `home-manager.users.larsartmann.home.homeDirector
 ## 📈 RISK ASSESSMENT
 
 ### High Risk
+
 - **Home Manager Compatibility**: Potential fundamental incompatibility requiring major rework
 - **macOS Integration**: Complex window management may require external tools
 - **Performance Impact**: Background process may affect system performance
 
 ### Medium Risk
+
 - **Module Complexity**: Ghost wallpaper module may need significant adaptation
 - **Configuration Drift**: Manual configs may conflict with Nix management
 - **Version Conflicts**: Package version alignment issues
 
 ### Mitigation Strategies
+
 - **Incremental Implementation**: Phase-based approach with validation at each step
 - **Fallback Planning**: Alternative implementation strategies
 - **Performance Monitoring**: Continuous system impact assessment

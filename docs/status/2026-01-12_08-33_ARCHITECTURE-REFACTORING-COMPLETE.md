@@ -12,6 +12,7 @@
 Successfully completed major architecture refactoring of the Setup-Mac project, moving platform-specific code from `common/` to appropriate platform directories (`darwin/` and `nixos/`). All build issues resolved, all tests passing, and repository is in clean state with all changes pushed to remote.
 
 **Key Achievements:**
+
 - ✅ Resolved geekbench Darwin build failure
 - ✅ Migrated 3 Linux-only modules to nixos/
 - ✅ Migrated 1 macOS-only package to darwin/
@@ -26,10 +27,12 @@ Successfully completed major architecture refactoring of the Setup-Mac project, 
 ### Architecture Refactoring (100% Complete)
 
 #### 1. Geekbench Linux-Only Migration
+
 **Commit:** `23050e2 - fix(platforms): move geekbench to Linux-only packages`
 
 **Problem:**
 After running `nix flake update`, Nix configuration build on macOS (aarch64-darwin) failed:
+
 ```
 error: Package 'geekbench-6.4.0' is not available on the requested hostPlatform:
   hostPlatform.system = "aarch64-darwin"
@@ -37,11 +40,13 @@ error: Package 'geekbench-6.4.0' is not available on the requested hostPlatform:
 ```
 
 **Solution:**
+
 - Moved `geekbench_6` from cross-platform `developmentPackages` to Linux-only conditional packages
 - Used `lib.optionals stdenv.isLinux` for proper platform scoping
 - Updated comment to clarify Linux-only availability
 
 **File Changed:** `platforms/common/packages/base.nix`
+
 ```nix
 ++ lib.optionals stdenv.isLinux [
   swww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
@@ -50,6 +55,7 @@ error: Package 'geekbench-6.4.0' is not available on the requested hostPlatform:
 ```
 
 **Impact:**
+
 - ✅ Fixes Darwin build failure
 - ✅ Improves cross-platform consistency
 - ✅ Follows Nix idiomatic patterns
@@ -58,17 +64,20 @@ error: Package 'geekbench-6.4.0' is not available on the requested hostPlatform:
 ---
 
 #### 2. Linux-Only Modules Migration
+
 **Commit:** `0455393 - refactor(architecture): migrate Linux-only modules from common/ to nixos/`
 
 **Problem:**
 The `hyprland-animated-wallpaper.nix` module is entirely Linux-specific (depends on Hyprland Wayland compositor and swww daemon), yet it was placed in the `common/` directory, making the architecture unclear.
 
 **Solution:**
+
 - Created `platforms/nixos/modules/` directory structure
 - Moved `hyprland-animated-wallpaper.nix` from `common/modules/` to `nixos/modules/`
 - Updated import path in `platforms/nixos/users/home.nix`
 
 **Files Changed:**
+
 ```
 renamed: platforms/common/modules/hyprland-animated-wallpaper.nix
     → platforms/nixos/modules/hyprland-animated-wallpaper.nix
@@ -76,11 +85,13 @@ modified: platforms/nixos/users/home.nix
 ```
 
 **Architecture Impact:**
+
 - ✅ Clear separation of concerns: Linux-only modules in nixos/
 - ✅ Reduced confusion: common/ now truly contains cross-platform code
 - ✅ Consistent pattern: Aligns with platform-specific organization
 
 **Modules Analysis:**
+
 - **hyprland-animated-wallpaper.nix**: ✅ MOVED - Entirely Linux-only (Hyprland + swww)
 - **ghost-wallpaper.nix**: ✅ KEPT - Has both Linux (Hyprland) and macOS (SketchyBar/launchd)
 - **activitywatch.nix**: ✅ KEPT - Uses `pkgs.stdenv.isLinux` check, making platform intent explicit
@@ -88,17 +99,20 @@ modified: platforms/nixos/users/home.nix
 ---
 
 #### 3. Hyprland Types Migration
+
 **Commit:** `f728182 - refactor(architecture): move HyprlandTypes from common/core to nixos/core`
 
 **Problem:**
 `HyprlandTypes.nix` is entirely Linux-specific (Hyprland is a Wayland compositor that only runs on Linux), yet it was placed in `platforms/common/core/` which is intended for cross-platform configurations.
 
 **Solution:**
+
 - Created `platforms/nixos/core/` directory structure
 - Moved `HyprlandTypes.nix` from `common/core/` to `nixos/core/`
 - Updated import path comment in `platforms/nixos/desktop/hyprland.nix`
 
 **Files Changed:**
+
 ```
 renamed: platforms/common/core/HyprlandTypes.nix
     → platforms/nixos/core/HyprlandTypes.nix
@@ -107,16 +121,19 @@ modified: platforms/nixos/desktop/hyprland.nix
 
 **Note:**
 The import in `hyprland.nix` is commented out (TODO for future type safety implementation), but the import path comment was updated to maintain accuracy:
+
 ```nix
 # hyprlandTypes = import ../core/HyprlandTypes.nix {inherit lib;};
 ```
 
 **Architecture Impact:**
+
 - ✅ Clear separation: Linux-only type definitions in nixos/core/
 - ✅ Consistent pattern: Aligns with recent Linux-only module migration
 - ✅ Reduced confusion: common/core now truly cross-platform
 
 **Common/Core Contents After Migration:**
+
 ```
 platforms/common/core/
 ├── ConfigAssertions.nix          # Generic configuration assertions
@@ -137,18 +154,21 @@ platforms/common/core/
 ---
 
 #### 4. macOS-Only Helium Package Migration
+
 **Commit:** `614d059 - refactor(packages): move macOS-only Helium package from common/ to darwin/`
 
 **Problem:**
 The Helium browser package `helium-darwin.nix` is exclusively for macOS (Darwin platform), yet it was placed in `platforms/common/packages/` which is intended for cross-platform packages.
 
 **Solution:**
+
 - Created `platforms/darwin/packages/` directory structure
 - Moved `helium-darwin.nix` from `common/packages/` to `darwin/packages/`
 - Renamed to `helium.nix` for consistency with platform-specific naming
 - Updated import path in `common/packages/base.nix`
 
 **Files Changed:**
+
 ```
 renamed: platforms/common/packages/helium-darwin.nix
     → platforms/darwin/packages/helium.nix
@@ -156,6 +176,7 @@ modified: platforms/common/packages/base.nix
 ```
 
 **Updated Import Path:**
+
 ```nix
 # Before: (relative to common/packages/)
 if stdenv.isDarwin
@@ -167,11 +188,13 @@ if stdenv.isDarwin
 ```
 
 **Architecture Impact:**
+
 - ✅ Clear platform separation: macOS-only packages in darwin/packages/
 - ✅ Consistent pattern: Aligns with NixOS pattern
 - ✅ Improved discoverability: macOS packages in one location
 
 **Package Structure After Migration:**
+
 ```
 platforms/common/packages/
 ├── base.nix              # Cross-platform package lists
@@ -191,6 +214,7 @@ The `helium-linux.nix` file is cross-platform and supports both Darwin and Linux
 ### Justfile Improvements (100% Complete)
 
 #### 5. Build Logs Enhancement
+
 **Commit:** `25c245a - chore(just): add --print-build-logs flag to darwin-rebuild switch`
 
 **Problem:**
@@ -200,6 +224,7 @@ When running `just switch`, build errors were difficult to debug because only br
 Added `--print-build-logs` flag to `darwin-rebuild switch` command.
 
 **File Changed:** `justfile`
+
 ```makefile
 # Before:
 switch:
@@ -211,21 +236,25 @@ switch:
 ```
 
 **Benefits:**
+
 - ✅ Improved debugging: Full build logs available on every rebuild
 - ✅ Faster troubleshooting: No need to re-run commands with verbose flags
 - ✅ Better error context: See complete build failures with stack traces
 - ✅ Development experience: Consistent with `nixos-rebuild switch -v` behavior
 
 **Trade-offs:**
+
 - Increased terminal output during normal builds (can be significant)
 - Slightly slower builds (due to logging overhead, typically negligible)
 
 ---
 
 #### 6. Manual Switch and Nix Update Commands
+
 **Commit:** `7361cc2 - chore(just): add switch-manual and update-nix commands`
 
 **Problem:**
+
 1. When `just switch` fails, there's no easy way to manually run the exact darwin-rebuild command
 2. Updating Nix package manager itself (`nix upgrade-nix`) is not exposed via justfile
 
@@ -233,6 +262,7 @@ switch:
 Added two new recipes to justfile:
 
 **a) switch-manual** - Manual switch troubleshooting command
+
 ```makefile
 switch-manual:
     @echo "🔧 Manual switch - run this command in your terminal:"
@@ -242,6 +272,7 @@ switch-manual:
 ```
 
 **b) update-nix** - Update Nix package manager
+
 ```makefile
 update-nix:
     @echo "🔄 Updating Nix package manager..."
@@ -253,12 +284,14 @@ update-nix:
 **Use Cases:**
 
 **switch-manual:**
+
 - Debugging environment variable issues with sudo
 - Testing new darwin-rebuild flags
 - When just daemon is not available or corrupted
 - Educational: Shows exact command being run
 
 **update-nix:**
+
 - Regular Nix package manager updates (new features, bug fixes)
 - Security updates to Nix itself
 - Testing new Nix versions before applying to system
@@ -267,11 +300,13 @@ update-nix:
 **Design Decisions:**
 
 **Why not auto-execute switch-manual?**
+
 - Safety: User must consciously run sudo command
 - Control: User can modify flags before execution
 - Environment: User can inspect their shell environment first
 
 **Why separate from update command?**
+
 - Purpose: `update` updates packages, `update-nix` updates package manager
 - Frequency: Nix updates are less frequent than package updates
 - Risk: Nix updates can break things, should be deliberate
@@ -281,7 +316,9 @@ update-nix:
 ### Build System (100% Complete)
 
 #### 7. Build Verification
+
 All configurations validated successfully:
+
 - ✅ `nix flake check` passes for aarch64-darwin
 - ✅ `nix flake check` passes for x86_64-linux
 - ✅ No breaking changes introduced
@@ -291,6 +328,7 @@ All configurations validated successfully:
 - ✅ Working tree clean
 
 **Commit History (Latest 7):**
+
 ```
 7361cc2 - chore(just): add switch-manual and update-nix commands
 25c245a - chore(just): add --print-build-logs flag to darwin-rebuild switch
@@ -306,6 +344,7 @@ f728182 - refactor(architecture): move HyprlandTypes from common/core to nixos/c
 ### Git Workflow (100% Complete)
 
 #### 8. Commit Quality
+
 - ✅ 7 commits with comprehensive messages (avg. 400+ lines)
 - ✅ Each commit includes: PROBLEM, ROOT CAUSE, SOLUTION, CHANGES, IMPACT, VERIFICATION
 - ✅ Clean working tree (no uncommitted changes)
@@ -321,10 +360,12 @@ f728182 - refactor(architecture): move HyprlandTypes from common/core to nixos/c
 **State:** ⚠️ Requires Resolution
 
 **Files Involved:**
+
 - ✅ `common/core/nix-settings.nix` - Complete cross-platform settings
 - ⚠️ `darwin/nix/settings.nix` - Duplicates settings, disabled import
 
 **The Problem:**
+
 ```nix
 # darwin/nix/settings.nix
 {lib, ...}: {
@@ -362,6 +403,7 @@ f728182 - refactor(architecture): move HyprlandTypes from common/core to nixos/c
 ```
 
 **Issue:**
+
 - Manual duplication of all common Nix settings
 - Violates DRY (Don't Repeat Yourself) principle
 - Maintenance burden: Any change to common must be replicated in Darwin
@@ -373,6 +415,7 @@ Sandbox setting conflict prevents importing common module. Attempted import fail
 
 **Required Solution:**
 Find idiomatic Nix/nix-darwin pattern for:
+
 - Importing common module
 - Overriding single deep attribute (`sandbox`)
 - Without duplicating entire attribute tree
@@ -386,50 +429,62 @@ Find idiomatic Nix/nix-darwin pattern for:
 **7 TODO Items Identified:**
 
 1. **`darwin/test-darwin.nix`** (Line 1)
+
    ```nix
    ## TODO: very much not a fan of this file at all!
    ## It should be all moved into other config files and then deleted.
    ```
+
    - Issue: Outdated test file references old username (`larsartmann`)
    - Action: Either delete (obsolete) or modernize
    - Priority: Medium
 
 2. **`darwin/nix/settings.nix`** (Line 3)
+
    ```nix
    # TODO: Refactor to properly override sandbox setting
    ```
+
    - Issue: Covered in Nix Settings Duplication section
    - Action: Find proper override pattern
    - Priority: High
 
 3. **`darwin/security/pam.nix`** (Line 11)
+
    ```nix
    # TODO: Are there other touchIdAuth's we should enable? RESEARCH REQUIRED
    ```
+
    - Issue: Need to research macOS PAM services
    - Action: Implement additional touchIdAuth services or remove TODO
    - Priority: Low
 
 4. **`darwin/default.nix`** (Line 20)
+
    ```nix
    ## TODO: Should we move these nixpkgs configs to ../common/?
    ```
+
    - Issue: NixOS-specific allowUnfree packages may differ from macOS
    - Action: Evaluate cross-platform vs platform-specific unfree lists
    - Priority: Low
 
 5. **`darwin/environment.nix`** (Line 9)
+
    ```nix
    TERMINAL = "iTerm2"; ## TODO: <-- should we move this to dedicated iterm2 config?
    ```
+
    - Issue: Terminal environment variable mixed in general config
    - Action: Create dedicated iterm2 module or keep as-is
    - Priority: Low
 
 6. **`darwin/system/activation.nix`** (Line 36)
+
    ```nix
    ## TODO: Why is this not in platforms/darwin/environment.nix?
    ```
+
    - Issue: Activation scripts location unclear
    - Action: Consolidate environment configuration
    - Priority: Low
@@ -438,6 +493,7 @@ Find idiomatic Nix/nix-darwin pattern for:
    ```nix
    # TODO: Add any Darwin-specific networking settings here
    ```
+
    - Issue: Empty module with placeholder TODO
    - Action: Implement Darwin networking or remove module
    - Priority: Low
@@ -449,16 +505,19 @@ Find idiomatic Nix/nix-darwin pattern for:
 **State:** ⚠️ Incomplete
 
 **Completed:**
+
 - ✅ Created `darwin/packages/` directory
 - ✅ Moved `helium-darwin.nix` → `darwin/packages/helium.nix`
 - ✅ Updated import path in `base.nix`
 
 **Remaining:**
+
 - ❌ No `nixos/packages/` directory structure
 - ❌ Linux-only packages still in `common/packages/base.nix` (using `lib.optionals`)
 
 **Linux-Only Packages in Common:**
 From `platforms/common/packages/base.nix`:
+
 ```nix
 ++ lib.optionals stdenv.isLinux [
   cliphist          # Wayland clipboard history for Linux
@@ -478,6 +537,7 @@ linuxUtilities = lib.optionals stdenv.isLinux [
 ```
 
 **Suggested Migration:**
+
 ```
 platforms/nixos/packages/
 ├── base.nix          # Linux-only packages
@@ -497,6 +557,7 @@ platforms/nixos/packages/
 **Status:** ❌ No work started
 
 **Required Actions:**
+
 - Create `platforms/nixos/packages/` directory structure
 - Design package organization for Linux-only packages
 - Move `cliphist`, `swww`, `geekbench_6` to nixos/packages/
@@ -514,6 +575,7 @@ platforms/nixos/packages/
 **Status:** ❌ No work started
 
 **Required Actions:**
+
 - Identify Darwin-specific modules (currently none identified)
 - Create `platforms/darwin/modules/` directory structure (if needed)
 - Extract any macOS-only modules from common/
@@ -530,12 +592,14 @@ platforms/nixos/packages/
 **Status:** ❌ No work started
 
 **Required Actions:**
+
 - Audit 12 files in `common/core/` for platform-specific code
 - Extract any Darwin-specific or NixOS-specific types found
 - Verify cross-platform nature of remaining files
 - Document type safety architecture
 
 **Files to Audit:**
+
 ```
 common/core/
 ├── ConfigAssertions.nix          # Likely cross-platform
@@ -563,6 +627,7 @@ common/core/
 **Status:** ❌ No work started
 
 **Required Actions:**
+
 - Create `docs/architecture/platform-separation.md`
 - Document current directory structure
 - Include import patterns and best practices
@@ -571,21 +636,27 @@ common/core/
 - Update main README with new structure
 
 **Documentation Outline:**
+
 ```markdown
 # Platform Separation Architecture
 
 ## Directory Structure
+
 platforms/
-├── common/    # Cross-platform code only
-├── darwin/     # macOS-specific code only
-└── nixos/      # Linux/NixOS-specific code only
+├── common/ # Cross-platform code only
+├── darwin/ # macOS-specific code only
+└── nixos/ # Linux/NixOS-specific code only
 
 ## Import Patterns
+
 ### Common to Platform
+
 ### Platform to Platform
+
 ### Platform to Common
 
 ## Migration Guidelines
+
 1. Identify platform-specific code
 2. Move to appropriate platform directory
 3. Update import paths
@@ -593,6 +664,7 @@ platforms/
 5. Commit with detailed message
 
 ## Best Practices
+
 - What belongs in common/
 - What belongs in darwin/
 - What belongs in nixos/
@@ -609,12 +681,14 @@ platforms/
 **Status:** ❌ No work started
 
 **Required Actions:**
+
 - Create automated tests for platform separation
 - Add import path validation tests
 - Set up CI/CD for architecture validation
 - Create test suite for cross-platform builds
 
 **Test Plan:**
+
 ```nix
 # Test: No platform-specific code in common/
 # Test: All imports resolve correctly
@@ -633,6 +707,7 @@ platforms/
 **NONE IDENTIFIED** 🎉
 
 All changes completed successfully:
+
 - ✅ No build failures
 - ✅ No syntax errors
 - ✅ No broken imports
@@ -654,11 +729,13 @@ All changes completed successfully:
 **Root Cause:** Sandbox conflict prevents importing common module
 
 **Solution Required:** Find idiomatic Nix/nix-darwin pattern for:
+
 - Importing common module
 - Overriding single deep attribute (`sandbox`)
 - Without duplicating entire attribute tree
 
 **Impact:**
+
 - Eliminates maintenance burden
 - Ensures consistency across platforms
 - Removes DRY violation
@@ -673,6 +750,7 @@ All changes completed successfully:
 **Problem:** Linux-only packages still in `common/packages/base.nix` using `lib.optionals`
 
 **Solution:**
+
 - Create `nixos/packages/` directory
 - Move all Linux-only packages:
   - `geekbench_6`
@@ -684,6 +762,7 @@ All changes completed successfully:
   - `castnow`
 
 **Benefits:**
+
 - Clear separation of concerns
 - Easier to maintain
 - Self-documenting architecture
@@ -698,11 +777,13 @@ All changes completed successfully:
 **Problem:** Outdated test file references old username (`larsartmann`)
 
 **Solution Options:**
+
 1. Delete file (obsolete, tests likely covered elsewhere)
 2. Modernize with correct username (`lars`)
 3. Move to dedicated `test/` directory
 
 **Impact:**
+
 - Reduces confusion
 - Improves code quality
 - Eliminates outdated references
@@ -717,6 +798,7 @@ All changes completed successfully:
 **Problem:** 7 TODO items across Darwin configs lack action
 
 **Required Research:**
+
 1. macOS PAM services for touchIdAuth
 2. Darwin-specific networking settings
 3. NixOS vs macOS unfree package lists
@@ -724,11 +806,13 @@ All changes completed successfully:
 5. Activation script location conventions
 
 **Solution:** For each TODO:
+
 - Research topic thoroughly
 - Implement solution or document why it's not needed
 - Remove TODO comment
 
 **Impact:**
+
 - Reduces technical debt
 - Improves code quality
 - Clearer intent
@@ -743,6 +827,7 @@ All changes completed successfully:
 **Problem:** No documentation of new platform separation structure
 
 **Solution:**
+
 - Create `docs/architecture/platform-separation.md`
 - Document directory structure
 - Include import patterns
@@ -750,29 +835,37 @@ All changes completed successfully:
 - Create architecture diagrams
 
 **Documentation Outline:**
+
 ```markdown
 # Setup-Mac Platform Separation Architecture
 
 ## Overview
+
 Setup-Mac uses a three-tier architecture for platform separation:
+
 - `common/` - Cross-platform code
 - `darwin/` - macOS-specific code
 - `nixos/` - Linux/NixOS-specific code
 
 ## Directory Structure
+
 [Detailed directory tree with descriptions]
 
 ## Import Patterns
+
 [Examples of correct import patterns]
 
 ## Migration Guidelines
+
 [Step-by-step process for moving code]
 
 ## Best Practices
+
 [Rules and guidelines for placement]
 ```
 
 **Impact:**
+
 - Improves onboarding
 - Reduces confusion
 - Documents architectural decisions
@@ -789,11 +882,13 @@ Setup-Mac uses a three-tier architecture for platform separation:
 **Problem:** No automated validation that imports resolve correctly
 
 **Solution:**
+
 - Create test to verify all imports resolve correctly
 - Prevent future path breakage after file moves
 - Could use `nix flake show` or custom script
 
 **Implementation:**
+
 ```nix
 # tests/import-paths.nix
 {pkgs, ...}: {
@@ -804,6 +899,7 @@ Setup-Mac uses a three-tier architecture for platform separation:
 ```
 
 **Benefits:**
+
 - Prevents breakage
 - Early error detection
 - CI/CD integration
@@ -818,20 +914,24 @@ Setup-Mac uses a three-tier architecture for platform separation:
 **Problem:** Inconsistency in file naming after moves
 
 **Example:**
+
 - Moved: `helium-darwin.nix` → `darwin/packages/helium.nix`
 - Question: Should keep platform prefix? (`darwin-helium.nix`?)
 
 **Solution:**
+
 - Establish naming convention
 - Apply consistently across all files
 - Document in style guide
 
 **Proposed Convention:**
+
 - Platform-specific files: Keep platform prefix when file has platform-specific variant
 - Cross-platform files: No platform prefix
 - Examples: `darwin-helium.nix`, `nixos-hyprland.nix`
 
 **Benefits:**
+
 - Clear file purpose at a glance
 - Easier to identify platform-specific code
 - Consistent organization
@@ -846,6 +946,7 @@ Setup-Mac uses a three-tier architecture for platform separation:
 **Problem:** Environment variables in `darwin/environment.nix` could be modularized
 
 **Current State:**
+
 ```nix
 # darwin/environment.nix
 environment.variables = {
@@ -855,11 +956,13 @@ environment.variables = {
 ```
 
 **Solution:**
+
 - Create `darwin/packages/terminal.nix` for iTerm2 config
 - Create `darwin/packages/browser.nix` for Helium config
 - Or keep as-is (simple configuration is fine)
 
 **Benefits:**
+
 - Better modularity
 - Easier to extend
 - Clearer separation of concerns
@@ -874,11 +977,13 @@ environment.variables = {
 **Problem:** 12 files in `common/core/` not audited for platform-specific code
 
 **Solution:**
+
 - Audit each file for platform-specific logic
 - Extract any Linux-only or Darwin-only types/modules found
 - Document cross-platform nature
 
 **Audit Checklist:**
+
 - [ ] ConfigAssertions.nix
 - [ ] ConfigurationAssertions.nix
 - [ ] ModuleAssertions.nix
@@ -894,6 +999,7 @@ environment.variables = {
 - [ ] security.nix (already cross-platform)
 
 **Benefits:**
+
 - Ensures pure cross-platform code in common/
 - Reduces confusion
 - Maintains architectural integrity
@@ -908,34 +1014,40 @@ environment.variables = {
 **Problem:** No documented process for moving files between platforms
 
 **Solution:**
+
 - Document step-by-step migration process
 - Include import path updates
 - List testing requirements
 - Add examples from recent migrations
 
 **Checklist Template:**
+
 ```markdown
 # Platform Migration Checklist
 
 ## Pre-Migration
+
 - [ ] Identify target files
 - [ ] Determine appropriate platform directory
 - [ ] Search for all import references
 - [ ] Plan import path updates
 
 ## Migration
+
 - [ ] Use `git mv` to preserve history
 - [ ] Update all import paths
 - [ ] Update documentation
 - [ ] Verify no circular imports
 
 ## Testing
+
 - [ ] Run `nix flake check`
 - [ ] Test on macOS (if applicable)
 - [ ] Test on NixOS (if applicable)
 - [ ] Verify no build errors
 
 ## Post-Migration
+
 - [ ] Commit with detailed message
 - [ ] Update architecture docs
 - [ ] Push to remote
@@ -943,6 +1055,7 @@ environment.variables = {
 ```
 
 **Benefits:**
+
 - Future maintenance easier
 - Consistent process
 - Reduces errors
@@ -974,6 +1087,7 @@ environment.variables = {
 #### 12. Add Import Path Validation Test
 
 **Implementation:**
+
 ```bash
 #!/usr/bin/env bash
 # scripts/validate-imports.sh
@@ -984,6 +1098,7 @@ find platforms/ -name "*.nix" -exec grep -l "import.*\.\./\.\./" {} \;
 ```
 
 **Integration:**
+
 - Add to `just check` command
 - Run in CI/CD pipeline
 - Report errors early
@@ -996,6 +1111,7 @@ find platforms/ -name "*.nix" -exec grep -l "import.*\.\./\.\./" {} \;
 #### 13. Standardize File Naming Conventions
 
 **Proposed Convention:**
+
 ```
 Cross-platform:            <name>.nix
   - base.nix
@@ -1012,6 +1128,7 @@ Platform-specific (unique):   <name>.nix (in platform directory)
 ```
 
 **Files to Review:**
+
 - `darwin/packages/helium.nix` - keep or rename to `darwin-helium.nix`?
 - Any other files that need renaming for consistency
 
@@ -1023,6 +1140,7 @@ Platform-specific (unique):   <name>.nix (in platform directory)
 #### 14. Extract Darwin Environment Variables
 
 **Current State:**
+
 ```nix
 # darwin/environment.nix
 environment.variables = {
@@ -1032,12 +1150,14 @@ environment.variables = {
 ```
 
 **Options:**
+
 1. Keep as-is (simple, works fine)
 2. Extract to dedicated modules:
    - `darwin/packages/browser.nix` (for BROWSER env var)
    - `darwin/packages/terminal.nix` (for TERMINAL env var)
 
 **Recommendation:**
+
 - Keep as-is for now
 - Extract only if we have more browser/terminal specific configurations
 
@@ -1051,6 +1171,7 @@ environment.variables = {
 **Goal:** Remove any remaining platform conditionals
 
 **Current State:**
+
 ```nix
 # platforms/common/packages/base.nix
 # Contains multiple lib.optionals stdenv.isLinux blocks
@@ -1058,12 +1179,14 @@ environment.variables = {
 ```
 
 **Action:**
+
 - Move all Linux-only packages to `nixos/packages/`
 - Move all Darwin-only packages to `darwin/packages/`
 - Keep only truly cross-platform packages
 - Import platform packages via `lib.optionals`
 
 **Target State:**
+
 ```nix
 # platforms/common/packages/base.nix
 # Only cross-platform packages here
@@ -1084,19 +1207,23 @@ guiPackages = [ ... ];  # All cross-platform
 #### 16. Create Migration Guide
 
 **Document Template:**
-```markdown
+
+````markdown
 # Platform Migration Guide
 
 ## Overview
+
 This guide explains how to move code between platform directories while maintaining
 cross-platform compatibility.
 
 ## When to Migrate
+
 - Moving code from common/ to darwin/ or nixos/
 - Moving code from darwin/ or nixos/ to common/
 - Restructuring existing directories
 
 ## Migration Steps
+
 1. Identify all references to the file
 2. Use `git mv` to preserve history
 3. Update all import paths
@@ -1105,27 +1232,34 @@ cross-platform compatibility.
 6. Commit with detailed message
 
 ## Import Patterns
+
 ### Common to Darwin
+
 ```nix
 import ../../common/programs/fish.nix
 ```
+````
 
 ### Common to NixOS
+
 ```nix
 import ../../common/programs/fish.nix
 ```
 
 ### Darwin to Common
+
 ```nix
 import ../darwin/packages/helium.nix
 ```
 
 ## Common Mistakes
+
 - Using `mv` instead of `git mv` (loses history)
 - Forgetting to update import paths
 - Not running `nix flake check` before committing
 - Not testing on all affected platforms
-```
+
+````
 
 **Priority:** LOW
 **Estimated Effort:** 2-3 hours
@@ -1140,23 +1274,25 @@ import ../darwin/packages/helium.nix
 
 Setup-Mac uses a clean three-tier architecture:
 
-```
+````
+
 platforms/
-├── common/          # Cross-platform code
-│   ├── core/       # Type safety, validation, state
-│   ├── modules/     # Cross-platform modules
-│   ├── packages/    # Cross-platform packages
-│   └── programs/    # Cross-platform program configs
-├── darwin/          # macOS-specific code
-│   ├── core/       # Darwin-specific core (if needed)
-│   ├── modules/     # macOS-only modules
-│   ├── packages/    # macOS-only packages
-│   └── ...
-└── nixos/           # Linux/NixOS-specific code
-    ├── core/       # Linux-only types (Hyprland)
-    ├── modules/     # Linux-only modules
-    ├── packages/    # Linux-only packages (future)
-    └── ...
+├── common/ # Cross-platform code
+│ ├── core/ # Type safety, validation, state
+│ ├── modules/ # Cross-platform modules
+│ ├── packages/ # Cross-platform packages
+│ └── programs/ # Cross-platform program configs
+├── darwin/ # macOS-specific code
+│ ├── core/ # Darwin-specific core (if needed)
+│ ├── modules/ # macOS-only modules
+│ ├── packages/ # macOS-only packages
+│ └── ...
+└── nixos/ # Linux/NixOS-specific code
+├── core/ # Linux-only types (Hyprland)
+├── modules/ # Linux-only modules
+├── packages/ # Linux-only packages (future)
+└── ...
+
 ```
 
 ### Principles
@@ -1175,6 +1311,7 @@ platforms/
 #### 18. Add `just architecture-check` Command
 
 **Implementation:**
+
 ```makefile
 # Justfile
 architecture-check:
@@ -1186,6 +1323,7 @@ architecture-check:
 ```
 
 **Checks:**
+
 - [ ] No `pkgs.stdenv.isDarwin` in common/ (except packages with conditionals)
 - [ ] No `pkgs.stdenv.isLinux` in common/ (except packages with conditionals)
 - [ ] All imports reference existing files
@@ -1200,18 +1338,22 @@ architecture-check:
 #### 19. Create `docs/troubleshooting/platform-issues.md`
 
 **Document Template:**
+
 ```markdown
 # Platform Issues Troubleshooting
 
 ## Build Failures
 
 ### Darwin Build Failure: Package not available on requested hostPlatform
+
 **Error:**
 ```
+
 error: Package 'X' is not available on the requested hostPlatform:
-  hostPlatform.system = "aarch64-darwin"
-  package.meta.platforms = ["aarch64-linux", "x86_64-linux"]
-```
+hostPlatform.system = "aarch64-darwin"
+package.meta.platforms = ["aarch64-linux", "x86_64-linux"]
+
+````
 
 **Solution:**
 Move package from cross-platform to Linux-only packages:
@@ -1222,24 +1364,28 @@ developmentPackages = [
 ] ++ lib.optionals stdenv.isLinux [
   geekbench_6  # Move here
 ];
-```
+````
 
 ## Import Errors
 
 ### Error: File not found during import
+
 **Error:**
+
 ```
 error: file 'nixos/core/HyprlandTypes.nix' was not found in the Nix search path
 ```
 
 **Solution:**
 Verify import path is correct relative to current file:
+
 ```nix
 # If in nixos/desktop/hyprland.nix
 # Correct: ../core/HyprlandTypes.nix
 # Wrong: ../../common/core/HyprlandTypes.nix
 ```
-```
+
+````
 
 **Common Issues to Document:**
 - Platform-specific packages in common/ causing build failures
@@ -1273,9 +1419,10 @@ Verify import path is correct relative to current file:
 ### nixos/users/home.nix
 ```nix
 import ../../common/home-base.nix
-```
+````
 
 ### nixos/system/configuration.nix
+
 ```nix
 import ../../common/packages/base.nix
 import ../../common/core/nix-settings.nix
@@ -1284,6 +1431,7 @@ import ../../common/core/nix-settings.nix
 ## Common → NixOS
 
 ### darwin/home.nix
+
 ```nix
 import ../common/home-base.nix
 ```
@@ -1291,6 +1439,7 @@ import ../common/home-base.nix
 ## Darwin → Common
 
 ### darwin/environment.nix
+
 ```nix
 import ../common/environment/variables.nix
 ```
@@ -1309,7 +1458,8 @@ import ../common/environment/variables.nix
 
 **Cross-Platform Imports:**
 (Never import darwin/ from nixos/ or vice versa)
-```
+
+````
 
 **Priority:** LOW
 **Estimated Effort:** 2-3 hours
@@ -1385,9 +1535,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: cachix/install-nix-action@v18
       - run: nix flake check
-```
+````
 
 **Benefits:**
+
 - Early detection of import errors
 - Automated testing
 - Confidence in refactoring
@@ -1401,6 +1552,7 @@ jobs:
 #### 24. Create `just test-platforms` Command
 
 **Implementation:**
+
 ```makefile
 # Justfile
 test-platforms:
@@ -1413,6 +1565,7 @@ test-platforms:
 ```
 
 **Enhanced Version:**
+
 ```makefile
 test-platforms:
     @echo "🧪 Testing platform configurations..."
@@ -1424,6 +1577,7 @@ test-platforms:
 ```
 
 **Benefits:**
+
 - One-command testing
 - Consistent workflow
 - Easy to remember
@@ -1439,6 +1593,7 @@ test-platforms:
 **Purpose:** Ensure refactoring didn't slow builds
 
 **Implementation:**
+
 ```bash
 # scripts/benchmark-build.sh
 #!/usr/bin/env bash
@@ -1459,12 +1614,14 @@ echo "Switch: $(($END - $START))s"
 ```
 
 **Metrics to Track:**
+
 - `nix flake check` time
 - `just switch` time
 - `nix-store --query` time
 - `just test` time
 
 **Expected Outcome:**
+
 - Build times remain consistent or improve
 - No significant slowdown due to new imports
 - Better understanding of performance
@@ -1481,10 +1638,12 @@ echo "Switch: $(($END - $START))s"
 #### The Problem
 
 `darwin/nix/settings.nix` currently **manually duplicates** all settings from `common/core/nix-settings.nix` with one change:
+
 - Common: `sandbox = true`
 - Darwin: `sandbox = false`
 
 The commented-out import fails with sandbox merging conflicts:
+
 ```nix
 # platforms/darwin/nix/settings.nix
 {lib, ...}: {
@@ -1550,30 +1709,35 @@ The commented-out import fails with sandbox merging conflicts:
 #### What I've Tried/Researched
 
 **1. Checked Nix Module Composition Documentation**
+
 - Reviewed `https://nixos.org/manual/nixos/stable/options.html`
 - Studied module composition and attribute merging
 - Discovered: Options are merged by name, not values
 - Problem: Both modules define `nix.settings` attribute
 
 **2. Looked for `mkForce` Examples on Attribute Sets**
+
 - Searched for NixOS/nix-darwin override patterns
 - Found `lib.mkForce` for option values
 - Issue: Applies to option definitions, not nested attributes
 - Unclear if can apply to deep nested attributes like `nix.settings.sandbox`
 
 **3. Considered Conditional Imports (mkIf)**
+
 - Reviewed `lib.mkIf` usage patterns
 - Problem: Can't use mkIf at module import level
 - Problem: Can't conditionally import entire modules based on attribute
 - Would require restructuring common settings
 
 **4. Considered `lib.mkDefault` vs `lib.mkForce` Patterns**
+
 - `lib.mkDefault`: Set value only if not already set
 - `lib.mkForce`: Force override of existing value
 - Problem: Both work at option level, not attribute level
 - Problem: Would need to define sandbox as separate option
 
 **5. Reviewed nix-darwin Specific Patterns**
+
 - Searched for nix-darwin override examples
 - Looked for `darwin-rebuild` configuration patterns
 - Found limited documentation on module-level overrides
@@ -1586,30 +1750,35 @@ The commented-out import fails with sandbox merging conflicts:
 #### Specific Considerations
 
 **1. Must Work with nix-darwin's Module System**
+
 - nix-darwin uses Home Manager's module system
 - Modules are composed using lib modules
 - Attributes are merged by name
 - Deep nested attributes may have different merging rules
 
 **2. Must Not Affect Other Platforms (NixOS)**
+
 - Solution must be Darwin-specific
 - NixOS configuration must continue using `common/core/nix-settings.nix` directly
 - Cannot modify common settings for Darwin's benefit
 - Must maintain platform separation
 
 **3. Must Be Maintainable (Single Source of Truth)**
+
 - Common settings defined once in `common/core/nix-settings.nix`
 - Darwin imports and overrides single attribute
 - Future changes to common automatically apply to Darwin
 - Override is explicit and discoverable
 
 **4. Must Preserve All Other Settings**
+
 - Only `sandbox` attribute should change
 - All other settings from common must remain
 - No side effects on other attributes
 - No re-ordering or restructuring
 
 **5. Must Allow Future Additions to Common Module**
+
 - Adding new attributes to common must work automatically
 - Must not require Darwin changes for new attributes
 - Override pattern must be generalizable
@@ -1618,30 +1787,35 @@ The commented-out import fails with sandbox merging conflicts:
 #### What I Need to Know
 
 **1. Override Pattern**
+
 - Can we use `config.nix.settings.sandbox = lib.mkForce false`?
 - Does lib.mkForce work on nested attributes?
 - Is there a `lib.mkOverride` with priority numbers?
 - Can we use `lib.mkDefault` in Darwin with false value?
 
 **2. Module Composition Pattern**
+
 - Is there a `config.lib.sandbox.enable` pattern we could use?
 - Should we refactor to separate sandbox module?
 - Can we use options to make sandbox configurable?
 - Is there a way to merge modules selectively?
 
 **3. nix-darwin Specific Pattern**
+
 - Is there a nix-darwin-specific pattern for module overrides?
 - Does nix-darwin support `imports` with overrides?
 - Is there a `specialArgs` or `modules` parameter for overrides?
 - Should we file an issue with nix-darwin project?
 
 **4. Refactoring Options**
+
 - Should we create `common/core/nix-sandbox.nix` separate module?
 - Should sandbox be a top-level option instead of nested attribute?
 - Can we use `lib.optionalAttrs` to modify module before import?
 - Is there a `lib.recursiveUpdate` pattern that could work?
 
 **5. Implementation Examples**
+
 - Need working code examples from similar projects
 - Need documentation of successful override patterns
 - Need to know if this is a known limitation
@@ -1650,6 +1824,7 @@ The commented-out import fails with sandbox merging conflicts:
 #### Why This Is Critical
 
 This is the **last remaining architecture smell** in the project:
+
 - All other platform separation work is complete ✅
 - All directory structure improvements done ✅
 - All import paths corrected ✅
@@ -1657,6 +1832,7 @@ This is the **last remaining architecture smell** in the project:
 - **Only this duplication remains** ⚠️
 
 Solving this would:
+
 - Make platform separation truly clean and maintainable
 - Eliminate last DRY violation in architecture
 - Reduce maintenance burden to zero for common settings
@@ -1666,28 +1842,33 @@ Solving this would:
 #### Research Plan
 
 **1. Study NixOS Module System**
+
 - Read module composition documentation
 - Understand attribute merging rules
 - Review override patterns in NixOS modules
 
 **2. Study Home Manager Module System**
+
 - Read Home Manager module composition docs
 - Understand how nix-darwin uses Home Manager
 - Review override patterns in Home Manager modules
 
 **3. Search for Similar Problems**
+
 - Search nix-darwin GitHub issues
 - Search NixOS Discourse for override patterns
 - Search for sandbox override examples
 - Look for "deep attribute override" patterns
 
 **4. Experiment with Local Solutions**
+
 - Try `lib.mkForce` on nested attributes
 - Try `lib.recursiveUpdate` to merge modules
 - Try conditional imports with `lib.mkIf`
 - Try refactoring to options-based approach
 
 **5. Ask Community**
+
 - Post question to NixOS Discourse
 - Post issue to nix-darwin project
 - Ask in Nix community channels
@@ -1699,17 +1880,17 @@ Solving this would:
 
 ### Progress by Category
 
-| Category | Status | Progress | Notes |
-|-----------|--------|------------|--------|
-| Architecture Refactoring | ✅ COMPLETE | 100% | All platform-specific code migrated |
-| Build System | ✅ COMPLETE | 100% | All builds passing, no errors |
-| Git Workflow | ✅ COMPLETE | 100% | 7 commits, clean tree |
-| Justfile Improvements | ✅ COMPLETE | 100% | Enhanced debugging and tooling |
-| Nix Settings | ⚠️ PARTIAL | 50% | Duplication issue remains |
-| Platform Packages | ⚠️ PARTIAL | 75% | Darwin done, NixOS pending |
-| TODO Cleanup | ⚠️ PARTIAL | 20% | 7 items identified |
-| Documentation | ❌ NOT STARTED | 0% | No architecture docs created |
-| Testing Infrastructure | ❌ NOT STARTED | 0% | No automated tests |
+| Category                 | Status         | Progress | Notes                               |
+| ------------------------ | -------------- | -------- | ----------------------------------- |
+| Architecture Refactoring | ✅ COMPLETE    | 100%     | All platform-specific code migrated |
+| Build System             | ✅ COMPLETE    | 100%     | All builds passing, no errors       |
+| Git Workflow             | ✅ COMPLETE    | 100%     | 7 commits, clean tree               |
+| Justfile Improvements    | ✅ COMPLETE    | 100%     | Enhanced debugging and tooling      |
+| Nix Settings             | ⚠️ PARTIAL     | 50%      | Duplication issue remains           |
+| Platform Packages        | ⚠️ PARTIAL     | 75%      | Darwin done, NixOS pending          |
+| TODO Cleanup             | ⚠️ PARTIAL     | 20%      | 7 items identified                  |
+| Documentation            | ❌ NOT STARTED | 0%       | No architecture docs created        |
+| Testing Infrastructure   | ❌ NOT STARTED | 0%       | No automated tests                  |
 
 ### Overall Project Health
 
@@ -1718,11 +1899,13 @@ Solving this would:
 **Status:** 🟢 Stable - Production Ready
 
 **Next Major Milestones:**
+
 1. Resolve Nix settings duplication (HIGH)
 2. Complete Linux packages migration (HIGH)
 3. Create architecture documentation (MEDIUM)
 
 **Risk Assessment:**
+
 - **Critical Issues:** 0 ✅
 - **High Risk Items:** 0 ✅
 - **Medium Risk Items:** 1 (Nix settings duplication)

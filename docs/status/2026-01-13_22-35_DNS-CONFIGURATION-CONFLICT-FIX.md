@@ -36,6 +36,7 @@ Jan 13 20:53:56 evo-x2 systemd[1]: network-setup.service: Main process exited, c
 **Why dhcpcd was trying to manage resolv.conf:**
 
 The dhcpcd configuration in `platforms/nixos/system/networking.nix` had:
+
 - `nooption domain_name_servers` - prevents dhcpcd from using router DNS
 - `noipv6` / `noipv6rs` - disables IPv6
 - **MISSING:** `nohook resolv.conf` - this tells dhcpcd NOT to manage `/etc/resolv.conf`
@@ -45,6 +46,7 @@ Without `nohook resolv.conf`, dhcpcd still tries to run its resolv.conf hook, wh
 **Architecture Intent:**
 
 The configuration was designed to use NixOS's declarative DNS management:
+
 - `networking.nameservers = ["9.9.9.10" "9.9.9.11"]` sets DNS declaratively
 - NixOS's `network-setup.service` (via resolvconf) updates `/etc/resolv.conf`
 - dhcpcd should NOT manage `/etc/resolv.conf` - it only handles DHCP
@@ -92,6 +94,7 @@ dhcpcd = {
 Run: `sudo nixos-rebuild switch --flake .#evo-x2`
 
 **Expected output:**
+
 ```
 building the system configuration...
 activating the configuration...
@@ -153,6 +156,7 @@ The following scripts manually edit `/etc/resolv.conf` and should **NOT be used*
 3. **`scripts/fix-nix-cache.sh`** - Manually edits `/etc/resolv.conf` to remove IPv6 DNS
 
 **Why these scripts are now obsolete:**
+
 - DNS is managed declaratively via `networking.nameservers`
 - dhcpcd no longer manages `/etc/resolv.conf` (thanks to `nohook resolv.conf`)
 - NixOS's `network-setup.service` (via resolvconf) updates `/etc/resolv.conf` automatically

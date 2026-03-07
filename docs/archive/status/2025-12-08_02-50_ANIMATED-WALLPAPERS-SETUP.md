@@ -11,11 +11,13 @@ Successfully implemented animated wallpapers support for NixOS with Hyprland usi
 ## Completed Tasks
 
 ### 1. Package Integration
+
 - ✅ Added `swww` (Simple Wayland Wallpaper) to platforms/nixos/desktop/hyprland.nix
 - ✅ Added `imagemagick` to platforms/nixos/desktop/hyprland.nix
 - ✅ Added both packages to platforms/common/packages/base.nix for cross-platform support
 
 ### 2. Configuration Updates
+
 - ✅ Updated Hyprland configuration with enhanced wallpaper management
 - ✅ Configured wallpaper-related keybindings:
   - Mod + W: Random static wallpaper
@@ -23,6 +25,7 @@ Successfully implemented animated wallpapers support for NixOS with Hyprland usi
   - Mod + Alt + W: Clear wallpaper
 
 ### 3. Documentation
+
 - ✅ Created comprehensive ANIMATED-WALLPAPERS-GUIDE.md with:
   - Installation instructions
   - Usage examples
@@ -31,6 +34,7 @@ Successfully implemented animated wallpapers support for NixOS with Hyprland usi
   - Advanced configuration options
 
 ### 4. Automation Script
+
 - ✅ Created setup-animated-wallpapers.sh with:
   - Directory structure creation
   - Sample wallpaper generation
@@ -39,6 +43,7 @@ Successfully implemented animated wallpapers support for NixOS with Hyprland usi
   - Configuration verification
 
 ### 5. Implementation Details
+
 - ✅ Wallpaper directories: ~/.config/wallpapers/{static,animated,gifs}
 - ✅ Automated sample wallpaper generation using ImageMagick gradients
 - ✅ Comprehensive wallpaper switcher script with multiple modes
@@ -55,6 +60,7 @@ Successfully implemented animated wallpapers support for NixOS with Hyprland usi
 ## Technical Implementation
 
 ### Package Integration
+
 ```nix
 # platforms/nixos/desktop/hyprland.nix
 home.packages = with pkgs; [
@@ -65,7 +71,9 @@ home.packages = with pkgs; [
 ```
 
 ### Script Architecture
+
 The wallpaper switcher script provides:
+
 - Random static wallpaper selection
 - Animated wallpaper mode
 - Wallpaper cycling with configurable delay
@@ -73,6 +81,7 @@ The wallpaper switcher script provides:
 - Clean transition effects
 
 ### Performance Optimizations
+
 - Hardware acceleration through swww
 - GPU-aware configuration for AMD hardware
 - Efficient memory usage with lazy loading
@@ -89,6 +98,7 @@ The wallpaper switcher script provides:
 ## Usage Instructions
 
 ### Quick Start
+
 1. Apply NixOS configuration: `sudo nixos-rebuild switch`
 2. Run setup script: `./setup-animated-wallpapers.sh`
 3. Use keybindings:
@@ -97,6 +107,7 @@ The wallpaper switcher script provides:
    - Mod + Alt + W: Clear wallpaper
 
 ### Manual Control
+
 ```bash
 # Set random wallpaper
 ~/.config/scripts/wallpaper-switcher

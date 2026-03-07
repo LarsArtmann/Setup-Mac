@@ -11,6 +11,7 @@
 Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) into the Nix-based cross-platform configuration system. All tools are now available via declarative Nix package management, installed and verified on macOS (Lars-MacBook-Air) with cross-platform support for NixOS (evo-x2).
 
 ### Key Achievements
+
 - ✅ **oxfmt** added to Nix configuration (discovered available in nixpkgs)
 - ✅ **SSH configuration bug** fixed (preferredAuthentications attribute)
 - ✅ **All three Oxc tools** installed and verified working
@@ -19,11 +20,12 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
 - ✅ **Cross-platform consistency** maintained (macOS + NixOS)
 
 ### Tools Delivered
-| Tool | Version | Language | Purpose | Status |
-|-------|---------|----------|---------|--------|
-| **oxlint** | 1.38.0 | Rust | Fast JS/TS linter (50-100x ESLint) | ✅ Installed |
-| **tsgolint** | Latest | Go | Type-aware linting support | ✅ Installed |
-| **oxfmt** | 0.23.0 | Rust | Fast JS/TS formatter (Prettier-compatible) | ✅ Installed |
+
+| Tool         | Version | Language | Purpose                                    | Status       |
+| ------------ | ------- | -------- | ------------------------------------------ | ------------ |
+| **oxlint**   | 1.38.0  | Rust     | Fast JS/TS linter (50-100x ESLint)         | ✅ Installed |
+| **tsgolint** | Latest  | Go       | Type-aware linting support                 | ✅ Installed |
+| **oxfmt**    | 0.23.0  | Rust     | Fast JS/TS formatter (Prettier-compatible) | ✅ Installed |
 
 ---
 
@@ -32,34 +34,41 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
 ### Task 1: Oxfmt Discovery & Integration ✅
 
 **Initial Understanding**:
+
 - Previous documentation (2026-01-14_01-45) stated oxfmt was "NOT available in nixpkgs"
 - Rationale: Custom package would require Cargo.lock vendoring and maintenance
 
 **Discovery**:
+
 - User command: `nix profile add nixpkgs#oxfmt` revealed oxfmt IS available in nixpkgs
 - Search confirmed: `nix search nixpkgs oxfmt` → `oxfmt (0.23.0)` found
 - Previous documentation was INCORRECT
 
 **Action Taken**:
+
 - Added `oxfmt` to `platforms/common/packages/base.nix:111`
 - Placed alongside existing oxlint and tsgolint in `developmentPackages` section
 - Cross-platform: Works on both macOS and NixOS
 
 **Files Modified**:
+
 - `platforms/common/packages/base.nix` (line 111 added)
 
 ### Task 2: SSH Configuration Bug Fix ✅
 
 **Issue Discovered**:
+
 - `just test-fast` failed with SSH configuration error
 - Error: `The option 'home-manager.users.lars.programs.ssh.matchBlocks.private-cloud-hetzner-0.data.preferredAuthentications' does not exist`
 - Affecting: `private-cloud-hetzner-0/1/2/3` SSH hosts
 
 **Root Cause**:
+
 - Home Manager SSH module doesn't support `preferredAuthentications` as direct attribute
 - Must be specified via `extraOptions.PreferredAuthentications`
 
 **Action Taken**:
+
 - Modified `platforms/common/programs/ssh.nix` (lines 66, 72, 78, 84)
 - Changed from:
   ```nix
@@ -73,12 +82,14 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
   ```
 
 **Result**:
+
 - SSH configuration syntax validation passed
 - All SSH hosts properly configured for Linux-only deployment
 
 ### Task 3: Configuration Validation & Deployment ✅
 
 **Phase 1: Syntax Validation**:
+
 - Command: `just test-fast`
 - Result: ✅ PASSED
 - Output:
@@ -100,6 +111,7 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
   ```
 
 **Phase 2: Initial Build Attempt**:
+
 - Command: `just switch` (first attempt)
 - Result: ❌ FAILED (transient error)
 - Error: `Package 'lm-sensors-3.6.2' is not available on aarch64-darwin`
@@ -109,6 +121,7 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
 - Hypothesis: Nix store cache issue or transient evaluation problem
 
 **Phase 3: Successful Deployment**:
+
 - Command: `just switch` (second attempt)
 - Result: ✅ SUCCESS
 - Build output:
@@ -146,6 +159,7 @@ Successfully integrated all three Oxc project tools (oxlint, tsgolint, oxfmt) in
 ### Task 4: Tool Installation Verification ✅
 
 **Verification Commands**:
+
 ```bash
 # Check all tools are in PATH
 $ which oxfmt
@@ -170,6 +184,7 @@ $ tsgolint --version
 ```
 
 **Result**:
+
 - ✅ All three tools installed in system PATH
 - ✅ All tools executable and working
 - ✅ Version verification complete
@@ -178,9 +193,11 @@ $ tsgolint --version
 ### Task 5: Documentation Update ✅
 
 **Files Updated**:
+
 - `docs/status/2026-01-14_01-45_OXC-TOOLS-ADDITION-STATUS.md`
 
 **Changes Made**:
+
 1. Updated date: `2026-01-14 01:45` → `2026-01-14 03:45`
 2. Updated status: `Partially Complete (2/3)` → `COMPLETE (3/3)`
 3. Added oxfmt to "Tools Added" section with full details
@@ -195,6 +212,7 @@ $ tsgolint --version
 12. Updated "Decision" and "Rationale" sections to reflect correct information
 
 **Corrected Misinformation**:
+
 - Previously stated: "oxfmt tool is NOT available in nixpkgs"
 - Corrected to: "oxfmt IS available in nixpkgs (version 0.23.0)"
 - Previous rationale: "Custom package would require Cargo.lock vendoring"
@@ -207,22 +225,26 @@ $ tsgolint --version
 ### Issue 1: Incorrect Documentation (CRITICAL)
 
 **Problem**:
+
 - Original status document claimed oxfmt was not in nixpkgs
 - This prevented immediate action on adding oxfmt
 - User had to manually verify availability
 
 **Root Cause**:
+
 - Documentation was written before verifying with `nix search nixpkgs`
 - Assumed oxfmt would not be packaged yet (oxc project is relatively new)
 - Did not account for rapid nixpkgs growth and community contributions
 
 **Resolution**:
+
 - User command: `nix profile add nixpkgs#oxfmt` proved availability
 - Verified with: `nix search nixpkgs oxfmt`
 - Updated documentation immediately
 - Lesson learned: Always verify package availability before declaring unavailable
 
 **Preventive Measures**:
+
 - Update documentation workflow to require package verification
 - Add check: `nix search nixpkgs <package>` before marking as unavailable
 - Implement documentation review process before finalizing
@@ -230,21 +252,25 @@ $ tsgolint --version
 ### Issue 2: SSH Configuration Syntax Error
 
 **Problem**:
+
 - `just test-fast` failed with SSH configuration validation error
 - Error: `preferredAuthentications` attribute does not exist
 - Affects: 4 SSH hosts (private-cloud-hetzner-0/1/2/3)
 
 **Root Cause**:
+
 - Home Manager SSH module changed API
 - Direct attribute `preferredAuthentications` no longer supported
 - Must use `extraOptions.PreferredAuthentications` instead
 
 **Resolution**:
+
 - Modified all 4 SSH host configurations
 - Wrapped in `extraOptions` attribute with proper capitalization
 - Tested with `just test-fast` → PASSED
 
 **Preventive Measures**:
+
 - Review Home Manager changelog for API changes
 - Test configuration changes before final deployment
 - Keep Home Manager version tracked in documentation
@@ -252,16 +278,19 @@ $ tsgolint --version
 ### Issue 3: Transient lm_sensors Build Error (MYSTERIOUS)
 
 **Problem**:
+
 - First `just switch` attempt failed with platform incompatibility error
 - Error: `Package 'lm-sensors-3.6.2' is not available on aarch64-darwin`
 - lm_sensors is Linux-only, properly wrapped with `lib.optionals stdenv.isLinux`
 
 **Root Cause**: UNKNOWN (transient issue)
+
 - Expected: Should not evaluate on Darwin due to platform guard
 - Actual: Attempted evaluation and failed
 - Self-resolved on second attempt without code changes
 
 **Investigation Results**:
+
 - ✅ lm_sensors only in `linuxUtilities` section with `lib.optionals stdenv.isLinux`
 - ✅ waybar.nix references lm_sensors but is NixOS-only
 - ✅ waybar.nix imported by `platforms/nixos/desktop/hyprland.nix`
@@ -270,6 +299,7 @@ $ tsgolint --version
 - ✅ No other references to lm_sensors in codebase
 
 **Hypotheses**:
+
 1. Nix store cache invalidation issue
 2. Flake input evaluation timing problem
 3. Temporary nixpkgs regression (self-resolved)
@@ -278,11 +308,13 @@ $ tsgolint --version
 6. Home Manager eager evaluation before platform filtering
 
 **Resolution**:
+
 - Second `just switch` succeeded without errors
 - No code changes required
 - Configuration deployed successfully
 
 **Preventive Measures**:
+
 - Monitor for recurrence with other Linux-only packages
 - Consider adding platform-specific build tests
 - Investigate nix-darwin evaluation behavior
@@ -295,11 +327,13 @@ $ tsgolint --version
 ### Cross-Platform Consistency ✅
 
 **Package Locations**:
+
 - `platforms/common/packages/base.nix` (line 111)
 - Both oxlint and tsgolint already present at lines 109-110
 - Added oxfmt at line 111
 
 **Platform Guards**:
+
 - `essentialPackages`: Cross-platform (no guards)
 - `developmentPackages`: Cross-platform (no guards)
 - `linuxUtilities`: Linux-only with `lib.optionals stdenv.isLinux`
@@ -309,6 +343,7 @@ $ tsgolint --version
   - Linux: None (all in separate desktop configs)
 
 **Package Merging**:
+
 - Final system packages: `essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities`
 - Platform-specific lists properly excluded via `lib.optionals`
 - lm_sensors in `linuxUtilities` excluded from Darwin
@@ -318,11 +353,13 @@ $ tsgolint --version
 ### Home Manager Configuration ✅
 
 **Module Structure**:
+
 - `platforms/darwin/home.nix`: Imports `../common/home-base.nix`
 - `platforms/nixos/users/home.nix`: Imports `../../common/home-base.nix`
 - Both platforms share common program configurations
 
 **Common Programs**:
+
 - Fish shell (`platforms/common/programs/fish.nix`)
 - Zsh shell (`platforms/common/programs/zsh.nix`)
 - Bash shell (`platforms/common/programs/bash.nix`)
@@ -337,6 +374,7 @@ $ tsgolint --version
 - uBlock filters (`platforms/common/programs/ublock-filters.nix`)
 
 **Platform-Specific Programs**:
+
 - NixOS only: Hyprland desktop, Waybar, etc.
 - Darwin only: Platform-specific shell aliases
 
@@ -354,6 +392,7 @@ $ tsgolint --version
 **Duration**: ~30 seconds
 
 **Output Summary**:
+
 ```
 ✅ Fast configuration test passed
 
@@ -374,6 +413,7 @@ warning: The check omitted these incompatible systems: x86_64-linux
 ```
 
 **Notes**:
+
 - All Darwin configurations validated
 - NixOS configuration syntax validated (even though running on Darwin)
 - x86_64-linux build omitted (expected - not running on Linux)
@@ -387,6 +427,7 @@ warning: The check omitted these incompatible systems: x86_64-linux
 **Duration**: ~8 minutes
 
 **Build Summary**:
+
 - Nix expressions evaluated: ✅
 - Derivations built: ✅
 - System configuration applied: ✅
@@ -396,6 +437,7 @@ warning: The check omitted these incompatible systems: x86_64-linux
 - User defaults applied: ✅
 
 **Launchd Services Activated**:
+
 - ActivityWatch service (if enabled)
 - Other user services configured via Home Manager
 
@@ -404,6 +446,7 @@ warning: The check omitted these incompatible systems: x86_64-linux
 ### Package Installation Test ✅
 
 **Test 1: oxfmt**
+
 ```bash
 $ which oxfmt
 /run/current-system/sw/bin/oxfmt
@@ -411,9 +454,11 @@ $ which oxfmt
 $ oxfmt --version
 Version: 0.23.0
 ```
+
 **Status**: ✅ PASSED
 
 **Test 2: oxlint**
+
 ```bash
 $ which oxlint
 /run/current-system/sw/bin/oxlint
@@ -421,9 +466,11 @@ $ which oxlint
 $ oxlint --version
 Version: 1.38.0
 ```
+
 **Status**: ✅ PASSED
 
 **Test 3: tsgolint**
+
 ```bash
 $ which tsgolint
 /run/current-system/sw/bin/tsgolint
@@ -441,6 +488,7 @@ Options:
     --list-files      List matched files
     -h, --help        Show help
 ```
+
 **Status**: ✅ PASSED
 
 **Result**: All three Oxc tools successfully installed and verified
@@ -452,12 +500,14 @@ Options:
 ### Performance Improvements
 
 **oxlint vs ESLint**:
+
 - Claimed speedup: 50-100x faster
 - Rule count: 570+ rules out of box
 - Zero configuration needed for basic use
 - Type-aware linting when combined with tsgolint
 
 **oxfmt vs Prettier**:
+
 - Claimed speedup: 50-100x faster
 - Prettier-compatible output
 - Rust-based implementation for performance
@@ -468,18 +518,21 @@ Options:
 ### Developer Experience Improvements
 
 **Unified Oxc Toolchain**:
+
 - All three tools from same project (oxc-project)
 - Consistent CLI design and usage patterns
 - Integrated workflow: format → lint → fix
 - Single dependency management via Nix
 
 **Declarative Management**:
+
 - No manual npm/bun installations required
 - Atomic updates via `just update && just switch`
 - Cross-platform consistency (macOS + NixOS)
 - Version pinning via nixpkgs
 
 **Integration Readiness**:
+
 - Tools installed system-wide
 - Available in all shells immediately
 - Editor integration straightforward
@@ -488,6 +541,7 @@ Options:
 ### Maintenance Benefits
 
 **Zero Maintenance Overhead**:
+
 - No custom packages to maintain
 - No Cargo.lock tracking required
 - No hash updates needed
@@ -495,6 +549,7 @@ Options:
 - Official nixpkgs packages
 
 **Automated Updates**:
+
 - Track nixpkgs-unstable for latest versions
 - `just update` pulls all tool updates
 - Atomic rollbacks if needed
@@ -764,6 +819,7 @@ The Oxc tools integration project has been completed successfully. All three too
 ### Next Phase
 
 The next phase focuses on integration, testing, and team adoption:
+
 - Integration testing with real codebases
 - Editor configuration for seamless development
 - Pre-commit hooks for automated quality enforcement

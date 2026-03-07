@@ -14,6 +14,7 @@
 **Key Finding:** The Setup-Mac project has a **CORRECT and COMPLETE** GPU configuration for NixOS. The `targets.genericLinux.enable = true` option is only needed when running Home Manager in **standalone mode** on **non-NixOS Linux distributions** (e.g., Arch, Ubuntu, Fedora).
 
 **Current Status:**
+
 - ✅ AMD GPU properly configured at NixOS system level
 - ✅ Hyprland Home Manager module enabled with systemd integration
 - ✅ GPU access working via `hardware.graphics` configuration
@@ -30,12 +31,14 @@
 This option is part of Home Manager's `targets` module and is designed to enable Linux-specific configurations when running Home Manager in **standalone mode** on non-NixOS systems.
 
 **When to Use:**
+
 - Running Home Manager on Arch Linux
 - Running Home Manager on Ubuntu, Debian, Fedora
 - Running Home Manager on other generic Linux distributions
 - Needing FHS (Filesystem Hierarchy Standard) compliance for GPU access
 
 **When NOT to Use:**
+
 - Running on **NixOS** (this is a complete Linux distribution)
 - Running Home Manager integrated with NixOS system configuration
 - When GPU access is already configured at system level
@@ -47,6 +50,7 @@ This option is part of Home Manager's `targets` module and is designed to enable
 **Reason 1: NixOS is a Complete Linux Distribution**
 
 Unlike generic Linux distributions where Home Manager needs to bridge FHS paths, NixOS provides:
+
 - Full system-level configuration
 - Native GPU driver support
 - Built-in hardware abstraction
@@ -73,6 +77,7 @@ services.xserver.videoDrivers = ["amdgpu"];
 ```
 
 This system-level configuration provides:
+
 - GPU driver loading (amdgpu)
 - OpenGL/Vulkan support (Mesa)
 - Video acceleration (libva, VDPAU)
@@ -93,6 +98,7 @@ wayland.windowManager.hyprland = {
 ```
 
 The `systemd.enable = true` option ensures:
+
 - Hyprland runs as a systemd user service
 - Proper GPU device access via systemd
 - Clean session management
@@ -112,6 +118,7 @@ environment.sessionVariables = {
 ```
 
 These variables are set at **NixOS system level**, making them available to:
+
 - All systemd services (including Hyprland)
 - All user sessions
 - All applications
@@ -124,27 +131,27 @@ These variables are set at **NixOS system level**, making them available to:
 
 **File:** `platforms/nixos/hardware/amd-gpu.nix`
 
-| Component | Status | Details |
-|-----------|---------|---------|
-| GPU Driver | ✅ CONFIGURED | `services.xserver.videoDrivers = ["amdgpu"]` |
-| OpenGL/Vulkan | ✅ ENABLED | `hardware.graphics` with Mesa packages |
-| 32-bit Support | ✅ ENABLED | `enable32Bit = true` for Steam/games |
-| OpenCL | ✅ ENABLED | `rocmPackages.clr.icd` |
-| Video Acceleration | ✅ ENABLED | `libva`, `libvdpau-va-gl` |
-| Environment Variables | ✅ SET | `LIBVA_DRIVER_NAME`, `AMD_VULKAN_ICD`, etc. |
-| Monitoring Tools | ✅ INSTALLED | `amdgpu_top`, `corectrl`, `vulkan-tools` |
+| Component             | Status        | Details                                      |
+| --------------------- | ------------- | -------------------------------------------- |
+| GPU Driver            | ✅ CONFIGURED | `services.xserver.videoDrivers = ["amdgpu"]` |
+| OpenGL/Vulkan         | ✅ ENABLED    | `hardware.graphics` with Mesa packages       |
+| 32-bit Support        | ✅ ENABLED    | `enable32Bit = true` for Steam/games         |
+| OpenCL                | ✅ ENABLED    | `rocmPackages.clr.icd`                       |
+| Video Acceleration    | ✅ ENABLED    | `libva`, `libvdpau-va-gl`                    |
+| Environment Variables | ✅ SET        | `LIBVA_DRIVER_NAME`, `AMD_VULKAN_ICD`, etc.  |
+| Monitoring Tools      | ✅ INSTALLED  | `amdgpu_top`, `corectrl`, `vulkan-tools`     |
 
 ### ✅ User-Level Configuration (Home Manager)
 
 **File:** `platforms/nixos/desktop/hyprland.nix`
 
-| Component | Status | Details |
-|-----------|---------|---------|
-| Hyprland | ✅ ENABLED | `wayland.windowManager.hyprland.enable = true` |
-| Systemd Integration | ✅ ENABLED | `systemd.enable = true` |
-| Xwayland | ✅ ENABLED | `xwayland.enable = true` |
-| Plugins | ✅ CONFIGURED | hyprwinwrap, hy3, hyprsplit |
-| Type Safety | ✅ ENABLED | HyprlandTypes validation |
+| Component           | Status        | Details                                        |
+| ------------------- | ------------- | ---------------------------------------------- |
+| Hyprland            | ✅ ENABLED    | `wayland.windowManager.hyprland.enable = true` |
+| Systemd Integration | ✅ ENABLED    | `systemd.enable = true`                        |
+| Xwayland            | ✅ ENABLED    | `xwayland.enable = true`                       |
+| Plugins             | ✅ CONFIGURED | hyprwinwrap, hy3, hyprsplit                    |
+| Type Safety         | ✅ ENABLED    | HyprlandTypes validation                       |
 
 ### ✅ Import Structure
 
@@ -288,6 +295,7 @@ targets.genericLinux.enable = true;
 ```
 
 **Analysis:**
+
 - ✅ No GPU variables at user level (correct - they're in `amd-gpu.nix`)
 - ✅ Wayland variables for user applications (appropriate)
 - ✅ Hyprland config imported correctly
@@ -357,6 +365,7 @@ targets.genericLinux.enable = true;
 ```
 
 **Analysis:**
+
 - ✅ Hyprland properly enabled
 - ✅ Systemd integration enabled (critical for GPU access)
 - ✅ Xwayland enabled
@@ -406,6 +415,7 @@ targets.genericLinux.enable = true;
 ```
 
 **Analysis:**
+
 - ✅ GPU driver configured
 - ✅ Full graphics stack enabled (OpenGL, Vulkan, OpenCL, video accel)
 - ✅ Environment variables set at system level
@@ -418,12 +428,14 @@ targets.genericLinux.enable = true;
 ### 1. NixOS vs Standalone Home Manager
 
 **NixOS:**
+
 - System-level GPU configuration via `hardware.graphics`
 - Home Manager integrated with NixOS system
 - No need for FHS bridging
 - `targets.genericLinux.enable = NOT NEEDED`
 
 **Standalone Home Manager (Arch/Ubuntu/etc.):**
+
 - System GPU drivers installed via package manager (apt/pacman)
 - Home Manager runs independently
 - Need FHS bridging for GPU access
@@ -446,18 +458,19 @@ GPU Hardware (AMD Ryzen AI Max+)
 ```
 
 On NixOS, all layers have GPU access because:
+
 - `hardware.graphics.enable = true` at system level
 - Systemd services inherit system-level configuration
 - No FHS bridging required
 
 ### 3. Correct Scoping Pattern
 
-| Level | GPU Configuration | Current Status | Correct? |
-|--------|------------------|----------------|-----------|
-| System (hardware.graphics) | ✅ YES | ✅ CORRECT |
-| System (environment.vars) | ✅ YES | ✅ CORRECT |
-| User (home.sessionVars) | ❌ NO (GPU vars) | ✅ CORRECT |
-| User (home.packages) | ✅ YES (GPU apps) | ✅ CORRECT |
+| Level                      | GPU Configuration | Current Status | Correct? |
+| -------------------------- | ----------------- | -------------- | -------- |
+| System (hardware.graphics) | ✅ YES            | ✅ CORRECT     |
+| System (environment.vars)  | ✅ YES            | ✅ CORRECT     |
+| User (home.sessionVars)    | ❌ NO (GPU vars)  | ✅ CORRECT     |
+| User (home.packages)       | ✅ YES (GPU apps) | ✅ CORRECT     |
 
 GPU variables are at system level, user variables are for Wayland integration only.
 
@@ -470,6 +483,7 @@ GPU variables are at system level, user variables are for Wayland integration on
 **Action Required:** NONE (current configuration is correct)
 
 **Rationale:**
+
 - NixOS provides system-level GPU configuration
 - This option is for standalone Home Manager on non-NixOS systems
 - Adding it would be redundant and violate NixOS best practices
@@ -479,6 +493,7 @@ GPU variables are at system level, user variables are for Wayland integration on
 **Status:** ✅ No changes needed
 
 **Why Current Setup is Optimal:**
+
 - System-level GPU configuration in `amd-gpu.nix`
 - Home Manager Hyprland configuration in `hyprland.nix`
 - Proper systemd integration enabled
@@ -507,6 +522,7 @@ journalctl -xe | grep -i gpu
 ```
 
 **Expected Results:**
+
 - ✅ `amdgpu` module loaded
 - ✅ GPU devices present (`/dev/dri/card0`, `/dev/dri/renderD128`)
 - ✅ OpenGL renderer shows AMD GPU
@@ -517,13 +533,13 @@ journalctl -xe | grep -i gpu
 
 ## 📊 Comparison Summary
 
-| Configuration | NixOS | Standalone Home Manager |
-|--------------|----------|------------------------|
-| GPU Driver Config | `hardware.graphics` (system) | System package manager |
-| FHS Bridging | ❌ NOT NEEDED | ✅ `targets.genericLinux.enable = true` |
-| Systemd Integration | ✅ Automatic (NixOS) | ✅ `systemd.enable = true` |
-| GPU Environment Vars | `environment.sessionVariables` (system) | May need in `home.sessionVariables` |
-| Type Safety | ✅ NixOS + Home Manager | ✅ Home Manager only |
+| Configuration        | NixOS                                   | Standalone Home Manager                 |
+| -------------------- | --------------------------------------- | --------------------------------------- |
+| GPU Driver Config    | `hardware.graphics` (system)            | System package manager                  |
+| FHS Bridging         | ❌ NOT NEEDED                           | ✅ `targets.genericLinux.enable = true` |
+| Systemd Integration  | ✅ Automatic (NixOS)                    | ✅ `systemd.enable = true`              |
+| GPU Environment Vars | `environment.sessionVariables` (system) | May need in `home.sessionVariables`     |
+| Type Safety          | ✅ NixOS + Home Manager                 | ✅ Home Manager only                    |
 
 ---
 
@@ -535,6 +551,7 @@ journalctl -xe | grep -i gpu
 Many online tutorials and GitHub configs are for **standalone Home Manager** on Arch/Ubuntu.
 
 **Incorrect Pattern for NixOS:**
+
 ```nix
 # ❌ WRONG for NixOS!
 targets.genericLinux.enable = true;
@@ -545,6 +562,7 @@ home.sessionVariables = {
 ```
 
 **Correct Pattern for NixOS:**
+
 ```nix
 # ✅ CORRECT for NixOS!
 # System level (in hardware/amd-gpu.nix):
@@ -569,6 +587,7 @@ environment.sessionVariables = {
 **A:** **NO.**
 
 **Summary:**
+
 - ✅ Current Setup-Mac GPU configuration is **CORRECT and COMPLETE**
 - ✅ `targets.genericLinux.enable = true` is **NOT NEEDED on NixOS**
 - ✅ GPU access is properly configured via `hardware.graphics`
@@ -576,6 +595,7 @@ environment.sessionVariables = {
 - ✅ All GPU environment variables are set at correct scope (system level)
 
 **Recommendation:**
+
 - **NO ACTION REQUIRED** - Current configuration is optimal
 - DO NOT add `targets.genericLinux.enable = true` to NixOS configuration
 - Keep GPU configuration at system level (not user level)

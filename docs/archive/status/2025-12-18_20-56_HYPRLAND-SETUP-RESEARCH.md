@@ -24,6 +24,7 @@ Based on the user's request, we need to address these four key areas:
 From examining `/Users/larsartmann/Desktop/Setup-Mac/platforms/nixos/desktop/hyprland.nix`:
 
 #### Good Foundation:
+
 - **Terminal**: Kitty (configured and working)
 - **App Launcher**: Rofi with show drun and icons
 - **Wallpaper**: Btop running as pseudo-wallpaper via hyprwinwrap
@@ -31,6 +32,7 @@ From examining `/Users/larsartmann/Desktop/Setup-Mac/platforms/nixos/desktop/hyp
 - **Waybar**: Basic configuration exists with modules
 
 #### Current Keybindings:
+
 ```nix
 $mod = SUPER
 $terminal = "kitty"
@@ -50,6 +52,7 @@ $menu = "rofi -show drun -show-icons"
 ```
 
 #### Current Waybar Modules:
+
 - **Left**: Workspaces, Window
 - **Center**: Clock
 - **Right**: Pulseaudio, Network, CPU, Memory, Temperature, Battery, Tray
@@ -59,6 +62,7 @@ $menu = "rofi -show drun -show-icons"
 ## 🚀 Essential Hyprland Shortcuts (Research Findings)
 
 ### 🪟 Window Management
+
 ```
 Mod + Q          - Close active window
 Mod + V          - Toggle floating mode
@@ -87,6 +91,7 @@ Mod + Mouse Scroll      - Scroll through workspaces
 ```
 
 ### 🏠 Workspace Management
+
 ```
 Mod + 1-0        - Switch to workspace 1-10
 Mod + Shift + 1-0 - Move window to workspace 1-10
@@ -96,6 +101,7 @@ Mod + Shift + S  - Move to special workspace
 ```
 
 ### 🚀 Application Launching
+
 ```
 Mod + T/Enter    - Launch terminal
 Mod + Space/R    - Launch app menu/launcher
@@ -107,6 +113,7 @@ Alt + V          - Open clipboard manager
 ```
 
 ### ⚙️ System Controls
+
 ```
 Mod + L          - Lock screen
 Mod + Shift + R  - Reload Hyprland configuration
@@ -121,7 +128,9 @@ Mod + Shift + E  - Launch power menu
 ## 💻 Desktop Console Setup Strategy
 
 ### Current State Analysis
+
 The config already has Btop running as a pseudo-wallpaper using `hyprwinwrap` plugin:
+
 ```nix
 exec-once = ["kitty --class btop-bg --hold -e btop"]
 ```
@@ -129,7 +138,9 @@ exec-once = ["kitty --class btop-bg --hold -e btop"]
 ### Recommended Enhancements
 
 #### 1. Multiple Desktop Terminals
+
 Add multiple specialized terminals:
+
 ```nix
 exec-once = [
   "kitty --class btop-bg --hold -e btop"                    # Current
@@ -140,6 +151,7 @@ exec-once = [
 ```
 
 #### 2. Window Rules for Desktop Terminals
+
 ```nix
 windowrulev2 = [
   # Btop (existing)
@@ -167,6 +179,7 @@ windowrulev2 = [
 ```
 
 #### 3. Keybindings for Desktop Consoles
+
 ```nix
 bind = [
   "$mod, B, togglefloating, class:^(btop-bg)$"      # Toggle Btop visibility
@@ -181,9 +194,11 @@ bind = [
 ## 🎨 Superb Waybar Enhancements
 
 ### Current Analysis
+
 The existing Waybar setup is solid but can be significantly enhanced with:
 
 #### 1. Additional Modules
+
 ```nix
 modules-left = [
   "hyprland/workspaces"
@@ -212,6 +227,7 @@ modules-right = [
 ```
 
 #### 2. Enhanced Styling
+
 - **Glass-morphism effects** with backdrop blur
 - **Gradient backgrounds** for different module types
 - **Hover animations** and transitions
@@ -219,6 +235,7 @@ modules-right = [
 - **Dark/light theme switching**
 
 #### 3. Custom Modules
+
 ```nix
 "custom/media" = {
   format = "{icon} {}";
@@ -251,41 +268,49 @@ modules-right = [
 ### 🏆 Must-Have Tools
 
 #### Status Bar Alternatives
+
 1. **HyprPanel** - Modern GTK4 panel with context menus
 2. **ironbar** - Highly customizable GTK status bar
 3. **eww** - ElKowars wacky widgets (highly customizable)
 
 #### Application Launchers
+
 1. **walker** - Wayland native, highly customizable runner
 2. **anyrun** - Krunner-like launcher for Wayland
 3. **tofi** - Very tiny rofi-inspired menu
 
 #### Wallpaper Tools
+
 1. **swww** - Animated wallpapers with transitions and GIF support
 2. **mpvpaper** - Video wallpapers via MPV
 3. **hyprwall** - GUI for multiple wallpaper backends
 
 #### Screenshots & Annotation
+
 1. **satty** - Screenshot annotation tool (modern alternative to Flameshot)
 2. **Watershot** - Simple wayland native screenshot tool
 3. **hyprmarker** - ZoomIt-inspired annotation tool
 
 #### Window Management Enhancements
+
 1. **hyprnome** - GNOME-like workspace switching
 2. **hyprswitch** - Window switcher with GUI
 3. **hyprdim** - Auto-dim inactive windows
 
 #### Display & Eye Care
+
 1. **hyprshade** - Frontend to Hyprland's screen shader feature
 2. **wluma** - Auto-adjust brightness based on ambient light
 3. **Hyprlux** - Auto-gamma adjustment and vibrance toggle
 
 ### 🎨 Visual Enhancements
+
 1. **waycorner** - Hot corners for Wayland
 2. **hyproled** - Shader utility to prevent OLED burn-in
 3. **swww** + **waypaper-engine** - Advanced wallpaper management
 
 ### 🔧 System Utilities
+
 1. **Hyprkeys** - Utility for managing keybinds
 2. **clipvault** - Enhanced clipboard manager
 3. **vigiland** - Idle inhibitor utility
@@ -295,17 +320,20 @@ modules-right = [
 ## 🎯 Implementation Priority Matrix
 
 ### 🔥 **Critical (Implement First)**
+
 1. **Enhanced shortcuts** - Add missing essential keybindings
 2. **Desktop terminals** - Implement multiple console setup
 3. **Waybar modules** - Add custom modules for better functionality
 
 ### ⚡ **High Priority**
+
 1. **swww** - Animated wallpapers with transitions
 2. **walker** or **anyrun** - Modern app launcher
 3. **satty** - Modern screenshot annotation
 4. **HyprPanel** - Advanced status bar (alternative to Waybar)
 
 ### 🌟 **Nice to Have**
+
 1. **hyprnome** - GNOME workspace switching
 2. **waycorner** - Hot corners
 3. **hyprshade** - Screen shaders for eye care
@@ -316,16 +344,19 @@ modules-right = [
 ## 📁 Next Implementation Steps
 
 ### Phase 1: Foundation Enhancement
+
 1. **Update Hyprland shortcuts** with comprehensive keybinding set
 2. **Implement desktop consoles** with multiple terminal types
 3. **Enhance Waybar** with custom modules and styling
 
 ### Phase 2: Visual Polish
+
 1. **Add swww** for animated wallpapers
 2. **Install modern launcher** (walker/anyrun)
 3. **Implement screenshot tool** (satty)
 
 ### Phase 3: Advanced Features
+
 1. **Add workspace enhancements** (hyprnome)
 2. **Implement hot corners** (waycorner)
 3. **Add screen shaders** (hyprshade)
@@ -335,11 +366,13 @@ modules-right = [
 ## 🔧 Configuration Files to Modify
 
 ### Primary Files:
+
 - `/platforms/nixos/desktop/hyprland.nix` - Main config
 - `/platforms/nixos/desktop/waybar.nix` - Status bar
 - `/platforms/nixos/system/configuration.nix` - System packages
 
 ### New Files to Create:
+
 - `/platforms/nixos/desktop/custom-waybar-modules.nix` - Custom Waybar modules
 - `/platforms/nixos/desktop/desktop-terminals.nix` - Desktop console config
 - `/platforms/nixos/desktop/shortcuts.nix` - Enhanced keybindings
@@ -349,11 +382,13 @@ modules-right = [
 ## 🚨 Important Considerations
 
 ### Performance Impact
+
 - **Desktop terminals**: Multiple background terminals add minimal overhead
 - **Animated wallpapers**: swww has low resource usage when optimized
 - **Custom Waybar modules**: Lightweight and efficient
 
 ### Integration Notes
+
 - **NixOS compatibility**: All recommended tools have Nix packages available
 - **Hyprland compatibility**: All tools specifically support Hyprland
 - **GPU acceleration**: Most tools leverage GPU for smooth performance
@@ -381,6 +416,6 @@ The setup will be both **functional** and **visually impressive**, creating a pr
 
 ---
 
-*Generated by Crush AI Assistant*
-*Setup-Mac Project*
-*Last Updated: 2025-12-18 20:56 CET*
+_Generated by Crush AI Assistant_
+_Setup-Mac Project_
+_Last Updated: 2025-12-18 20:56 CET_

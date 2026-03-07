@@ -21,11 +21,13 @@
 ### Package Distribution
 
 **Nix (Platform-Agnostic):**
+
 - All CLI tools: bat, fish, starship, ripgrep, etc.
 - Development toolchains: Go, Node.js, Python, Rust
 - System utilities
 
 **Homebrew (macOS-Specific):**
+
 - ActivityWatch (pynput broken in Nix on macOS)
 - Sublime Text (better macOS integration)
 - JetBrains Toolbox (manages multiple IDEs)
@@ -33,6 +35,7 @@
 ### Why This Split?
 
 **Pragmatic choice, not ideological:**
+
 1. Some packages broken/problematic in nixpkgs on macOS
 2. Homebrew provides better macOS integration for GUI apps
 3. Official binaries often more stable than Nix-packaged versions
@@ -46,17 +49,18 @@
 
 **GOOD NEWS:** All current Homebrew casks exist in nixpkgs!
 
-| macOS (Homebrew) | NixOS (nixpkgs) | Status |
-|------------------|-----------------|--------|
-| `activitywatch` | `pkgs.activitywatch` | ✅ Available |
-| `sublime-text` | `pkgs.sublime4` | ✅ Available |
-| `jetbrains-toolbox` | `pkgs.jetbrains.*` | ✅ Available |
+| macOS (Homebrew)    | NixOS (nixpkgs)      | Status       |
+| ------------------- | -------------------- | ------------ |
+| `activitywatch`     | `pkgs.activitywatch` | ✅ Available |
+| `sublime-text`      | `pkgs.sublime4`      | ✅ Available |
+| `jetbrains-toolbox` | `pkgs.jetbrains.*`   | ✅ Available |
 
 **Migration Effort:** LOW (all packages exist)
 
 ### Step 2: Configuration Portability
 
 **Platform-Agnostic Configs:**
+
 ```
 dotfiles/
   activitywatch/      # Works on both platforms
@@ -187,6 +191,7 @@ in
 ```
 
 **Benefits:**
+
 1. **Configurations portable** - Same dotfiles work everywhere
 2. **Installation abstracted** - Platform layer handles differences
 3. **Easy migration** - Change one import, everything works
@@ -202,6 +207,7 @@ in
 **Impact:** Blocks all Nix deployments
 
 **Options:**
+
 - A) Homebrew cask (5 min, works immediately)
 - B) Override broken flag (30-60 min, risky)
 - C) Python 3.12 override (1-2 hours, complex)
@@ -209,6 +215,7 @@ in
 ### Decision: Option A (Homebrew)
 
 **Rationale:**
+
 1. ✅ **Unblocks development** - 5 minute fix
 2. ✅ **Zero maintenance** - Official binary, auto-updates
 3. ✅ **Doesn't block NixOS migration** - `pkgs.activitywatch` exists for Linux
@@ -218,6 +225,7 @@ in
 ### NixOS Migration Impact: NONE
 
 **On NixOS:**
+
 ```nix
 # Simply use nixpkgs package
 environment.systemPackages = [ pkgs.activitywatch ];
@@ -231,6 +239,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### Long-Term Sustainability
 
 **Scenario 1: pynput gets fixed in nixpkgs (likely)**
+
 ```nix
 # macOS: Switch from Homebrew to Nix
 # Simply remove from homebrew.nix, add to environment.nix
@@ -238,6 +247,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ```
 
 **Scenario 2: pynput stays broken (unlikely)**
+
 ```nix
 # macOS: Continue using Homebrew
 # NixOS: Use nixpkgs (works fine on Linux)
@@ -253,6 +263,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### Use Nix (Both Platforms)
 
 **When:**
+
 - CLI tools (always prefer Nix)
 - Open-source with stable Nix packages
 - Development toolchains
@@ -263,6 +274,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### Use Homebrew on macOS, Nix on NixOS
 
 **When:**
+
 - Package broken in Nix on macOS
 - Commercial software with better integration
 - GUI apps with complex dependencies
@@ -273,6 +285,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### Avoid (Both Platforms)
 
 **Never use if:**
+
 - Doesn't exist in nixpkgs for NixOS
 - Would require platform-specific configuration
 - Creates vendor lock-in
@@ -286,21 +299,25 @@ environment.systemPackages = [ pkgs.activitywatch ];
 **Goal:** Ensure configs work on both platforms
 
 **Phase 1: Documentation (v0.1.0 - NOW)**
+
 - ✅ Document cross-platform strategy
 - ✅ Create platform package mapping
 - ✅ Record all platform-specific decisions
 
 **Phase 2: Abstraction (v0.2.0)**
+
 - [ ] Create Platform.nix
 - [ ] Make homebrew.nix conditional
 - [ ] Update environment.nix to use platform abstraction
 
 **Phase 3: Testing (v0.2.0)**
+
 - [ ] GitHub Actions: Build on both platforms
 - [ ] NixOS VM: Test actual migration
 - [ ] Document any migration issues
 
 **Phase 4: Validation (v0.3.0)**
+
 - [ ] Real NixOS migration test
 - [ ] Verify all configs work
 - [ ] Update documentation
@@ -336,6 +353,7 @@ jobs:
 **Create:** `docs/decisions/YYYY-MM-DD-package-name.md`
 
 **Template:**
+
 ```markdown
 # Decision: [Package] Installation Method
 
@@ -344,30 +362,38 @@ jobs:
 **Status:** Active
 
 ## Context
+
 Why platform-specific handling?
 
 ## Decision
+
 - macOS: [Method & Reason]
 - NixOS: [Method & Reason]
 
 ## Consequences
+
 ### Positive
+
 - Unblocks development
 - Uses best tool for platform
 - Documented migration path
 
 ### Negative
+
 - Hybrid package management
 - Need to maintain mapping
 
 ### NixOS Migration Impact
+
 LOW/MEDIUM/HIGH - Explain
 
 ## Alternatives Considered
+
 1. Option A: ...
 2. Option B: ...
 
 ## Review Date
+
 When to reconsider?
 ```
 
@@ -376,6 +402,7 @@ When to reconsider?
 **Maintain:** `docs/architecture/platform-package-mapping.md`
 
 Update whenever:
+
 - Adding new GUI app
 - Changing installation method
 - Discovering package availability
@@ -394,6 +421,7 @@ Update whenever:
 ### Migration Steps
 
 **Step 1: Backup macOS State**
+
 ```bash
 # List current Homebrew packages
 brew list --cask > /tmp/macos-packages.txt
@@ -403,24 +431,28 @@ tar -czf /tmp/macos-dotfiles-backup.tar.gz ~/.config
 ```
 
 **Step 2: Install NixOS**
+
 ```bash
 # Standard NixOS installation
 # Partition, format, install
 ```
 
 **Step 3: Clone Dotfiles**
+
 ```bash
 git clone https://github.com/user/Setup-Mac.git ~/dotfiles
 cd ~/dotfiles
 ```
 
 **Step 4: Build NixOS Configuration**
+
 ```bash
 # Platform.nix automatically detects NixOS
 sudo nixos-rebuild switch --flake .
 ```
 
 **Step 5: Verify**
+
 ```bash
 # All GUI apps should work
 activitywatch --version
@@ -432,6 +464,7 @@ fish --version
 ```
 
 **Step 6: Restore Configs**
+
 ```bash
 # Configs already in dotfiles/, just verify
 ls ~/.config/activitywatch

@@ -18,6 +18,7 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 ## 🎯 Objectives
 
 ### Primary Goals
+
 1. ✅ Integrate Home Manager into Darwin configuration
 2. ✅ Enable cross-platform program configuration sharing
 3. ✅ Migrate Darwin-specific shell configs to Home Manager
@@ -25,15 +26,16 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 5. ⚠️ Verify configuration builds and applies successfully
 
 ### Success Criteria
-| Criterion | Status | Notes |
-|------------|----------|---------|
-| Home Manager module added to Darwin | ✅ COMPLETE | Line 103 in flake.nix |
-| Darwin home.nix created | ✅ COMPLETE | Full configuration with platform overrides |
-| Shell configs migrated | ✅ COMPLETE | Fish moved from nix-darwin to Home Manager |
-| Starship/Tmux configured | ✅ COMPLETE | Imported via home-base.nix |
-| Configuration builds successfully | ⚠️ BLOCKED | Hung processes preventing verification |
-| Programs work correctly | ⚠️ PENDING | Depends on successful build |
-| Cross-platform consistency verified | ⚠️ PENDING | Depends on successful build |
+
+| Criterion                           | Status      | Notes                                      |
+| ----------------------------------- | ----------- | ------------------------------------------ |
+| Home Manager module added to Darwin | ✅ COMPLETE | Line 103 in flake.nix                      |
+| Darwin home.nix created             | ✅ COMPLETE | Full configuration with platform overrides |
+| Shell configs migrated              | ✅ COMPLETE | Fish moved from nix-darwin to Home Manager |
+| Starship/Tmux configured            | ✅ COMPLETE | Imported via home-base.nix                 |
+| Configuration builds successfully   | ⚠️ BLOCKED  | Hung processes preventing verification     |
+| Programs work correctly             | ⚠️ PENDING  | Depends on successful build                |
+| Cross-platform consistency verified | ⚠️ PENDING  | Depends on successful build                |
 
 ---
 
@@ -42,12 +44,14 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 ### 1. Architecture Research & Design (100%)
 
 **Research Findings:**
+
 - Nix-darwin DOES support Home Manager via `inputs.home-manager.darwinModules.home-manager`
 - Community best practice: Use Home Manager for user programs, nix-darwin for system settings
 - Setup-Mac already has correct architecture for NixOS (proven working pattern)
 - Decision: Replicate NixOS pattern for Darwin
 
 **Architectural Benefits:**
+
 1. **Code Reuse:** Single `platforms/common/home-base.nix` serves both platforms
 2. **Separation of Concerns:** System vs user-level configuration clearly separated
 3. **Maintainability:** Changes to programs apply to both platforms automatically
@@ -58,6 +62,7 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 #### Created Files
 
 **`platforms/darwin/home.nix`** (NEW)
+
 ```nix
 {config, pkgs, ...}: {
   imports = [../../common/home-base.nix];
@@ -78,6 +83,7 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 ```
 
 **Key Features:**
+
 - Imports common Home Manager base configuration
 - Provides platform-specific Fish aliases (Darwin rebuild commands)
 - Extensible for Darwin-specific packages and variables
@@ -86,6 +92,7 @@ Successfully implemented Home Manager integration for macOS (Darwin) to enable c
 #### Modified Files
 
 **`flake.nix`** (Lines 102-114)
+
 ```nix
 modules = [
   # NEW: Import Home Manager module for Darwin
@@ -108,11 +115,13 @@ modules = [
 ```
 
 **`platforms/darwin/default.nix`** (Line 6)
+
 ```diff
 -   ./programs/shells.nix  # REMOVED: Moved to Home Manager
 ```
 
 **Rationale:**
+
 - Shell configuration now managed by Home Manager (via `home-base.nix`)
 - Eliminates duplicate Fish configuration management
 - Removes manual `starship init fish` from nix-darwin shellInit
@@ -158,6 +167,7 @@ platforms/
 #### Configuration Flow
 
 **Darwin (macOS):**
+
 ```
 flake.nix
   └── darwinSystem
@@ -175,6 +185,7 @@ Result: Starship, Tmux, Fish configured identically on both platforms
 ```
 
 **NixOS:**
+
 ```
 flake.nix
   └── nixosSystem
@@ -194,6 +205,7 @@ Result: Same shared program configurations
 ### 4. Git Staging (90%)
 
 **Staged Files:**
+
 ```bash
 new file:   platforms/darwin/home.nix
 new file:   platforms/common/home-base.nix
@@ -204,12 +216,14 @@ new file:   platforms/common/programs/activitywatch.nix
 ```
 
 **Modified Files (Not Staged):**
+
 ```bash
 modified:   flake.nix
 modified:   platforms/darwin/default.nix
 ```
 
 **Git Status Output:**
+
 ```
 Changes to be committed:
   (use "git restore --staged <file>..." to unstage)
@@ -228,6 +242,7 @@ Changes not staged for commit:
 ### Critical Blocker: Hung Nix Processes
 
 **Symptoms:**
+
 1. `nix flake update` runs for 15+ minutes (expected: < 30 seconds)
 2. `just test` command moves to background instead of executing
 3. Cannot see build output (success/failure)
@@ -235,6 +250,7 @@ Changes not staged for commit:
 5. Cannot complete build verification
 
 **Processes Currently Running:**
+
 ```
 PID 30900: nix flake update (15+ minutes) - HUNG
 PID 31177: grep processes (ongoing) - SPINNING
@@ -243,6 +259,7 @@ Background Job 027: just test (moved to background) - HUNG
 ```
 
 **Impact:**
+
 - 🔴 Cannot verify configuration builds successfully
 - 🔴 Cannot apply configuration (`just switch`)
 - 🔴 Cannot test program functionality (Starship, Tmux)
@@ -250,6 +267,7 @@ Background Job 027: just test (moved to background) - HUNG
 - 🔴 Entire implementation blocked
 
 **Attempts Made:**
+
 1. ✅ Verified all files exist (`ls -la`)
 2. ✅ Verified file permissions (readable)
 3. ✅ Staged files in git
@@ -258,6 +276,7 @@ Background Job 027: just test (moved to background) - HUNG
 6. ❌ Standard output redirection (`2>&1 | tail`) - command moved to background
 
 **Root Cause (Suspected):**
+
 - Nix flake evaluation is caching stale paths
 - Files are staged but Nix not picking up changes
 - Possible Nix store corruption or garbage collection needed
@@ -266,6 +285,7 @@ Background Job 027: just test (moved to background) - HUNG
 ### Secondary Issue: Build Time
 
 **Current State:**
+
 - `just test` (darwin-rebuild check) takes > 10 minutes
 - Early syntax validation would be faster
 - Need incremental testing strategy
@@ -276,21 +296,22 @@ Background Job 027: just test (moved to background) - HUNG
 
 ### Implementation Progress
 
-| Component | Status | % Complete |
-|------------|----------|-------------|
-| Architecture Research | ✅ Complete | 100% |
-| Code Implementation | ✅ Complete | 100% |
-| File Creation | ✅ Complete | 100% |
-| File Modification | ✅ Complete | 100% |
-| Git Staging | 🟡 Partial | 90% |
-| Build Verification | 🔴 Blocked | 0% |
-| Testing | 🔴 Blocked | 0% |
-| Documentation | 🔴 Not Started | 0% |
-| **Overall** | **🟡 In Progress** | **~85%** |
+| Component             | Status             | % Complete |
+| --------------------- | ------------------ | ---------- |
+| Architecture Research | ✅ Complete        | 100%       |
+| Code Implementation   | ✅ Complete        | 100%       |
+| File Creation         | ✅ Complete        | 100%       |
+| File Modification     | ✅ Complete        | 100%       |
+| Git Staging           | 🟡 Partial         | 90%        |
+| Build Verification    | 🔴 Blocked         | 0%         |
+| Testing               | 🔴 Blocked         | 0%         |
+| Documentation         | 🔴 Not Started     | 0%         |
+| **Overall**           | **🟡 In Progress** | **~85%**   |
 
 ### Tasks Breakdown
 
 #### Phase 1: Research & Design (COMPLETED)
+
 - [x] Analyze Home Manager vs nix-darwin options
 - [x] Research NixOS Home Manager integration pattern
 - [x] Catalog Home Manager modules in platforms/common/
@@ -298,6 +319,7 @@ Background Job 027: just test (moved to background) - HUNG
 - [x] Design directory structure
 
 #### Phase 2: Implementation (COMPLETED)
+
 - [x] Create platforms/darwin/home.nix
 - [x] Add Home Manager module to flake.nix
 - [x] Update platforms/darwin/default.nix (remove shells import)
@@ -305,6 +327,7 @@ Background Job 027: just test (moved to background) - HUNG
 - [x] Configure platform-specific session variables
 
 #### Phase 3: Verification (BLOCKED)
+
 - [ ] Stage modified files (flake.nix, darwin/default.nix)
 - [ ] Run nix flake check --no-build
 - [ ] Run darwin-rebuild check --flake .
@@ -313,6 +336,7 @@ Background Job 027: just test (moved to background) - HUNG
 - [ ] Fix any errors found
 
 #### Phase 4: Testing (BLOCKED)
+
 - [ ] Run just switch
 - [ ] Apply configuration to system
 - [ ] Verify Starship prompt works
@@ -322,6 +346,7 @@ Background Job 027: just test (moved to background) - HUNG
 - [ ] Verify no duplicate configurations
 
 #### Phase 5: Documentation & Cleanup (NOT STARTED)
+
 - [ ] Update AGENTS.md with architecture rules
 - [ ] Create Architecture Decision Record (ADR)
 - [ ] Create module template documentation
@@ -392,9 +417,11 @@ Background Job 027: just test (moved to background) - HUNG
 ### Immediate (System-Level Intervention Required)
 
 #### 1. Resolve Hung Processes (CRITICAL)
+
 **Estimated Time:** 5-10 minutes
 
 **Actions Required:**
+
 ```bash
 # Kill all hung Nix and Just processes
 sudo pkill -9 nix
@@ -410,14 +437,17 @@ sudo nix-collect-garbage -d
 ```
 
 **Expected Outcome:**
+
 - All background processes terminated
 - System ready for fresh build attempt
 - No resource contention
 
 #### 2. Clean Git State (HIGH)
+
 **Estimated Time:** 2-3 minutes
 
 **Actions Required:**
+
 ```bash
 # Stage all modified files
 git add flake.nix platforms/darwin/default.nix
@@ -430,14 +460,17 @@ git diff --cached
 ```
 
 **Expected Outcome:**
+
 - All changes properly staged
 - Clean git state for commit
 - Ready for build verification
 
 #### 3. Fast Syntax Validation (HIGH)
+
 **Estimated Time:** 30-60 seconds
 
 **Actions Required:**
+
 ```bash
 # Validate flake syntax without building
 nix flake check --no-build
@@ -447,14 +480,17 @@ nix-instantiate --eval platforms/darwin/home.nix
 ```
 
 **Expected Outcome:**
+
 - Syntax errors caught quickly
 - Import issues identified
 - Clear path to resolution
 
 #### 4. Full Build Verification (HIGH)
+
 **Estimated Time:** 5-10 minutes
 
 **Actions Required:**
+
 ```bash
 # Build and check configuration
 just test
@@ -464,14 +500,17 @@ darwin-rebuild check --flake .
 ```
 
 **Expected Outcome:**
+
 - Configuration builds successfully
 - No assertion failures
 - Ready to apply
 
 #### 5. Apply Configuration (HIGH)
+
 **Estimated Time:** 5-10 minutes
 
 **Actions Required:**
+
 ```bash
 # Apply to system
 just switch
@@ -481,6 +520,7 @@ sudo darwin-rebuild switch --flake .
 ```
 
 **Expected Outcome:**
+
 - New generation activated
 - Home Manager programs configured
 - Starship and Tmux available
@@ -488,9 +528,11 @@ sudo darwin-rebuild switch --flake .
 ### Post-Deployment (After Build Success)
 
 #### 6. Verify Programs Work (MEDIUM)
+
 **Estimated Time:** 5-10 minutes
 
 **Actions Required:**
+
 ```bash
 # Open new terminal and verify
 starship --version      # Should show version
@@ -513,6 +555,7 @@ tmux new-session
 ```
 
 **Expected Outcome:**
+
 - All programs functional
 - Starship prompt active
 - Tmux sessions work
@@ -520,9 +563,11 @@ tmux new-session
 - Environment variables correct
 
 #### 7. Test NixOS Build (MEDIUM)
+
 **Estimated Time:** 10-15 minutes (on NixOS machine)
 
 **Actions Required:**
+
 ```bash
 # On NixOS machine (evo-x2)
 sudo nixos-rebuild check --flake .#evo-x2
@@ -532,14 +577,17 @@ sudo nixos-rebuild test --flake .#evo-x2
 ```
 
 **Expected Outcome:**
+
 - NixOS configuration still builds
 - Shared modules work on both platforms
 - No regressions from changes
 
 #### 8. Document & Commit (MEDIUM)
+
 **Estimated Time:** 10-15 minutes
 
 **Actions Required:**
+
 ```bash
 # Commit changes
 git commit -m "feat: add Home Manager to Darwin for cross-platform program management
@@ -577,6 +625,7 @@ git push
 ```
 
 **Expected Outcome:**
+
 - Changes committed with detailed message
 - Pushed to remote repository
 - History clear with architecture rationale
@@ -584,9 +633,11 @@ git push
 ### Documentation & Process (Low Priority)
 
 #### 9. Update AGENTS.md (LOW)
+
 **Estimated Time:** 15-20 minutes
 
 **Actions Required:**
+
 ```markdown
 Add to AGENTS.md:
 
@@ -595,6 +646,7 @@ Add to AGENTS.md:
 ### Module Separation
 
 **Home Manager Modules:**
+
 - Location: `platforms/common/programs/`
 - Purpose: User-level program configuration
 - Scope: Programs with Home Manager-specific options
@@ -602,6 +654,7 @@ Add to AGENTS.md:
 - Usage: Import via `platforms/common/home-base.nix`
 
 **nix-darwin Modules:**
+
 - Location: `platforms/darwin/`
 - Purpose: System-level configuration
 - Scope: System services, settings, security
@@ -611,11 +664,13 @@ Add to AGENTS.md:
 ### Cross-Platform Sharing
 
 **Shared Modules:**
+
 - All files in `platforms/common/programs/` are shared
 - Both Darwin and NixOS import via their respective `home.nix` files
 - Platform-specific overrides in each `home.nix`
 
 **Platform-Specific:**
+
 - Darwin: `platforms/darwin/home.nix`
 - NixOS: `platforms/nixos/users/home.nix`
 - Override shared configs with platform-specific aliases, variables, packages
@@ -639,23 +694,28 @@ Add to AGENTS.md:
 ```
 
 **Expected Outcome:**
+
 - Clear architectural guidelines for developers
 - Prevents future mixing of system and user configs
 - Easy to understand module placement
 
 #### 10. Create Architecture Decision Record (ADR) (LOW)
+
 **Estimated Time:** 20-30 minutes
 
 **Actions Required:**
+
 ```markdown
 Create: docs/architecture/adr-001-home-manager-for-darwin.md
 
 # ADR-001: Use Home Manager for Darwin User Programs
 
 ## Status
+
 Accepted
 
 ## Context
+
 Setup-Mac manages both macOS (Darwin) and NixOS systems. Originally, Darwin used nix-darwin-only configuration while NixOS used Home Manager for user programs. This led to:
 
 1. Duplicate configuration (shell configs in both systems)
@@ -664,16 +724,20 @@ Setup-Mac manages both macOS (Darwin) and NixOS systems. Originally, Darwin used
 4. User programs (Starship, Tmux) broken on Darwin
 
 ## Decision
+
 Integrate Home Manager into Darwin configuration to enable cross-platform program configuration sharing.
 
 ## Alternatives Considered
 
 ### Option A: Pure nix-darwin Configuration
+
 **Pros:**
+
 - Simpler (only one system to learn)
 - No additional dependency
 
 **Cons:**
+
 - Limited program configuration options
 - nix-darwin doesn't support `programs.starship` or `programs.tmux`
 - Cannot share configs with NixOS
@@ -682,7 +746,9 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 **Rejected:** nix-darwin lacks necessary options for user program management.
 
 ### Option B: Home Manager for Both Platforms (CHOSEN)
+
 **Pros:**
+
 - Full program configuration support
 - Code reuse across platforms
 - Type safety and validation
@@ -690,13 +756,16 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 - Community best practice
 
 **Cons:**
+
 - Additional dependency to manage
 - Slightly more complex architecture
 
 **Accepted:** Benefits far outweigh costs. Aligns with existing NixOS architecture.
 
 ## Consequences
+
 ### Positive
+
 1. Starship, Tmux, Fish configured identically on both platforms
 2. Changes apply to both platforms automatically
 3. Reduced duplication (~40% less code)
@@ -704,23 +773,27 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 5. Community alignment
 
 ### Negative
+
 1. Slightly more complex (two systems instead of one)
 2. Need to understand both nix-darwin and Home Manager
 3. Additional dependency to maintain
 
 ## Implementation
+
 - Added `inputs.home-manager.darwinModules.home-manager` to Darwin config
 - Created `platforms/darwin/home.nix` (mirrors NixOS pattern)
 - Migrated shell configs from nix-darwin to Home Manager
 - Shared all program modules via `platforms/common/home-base.nix`
 
 ## References
+
 - Research report: docs/research/2025-12-26_home-manager-integration.md
 - NixOS Home Manager integration: flake.nix lines 141-153
 - Community examples: GitHub (multiple nix-darwin + Home Manager projects)
 ```
 
 **Expected Outcome:**
+
 - Architectural decision documented
 - Rationale preserved for future reference
 - Clear traceability of design choices
@@ -731,33 +804,33 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 
 ### Code Quality Metrics
 
-| Metric | Before | After | Change |
-|---------|----------|---------|---------|
-| Lines of duplication (shell config) | ~150 | ~90 | -40% |
-| Platform-specific files | 2 | 2 | No change (proper separation) |
-| Shared program modules | 4 | 4 | No change (already optimal) |
-| Configuration files per platform | 1 (Darwin incomplete) | 2 (both complete) | +100% (completion) |
+| Metric                              | Before                | After             | Change                        |
+| ----------------------------------- | --------------------- | ----------------- | ----------------------------- |
+| Lines of duplication (shell config) | ~150                  | ~90               | -40%                          |
+| Platform-specific files             | 2                     | 2                 | No change (proper separation) |
+| Shared program modules              | 4                     | 4                 | No change (already optimal)   |
+| Configuration files per platform    | 1 (Darwin incomplete) | 2 (both complete) | +100% (completion)            |
 
 ### Functionality Metrics
 
-| Metric | Target | Current | Status |
-|---------|----------|----------|---------|
-| Starship works on Darwin | ✅ | ⚠️ | Pending verification |
-| Tmux works on Darwin | ✅ | ⚠️ | Pending verification |
-| Fish works on Darwin | ✅ | ⚠️ | Pending verification |
-| Build succeeds | ✅ | 🔴 | Blocked by processes |
-| Switch succeeds | ✅ | 🔴 | Blocked by build |
-| Cross-platform consistency | ✅ | ⚠️ | Pending verification |
+| Metric                     | Target | Current | Status               |
+| -------------------------- | ------ | ------- | -------------------- |
+| Starship works on Darwin   | ✅     | ⚠️      | Pending verification |
+| Tmux works on Darwin       | ✅     | ⚠️      | Pending verification |
+| Fish works on Darwin       | ✅     | ⚠️      | Pending verification |
+| Build succeeds             | ✅     | 🔴      | Blocked by processes |
+| Switch succeeds            | ✅     | 🔴      | Blocked by build     |
+| Cross-platform consistency | ✅     | ⚠️      | Pending verification |
 
 ### Timeline Metrics
 
-| Phase | Planned | Actual | Status |
-|--------|----------|----------|---------|
-| Research | 1 hour | 1 hour | ✅ On target |
-| Implementation | 2 hours | 2 hours | ✅ On target |
-| Testing | 1 hour | TBD | 🔴 Blocked |
-| Documentation | 1 hour | TBD | 🔴 Not started |
-| **Total** | **5 hours** | **TBD** | **🟡 ~40% complete** |
+| Phase          | Planned     | Actual  | Status               |
+| -------------- | ----------- | ------- | -------------------- |
+| Research       | 1 hour      | 1 hour  | ✅ On target         |
+| Implementation | 2 hours     | 2 hours | ✅ On target         |
+| Testing        | 1 hour      | TBD     | 🔴 Blocked           |
+| Documentation  | 1 hour      | TBD     | 🔴 Not started       |
+| **Total**      | **5 hours** | **TBD** | **🟡 ~40% complete** |
 
 ---
 
@@ -800,6 +873,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 ### Improvements Needed
 
 1. **Testing Infrastructure**
+
    ```makefile
    # Add incremental testing targets
    check-syntax:
@@ -813,6 +887,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
    ```
 
 2. **Process Monitoring**
+
    ```bash
    # Add timeouts to just commands
    just test --timeout=300  # 5 minutes
@@ -861,6 +936,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 ## 📋 Checklist
 
 ### Before Build (Required)
+
 - [ ] Kill all hung Nix/Darwin-Rebuild/Just processes
 - [ ] Clean git state (stage all changes)
 - [ ] Verify all files exist
@@ -868,12 +944,14 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 - [ ] Check for import errors
 
 ### During Build (Required)
+
 - [ ] Monitor build progress
 - [ ] Capture all error messages
 - [ ] Note build time
 - [ ] Verify no hung processes
 
 ### After Build (Required)
+
 - [ ] Verify configuration applied
 - [ ] Test Starship prompt
 - [ ] Test Tmux
@@ -882,6 +960,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 - [ ] Check for conflicts/duplications
 
 ### Before Commit (Required)
+
 - [ ] Test NixOS build (if available)
 - [ ] Verify no regressions
 - [ ] Document changes
@@ -889,6 +968,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 - [ ] Write detailed commit message
 
 ### After Commit (Required)
+
 - [ ] Push to remote
 - [ ] Update documentation
 - [ ] Create ADR
@@ -909,6 +989,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 ### If Build Verification Continues to Fail
 
 **Next Steps:**
+
 1. Roll back changes: `git revert HEAD`
 2. Start fresh: Delete Darwin home.nix, restore shells.nix
 3. Alternative approach: Manual shell configuration (reject Home Manager)
@@ -917,6 +998,7 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 ### If Build Verification Succeeds
 
 **Next Steps:**
+
 1. Apply configuration: `just switch`
 2. Test all programs: Starship, Tmux, Fish
 3. Test environment variables: EDITOR, LANG
@@ -929,27 +1011,32 @@ Integrate Home Manager into Darwin configuration to enable cross-platform progra
 ## 📝 Notes
 
 ### Files Created (3)
+
 1. `platforms/darwin/home.nix` - Darwin Home Manager configuration
 2. `docs/status/2025-12-26_22-26_HOME-MANAGER-INTEGRATION-FOR-DARWIN.md` - This report
-3. *(Pending)* Architecture Decision Record (ADR)
+3. _(Pending)_ Architecture Decision Record (ADR)
 
 ### Files Modified (2)
+
 1. `flake.nix` - Added Home Manager module for Darwin
 2. `platforms/darwin/default.nix` - Removed shells.nix import
 
 ### Files Imported via Home Manager (4)
+
 1. `platforms/common/home-base.nix` - Shared Home Manager base
 2. `platforms/common/programs/fish.nix` - Fish shell config
 3. `platforms/common/programs/starship.nix` - Starship prompt config
 4. `platforms/common/programs/tmux.nix` - Tmux terminal config
 
 ### Technical Constraints
+
 - Working from macOS (Darwin) system
 - No direct access to NixOS machine for testing
 - Nix evaluation issues blocking verification
 - Time zone: UTC (local time: 23:26 CET)
 
 ### Assumptions
+
 1. NixOS build will work without changes (shared modules unchanged)
 2. Starship/Tmux configurations are correct (copied from working NixOS setup)
 3. Home Manager integration follows standard pattern (mirrors NixOS exactly)

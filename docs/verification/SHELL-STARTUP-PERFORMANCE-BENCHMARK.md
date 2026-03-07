@@ -14,6 +14,7 @@
 All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performance** (< 100ms target). Bash is the fastest shell (43ms), while Fish is the slowest (76ms) but still within excellent range.
 
 **Performance Ranking:**
+
 1. 🅱️ Bash: 43ms (fastest) - 1.76x faster than Fish
 2. 🅼️ Zsh: 49ms (middle) - 1.55x faster than Fish
 3. 🐟 Fish: 76ms (slowest) - baseline for comparison
@@ -29,13 +30,14 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Run-by-Run Results:**
 | Run | Startup Time | Variance from Avg |
 |------|---------------|-------------------|
-| 1/5  | 45ms          | +2ms              |
-| 2/5  | 42ms          | -1ms              |
-| 3/5  | 43ms          | 0ms              |
-| 4/5  | 44ms          | +1ms              |
-| 5/5  | 43ms          | 0ms              |
+| 1/5 | 45ms | +2ms |
+| 2/5 | 42ms | -1ms |
+| 3/5 | 43ms | 0ms |
+| 4/5 | 44ms | +1ms |
+| 5/5 | 43ms | 0ms |
 
 **Statistics:**
+
 - Minimum: 42ms
 - Maximum: 45ms
 - Average: 43ms
@@ -44,6 +46,7 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Performance Target:** ✅ EXCELLENT (< 100ms target)
 
 **Analysis:**
+
 - **Consistency:** Very low variance (3ms) - highly predictable
 - **Speed:** Fastest shell - excellent for quick startup
 - **Reliability:** No outliers - stable performance across runs
@@ -58,13 +61,14 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Run-by-Run Results:**
 | Run | Startup Time | Variance from Avg |
 |------|---------------|-------------------|
-| 1/5  | 44ms          | -5ms              |
-| 2/5  | 54ms          | +5ms              |
-| 3/5  | 50ms          | +1ms              |
-| 4/5  | 54ms          | +5ms              |
-| 5/5  | 45ms          | -4ms              |
+| 1/5 | 44ms | -5ms |
+| 2/5 | 54ms | +5ms |
+| 3/5 | 50ms | +1ms |
+| 4/5 | 54ms | +5ms |
+| 5/5 | 45ms | -4ms |
 
 **Statistics:**
+
 - Minimum: 44ms
 - Maximum: 54ms
 - Average: 49ms
@@ -73,6 +77,7 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Performance Target:** ✅ EXCELLENT (< 100ms target)
 
 **Analysis:**
+
 - **Consistency:** Low variance (10ms) - predictable performance
 - **Speed:** Second fastest - only 6ms slower than Bash
 - **Reliability:** Minor outliers (54ms) - good stability
@@ -87,13 +92,14 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Run-by-Run Results:**
 | Run | Startup Time | Variance from Avg |
 |------|---------------|-------------------|
-| 1/5  | 208ms         | +132ms            |
-| 2/5  | 48ms          | -28ms             |
-| 3/5  | 44ms          | -32ms             |
-| 4/5  | 41ms          | -35ms             |
-| 5/5  | 39ms          | -37ms             |
+| 1/5 | 208ms | +132ms |
+| 2/5 | 48ms | -28ms |
+| 3/5 | 44ms | -32ms |
+| 4/5 | 41ms | -35ms |
+| 5/5 | 39ms | -37ms |
 
 **Statistics:**
+
 - Minimum: 39ms
 - Maximum: 208ms
 - Average: 76ms
@@ -102,6 +108,7 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 **Performance Target:** ✅ EXCELLENT (< 100ms target)
 
 **Analysis:**
+
 - **Consistency:** High variance (169ms) - first run anomaly
 - **Speed:** Slowest shell - 33ms slower than Bash
 - **Reliability:** First run outlier (208ms) - initialization overhead
@@ -109,12 +116,14 @@ All shell configurations (Fish, Zsh, Bash) achieve **excellent startup performan
 
 **First Run Anomaly:**
 The first Fish run (208ms) is significantly slower than subsequent runs (39-48ms). This is likely due to:
+
 - Shell initialization overhead (first-run compilation/function loading)
 - History file loading
 - Completion system initialization
 - Plugin initialization (carapace, starship)
 
 **Stable Performance (Excluding First Run):**
+
 - Average (runs 2-5): 43ms
 - Range: 39-48ms
 - Variance: 9ms (low - consistent after initialization)
@@ -125,24 +134,27 @@ The first Fish run (208ms) is significantly slower than subsequent runs (39-48ms
 
 ### Shell-by-Shell Comparison
 
-| Shell | Avg Time | Speed vs Bash | Speed vs Fish | Variance | Target Status |
-|--------|-----------|---------------|----------------|-----------|---------------|
-| 🅱️ Bash  | 43ms      | 1.00x (baseline) | 3ms     | ✅ EXCELLENT |
-| 🅼️ Zsh   | 49ms      | 1.14x slower      | 10ms    | ✅ EXCELLENT |
-| 🐟 Fish  | 76ms      | 1.76x slower      | 169ms   | ✅ EXCELLENT |
+| Shell   | Avg Time | Speed vs Bash    | Speed vs Fish | Variance     | Target Status |
+| ------- | -------- | ---------------- | ------------- | ------------ | ------------- |
+| 🅱️ Bash | 43ms     | 1.00x (baseline) | 3ms           | ✅ EXCELLENT |
+| 🅼️ Zsh   | 49ms     | 1.14x slower     | 10ms          | ✅ EXCELLENT |
+| 🐟 Fish | 76ms     | 1.76x slower     | 169ms         | ✅ EXCELLENT |
 
 ### Speed Analysis
 
 **Bash vs Zsh:**
+
 - Bash is 1.14x faster than Zsh
 - Difference: 6ms (14% faster)
 
 **Bash vs Fish:**
+
 - Bash is 1.76x faster than Fish (first run included)
 - Difference: 33ms (43% faster)
 - Bash is 1.00x faster than Fish (stable runs 2-5)
 
 **Zsh vs Fish:**
+
 - Zsh is 1.55x faster than Fish (first run included)
 - Difference: 27ms (36% faster)
 
@@ -154,16 +166,17 @@ The first Fish run (208ms) is significantly slower than subsequent runs (39-48ms
 
 Based on industry standards and ADR-002 performance considerations:
 
-| Target | Threshold | Status | Rationale |
-|---------|-------------|----------|------------|
-| ✅ EXCELLENT | < 100ms    | **ALL SHELLS MEET** - Instant user experience |
-| ⊘ GOOD      | < 200ms    | N/A - No shells in this range |
-| ✖ ACCEPTABLE| < 500ms    | N/A - No shells in this range |
-| ✖ SLOW      | ≥ 500ms     | N/A - No shells in this range |
+| Target       | Threshold | Status                                        | Rationale |
+| ------------ | --------- | --------------------------------------------- | --------- |
+| ✅ EXCELLENT | < 100ms   | **ALL SHELLS MEET** - Instant user experience |
+| ⊘ GOOD       | < 200ms   | N/A - No shells in this range                 |
+| ✖ ACCEPTABLE | < 500ms   | N/A - No shells in this range                 |
+| ✖ SLOW       | ≥ 500ms   | N/A - No shells in this range                 |
 
 ### Target Compliance
 
 **All Shells:** ✅ EXCELLENT (< 100ms target)
+
 - Bash: 43ms - 57% under target ✅
 - Zsh: 49ms - 51% under target ✅
 - Fish: 76ms - 24% under target ✅
@@ -219,6 +232,7 @@ Based on industry standards and ADR-002 performance considerations:
 ### Why Non-Interactive Benchmark?
 
 Non-interactive benchmarking measures shell startup time for:
+
 - Script execution (most common use case)
 - Quick terminal sessions (single command and exit)
 - CI/CD environments (automated execution)
@@ -228,6 +242,7 @@ Interactive startup (loading prompt, completions, history) would show different 
 ### Warmup Runs
 
 Two warmup runs are executed before benchmarking to:
+
 - Initialize shell environment
 - Load history files into memory
 - Compile functions and completions
@@ -242,11 +257,13 @@ Two warmup runs are executed before benchmarking to:
 The shell configuration (Fish, Zsh, Bash) achieves excellent performance with all shells meeting the < 100ms startup target. Bash is the fastest shell (43ms), while Fish has the highest variance due to first-run initialization overhead.
 
 **Performance Ranking:**
+
 1. 🅱️ Bash: 43ms (fastest, most consistent)
 2. 🅼️ Zsh: 49ms (fast, consistent)
 3. 🐟 Fish: 76ms (good, but has first-run variance)
 
 **Next Steps:**
+
 1. Monitor performance monthly or after major changes
 2. Consider Fish first-run optimization if needed
 3. Use benchmark script for performance tracking

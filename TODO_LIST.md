@@ -8,6 +8,7 @@
 ## Recent Session Summary (2026-02-10)
 
 ### ✅ Completed Actions
+
 - **File Organization**: Moved 12 files from root to proper directories
   - bin/: 6 shell scripts (cast-all-audio.sh, fix-dns.sh, fix-network-deep.sh, rebuild-after-fix.sh, apply-config.sh, my-project-remote-install.sh)
   - dev/testing/: 2 Python files (benchmark_ollama.py, test_streaming.py)
@@ -16,11 +17,13 @@
 - **Commit**: Changes committed as 77cc8a7
 
 ### ⚠️ Issues Identified (Pre-commit)
+
 - **gitleaks**: 6 potential secrets detected (requires review)
 - **statix**: Nix linting warnings (W20 repeated keys, W04 inherit suggestions, W23 empty list concat)
 - **trailing-whitespace**: Auto-fixed by pre-commit
 
 ### 📝 Next Recommended Actions
+
 1. Review gitleaks findings with `gitleaks detect --verbose`
 2. Fix statix warnings in Nix files
 3. Complete remaining P0 tasks from root-directory-organization-status.md
@@ -37,6 +40,7 @@
 **Files remaining**: 75+
 
 ### ✅ Files Read
+
 - [x] AGENTS.md (2026-02-08)
 - [x] docs/status/2026-02-06_modernize-comparison-report.md (2026-02-08)
 - [x] docs/status/2026-02-06_22-11_root-directory-organization-status.md (2026-02-08)
@@ -47,6 +51,7 @@
 - [x] README.md (2026-02-08)
 
 ### 📋 Files Remaining to Read
+
 - [ ] docs/GITHUB-ISSUES-RECOMMENDATIONS.md
 - [x] docs/TODO-STATUS.md (2026-02-08)
 - [x] docs/monitoring-comparison-matrix.md (2026-02-08) - No TODOs found
@@ -143,11 +148,13 @@
 ### AGENTS.md
 
 #### Code Maintenance
+
 - [ ] **[LOW]** Address or remove TODO items >1 week old
   - Source: AGENTS.md:691
   - Context: Immediate Refactoring Rules - maintain codebase cleanliness
 
 #### Pre-Completion Checklist (Code Quality)
+
 - [ ] **[HIGH]** Static Analysis: Appropriate linter passes without warnings
   - Source: AGENTS.md:936
   - Context: Code Quality verification
@@ -168,6 +175,7 @@
   - Context: Code Quality verification
 
 #### Pre-Completion Checklist (Nix-Specific)
+
 - [ ] **[HIGH]** Nix Syntax: `nix-instantiate --eval` passes on changed files
   - Source: AGENTS.md:944
   - Context: Nix validation
@@ -185,6 +193,7 @@
   - Context: Nix validation
 
 #### Pre-Completion Checklist (Final Verification)
+
 - [ ] **[HIGH]** Manual Testing: Changes tested in real environment
   - Source: AGENTS.md:951
   - Context: Final verification
@@ -201,16 +210,19 @@
 ### docs/status/2026-02-06_modernize-comparison-report.md
 
 #### Integration Status
+
 - [ ] **[IN PROGRESS]** System rebuild in progress (long-running)
   - Source: 2026-02-06_modernize-comparison-report.md:117
   - Context: Integration Status - System Configuration
 
 #### Current System State
+
 - [ ] **[HIGH]** Complete darwin-rebuild switch to activate new version
   - Source: 2026-02-06_modernize-comparison-report.md:122
   - Context: Next Step for Go 1.26rc2 modernize
 
 #### Future Considerations
+
 - [ ] **[MEDIUM]** When Go 1.26 stable releases, update from rc to stable
   - Source: 2026-02-06_modernize-comparison-report.md:133
   - Context: Future Considerations
@@ -227,6 +239,7 @@
 ### docs/status/2026-02-06_22-11_root-directory-organization-status.md
 
 #### Testing Checklist
+
 - [x] **[P0]** Run `just test` - Verify Nix configuration builds ✅ 2026-02-10
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:266
   - Context: Testing Checklist (flake check initiated)
@@ -259,6 +272,7 @@
   - Context: Testing Checklist
 
 #### Immediate Actions (Today)
+
 - [x] **[P0]** Complete file moves ✅ 2026-02-10
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:210
   - Context: Immediate Actions (Today) - 12 files moved
@@ -273,6 +287,7 @@
   - Context: Immediate Actions (Today)
 
 #### Short-term Actions (This Week)
+
 - [ ] **[P1]** Documentation consolidation: Merge AUDIO_CASTING_HISTORY.md + BLUETOOTH_SETUP_GUIDE.md + BLUETOOTH_QUICK_SUMMARY.md
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:217-219
   - Context: Short-term Actions (This Week)
@@ -290,6 +305,7 @@
   - Context: Short-term Actions (This Week)
 
 #### Medium-term Actions (This Sprint)
+
 - [ ] **[P2]** Audit all Nix files for hardcoded paths
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:244
   - Context: Medium-term Actions (This Sprint)
@@ -307,6 +323,7 @@
   - Context: Medium-term Actions (This Sprint)
 
 #### Long-term Actions (This Quarter)
+
 - [ ] **[P3]** Design unified project structure specification
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:256
   - Context: Long-term Actions (This Quarter)
@@ -324,6 +341,7 @@
   - Context: Long-term Actions (This Quarter)
 
 #### Files Pending Move
+
 - [x] **[P0]** Move cast-all-audio.sh → bin/ ✅ 2026-02-10
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:288
   - Context: Files Pending Move
@@ -365,6 +383,7 @@
   - Context: Files Pending Move
 
 #### Decision Questions
+
 - [ ] **[DECISION]** Should we move forward with file moves?
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:360-363
   - Context: All files and target locations identified
@@ -384,6 +403,7 @@
 ### BLUETOOTH_QUICK_SUMMARY.md
 
 #### Setup Tasks (Next Steps)
+
 - [ ] **[HIGH]** Rebuild NixOS
   - Source: BLUETOOTH_QUICK_SUMMARY.md:49-53
   - Context: Run `sudo nixos-rebuild switch --flake .#evo-x2`
@@ -401,6 +421,7 @@
   - Context: Play test sound or music file
 
 #### Post-Setup Tasks (Next Steps After Success)
+
 - [ ] **[MEDIUM]** Enable auto-connect
   - Source: BLUETOOTH_QUICK_SUMMARY.md:227
   - Context: Ensure Nest Audio connects automatically on boot
@@ -418,6 +439,7 @@
   - Context: If additional Bluetooth speakers are available
 
 #### Next Action
+
 - [ ] **[HIGH]** Rebuild NixOS on evo-x2 and follow BLUETOOTH_SETUP_GUIDE.md
   - Source: BLUETOOTH_QUICK_SUMMARY.md:270
   - Context: Immediate next step to begin implementation
@@ -425,6 +447,7 @@
 ### README.md
 
 #### Known Issues
+
 - [ ] **[MEDIUM]** Consider reporting Home Manager architecture issue if it causes problems in future versions
   - Source: README.md:162
   - Context: Regarding the workaround for `nix-darwin/default.nix` importing a NixOS-specific file requiring explicit user definition
@@ -432,6 +455,7 @@
 ### docs/strategy/2025-12-18_15-45_Step-4-Program-Integration-Strategy.md
 
 #### Immediate Priority (Next 2 Hours)
+
 - [ ] **[IMMEDIATE]** Create discovery system (30 min)
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:356
   - Context: Build programs/discovery.nix with listPrograms and getEnabledPrograms functions
@@ -446,6 +470,7 @@
   - Context: Add CLI packages and apps to flake outputs
 
 #### High Priority (Next 2 Hours)
+
 - [ ] **[HIGH]** Create config module (30 min)
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:362
   - Context: Build flakes/config.nix with programsConfig options
@@ -460,6 +485,7 @@
   - Context: End-to-end validation of integrated system
 
 #### Medium Priority (Next 3 Hours)
+
 - [ ] **[MEDIUM]** Add multiple programs (60 min)
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:368
   - Context: Extend discovery with fish, starship, git, docker, etc.
@@ -474,6 +500,7 @@
   - Context: Optimize system performance
 
 #### Verification Tasks
+
 - [ ] **[IMMEDIATE]** Run `nix flake check --all-systems`
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:179
   - Context: Validate flake integrity
@@ -488,6 +515,7 @@
   - Context: Confirm config merge logic
 
 #### Verification Checklists (Step 4)
+
 - [ ] **[HIGH]** Program discovery system working
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:394
   - Context: Verify discovery functionality
@@ -508,6 +536,7 @@
   - Context: Run test suite
 
 #### Verification Checklists (Step 8)
+
 - [ ] **[MEDIUM]** 5+ programs integrated
   - Source: 2025-12-18_15-45_Step-4-Program-Integration-Strategy.md:402
   - Context: Expand program catalog
@@ -532,11 +561,13 @@
 #### Phase 1: High Priority (21 items)
 
 **Config Reloader**
+
 - [ ] **[HIGH]** Add hot-reload capability with keybinding (Ctrl+Alt+R)
   - Source: DESKTOP-IMPROVEMENT-ROADMAP.md:1.1
   - Context: platforms/nixos/desktop/hyprland.nix - 10m
 
 **Privacy & Locking (7 items)**
+
 - [ ] **[HIGH]** Add blur effect for lock screen (hyprlock blur) - 1h
 - [ ] **[HIGH]** Add privacy mode (grayscale screen toggle) - 1h
 - [ ] **[HIGH]** Add screenshot detection indicator in Waybar - 1h
@@ -548,6 +579,7 @@
   - Context: Multiple files - privacy and locking features
 
 **Productivity Scripts (5 items)**
+
 - [ ] **[HIGH]** Create Quake Terminal dropdown script (F12) - 2h
 - [ ] **[HIGH]** Create Screenshot + OCR script (extract text) - 2h
 - [ ] **[HIGH]** Create Color Picker script - 2h
@@ -557,6 +589,7 @@
   - Context: Create platforms/nixos/desktop/scripts.nix
 
 **Monitoring (5 items)**
+
 - [ ] **[MEDIUM]** Add GPU temperature module (AMD GPU) - 1.5h
 - [ ] **[MEDIUM]** Add CPU usage module (per-core) - 1.5h
 - [ ] **[MEDIUM]** Add Memory usage module (used/total) - 1.5h
@@ -566,6 +599,7 @@
   - Context: platforms/nixos/desktop/waybar.nix, monitoring.nix
 
 **Window Management (4 items)**
+
 - [ ] **[HIGH]** Add Scratchpad Workspaces (Alt+S) - 30m
 - [ ] **[HIGH]** Add Better Floating Rules (size/position defaults) - 30m
 - [ ] **[HIGH]** Add Focus Follows Mouse toggle - 30m
@@ -576,6 +610,7 @@
 #### Phase 2: Medium Priority (21 items)
 
 **Keyboard & Input (4 items)**
+
 - [ ] **[MEDIUM]** Optimize keyboard repeat rate (faster typing) - 20m
 - [ ] **[MEDIUM]** Map Caps Lock to Escape/Control - 20m
 - [ ] **[MEDIUM]** Add keyboard layout switcher in Waybar - 20m
@@ -584,6 +619,7 @@
   - Context: platforms/nixos/desktop/hyprland.nix, waybar.nix
 
 **Audio & Media (7 items)**
+
 - [ ] **[LOW]** Add audio visualizer (real-time) - 1h
 - [ ] **[LOW]** Add microphone status indicator - 1h
 - [ ] **[LOW]** Add media player integration (Now playing) - 1h
@@ -595,6 +631,7 @@
   - Context: platforms/nixos/desktop/waybar.nix, audio.nix
 
 **Dev Tools (4 items)**
+
 - [ ] **[MEDIUM]** Add Git branch display in Waybar - 1h
 - [ ] **[MEDIUM]** Add terminal multiplexer integration (tmux/zellij) - 1h
 - [ ] **[MEDIUM]** Add editor-specific window rules (nvim/vscode) - 1h
@@ -603,6 +640,7 @@
   - Context: platforms/nixos/desktop/hyprland.nix, waybar.nix
 
 **Desktop Environment (4 items)**
+
 - [ ] **[LOW]** Add better window borders and shadows - 30m
 - [ ] **[LOW]** Tune animations (smoother transitions) - 30m
 - [ ] **[LOW]** Add workspace naming persistence - 30m
@@ -613,6 +651,7 @@
 #### Phase 3: Long-term (13 items)
 
 **Backup & Config (4 items)**
+
 - [ ] **[MEDIUM]** Create automated config backups (hourly/daily) - 3h
 - [ ] **[MEDIUM]** Add workspace state preservation (remember apps) - 3h
 - [ ] **[MEDIUM]** Create one-click config sync (multiple machines) - 3h
@@ -621,6 +660,7 @@
   - Context: Create platforms/nixos/desktop/backup.nix
 
 **Gaming (4 items)**
+
 - [ ] **[LOW]** Create game mode toggle (disable compositor) - 2h
 - [ ] **[LOW]** Add GPU optimization profiles - 2h
 - [ ] **[LOW]** Add frame rate statistics in Waybar - 2h
@@ -629,6 +669,7 @@
   - Context: platforms/nixos/desktop/hyprland.nix, hardware/amd-gpu.nix
 
 **Window Rules (4 items)**
+
 - [ ] **[LOW]** Add auto-group similar windows (tabs) - 1h
 - [ ] **[LOW]** Add per-application layout rules - 1h
 - [ ] **[LOW]** Add smart window positioning - 1h
@@ -637,6 +678,7 @@
   - Context: platforms/nixos/desktop/hyprland.nix
 
 **AI Integration (4 items)**
+
 - [ ] **[LOW]** Add AI-powered workspace suggestions - 8h+
 - [ ] **[LOW]** Add smart window arrangement - 8h+
 - [ ] **[LOW]** Add voice command integration - 8h+
@@ -647,6 +689,7 @@
 ### docs/reports/NIX-COLORS-INTEGRATION-IMPLEMENTATION-REPORT.md
 
 #### Phase 2 (Recommended)
+
 - [ ] **[RECOMMENDED]** GTK theme integration
   - Source: NIX-COLORS-INTEGRATION-IMPLEMENTATION-REPORT.md:183
   - Context: Future enhancements for Phase 2
@@ -664,6 +707,7 @@
   - Context: Future enhancements for Phase 2
 
 #### Phase 3 (Optional)
+
 - [ ] **[OPTIONAL]** Custom color scheme generation
   - Source: NIX-COLORS-INTEGRATION-IMPLEMENTATION-REPORT.md:190
   - Context: Future enhancements for Phase 3
@@ -677,6 +721,7 @@
 ### docs/reports/home-manager-users-workaround-bug-report.md
 
 #### Next Steps
+
 - [ ] **[HIGH]** Test whether removing workaround actually breaks the build
   - Source: home-manager-users-workaround-bug-report.md:191
   - Context: Awaiting verification - platforms/darwin/default.nix workaround
@@ -691,6 +736,7 @@
   - Context: Improve project documentation regardless of workaround status
 
 #### Questions for Home Manager Team
+
 - [ ] **[MEDIUM]** Determine if explicit `users.users.<name>.home` definition is actually required for nix-darwin + Home Manager, or if the workaround is obsolete
   - Source: home-manager-users-workaround-bug-report.md:139
   - Context: Core question about workaround necessity
@@ -709,11 +755,13 @@
 **Summary: 125 micro-tasks organized in 27 clusters**
 
 #### Task Cluster 1: System Verification (3 tasks)
+
 - [ ] **[CRITICAL]** Run `darwin-rebuild build --flake .#Lars-MacBook-Air`
 - [ ] **[CRITICAL]** Analyze build output for errors
 - [ ] **[CRITICAL]** Create git backup checkpoint
 
 #### Task Cluster 2: Home Manager Foundation (5 tasks)
+
 - [ ] **[CRITICAL]** Add home-manager input URL
 - [ ] **[CRITICAL]** Configure home-manager follows
 - [ ] **[CRITICAL]** Add home-manager module import
@@ -721,6 +769,7 @@
 - [ ] **[HIGH]** Configure useUserPackages
 
 #### Task Cluster 3: Essential CLI Tools (5 tasks)
+
 - [ ] **[CRITICAL]** Add git package
 - [ ] **[CRITICAL]** Add neovim package
 - [ ] **[CRITICAL]** Add tmux package
@@ -728,6 +777,7 @@
 - [ ] **[HIGH]** Add htop package
 
 #### Task Cluster 4: Shell Configuration (5 tasks)
+
 - [ ] **[HIGH]** Create basic .bashrc
 - [ ] **[HIGH]** Configure prompt
 - [ ] **[HIGH]** Add basic aliases
@@ -735,6 +785,7 @@
 - [ ] **[HIGH]** Test shell configuration
 
 #### Task Cluster 5: Go Development Environment (7 tasks)
+
 - [ ] **[HIGH]** Add go package
 - [ ] **[HIGH]** Configure GOPATH
 - [ ] **[HIGH]** Add gopls LSP server
@@ -744,11 +795,13 @@
 - [ ] **[MEDIUM]** Configure Go environment
 
 #### Task Cluster 6: Enhanced Git Configuration (3 tasks)
+
 - [ ] **[HIGH]** Configure git user.name
 - [ ] **[HIGH]** Configure git user.email
 - [ ] **[HIGH]** Configure git default editor
 
 #### Task Cluster 7: Advanced Development Utilities (5 tasks)
+
 - [ ] **[HIGH]** Add jq JSON processor
 - [ ] **[HIGH]** Add ripgrep search tool
 - [ ] **[HIGH]** Add fd find tool
@@ -756,6 +809,7 @@
 - [ ] **[HIGH]** Test all utilities
 
 #### Task Cluster 8: Advanced Neovim Setup (8 tasks)
+
 - [ ] **[HIGH]** Create neovim config directory
 - [ ] **[HIGH]** Create basic init.lua
 - [ ] **[MEDIUM]** Configure syntax highlighting
@@ -766,6 +820,7 @@
 - [ ] **[HIGH]** Test neovim configuration
 
 #### Task Cluster 9: Advanced Tmux Setup (5 tasks)
+
 - [ ] **[HIGH]** Create tmux config
 - [ ] **[MEDIUM]** Configure prefix key
 - [ ] **[MEDIUM]** Configure window splitting
@@ -773,6 +828,7 @@
 - [ ] **[HIGH]** Test tmux configuration
 
 #### Task Cluster 10: Package Management Tools (6 tasks)
+
 - [ ] **[HIGH]** Add nh Nix management tool
 - [ ] **[HIGH]** Configure nh integration
 - [ ] **[HIGH]** Test nh functionality
@@ -781,28 +837,33 @@
 - [ ] **[HIGH]** Test package management
 
 #### Task Cluster 11: Terminal Theming (3 tasks)
+
 - [ ] **[MEDIUM]** Install terminal font
 - [ ] **[MEDIUM]** Configure font in shell
 - [ ] **[MEDIUM]** Configure terminal colors
 
 #### Task Cluster 12: SSH Configuration (4 tasks)
+
 - [ ] **[HIGH]** Create SSH config directory
 - [ ] **[HIGH]** Configure SSH keys
 - [ ] **[HIGH]** Configure SSH options
 - [ ] **[HIGH]** Test SSH configuration
 
 #### Task Cluster 13: Basic Networking Tools (3 tasks)
+
 - [ ] **[MEDIUM]** Add network analysis tools
 - [ ] **[MEDIUM]** Configure DNS settings
 - [ ] **[HIGH]** Test network connectivity
 
 #### Task Cluster 14: Package Caching (4 tasks)
+
 - [ ] **[MEDIUM]** Configure Nix cache
 - [ ] **[MEDIUM]** Configure binary cache
 - [ ] **[MEDIUM]** Test cache performance
 - [ ] **[LOW]** Optimize cache settings
 
 #### Task Cluster 15: Basic Security Tools (5 tasks)
+
 - [ ] **[MEDIUM]** Add security scanning tools
 - [ ] **[MEDIUM]** Configure firewall basics
 - [ ] **[MEDIUM]** Add password manager
@@ -810,23 +871,27 @@
 - [ ] **[HIGH]** Test security setup
 
 #### Task Cluster 16: System Monitoring Basics (3 tasks)
+
 - [ ] **[MEDIUM]** Add system monitoring tools
 - [ ] **[LOW]** Configure basic alerts
 - [ ] **[MEDIUM]** Test monitoring
 
 #### Task Cluster 17: Backup Configuration (4 tasks)
+
 - [ ] **[MEDIUM]** Configure git backup strategy
 - [ ] **[MEDIUM]** Configure file backup
 - [ ] **[HIGH]** Test backup process
 - [ ] **[LOW]** Schedule automated backups
 
 #### Task Cluster 18: Code Formatting Setup (4 tasks)
+
 - [ ] **[MEDIUM]** Add formatting tools
 - [ ] **[MEDIUM]** Configure auto-formatting
 - [ ] **[HIGH]** Test formatting
 - [ ] **[HIGH]** Configure pre-commit formatting
 
 #### Task Cluster 19: Basic Testing Framework (5 tasks)
+
 - [ ] **[MEDIUM]** Add testing tools
 - [ ] **[MEDIUM]** Configure basic test runner
 - [ ] **[MEDIUM]** Create test template
@@ -834,6 +899,7 @@
 - [ ] **[LOW]** Configure CI testing
 
 #### Task Cluster 20: Git Hooks Automation (5 tasks)
+
 - [ ] **[HIGH]** Create pre-commit hook
 - [ ] **[HIGH]** Configure hook actions
 - [ ] **[HIGH]** Add testing to hooks
@@ -841,44 +907,53 @@
 - [ ] **[MEDIUM]** Configure git linting
 
 #### Task Cluster 21: Environment Variables Setup (3 tasks)
+
 - [ ] **[MEDIUM]** Configure editor environment
 - [ ] **[MEDIUM]** Configure development environment
 - [ ] **[HIGH]** Test environment variables
 
 #### Task Cluster 22: Path Optimization (3 tasks)
+
 - [ ] **[MEDIUM]** Optimize system PATH
 - [ ] **[MEDIUM]** Optimize user PATH
 - [ ] **[HIGH]** Test PATH configuration
 
 #### Task Cluster 23: Editor Plugins Setup (4 tasks)
+
 - [ ] **[HIGH]** Install Go language server
 - [ ] **[HIGH]** Configure LSP client
 - [ ] **[MEDIUM]** Install completion plugins
 - [ ] **[HIGH]** Test editor integration
 
 #### Task Cluster 24: Multiplexer Shortcuts (3 tasks)
+
 - [ ] **[MEDIUM]** Configure tmux shortcuts
 - [ ] **[MEDIUM]** Add session management
 - [ ] **[HIGH]** Test multiplexer workflow
 
 #### Task Cluster 25: Shell Aliases Setup (4 tasks)
+
 - [ ] **[MEDIUM]** Add productivity aliases
 - [ ] **[MEDIUM]** Add development aliases
 - [ ] **[LOW]** Add system aliases
 - [ ] **[HIGH]** Test all aliases
 
 #### Task Cluster 26: Basic Documentation (3 tasks)
+
 - [ ] **[LOW]** Create README template
 - [ ] **[LOW]** Document configuration
 - [ ] **[LOW]** Generate usage examples
 
 #### Task Cluster 27: Clean History (3 tasks)
+
 - [ ] **[LOW]** Clean git history
 - [ ] **[LOW]** Clean shell history
 - [ ] **[LOW]** Update documentation
+
 ### docs/operations/manual-steps-after-deployment.md
 
 #### Critical Steps
+
 - [ ] **[REQUIRED]** Install security tools that were not installed due to Nix deployment timeout
   - Source: manual-steps-after-deployment.md:8-27
   - Context: Security tools (blockblock, oversight, knockknock, dnd) missing despite being in homebrew.nix
@@ -887,6 +962,7 @@
   - Context: ZSH currently faster (72ms) than Fish (334ms) - performance issue exists
 
 #### Configuration Steps
+
 - [ ] **[REQUIRED]** Configure BlockBlock security monitoring tool
   - Source: manual-steps-after-deployment.md:51-59
   - Context: Grant permissions, set monitoring preferences, review baseline scan
@@ -907,6 +983,7 @@
   - Context: Create performance-data directory, run benchmarks, optional cron job
 
 #### Verification Steps
+
 - [ ] **[RECOMMENDED]** Execute deployment verification script
   - Source: manual-steps-after-deployment.md:108-111
   - Context: Verify all packages, security tools, shell performance, config files
@@ -915,6 +992,7 @@
   - Context: Check shell, security tools, Nix packages, Homebrew integration
 
 #### Monitoring and Maintenance
+
 - [ ] **[RECOMMENDED]** Perform weekly system verification, performance monitoring, and security tool status
   - Source: manual-steps-after-deployment.md:162-172
   - Context: Systematic weekly maintenance routine
@@ -926,6 +1004,7 @@
   - Context: Regular package updates for system maintenance
 
 #### Troubleshooting (Situational)
+
 - [ ] **[SITUATIONAL]** Handle Nix deployment timeouts
   - Source: manual-steps-after-deployment.md:136-140
   - Context: Don't force quit, check resources, restart, try individual installation
@@ -938,9 +1017,11 @@
 - [ ] **[SITUATIONAL]** Troubleshoot service startup failures
   - Source: manual-steps-after-deployment.md:154-158
   - Context: Check permissions, manual launch, check Console.app, restart
+
 ### docs/flake-consolidation-plan.md
 
 #### Step 2: Cleanup Tasks
+
 - [ ] **[UNSPECIFIED]** Remove flake.cross-platform.failed
   - Source: flake-consolidation-plan.md:30
   - Context: Cleaning up failed cross-platform flake configuration
@@ -955,6 +1036,7 @@
   - Context: Combining useful features from both flake.nix files
 
 #### Step 3: Synchronization
+
 - [ ] **[UNSPECIFIED]** Merge desired features from both files
   - Source: flake-consolidation-plan.md:37
   - Context: Ensuring no functionality is lost during consolidation
@@ -970,6 +1052,7 @@
 #### High Priority
 
 **Fix Audit Kernel Module (NixOS)**
+
 - [ ] **[HIGH]** Research audit kernel module compatibility issues
   - Source: TODO-STATUS.md:1
   - Context: platforms/nixos/desktop/security-hardening.nix - Line 11, 18
@@ -984,6 +1067,7 @@
   - Context: platforms/nixos/desktop/security-hardening.nix
 
 **Fix Sandbox Override (Darwin)**
+
 - [ ] **[HIGH]** Research proper sandbox configuration for nix-darwin
   - Source: TODO-STATUS.md:2
   - Context: platforms/darwin/nix/settings.nix - Line 3
@@ -1000,6 +1084,7 @@
 #### Medium Priority
 
 **Add Darwin-Specific Networking Settings**
+
 - [ ] **[MEDIUM]** Research macOS networking settings via nix-darwin
   - Source: TODO-STATUS.md:3
   - Context: platforms/darwin/networking/default.nix - Line 5
@@ -1014,6 +1099,7 @@
   - Context: platforms/darwin/networking/default.nix
 
 **Re-enable Hyprland Type Safety Assertions**
+
 - [ ] **[MEDIUM]** Investigate path resolution issues
   - Source: TODO-STATUS.md:4
   - Context: platforms/nixos/desktop/hyprland.nix - Line 6
@@ -1028,6 +1114,7 @@
   - Context: platforms/nixos/desktop/hyprland.nix
 
 **Research TouchID Authentication Extensions**
+
 - [ ] **[MEDIUM]** Research all available touchIdAuth options for macOS
   - Source: TODO-STATUS.md:5
   - Context: platforms/darwin/security/pam.nix - Line 7
@@ -1042,6 +1129,7 @@
   - Context: platforms/darwin/security/pam.nix
 
 **Fix LaunchAgent Working Directory**
+
 - [ ] **[MEDIUM]** Test if LaunchAgent works without workaround
   - Source: TODO-STATUS.md:6
   - Context: platforms/darwin/services/launchagents.nix - Line 5
@@ -1058,6 +1146,7 @@
 #### Low Priority
 
 **Move Terminal Environment to Dedicated Config**
+
 - [ ] **[LOW]** Create dedicated iTerm2 configuration file
   - Source: TODO-STATUS.md:7
   - Context: platforms/darwin/environment.nix - Line 13
@@ -1072,6 +1161,7 @@
   - Context: platforms/darwin/environment.nix
 
 **Move Nixpkgs Configuration to Common**
+
 - [ ] **[LOW]** Create `platforms/common/nixpkgs-config.nix`
   - Source: TODO-STATUS.md:8
   - Context: platforms/darwin/default.nix - Line 16
@@ -1086,6 +1176,7 @@
   - Context: platforms/darwin/default.nix
 
 **Move Activation Script to Environment Module**
+
 - [ ] **[LOW]** Understand reason for separation (if any)
   - Source: TODO-STATUS.md:9
   - Context: platforms/darwin/system/activation.nix - Line 36
@@ -1100,6 +1191,7 @@
   - Context: platforms/darwin/system/activation.nix
 
 **Migrate ActivityWatch to Nix Package**
+
 - [ ] **[LOW]** Check if ActivityWatch is now in stable Nixpkgs
   - Source: TODO-STATUS.md:10
   - Context: platforms/darwin/services/launchagents.nix - Line 13
@@ -1119,6 +1211,7 @@
 ### docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md
 
 #### #119: Complete SublimeText Default Editor Configuration
+
 - [ ] **[MEDIUM]** Configure SublimeText as default editor
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:170
   - Context: SublimeText configuration
@@ -1130,6 +1223,7 @@
   - Context: SublimeText configuration
 
 #### #105: Create Comprehensive Wrapper System Documentation
+
 - [ ] **[MEDIUM]** Create architecture documentation
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:212
   - Context: Wrapper system documentation
@@ -1144,6 +1238,7 @@
   - Context: Wrapper system documentation
 
 #### #104: Optimize and Benchmark Wrapper Performance
+
 - [ ] **[MEDIUM]** Add wrapper-benchmark command to justfile
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:240
   - Context: Wrapper performance optimization
@@ -1152,6 +1247,7 @@
   - Context: Wrapper performance optimization
 
 #### #116: Add Terminal Multiplexer for Productivity
+
 - [ ] **[MEDIUM]** Issue #116 is already solved - tmux is configured
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:299
   - Context: Terminal multiplexer (tmux)
@@ -1160,6 +1256,7 @@
   - Context: Terminal multiplexer (tmux)
 
 #### #22: Research: Incorporate Ideas from Awesome Dotfiles
+
 - [ ] **[LOW]** Review Awesome Dotfiles repository
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:384
   - Context: Research task
@@ -1171,6 +1268,7 @@
   - Context: Research task
 
 #### #17: Improve and Automate System Cleanup
+
 - [ ] **[LOW]** Review cleanup paths list
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:400
   - Context: System cleanup enhancement
@@ -1179,6 +1277,7 @@
   - Context: System cleanup enhancement
 
 #### #12: Complete TODOs in programs.nix
+
 - [ ] **[LOW]** Review programs.nix for TODOs
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:435
   - Context: programs.nix configuration
@@ -1193,6 +1292,7 @@
   - Context: programs.nix configuration
 
 #### #10: Complete TODOs in core.nix
+
 - [ ] **[LOW]** Review core.nix for TODOs
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:449
   - Context: core.nix security and services
@@ -1207,6 +1307,7 @@
   - Context: core.nix security and services
 
 #### #9: Complete TODOs in system.nix
+
 - [ ] **[LOW]** Review system.nix for TODOs
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:463
   - Context: system.nix macOS defaults
@@ -1218,6 +1319,7 @@
   - Context: system.nix macOS defaults
 
 #### #7: Add Backup Functionality to manual-linking.sh
+
 - [ ] **[LOW]** Add backup flag to manual-linking.sh
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:478
   - Context: manual-linking.sh backup feature
@@ -1226,21 +1328,25 @@
   - Context: manual-linking.sh backup feature
 
 #### #6: Refactor manual-linking.sh to Use External Configuration
+
 - [ ] **[LOW]** Extract configuration to external YAML file
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:494
   - Context: manual-linking.sh configuration refactor
 
 #### #5: Improve manual-linking.sh to Verify Symbolic Link Targets
+
 - [ ] **[LOW]** Add verification function for symbolic links
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:511
   - Context: manual-linking.sh link verification
 
 #### #100: Comprehensive Analysis Complete
+
 - [ ] **[ADMINISTRATIVE]** Move to project status documentation
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:528
   - Context: Administrative milestone
 
 #### #99: Create Milestones v0.1.0-v0.3.0
+
 - [ ] **[ADMINISTRATIVE]** Create GitHub milestones
   - Source: docs/GITHUB-ISSUES-RECOMMENDATIONS-REMAINING.md:538
   - Context: Project management
@@ -1254,6 +1360,7 @@
 ### docs/sddm-configuration-report.md
 
 #### Before Making Changes
+
 - [ ] **[HIGH]** Create system backup
   - Source: docs/sddm-configuration-report.md:297
   - Context: Pre-implementation checklist item
@@ -1265,6 +1372,7 @@
   - Context: Pre-implementation checklist item
 
 #### Implementation Steps
+
 - [ ] **[CRITICAL]** Disable SDDM Wayland support
   - Source: docs/sddm-configuration-report.md:302
   - Context: Critical fix for stability with AMD GPU
@@ -1285,6 +1393,7 @@
   - Context: Apply changes using nixos-rebuild
 
 #### Post-Implementation
+
 - [ ] **[CRITICAL]** Verify login screen works
   - Source: docs/sddm-configuration-report.md:310
   - Context: Basic functionality verification
@@ -1302,6 +1411,7 @@
   - Context: Documentation task
 
 #### Phase 2 Optimization
+
 - [ ] **[MEDIUM]** Add settings section for fine-tuned control
   - Source: docs/sddm-configuration-report.md:230
   - Context: Short-term optimization task
@@ -1315,6 +1425,7 @@
 ### docs/crush-advanced-build-strategies.md
 
 #### Vendor-Free Approach - Implementation Checklist
+
 - [ ] **[MEDIUM]** Backup current configuration
   - Source: docs/crush-advanced-build-strategies.md:390
   - Context: Before making changes to the Nix file
@@ -1335,6 +1446,7 @@
   - Context: Restore configuration if build fails
 
 #### Generate Vendor Approach - Implementation Checklist
+
 - [ ] **[MEDIUM]** Backup current configuration
   - Source: docs/crush-advanced-build-strategies.md:398
   - Context: Before making changes to the Nix file
@@ -1363,6 +1475,7 @@
 ### docs/COMPREHENSIVE-SESSION-SUMMARY.md
 
 #### IMMEDIATE PRIORITY (v0.1.1)
+
 - [ ] **[IMMEDIATE]** Type Safety Integration: Apply existing Types.nix to all configurations
   - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:91
   - Context: Next step in v0.1.1 milestone for core foundation and type safety
@@ -1377,6 +1490,7 @@
   - Context: Next step in v0.1.1 milestone for core foundation and type safety
 
 #### MEDIUM PRIORITY (v0.1.2)
+
 - [ ] **[MEDIUM]** Advanced Toolchains: Rust development environment
   - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:97
   - Context: Next step in v0.1.2 milestone for development toolchains and validation
@@ -1391,6 +1505,7 @@
   - Context: Next step in v0.1.2 milestone for development toolchains and validation
 
 #### LONG-TERM PRIORITY (v0.1.3+)
+
 - [ ] **[LONG-TERM]** System Maintenance: Cleanup automation and scheduled tasks
   - Source: docs/COMPREHENSIVE-SESSION-SUMMARY.md:103
   - Context: Next step in v0.1.3+ milestone for system maintenance and organization
@@ -1409,6 +1524,7 @@
 ## Status Summary
 
 ### TODOs Found So Far: 445
+
 - **CRITICAL**: 19 (+3 from sddm-configuration-report.md)
 - **P0 (Critical)**: 14
 - **P1 (High)**: 9
@@ -1431,6 +1547,7 @@
 - **SITUATIONAL**: 4
 
 ### Verification Status
+
 - **Verified Against Code**: 0/445 (Not yet started)
 - **Complete**: 0
 - **Partial**: 0

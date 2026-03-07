@@ -18,11 +18,13 @@ Investigated and resolved issue where `echo $GOPATH` returned empty in user's cu
 **Problem:** User reported that `echo $GOPATH` returned empty output, despite GOPATH being configured in the Nix-based Home Manager configuration.
 
 **Impact:**
+
 - Go toolchain tools (gopls, golangci-lint, etc.) rely on GOPATH for package discovery
 - Development workflow disrupted
 - User confusion about configuration state
 
 **Environment:**
+
 - OS: macOS (Darwin)
 - Shell: Zsh (`/bin/zsh`)
 - Configuration: Nix-based Home Manager via nix-darwin
@@ -34,11 +36,13 @@ Investigated and resolved issue where `echo $GOPATH` returned empty in user's cu
 ### Step 1: Configuration Analysis
 
 **Files Examined:**
+
 1. `platforms/common/programs/fish.nix` - Fish shell config (no GOPATH)
 2. `platforms/common/programs/zsh.nix` - Zsh shell config (GOPATH configured)
 3. `platforms/common/home-base.nix` - Home Manager imports
 
 **Finding:** GOPATH correctly configured in `platforms/common/programs/zsh.nix`:
+
 ```nix
 # Environment variables
 export GOPATH="$HOME/go"
@@ -48,16 +52,19 @@ export PATH="$GOPATH/bin:$PATH"
 ### Step 2: Shell Session Analysis
 
 **Current Shell Check:**
+
 ```bash
 echo $SHELL  # /bin/zsh
 ```
 
 **GOPATH Check in Current Session:**
+
 ```bash
 echo $GOPATH  # Empty (issue confirmed)
 ```
 
 **GOPATH Check in Fresh Zsh Subshell:**
+
 ```bash
 zsh -c 'echo $GOPATH'  # /Users/larsartmann/go (correct!)
 ```
@@ -65,20 +72,24 @@ zsh -c 'echo $GOPATH'  # /Users/larsartmann/go (correct!)
 ### Step 3: Configuration File Verification
 
 **Zsh Config Directory:**
+
 ```bash
 ls -la ~/.config/zsh/
 ```
 
 **Result:** Symlinks to Home Manager-managed files confirmed:
+
 - `.zshenv` → `/nix/store/...-home-manager-files/.config/zsh/.zshenv`
 - `.zshrc` → `/nix/store/...-home-manager-files/.config/zsh/.zshrc`
 
 **Actual Zshenv Content:**
+
 ```bash
 cat ~/.config/zsh/.zshenv
 ```
 
 **Result:** GOPATH correctly configured:
+
 ```bash
 # Go
 export GOPATH="$HOME/go"
@@ -92,6 +103,7 @@ export PATH="$GOPATH/bin:$PATH"
 **Primary Cause:** Shell session not reloaded after Home Manager configuration was applied.
 
 **Technical Details:**
+
 1. Home Manager generates configuration files (`~/.config/zsh/.zshenv`)
 2. Configuration files contain correct GOPATH settings
 3. User's current shell session started BEFORE configuration was applied
@@ -99,6 +111,7 @@ export PATH="$GOPATH/bin:$PATH"
 5. Fresh zsh subshell loads new configuration correctly
 
 **Verification:**
+
 - Fresh zsh subshell shows correct GOPATH: `/Users/larsartmann/go`
 - Current shell session shows empty GOPATH
 - Configuration files verified as correct
@@ -110,12 +123,14 @@ export PATH="$GOPATH/bin:$PATH"
 ### Immediate Fix
 
 **Option 1: Reload Shell Configuration**
+
 ```bash
 source ~/.config/zsh/.zshenv
 echo $GOPATH  # Should show: /Users/larsartmann/go
 ```
 
 **Option 2: Restart Shell**
+
 ```bash
 exec zsh
 ```
@@ -125,6 +140,7 @@ exec zsh
 ### Verification Steps
 
 After applying solution:
+
 ```bash
 # Verify GOPATH is set
 echo $GOPATH  # Should output: /Users/larsartmann/go
@@ -143,12 +159,14 @@ go env GOPATH  # Should match: /Users/larsartmann/go
 ### Current Configuration State
 
 **GOPATH Configuration:**
+
 - **File:** `platforms/common/programs/zsh.nix`
 - **Location:** `programs.zsh.envExtra`
 - **Value:** `$HOME/go` (resolves to `/Users/larsartmann/go`)
 - **Status:** ✅ Correctly configured
 
 **Zsh Integration:**
+
 - **Home Manager Module:** `platforms/common/programs/zsh.nix`
 - **Import Path:** `platforms/common/home-base.nix` → `./programs/zsh.nix`
 - **Generated File:** `~/.config/zsh/.zshenv`
@@ -158,12 +176,14 @@ go env GOPATH  # Should match: /Users/larsartmann/go
 ### Cross-Platform Coverage
 
 **Current Implementation:**
+
 - ✅ Zsh: GOPATH configured in `platforms/common/programs/zsh.nix`
 - ✅ Bash: Inherits environment variables (GOPATH set at shell level)
 - ⚠️ Fish: GOPATH NOT configured in `platforms/common/programs/fish.nix`
 
 **Recommended Enhancement:**
 Add GOPATH to Fish shell configuration for cross-platform consistency:
+
 ```nix
 # In platforms/common/programs/fish.nix
 interactiveShellInit = ''
@@ -184,6 +204,7 @@ interactiveShellInit = ''
 ## 🧪 Testing & Verification
 
 ### Pre-Fix State
+
 ```bash
 $ echo $GOPATH
 (empty)
@@ -193,6 +214,7 @@ $ echo $SHELL
 ```
 
 ### Post-Fix State
+
 ```bash
 $ source ~/.config/zsh/.zshenv
 $ echo $GOPATH
@@ -203,6 +225,7 @@ $ go env GOPATH
 ```
 
 ### Configuration Validation
+
 ```bash
 # Verify Home Manager configuration
 nix flake check
@@ -249,6 +272,7 @@ zsh -c 'echo $GOPATH'  # /Users/larsartmann/go
 ## 🔧 Recommended Actions
 
 ### Immediate (Completed)
+
 - ✅ Investigate GOPATH empty issue
 - ✅ Identify root cause (shell not reloaded)
 - ✅ Provide immediate fix (`source ~/.config/zsh/.zshenv` or `exec zsh`)
@@ -256,11 +280,13 @@ zsh -c 'echo $GOPATH'  # /Users/larsartmann/go
 - ✅ Document findings
 
 ### Short-Term (Recommended)
+
 - [ ] Add GOPATH configuration to `platforms/common/programs/fish.nix`
 - [ ] Add shell reload instructions to troubleshooting guide
 - [ ] Document GOPATH configuration in AGENTS.md
 
 ### Long-Term (Optional)
+
 - [ ] Add GOPATH verification to `just health` command
 - [ ] Create shell environment debugging command (`just debug-env`)
 - [ ] Standardize environment variable configuration across all shells
@@ -270,15 +296,18 @@ zsh -c 'echo $GOPATH'  # /Users/larsartmann/go
 ## 📚 Related Documentation
 
 ### Configuration Files
+
 - `platforms/common/programs/zsh.nix` - Zsh configuration with GOPATH
 - `platforms/common/programs/fish.nix` - Fish configuration (needs GOPATH)
 - `platforms/common/home-base.nix` - Home Manager base imports
 
 ### Documentation
+
 - `AGENTS.md` - Main project guide
 - `docs/troubleshooting/` - Common issues (may need GOPATH entry)
 
 ### Commands
+
 - `just health` - Comprehensive system health check
 - `just switch` - Apply Nix configuration changes
 - `just test` - Test configuration without applying

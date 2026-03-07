@@ -1,4 +1,5 @@
 # 🚀 SETUP-MAC COMPREHENSIVE STATUS UPDATE
+
 **Date:** 2025-12-30 07:25:00 CET
 **Current Generation:** 207 (Active ✅)
 **Previous Generation:** 206 (Broken ❌)
@@ -13,6 +14,7 @@
 **Overall Status:** 🟡 **MOSTLY FUNCTIONAL - CRITICAL DISK SPACE ISSUE**
 
 **Health Score:** 6.5/10
+
 - ✅ Configuration builds successfully
 - ✅ Home Manager activated
 - ✅ Cross-platform modules working
@@ -21,6 +23,7 @@
 - 🟡 NixOS configuration untested
 
 **Recent Progress:**
+
 - ✅ Fixed Home Manager username mismatch (Dec 30)
 - ✅ Fixed Darwin build failures (Dec 28-29)
 - ✅ Implemented cross-platform Home Manager (Dec 27)
@@ -32,10 +35,12 @@
 ## A) ✅ FULLY DONE
 
 ### 1. Home Manager Integration (100% Complete)
+
 **Status:** ✅ ACTIVATED AND WORKING
 **Generation:** 207 (Dec 30, 07:19)
 
 **What's Done:**
+
 - ✅ Home Manager integrated with nix-darwin
 - ✅ Cross-platform shared modules created
 - ✅ Username mismatch fixed (`lars` → `larsartmann`)
@@ -44,6 +49,7 @@
 - ✅ System generation 207 active
 
 **Working Components:**
+
 - ✅ Fish shell with custom config (greeting disabled, history settings)
 - ✅ Starship prompt with custom format (no newline, all modules)
 - ✅ Tmux configuration (mouse enabled, 24-hour clock, base-index 1)
@@ -53,6 +59,7 @@
 - ✅ Platform-specific overrides (Darwin vs NixOS)
 
 **Cross-Platform Success:**
+
 - ✅ ~80% code reduction via shared modules
 - ✅ `platforms/common/programs/` - Fish, Starship, Tmux, ActivityWatch
 - ✅ `platforms/common/packages/` - base packages, fonts, Helium (platform-split)
@@ -60,6 +67,7 @@
 - ✅ ActivityWatch: Linux only (`enable = pkgs.stdenv.isLinux`)
 
 **Verification:**
+
 ```bash
 # System Generation 207 Active ✅
 ls -lt /nix/var/nix/profiles/system-* | head -3
@@ -84,6 +92,7 @@ grep -n "nixup" ~/.config/fish/config.fish
 ```
 
 **Files Deployed:**
+
 - ✅ `flake.nix` - Home Manager config for `users.larsartmann`
 - ✅ `platforms/darwin/default.nix` - User definition for `larsartmann`
 - ✅ `platforms/darwin/home.nix` - Darwin-specific Home Manager overrides
@@ -94,10 +103,12 @@ grep -n "nixup" ~/.config/fish/config.fish
 ---
 
 ### 2. Darwin Build System (100% Functional)
+
 **Status:** ✅ BUILDS SUCCESSFULLY
 **Last Successful Build:** Dec 30, 07:19
 
 **Fixed Issues:**
+
 - ✅ Variable reference error in `platforms/darwin/nix/settings.nix:49:10`
 - ✅ Sandbox configuration (removed `/usr/include` path)
 - ✅ Nix version mismatch (2.26.1 → 2.31.2)
@@ -106,6 +117,7 @@ grep -n "nixup" ~/.config/fish/config.fish
 - ✅ Home Manager activation (username mismatch resolved)
 
 **Current Configuration:**
+
 - ✅ `sandbox = false` (temporary, fix pending)
 - ✅ SDK paths correct: `/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include`
 - ✅ No broken packages (`allowBroken = false`)
@@ -113,6 +125,7 @@ grep -n "nixup" ~/.config/fish/config.fish
 - ✅ Platform-specific package splitting (Helium-Darwin vs Helium-Linux)
 
 **Build Commands Working:**
+
 ```bash
 ✅ darwin-rebuild build --flake . --show-trace
 ✅ nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel
@@ -122,10 +135,12 @@ grep -n "nixup" ~/.config/fish/config.fish
 ---
 
 ### 3. Cross-Platform Architecture (100% Implemented)
+
 **Status:** ✅ MODULAR AND WORKING
 **Code Reduction:** ~80% (from duplicated configs)
 
 **Architecture:**
+
 ```
 Setup-Mac/
 ├── platforms/
@@ -144,6 +159,7 @@ Setup-Mac/
 ```
 
 **Shared Modules Working:**
+
 - ✅ `home-base.nix` - Base Home Manager configuration
 - ✅ `fish.nix` - Cross-platform Fish shell config
 - ✅ `starship.nix` - Identical on both platforms
@@ -153,6 +169,7 @@ Setup-Mac/
 - ✅ `fonts.nix` - Cross-platform fonts
 
 **Platform-Specific Overrides:**
+
 - ✅ Darwin: `nixup`, `nixbuild`, `nixcheck` aliases (darwin-rebuild)
 - ✅ NixOS: `nixup`, `nixbuild`, `nixcheck` aliases (nixos-rebuild)
 - ✅ Darwin: Homebrew integration, Carapace completions
@@ -162,9 +179,11 @@ Setup-Mac/
 ---
 
 ### 4. Security Configuration (95% Complete)
+
 **Status:** ✅ MOSTLY SECURE - MINOR ITEMS PENDING
 
 **Implemented:**
+
 - ✅ Broken packages disabled (`allowBroken = false`)
 - ✅ Gitleaks for secret detection in pre-commit
 - ✅ Touch ID for sudo operations
@@ -173,16 +192,19 @@ Setup-Mac/
 - ✅ No hardcoded secrets (enforced via Gitleaks)
 
 **Pending:**
+
 - 🟡 Complete Touch ID audit (TODO in platforms/darwin/security/pam.nix)
 - 🟡 SSH hardening on NixOS (documented, untested)
 
 ---
 
 ### 5. Documentation (100% Comprehensive)
+
 **Status:** ✅ EXTENSIVE DOCUMENTATION
 **Status Files:** 17 comprehensive reports
 
 **Documentation Created (Dec 27-30):**
+
 - ✅ `HOME-MANAGER-FINAL-VERIFICATION-REPORT.md` - Final verification
 - ✅ `HOME-MANAGER-INTEGRATION-COMPLETED.md` - Integration report
 - ✅ `HOME-MANAGER-READY-DEPLOYMENT.md` - Deployment guide
@@ -200,12 +222,14 @@ Setup-Mac/
 - ✅ `USERNAME-FIX-EXECUTION-SUMMARY.md` - Execution summary
 
 **Additional Documentation:**
+
 - ✅ `docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md`
 - ✅ `docs/verification/HOME-MANAGER-VERIFICATION-TEMPLATE.md`
 - ✅ `docs/verification/CROSS-PLATFORM-CONSISTENCY-REPORT.md`
 - ✅ `docs/architecture/adr-001-home-manager-for-darwin.md`
 
 **Documentation Quality:**
+
 - ✅ Comprehensive status reports with timestamps
 - ✅ Root cause analysis for each issue
 - ✅ Step-by-step resolution guides
@@ -216,10 +240,12 @@ Setup-Mac/
 ---
 
 ### 6. Justfile Task Runner (100% Functional)
+
 **Status:** ✅ FULLY OPERATIONAL
 **Total Commands:** 100+ recipes
 
 **Command Categories:**
+
 - ✅ System: `switch`, `build`, `test`, `check`, `health`
 - ✅ Development: `dev`, `format`, `pre-commit-run`
 - ✅ Go Tools: 19 Go-specific commands (golangci-lint, gofumpt, gup, wire)
@@ -230,6 +256,7 @@ Setup-Mac/
 - ✅ Home Manager: `deploy`, `verify`
 
 **Key Commands:**
+
 ```bash
 ✅ just switch              # Apply Nix configuration changes
 ✅ just test                # Test configuration without applying
@@ -243,10 +270,12 @@ Setup-Mac/
 ---
 
 ### 7. Git Workflow (100% Configured)
+
 **Status:** ✅ WORKFLOW ESTABLISHED
 **Branch:** master (2 commits ahead of origin)
 
 **Recent Commits:**
+
 1. ✅ `ff93c48` - fix: correct Home Manager username configuration (Dec 30)
 2. ✅ `5d1bd98` - feat: add art user to SSH access control on NixOS (Dec 28)
 3. ✅ `f5a7e1c` - chore: remove test.trash file from repository (Dec 28)
@@ -254,6 +283,7 @@ Setup-Mac/
 5. ✅ `05359c1` - fix: simplify Darwin Nix settings (Dec 28)
 
 **Workflow:**
+
 - ✅ Small, atomic commits
 - ✅ Comprehensive commit messages
 - ✅ Git town recommended (not enforced)
@@ -261,10 +291,12 @@ Setup-Mac/
 ---
 
 ### 8. Type Safety System (100% Integrated)
+
 **Status:** ✅ FRAMEWORK IN PLACE
 **Files:** `dotfiles/nix/core/TypeSafetySystem.nix`, `State.nix`, `Validation.nix`
 
 **Components:**
+
 - ✅ Type definitions for all configurations
 - ✅ Centralized state management
 - ✅ Configuration validation logic
@@ -275,24 +307,29 @@ Setup-Mac/
 ---
 
 ### 9. Development Environment (100% Configured)
+
 **Status:** ✅ COMPLETE TOOLCHAIN
 
 **Languages:**
+
 - ✅ Go: Complete toolchain (golangci-lint, gofumpt, gup, wire, mockgen, gotests)
 - ✅ TypeScript/Bun: Modern JavaScript development
 - ✅ Python: AI/ML and scripting with uv package manager
 - ✅ Nix: System configuration and package management
 
 **IDEs:**
+
 - ✅ JetBrains Toolbox (professional IDE management)
 - ✅ Alacritty (GPU-accelerated terminal)
 
 **Version Control:**
+
 - ✅ Git
 - ✅ Git Town (advanced branch management)
 - ✅ Pre-commit hooks (Gitleaks, trailing whitespace, Nix syntax)
 
 **Build Tools:**
+
 - ✅ Docker (container development)
 - ✅ Bun (modern JavaScript runtime)
 - ✅ Make (for Go projects)
@@ -300,20 +337,24 @@ Setup-Mac/
 ---
 
 ### 10. Monitoring & Performance (100% Functional)
+
 **Status:** ✅ SYSTEMS OPERATIONAL
 
 **Monitoring Tools:**
+
 - ✅ ActivityWatch (automatic time tracking)
 - ✅ Netdata (system monitoring at http://localhost:19999)
 - ✅ ntopng (network monitoring at http://localhost:3000)
 
 **Performance Tools:**
+
 - ✅ Built-in benchmarks (`just benchmark-all`)
 - ✅ Shell startup profiling
 - ✅ Build performance tracking
 - ✅ Context-aware loading hooks
 
 **Benchmarks Available:**
+
 ```bash
 ✅ just benchmark-all      # Comprehensive system benchmarks
 ✅ just benchmark-shells   # Shell startup performance
@@ -326,21 +367,25 @@ Setup-Mac/
 ## B) 🟡 PARTIALLY DONE
 
 ### 1. Disk Space Management (CRITICAL - 95% Full)
+
 **Status:** 🔴 **CRITICAL ISSUE - IMMEDIATE ACTION REQUIRED**
 **Current Usage:** 215G/229G (95%)
 **Free Space:** 14G (6%)
 
 **Problem:**
+
 - Disk is at 95% capacity
 - Nix store likely consuming significant space
 - Risk of system instability or inability to build
 - Only 14G free - insufficient for large builds
 
 **Current Actions:**
+
 - ✅ Garbage collection started (in progress)
 - 🟡 Need aggressive cleanup strategy
 
 **Immediate Actions Needed:**
+
 ```bash
 # 1. Stop current GC and run aggressive cleanup
 just clean-aggressive
@@ -356,12 +401,14 @@ df -h / && df -h /nix
 ```
 
 **Long-term Strategy:**
+
 - Implement regular cleanup schedule (weekly)
 - Monitor disk space alerts
 - Consider Nix store compression
 - Move large packages to external storage if needed
 
 **Impact:**
+
 - 🔴 **BLOCKING** - Cannot safely build large packages
 - 🟡 **RISK** - System may become unstable
 - 🟡 **RISK** - Unable to perform major updates
@@ -369,9 +416,11 @@ df -h / && df -h /nix
 ---
 
 ### 2. NixOS Configuration (60% Complete)
+
 **Status:** 🟡 **CONFIGURED BUT UNTESTED**
 
 **What's Done:**
+
 - ✅ NixOS system configuration in `platforms/nixos/system/configuration.nix`
 - ✅ Home Manager integration with shared modules
 - ✅ Cross-platform package management
@@ -382,6 +431,7 @@ df -h / && df -h /nix
 - ✅ GPU acceleration (ROCm for AMD Ryzen AI Max+ 395)
 
 **What's Missing:**
+
 - ❌ Deployment to evo-x2 machine (never tested)
 - ❌ Verification of NixOS configuration builds
 - ❌ Testing of Wayland/Hyprland desktop
@@ -389,11 +439,13 @@ df -h / && df -h /nix
 - ❌ Testing of GPU acceleration (ROCm)
 
 **Blocker:**
+
 - evo-x2 machine not currently accessible
 - No way to test NixOS configuration
 - Risk of configuration errors on deployment
 
 **Next Steps (when machine available):**
+
 ```bash
 # Test build
 nixos-rebuild build --flake .#evo-x2 --show-trace
@@ -411,29 +463,35 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ---
 
 ### 3. Sandbox Configuration (70% Complete)
+
 **Status:** 🟡 **TEMPORARY DISABLED**
 
 **Current State:**
+
 - `sandbox = false` (in `platforms/darwin/nix/settings.nix`)
 
 **Why Disabled:**
+
 - Generation 206 enabled sandbox + added `/usr/include` (doesn't exist on macOS)
 - Caused all builds to fail
 - Workaround: Disabled sandbox temporarily
 
 **What's Done:**
+
 - ✅ Identified root cause (sandbox + invalid path)
 - ✅ SDK paths correct (`/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include`)
 - ✅ Sandbox configuration documented
 - ✅ TODO marker added for future refactoring
 
 **What's Missing:**
+
 - ❌ Re-enable sandbox with correct configuration
 - ❌ Verify sandbox doesn't break builds
 - ❌ Test all packages compile with sandbox enabled
 - ❌ Remove sandbox workaround
 
 **Next Steps:**
+
 ```nix
 # In platforms/darwin/nix/settings.nix
 sandbox = true;  # Re-enable
@@ -444,6 +502,7 @@ extra-sandbox-paths = [
 ```
 
 **Testing:**
+
 ```bash
 # Test build with sandbox
 darwin-rebuild build --flake . --show-trace
@@ -455,20 +514,24 @@ darwin-rebuild build --flake . --show-trace
 ---
 
 ### 4. ActivityWatch (50% Complete)
+
 **Status:** 🟡 **LINUX ONLY - MACOS NOT SUPPORTED**
 
 **What's Done:**
+
 - ✅ ActivityWatch configured for NixOS (Linux)
 - ✅ Platform-conditional: `enable = pkgs.stdenv.isLinux`
 - ✅ Auto-start configuration
 - ✅ Documentation for Linux deployment
 
 **What's Missing:**
+
 - ❌ macOS alternative (ActivityWatch doesn't support macOS)
 - ❌ Time tracking solution for macOS
 - ❌ Cross-platform time tracking strategy
 
 **Options for macOS:**
+
 1. Use alternative time tracker (Toggl, RescueTime)
 2. Run ActivityWatch in container (complex)
 3. Accept no time tracking on macOS
@@ -477,15 +540,18 @@ darwin-rebuild build --flake . --show-trace
 ---
 
 ### 5. Ghost Systems Integration (40% Complete)
+
 **Status:** 🟡 **FRAMEWORK IN PLACE - ADOPTION PENDING**
 
 **What's Done:**
+
 - ✅ TypeSafetySystem.nix framework created
 - ✅ State.nix for centralized state management
 - ✅ Validation.nix for configuration validation
 - ✅ Types.nix for type definitions
 
 **What's Missing:**
+
 - ❌ Systematic adoption in all configuration files
 - ❌ Verification of type assertions
 - ❌ Testing of validation framework
@@ -493,11 +559,13 @@ darwin-rebuild build --flake . --show-trace
 - ❌ Examples of type-safe configuration patterns
 
 **Current State:**
+
 - Framework exists but not consistently used
 - Most config files don't use type assertions
 - Risk of configuration inconsistencies
 
 **Next Steps:**
+
 ```nix
 # Add type assertions to config files
 # Example:
@@ -513,15 +581,18 @@ validateConfig {
 ---
 
 ### 6. Pre-commit Hooks (70% Complete)
+
 **Status:** 🟡 **PARTIALLY CONFIGURED**
 
 **What's Done:**
+
 - ✅ Gitleaks for secret detection
 - ✅ Trailing whitespace check
 - ✅ Nix syntax validation
 - ✅ Pre-commit framework installed
 
 **What's Missing:**
+
 - ❌ Nix code formatting (nixfmt)
 - ❅ Dead code detection (deadnix)
 - ❅ Shell script linting (shellcheck)
@@ -529,6 +600,7 @@ validateConfig {
 - ❌ Hook enforcement for all developers
 
 **Current Hooks:**
+
 ```yaml
 - repo: https://github.com/zricethezav/gitleaks
   rev: v8.18.0
@@ -537,6 +609,7 @@ validateConfig {
 ```
 
 **Missing Hooks:**
+
 ```yaml
 - repo: https://github.com/nix-community/nixpkgs-fmt
   rev: ...
@@ -552,15 +625,18 @@ validateConfig {
 ---
 
 ### 7. Testing Framework (30% Complete)
+
 **Status:** 🟡 **MINIMAL TESTING**
 
 **What's Done:**
+
 - ✅ `just test` - Builds configuration without applying
 - ✅ `just test-fast` - Syntax validation only
 - ✅ `nix flake check` - Flake validation
 - ✅ Manual verification steps in docs
 
 **What's Missing:**
+
 - ❌ Automated unit tests for Nix modules
 - ❌ Integration tests for cross-platform configs
 - ❅ Home Manager activation tests
@@ -569,6 +645,7 @@ validateConfig {
 - ❅ Regression test suite
 
 **Desired Test Suite:**
+
 ```bash
 # Unit tests
 just test-units        # Test individual modules
@@ -591,9 +668,11 @@ just test-all          # Run all tests
 ## C) ❌ NOT STARTED
 
 ### 1. Automated Backup System (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - Manual backups via `just backup` command
 - No automated backup schedule
 - No off-site backups
@@ -601,6 +680,7 @@ just test-all          # Run all tests
 - No backup verification
 
 **Required:**
+
 - Automated daily/weekly backups
 - Off-site backup (cloud storage)
 - Backup rotation (keep last N backups)
@@ -608,6 +688,7 @@ just test-all          # Run all tests
 - Backup notifications (email/Slack)
 
 **Implementation Plan:**
+
 ```bash
 # Schedule automated backups (cron/launchd)
 # Backup to cloud storage (rsync to external drive/cloud)
@@ -619,9 +700,11 @@ just test-all          # Run all tests
 ---
 
 ### 2. Continuous Integration (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - No CI/CD pipeline
 - No automated testing on push
 - No automated builds
@@ -629,6 +712,7 @@ just test-all          # Run all tests
 - Manual verification only
 
 **Required:**
+
 - GitHub Actions or GitLab CI
 - Automated tests on every push
 - Automated builds for both platforms
@@ -636,6 +720,7 @@ just test-all          # Run all tests
 - Status badges in README
 
 **Implementation Plan:**
+
 ```yaml
 # .github/workflows/test.yml
 name: Test Configuration
@@ -659,15 +744,18 @@ jobs:
 ---
 
 ### 3. Configuration Drift Detection (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - No drift detection system
 - Manual comparison of generations
 - No alerts for configuration changes
 - No automated validation of live system
 
 **Required:**
+
 - Automated drift detection between config and live system
 - Alert system for detected drift
 - Automatic correction of drift (optional)
@@ -675,6 +763,7 @@ jobs:
 - Periodic validation reports
 
 **Implementation Plan:**
+
 ```bash
 # Compare current generation to latest config
 just check-drift
@@ -689,9 +778,11 @@ just drift-history
 ---
 
 ### 4. Performance Optimization (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - No performance monitoring
 - No optimization of Nix store
 - No build caching analysis
@@ -699,6 +790,7 @@ just drift-history
 - Manual ad-hoc optimization only
 
 **Required:**
+
 - Continuous performance monitoring
 - Nix store optimization
 - Build cache optimization
@@ -707,6 +799,7 @@ just drift-history
 - Build time optimization
 
 **Implementation Plan:**
+
 ```bash
 # Optimize Nix store
 nix-store --optimize
@@ -724,9 +817,11 @@ just optimize-deps
 ---
 
 ### 5. Security Auditing (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - Gitleaks for secret detection (partial)
 - No regular security scans
 - No vulnerability scanning
@@ -734,6 +829,7 @@ just optimize-deps
 - No security audit logs
 
 **Required:**
+
 - Regular security scans (nixpkgs-audit)
 - Vulnerability scanning (NVD)
 - Dependency security checks
@@ -742,6 +838,7 @@ just optimize-deps
 - Automated patch management
 
 **Implementation Plan:**
+
 ```bash
 # Security scan
 just security-scan
@@ -756,9 +853,11 @@ just check-vulns
 ---
 
 ### 6. Documentation Website (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - Status reports in markdown files
 - No searchable documentation
 - No navigation structure
@@ -766,6 +865,7 @@ just check-vulns
 - No interactive examples
 
 **Required:**
+
 - Static site generator (Hugo, Docusaurus)
 - Searchable documentation
 - Architecture diagrams
@@ -776,9 +876,11 @@ just check-vulns
 ---
 
 ### 7. User Onboarding (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - No getting started guide
 - No installation instructions
 - No troubleshooting guide
@@ -786,6 +888,7 @@ just check-vulns
 - Assume existing knowledge
 
 **Required:**
+
 - Getting started guide
 - Installation instructions
 - First-time setup
@@ -796,9 +899,11 @@ just check-vulns
 ---
 
 ### 8. Community/Contributor Guidelines (0% Complete)
+
 **Status:** ❌ **NOT IMPLEMENTED**
 
 **Current State:**
+
 - No contribution guidelines
 - No code of conduct
 - No issue templates
@@ -806,6 +911,7 @@ just check-vulns
 - No contributor recognition
 
 **Required:**
+
 - CONTRIBUTING.md
 - CODE_OF_CONDUCT.md
 - Issue templates
@@ -818,10 +924,12 @@ just check-vulns
 ## D) 💀 TOTALLY FUCKED UP
 
 ### 1. Disk Space at 95% - CRITICAL
+
 **Status:** 🔴 **CRITICAL FAILURE MODE**
 **Severity:** CRITICAL - SYSTEM AT RISK
 
 **Problem:**
+
 - Disk is 95% full (14G free)
 - Cannot build large packages
 - Risk of system instability
@@ -829,12 +937,14 @@ just check-vulns
 - Nix store likely consuming massive space
 
 **Impact:**
+
 - 🔴 **BLOCKS** all large builds
 - 🔴 **RISKS** system stability
 - 🔴 **RISKS** data loss
 - 🔴 **BLOCKS** major updates
 
 **Root Causes:**
+
 1. No regular cleanup schedule
 2. Old system generations not pruned
 3. Nix store optimization never run
@@ -842,6 +952,7 @@ just check-vulns
 5. No alerts when disk > 80%
 
 **Fix Required (URGENT):**
+
 ```bash
 # IMMEDIATE ACTIONS (Run NOW)
 sudo nix-collect-garbage -d  # Delete all old generations
@@ -860,6 +971,7 @@ just clean-aggressive         # Aggressive cleanup
 ```
 
 **Target:**
+
 - Free up 50G+ (target < 80% usage)
 - Implement regular cleanup
 - Set up disk space monitoring
@@ -868,10 +980,12 @@ just clean-aggressive         # Aggressive cleanup
 ---
 
 ### 2. Generation 206 Broken (Historical Issue - Now Fixed)
+
 **Status:** 🟡 **FIXED - BUT LEFT IN HISTORY**
 **Severity:** HIGH - BROKE SYSTEM FOR 9 DAYS
 
 **Problem:**
+
 - Generation 206 broke on Dec 21
 - Home Manager activation failed
 - System stuck for 9 days (Dec 21-30)
@@ -879,6 +993,7 @@ just clean-aggressive         # Aggressive cleanup
 - Manual intervention required
 
 **Root Causes:**
+
 1. Enabled sandbox without testing
 2. Added invalid path `/usr/include` (doesn't exist on macOS)
 3. No pre-build validation
@@ -886,17 +1001,20 @@ just clean-aggressive         # Aggressive cleanup
 5. No alert system for broken builds
 
 **Impact:**
+
 - 🔴 **BLOCKED** system updates for 9 days
 - 🔴 **LOST** productivity time
 - 🔴 **REQUIRES** manual fix
 
 **Fix Applied (Dec 30):**
+
 - ✅ Fixed sandbox configuration
 - ✅ Removed invalid path
 - ✅ Built generation 207
 - ✅ Activated successfully
 
 **Lessons Learned:**
+
 - Need automated build validation
 - Need automated rollback on failure
 - Need pre-commit/build checks
@@ -905,16 +1023,19 @@ just clean-aggressive         # Aggressive cleanup
 ---
 
 ### 3. Home Manager Username Mismatch (Historical Issue - Now Fixed)
+
 **Status:** 🟡 **FIXED - BUT SHOULD HAVE BEEN CAUGHT EARLIER**
 **Severity:** HIGH - BLOCKED ACTIVATION
 
 **Problem:**
+
 - Home Manager configured for user `lars`
 - System username is `larsartmann`
 - Activation failed with cryptic error
 - Blocker for 9 days
 
 **Root Causes:**
+
 1. No validation of user existence
 2. No automated testing of Home Manager config
 3. Username hardcoded (not dynamic)
@@ -922,11 +1043,13 @@ just clean-aggressive         # Aggressive cleanup
 5. No pre-build validation
 
 **Impact:**
+
 - 🔴 **BLOCKED** Home Manager activation
 - 🔴 **PREVENTED** shell configuration
 - 🔴 **WASTED** 9 days debugging
 
 **Fix Applied (Dec 30):**
+
 - ✅ Corrected username to `larsartmann`
 - ✅ Updated flake.nix
 - ✅ Updated platforms/darwin/default.nix
@@ -934,6 +1057,7 @@ just clean-aggressive         # Aggressive cleanup
 - ✅ Activated successfully
 
 **Lessons Learned:**
+
 - Need validation of user existence
 - Need automated Home Manager testing
 - Need dynamic username resolution
@@ -942,31 +1066,37 @@ just clean-aggressive         # Aggressive cleanup
 ---
 
 ### 4. iTerm2 Build Failure (Workaround Applied)
+
 **Status:** 🟡 **WORKAROUND - NOT ROOT CAUSE FIX**
 **Severity:** MEDIUM - PACKAGE UNAVAILABLE VIA NIX
 
 **Problem:**
+
 - iTerm2 derivation hardcodes `/usr/include` requirement
 - Path doesn't exist on modern macOS (Sequoia 15.4)
 - 10 attempted solutions all failed
 - iTerm2 cannot be built via Nix
 
 **Root Causes:**
+
 1. iTerm2 upstream uses legacy paths
 2. macOS removed `/usr/include` (Apple's change)
 3. Nix derivation not updated for modern macOS
 4. No alternative iTerm2 package in nixpkgs
 
 **Impact:**
+
 - 🟡 **LOSS** of iTerm2 via Nix (use Homebrew instead)
 - 🟡 **INCONSISTENCY** in package management
 
 **Workaround Applied:**
+
 - ✅ Disabled iTerm2 in Nix config
 - ✅ Documented Homebrew alternative
 - ✅ Added TODO for future fix
 
 **Proper Fix Required:**
+
 1. File upstream issue with iTerm2
 2. Update Nix derivation to use SDK paths
 3. Or patch iTerm2 to use modern macOS paths
@@ -975,10 +1105,12 @@ just clean-aggressive         # Aggressive cleanup
 ---
 
 ### 5. No Automated Rollback System
+
 **Status:** 🔴 **CRITICAL MISSING FEATURE**
 **Severity:** HIGH - SYSTEM VULNERABILITY
 
 **Problem:**
+
 - No automated rollback mechanism
 - Manual rollback only (`just rollback`)
 - No detection of broken generations
@@ -986,6 +1118,7 @@ just clean-aggressive         # Aggressive cleanup
 - Manual intervention required for all failures
 
 **Root Causes:**
+
 1. No automated monitoring of activation
 2. No health checks post-activation
 3. No automated detection of failures
@@ -993,11 +1126,13 @@ just clean-aggressive         # Aggressive cleanup
 5. No alert system for broken configs
 
 **Impact:**
+
 - 🔴 **RISK** of system being stuck in broken state
 - 🔴 **RISK** of extended downtime
 - 🔴 **REQUIRES** manual intervention for recovery
 
 **Required Implementation:**
+
 ```bash
 # Automated rollback system
 just auto-rollback  # Auto-detect broken gen, rollback to last good
@@ -1014,11 +1149,13 @@ just alert-failure   # Alert on broken activation
 ## E) 🚀 WHAT WE SHOULD IMPROVE
 
 ### 1. Automated Testing Framework
+
 **Priority:** 🔴 **CRITICAL**
 **Impact:** Prevents future breakages
 **Effort:** HIGH
 
 **Improvements:**
+
 - Add automated tests for all Nix modules
 - Add integration tests for Home Manager activation
 - Add validation tests for usernames, paths, sandbox
@@ -1026,6 +1163,7 @@ just alert-failure   # Alert on broken activation
 - Add CI/CD pipeline for automated testing on every push
 
 **Expected Impact:**
+
 - Catch issues before deployment
 - Prevent generation breakages
 - Reduce debugging time by 80%
@@ -1034,11 +1172,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 2. Disk Space Management Automation
+
 **Priority:** 🔴 **CRITICAL**
 **Impact:** Prevents system instability
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Implement automated weekly cleanup
 - Add disk space monitoring with alerts
 - Set up aggressive cleanup at 90% usage
@@ -1046,6 +1186,7 @@ just alert-failure   # Alert on broken activation
 - Add old generation pruning
 
 **Expected Impact:**
+
 - Maintain disk space < 80%
 - Prevent build failures
 - Improve system stability
@@ -1054,11 +1195,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 3. Pre-build Validation
+
 **Priority:** 🟡 **HIGH**
 **Impact:** Catches configuration errors early
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Validate user existence before build
 - Validate all paths exist before build
 - Validate sandbox configuration
@@ -1066,6 +1209,7 @@ just alert-failure   # Alert on broken activation
 - Validate Home Manager config
 
 **Expected Impact:**
+
 - Prevent build failures
 - Catch username/path issues
 - Reduce debugging time
@@ -1074,11 +1218,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 4. Automated Rollback System
+
 **Priority:** 🟡 **HIGH**
 **Impact:** Automatic recovery from failures
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Implement automated health checks
 - Auto-detect broken generations
 - Auto-rollback to last known good
@@ -1086,6 +1232,7 @@ just alert-failure   # Alert on broken activation
 - Implement safety checks before activation
 
 **Expected Impact:**
+
 - Automatic recovery from failures
 - Reduced downtime
 - Improved system resilience
@@ -1094,11 +1241,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 5. Cross-Platform Testing
+
 **Priority:** 🟡 **HIGH**
 **Impact:** Ensures NixOS config works
 **Effort:** HIGH
 
 **Improvements:**
+
 - Test NixOS builds on Linux CI
 - Test cross-platform consistency
 - Validate shared modules work on both platforms
@@ -1106,6 +1255,7 @@ just alert-failure   # Alert on broken activation
 - Verify GPU acceleration
 
 **Expected Impact:**
+
 - Catch NixOS issues before deployment
 - Ensure cross-platform consistency
 - Reduce deployment risks
@@ -1113,11 +1263,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 6. Documentation Website
+
 **Priority:** 🟢 **MEDIUM**
 **Impact:** Improves usability and onboarding
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Build static site with Hugo/Docusaurus
 - Add searchable documentation
 - Create architecture diagrams
@@ -1125,6 +1277,7 @@ just alert-failure   # Alert on broken activation
 - Add getting started guide
 
 **Expected Impact:**
+
 - Easier onboarding
 - Better documentation discoverability
 - Improved user experience
@@ -1132,11 +1285,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 7. Security Auditing Automation
+
 **Priority:** 🟢 **MEDIUM**
 **Impact:** Improves security posture
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Implement regular security scans
 - Add vulnerability scanning
 - Check for known CVEs
@@ -1144,6 +1299,7 @@ just alert-failure   # Alert on broken activation
 - Automate patch management
 
 **Expected Impact:**
+
 - Proactive security
 - Faster vulnerability detection
 - Automated patching
@@ -1151,11 +1307,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 8. Performance Monitoring
+
 **Priority:** 🟢 **MEDIUM**
 **Impact:** Optimizes system performance
 **Effort:** LOW
 
 **Improvements:**
+
 - Continuous performance monitoring
 - Build time tracking
 - Nix store usage analytics
@@ -1163,6 +1321,7 @@ just alert-failure   # Alert on broken activation
 - Performance regression detection
 
 **Expected Impact:**
+
 - Identify bottlenecks
 - Optimize build times
 - Improve system performance
@@ -1170,11 +1329,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 9. Backup Automation
+
 **Priority:** 🟡 **HIGH**
 **Impact:** Prevents data loss
 **Effort:** LOW
 
 **Improvements:**
+
 - Implement automated daily backups
 - Add off-site backups
 - Implement backup rotation
@@ -1182,6 +1343,7 @@ just alert-failure   # Alert on broken activation
 - Add backup notifications
 
 **Expected Impact:**
+
 - Automated data protection
 - Disaster recovery capability
 - Reduced manual effort
@@ -1189,11 +1351,13 @@ just alert-failure   # Alert on broken activation
 ---
 
 ### 10. Type Safety System Adoption
+
 **Priority:** 🟢 **MEDIUM**
 **Impact:** Reduces configuration errors
 **Effort:** MEDIUM
 
 **Improvements:**
+
 - Adopt type safety in all config files
 - Add validation assertions
 - Create type-safe configuration patterns
@@ -1201,6 +1365,7 @@ just alert-failure   # Alert on broken activation
 - Add examples
 
 **Expected Impact:**
+
 - Catch configuration errors at build time
 - Reduce runtime errors
 - Improve code quality
@@ -1473,6 +1638,7 @@ users.users.larsartmann = {
 ## 📊 FINAL STATISTICS
 
 ### Current System State
+
 - **System Generation:** 207 (Active ✅)
 - **Last Working Generation:** 205 (Dec 19)
 - **Broken Generation:** 206 (Dec 21 - Now Fixed)
@@ -1480,6 +1646,7 @@ users.users.larsartmann = {
 - **Free Space:** 14G (6% - 🔴 CRITICAL)
 
 ### Configuration Status
+
 - **Total Files Modified:** 2 (flake.nix, platforms/darwin/default.nix)
 - **Total Status Reports:** 17 comprehensive reports
 - **Total Documentation Files:** ~30+ guides, templates, ADRs
@@ -1487,6 +1654,7 @@ users.users.larsartmann = {
 - **Total Go Commands:** 19 Go-specific recipes
 
 ### Completion Metrics
+
 - **Home Manager Integration:** 100% ✅
 - **Darwin Build System:** 100% ✅
 - **Cross-Platform Architecture:** 100% ✅
@@ -1504,11 +1672,13 @@ users.users.larsartmann = {
 - **NixOS Configuration:** 60% (untested)
 
 ### Risk Assessment
+
 - 🔴 **CRITICAL RISKS:** 3 (disk space, no automated rollback, no pre-build validation)
 - 🟡 **HIGH RISKS:** 4 (NixOS untested, sandbox disabled, incomplete testing, drift detection)
 - 🟢 **MEDIUM RISKS:** 6 (automation missing, type adoption, iTerm2 workaround, etc.)
 
 ### Overall Health Score
+
 - **Functionality:** 8/10 (system works, but has critical issues)
 - **Stability:** 6/10 (working now, but recent 9-day outage)
 - **Reliability:** 5/10 (no automated recovery mechanisms)
@@ -1524,6 +1694,7 @@ users.users.larsartmann = {
 ## 🎯 IMMEDIATE NEXT ACTIONS (Priority Order)
 
 ### 1. 🔴 Fix Disk Space (CRITICAL - DO NOW)
+
 ```bash
 # Run aggressive cleanup
 just clean-aggressive
@@ -1539,6 +1710,7 @@ df -h / && df -h /nix
 ```
 
 ### 2. 🔴 Implement Pre-build Validation (CRITICAL - DO TODAY)
+
 ```bash
 # Add validation to just test
 # Check user existence, paths, sandbox config
@@ -1548,6 +1720,7 @@ just test
 ```
 
 ### 3. 🔴 Add Automated Health Checks (CRITICAL - DO TODAY)
+
 ```bash
 # Add health checks to just health
 # Verify system generation, Home Manager, disk space
@@ -1557,6 +1730,7 @@ just health
 ```
 
 ### 4. 🔴 Implement Automated Rollback (HIGH PRIORITY - DO THIS WEEK)
+
 ```bash
 # Create auto-rollback mechanism
 # Auto-detect broken generations
@@ -1564,6 +1738,7 @@ just health
 ```
 
 ### 5. 🟡 Test NixOS Configuration (HIGH PRIORITY - DO THIS WEEK)
+
 ```bash
 # Build NixOS config
 nixos-rebuild build --flake .#evo-x2 --show-trace
@@ -1578,6 +1753,7 @@ nixos-rebuild build --flake .#evo-x2 --show-trace
 **System Status:** 🟡 **MOSTLY FUNCTIONAL WITH CRITICAL ISSUES**
 
 **What's Working:**
+
 - ✅ Home Manager fully integrated and activated
 - ✅ Cross-platform architecture working well
 - ✅ Build system functional
@@ -1585,6 +1761,7 @@ nixos-rebuild build --flake .#evo-x2 --show-trace
 - ✅ Good development workflow
 
 **Critical Issues:**
+
 - 🔴 Disk space at 95% (14G free) - IMMEDIATE ACTION REQUIRED
 - 🔴 No automated rollback mechanism
 - 🔴 No pre-build validation
@@ -1592,6 +1769,7 @@ nixos-rebuild build --flake .#evo-x2 --show-trace
 - 🟡 Sandbox disabled
 
 **Immediate Actions Required:**
+
 1. Fix disk space (run aggressive cleanup NOW)
 2. Implement pre-build validation
 3. Add automated health checks
@@ -1603,8 +1781,8 @@ Why does Home Manager use `users.larsartmann` in flake.nix while nix-darwin also
 
 ---
 
-*Comprehensive Status Update Generated: 2025-12-30 07:25:00 CET*
-*Report Covers: 16 days of development (Dec 14-30, 2025)*
-*Total Status Reports Reviewed: 17 files*
+_Comprehensive Status Update Generated: 2025-12-30 07:25:00 CET_
+_Report Covers: 16 days of development (Dec 14-30, 2025)_
+_Total Status Reports Reviewed: 17 files_
 *Total Issues Identified: 25+
-*Total Recommendations: 25 action items*
+*Total Recommendations: 25 action items\*

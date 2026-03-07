@@ -17,6 +17,7 @@ Setup-Mac now uses `nix-colors` for centralized, declarative color scheme manage
    - Darwin: Line ~19 in `platforms/darwin/default.nix`
 
 2. Change the scheme name:
+
    ```nix
    colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
    ```
@@ -24,6 +25,7 @@ Setup-Mac now uses `nix-colors` for centralized, declarative color scheme manage
 3. Available schemes: https://tinted-themes.github.io/base16-gallery/
 
 4. Apply changes:
+
    ```bash
    # NixOS
    sudo nixos-rebuild switch --flake .
@@ -93,6 +95,7 @@ exec fish
 ## Future Enhancements
 
 Planned additions:
+
 - [ ] GTK theme integration
 - [ ] Qt theme integration
 - [ ] Terminal emulator colors (Alacritty/Kitty/WezTerm)
@@ -107,4 +110,4 @@ Planned additions:
 
 ---
 
-*Last updated: January 14, 2026*
+_Last updated: January 14, 2026_

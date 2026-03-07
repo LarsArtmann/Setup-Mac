@@ -43,11 +43,11 @@
 
 **Investigation Results:**
 
-| Issue | Root Cause | Impact |
-|-------|-------------|---------|
-| `nh darwin switch` fails | macOS temp directory permissions | Deployment blocked |
-| Silent build failures | No disk space alerts | Debugging difficult |
-| Configuration errors | Dangerous overrides applied | Security compromised |
+| Issue                    | Root Cause                       | Impact               |
+| ------------------------ | -------------------------------- | -------------------- |
+| `nh darwin switch` fails | macOS temp directory permissions | Deployment blocked   |
+| Silent build failures    | No disk space alerts             | Debugging difficult  |
+| Configuration errors     | Dangerous overrides applied      | Security compromised |
 
 **Key Findings:**
 
@@ -74,6 +74,7 @@
 **File:** `platforms/darwin/system/activation.nix` line 41
 
 **What Was Wrong:**
+
 ```nix
 ## TODO: below looks sus!
 # Completely disable all system checks to prevent TCC reset
@@ -82,23 +83,25 @@ checks = lib.mkForce {};  # DISABLING ALL SAFETY! 💥
 
 **What This Did:**
 
-| Check | Purpose | Risk If Disabled |
-|--------|-----------|-----------------|
-| `verifyMacOSVersion` | Ensures macOS ≥ 11.3 required | **BOOT FAILURE** |
-| `verifyBuildUsers` | Validates build user UIDs/GIDs | **PRIVILEGE ESCALATION** |
-| `nixDaemon` | Validates nix-daemon service | **SERVICE FAILURE** |
-| `primaryUser` | Ensures primary user exists | **USER CREATION FAILS** |
-| `determinate` | Detects Determinate conflicts | **UNDETECTABLE CONFLICTS** |
-| `buildGroupID` | Checks nixbld group GID | **PERMISSION ISSUES** |
-| `homebrewInstalled` | Validates Homebrew installation | **HOMEBREW BREAKS** |
-| `restartAfterPowerFailure` | Validates power management setting | **DATA LOSS RISK** |
+| Check                      | Purpose                            | Risk If Disabled           |
+| -------------------------- | ---------------------------------- | -------------------------- |
+| `verifyMacOSVersion`       | Ensures macOS ≥ 11.3 required      | **BOOT FAILURE**           |
+| `verifyBuildUsers`         | Validates build user UIDs/GIDs     | **PRIVILEGE ESCALATION**   |
+| `nixDaemon`                | Validates nix-daemon service       | **SERVICE FAILURE**        |
+| `primaryUser`              | Ensures primary user exists        | **USER CREATION FAILS**    |
+| `determinate`              | Detects Determinate conflicts      | **UNDETECTABLE CONFLICTS** |
+| `buildGroupID`             | Checks nixbld group GID            | **PERMISSION ISSUES**      |
+| `homebrewInstalled`        | Validates Homebrew installation    | **HOMEBREW BREAKS**        |
+| `restartAfterPowerFailure` | Validates power management setting | **DATA LOSS RISK**         |
 
 **Why This Was WRONG:**
 
 1. **The Comment Was 100% False:**
+
    ```nix
    # Completely disable all system checks to prevent TCC reset
    ```
+
    - System checks have NOTHING to do with TCC (macOS permissions)
    - TCC reset is in `activationScripts`, NOT `checks`
    - This is like "disabling car seatbelts to fix a broken radio"
@@ -125,6 +128,7 @@ checks = lib.mkForce {};  # DISABLING ALL SAFETY! 💥
 ```
 
 **Impact:**
+
 - ✅ System validation restored
 - ✅ Security checks active
 - ✅ Boot failure detection working
@@ -138,6 +142,7 @@ checks = lib.mkForce {};  # DISABLING ALL SAFETY! 💥
 **File:** `platforms/darwin/nix/settings.nix` lines 11-19
 
 **What Was Wrong:**
+
 ```nix
 extra-sandbox-paths = [
   "/dev"
@@ -153,11 +158,11 @@ extra-sandbox-paths = [
 
 **What Was Missing:**
 
-| Path | Purpose | Necessity |
-|------|---------|-----------|
-| `/private/tmp` | Temporary build files | **CRITICAL** |
+| Path               | Purpose                 | Necessity    |
+| ------------------ | ----------------------- | ------------ |
+| `/private/tmp`     | Temporary build files   | **CRITICAL** |
 | `/private/var/tmp` | Persistent temp storage | **CRITICAL** |
-| `/usr/bin/env` | Environment utility | **CRITICAL** |
+| `/usr/bin/env`     | Environment utility     | **CRITICAL** |
 
 **Impact If Not Fixed:**
 
@@ -194,6 +199,7 @@ extra-sandbox-paths = [
 ```
 
 **Impact:**
+
 - ✅ Builds can now write temporary files
 - ✅ Scripts can find environment utility
 - ✅ Random build failures prevented
@@ -269,30 +275,35 @@ warning: The check omitted these incompatible systems: x86_64-linux (expected)
 **Actions Taken:**
 
 1. **Garbage Collection:**
+
    ```bash
    nix-collect-garbage -d --delete-older-than 14d
    ```
+
    - Freed: ~3GB
    - Time: ~10 minutes
    - Status: ✅ COMPLETE
 
 2. **Store Optimization:**
+
    ```bash
    nix-store --optimize
    ```
+
    - Deduplicating files in Nix store
    - Status: 🔄 RUNNING (background)
    - Expected: Additional 1-2GB freed
 
 3. **Disk Space Improvement:**
 
-| Metric | Before | After | Improvement |
-|---------|---------|--------|--------------|
-| Used | 213G (93%) | 206G (91%) | 7GB freed |
-| Available | 19G | 23G | 4GB more free |
-| Percentage | 93% | 91% | 2% better |
+| Metric     | Before     | After      | Improvement   |
+| ---------- | ---------- | ---------- | ------------- |
+| Used       | 213G (93%) | 206G (91%) | 7GB freed     |
+| Available  | 19G        | 23G        | 4GB more free |
+| Percentage | 93%        | 91%        | 2% better     |
 
 **Current Status:**
+
 - Disk space: 206G/229G used (91%)
 - Free space: 23G
 - Status: ✅ ADEQUATE FOR BUILDS
@@ -304,6 +315,7 @@ warning: The check omitted these incompatible systems: x86_64-linux (expected)
 #### ⚠️ 1. System Configuration Build - IN PROGRESS
 
 **Command:**
+
 ```bash
 nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --out-link ./darwin-result --verbose
 ```
@@ -313,6 +325,7 @@ nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel -
 **Time Elapsed:** ~15 minutes
 
 **Output:**
+
 ```
 evaluating file '<nix/derivation-internal.nix>'
 evaluating derivation 'git+file:///Users/larsartmann/Desktop/Setup-Mac#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel'...
@@ -340,6 +353,7 @@ evaluating derivation 'git+file:///Users/larsartmann/Desktop/Setup-Mac#darwinCon
    - Waiting for locks (I/O-bound?)
 
 **Next Steps:**
+
 - Wait for build to complete (recommended)
 - Or kill and restart with `--print-build-logs` (for visibility)
 
@@ -356,10 +370,12 @@ evaluating derivation 'git+file:///Users/larsartmann/Desktop/Setup-Mac#darwinCon
 **Alternative:** `just switch` (recommended)
 
 **Blockers:**
+
 1. Build must complete first (no darwin-result symlink yet)
 2. User needs to approve system changes
 
 **What This Does:**
+
 - Applies new system configuration
 - Enables Home Manager for user `lars`
 - Configures Starship, Fish, Tmux, environment variables
@@ -376,6 +392,7 @@ evaluating derivation 'git+file:///Users/larsartmann/Desktop/Setup-Mac#darwinCon
 **Blocker:** System configuration switch must complete first
 
 **Why Required:**
+
 - Shell changes only apply to new shell sessions
 - Fish shell configuration won't be active in current terminal
 - Environment variables won't be updated
@@ -452,9 +469,11 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
    - Conflict detection: DISABLED (undetectable configuration errors)
 
 2. **The Comment Was 100% False:**
+
    ```nix
    # Completely disable all system checks to prevent TCC reset
    ```
+
    - System checks have NOTHING to do with TCC (macOS permissions)
    - TCC reset is in `activationScripts`, NOT `checks`
    - This is like "disabling car seatbelts to fix a broken radio"
@@ -468,13 +487,13 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
 
 4. **Security Impact:**
 
-| Risk | Severity | Likelihood | Impact |
-|------|-----------|------------|---------|
-| Boot failure | **CRITICAL** | HIGH | System unusable, requires recovery |
-| Privilege escalation | **CRITICAL** | MEDIUM | Unauthorized access possible |
-| Service failure | **HIGH** | HIGH | System services broken |
-| Configuration errors | **HIGH** | MEDIUM | Unpredictable behavior |
-| Undetectable issues | **HIGH** | HIGH | Errors not caught |
+| Risk                 | Severity     | Likelihood | Impact                             |
+| -------------------- | ------------ | ---------- | ---------------------------------- |
+| Boot failure         | **CRITICAL** | HIGH       | System unusable, requires recovery |
+| Privilege escalation | **CRITICAL** | MEDIUM     | Unauthorized access possible       |
+| Service failure      | **HIGH**     | HIGH       | System services broken             |
+| Configuration errors | **HIGH**     | MEDIUM     | Unpredictable behavior             |
+| Undetectable issues  | **HIGH**     | HIGH       | Errors not caught                  |
 
 **How It Was Fucked Up:**
 
@@ -492,6 +511,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
    ```nix
    # Completely disable all system checks to prevent TCC reset
    ```
+
    - Clearly shows developer didn't understand what they were doing
    - Applied dangerous change without proper research
    - Misleading comment hides actual issue
@@ -526,6 +546,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
 **File:** `docs/security/best-practices.md`
 
 **Content:**
+
 - Never disable `checks` with `lib.mkForce {}`
 - Keep `extra-sandbox-paths` complete
 - Verify configuration with `nix flake check` before applying
@@ -542,6 +563,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
 **File:** `docs/security/warning-templates.md`
 
 **Template:**
+
 ```nix
 ## ⚠️ SECURITY WARNING ⚠️
 ## Only disable this option if you understand ALL security implications:
@@ -560,6 +582,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
 **File:** `docs/configuration-review-checklist.md`
 
 **Checklist:**
+
 - ❌ Never disable `checks` with `lib.mkForce {}`
 - ✅ All `extra-sandbox-paths` include critical paths (/private/tmp, /private/var/tmp, /usr/bin/env)
 - ✅ Configuration validates with `nix flake check`
@@ -578,6 +601,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
 **File:** `scripts/security-validation.sh`
 
 **Checks:**
+
 ```bash
 # Check for dangerous patterns
 grep -r "checks = lib.mkForce {}" . && exit 1  # FAIL if found
@@ -594,6 +618,7 @@ echo "✅ All security checks passed"
 ```
 
 **Usage:**
+
 ```bash
 # Run before committing
 ./scripts/security-validation.sh
@@ -610,6 +635,7 @@ echo "✅ All security checks passed"
 **File:** `.git/hooks/pre-commit`
 
 **Hooks:**
+
 ```bash
 #!/bin/bash
 
@@ -642,6 +668,7 @@ exit 0
 ```
 
 **Setup:**
+
 ```bash
 # Make executable
 chmod +x .git/hooks/pre-commit
@@ -658,6 +685,7 @@ git commit --allow-empty -m "Test pre-commit hooks"
 **File:** `scripts/build-with-progress.sh`
 
 **Features:**
+
 ```bash
 #!/bin/bash
 
@@ -685,6 +713,7 @@ fi
 ```
 
 **Usage:**
+
 ```bash
 # Use instead of `nix build`
 ./scripts/build-with-progress.sh .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel
@@ -699,7 +728,9 @@ fi
 **Estimated Time:** 20-30 minutes
 
 **Actions:**
+
 1. Review all TODO comments in project:
+
    ```bash
    grep -r "TODO:" --include="*.nix" .
    ```
@@ -722,6 +753,7 @@ fi
 **Estimated Time:** 15-20 minutes
 
 **Template:**
+
 ```
 ## SECURITY IMPACT:
 - Before: [Description of vulnerabilities or security posture]
@@ -731,6 +763,7 @@ fi
 ```
 
 **Example:**
+
 ```
 ## SECURITY IMPACT:
 - Before: CRITICAL VULNERABILITIES - system checks disabled, boot failures possible
@@ -746,11 +779,13 @@ fi
 **Estimated Time:** 30-45 minutes
 
 **Tools:**
+
 - `nixpkgs-hammering` - Check for security issues in nixpkgs
 - `nix-vuln-feed` - Check for vulnerable packages
 - Custom scripts - Check configuration for dangerous patterns
 
 **Script:**
+
 ```bash
 #!/bin/bash
 
@@ -964,28 +999,33 @@ echo "Results: vuln-scan.txt"
 ### g) ❓ TOP #1 QUESTION I CANNOT FIGURE OUT MYSELF
 
 #### QUESTION:
+
 **Why is the Nix build taking so long (15+ minutes) with no visible output, and should I kill it and try a different approach?**
 
 #### CONTEXT:
 
 **Current Situation:**
+
 - Running: `nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --out-link ./darwin-result --verbose`
 - Time Elapsed: ~15 minutes
 - Output: Many `evaluating file ...` messages (configuration being loaded)
 - Result: `darwin-result` symlink NOT created yet
 
 **Expected Behavior:**
+
 - First-time build: 5-10 minutes
 - Subsequent builds: 1-2 minutes
 - With cache: <1 minute
 
 **System Specs:**
+
 - MacBook Air (M1/M2?)
 - Nix version: 2.31.2
 - Disk space: 91% used (23GB free)
 - Network: Unknown (possibly slow?)
 
 **Observed Behavior:**
+
 - `evaluating file ...` messages for hundreds of files
 - No build logs visible (despite `--verbose` flag)
 - No error messages
@@ -1057,6 +1097,7 @@ echo "Results: vuln-scan.txt"
 #### WHAT YOU (THE USER) CAN DO:
 
 1. **Check Build Progress Now:**
+
    ```bash
    # See if build process is still running
    ps aux | grep -E "nix.*(build|daemon)" | grep -v grep
@@ -1066,6 +1107,7 @@ echo "Results: vuln-scan.txt"
    ```
 
 2. **Enable Build Logging:**
+
    ```bash
    # Cancel current build (Ctrl+C)
    # Restart with build logs enabled
@@ -1077,6 +1119,7 @@ echo "Results: vuln-scan.txt"
    ```
 
 3. **Monitor System Resources:**
+
    ```bash
    # Check if build is using CPU
    top -o cpu | grep -E "(nix|PID)" | head -10
@@ -1086,6 +1129,7 @@ echo "Results: vuln-scan.txt"
    ```
 
 4. **Try Different Build Approach:**
+
    ```bash
    # Try darwin-rebuild instead
    darwin-rebuild build --flake . --verbose

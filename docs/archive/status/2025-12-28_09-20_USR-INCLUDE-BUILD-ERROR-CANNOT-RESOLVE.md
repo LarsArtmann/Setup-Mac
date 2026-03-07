@@ -8,6 +8,7 @@
 ## 🚨 THE PROBLEM
 
 ### Error Message:
+
 ```
 error:
   … while setting up the build environment
@@ -15,12 +16,14 @@ error:
 ```
 
 ### When It Occurs:
+
 - Building ANY package that needs system headers (iTerm2, etc.)
 - Using `nix build nixpkgs#iterm2`
 - Using `nix profile add nixpkgs#iterm2`
 - Happens during "setting up build environment" (before compilation)
 
 ### What Works:
+
 - ✅ `nix build nixpkgs#hello` (simple package works fine)
 - ✅ Nix is otherwise functional
 - ✅ nix doctor passes (no warnings)
@@ -31,6 +34,7 @@ error:
 ## 🔍 ROOT CAUSE ANALYSIS
 
 ### System State:
+
 - **macOS Version:** macOS 15.4 (Sequoia)
 - **Architecture:** aarch64-darwin (Apple Silicon)
 - **Command Line Tools:** Installed at `/Library/Developer/CommandLineTools`
@@ -39,6 +43,7 @@ error:
 - **Legacy Include Path:** `/usr/include` ❌ DOES NOT EXIST (removed in modern macOS)
 
 ### Why This Happens:
+
 On modern macOS (especially aarch64), `/usr/include` was removed. System headers are now in Xcode SDK. However, Nix is still trying to access `/usr/include` when building packages that need system headers.
 
 ---
@@ -46,21 +51,25 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ## 💪 ATTEMPTS TO FIX (ALL FAILED)
 
 ### Attempt 1: Create `/usr/include`
+
 **Command:** `sudo mkdir -p /usr/include`
 **Result:** ❌ "Operation not permitted"
 **Reason:** System Integrity Protection (SIP) blocks creation
 
 ### Attempt 2: Remove `/usr/include` from Configuration
+
 **File:** `platforms/darwin/nix/settings.nix`
 **Action:** Removed line 18 (`"/usr/include"`)
 **Result:** ❌ Error persists
 **Why:** Coming from somewhere else, not our configuration files
 
 ### Attempt 3: Add Xcode SDK Paths to Configuration
+
 **File:** `platforms/darwin/nix/settings.nix`
 **Action:** Added SDK paths to `extra-sandbox-paths`
 **Result:** ❌ Error persists
 **Paths Added:**
+
 ```nix
 "/Library/Developer/CommandLineTools"
 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
@@ -68,30 +77,37 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ```
 
 ### Attempt 4: Update nixpkgs
+
 **Command:** `nix flake update nixpkgs`
 **Result:** ❌ Error persists
 
 ### Attempt 5: Restart Nix Daemon
+
 **Command:** Tried restart
 **Result:** ❌ Cannot restart through this interface
 
 ### Attempt 6: Try Building with `--impure` Flag
+
 **Command:** `nix build nixpkgs#iterm2 --no-link --impure`
 **Result:** ❌ Error persists
 
 ### Attempt 7: Check Derivation for `/usr/include` References
+
 **Command:** `nix show-derivation nixpkgs#iterm2 | grep -i "usr/include"`
 **Result:** ❌ No references found in derivation
 
 ### Attempt 8: Check All Configuration Files
+
 **Action:** Searched entire project for `/usr/include` references
 **Result:** ❌ Only commented references found, no active ones
 
 ### Attempt 9: Check Global Nix Configuration
+
 **Files:** `~/.config/nix/nix.conf`, `/etc/nix/nix.conf`
 **Result:** ❌ No `/usr/include` references found
 
 ### Attempt 10: Test Simple Package Build
+
 **Command:** `nix build nixpkgs#hello --no-link`
 **Result:** ✅ Succeeds (Nix works for simple packages)
 
@@ -100,6 +116,7 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ## 🎯 DIAGNOSIS
 
 ### What We Know:
+
 1. ✅ Nix is working correctly (simple package builds)
 2. ✅ Our configuration files don't reference `/usr/include` anymore
 3. ✅ Xcode SDK paths are correctly configured
@@ -108,6 +125,7 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 6. ❌ Error occurs during build environment setup (not compilation)
 
 ### What We Don't Know:
+
 1. ❓ Where is `/usr/include` reference coming from?
    - Not in our configuration files
    - Not in global Nix config
@@ -119,6 +137,7 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 4. ❓ Is this a known Nix 2.31.2 + macOS 15.4 bug?
 
 ### Most Likely Causes:
+
 1. **Nixpkgs Derivation Issue** (HIGH PROBABILITY)
    - iTerm2 or its dependencies might have `/usr/include` hard-coded
    - Could be a platform-specific issue in nixpkgs
@@ -140,9 +159,11 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 ## 🔧 SUGGESTED SOLUTIONS
 
 ### Option 1: Search Online for Known Issues (RECOMMENDED)
+
 **Action:** Use the search queries in `/tmp/search-queries.md`
 
 **Specific Searches:**
+
 1. "nix darwin getting attributes of required path '/usr/include'"
 2. "nix build error /usr/include macOS aarch64"
 3. "iterm2 nix build error usr/include"
@@ -150,15 +171,18 @@ On modern macOS (especially aarch64), `/usr/include` was removed. System headers
 5. "nixos.org nix darwin usr/include"
 
 **Resources to Check:**
+
 - NixOS.org discourse
 - Nixpkgs GitHub issues
 - Reddit r/NixOS
 - StackOverflow
 
 ### Option 2: Try Different nixpkgs Version
+
 **Action:** Pin to older version of nixpkgs
 
 **Command:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 # In flake.nix, temporarily pin nixpkgs to an older version
@@ -166,9 +190,11 @@ cd ~/Desktop/Setup-Mac
 ```
 
 ### Option 3: Try Installing via Different Method
+
 **Action:** Use Homebrew or direct download
 
 **Commands:**
+
 ```bash
 # Try Homebrew
 brew install --cask iterm2
@@ -178,9 +204,11 @@ brew install --cask iterm2
 ```
 
 ### Option 4: Contact Nix Community
+
 **Action:** Post issue with full diagnostics
 
 **Information to Include:**
+
 - Nix version: 2.31.2
 - macOS version: 15.4
 - Architecture: aarch64-darwin
@@ -190,6 +218,7 @@ brew install --cask iterm2
 - Current configuration files
 
 ### Option 5: Wait for nixpkgs Fix
+
 **Action:** Monitor nixpkgs issues for macOS aarch64 fixes
 
 ---
@@ -197,12 +226,14 @@ brew install --cask iterm2
 ## 📊 CURRENT SYSTEM STATE
 
 ### Nix Status:
+
 - **Nix Version:** 2.31.2 ✅
 - **nix doctor:** PASS ✅
 - **System Profile Nix:** 2.31.2 ✅
 - **Configuration:** Clean (no `/usr/include` references) ✅
 
 ### macOS Status:
+
 - **Version:** macOS 15.4 (Sequoia)
 - **Architecture:** aarch64-darwin
 - **Command Line Tools:** Installed ✅
@@ -211,6 +242,7 @@ brew install --cask iterm2
 - **SDK `/usr/include`:** EXISTS ✅
 
 ### Build Status:
+
 - **Simple packages (hello):** WORKS ✅
 - **macOS packages (iTerm2):** FAILS ❌
 - **Error:** `/usr/include not found` ❌
@@ -220,12 +252,14 @@ brew install --cask iterm2
 ## 🚨 CRITICAL BLOCKERS
 
 ### Cannot Proceed With:
+
 1. ❌ Building or installing iTerm2 via Nix
 2. ❌ Building any package that needs system headers
 3. ❌ Updating system configuration (if it depends on such packages)
 4. ❌ Full system rebuild (likely same issue)
 
 ### System Impact:
+
 - **Generation:** Stuck at 206 (Dec 21)
 - **Configuration:** Cannot apply changes
 - **Package Management:** Limited to simple packages
@@ -259,17 +293,20 @@ brew install --cask iterm2
 ## 📝 NEXT ACTIONS
 
 ### Immediate (Do Now):
+
 1. **Search Online** for known issues using queries in `/tmp/search-queries.md`
 2. **Check Nixpkgs issues** for iTerm2 or macOS aarch64 problems
 3. **Try Homebrew** as alternative to install iTerm2
 4. **Post on Nix community** with full diagnostics if not found
 
 ### Short-Term (Today):
+
 1. **Monitor Nixpkgs** for fixes to this issue
 2. **Try older nixpkgs** if current has this bug
 3. **Consider workarounds** like installing via Homebrew
 
 ### Long-Term:
+
 1. **Report issue** to nixpkgs if this is a bug
 2. **Contribute fix** if we identify root cause
 3. **Help others** experiencing same issue
@@ -279,6 +316,7 @@ brew install --cask iterm2
 ## 📚 DOCUMENTATION
 
 Created:
+
 - `/tmp/search-queries.md` - Google search queries for this issue
 - `platforms/darwin/nix/settings.nix` - Updated with SDK paths (line 18 removed)
 - `platforms/darwin/nix/settings.nix.backup` - Backup of original

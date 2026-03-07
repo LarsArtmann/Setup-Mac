@@ -30,6 +30,7 @@ Status reports are organized by year and month in reverse chronological order (n
 ## Accessing Archived Reports
 
 Archived reports can be accessed in three ways:
+
 1. **Direct Access**: Browse this directory
 2. **Git History**: Use `git log` to view historical commits
 3. **Search**: Use `grep` to find specific topics

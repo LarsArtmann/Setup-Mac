@@ -75,15 +75,15 @@ Did you mean buildGo126Module?
 
 From previous build attempt (Shell 006):
 
-| Package | Version | Status |
-|---------|---------|--------|
-| carapace | 1.6.0 | Building |
-| docker-compose | 5.0.2 | Building |
-| esbuild | 0.27.2 | Building |
-| gh | 2.87.2 | Building |
-| gofumpt | 0.9.2 | Building |
-| golangci-lint-langserver | 0.0.12 | Building |
-| k9s | 0.50.18 | Building |
+| Package                  | Version | Status   |
+| ------------------------ | ------- | -------- |
+| carapace                 | 1.6.0   | Building |
+| docker-compose           | 5.0.2   | Building |
+| esbuild                  | 0.27.2  | Building |
+| gh                       | 2.87.2  | Building |
+| gofumpt                  | 0.9.2   | Building |
+| golangci-lint-langserver | 0.0.12  | Building |
+| k9s                      | 0.50.18 | Building |
 
 ### Build Statistics (from Shell 006)
 
@@ -137,11 +137,11 @@ The project uses a layered overlay approach for Go version management:
 
 ### Files with Go Overlay Configuration
 
-| File | Purpose |
-|------|---------|
-| `flake.nix:109` | `buildGo126Module` for darwin |
-| `flake.nix:163` | `buildGo126Module` for evo-x2 (NixOS) |
-| `platforms/darwin/default.nix:83` | golangci-lint override |
+| File                              | Purpose                               |
+| --------------------------------- | ------------------------------------- |
+| `flake.nix:109`                   | `buildGo126Module` for darwin         |
+| `flake.nix:163`                   | `buildGo126Module` for evo-x2 (NixOS) |
+| `platforms/darwin/default.nix:83` | golangci-lint override                |
 
 ---
 
@@ -230,6 +230,7 @@ nh darwin build . --verbose
 This is a continuation of a previous session that exceeded context limits. The original request was simply "FIX!" referring to the nix-darwin build failure.
 
 **Previous Session Summary:**
+
 - Task: Fix nix-darwin build failure
 - Progress: Fix applied, build started
 - Status: Build actively downloading and compiling packages

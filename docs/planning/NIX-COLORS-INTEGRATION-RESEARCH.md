@@ -1,4 +1,5 @@
 # Nix-Colors Integration Research Report
+
 ## Comprehensive Analysis for Setup-Mac Project
 
 **Date:** January 14, 2026
@@ -14,6 +15,7 @@
 **Recommendation:** ✅ **Strongly recommended** for implementation. Benefits significantly outweigh implementation effort.
 
 **Key Metrics:**
+
 - **Configuration Files:** 17+ → 1 (94% reduction)
 - **Theme Change Time:** 55 minutes → 3 minutes (18x faster)
 - **Available Themes:** 3 → 220+ (73x more)
@@ -42,14 +44,14 @@ nix-colors is a Nix-based color scheme management system that provides:
 
 ### Key Features
 
-| Feature | Description |
-|---------|-------------|
-| **220+ Schemes** | Access to entire Base16 ecosystem |
-| **Home Manager Module** | `nix-colors.homeManagerModules.default` |
-| **Contrib Functions** | GTK themes, wallpapers, shell scripts, TextMate themes |
-| **Color Conversion** | hexToRGB, hexToRGBString, hexToDec utilities |
-| **Image-to-Scheme** | Generate schemes from pictures |
-| **Scheme-to-Wallpaper** | Generate wallpapers from schemes |
+| Feature                 | Description                                            |
+| ----------------------- | ------------------------------------------------------ |
+| **220+ Schemes**        | Access to entire Base16 ecosystem                      |
+| **Home Manager Module** | `nix-colors.homeManagerModules.default`                |
+| **Contrib Functions**   | GTK themes, wallpapers, shell scripts, TextMate themes |
+| **Color Conversion**    | hexToRGB, hexToRGBString, hexToDec utilities           |
+| **Image-to-Scheme**     | Generate schemes from pictures                         |
+| **Scheme-to-Wallpaper** | Generate wallpapers from schemes                       |
 
 ---
 
@@ -59,18 +61,18 @@ nix-colors is a Nix-based color scheme management system that provides:
 
 Setup-Mac currently has **17+ files** with hardcoded color definitions, using **multiple inconsistent color schemes**:
 
-| Application | Current Scheme | Status |
-|-------------|---------------|--------|
-| **Waybar** | Catppuccin Mocha (custom) | 50+ hex codes |
-| **Hyprland** | Custom green-teal gradient | Hardcoded |
-| **Starship** | Custom (bold colors) | Hardcoded |
-| **tmux** | Custom dark theme | Hardcoded |
-| **iTerm2** | Custom profile (16 ANSI colors) | Platform-specific |
-| **Kitty** | TTY theme for btop | Minimal config |
-| **GTK** | Adwaita (default) | Not themed |
-| **Animated Wallpapers** | Custom SVG gradients | 5 hardcoded gradients |
-| **Sublime Text** | Monokai | Not integrated |
-| **Hyprlock** | Not configured | Missing |
+| Application             | Current Scheme                  | Status                |
+| ----------------------- | ------------------------------- | --------------------- |
+| **Waybar**              | Catppuccin Mocha (custom)       | 50+ hex codes         |
+| **Hyprland**            | Custom green-teal gradient      | Hardcoded             |
+| **Starship**            | Custom (bold colors)            | Hardcoded             |
+| **tmux**                | Custom dark theme               | Hardcoded             |
+| **iTerm2**              | Custom profile (16 ANSI colors) | Platform-specific     |
+| **Kitty**               | TTY theme for btop              | Minimal config        |
+| **GTK**                 | Adwaita (default)               | Not themed            |
+| **Animated Wallpapers** | Custom SVG gradients            | 5 hardcoded gradients |
+| **Sublime Text**        | Monokai                         | Not integrated        |
+| **Hyprlock**            | Not configured                  | Missing               |
 
 ### Color Configuration Locations
 
@@ -100,6 +102,7 @@ Setup-Mac/
 ### 1. Centralized Theme Management
 
 **Before** (Current):
+
 ```nix
 # platforms/nixos/desktop/waybar.nix - 50+ hardcoded hex codes
 #workspaces button.active {
@@ -110,6 +113,7 @@ Setup-Mac/
 ```
 
 **After** (with nix-colors):
+
 ```nix
 # Single color scheme definition for entire system
 colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
@@ -155,6 +159,7 @@ colorScheme = nix-colors.colorSchemes.tokyo-night; # → All apps update
 ### 4. Generated Themes (No Manual Config)
 
 **GTK Theme** (automatic generation):
+
 ```nix
 gtk = {
   enable = true;
@@ -167,6 +172,7 @@ gtk = {
 ```
 
 **Wallpaper from Scheme**:
+
 ```nix
 wallpaper = nix-colors.lib.contrib.nixWallpaperFromScheme {
   scheme = config.colorScheme;
@@ -176,6 +182,7 @@ wallpaper = nix-colors.lib.contrib.nixWallpaperFromScheme {
 ```
 
 **Neovim Theme**:
+
 ```nix
 programs.neovim.plugins = [{
   plugin = nix-colors.lib.contrib.vimThemeFromScheme {
@@ -190,28 +197,29 @@ programs.neovim.plugins = [{
 
 ### Popular Schemes Available
 
-| Scheme | Variant | Description |
-|--------|---------|-------------|
-| **dracula** | dark | Vibrant purple/pink with green highlights |
-| **nord** | dark | Arctic-inspired cool blues and teal |
-| **gruvbox-dark** | dark | Earthy, warm tones (retro terminal) |
-| **gruvbox-light** | light | Warm, light variant |
-| **catppuccin-mocha** | dark | Soft pastels, warm pinks/peaches |
-| **catppuccin-frappe** | dark | Catppuccin darker variant |
-| **tokyo-night** | dark | Modern magenta/cyan/violet |
-| **tokyo-night-day** | light | Light variant |
-| **monokai** | dark | Classic pink/yellow/green |
-| **solarized-dark** | dark | Balanced, harmonious colors |
-| **solarized-light** | light | Balanced, easy on eyes |
-| **one-dark** | dark | Soft blue/purple/green (VSCode-like) |
-| **everforest** | dark | Nature-inspired greens |
-| **nordic** | dark | Enhanced Nord palette |
+| Scheme                | Variant | Description                               |
+| --------------------- | ------- | ----------------------------------------- |
+| **dracula**           | dark    | Vibrant purple/pink with green highlights |
+| **nord**              | dark    | Arctic-inspired cool blues and teal       |
+| **gruvbox-dark**      | dark    | Earthy, warm tones (retro terminal)       |
+| **gruvbox-light**     | light   | Warm, light variant                       |
+| **catppuccin-mocha**  | dark    | Soft pastels, warm pinks/peaches          |
+| **catppuccin-frappe** | dark    | Catppuccin darker variant                 |
+| **tokyo-night**       | dark    | Modern magenta/cyan/violet                |
+| **tokyo-night-day**   | light   | Light variant                             |
+| **monokai**           | dark    | Classic pink/yellow/green                 |
+| **solarized-dark**    | dark    | Balanced, harmonious colors               |
+| **solarized-light**   | light   | Balanced, easy on eyes                    |
+| **one-dark**          | dark    | Soft blue/purple/green (VSCode-like)      |
+| **everforest**        | dark    | Nature-inspired greens                    |
+| **nordic**            | dark    | Enhanced Nord palette                     |
 
 **Total: 220+ schemes** available
 
 ### Catppuccin in nix-colors
 
 Good news: **Catppuccin has Base16 variants** available:
+
 - `catppuccin-mocha` (dark, current preference)
 - `catppuccin-frappe` (dark, deeper)
 - `catppuccin-latte` (light)
@@ -265,18 +273,22 @@ home-manager = {
 ### Phase 2: Migrate Core Applications (2-3 hours)
 
 **Priority 1 - Waybar** (highest impact):
+
 - Replace 50+ hardcoded hex codes with `config.colorScheme.palette.base0X`
 - Use conversion functions for rgba colors
 
 **Priority 2 - Kitty/Alacritty:**
+
 - Migrate background/foreground/selection colors
 - Use `config.colorScheme.variant` for light/dark mode
 
 **Priority 3 - Starship:**
+
 - Replace hardcoded color names with palette references
 - Use base08 (red), base0B (green), base0D (blue) for semantic colors
 
 **Priority 4 - tmux:**
+
 - Migrate status bar colors
 - Use palette for window/pane borders
 
@@ -317,10 +329,12 @@ waybar.settings.hyprland/window = {
 ### Phase 4: Platform-Specific Handling (1-2 hours)
 
 **macOS (Darwin):**
+
 - iTerm2: Keep manual profile (no nix-colors integration)
 - Alternative: Migrate to Kitty for cross-platform consistency
 
 **NixOS:**
+
 - Full integration with GTK, Qt, Hyprland, Waybar
 
 ---
@@ -329,13 +343,13 @@ waybar.settings.hyprland/window = {
 
 ### Quantitative Benefits
 
-| Metric | Current | With nix-colors | Improvement |
-|--------|---------|----------------|-------------|
-| **Color configuration files** | 17+ | 1 | **94% reduction** |
-| **Theme change time** | ~30 minutes (edit 17 files) | ~10 seconds (edit 1 line) | **180x faster** |
-| **Available themes** | ~3 | 220+ | **73x more** |
-| **Cross-platform consistency** | 40% (iTerm2 vs Kitty) | 100% | **2.5x improvement** |
-| **Maintenance overhead** | High (manual sync) | Zero (automatic) | **Eliminated** |
+| Metric                         | Current                     | With nix-colors           | Improvement          |
+| ------------------------------ | --------------------------- | ------------------------- | -------------------- |
+| **Color configuration files**  | 17+                         | 1                         | **94% reduction**    |
+| **Theme change time**          | ~30 minutes (edit 17 files) | ~10 seconds (edit 1 line) | **180x faster**      |
+| **Available themes**           | ~3                          | 220+                      | **73x more**         |
+| **Cross-platform consistency** | 40% (iTerm2 vs Kitty)       | 100%                      | **2.5x improvement** |
+| **Maintenance overhead**       | High (manual sync)          | Zero (automatic)          | **Eliminated**       |
 
 ### Qualitative Benefits
 
@@ -604,5 +618,5 @@ in {
 
 ---
 
-*Report generated: January 14, 2026*
-*Based on nix-colors v1.0.0 and Setup-Mac current state*
+_Report generated: January 14, 2026_
+_Based on nix-colors v1.0.0 and Setup-Mac current state_

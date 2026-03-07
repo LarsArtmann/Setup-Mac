@@ -20,16 +20,19 @@ Technitium DNS Server has been fully evaluated, configured, and documented for d
 ## 1. Project Overview
 
 ### 1.1 Current Infrastructure
+
 - **NixOS Laptop (evo-x2):** Ryzen AI Max+ 3990WX, AMD GPU, Desktop Environment
 - **NixOS Private Cloud:** (Planned) Centralized server for network services
 - **MacBook Air M2 (Darwin):** macOS, client device (no local DNS server planned)
 
 ### 1.2 DNS History
+
 - **Previous Setup:** Quad9 DNS via dhcpcd (IPv6 disabled due to timeouts)
 - **Resolved Issues:** IPv6 DNS timeouts, NetworkManager conflicts, Nix cache timeouts
 - **Current State:** Stable, working, but no ad blocking or caching
 
 ### 1.3 Goals
+
 - Implement network-wide ad blocking
 - Improve DNS performance (caching)
 - Enhance privacy (encrypted DNS)
@@ -43,6 +46,7 @@ Technitium DNS Server has been fully evaluated, configured, and documented for d
 **Document:** `docs/architecture/TECHNITIUM-DNS-EVALUATION.md`
 
 ### 2.1 Technology Assessment
+
 - **Technitium DNS Server v14+:** Excellent feature set
 - **Native NixOS Support:** ✅ Available (nixos/modules/services/networking/technitium-dns-server.nix)
 - **Cross-Platform:** ✅ Supported (Windows, Linux, macOS, Raspberry Pi)
@@ -51,22 +55,24 @@ Technitium DNS Server has been fully evaluated, configured, and documented for d
 
 ### 2.2 Feature Comparison
 
-| Feature | Current (Quad9) | Technitium DNS |
-|---------|----------------|----------------|
-| DNS Caching | Minimal (system-level) | Advanced (persistent) |
-| Ad Blocking | None | Yes (automatic blocklists) |
-| DNS Logging | None | Yes (detailed query logs) |
-| DNS-over-HTTPS | No | Yes (native) |
-| DNS-over-TLS | No | Yes (native) |
-| Web Console | No | Yes (port 5380/53443) |
-| Clustering | N/A | Yes (proprietary) |
-| DHCP Server | N/A | Yes (built-in) |
-| Complexity | Very Low | Medium |
+| Feature        | Current (Quad9)        | Technitium DNS             |
+| -------------- | ---------------------- | -------------------------- |
+| DNS Caching    | Minimal (system-level) | Advanced (persistent)      |
+| Ad Blocking    | None                   | Yes (automatic blocklists) |
+| DNS Logging    | None                   | Yes (detailed query logs)  |
+| DNS-over-HTTPS | No                     | Yes (native)               |
+| DNS-over-TLS   | No                     | Yes (native)               |
+| Web Console    | No                     | Yes (port 5380/53443)      |
+| Clustering     | N/A                    | Yes (proprietary)          |
+| DHCP Server    | N/A                    | Yes (built-in)             |
+| Complexity     | Very Low               | Medium                     |
 
 ### 2.3 Deployment Recommendation
+
 **Decision:** ✅ **Deploy Technitium DNS**
 
 **Priority:**
+
 1. **NixOS Private Cloud (Network-Wide):** High priority for centralized management
 2. **NixOS Laptop (Local Cache):** High priority for offline capability
 3. **MacBook Air (Client Only):** Low priority (use Private Cloud DNS)
@@ -83,6 +89,7 @@ Technitium DNS Server has been fully evaluated, configured, and documented for d
 **Documentation:** `platforms/nixos/system/dns.nix`
 
 **Configuration:**
+
 - ✅ Technitium DNS Server enabled
 - ✅ System DNS configured to use 127.0.0.1 (local)
 - ✅ Firewall: Local access only (recommended for laptop)
@@ -90,12 +97,14 @@ Technitium DNS Server has been fully evaluated, configured, and documented for d
 - ✅ Integrated into `platforms/nixos/system/configuration.nix`
 
 **Files:**
+
 - `platforms/nixos/system/dns-config.nix` (Server config)
 - `platforms/nixos/system/dns.nix` (Documentation)
 - `platforms/nixos/system/configuration.nix` (Updated to import dns-config.nix)
 - `platforms/nixos/system/networking.nix` (Updated with compatibility notes)
 
 **Deployment Command:**
+
 ```bash
 sudo nixos-rebuild switch --flake .#evo-x2
 ```
@@ -106,6 +115,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 **Documentation:** `platforms/nixos/private-cloud/README.md`
 
 **Configuration:**
+
 - ✅ Technitium DNS Server enabled
 - ✅ Firewall: Network access (all DNS ports open)
 - ✅ Web Console: http://<private-cloud-ip>:5380
@@ -113,10 +123,12 @@ sudo nixos-rebuild switch --flake .#evo-x2
 - ✅ DoH/DoT Ports: 443, 853
 
 **Files:**
+
 - `platforms/nixos/private-cloud/dns.nix` (Server config)
 - `platforms/nixos/private-cloud/README.md` (Deployment guide)
 
 **Deployment Command:**
+
 ```bash
 sudo nixos-rebuild switch --flake .#private-cloud-hostname
 ```
@@ -126,11 +138,13 @@ sudo nixos-rebuild switch --flake .#private-cloud-hostname
 **Recommendation:** Use as client to Private Cloud DNS (no local server)
 
 **Configuration:**
+
 - Use `networksetup` to configure DNS
 - Point to Private Cloud IP
 - No local DNS server deployment needed
 
 **Deployment Command:**
+
 ```bash
 sudo networksetup -setdnsservers Wi-Fi <private-cloud-ip>
 ```
@@ -180,6 +194,7 @@ sudo networksetup -setdnsservers Wi-Fi <private-cloud-ip>
 **File:** `justfile` (DNS management section added)
 
 **Available Commands:**
+
 ```bash
 # Management
 just dns-console        # Open Technitium DNS web console
@@ -212,6 +227,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Status:** ✅ All files in place, configuration ready
 
 **Deployment Steps:**
+
 1. Review migration guide: `cat docs/architecture/TECHNITIUM-DNS-MIGRATION-GUIDE.md`
 2. Run deployment command: `sudo nixos-rebuild switch --flake .#evo-x2`
 3. Access web console: `firefox http://localhost:5380`
@@ -221,6 +237,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Time Estimate:** 30 minutes (15 min deploy + 15 min configure)
 
 **Expected Benefits:**
+
 - Ad blocking (immediate)
 - Faster DNS (10-100x for cached)
 - Privacy features (DoH/DoT)
@@ -231,6 +248,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Status:** ✅ All files in place, configuration ready
 
 **Deployment Steps:**
+
 1. Review deployment guide: `cat platforms/nixos/private-cloud/README.md`
 2. Run deployment command: `sudo nixos-rebuild switch --flake .#private-cloud-hostname`
 3. Access web console: `firefox http://<private-cloud-ip>:5380`
@@ -241,6 +259,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Time Estimate:** 30 minutes (15 min deploy + 15 min configure)
 
 **Expected Benefits:**
+
 - Network-wide ad blocking
 - Centralized management
 - Shared caching
@@ -251,6 +270,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Status:** ✅ Plan documented, ready to execute
 
 **Deployment Steps:**
+
 1. Deploy Private Cloud DNS first
 2. Get Private Cloud IP address
 3. Configure macOS DNS: `sudo networksetup -setdnsservers Wi-Fi <ip>`
@@ -259,6 +279,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Time Estimate:** 5 minutes
 
 **Expected Benefits:**
+
 - Ad blocking (via Private Cloud)
 - Faster DNS (via Private Cloud cache)
 
@@ -269,6 +290,7 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 **Status:** ❌ **NOT RECOMMENDED** (evaluated and rejected)
 
 **Reasoning:**
+
 - Laptop goes offline frequently (breaks cluster sync)
 - Only 2 servers (private cloud + laptop)
 - Hierarchical approach simpler and more reliable
@@ -283,26 +305,31 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 ### 8.1 New Files Created ✅
 
 **Documentation:**
+
 - `docs/architecture/TECHNITIUM-DNS-EVALUATION.md` (23 KB)
 - `docs/architecture/TECHNITIUM-DNS-MIGRATION-GUIDE.md` (18 KB)
 - `docs/architecture/TECHNITIUM-DNS-SUMMARY.md` (13 KB)
 - `docs/status/2026-01-13_20-06_TECHNITIUM-DNS-IMPLEMENTATION-STATUS.md` (This file)
 
 **NixOS Laptop Configuration:**
+
 - `platforms/nixos/system/dns-config.nix` (1.6 KB)
 - `platforms/nixos/system/dns.nix` (7.6 KB)
 
 **NixOS Private Cloud Configuration:**
+
 - `platforms/nixos/private-cloud/dns.nix` (3.2 KB)
 - `platforms/nixos/private-cloud/README.md` (12 KB)
 
 ### 8.2 Files Modified ✅
 
 **NixOS Configuration:**
+
 - `platforms/nixos/system/configuration.nix` (Added import of dns-config.nix)
 - `platforms/nixos/system/networking.nix` (Added compatibility notes)
 
 **Justfile:**
+
 - `justfile` (Added DNS management commands section)
 
 ---
@@ -347,17 +374,18 @@ just dns-diagnostics    # Comprehensive DNS diagnostics
 
 ### 10.1 Identified Risks
 
-| Risk | Probability | Impact | Mitigation |
-|-------|-------------|--------|------------|
-| DNS resolution fails after deployment | Low | Medium | Rollback plan available (1 minute) |
-| Ad blocking breaks legitimate sites | Low | Low | Whitelist domains in web console |
-| High resource usage (CPU/RAM) | Low | Low | Tune cache size, reduce blocklists |
-| Web console inaccessible | Low | Medium | Restart service, check firewall |
-| Migration takes longer than expected | Low | Low | Follow migration guide step-by-step |
+| Risk                                  | Probability | Impact | Mitigation                          |
+| ------------------------------------- | ----------- | ------ | ----------------------------------- |
+| DNS resolution fails after deployment | Low         | Medium | Rollback plan available (1 minute)  |
+| Ad blocking breaks legitimate sites   | Low         | Low    | Whitelist domains in web console    |
+| High resource usage (CPU/RAM)         | Low         | Low    | Tune cache size, reduce blocklists  |
+| Web console inaccessible              | Low         | Medium | Restart service, check firewall     |
+| Migration takes longer than expected  | Low         | Low    | Follow migration guide step-by-step |
 
 ### 10.2 Rollback Plan
 
 **If deployment causes issues:**
+
 ```bash
 # Rollback to previous NixOS generation
 sudo nixos-rebuild switch --rollback
@@ -376,6 +404,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 Deployment is successful if:
 
 ### NixOS Laptop (evo-x2)
+
 - ✅ DNS resolution works for all domains
 - ✅ Ad blocking blocks ads and malware domains
 - ✅ Caching provides 10-100x performance improvement
@@ -386,6 +415,7 @@ Deployment is successful if:
 - ✅ Resource usage is acceptable (<500 MB RAM, <5% CPU)
 
 ### NixOS Private Cloud
+
 - ✅ Network-wide ad blocking working
 - ✅ All devices on network can use Private Cloud DNS
 - ✅ Centralized management via web console
@@ -415,16 +445,19 @@ just dns-perf
 ### 12.2 Maintenance Tasks
 
 **Automatic:**
+
 - Blocklist updates (daily)
 - Cache expiration (TTL-based)
 - Log rotation (systemd-managed)
 
 **Manual (Weekly):**
+
 - Review query logs (web console)
 - Check cache hit rate
 - Monitor resource usage
 
 **Manual (Monthly):**
+
 - Review performance metrics
 - Optimize cache settings
 - Update configuration if needed
@@ -460,6 +493,7 @@ grep -A 1 "# DNS Management Commands" justfile
 ### 13.4 Troubleshooting
 
 For issues specific to this configuration:
+
 - Check migration guide troubleshooting section
 - Run `just dns-diagnostics`
 - Check logs: `just dns-logs`
@@ -488,6 +522,7 @@ A comprehensive evaluation and implementation of Technitium DNS Server has been 
 **Deployment Time:** 30 minutes (one command, 15 minutes configuration)
 
 **Expected Benefits:**
+
 - Ad blocking (immediate)
 - Faster DNS (10-100x for cached)
 - Privacy features (DoH/DoT)
@@ -496,6 +531,7 @@ A comprehensive evaluation and implementation of Technitium DNS Server has been 
 ### 14.3 Next Action
 
 **Start Deployment:**
+
 ```bash
 # Deploy on NixOS Laptop (evo-x2)
 sudo nixos-rebuild switch --flake .#evo-x2

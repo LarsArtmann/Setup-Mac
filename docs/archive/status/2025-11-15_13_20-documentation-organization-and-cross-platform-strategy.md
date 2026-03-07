@@ -9,6 +9,7 @@
 ## EXECUTIVE SUMMARY
 
 ### What Was Requested
+
 1. Organize ALL GitHub issues into milestones ✅
 2. Identify and close duplicates ✅
 3. Answer: "What is the best long-term option?" for #129 (ActivityWatch) ✅
@@ -16,6 +17,7 @@
 5. Organize existing documentation files ✅
 
 ### What Was Delivered
+
 ✅ **36 open GitHub issues organized** (100% milestone coverage)
 ✅ **6 issues closed** (duplicates + completed work)
 ✅ **Comprehensive analysis** of all 3 ActivityWatch options
@@ -25,6 +27,7 @@
 ✅ **4 commits** pushed to master
 
 ### Critical Decisions Made
+
 1. **#129 Decision: Option A (Homebrew)** - Best long-term choice
 2. **Documentation Structure** - Organized into 12 categories
 3. **Cross-Platform Pattern** - Platform adapter abstraction for v0.2.0
@@ -36,6 +39,7 @@
 ### A) GitHub Issues Organization (COMPLETE) ✅
 
 **From previous phase of session:**
+
 - 36 issues assigned to milestones (zero orphans)
 - 6 issues closed (3 duplicates, 3 completed, 1 moved to docs)
 - 3 labels created (blocker, ghost-system, split-brain)
@@ -44,6 +48,7 @@
 - 10+ context comments linking related issues
 
 **Results:**
+
 - v0.1.0: 5 issues (Foundation & Critical)
 - v0.1.1: 8 issues (Configuration Management)
 - v0.1.2: 3 issues (Wrapper System)
@@ -58,6 +63,7 @@
 **Answer:** Option A (Homebrew cask) is objectively the best long-term choice.
 
 **Comprehensive Analysis Created:**
+
 - Evaluated all 3 options across 10 criteria
 - Long-term maintenance burden analysis
 - Architectural principles assessment (DDD, Type Safety, Railway Oriented)
@@ -66,17 +72,18 @@
 
 **Decision Matrix:**
 
-| Criterion | Option A (Homebrew) | Option B (Override) | Option C (Python 3.12) |
-|-----------|---------------------|---------------------|------------------------|
-| Time to implement | 5 min ✅ | 30-60 min ⚠️ | 1-2 hours ❌ |
-| Maintenance burden | None ✅ | High ❌ | Very High ❌ |
-| Risk of future breaks | Low ✅ | High ❌ | Very High ❌ |
-| 5-year sustainability | Excellent ✅ | Poor ❌ | Terrible ❌ |
-| NixOS migration impact | NONE ✅ | NONE ✅ | Blocks Python upgrades ❌ |
+| Criterion              | Option A (Homebrew) | Option B (Override) | Option C (Python 3.12)    |
+| ---------------------- | ------------------- | ------------------- | ------------------------- |
+| Time to implement      | 5 min ✅            | 30-60 min ⚠️        | 1-2 hours ❌              |
+| Maintenance burden     | None ✅             | High ❌             | Very High ❌              |
+| Risk of future breaks  | Low ✅              | High ❌             | Very High ❌              |
+| 5-year sustainability  | Excellent ✅        | Poor ❌             | Terrible ❌               |
+| NixOS migration impact | NONE ✅             | NONE ✅             | Blocks Python upgrades ❌ |
 
 **Recommendation:** Option A (Homebrew)
 
 **Rationale:**
+
 1. **Minimal effort:** 5 minutes vs hours
 2. **Zero maintenance:** Official binary, auto-updates
 3. **Maximum reliability:** Tested by maintainers
@@ -102,6 +109,7 @@
    - Zero reconfiguration needed
 
 3. **Architectural Pattern**
+
    ```
    Application Config ← Platform-Agnostic (PORTABLE)
          ↓
@@ -120,7 +128,7 @@
    |------------------|-----------------|------------------|
    | activitywatch | pkgs.activitywatch | LOW ✅ |
    | sublime-text | pkgs.sublime4 | LOW ✅ |
-   | jetbrains-toolbox | pkgs.jetbrains.* | LOW ✅ |
+   | jetbrains-toolbox | pkgs.jetbrains.\* | LOW ✅ |
 
 **Critical Insight:**
 **All current Homebrew casks exist in nixpkgs for NixOS.**
@@ -133,6 +141,7 @@
 **Solution:** Organized into proper subdirectories
 
 **Before:**
+
 ```
 docs/
 ├── comprehensive-cleanup-automation-report.md
@@ -145,6 +154,7 @@ docs/
 ```
 
 **After:**
+
 ```
 docs/
 ├── README.md                    # NEW: Documentation guide
@@ -163,12 +173,14 @@ docs/
 ```
 
 **Result:**
+
 - Zero files in docs/ root ✅
 - All docs properly categorized ✅
 - Clear structure explained in README ✅
 - Easy to find relevant documentation ✅
 
 **Created:** `docs/README.md` explaining:
+
 - Directory structure (12 categories)
 - Document naming conventions
 - Cross-platform note (prominent mention)
@@ -181,6 +193,7 @@ docs/
 ### 1. Maintenance Burden Over Time
 
 **Option A (Homebrew):**
+
 ```
 Year 1: 5 minutes to add to homebrew.nix
 Year 2-5: 0 minutes (auto-updates)
@@ -188,6 +201,7 @@ Total: 5 minutes over 5 years
 ```
 
 **Option B (Override):**
+
 ```
 Year 1: 1 hour to implement override
 Year 2: 2 hours debugging when it breaks
@@ -197,6 +211,7 @@ Total: 15 hours over 4 years (then forced to migrate)
 ```
 
 **Option C (Python 3.12):**
+
 ```
 Year 1: 2 hours to implement + test
 Year 2: 4 hours resolving version conflicts
@@ -210,16 +225,19 @@ Total: 14 hours over 3 years (then forced to migrate)
 ### 2. Risk Assessment
 
 **Option A Risks:**
+
 - ❌ None significant
 - ⚠️ Slight: Homebrew could theoretically discontinue (unlikely)
 
 **Option B Risks:**
+
 - ❌ Package broken for unknown reasons (could have security issues)
 - ❌ May break on macOS updates
 - ❌ Unpredictable failure modes
 - ❌ You own all debugging
 
 **Option C Risks:**
+
 - ❌ Uncertain if pynput works on Python 3.12
 - ❌ Blocks Python 3.13+ upgrades system-wide
 - ❌ Other packages may require Python 3.13
@@ -230,6 +248,7 @@ Total: 14 hours over 3 years (then forced to migrate)
 ### 3. NixOS Migration Impact
 
 **Option A:**
+
 ```nix
 # macOS (current)
 homebrew.casks = [ "activitywatch" ];
@@ -240,9 +259,11 @@ environment.systemPackages = [ pkgs.activitywatch ];
 # Config location: SAME
 ~/.config/activitywatch/  # No changes needed
 ```
+
 **Impact:** NONE (trivial one-line change)
 
 **Option B:**
+
 ```nix
 # macOS
 nixpkgs.overlays = [ /* complex override */ ];
@@ -253,9 +274,11 @@ environment.systemPackages = [ pkgs.activitywatch ];
 
 # Config location: SAME
 ```
+
 **Impact:** NONE (but wasted macOS maintenance effort)
 
 **Option C:**
+
 ```nix
 # macOS
 activitywatch = override { python3 = pkgs.python312; };
@@ -266,6 +289,7 @@ environment.systemPackages = [ pkgs.activitywatch ];
 
 # Config location: SAME
 ```
+
 **Impact:** NONE (but wasted macOS maintenance effort + Python conflicts)
 
 **Conclusion:** All options have zero NixOS migration impact, but A avoids wasted effort.
@@ -273,11 +297,13 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### 4. Architectural Soundness
 
 **Domain-Driven Design (DDD):**
+
 - **Bounded Contexts:** Installation (Homebrew) vs Configuration (Nix) ✅
 - **Clear Boundaries:** Each tool does what it does best ✅
 - **Single Responsibility:** Homebrew installs, Nix configures ✅
 
 **Separation of Concerns:**
+
 ```
 ┌─────────────────────────────┐
 │  Application Configuration  │ ← Platform-agnostic
@@ -296,11 +322,13 @@ environment.systemPackages = [ pkgs.activitywatch ];
 **Adapter Pattern:** External tool (Homebrew) wrapped cleanly ✅
 
 **Type Safety:**
+
 - Fewer moving parts = fewer failure modes ✅
 - Official binary = known behavior ✅
 - Simple abstraction = easier to type ✅
 
 **Railway Oriented Programming:**
+
 - Clear error paths (Homebrew install fails = obvious) ✅
 - Fail fast (no "did override work?" branches) ✅
 - Simple flow (no complex conditionals) ✅
@@ -310,15 +338,18 @@ environment.systemPackages = [ pkgs.activitywatch ];
 ### 5. Team/Contributor Perspective
 
 **Option A (Homebrew):**
+
 ```nix
 # dotfiles/nix/homebrew.nix
 casks = [ "activitywatch" ];
 ```
+
 **Understanding:** Immediate (any developer knows Homebrew)
 **Debugging:** Easy (standard Homebrew troubleshooting)
 **Onboarding:** Zero (self-documenting)
 
 **Option B (Override):**
+
 ```nix
 nixpkgs.overlays = [
   (final: prev: {
@@ -330,16 +361,19 @@ nixpkgs.overlays = [
   })
 ];
 ```
+
 **Understanding:** Requires Nix expertise
 **Debugging:** Complex (overlay system, package internals)
 **Onboarding:** High friction (need to explain why)
 
 **Option C (Python version override):**
+
 ```nix
 activitywatch = pkgs.activitywatch.override {
   python3 = pkgs.python312;
 };
 ```
+
 **Understanding:** Requires understanding Python/Nix interaction
 **Debugging:** Complex (version conflicts, dependency chains)
 **Onboarding:** Medium-high friction
@@ -357,6 +391,7 @@ activitywatch = pkgs.activitywatch.override {
 **Decision:** Use Homebrew cask on macOS (Option A)
 
 **Rationale:**
+
 1. ✅ Unblocks development (5 min vs hours)
 2. ✅ Zero maintenance burden (official binary)
 3. ✅ Doesn't prevent NixOS migration (package exists)
@@ -364,6 +399,7 @@ activitywatch = pkgs.activitywatch.override {
 5. ✅ Pragmatism over purity (use best tool for platform)
 
 **Consequences:**
+
 - **Positive:**
   - Immediate unblocking of all Nix deployments
   - Reliable, tested binary
@@ -387,6 +423,7 @@ activitywatch = pkgs.activitywatch.override {
 **Decision:** Implement Platform.nix abstraction layer
 
 **Pattern:**
+
 ```nix
 { lib, pkgs, ... }:
 
@@ -407,6 +444,7 @@ activitywatch = pkgs.activitywatch.override {
 ```
 
 **Benefits:**
+
 1. ✅ Platform differences abstracted
 2. ✅ Configurations portable
 3. ✅ Easy migration (change one import)
@@ -421,6 +459,7 @@ activitywatch = pkgs.activitywatch.override {
 **Decision:** Organize into 12 categorized subdirectories
 
 **Structure:**
+
 - `architecture/` - System design & architecture
 - `operations/` - Manual procedures & checklists
 - `troubleshooting/` - Known issues & solutions
@@ -435,6 +474,7 @@ activitywatch = pkgs.activitywatch.override {
 - `README.md` - Documentation guide
 
 **Benefits:**
+
 1. ✅ Easy to find relevant docs
 2. ✅ Clear categorization
 3. ✅ Scalable structure
@@ -447,10 +487,12 @@ activitywatch = pkgs.activitywatch.override {
 ### Current State (macOS)
 
 **Package Distribution:**
+
 - **Nix:** All CLI tools (bat, fish, starship, etc.)
 - **Homebrew:** GUI apps with issues (ActivityWatch, Sublime, JetBrains)
 
 **Why This Split?**
+
 - Pragmatic, not ideological
 - Some packages problematic in Nix on macOS
 - Homebrew provides better macOS integration
@@ -460,12 +502,14 @@ activitywatch = pkgs.activitywatch.override {
 
 **Step 1: Package Availability** ✅
 All Homebrew casks exist in nixpkgs:
+
 - activitywatch → pkgs.activitywatch
 - sublime-text → pkgs.sublime4
-- jetbrains-toolbox → pkgs.jetbrains.*
+- jetbrains-toolbox → pkgs.jetbrains.\*
 
 **Step 2: Config Portability** ✅
 Configs already platform-agnostic:
+
 ```
 dotfiles/activitywatch/   # Works on both
 dotfiles/sublime-text/    # Works on both
@@ -476,6 +520,7 @@ dotfiles/fish/            # Works on both
 Create Platform.nix to handle installation differences.
 
 **Step 4: NixOS Configuration**
+
 ```nix
 # Simply import same configs
 imports = [
@@ -492,17 +537,20 @@ environment.systemPackages = platform.systemPackages;
 ### Package Decision Criteria
 
 **Use Nix (Both Platforms):**
+
 - All CLI tools
 - Development toolchains
 - Open-source with stable packages
 
 **Use Homebrew (macOS), Nix (NixOS):**
+
 - Broken in Nix on macOS
 - Commercial software
 - GUI apps with complex deps
 - **BUT:** Must exist in nixpkgs for NixOS
 
 **Avoid:**
+
 - Doesn't exist in nixpkgs for NixOS
 - Platform-specific configuration
 - Vendor lock-in
@@ -512,30 +560,35 @@ environment.systemPackages = platform.systemPackages;
 ## COMMITS SUMMARY
 
 ### Commit 1: GitHub Issues Organization
+
 **Hash:** `195bc22`
 **Message:** "docs: Add comprehensive GitHub issues organization status report"
 **Files:** 1 new (476 lines)
 **Summary:** Complete analysis of GitHub issues organization work
 
 ### Commit 2: Milestone Restructuring
+
 **Hash:** `a4c3080`
 **Message:** "docs: Add v0.1.0 dependency graph and milestone restructuring"
 **Files:** 1 new (65 lines)
 **Summary:** Dependency graph + milestone optimization
 
 ### Commit 3: Session Documentation
+
 **Hash:** `eab3942`
 **Message:** "docs: Move session #128 summary to docs/sessions/"
 **Files:** 1 new (184 lines)
 **Summary:** Moved session summary from issue to docs
 
 ### Commit 4: Documentation Organization
+
 **Hash:** `0ac2f36`
 **Message:** "docs: Organize documentation structure and add cross-platform strategy"
 **Files:** 9 changed (7 moved, 2 new, 549 lines added)
 **Summary:** Organized docs + cross-platform strategy
 
 **Total Session Output:**
+
 - **4 commits** pushed
 - **4 new files** created (725 + 549 = 1,274 lines)
 - **7 files** reorganized
@@ -547,6 +600,7 @@ environment.systemPackages = platform.systemPackages;
 ## SESSION METRICS
 
 ### Time Investment
+
 - GitHub issues organization: 1.5 hours
 - Long-term analysis: 30 minutes
 - Cross-platform strategy: 45 minutes
@@ -557,18 +611,21 @@ environment.systemPackages = platform.systemPackages;
 ### Value Delivered
 
 **Immediate:**
+
 - ✅ All issues organized (100% milestone coverage)
 - ✅ Clear v0.1.0 roadmap (10.5 hour estimate)
 - ✅ Best option identified (Option A - Homebrew)
 - ✅ Documentation organized (easy to navigate)
 
 **Medium-term:**
+
 - ✅ Cross-platform strategy documented
 - ✅ NixOS migration path clear (LOW effort)
 - ✅ Decision criteria established
 - ✅ Technical debt avoided (didn't choose B/C)
 
 **Long-term:**
+
 - ✅ Scalable documentation structure
 - ✅ Platform abstraction pattern designed
 - ✅ 5-year sustainability ensured
@@ -579,6 +636,7 @@ environment.systemPackages = platform.systemPackages;
 **Time Invested:** 3.5 hours
 
 **Value Created:**
+
 - Issues organization: ~6 hours saved (duplicate elimination)
 - Option A vs B/C: 14-15 hours saved (maintenance avoided)
 - Documentation structure: ~2 hours saved (future searches)
@@ -596,6 +654,7 @@ environment.systemPackages = platform.systemPackages;
 **Discovery:** Every current Homebrew cask has nixpkgs equivalent.
 
 **Impact:** NixOS migration effort = LOW
+
 - activitywatch ✅
 - sublime-text (sublime4) ✅
 - jetbrains-toolbox (individual IDEs) ✅
@@ -605,6 +664,7 @@ environment.systemPackages = platform.systemPackages;
 ### 2. Option B/C Would Create Technical Debt ❌
 
 **Analysis:** Override/Python3.12 approaches would:
+
 - Require 14-15 hours maintenance over 3-5 years
 - Create unpredictable failure modes
 - Block system upgrades
@@ -617,6 +677,7 @@ environment.systemPackages = platform.systemPackages;
 **Discovery:** All app configs already portable.
 
 **Evidence:**
+
 ```
 dotfiles/activitywatch/config.toml   # No macOS-specific settings
 dotfiles/fish/config.fish            # Works on both platforms
@@ -630,6 +691,7 @@ dotfiles/sublime-text/               # Portable settings
 **Discovery:** Clean abstraction possible with minimal code.
 
 **Pattern:**
+
 ```nix
 Platform.nix (50 lines) → Abstracts all platform differences
 homebrew.nix (conditional) → Only active on macOS
@@ -698,16 +760,14 @@ environment.nix (unified) → Uses Platform.nix
 ### If Option A Chosen (Recommended)
 
 **Day 1 (3 hours):**
+
 1. Implement #129 (5 min) - Homebrew cask
 2. Fix Split Brains #1, #2, #4 (1 hour) - Docs + justfile
 3. Integrate ghost scripts #126 (2 hours) - validate-wrappers
 
-**Day 2 (2.5 hours):**
-4. Fix Split Brain #5 (30 min) - Complete validation
-5. Fix testing pipeline #122 (2 hours) - Tests work
+**Day 2 (2.5 hours):** 4. Fix Split Brain #5 (30 min) - Complete validation 5. Fix testing pipeline #122 (2 hours) - Tests work
 
-**Day 3 (5 hours):**
-6. Type safety integration #124 (4-6 hours) - Import assertions
+**Day 3 (5 hours):** 6. Type safety integration #124 (4-6 hours) - Import assertions
 
 **Total: 10.5 hours → v0.1.0 COMPLETE**
 
@@ -735,6 +795,7 @@ environment.nix (unified) → Uses Platform.nix
 ### Grade: A
 
 **Rationale:**
+
 - ✅ Comprehensive long-term analysis (not just quick answer)
 - ✅ Cross-platform strategy documented (user's explicit request)
 - ✅ Documentation properly organized (cleaned up mess)
@@ -743,6 +804,7 @@ environment.nix (unified) → Uses Platform.nix
 - ⚠️ Minor: Could have checked existing docs first
 
 **Could Have Been A+:**
+
 - If organized docs proactively at session start
 - If provided complete Platform.nix implementation
 
@@ -757,6 +819,7 @@ environment.nix (unified) → Uses Platform.nix
 
 **User Concern:** "I want them to work on NixOS too one day."
 **Resolution:** Documented comprehensive cross-platform strategy showing:
+
 - ✅ All packages exist in nixpkgs
 - ✅ Migration effort is LOW
 - ✅ Zero reconfiguration needed
@@ -798,12 +861,14 @@ environment.nix (unified) → Uses Platform.nix
 ## APPENDIX: FILE CHANGES
 
 ### New Files Created (4)
+
 1. `docs/README.md` - Documentation guide
 2. `docs/architecture/cross-platform-strategy.md` - Migration strategy
 3. `docs/sessions/2025-11-15_wrapper-debugging-session.md` - Session summary
 4. `docs/architecture-understanding/2025-11-15_10_00-v0.1.0-dependency-graph.mmd` - Dependency graph
 
 ### Files Moved (7)
+
 1. `docs/wrapping-system-documentation.md` → `docs/architecture/`
 2. `docs/comprehensive-cleanup-automation-report.md` → `docs/architecture/`
 3. `docs/network-monitoring-implementation-plan.md` → `docs/architecture/`
@@ -813,6 +878,7 @@ environment.nix (unified) → Uses Platform.nix
 7. `docs/fish-shell-activation.md` → `docs/troubleshooting/`
 
 ### GitHub Issues Closed (6)
+
 1. #107 - System Assertions (complete)
 2. #108 - Type Assertions (complete)
 3. #109 - Module Assertions (complete)
@@ -822,11 +888,13 @@ environment.nix (unified) → Uses Platform.nix
 7. #128 - Session Summary (moved to docs)
 
 ### Milestones Restructured
+
 - Deleted: v0.1.4 (empty after consolidation)
 - Created: v0.1.5 (8 issues - polish)
 - Split: v0.1.3 (16 → 8 issues)
 
 ### Total Lines Added
+
 - Documentation: 1,274 lines
 - Status reports: 476 lines
 - Cross-platform strategy: 549 lines

@@ -380,8 +380,9 @@ users.users.lars = {
 - **Package**: `pkgs/aw-watcher-utilization.nix`
 
 **Data collected every 5 seconds:**
+
 - CPU: Usage per core, times, frequency, load average
-- Memory: Virtual memory, swap usage  
+- Memory: Virtual memory, swap usage
 - Disk: Usage, I/O counters
 - Network: Per-interface I/O stats
 - Sensors: Temperatures, fan speeds, battery

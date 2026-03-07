@@ -11,16 +11,16 @@
 
 ### Your Current Stack
 
-| Component | Status | Configuration |
-|-----------|--------|---------------|
-| **Display Manager** | ⚠️ Needs Update | SDDM (Wayland **disabled** for AMD stability) |
-| **Primary WM** | ✅ Modern | Hyprland (type-safe configuration, Xwayland enabled) |
-| **Alternative WMs** | ⚠️ Overkill | Sway, Niri, LabWC, Awesome (rarely used) |
-| **Terminal** | ✅ Good | Kitty + Ghostty |
-| **Status Bar** | ✅ Good | Waybar |
-| **Launcher** | ✅ Good | Rofi |
-| **Screen Lock** | ✅ Good | Hyprlock + Swaylock |
-| **Key Features** | ✅ Excellent | Animated wallpapers, workspace rules, blur effects, 10 named workspaces |
+| Component           | Status          | Configuration                                                           |
+| ------------------- | --------------- | ----------------------------------------------------------------------- |
+| **Display Manager** | ⚠️ Needs Update | SDDM (Wayland **disabled** for AMD stability)                           |
+| **Primary WM**      | ✅ Modern       | Hyprland (type-safe configuration, Xwayland enabled)                    |
+| **Alternative WMs** | ⚠️ Overkill     | Sway, Niri, LabWC, Awesome (rarely used)                                |
+| **Terminal**        | ✅ Good         | Kitty + Ghostty                                                         |
+| **Status Bar**      | ✅ Good         | Waybar                                                                  |
+| **Launcher**        | ✅ Good         | Rofi                                                                    |
+| **Screen Lock**     | ✅ Good         | Hyprlock + Swaylock                                                     |
+| **Key Features**    | ✅ Excellent    | Animated wallpapers, workspace rules, blur effects, 10 named workspaces |
 
 ### Strengths
 
@@ -75,17 +75,18 @@ You have SDDM with Wayland disabled. Most devs with AMD GPUs now successfully ru
 
 **Ranking by Developer Usage (2025):**
 
-| Rank | WM | Popularity | Trend | Why |
-|------|----|------------|-------|-----|
-| 1 | **Hyprland** | 🚀 Massive growth | ⬆️ Upward | Smooth animations, Wayland native, active development |
-| 2 | **Sway** | 📊 Stable | ↔️ Steady | i3-like familiar, battle-tested, Wayland support |
-| 3 | **KDE Plasma** | 💪 Strong | ⬆️ Upward | Full DE with tiling option, feature-rich |
-| 4 | **i3** | 📉 Declining | ⬇️ Downward | Still popular but aging, X11-only by default |
-| 5 | **Niri** | 🆕 Emerging | ⬆️ Upward | New scrollable tiling, minimal but growing |
-| 6 | **River** | 🔥 Niche | ↔️ Steady | Minimalist choice for purists |
+| Rank | WM             | Popularity        | Trend       | Why                                                   |
+| ---- | -------------- | ----------------- | ----------- | ----------------------------------------------------- |
+| 1    | **Hyprland**   | 🚀 Massive growth | ⬆️ Upward   | Smooth animations, Wayland native, active development |
+| 2    | **Sway**       | 📊 Stable         | ↔️ Steady   | i3-like familiar, battle-tested, Wayland support      |
+| 3    | **KDE Plasma** | 💪 Strong         | ⬆️ Upward   | Full DE with tiling option, feature-rich              |
+| 4    | **i3**         | 📉 Declining      | ⬇️ Downward | Still popular but aging, X11-only by default          |
+| 5    | **Niri**       | 🆕 Emerging       | ⬆️ Upward   | New scrollable tiling, minimal but growing            |
+| 6    | **River**      | 🔥 Niche          | ↔️ Steady   | Minimalist choice for purists                         |
 
 **Your Multi-WM Setup Analysis:**
 You have 4 alternative WMs (Sway, Niri, LabWC, Awesome), which is unusually broad. Most devs pick **1-2 WMs** and master them. This creates:
+
 - ❌ **Configuration bloat** - Maintaining 5 WM configs
 - ❌ **Decision paralysis** - Too many options at login
 - ❌ **Maintenance burden** - Updating and debugging 5 different stacks
@@ -97,17 +98,17 @@ You have 4 alternative WMs (Sway, Niri, LabWC, Awesome), which is unusually broa
 
 **Popular Additions Among Power Users:**
 
-| Feature | Adoption | Why |
-|---------|----------|-----|
-| **Hyprland Plugins** | 🌟 70%+ | `hy3`, `hyprsplit`, `virtual-desktops` for enhanced tiling |
-| **Eww Widgets** | 📈 Growing | Custom Waybar widgets, advanced visuals |
-| **Rofi Plugins** | ✅ Standard | Enhanced launchers, emoji picker, clipboard |
-| **Touchpad Gestures** | 🌟 60%+ | Touchégg for navigation gestures |
-| **Gamemode** | 🎮 40%+ | Performance mode for gaming |
-| **MangoHUD** | 🎮 40%+ | FPS/hardware overlay |
-| **Quake Terminal** | 🌟 50%+ | Dropdown terminal (F12) |
-| **Screenshot+OCR** | 📈 Growing | Extract text from screenshots |
-| **Color Picker** | ✅ Standard | Pick screen color, save to clipboard |
+| Feature               | Adoption    | Why                                                        |
+| --------------------- | ----------- | ---------------------------------------------------------- |
+| **Hyprland Plugins**  | 🌟 70%+     | `hy3`, `hyprsplit`, `virtual-desktops` for enhanced tiling |
+| **Eww Widgets**       | 📈 Growing  | Custom Waybar widgets, advanced visuals                    |
+| **Rofi Plugins**      | ✅ Standard | Enhanced launchers, emoji picker, clipboard                |
+| **Touchpad Gestures** | 🌟 60%+     | Touchégg for navigation gestures                           |
+| **Gamemode**          | 🎮 40%+     | Performance mode for gaming                                |
+| **MangoHUD**          | 🎮 40%+     | FPS/hardware overlay                                       |
+| **Quake Terminal**    | 🌟 50%+     | Dropdown terminal (F12)                                    |
+| **Screenshot+OCR**    | 📈 Growing  | Extract text from screenshots                              |
+| **Color Picker**      | ✅ Standard | Pick screen color, save to clipboard                       |
 
 ---
 
@@ -118,6 +119,7 @@ You have 4 alternative WMs (Sway, Niri, LabWC, Awesome), which is unusually broa
 **Why:** Modern AMD GPU drivers are stable with Wayland. You're missing smooth animations, better scaling, and modern compositor features.
 
 **Current Configuration:**
+
 ```nix
 # platforms/nixos/desktop/display-manager.nix
 services.displayManager.sddm = {
@@ -131,6 +133,7 @@ services.displayManager.sddm = {
 ```
 
 **Recommended Configuration:**
+
 ```nix
 # platforms/nixos/desktop/display-manager.nix
 services.displayManager.sddm = {
@@ -151,6 +154,7 @@ services.displayManager.sddm = {
 ```
 
 **Benefits:**
+
 - ✅ Smooth login animations
 - ✅ Better HiDPI scaling support
 - ✅ Native Wayland integration
@@ -158,10 +162,12 @@ services.displayManager.sddm = {
 - ✅ Better multi-monitor support
 
 **Risk:** ⚠️ Medium
+
 - Test first with `sudo nixos-rebuild test --flake .#evo-x2`
 - If unstable, revert to `wayland.enable = false`
 
 **Recovery Plan:**
+
 ```bash
 # If issues occur
 sudo nixos-rebuild switch --rollback
@@ -172,6 +178,7 @@ sudo nixos-rebuild switch --rollback
 ### 2. CLEAN UP MULTI-WM (Reduce Bloat)
 
 **Problem:** Sway, Niri, LabWC, Awesome are unused (90% of the time). This creates:
+
 - Configuration bloat (maintaining 5 WM configs)
 - Decision paralysis at login
 - Maintenance burden
@@ -216,10 +223,12 @@ sudo nixos-rebuild switch --rollback
 ```
 
 **Files to Edit:**
+
 - ✅ `platforms/nixos/desktop/multi-wm.nix` - Remove unused WMs
 - ✅ `platforms/nixos/system/configuration.nix` - Line 26 imports this
 
 **Impact:**
+
 - 📦 Reduced disk usage (~500MB)
 - ⚡ Faster rebuild times (fewer packages)
 - 🧹 Cleaner login screen (2 options instead of 5)
@@ -231,12 +240,12 @@ sudo nixos-rebuild switch --rollback
 
 **High-Impact Plugins Used by Power Users:**
 
-| Plugin | Popularity | Purpose | Your Status |
-|--------|------------|---------|-------------|
-| `hyprwinwrap` | 🌟 50%+ | Background windows | ✅ You have this |
-| `hy3` | 🌟 70%+ | i3-style tiling (tabbed/stacked) | ❌ Missing |
-| `hyprsplit` | 📈 Growing | Dynamic window splitting | ❌ Missing |
-| `virtual-desktops` | 📈 Growing | Additional virtual desktops | ❌ Missing |
+| Plugin             | Popularity | Purpose                          | Your Status      |
+| ------------------ | ---------- | -------------------------------- | ---------------- |
+| `hyprwinwrap`      | 🌟 50%+    | Background windows               | ✅ You have this |
+| `hy3`              | 🌟 70%+    | i3-style tiling (tabbed/stacked) | ❌ Missing       |
+| `hyprsplit`        | 📈 Growing | Dynamic window splitting         | ❌ Missing       |
+| `virtual-desktops` | 📈 Growing | Additional virtual desktops      | ❌ Missing       |
 
 **Implementation:**
 
@@ -278,18 +287,21 @@ wayland.windowManager.hyprland = {
 **Benefits:**
 
 **hy3 Plugin:**
+
 - ✅ i3-like tabbed/stacked layouts
 - ✅ Better multi-window management
 - ✅ Familiar for i3/Sway users
 - ✅ Excellent for terminal-focused workflows
 
 **hyprsplit Plugin:**
+
 - ✅ Better window splitting than default
 - ✅ Easy workspace management
 - ✅ Keyboard-driven layout control
 - ✅ Smooth animations
 
 **Keybindings to Add:**
+
 ```nix
 # hy3-specific bindings
 bind = [
@@ -310,6 +322,7 @@ bind = [
 **What:** Dropdown terminal that slides down on F12 or Super+~. Instant access to a terminal from any application.
 
 **Why:** Power users love this for:
+
 - Quick commands without leaving current workflow
 - System monitoring (htop, logs)
 - Quick file operations
@@ -349,6 +362,7 @@ exec-once = [
 ```
 
 **Alternative Terminal Config:**
+
 ```nix
 # Use existing background terminals as Quake terminal
 exec-once = [
@@ -360,6 +374,7 @@ exec-once = [
 ```
 
 **Benefits:**
+
 - ⚡ Instant terminal access (no switching workspaces)
 - 🎯 Always available system monitor
 - 📋 Quick clipboard management
@@ -374,6 +389,7 @@ exec-once = [
 **Add:** GPU temperature, CPU usage, memory, network bandwidth
 
 **Prerequisites:**
+
 ```nix
 # platforms/common/packages/base.nix
 environment.systemPackages = with pkgs; [
@@ -450,6 +466,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 **Network Script** (`~/.config/waybar/network.sh`):
+
 ```bash
 #!/bin/bash
 # Get network stats
@@ -481,6 +498,7 @@ echo "{\"down\": \"${RX_KB}K\", \"up\": \"${TX_KB}K\"}"
 ```
 
 **Benefits:**
+
 - 🌡️ Real-time GPU temperature monitoring
 - 💻 CPU usage at a glance
 - 🧠 Memory usage tracking
@@ -494,6 +512,7 @@ echo "{\"down\": \"${RX_KB}K\", \"up\": \"${TX_KB}K\"}"
 **What:** Take screenshots and extract text using OCR (optical character recognition).
 
 **Use Cases:**
+
 - Extract text from images/PDFs
 - Grab error messages from screenshots
 - Copy text from terminal screenshots
@@ -528,6 +547,7 @@ bind = [
 ```
 
 **Alternative (with preview):**
+
 ```bash
 #!/bin/bash
 # ~/scripts/screenshot-ocr.sh
@@ -538,6 +558,7 @@ notify-send "OCR" "Text extracted to clipboard" -i /tmp/screenshot.png
 ```
 
 **Benefits:**
+
 - 📄 Extract text from any screenshot
 - 🔍 Copy error messages from screenshots
 - 📋 Quick text digitization
@@ -550,6 +571,7 @@ notify-send "OCR" "Text extracted to clipboard" -i /tmp/screenshot.png
 **What:** Performance optimizations for gaming.
 
 **Why:** Even occasional gaming benefits from:
+
 - FPS counter overlay
 - GPU/CPU monitoring
 - Performance mode (suspends background processes)
@@ -577,6 +599,7 @@ notify-send "OCR" "Text extracted to clipboard" -i /tmp/screenshot.png
 ```
 
 **Add to Configuration:**
+
 ```nix
 # platforms/nixos/system/configuration.nix
 imports = [
@@ -586,6 +609,7 @@ imports = [
 ```
 
 **MangoHUD Configuration** (`~/.config/MangoHud/MangoHud.conf`):
+
 ```ini
 # Performance overlay
 fps
@@ -607,6 +631,7 @@ font_size=24
 ```
 
 **Benefits:**
+
 - 🎮 Performance mode for gaming
 - 📊 Real-time FPS and hardware stats
 - 🚀 Better game performance (suspends background tasks)
@@ -650,16 +675,17 @@ gtk = {
 
 **Testing Different Sizes:**
 
-| Size | Use Case |
-|------|----------|
-| 24px | Standard desktop |
-| 32px | Small TV/monitor |
-| 48px | Large TV (recommended) |
-| 64px | Very large TV |
-| 96px | Oversized TV (at distance) |
-| 144px | Extreme (your current) |
+| Size  | Use Case                   |
+| ----- | -------------------------- |
+| 24px  | Standard desktop           |
+| 32px  | Small TV/monitor           |
+| 48px  | Large TV (recommended)     |
+| 64px  | Very large TV              |
+| 96px  | Oversized TV (at distance) |
+| 144px | Extreme (your current)     |
 
 **Benefits:**
+
 - 🎯 Better UI interaction
 - 👁️ Less cursor obstruction
 - ⚖️ Better balance between visibility and usability
@@ -673,6 +699,7 @@ gtk = {
 **Why:** Natural interaction for laptop touchpads.
 
 **Prerequisites:**
+
 ```nix
 # platforms/nixos/desktop/hyprland-config.nix
 environment.systemPackages = with pkgs; [
@@ -682,6 +709,7 @@ environment.systemPackages = with pkgs; [
 ```
 
 **Configuration** (`~/.config/libinput-gestures.conf`):
+
 ```bash
 # Swipe left (3 fingers) - Move workspace left
 gesture swipe left 3 xdotool key super+Left
@@ -703,6 +731,7 @@ gesture pinch out xdotool key Ctrl+plus
 ```
 
 **Enable Service:**
+
 ```nix
 # platforms/nixos/desktop/hyprland-config.nix
 systemd.user.services.libinput-gestures = {
@@ -716,6 +745,7 @@ systemd.user.services.libinput-gestures = {
 ```
 
 **Benefits:**
+
 - 👆 Natural touchpad interaction
 - 🔄 Quick workspace navigation
 - 📱 Mobile-like gestures
@@ -724,15 +754,15 @@ systemd.user.services.libinput-gestures = {
 
 ## 🚀 Quick Wins (1-2 hours total)
 
-| Priority | Change | Impact | Time | Risk |
-|----------|--------|--------|------|------|
-| 1 | Enable SDDM Wayland | ⭐⭐⭐⭐⭐ | 5 min | ⚠️ Medium |
-| 2 | Add `hy3` plugin | ⭐⭐⭐⭐ | 10 min | ✅ Low |
-| 3 | Add Quake terminal | ⭐⭐⭐⭐ | 20 min | ✅ Low |
-| 4 | Fix cursor size | ⭐⭐⭐ | 2 min | ✅ None |
-| 5 | Screenshot+OCR | ⭐⭐⭐ | 10 min | ✅ Low |
-| 6 | Add Waybar GPU/CPU modules | ⭐⭐⭐ | 15 min | ✅ Low |
-| 7 | Clean up unused WMs | ⭐⭐ | 10 min | ✅ Low |
+| Priority | Change                     | Impact     | Time   | Risk      |
+| -------- | -------------------------- | ---------- | ------ | --------- |
+| 1        | Enable SDDM Wayland        | ⭐⭐⭐⭐⭐ | 5 min  | ⚠️ Medium |
+| 2        | Add `hy3` plugin           | ⭐⭐⭐⭐   | 10 min | ✅ Low    |
+| 3        | Add Quake terminal         | ⭐⭐⭐⭐   | 20 min | ✅ Low    |
+| 4        | Fix cursor size            | ⭐⭐⭐     | 2 min  | ✅ None   |
+| 5        | Screenshot+OCR             | ⭐⭐⭐     | 10 min | ✅ Low    |
+| 6        | Add Waybar GPU/CPU modules | ⭐⭐⭐     | 15 min | ✅ Low    |
+| 7        | Clean up unused WMs        | ⭐⭐       | 10 min | ✅ Low    |
 
 **Total Time:** 1 hour 12 minutes
 **Total Impact:** ⭐⭐⭐⭐ (major productivity and experience improvements)
@@ -781,13 +811,13 @@ systemd.user.services.libinput-gestures = {
 
 ### Popular "Rice" Elements (2025)
 
-| Element | Current | Recommendation | Popularity |
-|---------|---------|----------------|------------|
-| **Wallpapers** | ✅ Dynamic | Keep animated wallpaper | 🌟 80%+ |
-| **Theme** | Mixed | Catppuccin or Dracula | 🌟 70%+ |
-| **Fonts** | ✅ JetBrains Mono | Keep, maybe add Iosevka | 🌟 60%+ |
-| **Icons** | Adwaita | Catppuccin icons | 📈 Growing |
-| **Cursor** | Adwaita | Catppuccin cursor theme | 📈 Growing |
+| Element        | Current           | Recommendation          | Popularity |
+| -------------- | ----------------- | ----------------------- | ---------- |
+| **Wallpapers** | ✅ Dynamic        | Keep animated wallpaper | 🌟 80%+    |
+| **Theme**      | Mixed             | Catppuccin or Dracula   | 🌟 70%+    |
+| **Fonts**      | ✅ JetBrains Mono | Keep, maybe add Iosevka | 🌟 60%+    |
+| **Icons**      | Adwaita           | Catppuccin icons        | 📈 Growing |
+| **Cursor**     | Adwaita           | Catppuccin cursor theme | 📈 Growing |
 
 ### Catppuccin Theme Integration
 
@@ -834,6 +864,7 @@ systemd.user.services.libinput-gestures = {
 ### Before Applying to Production
 
 **1. Test SDDM Wayland:**
+
 ```bash
 # Build test (don't apply)
 sudo nixos-rebuild test --flake .#evo-x2
@@ -849,6 +880,7 @@ sudo reboot
 ```
 
 **2. Check Hyprland Logs:**
+
 ```bash
 # Follow Hyprland logs
 journalctl --user -u hyprland -f
@@ -858,6 +890,7 @@ journalctl --user -u hyprland --since "1 hour ago"
 ```
 
 **3. Test Keybindings:**
+
 ```bash
 # List all keybindings
 hyprctl keybindings
@@ -867,6 +900,7 @@ hyprctl dispatch togglespecialworkspace magic
 ```
 
 **4. Monitor Performance:**
+
 ```bash
 # Check monitors
 hyprctl monitors
@@ -879,6 +913,7 @@ hyprctl activeworkspace
 ```
 
 **5. Test Waybar Modules:**
+
 ```bash
 # Test GPU temperature
 sensors | grep 'Tctl'
@@ -894,6 +929,7 @@ sensors
 ```
 
 **6. Test Plugins:**
+
 ```bash
 # Check if hy3 is loaded
 hyprctl plugins | grep hy3
@@ -924,19 +960,20 @@ Hyprland
 
 ## 📊 Comparison: Your Setup vs "Cool Devs" 2025
 
-| Feature | You | Cool Devs 2025 | Gap | Priority |
-|---------|-----|----------------|-----|----------|
-| **Display Manager** | SDDM (no Wayland) | Greetd or SDDM Wayland | ⚠️ | 1 |
-| **Primary WM** | Hyprland ✅ | Hyprland (you're ahead!) | ✅ | - |
-| **Plugins** | hyprwinwrap | hy3, hyprsplit, virtual-desktops | ⚠️ | 2 |
-| **Productivity Tools** | Basic | Quake, OCR, gestures | ⚠️ | 3-6 |
-| **Monitoring** | Waybar (basic) | Waybar + Eww widgets | ⚠️ | 6 |
-| **Gaming Support** | None | Gamemode, MangoHUD | ⚠️ | 7 |
-| **Cursor Size** | 144px | 24-48px | ⚠️ | 4 |
-| **Multi-WM** | 4 WMs | 1-2 WMs | ⚠️ | 7 |
-| **Theme** | Mixed | Catppuccin/Dracula | ℹ️ | Optional |
+| Feature                | You               | Cool Devs 2025                   | Gap | Priority |
+| ---------------------- | ----------------- | -------------------------------- | --- | -------- |
+| **Display Manager**    | SDDM (no Wayland) | Greetd or SDDM Wayland           | ⚠️  | 1        |
+| **Primary WM**         | Hyprland ✅       | Hyprland (you're ahead!)         | ✅  | -        |
+| **Plugins**            | hyprwinwrap       | hy3, hyprsplit, virtual-desktops | ⚠️  | 2        |
+| **Productivity Tools** | Basic             | Quake, OCR, gestures             | ⚠️  | 3-6      |
+| **Monitoring**         | Waybar (basic)    | Waybar + Eww widgets             | ⚠️  | 6        |
+| **Gaming Support**     | None              | Gamemode, MangoHUD               | ⚠️  | 7        |
+| **Cursor Size**        | 144px             | 24-48px                          | ⚠️  | 4        |
+| **Multi-WM**           | 4 WMs             | 1-2 WMs                          | ⚠️  | 7        |
+| **Theme**              | Mixed             | Catppuccin/Dracula               | ℹ️  | Optional |
 
 **Gap Analysis:**
+
 - **Critical:** SDDM Wayland, cursor size
 - **Important:** Hyprland plugins, productivity tools
 - **Nice to have:** Gaming mode, advanced monitoring, unified theme
@@ -1485,17 +1522,20 @@ Hyprland
 ## 📚 Additional Resources
 
 ### Official Documentation
+
 - [Hyprland Wiki](https://wiki.hyprland.org/)
 - [NixOS Manual](https://nixos.org/manual/nixos/stable/)
 - [Waybar Documentation](https://github.com/Alexays/Waybar/wiki)
 
 ### Community Resources
+
 - [NixOS Discourse](https://discourse.nixos.org/)
 - [r/nixos on Reddit](https://reddit.com/r/nixos)
 - [Hyprland rices](https://github.com/topics/hyprland-configuration)
 - [Catppuccin Theme](https://catppuccin.com/)
 
 ### Inspiration
+
 - [Unofficial Hyprland Wiki](https://wiki.hyprland.org/Unofficial-features/)
 - [NixOS Flakes](https://nixos.wiki/wiki/Flakes)
 - [Wayland Wiki](https://wayland.freedesktop.org/)
@@ -1505,11 +1545,13 @@ Hyprland
 ## ✅ Summary
 
 **Your Current Status:**
+
 - ✅ **Excellent base** - You're ahead of 80% of developers with Hyprland and type-safe configuration
 - ✅ **Cross-platform** - Well-architected with macOS/NixOS consistency
 - ✅ **Modern** - Wayland-first approach is the right direction
 
 **Priority Improvements:**
+
 1. ⚠️ **Critical:** Enable SDDM Wayland (major UX improvement)
 2. ⚠️ **Important:** Add Hyprland plugins (hy3, hyprsplit)
 3. ⚠️ **Important:** Fix cursor size (usability)
@@ -1517,10 +1559,12 @@ Hyprland
 5. ℹ️ **Nice to have:** Enhance Waybar, clean up WMs
 
 **Time Investment:**
+
 - **Quick wins:** 1-2 hours for major improvements
 - **Full implementation:** 4-5 hours for all recommendations
 
 **Expected Outcome:**
+
 - 🚀 Modern Wayland experience
 - ⚡ Enhanced productivity
 - 🎯 Better UX and aesthetics
@@ -1530,6 +1574,6 @@ Hyprland
 
 ---
 
-*Document created: 2025-01-14*
-*Author: Setup-Mac AI Assistant*
-*Status: Ready for implementation*
+_Document created: 2025-01-14_
+_Author: Setup-Mac AI Assistant_
+_Status: Ready for implementation_

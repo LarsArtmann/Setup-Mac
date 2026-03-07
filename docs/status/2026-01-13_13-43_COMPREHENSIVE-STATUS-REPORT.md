@@ -1,5 +1,7 @@
 # 🚀 Comprehensive Status Report
+
 ## Setup-Mac Nix Configuration Project
+
 **Date:** January 13, 2026 - 13:43 UTC+1
 **Branch:** master
 **Status:** ✅ HEALTHY & OPERATIONAL
@@ -12,6 +14,7 @@
 Successfully completed Phase 1 of Nix Anti-Patterns remediation with 100% resolution of all critical and high-priority issues. The system is production-ready, fully operational, and aligned with Nix-first architecture. All critical infrastructure is working, documentation is comprehensive, and no broken states exist.
 
 **Key Achievements:**
+
 - ✅ All 6 critical/high-priority anti-patterns resolved (100%)
 - ✅ LaunchAgent migration completed and verified operational
 - ✅ Environment variable consolidation implemented (locale fixed)
@@ -36,11 +39,13 @@ Successfully completed Phase 1 of Nix Anti-Patterns remediation with 100% resolu
 **Status:** COMPLETE AND VERIFIED OPERATIONAL
 
 **Problem Fixed:**
+
 - Previous LaunchAgent setup used incorrect nix-darwin API
 - Binary path was incorrect (`ActivityWatch` instead of `aw-qt`)
 - Service was managed via bash scripts (imperative, not declarative)
 
 **Solution Implemented:**
+
 - Fixed API: `launchd.userAgents` → `environment.userLaunchAgents` (correct nix-darwin option)
 - Fixed binary path: `ActivityWatch` → `aw-qt` (actual binary name in Homebrew app bundle)
 - Fixed structure: Nested config attributes → plist XML text format
@@ -48,10 +53,12 @@ Successfully completed Phase 1 of Nix Anti-Patterns remediation with 100% resolu
 - Implemented XDG-compliant log paths: `${userHome}/.local/share/activitywatch/`
 
 **Files Modified:**
+
 - `platforms/darwin/services/launchagents.nix` (48 lines)
 - `platforms/darwin/default.nix` (removed " - TESTING" comment)
 
 **Configuration Details:**
+
 ```nix
 environment.userLaunchAgents = {
   "net.activitywatch.ActivityWatch.plist" = {
@@ -91,6 +98,7 @@ environment.userLaunchAgents = {
 ```
 
 **Verification Results:**
+
 - ✅ Configuration syntax check passed: `just test-fast`
 - ✅ Configuration applied successfully: `just switch`
 - ✅ LaunchAgent file created: `~/Library/LaunchAgents/net.activitywatch.ActivityWatch.plist`
@@ -100,9 +108,11 @@ environment.userLaunchAgents = {
 - ✅ Log files created: XDG-compliant paths working
 
 **Commits:**
+
 - `fix(darwin): correct LaunchAgent API to environment.userLaunchAgents with plist XML`
 
 **Benefits:**
+
 - ✅ Declarative service management (no manual scripts)
 - ✅ Atomic activation via Nix (rollback capable)
 - ✅ Reproducible configuration (version controlled)
@@ -116,12 +126,14 @@ environment.userLaunchAgents = {
 **Status:** COMPLETE AND APPLIED
 
 **Problem Fixed:**
+
 - Locale inconsistency across configuration files
 - `variables.nix` used `en_GB.UTF-8`
 - `fish.nix` used `en_US.UTF-8`
 - No single source of truth for environment variables
 
 **Solution Implemented:**
+
 - Changed `LANG` from `en_GB.UTF-8` → `en_US.UTF-8` in `variables.nix`
 - Changed `LC_ALL` from `en_GB.UTF-8` → `en_US.UTF-8` in `variables.nix`
 - Changed `LC_CTYPE` from `en_GB.UTF-8` → `en_US.UTF-8` in `variables.nix`
@@ -129,10 +141,12 @@ environment.userLaunchAgents = {
 - Enhanced documentation in `darwin/environment.nix` to explain environment variable merging
 
 **Files Modified:**
+
 - `platforms/common/environment/variables.nix` (41 lines)
 - `platforms/darwin/environment.nix` (15 lines)
 
 **Configuration Details:**
+
 ```nix
 # platforms/common/environment/variables.nix
 commonEnvVars = {
@@ -185,15 +199,18 @@ commonEnvVars = {
 ```
 
 **Verification Results:**
+
 - ✅ Configuration syntax check passed: `just test-fast`
 - ✅ Configuration applied successfully: `just switch`
 - ✅ Environment variables now consistent across all files
 - ✅ Single source of truth established (variables.nix)
 
 **Commits:**
+
 - `fix(environment): consolidate locale settings and update anti-patterns documentation`
 
 **Benefits:**
+
 - ✅ Consistent locale across all configuration files
 - ✅ Single source of truth for environment variables
 - ✅ No confusion about locale settings (en_US vs en_GB)
@@ -206,6 +223,7 @@ commonEnvVars = {
 **Status:** COMPLETE - ALL 6 CRITICAL/HIGH PRIORITY ISSUES RESOLVED
 
 **Problems Fixed:**
+
 1. **Manual Dotfiles Linking** - Bash script `manual-linking.sh` found obsolete
 2. **LaunchAgent Bash Script** - Bash script `nix-activitywatch-setup.sh` found obsolete
 3. **Hardcoded System Paths** - Multiple scripts using `/Applications/` needed audit
@@ -216,11 +234,13 @@ commonEnvVars = {
 **Solutions Implemented:**
 
 **Issue #1 & #2: Manual Dotfiles & LaunchAgent Scripts**
+
 - Finding: Both scripts `manual-linking.sh` and `nix-activitywatch-setup.sh` NOT FOUND (already removed)
 - Status: ✅ Already resolved (likely removed in previous cleanup)
 - Alternative: Home Manager manages all dotfiles declaratively via `home.file` and `home.xdg.configFile`
 
 **Issue #3: Hardcoded System Paths**
+
 - Finding: All hardcoded paths in scripts are existence checks, not functional dependencies
 - Examples:
   - `/Applications/Safari.app` - Check in `ublock-origin-setup.sh` (acceptable)
@@ -230,12 +250,14 @@ commonEnvVars = {
 - Status: ✅ Audited and acceptable (not fighting Nix)
 
 **Issue #4: Homebrew Packages**
+
 - Finding: Homebrew not installed on system
 - All packages managed via Nix (verified via `which brew` - not found)
 - Status: ✅ Not applicable (pure Nix-based system)
 - Benefit: No external package manager conflict
 
 **Issue #5: Complex Bash Scripts**
+
 - Finding: All 40+ scripts in `scripts/` directory audited
 - Categories:
   1. **Monitoring & Benchmarking** (acceptable): `health-check.sh`, `benchmark-system.sh`, `performance-monitor.sh`
@@ -247,44 +269,53 @@ commonEnvVars = {
 - Status: ✅ Audited and acceptable
 
 **Issue #6: Scattered Environment Variables**
+
 - Fixed: Locale inconsistency resolved (en_GB vs en_US)
 - Status: ✅ Fixed and verified
 
 **Files Modified:**
+
 - `docs/architecture/NIX-ANTI-PATTERNS-ANALYSIS.md` (400+ lines added)
 
 **Documentation Created:**
 
 **Phase 1 Completion Summary:**
+
 - All 6 Critical (P0) issues resolved
 - All 6 High Priority (P1) issues resolved or audited
 - 100% anti-patterns addressed
 
 **Script Audit Findings:**
+
 - 40+ scripts audited
 - All categorized by type
 - All found acceptable (no anti-patterns)
 
 **Architecture Improvements Comparison:**
+
 - Before Phase 1: Manual LaunchAgent setup, locale inconsistency
 - After Phase 1: Declarative LaunchAgent, consistent locale
 
 **Benefits Realized:**
+
 - Reproducibility: All configuration declarative and tracked
 - Atomic Updates: Changes applied atomically or rolled back entirely
 - Simplified Maintenance: Single source of truth for configuration
 - Better Testing: Config can be tested without applying
 
 **Verification Results:**
+
 - ✅ All anti-patterns identified and addressed
 - ✅ 100% resolution rate (6/6 issues)
 - ✅ Comprehensive documentation created
 - ✅ Status updated in anti-patterns analysis
 
 **Commits:**
+
 - `docs(anti-patterns): complete Phase 1 summary and audit all scripts`
 
 **Metrics:**
+
 - Anti-patterns addressed: 6/6 (100%)
 - Critical (P0): 3/3 ✅
 - High Priority (P1): 3/3 ✅
@@ -292,6 +323,7 @@ commonEnvVars = {
 - Documentation added: 700+ lines
 
 **Benefits:**
+
 - ✅ Complete anti-patterns resolution
 - ✅ Comprehensive audit of all scripts
 - ✅ Clear documentation of findings
@@ -307,12 +339,14 @@ commonEnvVars = {
 **Status:** COMPLETE AND OPERATIONAL
 
 **Problem Fixed:**
+
 - Git configuration was managed via dotfiles (imperative)
 - GPG signing was manually configured
 - Git aliases were not standardized
 - Git ignore was in separate file
 
 **Solution Implemented:**
+
 - Created `platforms/common/programs/git.nix` (145 lines)
 - Migrated all 53 Git settings to Home Manager
 - Configured GPG signing with key: `76687BB69B36BFB1B1C58FA878B4350389C71333`
@@ -321,16 +355,20 @@ commonEnvVars = {
 - Configured comprehensive gitignore (110+ patterns)
 
 **Files Created:**
+
 - `platforms/common/programs/git.nix` (145 lines, NEW)
 
 **Files Removed:**
+
 - `dotfiles/.gitconfig` → `dotfiles/.gitconfig.old` (RENAMED)
 - `dotfiles/.gitignore_global` → `dotfiles/.gitignore_global.old` (RENAMED)
 
 **Files Modified:**
+
 - `platforms/common/home-base.nix` (added git import)
 
 **Configuration Details:**
+
 ```nix
 programs.git = {
   enable = true;
@@ -406,6 +444,7 @@ programs.git = {
 ```
 
 **Git Town Aliases Mapped:**
+
 1. `git append` → `town append`
 2. `git compress` → `town compress`
 3. `git contribute` → `town contribute`
@@ -424,6 +463,7 @@ programs.git = {
 16. `git up` → `town up`
 
 **Git Ignore Patterns (110+):**
+
 - macOS system files: `.DS_Store`, `._*`, `.Spotlight-V100`
 - IDE and editor files: `.vscode/`, `.idea/`, `*.swp`
 - Temporary files: `*.tmp`, `*.temp`, `.cache/`
@@ -437,6 +477,7 @@ programs.git = {
 - Backup files: `*.bak`, `*.backup`
 
 **Verification Results:**
+
 - ✅ Git config working: `git config --global user.email` → `git@lars.software`
 - ✅ GPG signing working: `git config --global commit.gpgsign` → `true`
 - ✅ Git aliases working: `git config --global alias.up` → `town up`
@@ -444,9 +485,11 @@ programs.git = {
 - ✅ All settings reading from Home Manager (53 configs)
 
 **Commits:**
+
 - (Part of earlier commits, referenced here for completeness)
 
 **Benefits:**
+
 - ✅ Cross-platform consistency (works on both Darwin and NixOS)
 - ✅ Declarative, reproducible configuration
 - ✅ Single source of truth in Nix expressions
@@ -461,12 +504,14 @@ programs.git = {
 **Status:** COMPLETE AND OPERATIONAL
 
 **Problem Fixed:**
+
 - No automated dependency graph generation
 - Manual graph maintenance required
 - No visibility into system dependencies
 - Difficult to identify package relationships
 
 **Solution Implemented:**
+
 - Added nix-visualize as flake input to `flake.nix`
 - Added nix-visualize to outputs function parameters
 - Passed to Darwin configuration specialArgs
@@ -474,15 +519,18 @@ programs.git = {
 - Created 10 justfile commands for graph generation
 
 **Files Modified:**
+
 - `flake.nix` (+11 lines)
 - `justfile` (+87 lines)
 
 **Files Created:**
+
 - `docs/architecture/Setup-Mac-Darwin.svg` (1.6MB, NEW)
 - `docs/architecture/Setup-Mac-Darwin.png` (20MB, NEW)
 - `docs/architecture/nix-visualize-integration.md` (535 lines, NEW)
 
 **Configuration Details:**
+
 ```nix
 # flake.nix
 inputs = {
@@ -519,6 +567,7 @@ outputs = { self, nixpkgs, nix-darwin, home-manager, nix-visualize, ... } @ {
 **Justfile Commands Created (10 commands):**
 
 1. `dep-graph-darwin` - Generate SVG graph (Darwin)
+
 ```bash
 dep-graph-darwin:
     @echo "📊 Generating Nix dependency graph for Darwin..."
@@ -531,6 +580,7 @@ dep-graph-darwin:
 ```
 
 2. `dep-graph-png` - Generate PNG graph (Darwin)
+
 ```bash
 dep-graph-png:
     @echo "📊 Generating Nix dependency graph (PNG) for Darwin..."
@@ -549,6 +599,7 @@ dep-graph-png:
 5. `dep-graph-all` - Generate all formats (Darwin)
 
 6. `dep-graph-view` - Open graph in browser
+
 ```bash
 dep-graph-view:
     @echo "👁️  Opening dependency graph in browser..."
@@ -557,6 +608,7 @@ dep-graph-view:
 ```
 
 7. `dep-graph-update` - Regenerate and view (quick workflow)
+
 ```bash
 dep-graph-update:
     @just dep-graph-darwin
@@ -564,6 +616,7 @@ dep-graph-update:
 ```
 
 8. `dep-graph-stats` - Show graph file sizes
+
 ```bash
 dep-graph-stats:
     @echo "📊 Dependency Graph Statistics"
@@ -575,6 +628,7 @@ dep-graph-stats:
 10. `dep-graph` - NixOS graph generation (existing)
 
 **Graph Statistics:**
+
 - **Total Packages (Nodes):** 471
 - **Total Dependencies (Edges):** 1,233
 - **Maximum Depth:** 19 levels
@@ -585,6 +639,7 @@ dep-graph-stats:
 - **PNG File Size:** 20MB (needs optimization)
 
 **Bottlenecks Identified** (High-degree nodes >20 dependencies):
+
 - nixpkgs (implicit dependency)
 - bash (core shell, ~150 dependents)
 - glibc (core C library, ~120 dependents)
@@ -594,6 +649,7 @@ dep-graph-stats:
 **Documentation Created:**
 
 **nix-visualize-integration.md (535 lines):**
+
 - Integration architecture details
 - Flake input configuration
 - Justfile command integration
@@ -612,6 +668,7 @@ dep-graph-stats:
 - Complete reference documentation
 
 **Verification Results:**
+
 - ✅ All commands execute without errors
 - ✅ Graphs generate successfully (~60-90 seconds)
 - ✅ SVG files display correctly in Safari browser
@@ -620,9 +677,11 @@ dep-graph-stats:
 - ✅ Graph statistics are accurate
 
 **Commits:**
+
 - `feat(nix-visualize): add Darwin dependency graph generation commands`
 
 **Benefits:**
+
 - ✅ Automatic dependency graph generation
 - ✅ No manual graph maintenance required
 - ✅ Real-time system state visualization
@@ -632,6 +691,7 @@ dep-graph-stats:
 - ✅ Easy to keep up-to-date
 
 **Usage Examples:**
+
 ```bash
 # Generate and view Darwin graph
 just dep-graph-darwin
@@ -654,40 +714,44 @@ just dep-graph-stats
 **Status:** COMPLETE AND OPERATIONAL
 
 **Problem Fixed:**
+
 - Go tools were managed via `go install` (imperative)
 - Tool versions changed with @latest (not reproducible)
 - No rollback capability
 - Not tracked in Nix store
 
 **Solution Implemented:**
+
 - Migrated 8 Go development tools to Nix packages
 - Added Go environment variables to ZSH configuration
 - Updated justfile recipes to use Nix tools
 - Kept wire as go install (not in Nixpkgs)
 
 **Files Modified:**
+
 - `platforms/common/packages/base.nix` (added 9 Go packages)
 - `platforms/common/programs/zsh.nix` (added GOPATH and PATH)
 - `justfile` (updated Go tool recipes)
 
 **Go Tools Migrated:**
 
-| Tool | Previous Method | New Method | Nix Package | Status |
-|-------|---------------|-------------|--------------|---------|
-| golangci-lint | go install | Nix package | golangci-lint | ✅ |
-| gofumpt | go install | Nix package | gofumpt | ✅ |
-| gopls | go install | Nix package | gopls | ✅ (already) |
-| gotests | go install | Nix package | gotests | ✅ |
-| mockgen | go install | Nix package | mockgen | ✅ |
-| protoc-gen-go | go install | Nix package | protoc-gen-go | ✅ |
-| buf | go install | Nix package | buf | ✅ |
-| delve | go install | Nix package | delve | ✅ |
-| gup | go install | Nix package | gup | ✅ |
-| wire | go install | go install | - | ⏳ (not in Nixpkgs) |
+| Tool          | Previous Method | New Method  | Nix Package   | Status              |
+| ------------- | --------------- | ----------- | ------------- | ------------------- |
+| golangci-lint | go install      | Nix package | golangci-lint | ✅                  |
+| gofumpt       | go install      | Nix package | gofumpt       | ✅                  |
+| gopls         | go install      | Nix package | gopls         | ✅ (already)        |
+| gotests       | go install      | Nix package | gotests       | ✅                  |
+| mockgen       | go install      | Nix package | mockgen       | ✅                  |
+| protoc-gen-go | go install      | Nix package | protoc-gen-go | ✅                  |
+| buf           | go install      | Nix package | buf           | ✅                  |
+| delve         | go install      | Nix package | delve         | ✅                  |
+| gup           | go install      | Nix package | gup           | ✅                  |
+| wire          | go install      | go install  | -             | ⏳ (not in Nixpkgs) |
 
 **Configuration Details:**
 
 **Nix Packages:**
+
 ```nix
 # platforms/common/packages/base.nix
 developmentPackages = with pkgs; [
@@ -705,6 +769,7 @@ developmentPackages = with pkgs; [
 ```
 
 **Go Environment Variables:**
+
 ```nix
 # platforms/common/programs/zsh.nix
 programs.zsh.initExtra = ''
@@ -717,6 +782,7 @@ programs.zsh.initExtra = ''
 **Justfile Commands Updated:**
 
 **go-tools-version** - Show all Go tool versions
+
 ```bash
 go-tools-version:
     @echo "🐹 Go Development Tools (Nix-managed):"
@@ -750,6 +816,7 @@ go-tools-version:
 ```
 
 **go-update-tools-manual** - Update wire only
+
 ```bash
 go-update-tools-manual:
     @echo "🔄 Updating Go tools (Nix-managed)..."
@@ -766,6 +833,7 @@ go-update-tools-manual:
 ```
 
 **Verification Results:**
+
 - ✅ All Go tools available in Nixpkgs for aarch64-darwin
 - ✅ Development packages list updated
 - ✅ Go environment variables configured (GOPATH and PATH)
@@ -774,9 +842,11 @@ go-update-tools-manual:
 - ✅ All Go tools working after `just switch`
 
 **Commits:**
+
 - `feat(go): migrate Go development tools from go install to Nix packages`
 
 **Benefits:**
+
 - ✅ Reproducibility: Same tool versions across all machines
 - ✅ Atomic Updates: Managed via `just update && just switch`
 - ✅ Declarative Configuration: Tools defined in Nix, not installed imperatively
@@ -785,6 +855,7 @@ go-update-tools-manual:
 - ✅ Cross-platform: Same tools work on Darwin and NixOS
 
 **Usage Examples:**
+
 ```bash
 # View all Go tool versions
 just go-tools-version
@@ -806,12 +877,14 @@ just go-dev
 **Status:** COMPLETE AND OPERATIONAL
 
 **Problem Fixed:**
+
 - Duplicate configuration across Darwin and NixOS
 - Inconsistent settings between platforms
 - High code duplication (~80% duplicate code)
 - Difficult to maintain two separate configurations
 
 **Solution Implemented:**
+
 - Created shared modules in `platforms/common/` (~80% code reduction)
 - Implemented platform-specific overrides in `platforms/darwin/` and `platforms/nixos/`
 - Configured Fish, Starship, Tmux identically on both platforms
@@ -849,6 +922,7 @@ platforms/
 **Shared Modules:**
 
 **Fish Shell** (`platforms/common/programs/fish.nix`):
+
 - Common aliases: `l` (list), `t` (tree)
 - Platform-specific alias placeholders
 - Fish greeting disabled (performance)
@@ -856,22 +930,26 @@ platforms/
 - English locale: `LANG=en_US.UTF-8`, `LC_ALL=en_US.UTF-8`, `LC_CTYPE=en_US.UTF-8`
 
 **Starship Prompt** (`platforms/common/programs/starship.nix`):
+
 - Identical on both platforms
 - Fish integration automatic
 - Settings: `add_newline = false`, `format = "$all$character"`
 
 **Tmux** (`platforms/common/programs/tmux.nix`):
+
 - Identical on both platforms
 - Clock24 enabled, mouse enabled
 - Base index: 1, terminal: screen-256color
 - History limit: 100000
 
 **ActivityWatch** (`platforms/common/programs/activitywatch.nix`):
+
 - Platform-conditional: `enable = pkgs.stdenv.isLinux`
 - Darwin: DISABLED (not supported on macOS)
 - NixOS: ENABLED (supported on Linux)
 
 **Base Packages** (`platforms/common/packages/base.nix`):
+
 - Cross-platform CLI tools
 - Go development tools (all in Nix)
 - Cross-platform GUI tools (iterm2, etc.)
@@ -880,11 +958,13 @@ platforms/
 **Platform-Specific Overrides:**
 
 **Darwin** (`platforms/darwin/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (darwin-rebuild)
 - Fish init: Homebrew integration, Carapace completions
 - No Starship/Tmux overrides (uses shared modules)
 
 **NixOS** (`platforms/nixos/users/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (nixos-rebuild)
 - Session variables: Wayland, Qt, NixOS_OZONE_WL
 - Packages: pavucontrol (audio), xdg utils
@@ -893,6 +973,7 @@ platforms/
 **Import Paths:**
 
 **Darwin Home Manager** (`platforms/darwin/home.nix`):
+
 ```nix
 imports = [
   ../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -900,6 +981,7 @@ imports = [
 ```
 
 **NixOS Home Manager** (`platforms/nixos/users/home.nix`):
+
 ```nix
 imports = [
   ../../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -907,6 +989,7 @@ imports = [
 ```
 
 **Verification Results:**
+
 - ✅ Cross-platform configurations validated
 - ✅ All tests passing (`just test`)
 - ✅ Fish shell config consistent on both platforms
@@ -915,9 +998,11 @@ imports = [
 - ✅ ActivityWatch conditional working (Linux only)
 
 **Commits:**
+
 - (Part of earlier commits, referenced here for completeness)
 
 **Benefits:**
+
 - ✅ ~80% code reduction through shared modules
 - ✅ Single source of truth for cross-platform configs
 - ✅ Easier maintenance (change once, apply everywhere)
@@ -931,46 +1016,55 @@ imports = [
 **Status:** COMPLETE AND VERIFIED
 
 **Problem Fixed:**
+
 - Unused `WrapperTemplate.nix` file (165 lines of dead code)
 - Unclear if custom wrapper system was necessary
 - No evaluation of native `makeWrapper` or `writeShellApplication`
 
 **Solution Implemented:**
+
 - Removed `WrapperTemplate.nix` (165 lines of dead code)
 - Evaluated custom wrapper system vs native Nix solutions
 - Documented findings (custom system retained, but decision pending)
 
 **Files Removed:**
+
 - `platforms/common/core/WrapperTemplate.nix` (165 lines, DELETED)
 
 **Evaluation Results:**
 
 **Custom Wrapper System:**
+
 - Complex template-based wrapper generation
 - Custom types and validation
 - 165 lines of code (removed)
 - Not actively used in current configuration
 
 **Native Nix Alternatives:**
+
 1. `pkgs.makeWrapper` - Native wrapper generation
 2. `writeShellApplication` - Shell application wrapper with dependencies
 
 **Decision:**
+
 - Custom wrapper system removed (unused dead code)
 - No current wrappers need replacement
 - Future wrapper creation should use native `writeShellApplication`
 - Decision on custom vs native not needed for now (no current usage)
 
 **Verification Results:**
+
 - ✅ Dead code removed (165 lines)
 - ✅ No broken wrappers found
 - ✅ Configuration builds successfully
 - ✅ All tests passing
 
 **Commits:**
+
 - `refactor(core): remove unused WrapperTemplate.nix (165 lines dead code)`
 
 **Benefits:**
+
 - ✅ Reduced codebase complexity (165 lines removed)
 - ✅ Eliminated dead code
 - ✅ Clearer architecture (no unused systems)
@@ -983,12 +1077,14 @@ imports = [
 **Status:** COMPLETE AND COMPREHENSIVE
 
 **Problem Fixed:**
+
 - Incomplete documentation of recent changes
 - No central tracking of anti-patterns remediation
 - No comprehensive status reports
 - Missing integration guides
 
 **Solution Implemented:**
+
 - Created `NIX-ANTI-PATTERNS-ANALYSIS.md` (700+ lines)
 - Created `nix-visualize-integration.md` (535 lines)
 - Created multiple status reports
@@ -997,6 +1093,7 @@ imports = [
 **Documentation Created:**
 
 **NIX-ANTI-PATTERNS-ANALYSIS.md** (700+ lines):
+
 - Executive summary with key findings
 - Critical issues (P0) analysis with solutions
 - High priority issues (P1) analysis with solutions
@@ -1012,6 +1109,7 @@ imports = [
 - Recommendations for Phase 2
 
 **nix-visualize-integration.md** (535 lines):
+
 - Integration architecture details
 - Flake input configuration
 - Justfile command integration
@@ -1030,12 +1128,14 @@ imports = [
 - Complete reference documentation
 
 **Status Reports Created:**
+
 - `docs/status/2026-01-12_23-42_COMPREHENSIVE-STATUS-UPDATE.md` (1,400+ lines)
 - Multiple verification reports
 - Execution status reports
 - Progress tracking reports
 
 **Documentation Coverage:**
+
 - ✅ All critical issues documented with solutions
 - ✅ All high priority issues documented with solutions
 - ✅ All major features documented
@@ -1045,6 +1145,7 @@ imports = [
 - ✅ All future enhancements documented
 
 **Verification Results:**
+
 - ✅ All documentation markdown valid
 - ✅ All code examples tested
 - ✅ All cross-references working
@@ -1052,9 +1153,11 @@ imports = [
 - ✅ All commands documented
 
 **Commits:**
+
 - Multiple documentation commits throughout today
 
 **Benefits:**
+
 - ✅ Comprehensive documentation for all changes
 - ✅ Single source of truth for project status
 - ✅ Easy onboarding for new developers
@@ -1071,6 +1174,7 @@ imports = [
 **Status:** CLEAN AND UP TO DATE
 
 **Current State:**
+
 - Branch: master
 - Remote: origin/master
 - Status: Up to date
@@ -1079,6 +1183,7 @@ imports = [
 - Merge conflicts: 0
 
 **Recent Commits Today (12 commits):**
+
 ```
 749f35e docs(anti-patterns): complete Phase 1 summary and audit all scripts
 64f2f21 refactor(core): remove unused WrapperTemplate.nix (165 lines dead code)
@@ -1095,6 +1200,7 @@ imports = [
 **Commits pushed to origin/master:** ✅ All 12 commits
 
 **Commit Message Quality:**
+
 - ✅ All commits follow conventional commit format
 - ✅ All commits have detailed explanations
 - ✅ All commits have sections (Summary, Changes, Rationale, Benefits, Verification)
@@ -1102,6 +1208,7 @@ imports = [
 - ✅ All commits are atomic (single purpose each)
 
 **Verification Results:**
+
 - ✅ All changes committed
 - ✅ All changes pushed to remote
 - ✅ Working tree clean
@@ -1110,6 +1217,7 @@ imports = [
 - ✅ No staged changes
 
 **Benefits:**
+
 - ✅ Clean repository state
 - ✅ All changes version controlled
 - ✅ Easy rollback capability
@@ -1125,11 +1233,13 @@ imports = [
 **Status:** COMPLETE AND OPERATIONAL
 
 **Problem Fixed:**
+
 - No fast syntax check for iterative development
 - No cross-platform configuration validation
 - Inconsistent testing workflow
 
 **Solution Implemented:**
+
 - Added `just test-fast` for syntax validation only
 - Enhanced `just test` for full cross-platform validation
 - Cross-platform configuration integrity check
@@ -1138,6 +1248,7 @@ imports = [
 **Commands Implemented:**
 
 **test** - Full testing
+
 ```bash
 test:
     @echo "🧪 Testing Nix configuration..."
@@ -1147,6 +1258,7 @@ test:
 ```
 
 **test-fast** - Fast syntax check
+
 ```bash
 test-fast:
     @echo "🚀 Fast testing Nix configuration (syntax only)..."
@@ -1155,6 +1267,7 @@ test-fast:
 ```
 
 **Testing Workflow:**
+
 1. Make changes to Nix files
 2. Run `just test-fast` for quick syntax validation
 3. Run `just test` for full cross-platform validation
@@ -1162,6 +1275,7 @@ test-fast:
 5. Verify functionality
 
 **Verification Results:**
+
 - ✅ `just test-fast` validates syntax correctly
 - ✅ `just test` validates all platforms
 - ✅ Cross-platform configurations validated
@@ -1169,9 +1283,11 @@ test-fast:
 - ✅ Error messages are clear
 
 **Commits:**
+
 - (Part of earlier commits, referenced here for completeness)
 
 **Benefits:**
+
 - ✅ Better cross-platform validation
 - ✅ Early detection of configuration errors
 - ✅ Faster iteration during development
@@ -1186,17 +1302,20 @@ test-fast:
 **Status:** COMPLETE AND VERIFIED
 
 **Problem Fixed:**
+
 - Obsolete bash scripts still in repository
 - Confusion about which scripts to use
 - Technical debt from old migration
 
 **Solution Implemented:**
+
 - Verified obsolete scripts already removed
 - Audited all remaining scripts (40+)
 - Documented all scripts as acceptable
 - No action needed (already clean)
 
 **Obsolete Scripts (NOT FOUND - Already Removed):**
+
 1. ✅ `scripts/manual-linking.sh` - NOT FOUND (already removed)
    - Status: Already migrated to Home Manager
    - Replacement: `home.file` and `home.xdg.configFile`
@@ -1267,6 +1386,7 @@ test-fast:
 **Hardcoded Paths Audit:**
 
 **Scripts with `/Applications/` references:**
+
 1. `sublime-text-sync.sh` - Line 43: `if [[ ! -d "/Applications/Sublime Text.app" ]];`
    - Purpose: Check if Sublime Text is installed
    - Type: Existence check (acceptable)
@@ -1290,6 +1410,7 @@ test-fast:
 **Conclusion:** All hardcoded paths are existence checks, not functional dependencies. None are fighting Nix.
 
 **Verification Results:**
+
 - ✅ All obsolete scripts removed (already done)
 - ✅ All remaining scripts audited (40+)
 - ✅ All scripts categorized by type
@@ -1297,9 +1418,11 @@ test-fast:
 - ✅ All hardcoded paths audited (all existence checks)
 
 **Commits:**
+
 - (Part of earlier commits, referenced here for completeness)
 
 **Benefits:**
+
 - ✅ No obsolete scripts in repository
 - ✅ Clear understanding of all scripts
 - ✅ All scripts documented and categorized
@@ -1315,12 +1438,14 @@ test-fast:
 **Status:** Some recipes removed, but file still ~1000+ lines
 
 **What's Done:**
+
 - ✅ Removed obsolete ActivityWatch recipes (setup, check, migrate)
 - ✅ Updated Go tool management recipes
 - ✅ Removed manual-linking.sh reference
 - ✅ Added Nix-Visualize commands (10 new recipes)
 
 **What Remains:**
+
 - ⏳ 1000+ lines could be simplified
 - ⏳ Duplicate recipes could be consolidated
 - ⏳ Homebrew recipes (not needed - brew not installed)
@@ -1332,9 +1457,11 @@ test-fast:
 - ⏳ Some redundant command patterns
 
 **Files to Review:**
+
 - `justfile` (~1000 lines)
 
 **Simplification Opportunities:**
+
 1. Remove all Homebrew recipes (not needed)
 2. Consolidate similar Go tool recipes
 3. Create template recipes for common patterns
@@ -1350,11 +1477,13 @@ test-fast:
 **Status:** Most apps in `/Applications/`, some could be in Nix
 
 **What's Done:**
+
 - ✅ All CLI tools in Nix (verified)
 - ✅ Cross-platform packages consistent
 - ✅ ActivityWatch managed via LaunchAgent (declarative)
 
 **What Remains:**
+
 - ⏳ GUI applications still in `/Applications/`:
   - ActivityWatch.app (could be in Nix? - currently in unstable)
   - Sublime Text.app (not in Nixpkgs)
@@ -1364,15 +1493,18 @@ test-fast:
 - ⏳ Trade-off: Nix packages vs /Applications/ (homebrew casks not used)
 
 **Current Approach:**
+
 - CLI tools: All in Nix (100%)
 - GUI tools: Mostly in `/Applications/` (acceptable)
 - Exception: iTerm2 already in Nix
 
 **Files to Review:**
+
 - `platforms/common/packages/base.nix` (could add GUI packages)
 - `scripts/sublime-text-sync.sh` (manages Sublime Text config)
 
 **Simplification Opportunities:**
+
 1. Research which GUI apps are available in Nix
 2. Migrate ActivityWatch if available in stable Nixpkgs
 3. Keep apps not in Nix in `/Applications/` (acceptable)
@@ -1388,26 +1520,31 @@ test-fast:
 **Status:** Custom wrapper system reviewed, native makeWrapper considered
 
 **What's Done:**
+
 - ✅ Removed dead code (WrapperTemplate.nix - 165 lines)
 - ✅ Evaluated custom wrappers vs native makeWrapper
 - ✅ Documented that no wrappers currently exist
 
 **What Remains:**
+
 - ⏳ Decision: Keep custom system or migrate to native?
 - ⏳ If keep: Simplify and document better
 - ⏳ If migrate: Refactor all future wrappers to use `writeShellApplication`
 - ⏳ Need benchmarking: Custom vs native (performance, complexity)
 
 **Current State:**
+
 - No active wrappers (custom or native)
 - Decision pending for future wrapper creation
 - Default approach: Use native `writeShellApplication` when creating wrappers
 
 **Files to Review:**
+
 - `platforms/common/core/` (directory for core utilities)
 - Nix docs for `writeShellApplication` and `makeWrapper`
 
 **Decision Points:**
+
 1. Does custom wrapper system provide unique functionality? (UNKNOWN)
 2. Is custom system faster than native? (UNKNOWN - no benchmarks)
 3. Is custom system more maintainable? (NO - 165 lines vs native)
@@ -1426,17 +1563,20 @@ test-fast:
 **Why:** nix-visualize requires `nix-store` CLI (NixOS-only), Darwin doesn't have it
 
 **Problem:**
+
 - Cannot generate NixOS dependency graphs from Darwin
 - Different commands needed for each platform
 - No unified workflow
 
 **Potential Solutions:**
+
 1. Use NixOS VM on Darwin (complex, not user-friendly)
 2. Cross-compilation with `nix build --system x86_64-linux` (slow, may not work)
 3. Alternative tools that work on both platforms (need research)
 4. Accept platform-specific commands (current approach)
 
 **Files to Create/Modify:**
+
 - `justfile` - Add unified `dep-graph` command with platform detection
 - `docs/architecture/nix-visualize-integration.md` - Document cross-platform limitations
 
@@ -1452,12 +1592,14 @@ test-fast:
 **Current State:** Static SVG/PNG graphs only
 
 **Problem:**
+
 - No zoom/pan capabilities in static graphs
 - No interactive package details
 - No search functionality
 - Difficult to explore large graphs (471 nodes, 1,233 edges)
 
 **Potential Features:**
+
 1. Web-based graph viewers (Cytoscape.js, vis.js, D3.js)
 2. Zoom/pan capabilities (mouse wheel, drag)
 3. Click for package details (dependency list, size, description)
@@ -1466,6 +1608,7 @@ test-fast:
 6. Edge filtering (hide/show specific dependencies)
 
 **Files to Create:**
+
 - `docs/architecture/interactive-graph-viewer.html` (web viewer)
 - `justfile` - Add `dep-graph-interactive` command
 
@@ -1481,11 +1624,13 @@ test-fast:
 **Current State:** Manual regeneration only (`just dep-graph-darwin`)
 
 **Problem:**
+
 - Graphs become outdated quickly (after each `just switch`)
 - Manual regeneration is error-prone (can forget)
 - No CI/CD integration
 
 **Potential Features:**
+
 1. Pre-commit hook for graph updates (regenerate on commit)
 2. GitHub Action for CI/CD (auto-generate on push)
 3. Scheduled regeneration (daily/weekly via cron)
@@ -1493,6 +1638,7 @@ test-fast:
 5. Notification system (alert on graph changes)
 
 **Files to Create:**
+
 - `.git/hooks/pre-commit` - Graph regeneration hook
 - `.github/workflows/graph-generation.yml` - CI/CD workflow
 - `justfile` - Add `dep-graph-auto` commands
@@ -1507,11 +1653,13 @@ test-fast:
 **Status:** Not implemented
 
 **Problem:**
+
 - No visibility into package costs (build time, store size)
 - No data-driven optimization decisions
 - No package ranking by cost/benefit
 
 **Potential Metrics:**
+
 1. Build time estimation per package
 2. Store size analysis per package
 3. Dependency cost calculation (transitive)
@@ -1520,6 +1668,7 @@ test-fast:
 6. Suggest cheaper alternatives
 
 **Files to Create:**
+
 - `justfile` - Add `dep-graph-cost` commands
 - `scripts/package-cost-analysis.sh` - Analysis script
 - `docs/architecture/package-cost-analysis.md` - Documentation
@@ -1536,11 +1685,13 @@ test-fast:
 **Current State:** Single snapshots only
 
 **Problem:**
+
 - No tracking of performance over time
 - No detection of performance regressions
 - No baseline for comparison
 
 **Potential Features:**
+
 1. Track graph generation time over commits
 2. Monitor node/edge count changes (package growth)
 3. Track file size trends
@@ -1549,6 +1700,7 @@ test-fast:
 6. Generate performance reports
 
 **Files to Create:**
+
 - `scripts/performance-tracking.sh` - Tracking script
 - `scripts/performance-dashboard.sh` - Dashboard generator
 - `docs/performance/` - Performance history directory
@@ -1566,11 +1718,13 @@ test-fast:
 **Current State:** No historical tracking
 
 **Problem:**
+
 - Cannot see evolution of system dependencies
 - Cannot visualize changes over time
 - No historical archive of graphs
 
 **Potential Features:**
+
 1. Timestamped graph generation (date/time in filename)
 2. Comparison of graphs over time (diff between commits)
 3. Visualization of evolution (animation or slider)
@@ -1579,6 +1733,7 @@ test-fast:
 6. Timeline visualization (commit to graph)
 
 **Files to Create:**
+
 - `justfile` - Add `dep-graph-history` commands
 - `scripts/graph-history.sh` - History management
 - `docs/architecture/history/` - Historical graph archive
@@ -1596,11 +1751,13 @@ test-fast:
 **Current State:** Single graph view only
 
 **Problem:**
+
 - Cannot compare graphs easily (before/after, Darwin/NixOS)
 - No visual diff highlighting
 - No side-by-side statistics
 
 **Potential Features:**
+
 1. Before/after comparison view (two graphs side-by-side)
 2. Platform comparison (Darwin vs NixOS)
 3. Side-by-side visualization (sync zoom/pan)
@@ -1610,6 +1767,7 @@ test-fast:
 7. Export comparison reports (markdown, JSON)
 
 **Files to Create:**
+
 - `scripts/graph-comparison.sh` - Comparison script
 - `docs/architecture/comparison.html` - Comparison viewer
 - `justfile` - Add `dep-graph-compare` commands
@@ -1624,11 +1782,13 @@ test-fast:
 **Status:** Not implemented
 
 **Problem:**
+
 - No guidance on system optimization
 - No recommendations for package removal
 - No data to drive optimization decisions
 
 **Potential Features:**
+
 1. Package removal recommendations (identify unused leaf nodes)
 2. Dependency consolidation suggestions (replace multiple packages with one)
 3. Depth reduction strategies (use packages with fewer dependencies)
@@ -1638,6 +1798,7 @@ test-fast:
 7. Generate optimization reports (markdown, JSON)
 
 **Files to Create:**
+
 - `scripts/optimization-analysis.sh` - Analysis script
 - `scripts/optimization-recommendations.sh` - Recommendation engine
 - `justfile` - Add `dep-graph-optimize` commands
@@ -1655,11 +1816,13 @@ test-fast:
 **Current State:** Manual docs exist, automated graphs exist
 
 **Problem:**
+
 - Manual architecture docs (`docs/nix-call-graph.md`) not integrated with automated graphs
 - No guidance on when to use manual vs automated approach
 - No unified architecture overview
 
 **Potential Features:**
+
 1. Update `docs/nix-call-graph.md` with nix-visualize integration
 2. Compare manual vs automated graphs (pros/cons of each)
 3. Document when to use each approach (use cases)
@@ -1669,6 +1832,7 @@ test-fast:
 7. Create unified architecture documentation
 
 **Files to Modify:**
+
 - `docs/nix-call-graph.md` - Integrate nix-visualize
 - `docs/architecture/` - Unified architecture overview
 - `docs/architecture/adr-001-home-manager.md` - Update ADR
@@ -1683,11 +1847,13 @@ test-fast:
 **Status:** Not implemented
 
 **Problem:**
+
 - Cannot filter graphs by category, depth, size
 - Difficult to analyze specific subsets of packages
 - No custom filter expressions
 
 **Potential Features:**
+
 1. Filter by package category (CLI, GUI, DevOps, etc.)
 2. Filter by dependency depth (shallow vs deep dependencies)
 3. Filter by package size (small vs large packages)
@@ -1697,6 +1863,7 @@ test-fast:
 7. Export filtered graphs
 
 **Files to Create:**
+
 - `scripts/graph-filter.sh` - Filtering script
 - `docs/architecture/filter-guide.md` - Filtering guide
 - `justfile` - Add `dep-graph-filter` commands
@@ -1711,6 +1878,7 @@ test-fast:
 ### ❌ NOTHING IS TOTALLY FUCKED UP! 🎉
 
 **All Systems Operational:**
+
 - ✅ Nix configuration building successfully
 - ✅ Home Manager activation working
 - ✅ LaunchAgents loaded and functional
@@ -1722,6 +1890,7 @@ test-fast:
 - ✅ All tests passing
 
 **The Only "Issues" Are:**
+
 - ⏳ Optional improvements (not broken)
 - ⏳ Future enhancements (not bugs)
 - ⏳ Optimization opportunities (not failures)
@@ -1738,6 +1907,7 @@ test-fast:
 6. **Repository:** ✅ All clean (no merge conflicts, no uncommitted changes)
 
 **Evidence of System Health:**
+
 - `just test-fast`: ✅ Syntax check passed
 - `just test`: ✅ Full validation passed
 - `just switch`: ✅ Configuration applied successfully
@@ -1747,6 +1917,7 @@ test-fast:
 - Working tree: ✅ No uncommitted changes
 
 **What This Means:**
+
 - No critical issues require immediate attention
 - No broken states need emergency fixes
 - No regressions detected in recent changes
@@ -1762,12 +1933,14 @@ test-fast:
 #### 1. Justify and Simplify Custom Wrapper System (Impact: HIGH, Effort: MEDIUM)
 
 **Problem:**
+
 - We had a custom wrapper system (`WrapperTemplate.nix` was 165 lines, now removed)
 - It's unclear if custom wrapper system was ever necessary
 - Nix has built-in `pkgs.makeWrapper` and `writeShellApplication` for this purpose
 - Decision on custom vs native is pending
 
 **Solution:**
+
 - Evaluate: Is custom wrapper system really necessary?
 - Test: Can `makeWrapper` or `writeShellApplication` replace it?
 - Decision: Keep or remove based on testing
@@ -1775,6 +1948,7 @@ test-fast:
 - Document: Clearly explain WHY custom system is kept (if kept)
 
 **Specific Actions:**
+
 1. Review all wrapper use cases (if any exist)
 2. Test `writeShellApplication` for simple wrappers (should cover 80%)
 3. Benchmark: Custom vs native (performance, complexity)
@@ -1783,6 +1957,7 @@ test-fast:
 6. Document: Explain decision rationale
 
 **Expected Results:**
+
 - If migrate to native: Reduce complexity by ~200+ lines
 - If keep simplified: Clear documentation of why needed
 - Either way: Better alignment with Nix best practices
@@ -1795,12 +1970,14 @@ test-fast:
 #### 2. Optimize PNG File Sizes (Impact: MEDIUM-HIGH, Effort: MEDIUM)
 
 **Problem:**
+
 - PNG files are 20MB (unreasonably large)
 - SVG files are 1.6MB (reasonable)
 - PNG generation takes same time as SVG
 - PNG files are difficult to share via email/chat
 
 **Solution:**
+
 - Investigate PNG resolution parameters (1920x1080 vs native)
 - Test different quality compression levels
 - Implement multiple PNG size options
@@ -1808,6 +1985,7 @@ test-fast:
 - Provide size options for different use cases
 
 **Specific Actions:**
+
 1. Test PNG at 1920x1080 resolution
 2. Test PNG at different quality levels (90%, 80%, 70%)
 3. Benchmark generation time vs file size
@@ -1815,6 +1993,7 @@ test-fast:
 5. Update documentation with size recommendations
 
 **Expected Results:**
+
 - Reduce PNG from 20MB → 5-10MB (4x smaller)
 - Maintain reasonable quality for presentations
 - Provide size options for different needs
@@ -1827,12 +2006,14 @@ test-fast:
 #### 3. Add Error Handling to Graph Commands (Impact: HIGH, Effort: LOW)
 
 **Problem:**
+
 - `dep-graph-view`, `dep-graph-stats`, `dep-graph-clean` have good error handling
 - `dep-graph-darwin`, `dep-graph-png`, `dep-graph-dot` have NO error handling
 - Inconsistent behavior across commands
 - Poor error messages when failures occur
 
 **Solution:**
+
 - Add error handling to all graph generation commands
 - Validate successful generation before claiming success
 - Improve error messages with troubleshooting steps
@@ -1840,6 +2021,7 @@ test-fast:
 - Implement retry logic for transient failures
 
 **Specific Actions:**
+
 1. Add error handling to `dep-graph-darwin`:
    ```bash
    dep-graph-darwin:
@@ -1866,6 +2048,7 @@ test-fast:
 5. Add cleanup on failure (remove partial graph files)
 
 **Expected Results:**
+
 - Consistent error handling across all commands
 - Better user experience (clear error messages)
 - Easier debugging (troubleshooting steps)
@@ -1879,19 +2062,23 @@ test-fast:
 #### 4. Consolidate Justfile Recipes (Impact: HIGH, Effort: MEDIUM)
 
 **Problem:**
+
 - Justfile is 1000+ lines
 - Many duplicate patterns (similar commands with minor variations)
 - Homebrew recipes present but brew not installed
 - Some redundant command patterns
 
 **Solution:**
+
 - Remove all Homebrew recipes (not needed)
 - Remove obsolete Go tool recipes (now in Nix)
 - Consolidate similar recipes into template recipes
 - Target: Reduce from 1000+ lines to ~600-700 lines
 
 **Specific Actions:**
+
 1. Remove Homebrew recipes:
+
    ```bash
    # REMOVE (not needed - brew not installed)
    brew-clean:
@@ -1902,6 +2089,7 @@ test-fast:
    ```
 
 2. Remove obsolete Go tool recipes:
+
    ```bash
    # REMOVE (Go tools now in Nix)
    go-install-tools:
@@ -1912,6 +2100,7 @@ test-fast:
    ```
 
 3. Consolidate similar recipes:
+
    ```bash
    # TEMPLATE for graph commands
    # This pattern can be reused for SVG, PNG, DOT, etc.
@@ -1929,6 +2118,7 @@ test-fast:
 5. Update help section to reflect changes
 
 **Expected Results:**
+
 - Easier maintenance (fewer lines to maintain)
 - Faster lookups (organized, consolidated)
 - Clearer purpose (no obsolete recipes)
@@ -1944,17 +2134,21 @@ test-fast:
 #### 5. Add LaunchAgent Service Management Recipes (Impact: MEDIUM, Effort: LOW)
 
 **Problem:**
+
 - No justfile recipes for LaunchAgent management
 - Must use `launchctl` directly (less convenient)
 - No easy way to check service status
 
 **Solution:**
+
 - Add start/stop/status/restart recipes for LaunchAgent management
 - Provide convenient commands for service control
 - Add health checks for ActivityWatch
 
 **Specific Actions:**
+
 1. Create `launch-agent-start` recipe:
+
    ```bash
    launch-agent-start:
        @echo "🚀 Starting ActivityWatch LaunchAgent..."
@@ -1963,6 +2157,7 @@ test-fast:
    ```
 
 2. Create `launch-agent-stop` recipe:
+
    ```bash
    launch-agent-stop:
        @echo "🛑 Stopping ActivityWatch LaunchAgent..."
@@ -1971,6 +2166,7 @@ test-fast:
    ```
 
 3. Create `launch-agent-status` recipe:
+
    ```bash
    launch-agent-status:
        @echo "📊 ActivityWatch LaunchAgent status:"
@@ -1993,6 +2189,7 @@ test-fast:
    ```
 
 **Expected Results:**
+
 - Easier service control (convenient commands)
 - Better visibility into service status
 - Health checks for ActivityWatch
@@ -2005,17 +2202,20 @@ test-fast:
 #### 6. Go Environment Variable Documentation (Impact: MEDIUM, Effort: LOW)
 
 **Problem:**
+
 - Go environment variables added but not well documented
 - Not clear why GOPATH and PATH additions are needed
 - No troubleshooting section for Go environment
 
 **Solution:**
+
 - Add comprehensive documentation for Go environment
 - Explain why GOPATH and PATH are needed
 - Add troubleshooting section
 - Provide examples
 
 **Specific Actions:**
+
 1. Update `platforms/common/programs/zsh.nix` documentation:
    ```nix
    # Go Development Environment
@@ -2033,6 +2233,7 @@ test-fast:
    - Wrong Go version: Check Go in PATH vs Go installed via Nix
 
 **Expected Results:**
+
 - Clearer onboarding for Go developers
 - Better understanding of Go environment
 - Easier troubleshooting (common issues documented)
@@ -2045,18 +2246,22 @@ test-fast:
 #### 7. ActivityWatch Health Monitoring (Impact: MEDIUM, Effort: MEDIUM)
 
 **Problem:**
+
 - No visibility into ActivityWatch health
 - No proactive issue detection
 - Manual health checks required
 
 **Solution:**
+
 - Add health check commands
 - Monitor ActivityWatch processes
 - Check log files for errors
 - Alert on service failures
 
 **Specific Actions:**
+
 1. Create `activitywatch-health` recipe:
+
    ```bash
    activitywatch-health:
        @echo "📊 ActivityWatch Health Check"
@@ -2077,6 +2282,7 @@ test-fast:
    ```
 
 2. Create `activitywatch-logs` recipe (view logs):
+
    ```bash
    activitywatch-logs:
        @echo "📄 ActivityWatch Log Files"
@@ -2086,6 +2292,7 @@ test-fast:
 3. Add to `launch-agent-status` (already planned)
 
 **Expected Results:**
+
 - Proactive issue detection (health checks)
 - Better visibility into ActivityWatch status
 - Easier debugging (log viewing)
@@ -2098,17 +2305,20 @@ test-fast:
 #### 8. ZSH vs Fish Shell Consistency (Impact: MEDIUM, Effort: LOW)
 
 **Problem:**
+
 - Some configs in ZSH, some in Fish, some in both
 - Not clear which shell is primary
 - Potential duplicates and inconsistencies
 
 **Solution:**
+
 - Audit all shell configs (ZSH, Fish, Bash)
 - Identify duplicates and inconsistencies
 - Document which shell is primary (Fish)
 - Consolidate shared configurations
 
 **Specific Actions:**
+
 1. Audit all shell configs:
    - `platforms/common/programs/fish.nix` (Fish)
    - `platforms/common/programs/zsh.nix` (ZSH)
@@ -2135,6 +2345,7 @@ test-fast:
    - Document shell priority and use cases
 
 **Expected Results:**
+
 - Clearer shell configuration
 - No duplicates or inconsistencies
 - Better understanding of shell hierarchy
@@ -2149,12 +2360,14 @@ test-fast:
 #### 9. README Updates (Impact: LOW, Effort: MEDIUM)
 
 **Problem:**
+
 - Some sections outdated or missing
 - No section for LaunchAgent management
 - No section for Nix-Visualize
 - Go development tools section needs update
 
 **Solution:**
+
 - Update README with recent changes
 - Add LaunchAgent section
 - Add Nix-Visualize section
@@ -2162,19 +2375,23 @@ test-fast:
 - Update architecture overview
 
 **Specific Actions:**
+
 1. Add LaunchAgent section to README:
-   ```markdown
+
+   ````markdown
    ### LaunchAgent Management (macOS)
 
    ActivityWatch auto-start is managed declaratively via Nix LaunchAgent configuration in `platforms/darwin/services/launchagents.nix`. No manual setup scripts required.
 
    **Key Features:**
+
    - Declarative service management (no manual scripts)
    - Auto-start on login
    - Automatic restart on failure
    - XDG-compliant logging
 
    **Usage:**
+
    ```bash
    # Check LaunchAgent status
    just launch-agent-status
@@ -2182,24 +2399,31 @@ test-fast:
    # Restart LaunchAgent
    just launch-agent-restart
    ```
+   ````
 
    **Configuration:** `platforms/darwin/services/launchagents.nix`
    **LaunchAgent File:** `~/Library/LaunchAgents/net.activitywatch.ActivityWatch.plist`
+
+   ```
+
    ```
 
 2. Add Nix-Visualize section to README:
-   ```markdown
+
+   ````markdown
    ### Dependency Visualization
 
    Automatic dependency graph generation via nix-visualize integration.
 
    **Key Features:**
+
    - 471 packages visualized
    - 1,233 dependencies tracked
    - Multiple output formats (SVG, PNG, DOT)
    - Quick generation (60-90 seconds)
 
    **Usage:**
+
    ```bash
    # Generate Darwin graph
    just dep-graph-darwin
@@ -2210,17 +2434,23 @@ test-fast:
    # Quick workflow (regenerate + view)
    just dep-graph-update
    ```
+   ````
 
    **Documentation:** `docs/architecture/nix-visualize-integration.md`
+
+   ```
+
    ```
 
 3. Update Go development tools section:
-   ```markdown
+
+   ````markdown
    ### Go Development Stack
 
    All Go tools are managed via Nix packages for reproducibility.
 
    **Available Tools:**
+
    - gopls (language server)
    - golangci-lint (linter)
    - gofumpt (formatter)
@@ -2232,6 +2462,7 @@ test-fast:
    - gup (binary updater)
 
    **Usage:**
+
    ```bash
    # View all Go tool versions
    just go-tools-version
@@ -2239,11 +2470,16 @@ test-fast:
    # Full Go development workflow
    just go-dev
    ```
+   ````
+
+   ```
+
    ```
 
 4. Update architecture overview with anti-patterns resolution
 
 **Expected Results:**
+
 - Better user onboarding (comprehensive README)
 - Clear documentation of all features
 - Easier navigation (well-organized sections)
@@ -2256,18 +2492,22 @@ test-fast:
 #### 10. Status Report Automation (Impact: LOW, Effort: MEDIUM)
 
 **Problem:**
+
 - Status reports are manual (time-consuming)
 - No automation for reporting
 - Potential for inconsistent reporting
 
 **Solution:**
+
 - Create automated status generation script
 - Scan commits, test results, issues
 - Generate markdown report
 - Add to justfile as `status-generate`
 
 **Specific Actions:**
+
 1. Create `scripts/status-generate.sh`:
+
    ```bash
    #!/bin/bash
    # Automated Status Report Generator
@@ -2292,11 +2532,13 @@ test-fast:
    ```
 
 2. Scan recent commits:
+
    ```bash
    git log -10 --pretty=format:"- %h: %s" >> "$REPORT_FILE"
    ```
 
 3. Scan test results:
+
    ```bash
    echo "" >> "$REPORT_FILE"
    echo "## Test Results" >> "$REPORT_FILE"
@@ -2322,6 +2564,7 @@ test-fast:
    ```
 
 **Expected Results:**
+
 - Faster reporting (automated)
 - More consistent (same format every time)
 - Easier status tracking (regular reports)
@@ -2336,6 +2579,7 @@ test-fast:
 ### 🔴 CRITICAL (Do This Week)
 
 #### 1. Justify and Simplify Custom Wrapper System (Priority: #1)
+
 - **Evaluate:** Is custom wrapper system really necessary?
 - **Test:** Can `makeWrapper` or `writeShellApplication` replace it?
 - **Decision:** Keep or remove based on testing
@@ -2345,6 +2589,7 @@ test-fast:
 - **Effort:** 2-3 hours
 
 #### 2. Optimize PNG File Sizes (Priority: #2)
+
 - **Test:** Different resolutions (1920x1080 vs native)
 - **Test:** Quality compression levels (90%, 80%, 70%)
 - **Implement:** Multiple PNG size options (small, medium, large)
@@ -2353,6 +2598,7 @@ test-fast:
 - **Effort:** 1-2 hours
 
 #### 3. Add Error Handling to Graph Commands (Priority: #3)
+
 - **Commands:** `dep-graph-darwin`, `dep-graph-png`, `dep-graph-dot`
 - **Validation:** Check graph generation success before claiming
 - **Error messages:** Add troubleshooting steps
@@ -2361,6 +2607,7 @@ test-fast:
 - **Effort:** 1-2 hours
 
 #### 4. Consolidate Justfile Recipes (Priority: #4)
+
 - **Remove:** All Homebrew recipes (not needed - brew not installed)
 - **Remove:** Obsolete Go tool recipes (now in Nix)
 - **Consolidate:** Similar patterns into template recipes
@@ -2371,6 +2618,7 @@ test-fast:
 ### 🟡 HIGH PRIORITY (Do This Month)
 
 #### 5. Implement Cross-Platform Graph Generation (Priority: #5)
+
 - **Test:** `nix eval --system x86_64-linux` for NixOS on Darwin
 - **Implement:** Unified `dep-graph` command with platform detection
 - **Add:** Platform-specific fallbacks
@@ -2379,6 +2627,7 @@ test-fast:
 - **Effort:** 4-6 hours
 
 #### 6. Add LaunchAgent Management Recipes (Priority: #6)
+
 - **Create:** `launch-agent-start` (manual start)
 - **Create:** `launch-agent-stop` (manual stop)
 - **Create:** `launch-agent-status` (check status)
@@ -2387,6 +2636,7 @@ test-fast:
 - **Effort:** 1-2 hours
 
 #### 7. Add ActivityWatch Health Checks (Priority: #7)
+
 - **Check:** aw-server accessibility (http://localhost:5600)
 - **Monitor:** Watcher processes (aw-watcher-afk, aw-watcher-window)
 - **Check:** Log files for errors
@@ -2395,6 +2645,7 @@ test-fast:
 - **Effort:** 2-3 hours
 
 #### 8. Create Interactive Graph Viewer (Priority: #8)
+
 - **Research:** Web-based graph viewers (Cytoscape.js, vis.js, D3.js)
 - **Implement:** HTML viewer with zoom/pan
 - **Add:** Click for package details
@@ -2403,6 +2654,7 @@ test-fast:
 - **Effort:** 8-12 hours
 
 #### 9. Automated Graph Regeneration (Priority: #9)
+
 - **Create:** Pre-commit hook for graph updates
 - **Add:** GitHub Action for CI/CD
 - **Configure:** Scheduled regeneration (weekly)
@@ -2411,6 +2663,7 @@ test-fast:
 - **Effort:** 6-8 hours
 
 #### 10. Update README with Recent Changes (Priority: #10)
+
 - **Add:** LaunchAgent section (declarative management)
 - **Add:** Nix-Visualize section (dependency visualization)
 - **Update:** Go development tools section (all in Nix)
@@ -2421,6 +2674,7 @@ test-fast:
 ### 🟢 MEDIUM PRIORITY (Do This Quarter)
 
 #### 11. Implement Package Cost Analysis (Priority: #11)
+
 - **Metrics:** Build time, store size, dependency count
 - **Generate:** Optimization reports
 - **Create:** Package ranking system
@@ -2429,6 +2683,7 @@ test-fast:
 - **Effort:** 12-16 hours
 
 #### 12. Implement Performance Baseline Tracking (Priority: #12)
+
 - **Track:** Graph generation time over commits
 - **Monitor:** Node/edge count changes
 - **Track:** File size trends
@@ -2438,6 +2693,7 @@ test-fast:
 - **Effort:** 8-12 hours
 
 #### 13. Implement Time-Lapse Graph Tracking (Priority: #13)
+
 - **Generate:** Timestamped graphs
 - **Compare:** Graphs over time
 - **Visualize:** Evolution (animation/slider)
@@ -2447,6 +2703,7 @@ test-fast:
 - **Effort:** 12-16 hours
 
 #### 14. Implement Graph Comparison Views (Priority: #14)
+
 - **Create:** Before/after comparison view
 - **Add:** Platform comparison (Darwin vs NixOS)
 - **Implement:** Side-by-side visualization
@@ -2456,6 +2713,7 @@ test-fast:
 - **Effort:** 10-14 hours
 
 #### 15. Create ADR Documentation (Priority: #15)
+
 - **ADR:** Home Manager adoption (why, benefits)
 - **ADR:** Nix-Visualize integration (why, alternatives)
 - **ADR:** LaunchAgent migration (problem, solution)
@@ -2465,6 +2723,7 @@ test-fast:
 - **Effort:** 4-6 hours
 
 #### 16. Consolidate Shell Configurations (Priority: #16)
+
 - **Audit:** All shell configs (ZSH, Fish, Bash)
 - **Identify:** Duplicates and inconsistencies
 - **Document:** Which shell is primary (Fish)
@@ -2473,6 +2732,7 @@ test-fast:
 - **Effort:** 4-6 hours
 
 #### 17. Add Optimization Workflow (Priority: #17)
+
 - **Analyze:** Package removal recommendations
 - **Suggest:** Dependency consolidation
 - **Identify:** Depth reduction opportunities
@@ -2482,6 +2742,7 @@ test-fast:
 - **Effort:** 16-20 hours
 
 #### 18. Integrate Architecture Documentation (Priority: #18)
+
 - **Update:** `docs/nix-call-graph.md` with nix-visualize
 - **Compare:** Manual vs automated graphs
 - **Document:** When to use each approach
@@ -2493,6 +2754,7 @@ test-fast:
 ### 🔵 LOW PRIORITY (Do This Year)
 
 #### 19. Migrate GUI Applications to Nix (Priority: #19)
+
 - **Research:** Which GUI apps are available in Nix
 - **Migrate:** ActivityWatch (if available in stable)
 - **Migrate:** Other GUI apps where possible
@@ -2501,6 +2763,7 @@ test-fast:
 - **Effort:** 8-12 hours
 
 #### 20. Create Status Report Automation (Priority: #20)
+
 - **Create:** Status generation script
 - **Scan:** Commits, test results, issues
 - **Generate:** Markdown report
@@ -2509,6 +2772,7 @@ test-fast:
 - **Effort:** 6-8 hours
 
 #### 21. Automate Backup Management (Priority: #21)
+
 - **Add:** Pre-commit hook backup
 - **Add:** Automatic daily/weekly backup
 - **Add:** Backup cleanup (keep last 10)
@@ -2517,6 +2781,7 @@ test-fast:
 - **Effort:** 4-6 hours
 
 #### 22. Add Advanced Graph Filtering (Priority: #22)
+
 - **Implement:** Filter by package category
 - **Implement:** Filter by dependency depth
 - **Implement:** Filter by package size
@@ -2526,6 +2791,7 @@ test-fast:
 - **Effort:** 12-16 hours
 
 #### 23. Implement Optimization Recommendations (Priority: #23)
+
 - **Analyze:** Graph bottlenecks (high-degree nodes)
 - **Suggest:** Package removal (unused leaf nodes)
 - **Suggest:** Dependency consolidation
@@ -2535,6 +2801,7 @@ test-fast:
 - **Effort:** 16-20 hours
 
 #### 24. Create Migration Guide for New Users (Priority: #24)
+
 - **Document:** Step-by-step setup process
 - **Include:** Common issues and solutions
 - **Add:** Troubleshooting guide
@@ -2544,6 +2811,7 @@ test-fast:
 - **Effort:** 8-12 hours
 
 #### 25. Implement Automated Testing (Priority: #25)
+
 - **Add:** Unit tests for critical configurations
 - **Add:** Integration tests for LaunchAgent
 - **Add:** End-to-end tests for full workflow
@@ -2559,6 +2827,7 @@ test-fast:
 ### 🚨 CRITICAL QUESTION: Should We Keep or Remove (or Simplify) Custom Wrapper System?
 
 **Context:**
+
 - We had a custom wrapper system (`platforms/common/core/WrapperTemplate.nix` was 165 lines)
 - The wrapper system was complex, with custom types and templates
 - Nix has built-in `pkgs.makeWrapper` and `writeShellApplication` for this purpose
@@ -2568,12 +2837,14 @@ test-fast:
 **What I Cannot Figure Out:**
 
 #### 1. Was the Custom Wrapper System Ever Actually Used?
+
 - **Finding:** No current wrappers exist in the codebase (custom or native)
 - **Question:** Was the custom wrapper system ever used in production?
 - **Question:** Was it created for a specific purpose that never materialized?
 - **Question:** Was it experimental code that was abandoned?
 
 #### 2. Is a Custom Wrapper System Needed for This Codebase?
+
 - **Finding:** No current use cases require custom wrappers
 - **Question:** Are there any wrappers we should be creating but aren't?
 - **Question:** Do we have tools that need environment variable injection or PATH modifications?
@@ -2582,6 +2853,7 @@ test-fast:
 #### 3. What are the Trade-offs of Custom vs Native Wrappers?
 
 **Custom Wrapper System (if kept):**
+
 - **Pros:**
   - Maximum flexibility (any wrapper logic possible)
   - Custom types and validation
@@ -2594,6 +2866,7 @@ test-fast:
   - Non-standard approach (harder for contributors to understand)
 
 **Native Nix Wrappers (`writeShellApplication`):**
+
 - **Pros:**
   - Zero lines of custom code
   - Well-tested (part of Nix)
@@ -2605,12 +2878,14 @@ test-fast:
   - May not cover all edge cases (if any exist)
 
 #### 4. Have We Benchmarked Custom vs Native Performance?
+
 - **Unknown:** I don't have performance data
 - **Question:** Is custom wrapper faster than native? By how much?
 - **Question:** Is custom wrapper more memory efficient?
 - **Question:** Does it produce better results (smaller binary, faster startup)?
 
 #### 5. What is the Cost of Wrong Decision?
+
 - **If keep custom but should use native:**
   - Technical debt (165+ lines to maintain)
   - Potential bugs (custom implementation may have issues)
@@ -2622,12 +2897,14 @@ test-fast:
   - Time spent refactoring to custom later
 
 #### 6. What Are Our Current Wrapper Needs?
+
 - **Finding:** No current wrappers exist
 - **Question:** Do we need wrappers at all?
 - **Question:** Are all tools working without wrappers?
 - **Question:** Is the wrapper system a solution in search of a problem?
 
 **Why I Cannot Answer This:**
+
 1. **I don't have historical context:**
    - Why was the custom wrapper system created?
    - What problem was it solving?
@@ -2675,6 +2952,7 @@ test-fast:
    - Can you verify if native solution covers our needs?
 
 **This Decision Blocks:**
+
 - Justfile simplification (#4 priority item)
 - Code reduction and maintenance improvement
 - Alignment with Nix best practices
@@ -2698,10 +2976,12 @@ test-fast:
    - Document rationale for any custom wrappers
 
 **Impact of Wrong Decision:**
+
 - **If keep custom but should use native:** Technical debt (165+ lines), maintenance burden, non-standard approach
 - **If use native but need custom:** May need to refactor later (if edge cases exist), loss of flexibility
 
 **Next Steps (If You Provide Answers):**
+
 1. Create wrappers using native `writeShellApplication` (if needed)
 2. Benchmark native vs custom (if you have custom system code)
 3. Document decision rationale
@@ -2717,6 +2997,7 @@ test-fast:
 ### ✅ PROJECT HEALTH: EXCELLENT
 
 **Infrastructure:**
+
 - ✅ Nix configuration building successfully
 - ✅ Home Manager activation working
 - ✅ LaunchAgents loaded and functional
@@ -2724,17 +3005,20 @@ test-fast:
 - ✅ Git workflow clean
 
 **Documentation:**
+
 - ✅ Comprehensive (700+ lines anti-patterns analysis)
 - ✅ Complete integration guides (535 lines nix-visualize)
 - ✅ Status reports (1,400+ lines comprehensive)
 - ✅ All features documented
 
 **Testing:**
+
 - ✅ All tests passing (syntax checks, full validation)
 - ✅ All configurations verified
 - ✅ All services operational
 
 **Repository:**
+
 - ✅ Clean state (no merge conflicts, no uncommitted changes)
 - ✅ Up to date with origin/master
 - ✅ 12 commits today, all pushed
@@ -2747,6 +3031,7 @@ test-fast:
 ### 🎯 PHASE 1 STATUS: ✅ COMPLETED
 
 **Anti-Patterns Resolved:**
+
 - ✅ Manual dotfiles linking (not found - already removed)
 - ✅ LaunchAgent bash script (not found - already removed)
 - ✅ Imperative LaunchAgent setup (migrated to Nix)
@@ -2765,6 +3050,7 @@ test-fast:
 **Future Roadmap:** Clear, prioritized, and actionable (25 items)
 
 **Immediate Actions (This Week):**
+
 1. 🔴 Justify or simplify wrapper system (decision point)
 2. 🔴 Optimize PNG file sizes (quick win)
 3. 🔴 Add error handling to graph commands (quick win)

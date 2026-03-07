@@ -1,4 +1,5 @@
 # 🎯 SETUP-MAC EXECUTION PLAN WITH MERMAID WORKFLOW
+
 **Generated**: Sun Dec 21 15:47:23 CET 2025
 **Total Tasks**: 125 tasks in 31h 15m for complete project validation
 
@@ -153,10 +154,10 @@ timeline
 
 ## 🔥 IMMEDIATE NEXT ACTIONS (First 90 Minutes)
 
-| Time | Task | Impact | Status |
-|------|------|--------|--------|
-| 0-15m | Fix macOS TCC permissions | ⚡⚡⚡⚡⚡ | 🔄 READY |
-| 15-30m | Prepare evo-x2 deployment | ⚡⚡⚡⚡⚡ | ⏳ WAITING |
+| Time   | Task                          | Impact     | Status     |
+| ------ | ----------------------------- | ---------- | ---------- |
+| 0-15m  | Fix macOS TCC permissions     | ⚡⚡⚡⚡⚡ | 🔄 READY   |
+| 15-30m | Prepare evo-x2 deployment     | ⚡⚡⚡⚡⚡ | ⏳ WAITING |
 | 30-90m | Hardware validation boot test | ⚡⚡⚡⚡⚡ | ⏳ WAITING |
 
 ---
@@ -170,6 +171,7 @@ timeline
 **RISK MITIGATION**: Decision gates at each major checkpoint with fallback procedures
 
 **EXECUTION ORDER**:
+
 1. Critical path (T1-T7) → 51% impact
 2. Core functionality (T8-T27) → 13% more impact
 3. Advanced features (T28-T60) → 16% more impact

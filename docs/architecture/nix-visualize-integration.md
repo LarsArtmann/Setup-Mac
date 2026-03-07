@@ -7,6 +7,7 @@
 ## What is nix-visualize?
 
 **nix-visualize** is a Python-based tool that:
+
 - Parses Nix store paths (system closures)
 - Analyzes package dependencies
 - Generates visual dependency graphs
@@ -37,11 +38,13 @@ Added comprehensive visualization commands to `justfile`:
 #### Basic Commands
 
 - **`just dep-graph`** - Generate Darwin dependency graph (SVG)
+
   ```bash
   just dep-graph
   ```
 
 - **`just dep-graph-nixos`** - Generate NixOS dependency graph (SVG)
+
   ```bash
   just dep-graph-nixos
   ```
@@ -54,26 +57,31 @@ Added comprehensive visualization commands to `justfile`:
 #### Advanced Commands
 
 - **`just dep-graph-all`** - Generate all formats for both platforms
+
   ```bash
   just dep-graph-all
   ```
 
 - **`just dep-graph-verbose`** - Generate with verbose output (debugging)
+
   ```bash
   just dep-graph-verbose
   ```
 
 - **`just dep-graph-view`** - Open graph in browser
+
   ```bash
   just dep-graph-view
   ```
 
 - **`just dep-graph-update`** - Regenerate and view (quick workflow)
+
   ```bash
   just dep-graph-update
   ```
 
 - **`just dep-graph-stats`** - Show graph statistics
+
   ```bash
   just dep-graph-stats
   ```
@@ -96,6 +104,7 @@ just dep-graph-view
 ```
 
 **Output:**
+
 - File: `docs/architecture/Setup-Mac-Darwin.svg`
 - Size: ~1.6MB
 - Nodes: 471 packages
@@ -115,6 +124,7 @@ just dep-graph-nixos
 ```
 
 **Output:**
+
 ```
 docs/architecture/
 ├── Setup-Mac-Darwin.svg (1.6MB)
@@ -164,11 +174,13 @@ dot -Tpdf docs/architecture/Setup-Mac-Darwin.svg -o docs/architecture/Setup-Mac-
 ### Understanding the Graph
 
 **Nodes (Circles/Boxes):**
+
 - Represent Nix packages
 - Size indicates importance (dependencies)
 - Color groups related packages
 
 **Edges (Lines):**
+
 - Represent dependencies
 - Arrow direction: A depends on B
 - Line thickness: Dependency strength
@@ -226,12 +238,12 @@ dot -Tpdf docs/architecture/Setup-Mac-Darwin.svg -o docs/architecture/Setup-Mac-
 
 Current Setup-Mac graph (Darwin):
 
-| Metric | Value | Interpretation |
-|---------|--------|----------------|
-| Nodes | 471 | Total packages in system |
-| Edges | 1,233 | Total dependencies |
-| Depth | 19 | Maximum dependency depth |
-| Avg Degree | 2.6 | Avg dependencies per package |
+| Metric     | Value | Interpretation               |
+| ---------- | ----- | ---------------------------- |
+| Nodes      | 471   | Total packages in system     |
+| Edges      | 1,233 | Total dependencies           |
+| Depth      | 19    | Maximum dependency depth     |
+| Avg Degree | 2.6   | Avg dependencies per package |
 
 ### Bottleneck Detection
 
@@ -281,12 +293,14 @@ just dep-graph-view
 ### Manual Mermaid Graph (`docs/nix-call-graph.md`)
 
 **Pros:**
+
 - Hand-crafted, semantic meaning
 - Clear architecture documentation
 - Easy to understand
 - Shows module hierarchy
 
 **Cons:**
+
 - Manual maintenance required
 - May not reflect actual dependencies
 - Limited to Nix files, not packages
@@ -295,12 +309,14 @@ just dep-graph-view
 ### Automated nix-visualize Graph
 
 **Pros:**
+
 - Automatic generation
 - Reflects actual system state
 - Shows all package dependencies
 - Accurate and up-to-date
 
 **Cons:**
+
 - Shows raw dependencies (less semantic)
 - Large graphs can be hard to read
 - Technical detail may be overwhelming
@@ -325,12 +341,14 @@ Use both tools:
 ### Issue 1: Graph Generation Fails
 
 **Symptom:**
+
 ```bash
 just dep-graph
 # Error: Recipe `dep-graph` failed
 ```
 
 **Solution:**
+
 ```bash
 # Check if system closure exists
 nix eval .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --raw
@@ -345,10 +363,12 @@ just dep-graph
 ### Issue 2: SVG File Too Large
 
 **Symptom:**
+
 - SVG > 10MB
 - Slow to open in browser
 
 **Solution:**
+
 ```bash
 # Reduce graph complexity by filtering
 # (Not directly supported by nix-visualize)
@@ -362,9 +382,11 @@ just dep-graph-png
 ### Issue 3: Graph Missing Packages
 
 **Symptom:**
+
 - Expected packages not in graph
 
 **Solution:**
+
 ```bash
 # Rebuild system to update closure
 just switch
@@ -380,12 +402,14 @@ nix-store --query --requisites /run/current-system
 ### Issue 4: NixOS Graph Fails on Darwin
 
 **Symptom:**
+
 ```bash
 just dep-graph-nixos
 # Error: Cannot evaluate NixOS on Darwin
 ```
 
 **Solution:**
+
 ```bash
 # Generate NixOS graph only on NixOS system
 # Or use nix eval with --system flag
@@ -397,11 +421,13 @@ nix eval --system x86_64-linux .#nixosConfigurations.evo-x2.config.system.build.
 ### Complementing `docs/nix-call-graph.md`
 
 **Use nix-visualize for:**
+
 - Package-level dependency analysis
 - System closure optimization
 - Performance bottleneck detection
 
 **Use call graph for:**
+
 - Module architecture documentation
 - Import relationship analysis
 - Design pattern identification

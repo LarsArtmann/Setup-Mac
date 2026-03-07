@@ -12,6 +12,7 @@
 ## 📊 EXECUTIVE SUMMARY
 
 ### **Current Status: 90% Complete**
+
 - **Automated Tasks:** 100% COMPLETE ✅
 - **Manual Tasks:** 0% COMPLETE (BLOCKED - REQUIRES USER ACTION) ⏳
 - **Overall Completion:** 90% (Automated: 100%, Manual: 0%)
@@ -23,12 +24,14 @@ The Home Manager integration is **production-ready** and waiting for manual depl
 ### **Next Action Required: ⚠️ USER ACTION**
 
 **User must execute:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake .
 ```
 
 Then verify:
+
 ```bash
 just verify
 ```
@@ -257,16 +260,19 @@ just verify
 ### **Issue 1: Import Path Error** ✅ FIXED
 
 **Problem:**
+
 ```
 error: file 'nix-darwin/home.nix' was not found in Nix search path
 ```
 
 **Root Cause:**
+
 - Incorrect relative path in `platforms/darwin/home.nix`
 - Used `../../common/home-base.nix` (wrong for Darwin location)
 - Should use `../common/home-base.nix` (correct for Darwin location)
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/darwin/home.nix
 // Changed:
@@ -281,6 +287,7 @@ imports = [
 ```
 
 **Verification:**
+
 - ✅ Build verification successful
 - ✅ Import path resolves correctly
 - ✅ Cross-platform consistency verified
@@ -290,16 +297,19 @@ imports = [
 ### **Issue 2: ActivityWatch Platform Support Error** ✅ FIXED
 
 **Problem:**
+
 ```
 error: Package 'activitywatch-0.14.0' not supported on platform 'aarch64-darwin'
 ```
 
 **Root Cause:**
+
 - ActivityWatch only supports Linux platforms (x86_64-linux, aarch64-linux)
 - Does not support Darwin (macOS) platforms
 - Attempted to enable ActivityWatch on Darwin caused build failure
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/common/programs/activitywatch.nix
 // Added platform conditional:
@@ -313,6 +323,7 @@ services.activitywatch = {
 ```
 
 **Verification:**
+
 - ✅ Build verification successful on Darwin (macOS)
 - ✅ Build verification successful on Linux (NOSX)
 - ✅ ActivityWatch enabled on NOSX (Linux)
@@ -323,17 +334,20 @@ services.activitywatch = {
 ### **Issue 3: Home Manager Users Definition Error** ✅ FIXED (Workaround)
 
 **Problem:**
+
 ```
 error: The option 'config.users.users.lars.home' is used but not defined
 ```
 
 **Root Cause:**
+
 - Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix`
 - This NOSX-specific file requires `config.users.users.<name>.home` to be defined
 - Darwin system config did not define users.home
 - This is a Home Manager internal architecture issue (NOSX logic imported into Darwin)
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/darwin/default.nix
 // Added explicit user definition:
@@ -344,15 +358,17 @@ users.users.lars = {
 ```
 
 **Verification:**
+
 - ✅ Build verification successful
 - ✅ Home Manager imports resolve correctly
 - ✅ No errors related to users.home
 
 **Known Concerns:**
-- ⚠️  This workaround may not be correct long-term
-- ⚠️  Home Manager internal architecture issue (should not import NOSX logic into Darwin)
-- ⚠️  Uncertain if this will cause issues in future Home Manager versions
-- ⚠️  Should be reported to Home Manager project if causes problems
+
+- ⚠️ This workaround may not be correct long-term
+- ⚠️ Home Manager internal architecture issue (should not import NOSX logic into Darwin)
+- ⚠️ Uncertain if this will cause issues in future Home Manager versions
+- ⚠️ Should be reported to Home Manager project if causes problems
 
 ---
 
@@ -365,6 +381,7 @@ users.users.lars = {
 **Reason:** Requires sudo access (user action needed)
 
 **Command:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake .
@@ -373,12 +390,14 @@ sudo darwin-rebuild switch --flake .
 **Estimated Time:** 5-10 minutes
 
 **What's Done:**
+
 - ✅ Build verification successful
 - ✅ All automated tasks completed
 - ✅ Documentation comprehensive
 - ✅ Tooling improved
 
 **What's Remaining:**
+
 - ⏳ Manual deployment (user action needed)
 - ⏳ System activation (user action needed)
 
@@ -391,12 +410,14 @@ sudo darwin-rebuild switch --flake .
 **Reason:** Requires system activation (user action needed)
 
 **Tests Needed:**
+
 - Starship prompt verification
 - Fish shell testing
 - Tmux configuration testing
 - Environment variables verification
 
 **Command:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 just verify
@@ -405,11 +426,13 @@ just verify
 **Estimated Time:** 1-2 minutes
 
 **What's Done:**
+
 - ✅ Verification script created
 - ✅ Test cases defined
 - ✅ Output format defined
 
 **What's Remaining:**
+
 - ⏳ Run verification script after deployment (user action needed)
 - ⏳ Check test results (user action needed)
 
@@ -426,11 +449,13 @@ just verify
 **Estimated Time:** 10-15 minutes
 
 **What's Done:**
+
 - ✅ Template exists and is comprehensive
 - ✅ Test cases defined
 - ✅ Success criteria defined
 
 **What's Remaining:**
+
 - ⏳ User fills template with results (user action needed)
 - ⏳ Document deployment date (user action needed)
 - ⏳ Report any issues encountered (user action needed)
@@ -444,6 +469,7 @@ just verify
 **Reason:** Requires SSH access to evo-x2 machine
 
 **Command:**
+
 ```bash
 ssh user@evo-x2
 cd ~/Desktop/Setup-Mac
@@ -453,11 +479,13 @@ sudo nixos-rebuild switch --flake .
 **Estimated Time:** 10-20 minutes
 
 **What's Done:**
+
 - ✅ Build verification successful
 - ✅ Platform conditionals verified
 - ✅ Import paths verified
 
 **What's Remaining:**
+
 - ⏳ SSH to evo-x2 machine (user action needed)
 - ⏳ Run NOSX build (user action needed)
 - ⏳ Verify shared modules work on NOSX (user action needed)
@@ -471,6 +499,7 @@ sudo nixos-rebuild switch --flake .
 **Reason:** Requires SSH access to evo-x2 machine
 
 **Tests Needed:**
+
 - Shared modules work on NOSX
 - Fish shell configuration
 - ActivityWatch service (Linux only)
@@ -479,11 +508,13 @@ sudo nixos-rebuild switch --flake .
 **Estimated Time:** 5-10 minutes
 
 **What's Done:**
+
 - ✅ Platform conditionals verified
 - ✅ Linux-specific packages verified
 - ✅ Linux-specific environment variables verified
 
 **What's Remaining:**
+
 - ⏳ SSH to evo-x2 machine (user action needed)
 - ⏳ Run verification script (user action needed)
 - ⏳ Check test results (user action needed)
@@ -495,6 +526,7 @@ sudo nixos-rebuild switch --flake .
 ### **1. Documentation Improvements**
 
 **a) Add Screenshots**
+
 - **Current:** Text-based guides only
 - **Improvement:** Add screenshots for:
   - Starship prompt (colorful with git branch)
@@ -505,6 +537,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 1-2 hours
 
 **b) Add Video Tutorials**
+
 - **Current:** No video tutorials
 - **Improvement:** Create screen recordings:
   - Deployment process (3 commands)
@@ -514,6 +547,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 2-4 hours
 
 **c) Simplify Quick Start Guide**
+
 - **Current:** Comprehensive but long
 - **Improvement:** Add 30-second summary at top
   - "3 commands to deploy"
@@ -525,6 +559,7 @@ sudo nixos-rebuild switch --flake .
 ### **2. Tooling Improvements**
 
 **a) Automated Testing in CI**
+
 - **Current:** CI only checks syntax, doesn't test functionality
 - **Improvement:** Add functional tests to CI:
   - Test Starship prompt configuration
@@ -536,6 +571,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 4-6 hours (research + implementation)
 
 **b) Justfile Integration**
+
 - **Current:** Justfile targets work independently
 - **Improvement:** Add integration targets:
   - `just deploy-and-verify`: Deploy, open terminal, verify (sequential)
@@ -545,6 +581,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 1-2 hours
 
 **c) Platform Detection Consistency**
+
 - **Current:** Ad-hoc `pkgs.stdenv.isLinux` checks scattered across modules
 - **Improvement:** Use lib/platform.nix consistently:
   - Replace all ad-hoc checks with lib/platform.platform.isLinux
@@ -556,6 +593,7 @@ sudo nixos-rebuild switch --flake .
 ### **3. Architecture Improvements**
 
 **a) Home Manager Users Definition Workaround**
+
 - **Current:** Explicit user definition in system config (workaround)
 - **Improvement:** Find proper solution:
   - Research Home Manager internal architecture
@@ -566,11 +604,13 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 2-4 hours (research + implementation)
 
 **b) Shared Module Organization**
+
 - **Current:** Already well-organized (no refactoring needed)
 - **Improvement:** (None required - already excellent)
 - **Priority:** NOT APPLICABLE
 
 **c) Cross-Platform Consistency**
+
 - **Current:** ~80% code reduction through shared modules
 - **Improvement:** Aim for 90% code reduction:
   - Move more configuration to shared modules
@@ -582,6 +622,7 @@ sudo nixos-rebuild switch --flake .
 ### **4. Testing Improvements**
 
 **a) Automated Functional Testing**
+
 - **Current:** Verification script requires manual execution
 - **Improvement:** Automate verification script execution:
   - Run after deployment automatically
@@ -592,6 +633,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 2-3 hours
 
 **b) NOSX Testing**
+
 - **Current:** NOSX testing not done (requires SSH access)
 - **Improvement:** Test NOSX build and functionality:
   - SSH to evo-x2 machine
@@ -602,6 +644,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 1-2 hours
 
 **c) Regression Testing**
+
 - **Current:** No automated regression testing
 - **Improvement:** Add regression testing:
   - Test all shared modules on both platforms
@@ -613,6 +656,7 @@ sudo nixos-rebuild switch --flake .
 ### **5. Workflow Improvements**
 
 **a) Pre-commit Hooks**
+
 - **Current:** Pre-commit hooks exist but don't check Home Manager config
 - **Improvement:** Add Home Manager config checks:
   - Check syntax of shared modules
@@ -622,6 +666,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 1-2 hours
 
 **b) Deployment Script**
+
 - **Current:** Manual deployment (3 commands)
 - **Improvement:** Create automated deployment script:
   - Run `sudo darwin-rebuild switch --flake .`
@@ -633,6 +678,7 @@ sudo nixos-rebuild switch --flake .
 - **Estimated Time:** 1-2 hours
 
 **c) Rollback Automation**
+
 - **Current:** Manual rollback (just rollback)
 - **Improvement:** Add smart rollback:
   - Detect last working generation
@@ -817,6 +863,7 @@ sudo nixos-rebuild switch --flake .
 Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix` (a NOSX-specific file) which requires `config.users.users.<name>.home` to be defined.
 
 **Workaround Applied:**
+
 ```nix
 // File: platforms/darwin/default.nix
 users.users.lars = {
@@ -941,6 +988,7 @@ The Home Manager integration is **production-ready** and waiting for manual depl
 **I did a great job!** 🎊
 
 All automated tasks have been completed successfully, with:
+
 - ✅ Comprehensive documentation (10 files, 4500+ lines)
 - ✅ Tooling improvements (4 enhancements)
 - ✅ CI/CD pipeline added
@@ -975,4 +1023,4 @@ If you encounter issues during deployment:
 
 ---
 
-## ⏸️  WAITING FOR INSTRUCTIONS...
+## ⏸️ WAITING FOR INSTRUCTIONS...

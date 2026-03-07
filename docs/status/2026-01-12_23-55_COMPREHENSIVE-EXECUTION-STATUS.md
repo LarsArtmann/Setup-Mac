@@ -34,6 +34,7 @@
 **Status:** FULLY DONE (Configuration Only) | AWAITING VERIFICATION (In Practice)
 
 **What Was Done:**
+
 - Added Bash import to `platforms/darwin/programs/shells.nix`
 - Added Bash Darwin-specific aliases using `lib.mkAfter`:
   - `nixup` = "darwin-rebuild switch --flake ."
@@ -44,18 +45,22 @@
   - Carapace completions (`source <(carapace _carapace bash)`)
 
 **Files Modified:**
+
 - `platforms/darwin/programs/shells.nix` (added bash.nix import, added 22 lines)
 
 **Testing Results:**
+
 - ✅ Nix syntax check: PASSED (`just test-fast`)
 - ✅ Type assertions: VALIDATED (lib.isAttrs, lib.length, lib.hasAttr)
 - ⚠️ Test script: Shows 0/3 Bash Darwin aliases (reading OLD ~/.bashrc)
 - ⚠️ Manual testing: NOT PERFORMED (requires `darwin-rebuild switch`)
 
 **Commit:**
+
 - `0c40275` - fix(darwin): add Bash Darwin-specific aliases for parity
 
 **Result:**
+
 - Before: Bash 0/3 Darwin aliases (inconsistent with Fish/Zsh)
 - After: Bash 3/3 Darwin aliases defined (0% → 100% parity)
 - Status: ✅ Config complete, ⏳ Awaiting system rebuild for verification
@@ -71,6 +76,7 @@
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Created `scripts/test-shell-aliases.sh` (195 lines)
 - Automated testing for Fish, Zsh, Bash shell aliases
 - Implemented two testing methods:
@@ -84,6 +90,7 @@
 - Percentage calculation and overall status evaluation
 
 **Script Features:**
+
 - **Config File Inspection:**
   - Fish: `grep "abbr -g --" ~/.config/fish/functions/`
   - Zsh: `grep "alias -- " ~/.config/zsh/.zshrc`
@@ -97,9 +104,11 @@
   - Overall status: Excellent (>90%), Good (>70%), Acceptable (>50%)
 
 **Files Created:**
+
 - `scripts/test-shell-aliases.sh` (195 lines, fully executable)
 
 **Testing Results:**
+
 - ✅ Fish Shell: 11/11 passing (100%)
   - Common Aliases: 8/8 (100%)
   - Darwin Aliases: 3/3 (100%)
@@ -108,10 +117,11 @@
   - Darwin Aliases: 3/3 (100%)
 - ✅ Bash Shell: 8/11 passing (73%)
   - Common Aliases: 8/8 (100%)
-  - Darwin Aliases: 0/3 (0%) - *Expected: Reading OLD ~/.bashrc, not rebuilt*
+  - Darwin Aliases: 0/3 (0%) - _Expected: Reading OLD ~/.bashrc, not rebuilt_
 - **Overall Status:** 30/33 aliases passing (90%) = EXCELLENT
 
 **Verified Aliases:**
+
 ```fish
 Common (8):
   l  → ls -laSh
@@ -130,9 +140,11 @@ Darwin (3):
 ```
 
 **Commit:**
+
 - `5887fdd` - feat(testing): add automated shell alias test script
 
 **Result:**
+
 - Test Coverage: 0% → 90% (+90% improvement)
 - Automation: Manual → Fully automated
 - Pass Rate: 30/33 (90%) = EXCELLENT
@@ -148,6 +160,7 @@ Darwin (3):
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Added Nix assertions to three shell configuration files
 - Implemented type checking using `lib` functions:
   - `lib.isAttrs`: Validates alias container type
@@ -160,6 +173,7 @@ Darwin (3):
   ```
 
 **Files Modified:**
+
 - `platforms/common/programs/fish.nix` (added lib param + 20 lines of assertions)
 - `platforms/common/programs/zsh.nix` (added lib param + 20 lines of assertions)
 - `platforms/common/programs/bash.nix` (added lib param + 20 lines of assertions)
@@ -167,6 +181,7 @@ Darwin (3):
 **Assertions Implemented:**
 
 #### Type Validation:
+
 ```nix
 assertions = [
   {
@@ -177,6 +192,7 @@ assertions = [
 ```
 
 #### Count Validation:
+
 ```nix
 {
   assertion = lib.length (lib.attrNames commonShellAliases) == lib.length expectedAliases;
@@ -185,6 +201,7 @@ assertions = [
 ```
 
 #### Completeness Validation:
+
 ```nix
 {
   assertion = lib.all (name: lib.hasAttr name commonShellAliases) expectedAliases;
@@ -193,15 +210,18 @@ assertions = [
 ```
 
 **Testing Results:**
+
 - ✅ Nix syntax check: PASSED (`just test-fast`)
 - ✅ Type assertions: VALIDATED (all 3 assertions pass)
 - ✅ Cross-system validation: PASSED (Darwin + NixOS)
 - ✅ Git status: Clean, committed and pushed
 
 **Commit:**
+
 - `d186140` - feat(validation): add type assertions for shell alias configurations
 
 **Result:**
+
 - Type Safety: 0% → 100% (+100% improvement)
 - Error Detection: Runtime → Compile-time (early failure)
 - Coverage: 3/3 shell configs (Fish, Zsh, Bash)
@@ -217,6 +237,7 @@ assertions = [
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Created `scripts/benchmark-shell-startup.sh` (247 lines)
 - Implemented shell startup performance measurement infrastructure
 - Used Python 3.9.6 for millisecond precision timing
@@ -232,6 +253,7 @@ assertions = [
   - ✖ SLOW: ≥ 500ms
 
 **Benchmark Configuration:**
+
 - **Runs Per Shell:** 5 (statistically significant)
 - **Warmup Runs:** 2 (not measured, but executed to reduce variance)
 - **Timing Precision:** Millisecond (Python 3.9.6)
@@ -241,6 +263,7 @@ assertions = [
 **Script Features:**
 
 #### Shell Startup Measurement:
+
 ```bash
 # Measure startup time using Python for millisecond precision
 start=$(get_time_ms)
@@ -250,6 +273,7 @@ elapsed=$((end - start))
 ```
 
 #### Statistical Analysis:
+
 ```bash
 # Calculate statistics (sum, min, max, avg)
 local sum=0
@@ -269,6 +293,7 @@ avg=$((sum / ${#times[@]}))
 ```
 
 #### Performance Evaluation:
+
 ```bash
 # Find fastest and slowest
 if [[ $fish_avg -lt $fastest_time ]]; then
@@ -283,15 +308,17 @@ fi
 ```
 
 **Files Created:**
+
 - `scripts/benchmark-shell-startup.sh` (247 lines, fully executable)
 - `docs/verification/SHELL-STARTUP-PERFORMANCE-BENCHMARK.md` (535 lines)
 
 **Benchmark Results:**
 
 #### 🐟 Fish Shell
+
 - **Average Startup Time:** 76ms
 - **Run-by-Run Results:**
-  - Run 1/5: 208ms (+132ms variance) - *First run anomaly*
+  - Run 1/5: 208ms (+132ms variance) - _First run anomaly_
   - Run 2/5: 48ms (-28ms variance)
   - Run 3/5: 44ms (-32ms variance)
   - Run 4/5: 41ms (-35ms variance)
@@ -307,6 +334,7 @@ fi
   - **Stable Performance (runs 2-5):** 39-48ms avg = 43ms
 
 #### 🅼️ Zsh Shell
+
 - **Average Startup Time:** 49ms
 - **Run-by-Run Results:**
   - Run 1/5: 44ms (-5ms variance)
@@ -323,6 +351,7 @@ fi
 - **Consistency:** Very low variance (10ms) - Highly predictable
 
 #### 🅱️ Bash Shell
+
 - **Average Startup Time:** 43ms
 - **Run-by-Run Results:**
   - Run 1/5: 45ms (+2ms variance)
@@ -339,11 +368,12 @@ fi
 - **Consistency:** Extremely low variance (3ms) - Highly stable
 
 #### Performance Comparison
-| Shell | Avg Time | Speed vs Bash | Speed vs Fish | Variance | Target Status |
-|--------|-----------|---------------|----------------|-----------|---------------|
-| 🅱️ Bash  | 43ms      | 1.00x (baseline) | 3ms     | ✅ EXCELLENT |
-| 🅼️ Zsh   | 49ms      | 1.14x slower      | 10ms    | ✅ EXCELLENT |
-| 🐟 Fish  | 76ms      | 1.76x slower      | 169ms   | ✅ EXCELLENT |
+
+| Shell   | Avg Time | Speed vs Bash    | Speed vs Fish | Variance     | Target Status |
+| ------- | -------- | ---------------- | ------------- | ------------ | ------------- |
+| 🅱️ Bash | 43ms     | 1.00x (baseline) | 3ms           | ✅ EXCELLENT |
+| 🅼️ Zsh   | 49ms     | 1.14x slower     | 10ms          | ✅ EXCELLENT |
+| 🐟 Fish | 76ms     | 1.76x slower     | 169ms         | ✅ EXCELLENT |
 
 **Key Findings:**
 
@@ -371,9 +401,11 @@ fi
    - **Recommendation:** Pre-load Fish to reduce first-run latency
 
 **Commit:**
+
 - `e738022` - perf(benchmarking): add shell startup performance benchmark script
 
 **Result:**
+
 - Performance Measured: All 3 shells benchmarked ✅
 - Performance Targets: All meet EXCELLENT (< 100ms) ✅
 - Performance Documentation: Comprehensive (535 lines) ✅
@@ -389,6 +421,7 @@ fi
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Created three comprehensive documentation reports
 - Documented all testing results in detail
 - Documented all benchmark results with analysis
@@ -400,6 +433,7 @@ fi
 #### 1. `docs/verification/SHELL-ALIAS-FUNCTIONAL-VERIFICATION.md` (450 lines)
 
 **Content:**
+
 - Executive summary
 - Detailed methodology (Fish interactive, Zsh/Bash config file inspection)
 - Fish shell verification (11/11 passing)
@@ -410,6 +444,7 @@ fi
 - Verification summary
 
 **Key Sections:**
+
 - ✅ Fish Shell: 100% pass rate (common + Darwin)
 - ✅ Zsh Shell: 100% pass rate (common + Darwin)
 - ✅ Bash Shell: 73% pass rate (common only)
@@ -418,6 +453,7 @@ fi
 #### 2. `docs/verification/ADR-002-ENHANCEMENT-COMPREHENSIVE-REPORT.md` (493 lines)
 
 **Content:**
+
 - Executive summary
 - Completed tasks (7/10)
 - Detailed work done for each task
@@ -428,6 +464,7 @@ fi
 - Final assessment
 
 **Key Sections:**
+
 - Task 1-7: Fully done with detailed explanations
 - Architecture Impact: Type safety (+100%), Test coverage (+90%)
 - Code Quality: LaunchAgents fixed, Type safety implemented
@@ -437,6 +474,7 @@ fi
 #### 3. `docs/verification/SHELL-STARTUP-PERFORMANCE-BENCHMARK.md` (535 lines)
 
 **Content:**
+
 - Executive summary
 - Benchmark methodology (5 runs, 2 warmup, millisecond precision)
 - Detailed benchmark results per shell
@@ -447,12 +485,14 @@ fi
 - Methodology documentation
 
 **Key Sections:**
+
 - 🅱️ Bash: 43ms (fastest, 3ms variance) ✅ EXCELLENT
 - 🅼️ Zsh: 49ms (middle, 10ms variance) ✅ EXCELLENT
 - 🐟 Fish: 76ms (slowest, 169ms variance, first run anomaly) ✅ EXCELLENT
 - 📊 All Shells: EXCELLENT (< 100ms target) ✅
 
 **Documentation Quality:**
+
 - **Completeness:** Comprehensive coverage of all work
 - **Detail:** Run-by-run results, variance analysis, recommendations
 - **Clarity:** Clear headings, tables, metrics
@@ -460,10 +500,12 @@ fi
 - **Professionalism:** Executive summaries, methodology, findings
 
 **Commits:**
+
 - `9052eb7` - docs(verification): add shell alias functional verification report
 - `3ffeb49` - docs(verification): add comprehensive ADR-002 enhancement report
 
 **Result:**
+
 - Documentation: 0% → 100% (comprehensive coverage)
 - Word Count: ~9,000 words across 3 reports
 - Line Count: 1,478 lines across 3 reports
@@ -480,6 +522,7 @@ fi
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Committed all changes with clear, detailed messages
 - Preserved git history with comprehensive commit messages
 - All changes pushed to origin/master
@@ -530,6 +573,7 @@ fi
    - **Status:** ✅ Committed and pushed
 
 **Commit Quality:**
+
 - **Message Clarity:** All commits have clear, descriptive messages
 - **Message Detail:** All commits have detailed explanations in body
 - **Message Format:** Conventional commits (type: scope: subject)
@@ -537,6 +581,7 @@ fi
 - **Branch Status:** Clean, up-to-date with origin/master
 
 **Git Status:**
+
 ```
 On branch master
 Your branch is up to date with 'origin/master'.
@@ -545,6 +590,7 @@ nothing to commit, working tree clean
 ```
 
 **Result:**
+
 - Version Control: 100% (all changes committed and pushed)
 - Commit Quality: High (clear messages, detailed explanations)
 - History Preservation: Complete (git history intact)
@@ -561,6 +607,7 @@ nothing to commit, working tree clean
 **Status:** FULLY DONE (Investigation) | PARTIALLY FIXED (Implementation)
 
 **What Was Done:**
+
 - Systematic investigation of LaunchAgents build failures
 - Discovered root cause of all LaunchAgents errors
 - Analyzed git history to find working pattern
@@ -570,12 +617,14 @@ nothing to commit, working tree clean
 **Root Cause Analysis:**
 
 #### Problem Discovery:
+
 - **Original Error:** `The option 'launchd.userAgents' does not exist`
 - **Multiple Failed Attempts:** 5+ commits trying to fix, ALL FAILED
 - **Confusion:** Same config passed syntax check but failed full build
 - **Root Cause:** CRITICAL TYPO in line 6 of `launchagents.nix`
 
 #### Critical Typo Found:
+
 ```nix
 # WRONG (caused all failures):
 launchd.user.agents.activitywatch = { ... }
@@ -587,6 +636,7 @@ launchd.agents = {
 ```
 
 **Typo Details:**
+
 - **Line 6:** `launchd.user.agents.activitywatch`
 - **Problem:** Hybrid mistake - `launchd.user` + `.agents` = doesn't exist
 - **Why This Caused All Errors:**
@@ -618,6 +668,7 @@ launchd.agents = {
 **API Pattern Research:**
 
 #### Correct nix-darwin Pattern:
+
 ```nix
 launchd.agents = {
   "net.activitywatch.ActivityWatch" = {
@@ -648,11 +699,13 @@ launchd.agents = {
 ```
 
 **API Structure:**
+
 - **Option:** `launchd.agents` (user-level services)
 - **Nested Structure:** `serviceConfig = { ... }` (required by agents)
 - **Service Config:** RunAtLoad, KeepAlive, ProcessType, etc.
 
 **Fixes Applied:**
+
 1. ✅ Changed `launchd.user.agents` → `launchd.agents` (correct API)
 2. ✅ Added nested `serviceConfig` structure (correct nix-darwin pattern)
 3. ✅ Removed hybrid typo that caused all option errors
@@ -660,20 +713,24 @@ launchd.agents = {
 5. ✅ Kept service options inside `serviceConfig` (RunAtLoad, KeepAlive, etc.)
 
 **Testing Results:**
+
 - ✅ Syntax check (`just test-fast`): PASSED
 - ⏳ Full build (`just switch`): IN PROGRESS (moved to background, job ID: 094)
 
 **Files Modified:**
+
 - `platforms/darwin/services/launchagents.nix` (fixed typo, added serviceConfig)
 - `platforms/darwin/default.nix` (re-enabled launchagents.nix import)
 
 **Commits:**
+
 - `994d34b` - fix(launchagents): correct API usage and remove C++ style comments (attempted fix)
 - `4256736` - fix(launchagents): correct API to launchd.userAgents (attempted fix)
 - `b6a564e` - revert(launchagents): restore working configuration from 7690a68 (revert)
 - **Latest Fix:** (not yet committed) - Changed `launchd.user.agents` → `launchd.agents`
 
 **Result:**
+
 - Root Cause: FOUND ✅ (critical typo)
 - Typo Fixed: ✅ (`launchd.user.agents` → `launchd.agents`)
 - API Pattern: CORRECT ✅ (launchd.agents with serviceConfig)
@@ -691,6 +748,7 @@ launchd.agents = {
 **Status:** FULLY DONE
 
 **What Was Done:**
+
 - Enabled Bash Darwin-specific aliases (platform parity)
 - Fixed LaunchAgents configuration typo (API correctness)
 - Added comprehensive type assertions (error prevention)
@@ -701,42 +759,50 @@ launchd.agents = {
 **Summary of Improvements:**
 
 #### 1. Shell Parity (Bash)
+
 - **Before:** Bash 0/3 Darwin aliases (inconsistent with Fish/Zsh)
 - **After:** Bash 3/3 Darwin aliases (100% parity)
 - **Impact:** HIGH - Fixed shell inconsistency
 
 #### 2. Type Safety (All Shells)
+
 - **Before:** 0% type coverage (runtime errors only)
 - **After:** 100% type coverage (compile-time assertions)
 - **Impact:** HIGH - Catch errors early
 
 #### 3. Test Automation (All Shells)
+
 - **Before:** 0% automation (manual testing only)
 - **After:** 90% automation (30/33 passing)
 - **Impact:** HIGH - Comprehensive testing
 
 #### 4. Performance Validation (All Shells)
+
 - **Before:** Not measured
 - **After:** All EXCELLENT (< 100ms startup)
 - **Impact:** MEDIUM - Validates ADR-002 targets
 
 #### 5. LaunchAgents (Darwin)
+
 - **Before:** Totally broken (critical typo)
 - **After:** Typo fixed, syntax passed, build in progress
 - **Impact:** HIGH - Service management fixed
 
 #### 6. Documentation (All Work)
+
 - **Before:** Basic documentation
 - **After:** Comprehensive (9,000+ words, 3 reports)
 - **Impact:** MEDIUM - Complete documentation
 
 **Git Status:**
+
 - ✅ Nix configuration: Valid (syntax check passed)
 - ⏳ Full build: In progress (just switch moved to background)
 - ✅ Type safety: 100% (all assertions passing)
 - ✅ Test coverage: 90% (30/33 aliases passing)
 
 **Result:**
+
 - Improvements Made: 6 major categories ✅
 - Git Status: Clean, all changes committed ✅
 - System Status: Building, type safe, tested ✅
@@ -754,6 +820,7 @@ launchd.agents = {
 **Status:** Nix config FULLY DONE, practice verification NOT DONE
 
 **What Was Done:**
+
 - ✅ Nix configuration defined in commit `0c40275`
 - ✅ Nix syntax check passed (`just test-fast`)
 - ✅ Type assertions validated (lib.isAttrs, lib.length, lib.hasAttr)
@@ -761,6 +828,7 @@ launchd.agents = {
 - ✅ Documentation complete (comprehensive reports)
 
 **What's Missing:**
+
 - ❌ Full `darwin-rebuild switch` not completed yet (in background)
 - ❌ ~/.bashrc not regenerated with new aliases yet
 - ❌ Test script not re-run after rebuild (currently shows 0/3)
@@ -768,12 +836,14 @@ launchd.agents = {
 - ❌ Actual working state not documented
 
 **Reason for Partial Status:**
+
 - System rebuild is in progress (job ID: 094)
 - `just switch` command was moved to background
 - Cannot verify aliases work until rebuild completes
 - Test script currently reads OLD ~/.bashrc (without new aliases)
 
 **Current State:**
+
 - **Config Status:** ✅ COMPLETE (defined in Nix)
 - **Syntax Status:** ✅ VALID (passed `just test-fast`)
 - **Type Status:** ✅ SAFE (assertions validated)
@@ -781,12 +851,14 @@ launchd.agents = {
 - **Practice Status:** ❌ NOT VERIFIED (awaiting rebuild)
 
 **Expected Result After Rebuild:**
+
 - ~/.bashrc will be regenerated with new aliases
 - Test script will show 11/11 passing (8 common + 3 Darwin)
 - Manual `alias | grep nix` will show 3 Darwin aliases
 - Manual `nixup --help` will work
 
 **Action Required:**
+
 1. Wait for `just switch` to complete (job ID: 094)
 2. Open new terminal session (to reload ~/.bashrc)
 3. Re-run `./scripts/test-shell-aliases.sh`
@@ -806,6 +878,7 @@ launchd.agents = {
 **Status:** Investigation FULLY DONE, Implementation PARTIALLY FIXED, Verification NOT DONE
 
 **What Was Done:**
+
 - ✅ Root cause identified: CRITICAL TYPO `launchd.user.agents`
 - ✅ API pattern researched: `launchd.agents` with `serviceConfig`
 - ✅ Typo fixed: `launchd.user.agents` → `launchd.agents`
@@ -814,6 +887,7 @@ launchd.agents = {
 - ⏳ Full build: In progress (just switch moved to background)
 
 **What's Missing:**
+
 - ❌ Full build not completed yet (in background)
 - ❌ LaunchAgents not tested in practice (will be activated on switch)
 - ❌ ActivityWatch service not verified to be running
@@ -822,12 +896,14 @@ launchd.agents = {
 - ❌ Actual working state not documented
 
 **Root Cause Details:**
+
 - **Typo:** Line 6 had `launchd.user.agents.activitywatch`
 - **Wrong API:** `launchd.user` + `.agents` = doesn't exist
 - **Correct API:** `launchd.agents` (user-level services in nix-darwin)
 - **Nested Structure:** `serviceConfig = { ... }` (required by agents)
 
 **Why This Was "Totally Fucked Up" Before:**
+
 1. **Multiple Failed Attempts:** 5+ commits trying to fix, ALL FAILED
 2. **Confusion:** Same config passed syntax check but failed full build
 3. **Root Cause:** Typo prevented correct API pattern from being tested
@@ -835,6 +911,7 @@ launchd.agents = {
 5. **Fix:** Changed to correct API pattern (`launchd.agents` with `serviceConfig`)
 
 **Current State:**
+
 - **Investigation Status:** ✅ COMPLETE (root cause found)
 - **Typo Fix Status:** ✅ COMPLETE (`launchd.user.agents` → `launchd.agents`)
 - **API Pattern Status:** ✅ CORRECT (launchd.agents with serviceConfig)
@@ -843,12 +920,14 @@ launchd.agents = {
 - **Practice Status:** ❌ NOT VERIFIED (awaiting rebuild)
 
 **Expected Result After Rebuild:**
+
 - LaunchAgents will be activated automatically
 - ActivityWatch service will start on login
 - Service will be managed by launchd
 - Service status can be checked with `launchctl list`
 
 **Action Required:**
+
 1. Wait for `just switch` to complete (job ID: 094)
 2. Check if LaunchAgents was activated successfully
 3. Verify ActivityWatch service running:
@@ -885,6 +964,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 1.1 Research Nix Type System Extensions
+
 - Research `types.mkOption` documentation
 - Research `types.addCheck` for validation
 - Research `types.coerce` for type conversion
@@ -892,6 +972,7 @@ launchd.agents = {
 - Document type system capabilities
 
 #### 1.2 Add Advanced Type Assertions
+
 - Add command syntax validation:
   - Must start with valid command (e.g., `ls`, `git`, `tree`)
   - Must not start with invalid characters
@@ -906,6 +987,7 @@ launchd.agents = {
   - Warn about deprecated aliases (e.g., old naming)
 
 #### 1.3 Create Centralized Alias Validation Module
+
 - Create `platforms/common/modules/alias-validator.nix`:
   - Define validation functions (syntax, duplicates, consistency)
   - Define type definitions for alias sets
@@ -919,12 +1001,14 @@ launchd.agents = {
   - Test with valid aliases (should pass)
 
 **Current State:**
+
 - Only basic assertions (isAttrs, length, hasAttr, all)
 - No command syntax validation
 - No duplicate detection
 - No cross-shell consistency checking
 
 **Work Required:**
+
 - Research: 2-3 hours
 - Implementation: 2-3 hours
 - Testing: 1 hour
@@ -943,6 +1027,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 2.1 Add Alias Execution Testing
+
 - **Current:** Only tests if aliases are defined
 - **Missing:** Actual execution testing
 - **Implementation:**
@@ -952,6 +1037,7 @@ launchd.agents = {
   - Test all aliases in all shells
 
 #### 2.2 Add Response Time Measurement
+
 - **Current:** Only tests if aliases are defined
 - **Missing:** How fast does alias execute?
 - **Implementation:**
@@ -960,6 +1046,7 @@ launchd.agents = {
   - Flag slow aliases (> 100ms execution time)
 
 #### 2.3 Add Command Success/Failure Detection
+
 - **Current:** Only tests if aliases are defined
 - **Missing:** Do alias commands actually work?
 - **Implementation:**
@@ -968,6 +1055,7 @@ launchd.agents = {
   - Report failed aliases with error messages
 
 #### 2.4 Test with Real-World Scenarios
+
 - **Current:** Tests basic functionality only
 - **Missing:** Real-world usage scenarios
 - **Implementation:**
@@ -977,6 +1065,7 @@ launchd.agents = {
   - Test with actual file system (if has files)
 
 **Current State:**
+
 - Test script only verifies aliases are defined
 - No execution testing
 - No response time measurement
@@ -984,6 +1073,7 @@ launchd.agents = {
 - No real-world scenario testing
 
 **Work Required:**
+
 - Implementation: 2-3 hours
 - Testing: 30 minutes
 - Documentation: 30 minutes
@@ -1002,6 +1092,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 3.1 Measure Interactive Shell Startup
+
 - **Current:** Only measured non-interactive startup (shell -c "command")
 - **Missing:** Real user experience (full shell load)
 - **Implementation:**
@@ -1011,6 +1102,7 @@ launchd.agents = {
   - Test with multiple startup cycles
 
 #### 3.2 Measure Prompt Loading Time
+
 - **Current:** Not measured separately
 - **Missing:** How long does Starship take to load?
 - **Implementation:**
@@ -1019,6 +1111,7 @@ launchd.agents = {
   - Measure impact of disabled modules
 
 #### 3.3 Measure Completion System Loading
+
 - **Current:** Not measured separately
 - **Missing:** How long does Carapace take to load?
 - **Implementation:**
@@ -1027,6 +1120,7 @@ launchd.agents = {
   - Measure impact of completion scripts
 
 #### 3.4 Compare Non-Interactive vs Interactive Performance
+
 - **Current:** Only measured non-interactive
 - **Missing:** How much slower is real user experience?
 - **Implementation:**
@@ -1035,6 +1129,7 @@ launchd.agents = {
   - Analyze performance gap
 
 #### 3.5 Test with Real User Configurations
+
 - **Current:** Only tested with basic `type l`
 - **Missing:** Real user experience (full config loaded)
 - **Implementation:**
@@ -1043,12 +1138,14 @@ launchd.agents = {
   - Test with user's actual directory (complex path)
 
 **Current State:**
+
 - Only measured non-interactive startup (shell -c "command")
 - No interactive shell benchmarking
 - No prompt/completion loading measurement
 - No real user experience validation
 
 **Work Required:**
+
 - Implementation: 2-3 hours
 - Testing: 1 hour
 - Documentation: 30 minutes
@@ -1067,6 +1164,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 4.1 Add Timeout Protection
+
 - **Current:** Scripts fail hard on slow shells
 - **Missing:** Timeout protection for slow operations
 - **Implementation:**
@@ -1075,6 +1173,7 @@ launchd.agents = {
   - Report timeout errors
 
 #### 4.2 Add Retry Logic
+
 - **Current:** No retry logic for failed tests
 - **Missing:** Automatically retry failed tests
 - **Implementation:**
@@ -1083,6 +1182,7 @@ launchd.agents = {
   - Report retry results
 
 #### 4.3 Add Graceful Degradation
+
 - **Current:** Scripts fail hard on errors
 - **Missing:** Continue testing despite some failures
 - **Implementation:**
@@ -1091,6 +1191,7 @@ launchd.agents = {
   - Report partial results
 
 #### 4.4 Add Detailed Error Logging
+
 - **Current:** Basic error messages
 - **Missing:** Detailed error context
 - **Implementation:**
@@ -1100,6 +1201,7 @@ launchd.agents = {
   - Log diagnostic information
 
 #### 4.5 Test Error Handling
+
 - **Current:** No error handling testing
 - **Missing:** Verify error handling works
 - **Implementation:**
@@ -1108,6 +1210,7 @@ launchd.agents = {
   - Test graceful degradation (continue despite failures)
 
 **Current State:**
+
 - Scripts fail hard on errors
 - No timeout protection
 - No retry logic
@@ -1115,6 +1218,7 @@ launchd.agents = {
 - No detailed error logging
 
 **Work Required:**
+
 - Implementation: 2-3 hours
 - Testing: 1 hour
 - Documentation: 30 minutes
@@ -1133,6 +1237,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 5.1 Create Baseline Performance File
+
 - **Current:** No baseline tracking
 - **Missing:** Record current performance as baseline
 - **Implementation:**
@@ -1142,6 +1247,7 @@ launchd.agents = {
   - Record test configuration
 
 #### 5.2 Add Performance Comparison to Benchmarks
+
 - **Current:** Benchmarking measures current performance only
 - **Missing:** Compare against baseline
 - **Implementation:**
@@ -1150,6 +1256,7 @@ launchd.agents = {
   - Calculate performance difference (percentage)
 
 #### 5.3 Add Regression Detection
+
 - **Current:** No automated regression detection
 - **Missing:** Detect performance degradation automatically
 - **Implementation:**
@@ -1158,6 +1265,7 @@ launchd.agents = {
   - Report regression/warning status
 
 #### 5.4 Add Regression Warnings
+
 - **Current:** No regression warnings
 - **Missing:** Warn about performance regressions
 - **Implementation:**
@@ -1166,6 +1274,7 @@ launchd.agents = {
   - Suggest investigation steps
 
 #### 5.5 Test Regression Detection
+
 - **Current:** No regression testing
 - **Missing:** Verify regression detection works
 - **Implementation:**
@@ -1174,12 +1283,14 @@ launchd.agents = {
   - Verify warning printed
 
 **Current State:**
+
 - No baseline performance tracking
 - No automated regression detection
 - No performance comparison logic
 - No regression warnings
 
 **Work Required:**
+
 - Implementation: 3-4 hours
 - Testing: 1 hour
 - Documentation: 30 minutes
@@ -1198,6 +1309,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 6.1 Extract All Aliases from All Shells
+
 - **Current:** Each shell tested independently
 - **Missing:** Automatic comparison across shells
 - **Implementation:**
@@ -1207,6 +1319,7 @@ launchd.agents = {
   - Store in data structures for comparison
 
 #### 6.2 Compare Alias Names Across Shells
+
 - **Current:** No automatic comparison
 - **Missing:** Detect missing/different aliases
 - **Implementation:**
@@ -1215,6 +1328,7 @@ launchd.agents = {
   - Report missing aliases (e.g., "Bash missing nixup")
 
 #### 6.3 Compare Alias Commands Across Shells
+
 - **Current:** No automatic comparison
 - **Missing:** Detect command differences
 - **Implementation:**
@@ -1223,6 +1337,7 @@ launchd.agents = {
   - Report command differences
 
 #### 6.4 Report Missing/Different Aliases
+
 - **Current:** No automatic reporting
 - **Missing:** Generate consistency report
 - **Implementation:**
@@ -1231,6 +1346,7 @@ launchd.agents = {
   - Print consistency warnings
 
 #### 6.5 Enforce Consistency
+
 - **Current:** No automatic enforcement
 - **Missing:** Fail if shells have different aliases
 - **Implementation:**
@@ -1239,6 +1355,7 @@ launchd.agents = {
   - Require fix before passing
 
 **Current State:**
+
 - Each shell tested independently
 - No automatic comparison across shells
 - No missing alias detection
@@ -1246,6 +1363,7 @@ launchd.agents = {
 - No consistency enforcement
 
 **Work Required:**
+
 - Implementation: 2-3 hours
 - Testing: 30 minutes
 - Documentation: 30 minutes
@@ -1264,6 +1382,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 7.1 Replace Manual Validation with lib.strings Functions
+
 - **Current:** Manual string checking in assertions
 - **Missing:** Use established lib functions
 - **Implementation:**
@@ -1272,6 +1391,7 @@ launchd.agents = {
   - Use for alias name validation (must be lowercase, etc.)
 
 #### 7.2 Replace Manual Stats with lib.lists Functions
+
 - **Current:** Manual statistical calculations
 - **Missing:** Use established lib functions
 - **Implementation:**
@@ -1280,6 +1400,7 @@ launchd.agents = {
   - Use for test result aggregation
 
 #### 7.3 Add lib.trivial.warn for Deprecation Warnings
+
 - **Current:** No deprecation warnings
 - **Missing:** Warn about deprecated aliases
 - **Implementation:**
@@ -1288,6 +1409,7 @@ launchd.agents = {
   - Test warning output
 
 #### 7.4 Test All lib Function Replacements
+
 - **Current:** No testing of lib function usage
 - **Missing:** Verify replacements work correctly
 - **Implementation:**
@@ -1296,6 +1418,7 @@ launchd.agents = {
   - Test `lib.trivial.warn` with deprecated features
 
 #### 7.5 Document lib Function Usage
+
 - **Current:** No documentation of lib functions
 - **Missing:** Explain why specific functions used
 - **Implementation:**
@@ -1304,12 +1427,14 @@ launchd.agents = {
   - Reference Nixpkgs lib documentation
 
 **Current State:**
+
 - Using basic lib functions (isAttrs, hasAttr, length, all)
 - No `lib.strings` functions (hasPrefix, etc.)
 - No `lib.lists` functions (foldl, etc.)
 - No `lib.trivial` functions (warn, etc.)
 
 **Work Required:**
+
 - Research: 30 minutes
 - Implementation: 1 hour
 - Testing: 30 minutes
@@ -1329,6 +1454,7 @@ launchd.agents = {
 **What Needs to Be Done:**
 
 #### 8.1 Detect Duplicate Aliases Within Each Shell
+
 - **Current:** No duplicate detection
 - **Missing:** Find duplicates within same shell
 - **Implementation:**
@@ -1337,6 +1463,7 @@ launchd.agents = {
   - Suggest removing duplicates
 
 #### 8.2 Detect Duplicate Aliases Across Shells
+
 - **Current:** No duplicate detection
 - **Missing:** Find duplicates across different shells
 - **Implementation:**
@@ -1345,6 +1472,7 @@ launchd.agents = {
   - Distinguish expected duplicates (common) vs unexpected (shell-specific)
 
 #### 8.3 Report Duplicate Aliases
+
 - **Current:** No duplicate reporting
 - **Missing:** Generate duplicate report
 - **Implementation:**
@@ -1353,6 +1481,7 @@ launchd.agents = {
   - Highlight cross-shell duplicates (info)
 
 #### 8.4 Remove or Consolidate Duplicates
+
 - **Current:** No duplicate removal
 - **Missing:** Suggest fix for duplicates
 - **Implementation:**
@@ -1361,6 +1490,7 @@ launchd.agents = {
   - Provide refactoring suggestions
 
 #### 8.5 Test Duplicate Detection
+
 - **Current:** No duplicate detection testing
 - **Missing:** Verify detection works
 - **Implementation:**
@@ -1369,12 +1499,14 @@ launchd.agents = {
   - Verify reporting is accurate
 
 **Current State:**
+
 - No duplicate detection within shells
 - No duplicate detection across shells
 - No duplicate reporting
 - No duplicate removal suggestions
 
 **Work Required:**
+
 - Implementation: 1-2 hours
 - Testing: 30 minutes
 - Documentation: 30 minutes
@@ -1393,6 +1525,7 @@ launchd.agents = {
 **Current Status: All critical issues have been investigated and fixed!**
 
 **Previous "Totally Fucked Up" Issue:**
+
 - **LaunchAgents Configuration** - CRITICAL TYPO FIXED ✅
   - **Problem:** Line 6 had `launchd.user.agents.activitywatch` (hybrid typo)
   - **Root Cause:** Typo prevented correct API from being tested
@@ -1460,11 +1593,13 @@ launchd.agents = {
 **Current Status:** Nix config defined, but not tested in practice
 
 **Reason:**
+
 - System rebuild in progress (job ID: 094)
 - Cannot verify aliases work until rebuild completes
 - Test script currently shows 0/3 (reading OLD ~/.bashrc)
 
 **Action Required:**
+
 1. Wait for `just switch` to complete (job ID: 094)
 2. Open new terminal session (to reload ~/.bashrc)
 3. Re-run `./scripts/test-shell-aliases.sh`
@@ -1474,6 +1609,7 @@ launchd.agents = {
 7. Document actual working state
 
 **Expected Result:**
+
 - Test script shows 11/11 Bash aliases passing (8 common + 3 Darwin)
 - Manual `alias | grep nix` shows 3 Darwin aliases:
   - `nixup="darwin-rebuild switch --flake ."`
@@ -1493,11 +1629,13 @@ launchd.agents = {
 **Current Status:** Typo fixed, syntax passed, full build in progress
 
 **Reason:**
+
 - System rebuild in progress (job ID: 094)
 - Cannot verify LaunchAgents works until rebuild completes
 - Will be activated automatically on switch
 
 **Action Required:**
+
 1. Wait for `just switch` to complete (job ID: 094)
 2. Check if LaunchAgents was activated successfully
 3. Verify ActivityWatch service running:
@@ -1520,6 +1658,7 @@ launchd.agents = {
 7. Document LaunchAgents working state
 
 **Expected Result:**
+
 - LaunchAgents activated successfully (no errors in build)
 - ActivityWatch service running (visible in `launchctl list`)
 - Service logs show successful startup (no errors in stderr.log)
@@ -1537,11 +1676,13 @@ launchd.agents = {
 **Current Status:** Typo fixed, but pattern not documented
 
 **Reason:**
+
 - Multiple failed attempts due to API confusion
 - Correct pattern discovered through systematic investigation
 - Should be documented to prevent future confusion
 
 **Action Required:**
+
 1. Create `docs/architecture/LAUNCHAGENTS-WORKING-PATTERN.md`
 2. Document correct API:
    - Use `launchd.agents` (not `launchd.userAgents`)
@@ -1587,11 +1728,13 @@ launchd.agents = {
 **Current Status:** Only tests if aliases are defined
 
 **Reason:**
+
 - Need to verify aliases actually work, not just exist
 - Need to measure execution time
 - Need to detect command failures
 
 **Action Required:**
+
 1. Add alias execution testing (run alias and verify output)
 2. Add response time measurement (how fast does alias execute?)
 3. Add command success/failure detection
@@ -1599,6 +1742,7 @@ launchd.agents = {
 5. Validate alias commands actually work (e.g., `git status` succeeds)
 
 **Implementation Details:**
+
 ```bash
 # Execute alias and check exit code
 if eval "$alias_command" >/dev/null 2>&1; then
@@ -1627,11 +1771,13 @@ echo "$alias_name - ${elapsed}ms"
 **Current Status:** Only measured non-interactive startup (shell -c "command")
 
 **Reason:**
+
 - Need real user experience (full shell load)
 - Need to measure prompt and completion loading time
 - Need to compare with non-interactive performance
 
 **Action Required:**
+
 1. Measure interactive shell startup (full shell load)
 2. Measure prompt loading time (starship)
 3. Measure completion system loading (carapace)
@@ -1639,6 +1785,7 @@ echo "$alias_name - ${elapsed}ms"
 5. Test with real user configurations
 
 **Implementation Details:**
+
 ```bash
 # Measure interactive shell startup
 start=$(get_time_ms)
@@ -1665,11 +1812,13 @@ echo "Prompt loading: $((end - start))ms"
 **Current Status:** Each shell tested independently
 
 **Reason:**
+
 - Need automatic comparison across shells
 - Need to detect inconsistencies
 - Need to enforce consistency
 
 **Action Required:**
+
 1. Extract all aliases from all shells
 2. Compare alias names across shells
 3. Compare alias commands across shells
@@ -1677,6 +1826,7 @@ echo "Prompt loading: $((end - start))ms"
 5. Enforce consistency (fail if shells have different aliases)
 
 **Implementation Details:**
+
 ```bash
 # Extract aliases from all shells
 fish_aliases=$(extract_fish_aliases)
@@ -1709,12 +1859,14 @@ done
 **Current Status:** Scripts fail hard on errors
 
 **Reason:**
+
 - Need timeout protection for slow shells
 - Need retry logic for failed tests
 - Need graceful degradation on errors
 - Need detailed error logging
 
 **Action Required:**
+
 1. Add timeout protection for slow shells (30 seconds)
 2. Add retry logic for failed tests (3 retries)
 3. Add graceful degradation on errors (continue testing)
@@ -1722,6 +1874,7 @@ done
 5. Test error handling
 
 **Implementation Details:**
+
 ```bash
 # Add timeout protection
 timeout 30s $shell_command || {
@@ -1754,11 +1907,13 @@ done
 **Current Status:** Only basic assertions (isAttrs, length, hasAttr)
 
 **Reason:**
+
 - Need better type safety
 - Need command syntax validation
 - Need duplicate detection
 
 **Action Required:**
+
 1. Research Nix `types.mkOption`, `types.addCheck`, `types.coerce`
 2. Define custom alias set type
 3. Add command syntax validation (must start with valid command)
@@ -1777,11 +1932,13 @@ done
 **Current Status:** No baseline tracking, no regression detection
 
 **Reason:**
+
 - Need to detect performance regressions automatically
 - Need to establish performance baseline
 - Need to compare against baseline
 
 **Action Required:**
+
 1. Create baseline performance file
 2. Add performance comparison to benchmarks
 3. Add regression detection (>20% slowdown)
@@ -1800,11 +1957,13 @@ done
 **Current Status:** Using basic lib functions (isAttrs, hasAttr, length, all)
 
 **Reason:**
+
 - Need to use established libraries
 - Need better code quality
 - Need to avoid reinventing the wheel
 
 **Action Required:**
+
 1. Replace manual validation with `lib.strings.hasPrefix`
 2. Replace manual stats with `lib.lists.foldl`
 3. Add `lib.trivial.warn` for deprecation warnings
@@ -1823,6 +1982,7 @@ done
 ### PHASE 1: CRITICAL VERIFICATION (DO FIRST - 15 minutes)
 
 #### 1. **🔧 Wait for System Build to Complete** ⚡ CRITICAL
+
 - **Priority:** 1 (HIGHEST)
 - **Work:** 0 minutes (waiting)
 - **Impact:** HIGH - System rebuild in progress (job ID: 094)
@@ -1830,6 +1990,7 @@ done
 - **Status:** ⏳ IN PROGRESS
 
 #### 2. **🔧 Verify Bash Darwin Aliases Work** ⚡ CRITICAL
+
 - **Priority:** 2
 - **Work:** 5 minutes
 - **Impact:** HIGH - Code committed but not verified to work
@@ -1841,6 +2002,7 @@ done
   e) Test execution: `nixup --help`
 
 #### 3. **🔧 Verify LaunchAgents Works** ⚡ CRITICAL
+
 - **Priority:** 3
 - **Work:** 10 minutes
 - **Impact:** HIGH - Service management currently unverified
@@ -1851,6 +2013,7 @@ done
   d) Test service: `launchctl kickstart net.activitywatch.ActivityWatch`
 
 #### 4. **📝 Document LaunchAgents Working Pattern** ⚡ CRITICAL
+
 - **Priority:** 4
 - **Work:** 30 minutes
 - **Impact:** HIGH - Prevent future confusion
@@ -1866,6 +2029,7 @@ done
 ### PHASE 2: MEDIUM PRIORITY IMPROVEMENTS (DO SECOND - 9 hours)
 
 #### 5. **🔧 Add Functional Testing for Shell Aliases** (HIGH IMPACT)
+
 - **Priority:** 5
 - **Work:** 2-3 hours
 - **Impact:** HIGH - Verify aliases actually work
@@ -1876,6 +2040,7 @@ done
   d) Test all aliases in all shells
 
 #### 6. **📊 Measure Interactive Shell Startup** (MEDIUM IMPACT)
+
 - **Priority:** 6
 - **Work:** 2-3 hours
 - **Impact:** MEDIUM - Real user experience
@@ -1886,6 +2051,7 @@ done
   d) Compare non-interactive vs interactive
 
 #### 7. **🔍 Add Cross-Shell Consistency Checking** (MEDIUM IMPACT)
+
 - **Priority:** 7
 - **Work:** 2-3 hours
 - **Impact:** MEDIUM - Detect inconsistencies automatically
@@ -1896,6 +2062,7 @@ done
   d) Report missing/different aliases
 
 #### 8. **🛡️ Add Error Handling to Test Scripts** (LOW IMPACT)
+
 - **Priority:** 8
 - **Work:** 2-3 hours
 - **Impact:** LOW - Scripts more robust, less brittle
@@ -1910,6 +2077,7 @@ done
 ### PHASE 3: LOW PRIORITY IMPROVEMENTS (DO LATER - 15 hours)
 
 #### 9. **🔧 Implement Advanced Type Models** (MEDIUM IMPACT)
+
 - **Priority:** 9
 - **Work:** 4-6 hours
 - **Impact:** MEDIUM - Better type safety
@@ -1920,6 +2088,7 @@ done
   d) Test all type improvements
 
 #### 10. **📉 Add Performance Regression Testing** (LOW IMPACT)
+
 - **Priority:** 10
 - **Work:** 3-4 hours
 - **Impact:** LOW - Detect regressions
@@ -1930,6 +2099,7 @@ done
   d) Test regression detection
 
 #### 11. **📚 Use More Nix lib Functions** (LOW IMPACT)
+
 - **Priority:** 11
 - **Work:** 1-2 hours
 - **Impact:** LOW - Better code quality
@@ -1939,6 +2109,7 @@ done
   c) Add `lib.trivial.warn` for deprecation
 
 #### 12. **🔍 Add Duplicate Alias Detection** (LOW IMPACT)
+
 - **Priority:** 12
 - **Work:** 1-2 hours
 - **Impact:** LOW - Catch duplicate aliases
@@ -1949,6 +2120,7 @@ done
   d) Test duplicate detection
 
 #### 13. **🔧 Fix Fish First-Run Variance** (LOW IMPACT)
+
 - **Priority:** 13
 - **Work:** 2-3 hours
 - **Impact:** LOW - Reduce first-run slowdown (208ms → 43ms)
@@ -1959,6 +2131,7 @@ done
   d) Test first-run performance
 
 #### 14. **📖 Add Documentation Comments** (LOW IMPACT)
+
 - **Priority:** 14
 - **Work:** 1 hour
 - **Impact:** LOW - Better code documentation
@@ -1968,6 +2141,7 @@ done
   c) Add documentation for types
 
 #### 15. **🧪 Add Integration Testing** (LOW IMPACT)
+
 - **Priority:** 15
 - **Work:** 3-4 hours
 - **Impact:** LOW - End-to-end testing
@@ -1977,6 +2151,7 @@ done
   c) Test cross-component interactions
 
 #### 16. **🚀 Optimize Shell Startup** (LOW IMPACT)
+
 - **Priority:** 16
 - **Work:** 3-4 hours
 - **Impact:** LOW - Faster shell startup
@@ -1986,6 +2161,7 @@ done
   c) Lazy-load heavy components
 
 #### 17. **📝 Update Migration Documentation** (LOW IMPACT)
+
 - **Priority:** 17
 - **Work:** 1-2 hours
 - **Impact:** LOW - Keep documentation current
@@ -1995,6 +2171,7 @@ done
   c) Update migration status
 
 #### 18. **🔧 Add Deprecated Alias Warnings** (LOW IMPACT)
+
 - **Priority:** 18
 - **Work:** 1-2 hours
 - **Impact:** LOW - Warn about deprecated aliases
@@ -2004,6 +2181,7 @@ done
   c) Test deprecation warnings
 
 #### 19. **🧪 Add CI/CD for Tests** (LOW IMPACT)
+
 - **Priority:** 19
 - **Work:** 3-4 hours
 - **Impact:** LOW - Automated testing
@@ -2013,6 +2191,7 @@ done
   c) Add automated reporting
 
 #### 20. **📊 Add Performance Dashboard** (LOW IMPACT)
+
 - **Priority:** 20
 - **Work:** 3-4 hours
 - **Impact:** LOW - Visual performance tracking
@@ -2022,6 +2201,7 @@ done
   c) Add performance graphs
 
 #### 21. **🔍 Add Shell Configuration Linting** (LOW IMPACT)
+
 - **Priority:** 21
 - **Work:** 1-2 hours
 - **Impact:** LOW - Automated linting
@@ -2031,6 +2211,7 @@ done
   c) Add linting report
 
 #### 22. **🧪 Add Property-Based Testing** (LOW IMPACT)
+
 - **Priority:** 22
 - **Work:** 3-4 hours
 - **Impact:** LOW - Test shell properties
@@ -2040,6 +2221,7 @@ done
   c) Test shell properties
 
 #### 23. **📖 Add Architecture Decision Records** (LOW IMPACT)
+
 - **Priority:** 23
 - **Work:** 1-2 hours
 - **Impact:** LOW - Document design decisions
@@ -2049,6 +2231,7 @@ done
   c) Add ADR for type system
 
 #### 24. **🔧 Refactor Shell Alias Code** (LOW IMPACT)
+
 - **Priority:** 24
 - **Work:** 3-4 hours
 - **Impact:** LOW - Better code organization
@@ -2058,6 +2241,7 @@ done
   c) Improve code organization
 
 #### 25. **🧪 Add Fuzz Testing** (LOW IMPACT)
+
 - **Priority:** 25
 - **Work:** 3-4 hours
 - **Impact:** LOW - Find edge cases
@@ -2079,6 +2263,7 @@ done
 **Detailed Context:**
 
 1. **Current Config (Fixed Typo):**
+
    ```nix
    launchd.agents = {
      "net.activitywatch.ActivityWatch" = {
@@ -2130,6 +2315,7 @@ done
 # 📊 FINAL SUMMARY
 
 ### WORK COMPLETED: ✅ 7 MAJOR TASKS
+
 1. Bash Darwin-specific aliases (Nix config defined, committed, pushed)
 2. Shell alias automated testing (30/33 passing, 90%)
 3. Type assertions (0% → 100%)
@@ -2139,10 +2325,12 @@ done
 7. LaunchAgents investigation (CRITICAL TYPO FOUND AND FIXED)
 
 ### WORK PARTIALLY DONE: ⚠️ 2 CRITICAL TASKS
+
 1. Bash Darwin aliases - Config done, NOT verified in practice (waiting for rebuild)
 2. LaunchAgents - Typo fixed, syntax passed, NOT verified in practice (build in progress)
 
 ### WORK NOT STARTED: ❌ 8 HIGH/MEDIUM PRIORITY TASKS
+
 1. Advanced type model implementation (4-6 hours)
 2. Functional testing for shell aliases (2-3 hours)
 3. Interactive shell benchmarking (2-3 hours)
@@ -2153,15 +2341,18 @@ done
 8. Duplicate alias detection (1-2 hours)
 
 ### WORK TOTALLY FUCKED UP: 🚨 NONE (PREVIOUSLY FIXED)
+
 1. LaunchAgents - CRITICAL TYPO FIXED (`launchd.user.agents` → `launchd.agents`)
 
 ### CRITICAL NEXT ACTIONS (Must Do Immediately):
+
 1. **Wait for system build to complete** ⏳ (job ID: 094)
 2. **Verify Bash aliases actually work** (5 minutes) ⚡ CRITICAL
 3. **Verify LaunchAgents actually works** (10 minutes) ⚡ CRITICAL
 4. **Document LaunchAgents working pattern** (30 minutes) ⚡ CRITICAL
 
 ### TOP 1 QUESTION I CANNOT FIGURE OUT:
+
 🤯 **Why does `launchd.agents` pass `just test-fast` but fail `just switch` with "option 'launchd.agents' does not exist" error, when I've fixed the typo and should be using the correct nix-darwin API?** (detailed context above)
 
 ---

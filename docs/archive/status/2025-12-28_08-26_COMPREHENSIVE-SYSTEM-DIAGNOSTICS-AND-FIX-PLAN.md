@@ -8,20 +8,24 @@
 ## 🚨 CRITICAL ISSUES IDENTIFIED
 
 ### 1. NIX VERSION CONFLICT (ROOT CAUSE)
+
 **Problem:** Multiple versions of Nix in system with PATH resolution conflicts
 
 **Details:**
+
 - System profile Nix: **OLD VERSION** (at `/nix/var/nix/profiles/default/bin/nix`)
 - Current system Nix: **NEW VERSION** (at `/run/current-system/sw/bin/nix`)
 - PATH contains TWO nix directories causing command confusion
 
 **Impact:**
+
 - Build commands fail silently
 - Wrong Nix version gets invoked depending on context
 - `nix doctor` reports "Multiple versions of nix found in PATH"
 - All darwin-rebuild attempts hang at "building system configuration..."
 
 **Evidence:**
+
 ```bash
 # System profile has OLD nix
 $ /nix/var/nix/profiles/default/bin/nix --version
@@ -42,15 +46,18 @@ $ echo $PATH | tr ':' '\n' | grep nix
 ---
 
 ### 2. DARWIN-REBUILD FAILURES
+
 **Problem:** All darwin-rebuild commands fail silently
 
 **Attempts Made:**
+
 1. ✅ `nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel` - Fails immediately
 2. ✅ `just switch` - Fails at "building system configuration..."
 3. ✅ `sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./` - Silent failure
 4. ✅ Manual activation of result symlink - File not found
 
 **Evidence:**
+
 ```bash
 $ just switch
 🔄 Applying Nix configuration...
@@ -64,11 +71,13 @@ error: Recipe `switch` failed on line 32 with exit code 1
 ---
 
 ### 3. NH DARWIN SWITCH FAILURES
+
 **Problem:** `nh darwin switch` fails with temp directory access errors
 
 **Details:** Documented in `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md`
 
 **Error Message:**
+
 ```
 error: getting status of '/private/var/folders/07/.../T/nh-result': No such file or directory
 ```
@@ -80,9 +89,11 @@ error: getting status of '/private/var/folders/07/.../T/nh-result': No such file
 ---
 
 ### 4. CORRUPTED CACHES
+
 **Problem:** Nix evaluation and fetcher caches contain binary references to both Nix versions
 
 **Evidence:**
+
 ```bash
 $ grep -r "<old version>" ~/.cache/nix/
 Binary file /Users/larsartmann/.cache/nix/fetcher-cache-v4.sqlite matches
@@ -90,6 +101,7 @@ Binary file /Users/larsartmann/.cache/nix/gitv3/.../objects/pack/pack-*.pack mat
 ```
 
 **Impact:**
+
 - SQLite database errors during evaluation
 - "SQLite database is busy" errors
 - Silent build failures
@@ -99,9 +111,11 @@ Binary file /Users/larsartmann/.cache/nix/gitv3/.../objects/pack/pack-*.pack mat
 ---
 
 ### 5. STUCK NIX PROCESSES
+
 **Problem:** Build processes start but never complete
 
 **Evidence:**
+
 ```bash
 $ ps aux | grep -E "(nix build|nix-eval)"
 # No processes running, but command already "finished"
@@ -114,17 +128,20 @@ $ ps aux | grep -E "(nix build|nix-eval)"
 ## 📊 CURRENT SYSTEM STATE
 
 ### Last Successful Build
+
 - **Generation:** 206
 - **Date:** Dec 21 07:34
 - **Path:** `/nix/store/zf2r9yb4rlgnqggz1kwsf319kb22f4bw-darwin-system-26.05.5fb45ec`
 
 ### Current System Info
+
 - **Hostname:** Lars-MacBook-Air (matches flake configuration ✅)
 - **Computer Name:** Lars's MacBook Air
 - **Architecture:** aarch64-darwin
 - **System Profile:** system-206-link (5 generations behind!)
 
 ### Nix Installation Status
+
 ```bash
 # Multiple versions in store (causing conflicts):
 /nix/store/<hash>-nix-<old version>/bin/nix
@@ -136,6 +153,7 @@ $ ps aux | grep -E "(nix build|nix-eval)"
 ```
 
 ### Profile Configuration
+
 ```bash
 # Current generation:
 $ readlink /nix/var/nix/profiles/system
@@ -155,10 +173,13 @@ nix (Nix) <old version>  # ← PROBLEM!
 ## 🛠️ COMPREHENSIVE FIX PLAN
 
 ### PHASE 1: Fix Nix Version Mismatch (CRITICAL)
+
 **Status:** ❌ NOT STARTED
 
 **Steps:**
+
 1. Update system-wide default profile to use NEW Nix version
+
    ```bash
    # Remove old system profile
    sudo rm -f /nix/var/nix/profiles/default
@@ -174,6 +195,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```
 
 **Expected Outcome:**
+
 - System-wide profile uses correct Nix version
 - `nix doctor` passes without "multiple versions" warning
 - Commands no longer fail silently
@@ -181,10 +203,13 @@ nix (Nix) <old version>  # ← PROBLEM!
 ---
 
 ### PHASE 2: Remove Old Nix from Store
+
 **Status:** ⏳ ATTEMPTED (garbage collection didn't remove it)
 
 **Steps:**
+
 1. Find and remove references keeping old Nix alive
+
    ```bash
    # Old manifest file
    sudo rm -f /nix/store/<hash>-env-manifest.nix
@@ -194,6 +219,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```
 
 2. Force delete old Nix
+
    ```bash
    nix-store --delete /nix/store/<hash>-nix-<old version>
    ```
@@ -204,6 +230,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```
 
 **Expected Outcome:**
+
 - Only NEW Nix version remains in store
 - No more "multiple versions" warnings
 - Store size reduced
@@ -211,9 +238,11 @@ nix (Nix) <old version>  # ← PROBLEM!
 ---
 
 ### PHASE 3: Clean Up Caches (ALREADY DONE ✅)
+
 **Status:** ✅ COMPLETED
 
 **Actions Taken:**
+
 1. ✅ Cleared eval cache: `rm -rf ~/.cache/nix/eval-cache-v6/*.sqlite*`
 2. ✅ Cleared fetcher cache: `rm -rf ~/.cache/nix/fetcher-cache-v4.sqlite`
 3. ✅ Cleared git cache: `rm -rf ~/.cache/nix/gitv3/`
@@ -222,16 +251,20 @@ nix (Nix) <old version>  # ← PROBLEM!
 ---
 
 ### PHASE 4: Rebuild Darwin System
+
 **Status:** ❌ CANNOT START (depends on Phase 1)
 
 **Steps:**
+
 1. Build new system configuration
+
    ```bash
    cd ~/Desktop/Setup-Mac
    nix build .#darwinConfigurations.Lars-MacBook-Air.config.system.build.toplevel --out-link /tmp/darwin-result
    ```
 
 2. Apply new system
+
    ```bash
    sudo /tmp/darwin-result/activate
    ```
@@ -242,6 +275,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```
 
 **Expected Outcome:**
+
 - New system generation created (207+)
 - Configuration applied successfully
 - All services running correctly
@@ -249,22 +283,27 @@ nix (Nix) <old version>  # ← PROBLEM!
 ---
 
 ### PHASE 5: Verify Everything Works
+
 **Status:** ❌ CANNOT START (depends on Phase 4)
 
 **Steps:**
+
 1. Run nix diagnostics
+
    ```bash
    nix doctor
    # Should pass all checks
    ```
 
 2. Test darwin-rebuild
+
    ```bash
    /run/current-system/sw/bin/darwin-rebuild check --flake ./
    # Should complete successfully
    ```
 
 3. Verify system generation
+
    ```bash
    ls -lt /nix/var/nix/profiles/system-* | head -2
    # Should show new generation at top
@@ -277,6 +316,7 @@ nix (Nix) <old version>  # ← PROBLEM!
    ```
 
 **Expected Outcome:**
+
 - All diagnostics pass
 - System is up-to-date (generation 207+)
 - No more build failures
@@ -286,6 +326,7 @@ nix (Nix) <old version>  # ← PROBLEM!
 ## 📝 ACTIONS TAKEN THIS SESSION
 
 ### Completed Successfully:
+
 1. ✅ Ran `nix doctor` - Identified multiple Nix versions
 2. ✅ Cleared all Nix caches (eval, fetcher, git)
 3. ✅ Ran garbage collection
@@ -294,12 +335,14 @@ nix (Nix) <old version>  # ← PROBLEM!
 6. ✅ Documented all findings comprehensively
 
 ### Attempted But Failed:
+
 1. ❌ Delete old Nix from store - Still referenced by old manifest and user environment
 2. ❌ Build darwin system - Fails silently due to Nix version mismatch
 3. ❌ Apply new configuration - Cannot build due to Nix version mismatch
 4. ❌ Garbage collection - Didn't remove old Nix (still referenced)
 
 ### Ongoing Issues:
+
 1. ⏳ System profile has OLD Nix version
 2. ⏳ Old Nix still in store (cannot remove, still referenced)
 3. ⏳ Cannot rebuild system (depends on fixing Nix version)
@@ -310,6 +353,7 @@ nix (Nix) <old version>  # ← PROBLEM!
 ## 🎯 NEXT IMMEDIATE ACTIONS (REQUIRED)
 
 ### Step 1: Fix System-Wide Profile (CRITICAL - DO THIS FIRST)
+
 This is THE FIX that will solve everything else.
 
 ```bash
@@ -324,6 +368,7 @@ sudo ln -sf /run/current-system/sw/bin/* /nix/var/nix/profiles/default/bin/
 ```
 
 ### Step 2: Verify Fix
+
 ```bash
 # Check that system profile now has correct Nix
 /nix/var/nix/profiles/default/bin/nix --version
@@ -335,6 +380,7 @@ nix doctor
 ```
 
 ### Step 3: Try Building System
+
 ```bash
 cd ~/Desktop/Setup-Mac
 
@@ -346,6 +392,7 @@ sudo /tmp/darwin-result/activate
 ```
 
 ### Step 4: Alternative (If Steps 1-3 Don't Work)
+
 Use full Nix/Darwin reinstall:
 
 ```bash
@@ -401,6 +448,7 @@ ls -lt /nix/var/nix/profiles/system-* | head -2
 ## 📚 DOCUMENTATION REFERENCES
 
 Related documentation created during this session:
+
 - `docs/troubleshooting/nh-darwin-switch-failure-ROOT-CAUSE.md` - NH tool temp directory issue
 - `docs/troubleshooting/nh-darwin-switch-EXECUTIVE-SUMMARY.md` - NH issue summary
 - `docs/troubleshooting/SANDBOX-PATHS-RESEARCH.md` - Sandbox configuration research
@@ -408,6 +456,7 @@ Related documentation created during this session:
 - `docs/troubleshooting/nh-darwin-switch-EXECUTIVE-SUMMARY.md` - Executive summary
 
 Git commits related to these issues (last 3 days):
+
 - `68f50aa` - iTerm2 recovery and sandbox configuration
 - `cae80d5` - macOS sandbox paths research
 - `84a50a2` - comprehensive sandbox paths
@@ -423,18 +472,22 @@ Git commits related to these issues (last 3 days):
 ## ⚠️ RISK ASSESSMENT
 
 ### Low Risk:
+
 - Clearing caches (already done ✅)
 - Garbage collection (already done ✅)
 - Updating system profile (simple symlink changes)
 
 ### Medium Risk:
+
 - Deleting old Nix from store (might have unexpected references)
 - Removing root's user environment (might break something)
 
 ### High Risk:
+
 - Full Nix/Darwin reinstall (will lose current system state)
 
 ### Recommended Approach:
+
 Start with **Step 1: Fix System-Wide Profile** (Low Risk)
 This single fix will likely resolve all issues without needing reinstall.
 

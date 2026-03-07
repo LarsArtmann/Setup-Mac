@@ -12,6 +12,7 @@
 This report provides a comprehensive analysis of the current home-manager setup within the Setup-Mac project, identifies critical integration gaps, and outlines actionable recommendations for optimization.
 
 ### 🚨 KEY FINDING
+
 **Home-Manager is declared but NOT properly integrated** - the system operates with fragmented configurations despite having home-manager available as a dependency.
 
 ---
@@ -19,16 +20,19 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ## 📊 CURRENT STATE ANALYSIS
 
 ### ✅ FULLY COMPLETED RESEARCH
+
 - **Home-manager fundamentals**: Complete understanding of architecture, integration patterns, and best practices
 - **File discovery catalog**: 59 .nix files identified and analyzed
 - **Integration point mapping**: Located all home-manager references in the codebase
 - **Configuration pattern analysis**: Documented current approach and identified anti-patterns
 
 ### 🔄 PARTIAL PROGRESS
+
 - **Module options research**: Started comprehensive options review but requires completion
 - **Gap analysis**: Identified gaps but needs detailed quantification
 
 ### ❌ NOT STARTED
+
 - Implementation planning
 - Migration strategy development
 - Testing framework setup
@@ -59,6 +63,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 #### 📁 Files Requiring Immediate Attention
 
 **Primary Integration Points:**
+
 ```
 ❌ flake.nix - Home-manager declared but not integrated
 ❌ platforms/darwin/darwin.nix - Missing home-manager import
@@ -69,6 +74,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ```
 
 **Configuration Duplication Issues:**
+
 ```
 ⚠️  platforms/darwin/programs/shells.nix - System-level shell config
 ⚠️  programs/default.nix - Custom program system competing with home-manager
@@ -82,6 +88,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ### 🎯 Priority 1: Critical Integration Fixes
 
 1. **Proper Home-Manager Integration**
+
    ```nix
    # Required in both darwin.nix and configuration.nix
    imports = [
@@ -171,6 +178,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ## 🎯 TOP 25 IMMEDIATE NEXT ACTIONS (Priority Ranked)
 
 ### 🚨 Critical (Week 1)
+
 1. **Fix home-manager integration** in flake.nix system configs
 2. **Create unified home-manager module structure**
 3. **Consolidate shell configurations** under home-manager
@@ -178,13 +186,15 @@ This report provides a comprehensive analysis of the current home-manager setup 
 5. **Implement `home-manager.useUserPackages = true`**
 
 ### ⚡ High Priority (Week 1-2)
-6. **Migrate programs.* configurations** to home-manager modules
+
+6. **Migrate programs.\* configurations** to home-manager modules
 7. **Implement proper `home.sessionVariables` structure**
 8. **Add `home.file` management** for dotfiles
 9. **Implement `xdg.*` modules** for proper file organization
 10. **Add `services.*` modules** for user services
 
 ### 📈 Medium Priority (Week 2-3)
+
 11. **Create platform-specific home-manager extensions**
 12. **Implement backup and rollback strategy**
 13. **Add activation scripts** for complex migrations
@@ -192,6 +202,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 15. **Implement state version management**
 
 ### 🔧 Optimization (Week 3-4)
+
 16. **Add conditional configuration** based on platform
 17. **Create shared modules** across platforms
 18. **Implement email/accounts modules**
@@ -208,9 +219,11 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ## 🤔 CRITICAL UNRESOLVED QUESTION
 
 ### 🎯 Primary Challenge
+
 **"What is the optimal strategy to migrate from the current fragmented shell configuration approach to a unified home-manager system without breaking existing functionality, especially given the complex interaction between nix-darwin, NixOS, and the custom program integration system?"**
 
 #### Core Challenge Components:
+
 1. **Migration Risk Management**: Current system works despite fragmentation
 2. **Compatibility Constraints**: Must maintain cross-platform compatibility
 3. **Integration Complexity**: Custom program system vs home-manager native modules
@@ -218,6 +231,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 5. **Rollback Strategy**: Quick recovery if migration fails
 
 #### Potential Approaches:
+
 1. **Incremental Migration**: Gradual module-by-module transition
 2. **Dual Configuration**: Run both systems in parallel during transition
 3. **Flag-Based Migration**: Feature flags to enable/disable systems
@@ -228,6 +242,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ## 📈 SUCCESS METRICS
 
 ### Technical Metrics
+
 - [ ] Home-manager properly integrated in both platforms
 - [ ] Zero configuration duplication
 - [ ] All `programs.*` modules implemented via home-manager
@@ -235,6 +250,7 @@ This report provides a comprehensive analysis of the current home-manager setup 
 - [ ] Configuration evaluation time optimized
 
 ### Functional Metrics
+
 - [ ] Cross-platform consistency maintained
 - [ ] All existing functionality preserved
 - [ ] New module patterns established
@@ -255,11 +271,13 @@ This report provides a comprehensive analysis of the current home-manager setup 
 ## 📁 RELEVANT FILES FOR IMMEDIATE ACTION
 
 **Critical Integration Points:**
+
 - `flake.nix` - Add home-manager module imports
 - `platforms/darwin/darwin.nix` - Add home-manager configuration
 - `platforms/nixos/system/configuration.nix` - Add home-manager integration
 
 **Configuration Consolidation:**
+
 - `platforms/darwin/programs/shells.nix` - Move to home-manager
 - `platforms/darwin/home.nix` - Enhance with proper integration
 - `platforms/nixos/users/home.nix` - Enhance with proper integration

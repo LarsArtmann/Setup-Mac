@@ -19,20 +19,21 @@ This guide walks you through migrating from Quad9 DNS (direct) to Technitium DNS
 
 ## Migration Timeline
 
-| Phase | Duration | Description |
-|-------|-----------|-------------|
-| **Preparation** | 5 min | Backup current config, review documentation |
-| **Deployment** | 10 min | Enable Technitium DNS, rebuild NixOS |
-| **Configuration** | 15 min | Web console setup, forwarders, blocklists |
-| **Testing** | 10 min | DNS resolution, ad blocking, performance |
-| **Cleanup** | 5 min | Verify all systems working |
-| **Total** | **45 min** | Complete migration |
+| Phase             | Duration   | Description                                 |
+| ----------------- | ---------- | ------------------------------------------- |
+| **Preparation**   | 5 min      | Backup current config, review documentation |
+| **Deployment**    | 10 min     | Enable Technitium DNS, rebuild NixOS        |
+| **Configuration** | 15 min     | Web console setup, forwarders, blocklists   |
+| **Testing**       | 10 min     | DNS resolution, ad blocking, performance    |
+| **Cleanup**       | 5 min      | Verify all systems working                  |
+| **Total**         | **45 min** | Complete migration                          |
 
 ---
 
 ## Phase 1: Preparation (5 minutes)
 
 ### Step 1.1: Review Current DNS Configuration
+
 ```bash
 # Check current DNS servers
 cat /etc/resolv.conf
@@ -43,6 +44,7 @@ cat /etc/resolv.conf
 ```
 
 ### Step 1.2: Create Backup
+
 ```bash
 # Backup current DNS configuration
 sudo cp /etc/resolv.conf /etc/resolv.conf.backup.$(date +%Y%m%d-%H%M%S)
@@ -57,6 +59,7 @@ echo "Current generation: $(readlink /run/current-system)"
 ```
 
 ### Step 1.3: Review Documentation
+
 ```bash
 # Read the DNS module documentation
 cat platforms/nixos/system/dns.nix
@@ -66,6 +69,7 @@ cat docs/architecture/TECHNITIUM-DNS-EVALUATION.md
 ```
 
 ### Step 1.4: Verify Requirements
+
 ```bash
 # Check if Technitium DNS package is available
 nix search nixpkgs technitium-dns-server
@@ -82,6 +86,7 @@ echo "✅ Disk space check complete"
 ```
 
 ### Step 1.5: Prepare Rollback Plan
+
 ```bash
 # Save current generation for rollback
 sudo nixos-rebuild switch --flake .#evo-x2
@@ -97,6 +102,7 @@ echo "Current working generation: $CURRENT_GENERATION"
 ## Phase 2: Deployment (10 minutes)
 
 ### Step 2.1: Verify DNS Module Import
+
 ```bash
 # Check if dns-config.nix is imported in configuration.nix
 grep "dns-config" platforms/nixos/system/configuration.nix
@@ -106,6 +112,7 @@ grep "dns-config" platforms/nixos/system/configuration.nix
 ```
 
 ### Step 2.2: Test Configuration Syntax
+
 ```bash
 # Validate Nix syntax
 nix-instantiate --eval --show-trace \
@@ -115,6 +122,7 @@ nix-instantiate --eval --show-trace \
 ```
 
 ### Step 2.3: Build System
+
 ```bash
 # Build with Technitium DNS enabled
 sudo nixos-rebuild build --flake .#evo-x2 --print-build-logs
@@ -131,6 +139,7 @@ sudo nixos-rebuild build --flake .#evo-x2 --print-build-logs
 ```
 
 ### Step 2.4: Switch to New Generation
+
 ```bash
 # Apply new configuration
 sudo nixos-rebuild switch --flake .#evo-x2 --print-build-logs
@@ -150,6 +159,7 @@ systemctl status technitium-dns-server
 ```
 
 ### Step 2.5: Verify DNS Configuration
+
 ```bash
 # Check /etc/resolv.conf (should now use local DNS)
 cat /etc/resolv.conf
@@ -170,6 +180,7 @@ ss -tulpn | grep :53
 ## Phase 3: Configuration (15 minutes)
 
 ### Step 3.1: Access Web Console
+
 ```bash
 # Open web console
 just dns-console
@@ -183,6 +194,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.2: Change Admin Password
+
 ```
 1. Click "Settings" in the left menu
 2. Click "General" tab
@@ -195,6 +207,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.3: Configure Forwarders
+
 ```
 1. Click "DNS Settings" in the left menu
 2. Click "Forwarders" tab
@@ -224,6 +237,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.4: Enable Ad Blocking
+
 ```
 1. Click "Block Lists" in the left menu
 2. Click "Quick Add" button
@@ -242,6 +256,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.5: Enable Persistent Caching
+
 ```
 1. Click "DNS Settings" in the left menu
 2. Click "Cache" tab
@@ -259,6 +274,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.6: Enable DNSSEC Validation
+
 ```
 1. Click "DNS Settings" in the left menu
 2. Click "DNSSEC" tab
@@ -273,6 +289,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.7: Enable Query Logging
+
 ```
 1. Click "Settings" in the left menu
 2. Click "Logging" tab
@@ -288,6 +305,7 @@ firefox http://localhost:5380
 ```
 
 ### Step 3.8: Test Configuration
+
 ```
 1. Click "DNS Client" in the left menu
 2. Enter domain: google.com
@@ -317,6 +335,7 @@ doubleclick.net
 ## Phase 4: Testing (10 minutes)
 
 ### Step 4.1: Test Basic DNS Resolution
+
 ```bash
 # Test basic resolution
 just dns-test
@@ -332,6 +351,7 @@ just dns-test
 ```
 
 ### Step 4.2: Test Caching Performance
+
 ```bash
 # Test uncached resolution
 echo "Uncached resolution:"
@@ -349,6 +369,7 @@ time dig github.com +short > /dev/null
 ```
 
 ### Step 4.3: Test Ad Blocking
+
 ```bash
 # Test ad domain
 dig doubleclick.net +short
@@ -364,6 +385,7 @@ dig malwaredomain.com +short
 ```
 
 ### Step 4.4: Test DNSSEC Validation
+
 ```bash
 # Test DNSSEC-protected domain
 dig +dnssec example.net +short
@@ -379,6 +401,7 @@ dig +dnssec +adflag example.net
 ```
 
 ### Step 4.5: Test with Real Applications
+
 ```bash
 # Test web browsing
 firefox https://google.com
@@ -398,6 +421,7 @@ firefox https://doubleclick.net
 ```
 
 ### Step 4.6: Monitor DNS Logs
+
 ```bash
 # Monitor query logs in real-time
 just dns-logs
@@ -410,6 +434,7 @@ just dns-logs
 ```
 
 ### Step 4.7: Check Service Status
+
 ```bash
 # Check service status
 just dns-status
@@ -426,6 +451,7 @@ just dns-status
 ## Phase 5: Cleanup & Verification (5 minutes)
 
 ### Step 5.1: Verify All Systems Working
+
 ```bash
 # Run comprehensive diagnostics
 just dns-diagnostics
@@ -438,6 +464,7 @@ just dns-diagnostics
 ```
 
 ### Step 5.2: Check System Health
+
 ```bash
 # Check system health
 just health
@@ -448,6 +475,7 @@ just health
 ```
 
 ### Step 5.3: Remove Temporary Backups
+
 ```bash
 # Remove temporary backup files (optional)
 # Keep final backup for reference
@@ -458,6 +486,7 @@ sudo rm -f /etc/resolv.conf.backup.* 2>/dev/null
 ```
 
 ### Step 5.4: Document Changes
+
 ```bash
 # Create migration notes
 cat > ~/backups/migration-notes-$(date +%Y%m%d).md << 'EOF'
@@ -501,6 +530,7 @@ echo "✅ Migration notes saved"
 ```
 
 ### Step 5.5: Final Verification Checklist
+
 ```bash
 echo "📋 Final Verification Checklist"
 echo ""
@@ -525,11 +555,14 @@ echo "✅ If all items checked, migration is complete!"
 ## Troubleshooting
 
 ### Issue 1: DNS Resolution Fails
+
 **Symptoms:**
+
 - `dig google.com` returns SERVFAIL or timeout
 - Web pages don't load
 
 **Solutions:**
+
 ```bash
 # Check if service is running
 systemctl status technitium-dns-server
@@ -545,11 +578,14 @@ sudo nixos-rebuild switch --rollback
 ```
 
 ### Issue 2: Web Console Inaccessible
+
 **Symptoms:**
+
 - Cannot access http://localhost:5380
 - Connection refused or timeout
 
 **Solutions:**
+
 ```bash
 # Check if service is listening
 ss -tulpn | grep 5380
@@ -566,11 +602,14 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ```
 
 ### Issue 3: Ad Blocking Not Working
+
 **Symptoms:**
+
 - Ad domains resolve normally
 - Ads still visible in browser
 
 **Solutions:**
+
 ```bash
 # Check blocklists in web console
 # Block Lists tab > Verify lists are downloaded
@@ -587,11 +626,14 @@ dig @127.0.0.1 doubleclick.net
 ```
 
 ### Issue 4: Slow DNS Resolution
+
 **Symptoms:**
+
 - All queries take >100ms
 - No performance improvement
 
 **Solutions:**
+
 ```bash
 # Check cache hit rate (via web console)
 # Statistics tab > Cache Hit Rate
@@ -611,11 +653,14 @@ dig @1.1.1.1 google.com +time=5
 ```
 
 ### Issue 5: High Memory Usage
+
 **Symptoms:**
+
 - Technitium DNS using >500 MB RAM
 - System slows down
 
 **Solutions:**
+
 ```bash
 # Check actual memory usage
 systemctl status technitium-dns-server
@@ -629,12 +674,15 @@ sudo systemctl restart technitium-dns-server
 ```
 
 ### Issue 6: Migration Failed Completely
+
 **Symptoms:**
+
 - NixOS rebuild failed
 - System won't boot
 - Can't access web console
 
 **Solutions:**
+
 ```bash
 # Emergency rollback from GRUB
 # 1. Reboot to GRUB menu
@@ -661,6 +709,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 If migration causes issues, follow these steps:
 
 ### Immediate Rollback (if system is running)
+
 ```bash
 # Rollback to previous generation
 sudo nixos-rebuild switch --rollback
@@ -670,6 +719,7 @@ sudo nixos-rebuild switch --rollback
 ```
 
 ### Emergency Rollback (if system won't boot)
+
 ```bash
 # 1. Reboot to GRUB menu
 # 2. Select "Advanced options" > Select previous generation
@@ -682,6 +732,7 @@ sudo nixos-rebuild switch --rollback
 ```
 
 ### Selective Rollback (disable Technitium DNS only)
+
 ```bash
 # If you want to keep NixOS config but disable Technitium DNS:
 nano platforms/nixos/system/configuration.nix
@@ -701,6 +752,7 @@ sudo nixos-rebuild switch --flake .#evo-x2
 ## Post-Migration Monitoring
 
 ### First Week Monitoring
+
 ```bash
 # Check daily (for first week)
 just dns-diagnostics
@@ -714,6 +766,7 @@ just dns-diagnostics
 ```
 
 ### Weekly Maintenance
+
 ```bash
 # Check blocklist updates (automatic, but verify)
 # Web Console > Block Lists > Check "Last Updated"
@@ -729,6 +782,7 @@ just dns-diagnostics
 ```
 
 ### Monthly Review
+
 ```bash
 # Review performance metrics
 # Web Console > Statistics > Compare month-over-month
@@ -763,6 +817,7 @@ Migration is successful if:
 ## Support
 
 For issues specific to this migration:
+
 ```bash
 # Check migration notes
 cat ~/backups/migration-notes-$(date +%Y%m%d).md
@@ -778,6 +833,7 @@ cat docs/architecture/TECHNITIUM-DNS-EVALUATION.md
 ```
 
 For general Technitium DNS issues:
+
 - Web Console Help: http://localhost:5380/help.html
 - GitHub Issues: https://github.com/TechnitiumSoftware/DnsServer/issues
 - Technitium Support: https://technitium.com/contact/

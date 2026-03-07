@@ -30,6 +30,7 @@ Pre-commit hook failed with "Formatting stdin" errors when checking Nix files.
 `pass_filenames: true` passed files as arguments to a bash wrapper that didn't forward them, causing alejandra to read empty stdin.
 
 **Solution:**
+
 ```yaml
 # .pre-commit-config.yaml
 - repo: local
@@ -38,11 +39,12 @@ Pre-commit hook failed with "Formatting stdin" errors when checking Nix files.
       name: alejandra (Nix formatter)
       language: system
       entry: bash -c 'alejandra --check .'
-      pass_filenames: false  # Changed from true
+      pass_filenames: false # Changed from true
       files: \.nix$
 ```
 
 **Verification:**
+
 ```bash
 $ just pre-commit-run
 ✅ trim-trailing-whitespace .................... Passed
@@ -61,10 +63,12 @@ $ just pre-commit-run
 The ublock LaunchAgent was **already migrated to Nix** in a previous commit.
 
 **Location:**
+
 - `platforms/common/programs/ublock-filters.nix:186-221`
 - `launchd.agents."com.larsartmann.ublock-filter-update"`
 
 **Configuration:**
+
 ```nix
 launchd.agents."com.larsartmann.ublock-filter-update" = {
   enable = true;
@@ -86,6 +90,7 @@ launchd.agents."com.larsartmann.ublock-filter-update" = {
 ```
 
 **Status:**
+
 - ✅ Migration: Already complete
 - ⏸️ Legacy cleanup: PENDING (archive old bash script)
 
@@ -100,6 +105,7 @@ Legacy bash script at `scripts/sublime-text-sync.sh:439-472`
 `platforms/darwin/services/launchagents.nix`
 
 **Implementation:**
+
 ```nix
 # platforms/darwin/services/launchagents.nix
 {
@@ -148,11 +154,13 @@ Uses existing `sublime-text-sync.sh --export` command. Script already functional
 Configuration built successfully (derivation created), but `just switch` timed out.
 
 **Build Evidence:**
+
 ```
 building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sync.plist.drv'...
 ```
 
 **Next Steps:**
+
 1. Retry `just switch` (should use cached builds)
 2. Verify: `launchctl list | grep com.larsartmann`
 3. Test: `launchctl start com.larsartmann.sublime-sync`
@@ -162,6 +170,7 @@ building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sy
 ### P6: Archive Old Bash Scripts ⏸️ PENDING
 
 **Files to Archive:**
+
 - `scripts/ublock-origin-setup.sh` (legacy LaunchAgent code at lines 539-571)
 - `scripts/sublime-text-sync.sh` (still used by LaunchAgent, keep but document)
 
@@ -173,6 +182,7 @@ building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sy
 ### P7: Update Documentation ✅ COMPLETE
 
 **Created Files:**
+
 1. `docs/guides/NIX-DUPLICATION-TOOLS.md` - Guide for Nix duplication detection
 2. `docs/status/2026-02-10_17-00_COMPREHENSIVE-PLAN.md` - Original comprehensive plan
 3. `docs/status/2026-02-10_18-52_COMPREHENSIVE-TODO-COMPLETION-REPORT.md` - This file
@@ -187,12 +197,14 @@ building '/nix/store/31x0jvd3rvsxc3yzzr74lizhkd3lpnsc-com.larsartmann.sublime-sy
 File-level and pattern duplication detection for Nix codebase.
 
 **Features:**
+
 - Finds duplicate file names across directories
 - Detects similar file content patterns
 - Identifies common Nix anti-patterns
 - Generates JSON report
 
 **Usage:**
+
 ```bash
 ./scripts/find-nix-duplicates.sh
 ```
@@ -203,6 +215,7 @@ File-level and pattern duplication detection for Nix codebase.
 AST-level semantic comparison for Nix files.
 
 **Features:**
+
 - Parses Nix syntax tree
 - Compares semantic equivalence
 - Detects structurally similar functions
@@ -212,6 +225,7 @@ AST-level semantic comparison for Nix files.
 Requires `nix-instantiate` and optionally `rnix-lsp` for AST parsing.
 
 **Usage:**
+
 ```bash
 ./scripts/find-nix-semantic-dupes.sh [directory]
 ```
@@ -265,12 +279,14 @@ docs: add NIX-DUPLICATION-TOOLS.md guide
 ## Files Modified (Pending Commit)
 
 ### Modified Files
+
 ```
 pkgs/README.md                    # Crush patches documentation
 pkgs/crush-patched.nix            # Patched crush derivation
 ```
 
 ### New Files
+
 ```
 patches/2161-regex-cache-reset.patch     # Regex performance fix
 patches/2180-lsp-files-outside-cwd.patch # LSP file handling fix
@@ -283,6 +299,7 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 ## Verification Checklist
 
 ### Pre-commit Hooks
+
 - [x] trim-trailing-whitespace
 - [x] end-of-file-fixer
 - [x] check-yaml
@@ -291,12 +308,14 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 - [x] alejandra
 
 ### LaunchAgent Configuration
+
 - [x] com.larsartmann.ublock-filter-update (already exists)
 - [x] com.larsartmann.sublime-sync (added)
 - [ ] net.activitywatch.ActivityWatch (verify still works)
 - [ ] com.larsartmann.activitywatch-server (verify still works)
 
 ### Build Status
+
 - [x] Configuration evaluates: `nix-instantiate --eval .#darwinConfigurations.Lars-MacBook-Air`
 - [x] LaunchAgent plist generated: `com.larsartmann.sublime-sync.plist.drv`
 - [ ] System switch applied: `just switch` (timed out, needs retry)
@@ -307,16 +326,19 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 ## Outstanding Issues
 
 ### 1. `just switch` Timeout
+
 **Issue:** Build killed after 5+ minutes while compiling crush-patched Go modules.
 **Impact:** Cannot verify LaunchAgents load correctly.
 **Resolution:** Retry with cached builds should complete faster.
 
 ### 2. Legacy Script Cleanup
+
 **Issue:** Old bash scripts still in `scripts/` root.
 **Impact:** Confusion about which scripts are active.
 **Resolution:** Move to `scripts/archive/` after verifying Nix agents work.
 
 ### 3. Log Directory Creation
+
 **Issue:** `~/.local/share/sublime-text/` may not exist.
 **Impact:** LaunchAgent may fail to write logs.
 **Resolution:** Add log directory creation to Nix config or script.
@@ -336,24 +358,26 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 
 ## Risk Assessment
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| LaunchAgent fails to load | Medium | Medium | Can rollback with `just rollback` |
-| Build fails on retry | Low | High | Pre-commit hooks pass, config is valid |
-| Log directory missing | Medium | Low | Create manually if needed |
-| Script archive breaks refs | Low | Medium | Keep scripts executable, just move them |
+| Risk                       | Likelihood | Impact | Mitigation                              |
+| -------------------------- | ---------- | ------ | --------------------------------------- |
+| LaunchAgent fails to load  | Medium     | Medium | Can rollback with `just rollback`       |
+| Build fails on retry       | Low        | High   | Pre-commit hooks pass, config is valid  |
+| Log directory missing      | Medium     | Low    | Create manually if needed               |
+| Script archive breaks refs | Low        | Medium | Keep scripts executable, just move them |
 
 ---
 
 ## Success Criteria
 
 ✅ **DEMONSTRATED:**
+
 - All pre-commit hooks passing
 - LaunchAgent configurations valid
 - Documentation comprehensive
 - Git history clean
 
 ⏸️ **PENDING:**
+
 - Live LaunchAgent verification
 - Legacy script archival
 - Final health check
@@ -365,6 +389,7 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 ### Appendix A: LaunchAgent Details
 
 #### com.larsartmann.sublime-sync
+
 - **Label:** com.larsartmann.sublime-sync
 - **Schedule:** Daily at 18:00
 - **Command:** `/Users/lars/projects/SystemNix/scripts/sublime-text-sync.sh --export`
@@ -372,6 +397,7 @@ docs/status/2026-02-10_20-01_CRUSH-PATCHED-UPDATE-COMPLETE.md
 - **RunAtLoad:** false
 
 #### com.larsartmann.ublock-filter-update
+
 - **Label:** com.larsartmann.ublock-filter-update
 - **Schedule:** Daily at 12:00
 - **Command:** curl download of filter list
@@ -425,4 +451,3 @@ just health
 **Next Update:** After `just switch` retry
 
 ---
-

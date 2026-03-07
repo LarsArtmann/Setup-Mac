@@ -19,16 +19,17 @@
 
 ### 1. Root Cause Analysis
 
-| Issue | Discovery |
-|-------|-----------|
-| **Problem** | `aw-watcher-utilization` required manual `pip3 install` on macOS |
-| **Why** | ActivityWatch on macOS uses Homebrew Cask, not Nix package |
-| **Mistake** | Custom watcher wasn't integrated into Nix-Darwin LaunchAgent system |
+| Issue              | Discovery                                                                  |
+| ------------------ | -------------------------------------------------------------------------- |
+| **Problem**        | `aw-watcher-utilization` required manual `pip3 install` on macOS           |
+| **Why**            | ActivityWatch on macOS uses Homebrew Cask, not Nix package                 |
+| **Mistake**        | Custom watcher wasn't integrated into Nix-Darwin LaunchAgent system        |
 | **Package Exists** | `pkgs/aw-watcher-utilization.nix` was already defined but unused on Darwin |
 
 ### 2. Investigation Completed
 
 **Active Buckets (Before Fix):**
+
 - ✅ `aw-watcher-afk_Lars-MacBook-Air.local` - Working
 - ⚠️ `aw-watcher-window_Lars-MacBook-Air.local` - Partial (restart loop errors)
 - ✅ `aw-watcher-web-chrome_Lars-MacBook-Air.local` - Working
@@ -42,6 +43,7 @@
 **File:** `platforms/darwin/services/launchagents.nix`
 
 **Changes:**
+
 1. Added `pkgs` to function arguments
 2. Added new LaunchAgent `net.activitywatch.aw-watcher-utilization.plist`
 3. Uses `${pkgs.aw-watcher-utilization}/bin/aw-watcher-utilization` (Nix store path)
@@ -49,6 +51,7 @@
 5. Logs to `~/.local/share/activitywatch/aw-watcher-utilization.log`
 
 **LaunchAgent Configuration:**
+
 ```nix
 "net.activitywatch.aw-watcher-utilization.plist" = {
   enable = true;
@@ -79,12 +82,14 @@
 ### 4. Package Verification
 
 **Nix Package Location:** `pkgs/aw-watcher-utilization.nix`
+
 - Version: 1.2.2
 - Source: GitHub (Alwinator/aw-watcher-utilization)
 - Dependencies: `aw-client`, `psutil`
 - Available via: `pkgs.aw-watcher-utilization` in flake overlay
 
 **Flake Integration:**
+
 ```nix
 # flake.nix line 115, 126, 176, 242
 aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
@@ -95,11 +100,13 @@ aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
 ## b) PARTIALLY DONE
 
 ### Configuration Applied
+
 - ✅ LaunchAgent configuration added to `launchagents.nix`
 - ✅ Changes staged in git
 - ⏳ **Build/Activation INTERRUPTED** - `nh darwin switch` was terminated mid-build
 
 **Need to complete:**
+
 1. Run `nh darwin switch .` to apply the configuration
 2. Verify `aw-watcher-utilization` bucket appears
 3. Test that events are being reported
@@ -129,6 +136,7 @@ pip3 install --user aw-watcher-utilization
 ```
 
 **Why This is Bad:**
+
 1. **Imperative** - violates Nix's declarative philosophy
 2. **Non-reproducible** - pip install can fail or install different versions
 3. **State leakage** - creates ~/.local files outside Nix store
@@ -136,6 +144,7 @@ pip3 install --user aw-watcher-utilization
 5. **Harder to debug** - scattered state across filesystem
 
 **The Nix package WAS ALREADY THERE:**
+
 - `pkgs/aw-watcher-utilization.nix` - properly packaged
 - Available in flake overlay
 - Just needed LaunchAgent integration
@@ -147,11 +156,13 @@ pip3 install --user aw-watcher-utilization
 ## e) WHAT WE SHOULD IMPROVE
 
 ### Immediate (Today)
+
 1. ✅ Complete the `nh darwin switch` to activate the new LaunchAgent
 2. Verify the utilization bucket appears in ActivityWatch API
 3. Confirm events are flowing (CPU, RAM, disk, network data)
 
 ### Short-term (This Week)
+
 4. **Remove manual install cruft:**
    - Deprecate `dotfiles/activitywatch/install-utilization.sh`
    - Update `dotfiles/activitywatch/README.md`
@@ -166,6 +177,7 @@ pip3 install --user aw-watcher-utilization
    - Verify process is running
 
 ### Medium-term (This Month)
+
 7. **Consider full Nix ActivityWatch:**
    - Currently using Homebrew Cask for ActivityWatch.app
    - Could use Nix-packaged ActivityWatch for complete purity
@@ -183,32 +195,32 @@ pip3 install --user aw-watcher-utilization
 
 ## f) TOP 25 THINGS TO GET DONE NEXT
 
-| Priority | Task | Effort | Context |
-|----------|------|--------|---------|
-| 🔴 P0 | Complete `nh darwin switch` for utilization LaunchAgent | 2 min | Interrupted build |
-| 🔴 P0 | Verify utilization bucket is reporting events | 5 min | Test fix |
-| 🟡 P1 | Update ActivityWatch README.md (remove manual install) | 15 min | Documentation |
-| 🟡 P1 | Deprecate `install-utilization.sh` script | 10 min | Cleanup |
-| 🟡 P1 | Update justfile command documentation | 10 min | UX |
-| 🟡 P1 | Debug aw-watcher-window restart loop | 30 min | Logs show fork errors |
-| 🟢 P2 | Debug aw-watcher-input (check permissions) | 20 min | Not reporting |
-| 🟢 P2 | Create `just activitywatch-status` command | 30 min | Monitoring |
-| 🟢 P2 | Consider Nix-packaged ActivityWatch.app | 2 hr | Purity vs GUI |
-| 🟢 P2 | Verify NixOS ActivityWatch configuration | 30 min | Cross-platform |
-| ⚪ P3 | Add ActivityWatch health check to `just health` | 45 min | System health |
-| ⚪ P3 | Document all ActivityWatch buckets | 30 min | Reference |
-| ⚪ P3 | Create troubleshooting guide | 1 hr | Support |
-| ⚪ P3 | Add bucket count check to CI | 1 hr | Testing |
-| ⚪ P4 | Investigate web watcher duplication (chrome vs chrome_Lars-MacBook-Air) | 30 min | Cleanup |
-| ⚪ P4 | Archive old IntelliJ/WebStorm buckets | 15 min | Maintenance |
-| ⚪ P4 | Consider aw-watcher-vscode for Nix-managed VS Code | 1 hr | Extension |
-| ⚪ P4 | Review ActivityWatch TCC profile | 30 min | Permissions |
-| ⚪ P4 | Add log rotation for ActivityWatch logs | 45 min | Maintenance |
-| ⚪ P5 | Contribute aw-watcher-utilization to nixpkgs | 4 hr | Upstreaming |
-| ⚪ P5 | Create ActivityWatch module for nix-darwin | 4 hr | Abstraction |
-| ⚪ P5 | Investigate aw-stopwatch usage | 15 min | Unused bucket? |
-| ⚪ P5 | Review Helium browser watcher | 15 min | Additional browser |
-| ⚪ P5 | Add ActivityWatch to system monitoring dashboard | 2 hr | Observability |
+| Priority | Task                                                                    | Effort | Context               |
+| -------- | ----------------------------------------------------------------------- | ------ | --------------------- |
+| 🔴 P0    | Complete `nh darwin switch` for utilization LaunchAgent                 | 2 min  | Interrupted build     |
+| 🔴 P0    | Verify utilization bucket is reporting events                           | 5 min  | Test fix              |
+| 🟡 P1    | Update ActivityWatch README.md (remove manual install)                  | 15 min | Documentation         |
+| 🟡 P1    | Deprecate `install-utilization.sh` script                               | 10 min | Cleanup               |
+| 🟡 P1    | Update justfile command documentation                                   | 10 min | UX                    |
+| 🟡 P1    | Debug aw-watcher-window restart loop                                    | 30 min | Logs show fork errors |
+| 🟢 P2    | Debug aw-watcher-input (check permissions)                              | 20 min | Not reporting         |
+| 🟢 P2    | Create `just activitywatch-status` command                              | 30 min | Monitoring            |
+| 🟢 P2    | Consider Nix-packaged ActivityWatch.app                                 | 2 hr   | Purity vs GUI         |
+| 🟢 P2    | Verify NixOS ActivityWatch configuration                                | 30 min | Cross-platform        |
+| ⚪ P3    | Add ActivityWatch health check to `just health`                         | 45 min | System health         |
+| ⚪ P3    | Document all ActivityWatch buckets                                      | 30 min | Reference             |
+| ⚪ P3    | Create troubleshooting guide                                            | 1 hr   | Support               |
+| ⚪ P3    | Add bucket count check to CI                                            | 1 hr   | Testing               |
+| ⚪ P4    | Investigate web watcher duplication (chrome vs chrome_Lars-MacBook-Air) | 30 min | Cleanup               |
+| ⚪ P4    | Archive old IntelliJ/WebStorm buckets                                   | 15 min | Maintenance           |
+| ⚪ P4    | Consider aw-watcher-vscode for Nix-managed VS Code                      | 1 hr   | Extension             |
+| ⚪ P4    | Review ActivityWatch TCC profile                                        | 30 min | Permissions           |
+| ⚪ P4    | Add log rotation for ActivityWatch logs                                 | 45 min | Maintenance           |
+| ⚪ P5    | Contribute aw-watcher-utilization to nixpkgs                            | 4 hr   | Upstreaming           |
+| ⚪ P5    | Create ActivityWatch module for nix-darwin                              | 4 hr   | Abstraction           |
+| ⚪ P5    | Investigate aw-stopwatch usage                                          | 15 min | Unused bucket?        |
+| ⚪ P5    | Review Helium browser watcher                                           | 15 min | Additional browser    |
+| ⚪ P5    | Add ActivityWatch to system monitoring dashboard                        | 2 hr   | Observability         |
 
 ---
 
@@ -217,11 +229,13 @@ pip3 install --user aw-watcher-utilization
 ### Why was the manual install script created when the Nix package already existed?
 
 **Evidence:**
+
 - `pkgs/aw-watcher-utilization.nix` has existed for some time
 - Flake overlay exposes it as `pkgs.aw-watcher-utilization`
 - NixOS configuration already uses it via Home Manager
 
 **Possible explanations:**
+
 1. **Historical:** Nix package was added after manual script was created
 2. **Integration difficulty:** Uncertainty about connecting Nix watcher to Homebrew ActivityWatch
 3. **Documentation gap:** README documents manual approach, not Nix approach
@@ -229,6 +243,7 @@ pip3 install --user aw-watcher-utilization
 
 **The core confusion:**
 ActivityWatch architecture has:
+
 - **Server** (aw-server) - runs on port 5600
 - **Watchers** - connect to server via HTTP API
 - **Client** (aw-qt or web UI) - displays data
@@ -269,15 +284,15 @@ The LaunchAgent integration pattern wasn't established for custom watchers on Da
 
 ### Nix vs Manual Install Comparison
 
-| Aspect | Manual (pip) | Nix (new) |
-|--------|-------------|-----------|
-| **Installation** | `pip3 install --user aw-watcher-utilization` | Declarative in `launchagents.nix` |
-| **Location** | `~/.local/lib/python*/site-packages/` | `/nix/store/...-aw-watcher-utilization/` |
-| **Version** | Latest from PyPI (uncontrolled) | Pinned in `pkgs/aw-watcher-utilization.nix` |
-| **Autostart** | Manual edit of `aw-qt.toml` | LaunchAgent managed by nix-darwin |
-| **Logs** | Console/unknown | `~/.local/share/activitywatch/aw-watcher-utilization.log` |
-| **Rollback** | Manual uninstall/reinstall | `nix rollback` |
-| **Reproducibility** | ❌ Environment-dependent | ✅ Pure Nix expression |
+| Aspect              | Manual (pip)                                 | Nix (new)                                                 |
+| ------------------- | -------------------------------------------- | --------------------------------------------------------- |
+| **Installation**    | `pip3 install --user aw-watcher-utilization` | Declarative in `launchagents.nix`                         |
+| **Location**        | `~/.local/lib/python*/site-packages/`        | `/nix/store/...-aw-watcher-utilization/`                  |
+| **Version**         | Latest from PyPI (uncontrolled)              | Pinned in `pkgs/aw-watcher-utilization.nix`               |
+| **Autostart**       | Manual edit of `aw-qt.toml`                  | LaunchAgent managed by nix-darwin                         |
+| **Logs**            | Console/unknown                              | `~/.local/share/activitywatch/aw-watcher-utilization.log` |
+| **Rollback**        | Manual uninstall/reinstall                   | `nix rollback`                                            |
+| **Reproducibility** | ❌ Environment-dependent                     | ✅ Pure Nix expression                                    |
 
 ---
 
@@ -286,6 +301,7 @@ The LaunchAgent integration pattern wasn't established for custom watchers on Da
 **Status:** Configuration complete, **waiting for build activation**
 
 The manual install anti-pattern has been identified and replaced with proper Nix-managed LaunchAgent configuration. The `aw-watcher-utilization` watcher will now be:
+
 - Installed from Nix store (reproducible)
 - Managed by nix-darwin LaunchAgent (declarative)
 - Auto-started with correct parameters

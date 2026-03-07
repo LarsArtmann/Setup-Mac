@@ -19,6 +19,7 @@
 ## Current State Assessment
 
 ### Completed Work ✅
+
 1. **Package Configuration (100% Complete)**
    - Added `terraform` to `dotfiles/common/packages.nix` (line 34)
    - Added `terraform` to `platforms/common/packages/base.nix` (line 36)
@@ -37,12 +38,14 @@
    - All system assertions pass (except home-manager activation)
 
 ### In-Progress Work 🔄
+
 1. **System Application (0% Functional)**
    - `nh darwin switch` builds successfully but fails at activation step
    - Error occurs during Home Manager configuration activation
    - System generates new build but cannot apply to live environment
 
 ### Blocked Work ❌
+
 1. **Functional Testing (0% Complete)**
    - Cannot verify terraform installation in PATH due to activation failure
    - Cannot test terraform functionality (init, plan, apply) until switch succeeds
@@ -53,6 +56,7 @@
 ## Technical Details
 
 ### Architecture Modifications
+
 ```nix
 # 3 Configuration Files Modified:
 1. dotfiles/common/packages.nix
@@ -68,6 +72,7 @@
 ```
 
 ### Build Process Analysis
+
 ```
 Build Output Analysis:
  ✓ Terraform 1.14.1 detected in ADDED packages
@@ -78,6 +83,7 @@ Build Output Analysis:
 ```
 
 ### Critical Error Pattern
+
 ```
 Activation Failure Sequence:
 1. System builds successfully
@@ -93,9 +99,11 @@ Activation Failure Sequence:
 ## Blocker Analysis
 
 ### Primary Blocker: Home Manager File Conflicts
+
 **Issue:** Despite configuring `backupFileExtension = "backup"` in flake.nix, Home Manager fails to handle `.bashrc` and `.bash_profile` files.
 
 **Error Details:**
+
 ```
 Existing file '/Users/larsartmann/.bashrc' would be clobbered
 Existing file '/Users/larsartmann/.bash_profile' would be clobbered
@@ -104,6 +112,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 **Inconsistency:** Other files like `.config/btop/btop.conf` successfully backed up with `.backup` extension.
 
 ### Secondary Issues
+
 1. **Deprecated Path Configuration**: Warning about relative paths in `programs.zsh.dotDir`
 2. **Assertion Loop**: System gets stuck in "Applying system assertions..." for extended periods
 3. **NH Tool Limitations**: Provides minimal diagnostics for activation failures
@@ -113,16 +122,19 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 ## Risk Assessment
 
 ### High Risks 🔴
+
 1. **System Instability**: Incomplete activation may leave system in inconsistent state
 2. **Configuration Drift**: Manual workarounds could cause configuration inconsistency
 3. **Time Investment**: Debugging Home Manager issues could be time-consuming
 
 ### Medium Risks 🟡
+
 1. **Package Conflicts**: Terraform may conflict with existing IaC tools
 2. **Version Management**: No automatic terraform version management configured
 3. **Documentation Gap**: Current setup lacks terraform-specific documentation
 
 ### Low Risks 🟢
+
 1. **Security**: Terraform properly configured through Nix (no security risks)
 2. **Dependencies**: All terraform dependencies properly managed by Nix
 3. **Rollback**: System can be rolled back if issues persist
@@ -132,6 +144,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 ## Next Action Plans
 
 ### Immediate Actions (Next 24 Hours)
+
 1. **Fix Home Manager Configuration**
    - Investigate why backupFileExtension doesn't work for .bashrc/.bash_profile
    - Try alternative approaches: force=true or custom backup commands
@@ -143,6 +156,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
    - Document whichever method succeeds
 
 ### Short-term Actions (This Week)
+
 1. **Functional Validation**
    - Verify terraform installation: `which terraform`, `terraform --version`
    - Create test infrastructure: Basic AWS provider configuration
@@ -154,6 +168,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
    - Test terraform command discovery and PATH visibility
 
 ### Medium-term Actions (Next Sprint)
+
 1. **Enhanced Tooling**
    - Add tflint for terraform linting
    - Add tfsec for security scanning
@@ -169,16 +184,19 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 ## Resource Requirements
 
 ### Technical Resources Needed
+
 - Home Manager configuration expert or documentation
 - Nix-darwin troubleshooting experience
 - Shell configuration best practices knowledge
 
 ### Time Estimates
+
 - **Home Manager fix**: 2-4 hours (if straightforward), 1-2 days (if complex)
 - **Testing and validation**: 1 hour once activation succeeds
 - **Documentation**: 2-3 hours
 
 ### Risk Mitigation
+
 - Backup current shell configuration before attempting fixes
 - Document all changes for rollback purposes
 - Consider alternative installation methods if Home Manager proves problematic
@@ -188,6 +206,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 ## Success Metrics
 
 ### Definition of Done
+
 1. ✅ Terraform installed and version 1.14.1 confirmed
 2. ✅ Terraform available in PATH and accessible from shell
 3. ✅ `terraform init` succeeds with a basic provider configuration
@@ -195,6 +214,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 5. ✅ All existing functionality preserved
 
 ### Completion Criteria
+
 - terraform --version shows 1.14.1 in standard shell
 - terraform commands work without PATH or permission issues
 - Home Manager activation completes without manual intervention
@@ -214,6 +234,7 @@ Existing file '/Users/larsartmann/.bash_profile' would be clobbered
 ## Appendix
 
 ### A. Modified Files Hash Verification
+
 ```
 dotfiles/common/packages.nix:    SHA256 modified
 platforms/common/packages/base.nix: SHA256 modified
@@ -221,6 +242,7 @@ flake.nix:                       SHA256 modified
 ```
 
 ### B. Build Output Excerpts
+
 ```
 [ADDED] terraform 1.14.1
 [CHANGED] darwin-system 2511.7e22bf5 -> 2605.7e22bf5
@@ -228,6 +250,7 @@ Warning: larsartmann profile: Using relative paths in programs.zsh.dotDir is dep
 ```
 
 ### C. Error Log Snippets
+
 ```
 Existing file '/Users/larsartmann/.bashrc' would be clobbered
 Existing file '/Users/larsartmann/.bash_profile' would be clobbered

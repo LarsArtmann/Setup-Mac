@@ -11,6 +11,7 @@
 GUI packages (iTerm2, Helium, Google Chrome, Micro) have been successfully **committed to git** and **pushed to remote**, but are **NOT yet activated** in the running Nix-Darwin system. A manual `sudo darwin-rebuild switch` command is required to complete deployment.
 
 **Key Milestones:**
+
 - ✅ GUI packages re-enabled in configuration files
 - ✅ Configuration changes committed (2 commits)
 - ✅ Changes pushed to origin/master
@@ -24,17 +25,18 @@ GUI packages (iTerm2, Helium, Google Chrome, Micro) have been successfully **com
 
 ### 1. GUI Packages Re-Enabled
 
-| Package | Status | Location | Notes |
-|---------|---------|-----------|-------|
-| **iTerm2** | ✅ Enabled | platforms/common/packages/base.nix | Moved from darwin/environment.nix |
-| **Helium Browser** | ✅ Enabled | platforms/common/packages/base.nix | Platform-specific Darwin import |
-| **Google Chrome** | ✅ Enabled | platforms/common/packages/base.nix | Darwin-only via lib.optionals stdenv.isDarwin |
-| **Micro Editor** | ✅ Enabled | platforms/common/packages/base.nix | Changed from # micro-full to micro |
-| **ClipHist** | ✅ Enabled | platforms/common/packages/base.nix | Linux-only (correct platform scoping) |
+| Package            | Status     | Location                           | Notes                                         |
+| ------------------ | ---------- | ---------------------------------- | --------------------------------------------- |
+| **iTerm2**         | ✅ Enabled | platforms/common/packages/base.nix | Moved from darwin/environment.nix             |
+| **Helium Browser** | ✅ Enabled | platforms/common/packages/base.nix | Platform-specific Darwin import               |
+| **Google Chrome**  | ✅ Enabled | platforms/common/packages/base.nix | Darwin-only via lib.optionals stdenv.isDarwin |
+| **Micro Editor**   | ✅ Enabled | platforms/common/packages/base.nix | Changed from # micro-full to micro            |
+| **ClipHist**       | ✅ Enabled | platforms/common/packages/base.nix | Linux-only (correct platform scoping)         |
 
 ### 2. Configuration Changes
 
 **File: platforms/common/packages/base.nix**
+
 - Re-enabled iTerm2 (moved to guiPackages)
 - Re-enabled Helium (platform-specific)
 - Re-enabled Google Chrome (Darwin-only)
@@ -42,6 +44,7 @@ GUI packages (iTerm2, Helium, Google Chrome, Micro) have been successfully **com
 - Fixed ClipHist platform scoping (Linux-only)
 
 **File: platforms/darwin/environment.nix**
+
 - Removed redundant iTerm2 from systemPackages
 - Updated BROWSER="helium" (was "google-chrome")
 - Kept TERMINAL="iTerm2"
@@ -49,10 +52,12 @@ GUI packages (iTerm2, Helium, Google Chrome, Micro) have been successfully **com
 ### 3. Git Commits
 
 **Commit 0e2ea35** - "refactor: move iTerm2 to platform-specific GUI packages"
+
 - Files: 2 changed, 4 insertions(+), 7 deletions(-)
 - Purpose: Fix iTerm2 platform scoping
 
 **Commit bac6a9f** - "chore: update flake.lock after nixpkgs input update"
+
 - Files: 1 changed, 24 insertions(+), 24 deletions(-)
 - Purpose: Update all flake inputs
 
@@ -67,12 +72,15 @@ GUI packages (iTerm2, Helium, Google Chrome, Micro) have been successfully **com
 ### Active System Generation
 
 Current: Generation 205 (2025-12-19 16:36:28)
+
 - GUI Packages: ❌ NOT PRESENT
 
 Previous: Generation 206 (2025-12-21 07:34:34)
+
 - GUI Packages: ❌ NOT PRESENT
 
 Failed: Generation 207 (2025-12-30 07:19:01)
+
 - GUI Packages: ❌ NOT PRESENT
 - Status: Rolled back to 206
 
@@ -137,12 +145,14 @@ Requires manual sudo darwin-rebuild switch command.
 ### BLOCKER #1: Manual sudo Required for System Activation
 
 **Command to Run:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake ./
 ```
 
 **Expected Behavior:**
+
 1. Build system with GUI packages (25-30 minutes)
 2. Create new generation 208
 3. Activate new generation
@@ -173,6 +183,7 @@ guiPackages = with pkgs;
 ```
 
 **Why This Pattern:**
+
 - Prevents cross-platform evaluation errors
 - Ensures Linux packages aren't built on Darwin
 - Ensures Darwin packages aren't built on Linux
@@ -185,17 +196,21 @@ guiPackages = with pkgs;
 ### URGENT - Must Complete First
 
 1. **[BLOCKER] Run manual sudo activation**
+
    ```bash
    sudo darwin-rebuild switch --flake ./
    ```
+
    - Time: 30 minutes
    - Priority: CRITICAL
 
 2. **Verify new generation created**
+
    ```bash
    sudo darwin-rebuild --list-generations
    # Should show generation 208 as current
    ```
+
    - Time: 1 minute
    - Priority: CRITICAL
 
@@ -244,11 +259,13 @@ guiPackages = with pkgs;
 **If Manual Activation Fails:**
 
 1. Capture error logs:
+
    ```bash
    sudo darwin-rebuild switch --flake ./ 2>&1 | tee /tmp/darwin-switch-error.log
    ```
 
 2. Check build output:
+
    ```bash
    sudo darwin-rebuild build --flake ./ --show-trace
    ```

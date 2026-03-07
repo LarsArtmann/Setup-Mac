@@ -15,6 +15,7 @@ sudo darwin-rebuild switch --flake .
 ```
 
 **What this does:**
+
 - Downloads and builds all packages
 - Applies Home Manager configuration
 - Activates all programs and settings
@@ -40,6 +41,7 @@ just verify
 ```
 
 **What this checks:**
+
 - ✅ Starship prompt is working
 - ✅ Fish shell is configured
 - ✅ Fish aliases are available
@@ -53,6 +55,7 @@ just verify
 After deployment, verify these basics:
 
 ### Check Starship Prompt
+
 ```bash
 # Open new terminal
 # You should see:
@@ -62,6 +65,7 @@ After deployment, verify these basics:
 ```
 
 ### Check Fish Aliases
+
 ```bash
 # These should work:
 type nixup      # Should show: darwin-rebuild switch --flake .
@@ -72,6 +76,7 @@ type t           # Should show: tree -h -L 2 -C --dirsfirst
 ```
 
 ### Check Environment Variables
+
 ```bash
 echo $EDITOR     # Should show: micro
 echo $LANG       # Should show: en_GB.UTF-8
@@ -79,6 +84,7 @@ echo $LC_ALL     # Should show: en_GB.UTF-8
 ```
 
 ### Check Tmux
+
 ```bash
 tmux new-session
 # You should see:
@@ -98,6 +104,7 @@ tmux new-session
 **Problem:** Default Fish prompt instead of Starship
 
 **Solution:**
+
 ```bash
 # Restart shell
 exec fish
@@ -114,6 +121,7 @@ which starship
 **Problem:** `nixup` command not found
 
 **Solution:**
+
 ```bash
 # Reload Fish config
 source ~/.config/fish/config.fish
@@ -128,6 +136,7 @@ type nixup
 **Problem:** `EDITOR` or `LANG` not set
 
 **Solution:**
+
 ```bash
 # Check environment
 echo $EDITOR
@@ -142,6 +151,7 @@ exec fish
 **Problem:** Default Tmux config instead of custom
 
 **Solution:**
+
 ```bash
 # Check Tmux config
 cat ~/.config/tmux/tmux.conf
@@ -155,6 +165,7 @@ tmux kill-server && tmux new-session
 **Problem:** Deployment caused issues
 
 **Solution:**
+
 ```bash
 # Rollback to previous generation
 cd ~/projects/SystemNix
@@ -209,6 +220,7 @@ just list-generations
 ## ✅ Success Criteria
 
 Deployment is successful if:
+
 - ✅ Starship prompt appears (colorful with git branch)
 - ✅ Fish shell is active (`echo $SHELL` shows Fish)
 - ✅ Fish aliases work (`nixup`, `nixbuild`, `nixcheck`)

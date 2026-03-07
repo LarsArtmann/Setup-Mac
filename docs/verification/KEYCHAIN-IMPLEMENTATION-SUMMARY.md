@@ -12,12 +12,14 @@
 **File:** `platforms/darwin/security/keychain.nix`
 
 **Features:**
+
 - Automatic KeyChain security configuration on `just switch`
 - Locks KeyChain after 5 minutes of inactivity
 - Validates login keychain exists
 - Integrated into darwin configuration imports
 
 **How to Apply:**
+
 ```bash
 just switch  # Applies automatically on next rebuild
 ```
@@ -27,6 +29,7 @@ just switch  # Applies automatically on next rebuild
 **File:** `justfile` (lines 196-257)
 
 **Commands Added:**
+
 ```bash
 just keychain-help          # Show all available commands
 just keychain-list          # List all KeyChain items
@@ -43,6 +46,7 @@ just keychain-settings      # Configure KeyChain security settings
 **File:** `docs/guides/KEYCHAIN-BIOMETRIC-AUTHENTICATION.md`
 
 **Contents:**
+
 - Architecture explanation
 - Usage examples
 - Security best practices
@@ -59,12 +63,14 @@ just keychain-settings      # Configure KeyChain security settings
 **Limitation:** macOS KeyChain does not support system-wide Touch ID configuration
 
 **Why:**
+
 - Touch ID requirements are embedded in **individual KeyChain items**
 - Set via `kSecAttrAccessControl` when items are created
 - No plist files or defaults to control this globally
 - The setting is stored in the KeyChain database itself
 
 **Impact:**
+
 - Cannot make all existing items require Touch ID via nix-darwin
 - Each item must be configured individually
 - New items require Touch ID to be set during creation
@@ -73,6 +79,7 @@ just keychain-settings      # Configure KeyChain security settings
 ### Nix-Darwin Module Limitation
 
 **Why No Module Exists:**
+
 - KeyChain item management is outside nix-darwin's scope
 - Security framework requires programmatic access per-item
 - macOS prevents automated bulk biometric configuration
@@ -85,11 +92,13 @@ just keychain-settings      # Configure KeyChain security settings
 ### Touch ID for Sudo (Already Configured)
 
 **File:** `platforms/darwin/security/pam.nix`
+
 ```nix
 security.pam.services.sudo_local.touchIdAuth = true;
 ```
 
 **Status:** Active and functional
+
 - Touch ID for terminal `sudo` commands
 - Works in tmux sessions
 - Configured per nix-darwin best practices
@@ -97,6 +106,7 @@ security.pam.services.sudo_local.touchIdAuth = true;
 ### KeyChain Management (New Implementation)
 
 **Features:**
+
 1. **Add Passwords:** `just keychain-add account service password`
 2. **List Items:** `just keychain-list`
 3. **Check Status:** `just keychain-status`
@@ -104,6 +114,7 @@ security.pam.services.sudo_local.touchIdAuth = true;
 5. **Configure:** `just keychain-settings`
 
 **Security Settings:**
+
 - Automatic 5-minute lock timeout
 - Per-item Touch ID configuration (manual via Keychain Access)
 - Secure password storage with fallback
@@ -186,6 +197,7 @@ just keychain-unlock
 ### KeyChain Item Access Control
 
 **Per-Item Flags:**
+
 - `kSecAttrAccessControl`: Main access control attribute
 - `kSecAccessControlTouchIDAny`: Any enrolled fingerprint
 - `kSecAccessControlTouchIDCurrentSet`: Current fingerprints only
@@ -209,10 +221,12 @@ just keychain-unlock
 ## Files Modified/Created
 
 ### Created
+
 1. `platforms/darwin/security/keychain.nix` - Nix-darwin module
 2. `docs/guides/KEYCHAIN-BIOMETRIC-AUTHENTICATION.md` - Documentation
 
 ### Modified
+
 1. `platforms/darwin/default.nix` - Added keychain import
 2. `justfile` - Added 7 keychain management commands
 

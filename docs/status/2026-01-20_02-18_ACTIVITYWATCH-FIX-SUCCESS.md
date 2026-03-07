@@ -10,10 +10,12 @@
 ## 🎯 Executive Summary
 
 ActivityWatch was not reporting programs due to **TWO critical issues**:
+
 1. **Invalid LaunchAgent flag** - Using non-existent `--background` flag
 2. **Database lock contention** - SQLite database locked, preventing writes
 
 Both issues have been **completely resolved**:
+
 - ✅ LaunchAgent fixed (`--background` → `--no-gui`)
 - ✅ Database lock fixed (enabled WAL mode)
 - ✅ All watchers working and tracking programs
@@ -27,15 +29,18 @@ Both issues have been **completely resolved**:
 ### Issue #1: Invalid Command-Line Flag ❌ → ✅ FIXED
 
 **Problem:**
+
 - LaunchAgent was using `--background` flag which doesn't exist in `aw-qt`
 - Caused immediate startup failures
 - Thousands of error logs: `Error: No such option: --background`
 
 **Root Cause:**
+
 - `aw-qt` command changed over time, removed `--background` option
 - Valid flags: `--testing`, `--verbose`, `--no-gui`, `--interactive`
 
 **Fix Applied:**
+
 ```nix
 # File: platforms/darwin/services/launchagents.nix:26
 
@@ -47,6 +52,7 @@ Both issues have been **completely resolved**:
 ```
 
 **Verification:**
+
 ```bash
 just switch  # Applied Nix configuration
 # Result: ✅ LaunchAgent updated successfully
@@ -57,17 +63,20 @@ just switch  # Applied Nix configuration
 ### Issue #2: Database Lock Contention ❌ → ✅ FIXED
 
 **Problem:**
+
 - SQLite database locked when multiple watchers tried to write simultaneously
 - Error: `peewee.OperationalError: database is locked`
 - Watchers connected but couldn't save data
 - Web UI showed timeouts and "No events match selected criteria"
 
 **Root Cause:**
+
 - Multiple watchers (aw-watcher-window, aw-watcher-afk) writing concurrently
 - SQLite default journal mode doesn't handle concurrent writes well
 - Database locked, causing 500 errors and timeouts
 
 **Fix Applied:**
+
 ```bash
 # Enable Write-Ahead Logging (WAL) mode
 sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.db "PRAGMA journal_mode=WAL;"
@@ -76,12 +85,14 @@ sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.
 ```
 
 **Benefits of WAL Mode:**
+
 - Multiple readers + single writer can access simultaneously
 - Non-blocking writes
 - Better performance
 - Reduced lock contention
 
 **Verification:**
+
 ```bash
 # WAL files created
 -rw-r--r-- 1 larsartmann staff 364M Jan 20 02:15 peewee-sqlite.v2.db
@@ -94,17 +105,19 @@ sqlite3 ~/Library/Application\ Support/activitywatch/aw-server/peewee-sqlite.v2.
 ## 📊 Current Status - All Systems Go!
 
 ### Process Status ✅
+
 All 5 required processes running:
 
-| PID | Process | State | Parent | Status |
-|-----|---------|-------|--------|--------|
-| 36825 | aw-qt | S (sleeping) | launchd | ✅ Manager |
-| 36834 | aw-server | R (running) | aw-qt | ✅ API Server |
-| 36835 | aw-watcher-afk | S (sleeping) | aw-qt | ✅ AFK Tracker |
-| 36836 | aw-watcher-window | S (sleeping) | aw-qt | ✅ Window Tracker |
+| PID   | Process                 | State        | Parent            | Status              |
+| ----- | ----------------------- | ------------ | ----------------- | ------------------- |
+| 36825 | aw-qt                   | S (sleeping) | launchd           | ✅ Manager          |
+| 36834 | aw-server               | R (running)  | aw-qt             | ✅ API Server       |
+| 36835 | aw-watcher-afk          | S (sleeping) | aw-qt             | ✅ AFK Tracker      |
+| 36836 | aw-watcher-window       | S (sleeping) | aw-qt             | ✅ Window Tracker   |
 | 36856 | aw-watcher-window-macos | S (sleeping) | aw-watcher-window | ✅ Swift Subprocess |
 
 ### Network Status ✅
+
 - **Port 5600:** ✅ LISTENING
 - **Server:** `aw-server` (Flask development server)
 - **Connections:** 9 active connections (watchers + web UI + browser)
@@ -120,6 +133,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ```
 
 ### Database Status ✅
+
 - **File:** `~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`
 - **Size:** 364 MB
 - **WAL Mode:** ✅ Enabled
@@ -129,12 +143,15 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 - **Status:** ✅ Actively updating, no lock errors
 
 ### Log Status ✅
+
 **Stdout:** `~/.local/share/activitywatch/stdout.log` (52 bytes)
+
 ```
 * Debug mode: off
 ```
 
 **Stderr:** `~/.local/share/activitywatch/stderr.log` (107,943 lines, growing)
+
 ```
 2026-01-20 02:15:23 [INFO ]: aw-watcher-window started
 2026-01-20 02:15:27 [INFO ]: aw-watcher-afk started
@@ -144,12 +161,14 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ```
 
 **Key Observations:**
+
 - ✅ No "database is locked" errors (previously constant)
 - ✅ Watchers started successfully
 - ✅ Events being inserted regularly
 - ✅ Different applications detected (aw-watcher-window, aw-watcher-web-chrome)
 
 ### Web UI Status ✅
+
 - **URL:** `http://localhost:5600`
 - **Status:** ✅ Accessible
 - **Last Update:** Shows recent updates (previously "Loading..." timeout)
@@ -164,6 +183,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 🔍 Verification Results
 
 ### Before Fix (Broken)
+
 ```
 ❌ LaunchAgent: Invalid --background flag
 ❌ aw-qt: Failed to start (hundreds of error logs)
@@ -175,6 +195,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ```
 
 ### After Fix (Working)
+
 ```
 ✅ LaunchAgent: Correct --no-gui flag
 ✅ aw-qt: Started successfully
@@ -190,6 +211,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 📝 Actions Taken
 
 ### Step 1: Investigation
+
 - [x] Read LaunchAgent configuration
 - [x] Check ActivityWatch logs
 - [x] Verify process status
@@ -197,24 +219,28 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 - [x] Identify invalid flag issue
 
 ### Step 2: Configuration Fix
+
 - [x] Edit `platforms/darwin/services/launchagents.nix`
 - [x] Change `--background` → `--no-gui`
 - [x] Run `just switch` to apply configuration
 - [x] Verify LaunchAgent plist updated
 
 ### Step 3: Database Investigation
+
 - [x] Check database lock errors in logs
 - [x] Identify SQLite contention issue
 - [x] Verify all watchers trying to write simultaneously
 - [x] Confirm database not updating
 
 ### Step 4: Database Fix
+
 - [x] Stop all ActivityWatch processes
 - [x] Enable WAL mode on SQLite database
 - [x] Verify WAL mode enabled
 - [x] Restart ActivityWatch service
 
 ### Step 5: Verification
+
 - [x] Verify all processes running
 - [x] Check aw-server listening on port 5600
 - [x] Confirm watchers connected successfully
@@ -246,24 +272,27 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 📊 Performance Metrics
 
 ### Log File Analysis
-| Metric | Before Fix | After Fix | Improvement |
-|--------|-------------|------------|-------------|
-| Error lines | 97,000+ | 0 | 100% reduction |
-| Database lock errors | Hundreds | 0 | 100% reduction |
-| Successful event inserts | 0 | Continual | ✅ Working |
-| Log growth rate | 97K/3 days | ~11K/20 min | Healthy |
-| Database updates | None | Active | ✅ Working |
+
+| Metric                   | Before Fix | After Fix   | Improvement    |
+| ------------------------ | ---------- | ----------- | -------------- |
+| Error lines              | 97,000+    | 0           | 100% reduction |
+| Database lock errors     | Hundreds   | 0           | 100% reduction |
+| Successful event inserts | 0          | Continual   | ✅ Working     |
+| Log growth rate          | 97K/3 days | ~11K/20 min | Healthy        |
+| Database updates         | None       | Active      | ✅ Working     |
 
 ### Resource Usage
-| Process | CPU% | Memory | State | Status |
-|---------|------|--------|-------|--------|
-| aw-server | 38% | 48 MB | R | ✅ Healthy |
-| aw-watcher-afk | 0.9% | 32 MB | S | ✅ Healthy |
-| aw-watcher-window | 0.1% | 12 MB | S | ✅ Healthy |
-| aw-watcher-window-macos | 0.4% | 12 MB | S | ✅ Healthy |
-| aw-qt | 0.0% | 32 MB | S | ✅ Healthy |
+
+| Process                 | CPU% | Memory | State | Status     |
+| ----------------------- | ---- | ------ | ----- | ---------- |
+| aw-server               | 38%  | 48 MB  | R     | ✅ Healthy |
+| aw-watcher-afk          | 0.9% | 32 MB  | S     | ✅ Healthy |
+| aw-watcher-window       | 0.1% | 12 MB  | S     | ✅ Healthy |
+| aw-watcher-window-macos | 0.4% | 12 MB  | S     | ✅ Healthy |
+| aw-qt                   | 0.0% | 32 MB  | S     | ✅ Healthy |
 
 ### Database Activity
+
 - **WAL file size:** 524 KB (actively growing)
 - **Write rate:** ~25 KB/min (estimated)
 - **Lock errors:** 0 (down from constant)
@@ -274,12 +303,14 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 💡 Technical Learnings
 
 ### SQLite WAL Mode Benefits
+
 1. **Concurrency:** Multiple readers + single writer
 2. **Performance:** Faster reads/writes
 3. **Reliability:** Less prone to corruption
 4. **Lock Reduction:** Minimal lock contention
 
 ### ActivityWatch Architecture
+
 1. **aw-qt:** Manager process (launches watchers)
 2. **aw-server:** Flask API server (receives and stores events)
 3. **aw-watcher-window:** Tracks window/app usage (Swift strategy)
@@ -288,6 +319,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 6. **Storage:** SQLite database with Peewee ORM
 
 ### macOS Permission Requirements
+
 - **Accessibility:** Required for window watching
 - **Screen Recording:** May be required for full functionality
 - **Note:** Not blocking in this case (watchers are working)
@@ -297,6 +329,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 🚀 Recommendations
 
 ### Immediate (Already Done) ✅
+
 1. [x] Fix LaunchAgent flag issue
 2. [x] Enable WAL mode on database
 3. [x] Verify tracking works
@@ -310,6 +343,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
    - Prevent future lock issues
 
 2. **Add Health Check Command**
+
    ```bash
    # Create: just activitywatch-health
    # Check: process status, port listening, database updating, API responding
@@ -327,6 +361,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
    - Notify if database not updating
 
 5. **Create Test Workflow**
+
    ```bash
    # Create: just activitywatch-test
    # Test: program detection, AFK detection, API endpoints
@@ -343,10 +378,12 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 ## 📁 Files Modified
 
 ### Nix Configuration
+
 - **`platforms/darwin/services/launchagents.nix`**
   - Line 26: Changed `--background` → `--no-gui`
 
 ### Database
+
 - **`~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`**
   - Enabled WAL mode: `PRAGMA journal_mode=WAL`
   - Created WAL files:
@@ -354,6 +391,7 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
     - `peewee-sqlite.v2.db-wal` (524 KB)
 
 ### Logs
+
 - **`~/.local/share/activitywatch/stderr.log`**
   - Status: Clean, no lock errors
   - Growth: Healthy (events being logged)
@@ -366,10 +404,12 @@ aw-server 36834 larsartmann   15u  IPv4 ... TCP localhost:esmmanager->localhost:
 **Status:** ✅ **FULLY RESOLVED**
 
 ActivityWatch was completely broken due to two issues:
+
 1. Invalid LaunchAgent flag preventing startup
 2. Database lock contention preventing data storage
 
 Both issues have been fixed:
+
 - ✅ LaunchAgent now uses correct `--no-gui` flag
 - ✅ Database WAL mode enabled, eliminating lock contention
 - ✅ All watchers working and tracking programs

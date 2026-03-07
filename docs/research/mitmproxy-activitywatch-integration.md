@@ -18,28 +18,32 @@ mitmproxy is a free, open-source interactive HTTPS proxy that intercepts, inspec
 
 ### Key Features
 
-| Feature | Description |
-|---------|-------------|
-| **Protocol Support** | HTTP/1, HTTP/2, HTTP/3, WebSockets, SSL/TLS, TCP/UDP/QUIC, DNS |
-| **Interfaces** | `mitmproxy` (terminal), `mitmweb` (web UI), `mitmdump` (CLI) |
-| **Traffic Manipulation** | Modify headers, bodies, blocklist, map local/remote |
-| **Replay** | Client/server-side replay of HTTP conversations |
-| **Automation** | Python addon system with event hooks |
+| Feature                  | Description                                                    |
+| ------------------------ | -------------------------------------------------------------- |
+| **Protocol Support**     | HTTP/1, HTTP/2, HTTP/3, WebSockets, SSL/TLS, TCP/UDP/QUIC, DNS |
+| **Interfaces**           | `mitmproxy` (terminal), `mitmweb` (web UI), `mitmdump` (CLI)   |
+| **Traffic Manipulation** | Modify headers, bodies, blocklist, map local/remote            |
+| **Replay**               | Client/server-side replay of HTTP conversations                |
+| **Automation**           | Python addon system with event hooks                           |
 
 ### Extension Mechanism
 
 mitmproxy provides a powerful addon system with event hooks:
 
 **Lifecycle Events:**
+
 - `load()`, `running()`, `configure()`, `done()`
 
 **Connection Events:**
+
 - `client_connected/disconnected()`, `server_connect/connected/disconnected()`
 
 **HTTP Events:**
+
 - `requestheaders()`, `request()`, `responseheaders()`, `response()`, `error()`
 
 **Protocol Events:**
+
 - WebSocket, TCP, UDP, DNS, TLS handshake events
 
 ---
@@ -54,15 +58,15 @@ mitmproxy provides a powerful addon system with event hooks:
 
 Two network-related watchers exist, but neither tracks detailed web traffic:
 
-| Project | Description | Limitation |
-|---------|-------------|------------|
+| Project                                                                       | Description                                | Limitation      |
+| ----------------------------------------------------------------------------- | ------------------------------------------ | --------------- |
 | [aw-watcher-netstatus](https://github.com/sameersismail/aw-watcher-netstatus) | Network connection status (online/offline) | No URL tracking |
-| [aw-watcher-network-rs](https://github.com/0xbrayo/aw-watcher-network-rs) | Network connectivity and Wi-Fi scanning | No URL tracking |
+| [aw-watcher-network-rs](https://github.com/0xbrayo/aw-watcher-network-rs)     | Network connectivity and Wi-Fi scanning    | No URL tracking |
 
 ### References
 
 - [ActivityWatch awesome list](https://github.com/ActivityWatch/awesome-activitywatch)
-- [ActivityWatch proxy issue #360](https://github.com/ActivityWatch/activitywatch/issues/360) - Using AW *behind* proxies, not for tracking
+- [ActivityWatch proxy issue #360](https://github.com/ActivityWatch/activitywatch/issues/360) - Using AW _behind_ proxies, not for tracking
 - [LibHunt comparison](https://www.libhunt.com/compare-activitywatch-vs-mitmproxy) - Tool comparison only
 - [mitmproxy traffic logging discussion #6844](https://github.com/mitmproxy/mitmproxy/discussions/6844) - Logging to CSV/text
 
@@ -72,26 +76,26 @@ Two network-related watchers exist, but neither tracks detailed web traffic:
 
 ### Unique Capabilities
 
-| Benefit | Description |
-|---------|-------------|
-| **Protocol-level tracking** | Capture URLs that browser extensions miss (apps, background requests, electron apps) |
-| **Cross-browser unification** | Single watcher for Chrome, Firefox, Safari, Edge - no per-browser extensions |
-| **App traffic visibility** | Track requests from Slack, Discord, Spotify, VS Code, mobile devices |
-| **Full request metadata** | HTTP method, headers, response codes, timing, payload sizes |
-| **Privacy auditing** | See exactly what data apps send to servers |
-| **No fingerprinting bypass** | Works regardless of browser privacy settings/incognito mode |
-| **Device-wide coverage** | Any device configured to use the proxy (phones, tablets, IoT) |
+| Benefit                       | Description                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------ |
+| **Protocol-level tracking**   | Capture URLs that browser extensions miss (apps, background requests, electron apps) |
+| **Cross-browser unification** | Single watcher for Chrome, Firefox, Safari, Edge - no per-browser extensions         |
+| **App traffic visibility**    | Track requests from Slack, Discord, Spotify, VS Code, mobile devices                 |
+| **Full request metadata**     | HTTP method, headers, response codes, timing, payload sizes                          |
+| **Privacy auditing**          | See exactly what data apps send to servers                                           |
+| **No fingerprinting bypass**  | Works regardless of browser privacy settings/incognito mode                          |
+| **Device-wide coverage**      | Any device configured to use the proxy (phones, tablets, IoT)                        |
 
 ### Comparison with Browser Extensions
 
-| Aspect | Browser Extension | mitmproxy Integration |
-|--------|-------------------|----------------------|
-| Browser support | Per-browser install | All browsers via proxy |
-| Incognito/Private | Often disabled | Full coverage |
-| Desktop apps | No coverage | Full coverage |
-| Mobile devices | Limited | Full coverage (proxy config) |
-| Protocol depth | Limited API | Full HTTP/HTTPS inspection |
-| Setup complexity | Simple | Certificate trust required |
+| Aspect            | Browser Extension   | mitmproxy Integration        |
+| ----------------- | ------------------- | ---------------------------- |
+| Browser support   | Per-browser install | All browsers via proxy       |
+| Incognito/Private | Often disabled      | Full coverage                |
+| Desktop apps      | No coverage         | Full coverage                |
+| Mobile devices    | Limited             | Full coverage (proxy config) |
+| Protocol depth    | Limited API         | Full HTTP/HTTPS inspection   |
+| Setup complexity  | Simple              | Certificate trust required   |
 
 ---
 
@@ -379,33 +383,36 @@ mitmdump -s ~/.mitmproxy/aw-watcher.py
 
 ## Challenges and Mitigations
 
-| Challenge | Mitigation |
-|-----------|------------|
-| **HTTPS requires cert trust** | Install mitmproxy CA cert in system/browser keychain |
-| **High event volume** | Aggregate by host, debounce rapid requests, filter noise |
-| **Identifying "active use"** | Correlate with `aw-watcher-window` events |
-| **Mobile devices** | Configure device WiFi proxy to point to mitmproxy host |
-| **Performance overhead** | Use async requests, batch events, run on capable hardware |
-| **Privacy concerns** | Local-only, filter sensitive URLs, no external transmission |
-| **TLS 1.3 / Certificate Pinning** | Some apps may fail; fallback to SNI-based logging only |
+| Challenge                         | Mitigation                                                  |
+| --------------------------------- | ----------------------------------------------------------- |
+| **HTTPS requires cert trust**     | Install mitmproxy CA cert in system/browser keychain        |
+| **High event volume**             | Aggregate by host, debounce rapid requests, filter noise    |
+| **Identifying "active use"**      | Correlate with `aw-watcher-window` events                   |
+| **Mobile devices**                | Configure device WiFi proxy to point to mitmproxy host      |
+| **Performance overhead**          | Use async requests, batch events, run on capable hardware   |
+| **Privacy concerns**              | Local-only, filter sensitive URLs, no external transmission |
+| **TLS 1.3 / Certificate Pinning** | Some apps may fail; fallback to SNI-based logging only      |
 
 ---
 
 ## Future Enhancements
 
 ### Short Term
+
 - [ ] Aggregate requests by host/session
 - [ ] Correlate with active window watcher
 - [ ] Add category detection (work/social/entertainment)
 - [ ] Filter list configuration
 
 ### Medium Term
+
 - [ ] Web UI for configuration
 - [ ] Real-time dashboard
 - [ ] Export to other time tracking tools
 - [ ] Mobile device auto-discovery
 
 ### Long Term
+
 - [ ] ML-based activity categorization
 - [ ] Productivity scoring
 - [ ] Privacy report generation
@@ -439,4 +446,4 @@ A mitmproxy addon for ActivityWatch would provide unique protocol-level insights
 
 ---
 
-*Document created: 2026-02-27*
+_Document created: 2026-02-27_

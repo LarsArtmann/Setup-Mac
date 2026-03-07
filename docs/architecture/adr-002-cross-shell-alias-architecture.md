@@ -18,6 +18,7 @@ confusion and inconsistent behavior across shells. The original architecture had
 - ❌ NixOS duplication: Fish aliases duplicated in home.nix
 
 **User Impact:**
+
 - `l` alias works in Fish
 - `l` alias works in Zsh
 - `l` alias doesn't work in Bash (not configured)
@@ -25,6 +26,7 @@ confusion and inconsistent behavior across shells. The original architecture had
 - Manual Nix duplication required for changes
 
 **Root Cause:**
+
 - Home Manager's `shellAliases` option is shell-specific
 - No "shared aliases" option exists in Home Manager
 - Defining aliases requires Nix code duplication
@@ -109,15 +111,18 @@ programs.fish.shellAliases = lib.mkAfter {
 **Multi-Shell Tool: Home Manager's `shellAliases`**
 
 We ARE using a multi-shell alias tool:
+
 - **Carapace:** Multi-shell completion (Fish, Zsh, Bash, PowerShell, etc.)
 - **Starship:** Multi-shell prompt (Fish, Zsh, Bash, PowerShell, etc.)
 - **Home Manager:** Multi-shell alias management (Fish, Zsh, Bash)
 
 **Why Not "Using Properly":**
+
 - ❌ Nix code duplication (Fish, Zsh, Bash define same aliases 3x)
 - ❌ Single source of truth not enforced (manual discipline required)
 
 **Solution:**
+
 - ✅ Define aliases once in Nix (`shell-aliases.nix`)
 - ✅ Import and use in all shells (Fish, Zsh, Bash)
 - ✅ No Nix duplication (single source of truth)
@@ -180,6 +185,7 @@ grep "alias l=" ~/.bashrc
 ## Consequences
 
 **Positive:**
+
 - ✅ No Nix code duplication (define once, use everywhere)
 - ✅ Single source of truth for common aliases
 - ✅ Platform-specific overrides cleanly separated
@@ -189,14 +195,16 @@ grep "alias l=" ~/.bashrc
 - ✅ Matches multi-shell tool pattern (Carapace, Starship)
 
 **Negative:**
-- ⚠️  Requires maintaining multiple shell config files
-- ⚠️  Platform-specific files need updates per platform
-- ⚠️  Interactive vs non-interactive shell behavior differences
+
+- ⚠️ Requires maintaining multiple shell config files
+- ⚠️ Platform-specific files need updates per platform
+- ⚠️ Interactive vs non-interactive shell behavior differences
 
 **Neutral:**
-- ℹ️  Home Manager's `shellAliases` IS the multi-shell alias tool
-- ℹ️  No standard shared-alias tool exists (shell syntax incompatible)
-- ℹ️  Manual .aliases file pattern possible but not declarative
+
+- ℹ️ Home Manager's `shellAliases` IS the multi-shell alias tool
+- ℹ️ No standard shared-alias tool exists (shell syntax incompatible)
+- ℹ️ Manual .aliases file pattern possible but not declarative
 
 ---
 
@@ -255,6 +263,7 @@ grep "alias l=" ~/.bashrc
    - **Verdict:** Already using correctly!
 
 **Conclusion:**
+
 - Home Manager's `shellAliases` IS the multi-shell alias tool
 - We're now using it properly (no Nix duplication)
 - No external tool needed for better solution
@@ -264,6 +273,7 @@ grep "alias l=" ~/.bashrc
 **Status:** Not Implemented
 
 **Requirements:**
+
 - Shell config validation tests
 - Alias definition verification
 - Interactive shell testing automation
@@ -276,9 +286,11 @@ grep "alias l=" ~/.bashrc
 ## Alternatives Considered
 
 ### Alternative 1: Single Shell Config File (Option A)
+
 Define all shell configs in one file (Fish, Zsh, Bash together).
 
 **Rejected:**
+
 - ❌ Larger file (hard to navigate)
 - ❌ Mixed configs (Fish, Zsh, Bash all together)
 - ❌ Breaks modular pattern
@@ -286,27 +298,33 @@ Define all shell configs in one file (Fish, Zsh, Bash together).
 - ❌ Doesn't scale well
 
 ### Alternative 2: Shell-Specific Common Aliases (Option C)
+
 Keep current structure but accept Nix duplication.
 
 **Rejected:**
+
 - ❌ Nix code duplication (Fish, Zsh, Bash each define l, t)
 - ❌ Maintenance risk (change requires 3 files)
 - ❌ Error-prone (easy to forget one shell)
 - ❌ Violates DRY principle
 
 ### Alternative 3: Manual .aliases File
+
 Create manual `.aliases` file sourced by all shells.
 
 **Rejected:**
+
 - ❌ Not declarative (manual file management)
 - ❌ Fish incompatibility (different alias syntax)
 - ❌ Not reproducible (requires manual setup)
 - ❌ Doesn't work with Nix/Home Manager
 
 ### Alternative 4: Import Pattern (SELECTED ✅)
+
 Define aliases once in Nix, import and use in all shells.
 
 **Accepted:**
+
 - ✅ Single source of truth (no duplication)
 - ✅ Declarative (Nix-based)
 - ✅ Reproducible (automatic translation)
@@ -328,6 +346,7 @@ Does Home Manager's `lib.mkAfter` pattern work identically for all shell options
 
 **Answer:**
 YES - `lib.mkAfter` works identically for all shell configuration options:
+
 - Fish: `interactiveShellInit` + `shellAliases`
 - Zsh: `initContent` + `shellAliases`
 - Bash: `initExtra` + `shellAliases`
@@ -335,6 +354,7 @@ YES - `lib.mkAfter` works identically for all shell configuration options:
 All options use the same `lib.mkAfter` mechanism for merging configs.
 
 **Verification:**
+
 - ✅ Tested with Fish (works)
 - ✅ Tested with Zsh (works)
 - ⏳ Tested with Bash (pending)
@@ -347,13 +367,14 @@ All options use the same `lib.mkAfter` mechanism for merging configs.
 
 **Root Cause: Shell Alias Syntax Incompatibility**
 
-| Shell | Alias Syntax | What It Actually Creates |
-|--------|--------------|------------------------|
-| **Zsh** | `alias l='ls -laSh'` | Real alias |
-| **Bash** | `alias l='ls -laSh'` | Real alias |
+| Shell    | Alias Syntax         | What It Actually Creates |
+| -------- | -------------------- | ------------------------ |
+| **Zsh**  | `alias l='ls -laSh'` | Real alias               |
+| **Bash** | `alias l='ls -laSh'` | Real alias               |
 | **Fish** | `alias l 'ls -laSh'` | **FUNCTION** (not alias) |
 
 **Impact:**
+
 - Fish's `alias` creates a Fish function, not a real alias
 - Zsh/Bash create actual aliases
 - The syntax and behavior are **fundamentally different**
@@ -380,16 +401,19 @@ source ~/.aliases  # Error: Fish doesn't understand Bash alias syntax
 ### Multi-Shell Tools We ARE Using
 
 **1. Carapace** ✅ (Multi-Shell Completion)
+
 - Supports: Fish, Zsh, Bash, PowerShell, Ion, Elvish, Nu
 - Purpose: Universal completion engine (1000+ commands)
 - **Status:** Using ✅
 
 **2. Starship** ✅ (Multi-Shell Prompt)
+
 - Supports: Fish, Zsh, Bash, PowerShell, Ion, Tcsh, Nu, Elvish
 - Purpose: Beautiful cross-shell prompt
 - **Status:** Using ✅
 
 **3. Home Manager's `shellAliases`** ✅ (Multi-Shell Alias Management)
+
 - Supports: Fish, Zsh, Bash
 - Purpose: Declarative alias management
 - Translates Nix config to shell-specific syntax
@@ -410,24 +434,28 @@ alias gl='git log --oneline --graph --decorate --all'
 ```
 
 **Source in .zshrc:**
+
 ```bash
 # ~/.zshrc
 source ~/.aliases  # Works ✅
 ```
 
 **Source in .bashrc:**
+
 ```bash
 # ~/.bashrc
 source ~/.bashrc  # Sources ~/.aliases ✅
 ```
 
 **Source in Fish config.fish:**
+
 ```fish
 # ~/.config/fish/config.fish
 source ~/.aliases  # FAILS ❌ (incompatible syntax)
 ```
 
 **Fish Workaround:**
+
 ```fish
 # ~/.config/fish/conf.d/aliases.fish
 set -g l (ls -laSh)  # Works ✅
@@ -435,6 +463,7 @@ set -g t (tree -h -L 2 -C --dirsfirst)  # Works ✅
 ```
 
 **Why Not Using:**
+
 - ❌ Not declarative (manual file management)
 - ❌ Doesn't work with Nix/Home Manager
 - ❌ Fish workaround required (different syntax)
@@ -447,12 +476,13 @@ set -g t (tree -h -L 2 -C --dirsfirst)  # Works ✅
 **Date:** 2026-01-12
 **Decision:** Implement shared alias architecture using Nix import pattern
 **Rationale:**
+
 - Eliminates Nix code duplication
 - Provides single source of truth
 - Declarative and reproducible
 - Works with Home Manager's `shellAliases`
 - Platform-specific overrides via `lib.mkAfter`
-**Implemented:**
+  **Implemented:**
 - ✅ Shared aliases module (`shell-aliases.nix`)
 - ✅ Fish config with shared imports
 - ✅ Zsh config with shared imports
@@ -466,4 +496,4 @@ set -g t (tree -h -L 2 -C --dirsfirst)  # Works ✅
 
 ---
 
-*ADR Updated: 2026-01-12 (v2 - Implementation Complete)*
+_ADR Updated: 2026-01-12 (v2 - Implementation Complete)_

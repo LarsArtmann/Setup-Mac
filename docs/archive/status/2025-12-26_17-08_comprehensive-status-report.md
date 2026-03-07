@@ -1,4 +1,5 @@
 # Setup-Mac Comprehensive Status Report
+
 **Date**: 2025-12-26
 **Time**: 17:08
 **Status**: STABLE & PRODUCTION-READY
@@ -245,6 +246,7 @@ Setup-Mac is a **sophisticated, type-safe, cross-platform Nix configuration syst
 - ⚠️ **No cross-platform testing** (only mentioned for NixOS)
 
 **What's Missing**:
+
 - Multiple wallpaper support (not just btop)
 - Automatic rotation based on time/day
 - Cross-platform implementation for macOS
@@ -267,6 +269,7 @@ Setup-Mac is a **sophisticated, type-safe, cross-platform Nix configuration syst
 - ⚠️ **Untested** (Hyprland is actively used)
 
 **What's Missing**:
+
 - Documentation for switching WMs
 - Per-WM configuration conflicts resolution
 - Shared dotfiles management (i3.conf, etc.)
@@ -288,6 +291,7 @@ Setup-Mac is a **sophisticated, type-safe, cross-platform Nix configuration syst
 - ❌ **No actual wrappers deployed**
 
 **What's Missing**:
+
 - Concrete wrapper implementations (bat, starship, fish, etc. were all deleted)
 - Documentation on how to create new wrappers
 - Use cases for when wrappers are needed
@@ -310,6 +314,7 @@ The `platforms/common/wrappers/` directory contained 1,095 lines of **unreachabl
 - ❌ **No networking configuration**
 
 **What's Missing**:
+
 - macOS-specific networking settings
 - Proxy configuration
 - Network interface configuration
@@ -317,6 +322,7 @@ The `platforms/common/wrappers/` directory contained 1,095 lines of **unreachabl
 - Any actual networking logic
 
 **File Content**:
+
 ```nix
 # Darwin-specific networking configuration
 # TODO: Add any Darwin-specific networking settings here
@@ -335,6 +341,7 @@ The `platforms/common/wrappers/` directory contained 1,095 lines of **unreachabl
 - ❌ **Completely empty file**
 
 **What's Missing**:
+
 - Any Hyprland system-level configuration
 - Could contain: system services, systemd units, user groups, kernel params
 
@@ -354,12 +361,14 @@ Imported in main configuration but contains no content. May have been planned fo
 - ⚠️ **Comment says "below looks sus!"**
 
 **What's Concerning**:
+
 - All system checks are disabled with `mkForce`
 - No explanation of why they're disabled
 - No documentation of what checks were disabled
 - This could hide configuration errors
 
 **Code Context**:
+
 ```nix
 # TODO: below looks sus!
 checks = lib.mkForce {}
@@ -384,6 +393,7 @@ checks = lib.mkForce {}
 - ⚠️ **Wrapper system undocumented** (even though core exists)
 
 **What's Missing**:
+
 - Comprehensive README.md (how to use this)
 - Architecture diagram (import chain)
 - Module reference (what each file does)
@@ -405,11 +415,13 @@ checks = lib.mkForce {}
 - ⚠️ **Commented code still present** in some files
 
 **Examples**:
+
 - `hyprland.nix`: Many tools commented as "moved to other modules"
 - `multi-wm.nix`: pavucontrol, waybar commented as moved
 - `monitoring.nix`: btop commented as moved to base.nix
 
 **What's Missing**:
+
 - Complete cleanup of commented packages
 - Consistency across all files
 - Verification that all comments are accurate
@@ -432,6 +444,7 @@ checks = lib.mkForce {}
 - ⚠️ **Many test scripts broken** (wrapper tests deleted)
 
 **What's Missing**:
+
 - Automated integration test suite
 - Platform-specific testing (macOS vs NixOS)
 - Performance regression tests
@@ -453,6 +466,7 @@ checks = lib.mkForce {}
 - ⚠️ **Overkill** for Nix configuration system?
 
 **What's Concerning**:
+
 - 6 error modules but not referenced anywhere in main configs
 - Complex but potentially unused
 - Could be over-engineered for this use case
@@ -468,6 +482,7 @@ checks = lib.mkForce {}
 **Status**: Basic system exists, enhancements not planned
 
 **What Should Be Done**:
+
 - Multiple wallpaper support (not just btop)
 - Time-based rotation (morning, afternoon, evening, night)
 - Day-based rotation (workday, weekend)
@@ -486,6 +501,7 @@ checks = lib.mkForce {}
 **Status**: 4 WMs configured but not integrated
 
 **What Should Be Done**:
+
 - Create WM switching mechanism (script + keybinding)
 - Resolve keybinding conflicts between WMs
 - Document how to use each WM
@@ -503,6 +519,7 @@ checks = lib.mkForce {}
 **Status**: Core system ready, no applications
 
 **What Should Be Done**:
+
 - Decide: Do we even need wrapper applications?
 - If yes: Create concrete wrapper implementations
   - bat with gruvbox theme wrapper
@@ -522,6 +539,7 @@ checks = lib.mkForce {}
 **Status**: Placeholder file, no configuration
 
 **What Should Be Done**:
+
 - Add macOS-specific networking settings
 - Proxy configuration (if needed)
 - DNS settings (if needed)
@@ -537,6 +555,7 @@ checks = lib.mkForce {}
 **Status**: AGENTS.md exists, but no README or architecture docs
 
 **What Should Be Done**:
+
 - Create comprehensive `README.md`
   - What is Setup-Mac?
   - Quick start guide
@@ -566,6 +585,7 @@ checks = lib.mkForce {}
 **Status**: Manual testing only
 
 **What Should Be Done**:
+
 - Create integration test suite
 - Test all import chains
 - Test platform-specific configs
@@ -583,6 +603,7 @@ checks = lib.mkForce {}
 **Status**: Manual benchmarks only
 
 **What Should Be Done**:
+
 - Create automated performance tests
 - Track shell startup time
 - Track configuration build time
@@ -600,6 +621,7 @@ checks = lib.mkForce {}
 **Status**: Comments say "moved", not verified
 
 **What Should Be Done**:
+
 - Verify all "moved" comments are accurate
 - Remove all commented package code
 - Ensure consistency across all files
@@ -615,6 +637,7 @@ checks = lib.mkForce {}
 **Status**: Checks disabled, reason unknown
 
 **What Should Be Done**:
+
 - Investigate why checks were disabled
 - Document what checks were disabled
 - Fix underlying issues (if any)
@@ -630,6 +653,7 @@ checks = lib.mkForce {}
 **Status**: Empty file imported in config
 
 **What Should Be Done**:
+
 - Implement system-level Hyprland configuration
   - System services
   - Systemd units
@@ -648,6 +672,7 @@ checks = lib.mkForce {}
 **File**: `platforms/darwin/test-darwin.nix`
 
 **What's Wrong**:
+
 - This is a **temporary test file** that was never cleaned up
 - Explicitly marked with TODO: "very much not a fan of this file at all! It should be all moved into: other config files and then deleted."
 - **Contains 1,200+ lines** of test configuration
@@ -655,12 +680,14 @@ checks = lib.mkForce {}
 - Violates clean architecture principles
 
 **Why It's Fucked**:
+
 - Been sitting in codebase for who knows how long
 - Explicitly marked for deletion but never deleted
 - Clutters the directory structure
 - Confuses the purpose of the configuration system
 
 **What Should Happen**:
+
 - **IMMEDIATELY DELETE THIS FILE**
 - Move any useful test configs to their proper locations
 - Document why tests were needed (if at all)
@@ -672,22 +699,26 @@ checks = lib.mkForce {}
 ### 2. Empty Placeholder Files 🚨 ARCHITECTURE SMELL
 
 **Files**:
+
 - `platforms/darwin/networking/default.nix` - Only TODO comment
 - `platforms/nixos/desktop/hyprland-system.nix` - Completely empty
 
 **What's Wrong**:
+
 - **Imported in main configs** but contain nothing
 - Violates "YAGNI" (You Aren't Gonna Need It) principle
 - Creates false expectations about functionality
 - Should either be implemented or removed
 
 **Why It's Fucked**:
+
 - Placeholder files become permanent fixtures
 - Never get implemented, just sit there
 - Waste time looking at empty files
 - Confusing for maintenance
 
 **What Should Happen**:
+
 - **Either implement** actual configuration
 - **Or remove** from imports and delete files
 - No middle ground
@@ -701,22 +732,26 @@ checks = lib.mkForce {}
 **File**: `platforms/darwin/activation.nix`
 
 **What's Wrong**:
+
 ```nix
 # TODO: below looks sus!
 checks = lib.mkForce {}
 ```
+
 - **All system checks disabled** with `mkForce`
 - Comment admits it's "sus!" (suspicious)
 - No documentation of what was disabled
 - Hides configuration errors
 
 **Why It's Fucked**:
+
 - Overrides all checks, potentially hiding errors
 - No way to know what's being skipped
 - Violates type safety principles
 - Could mask serious configuration issues
 
 **What Should Happen**:
+
 - **Investigate why checks were disabled**
 - Document what checks were disabled
 - Fix underlying issues
@@ -732,18 +767,21 @@ checks = lib.mkForce {}
 **Directory**: `platforms/common/errors/` (6 modules)
 
 **What's Wrong**:
+
 - **6 error modules** but not referenced anywhere in main configs
 - Complex error handling for a Nix configuration system
 - Potentially over-engineered for this use case
 - Could be 100% dead code
 
 **Why It's Fucked**:
+
 - Significant complexity but potentially unused
 - No evidence of error management system being used
 - Maintenance burden for no benefit
 - Should be either integrated or removed
 
 **What Should Happen**:
+
 - **Investigate if error system is used anywhere**
 - If yes: Integrate and document
 - If no: Remove entire error management system
@@ -758,15 +796,18 @@ checks = lib.mkForce {}
 **Status**: ✅ FIXED (just cleaned up)
 
 **What Was Wrong**:
+
 - 4 broken justfile commands referencing deleted wrapper system
 - 5 broken scripts in `scripts/` directory
 - Would fail with "file not found" errors
 
 **What Happened**:
+
 - ✅ All commands and scripts removed (DEC 26, 2025)
 - ✅ Cleaned up properly
 
 **Lesson**:
+
 - Dead code accumulates quickly
 - Need regular cleanup audits
 - Scripts and commands must track code changes
@@ -778,17 +819,20 @@ checks = lib.mkForce {}
 **Status**: ✅ FIXED (just deleted)
 
 **What Was Wrong**:
+
 - 1,770 lines of unreachable code
 - `platforms/common/wrappers/` - Never imported
 - `platforms/common/adapters/` - Never imported
 - Massive waste of space and confusion
 
 **What Happened**:
+
 - ✅ Both directories deleted (DEC 26, 2025)
 - ✅ 1,770 lines removed
 - ✅ All references cleaned up
 
 **Lesson**:
+
 - Unreachable code can accumulate silently
 - Need regular import chain audits
 - Dead code adds confusion and maintenance burden
@@ -800,28 +844,33 @@ checks = lib.mkForce {}
 ### 1. Architecture & Code Quality
 
 **Priority 1: Remove Test File Immediately** ⚠️ CRITICAL
+
 - Delete `platforms/darwin/test-darwin.nix`
 - Move any useful configs to proper locations
 - Clean up directory structure
 
 **Priority 2: Resolve Placeholder Files** ⚠️ HIGH
+
 - Either implement `darwin/networking/default.nix` or remove it
 - Either implement `hyprland-system.nix` or remove it
 - No middle ground - implement or delete
 
 **Priority 3: Investigate System Checks** ⚠️ HIGH
+
 - Find out why Darwin checks are disabled
 - Document what's being skipped
 - Fix underlying issues
 - Re-enable checks
 
 **Priority 4: Error Management System Audit** 🔍 MEDIUM
+
 - Determine if error system is used anywhere
 - If yes: Integrate and document
 - If no: Remove entire system (6 modules, 1,000+ lines)
 - No gray area
 
 **Priority 5: Package Cleanup Finalization** 🧹 MEDIUM
+
 - Verify all "moved" comments are accurate
 - Remove all commented package code
 - Ensure consistency across all files
@@ -832,6 +881,7 @@ checks = lib.mkForce {}
 ### 2. Documentation
 
 **Priority 6: Create README.md** 📖 CRITICAL
+
 - What is Setup-Mac?
 - Quick start guide (5 min setup)
 - How to install on macOS
@@ -840,24 +890,28 @@ checks = lib.mkForce {}
 - Common tasks
 
 **Priority 7: Architecture Documentation** 📐 HIGH
+
 - Create import chain diagram
 - Document module relationships
 - Explain architecture decisions
 - Show how to add new modules
 
 **Priority 8: Module Reference** 📚 HIGH
+
 - What each module does
 - Key configurations
 - Platform differences
 - How to customize
 
 **Priority 9: Deployment Guide** 🚀 MEDIUM
+
 - Fresh installation steps (macOS)
 - Fresh installation steps (NixOS)
 - Migration from other configs
 - Common pitfalls
 
 **Priority 10: Troubleshooting Guide** 🔧 MEDIUM
+
 - Common issues and solutions
 - Debugging commands
 - How to get help
@@ -868,18 +922,21 @@ checks = lib.mkForce {}
 ### 3. Testing & Quality Assurance
 
 **Priority 11: Automated Integration Tests** ✅ HIGH
+
 - Test all import chains
 - Test platform-specific configs
 - Test cross-platform consistency
 - Add to CI/CD pipeline
 
 **Priority 12: Performance Regression Tests** ⚡ MEDIUM
+
 - Track shell startup time
 - Track build time
 - Set baselines
 - Alert on regression
 
 **Priority 13: Configuration Validation Tests** ✔️ MEDIUM
+
 - Validate all Nix expressions
 - Check type safety assertions
 - Verify platform compatibility
@@ -890,6 +947,7 @@ checks = lib.mkForce {}
 ### 4. Features
 
 **Priority 14: Ghost Wallpaper Enhancement** 🖼️ LOW
+
 - Multiple wallpaper support
 - Time/day-based rotation
 - ActivityWatch integration
@@ -897,12 +955,14 @@ checks = lib.mkForce {}
 - Cross-platform support
 
 **Priority 15: Multi-WM Integration** 🪟 LOW
+
 - WM switching mechanism
 - Keybinding conflict resolution
 - Documentation for each WM
 - Testing all 4 WMs
 
 **Priority 16: Wrapper System Decision** 🔄 LOW
+
 - Decide: Need wrapper applications?
 - If yes: Implement concrete wrappers
 - If no: Remove core template system
@@ -913,18 +973,21 @@ checks = lib.mkForce {}
 ### 5. Maintenance
 
 **Priority 17: Regular Audit Schedule** 📅 HIGH
+
 - Weekly: Check for dead code
 - Monthly: Review TODOs
 - Quarterly: Full architecture review
 - Document findings
 
 **Priority 18: Pre-commit Hook Enhancement** 🔒 MEDIUM
+
 - Add import chain validation
 - Add dead code detection
 - Add type checking
 - Add documentation completeness check
 
 **Priority 19: Dependency Updates** 📦 MEDIUM
+
 - Regular nix flake update schedule
 - Track upstream changes
 - Test updates before merging
@@ -935,12 +998,14 @@ checks = lib.mkForce {}
 ### 6. Development Experience
 
 **Priority 20: Developer Onboarding** 👤 MEDIUM
+
 - Create "Getting Started" guide
 - Create "Contributing" guide
 - Document development workflow
 - Create module templates
 
 **Priority 21: Debugging Tools** 🐛 LOW
+
 - Add debug logging
 - Create diagnostic commands
 - Add tracing for complex flows
@@ -1188,6 +1253,7 @@ This is the ONE thing I cannot determine from the code alone - I need human know
 ## Summary Statistics
 
 ### Code Statistics 📊
+
 - **Total Configuration Files**: 80+ modules
 - **Total Lines of Code**: ~5,000+ lines
 - **Cross-Platform Modules**: 15+ files
@@ -1196,6 +1262,7 @@ This is the ONE thing I cannot determine from the code alone - I need human know
 - **Recently Deleted Dead Code**: 1,770 lines (wrappers + adapters)
 
 ### Completion Rates 📈
+
 - **Core System Architecture**: 100% ✅
 - **Type Safety & Validation**: 100% ✅
 - **NixOS Desktop Environment**: 95% ✅
@@ -1207,6 +1274,7 @@ This is the ONE thing I cannot determine from the code alone - I need human know
 - **Cleanup**: 85% ✅ (still need to delete test file)
 
 ### System Health 🏥
+
 - **Overall Status**: STABLE & PRODUCTION-READY
 - **Architecture Score**: 9/10
 - **Maintainability**: HIGH
@@ -1219,17 +1287,20 @@ This is the ONE thing I cannot determine from the code alone - I need human know
 ## Immediate Action Required 🚨
 
 ### Critical Path (Do This First)
+
 1. Delete `darwin/test-darwin.nix` - 30 min
 2. Fix/Remove placeholder files - 1 hour
 3. Fix Darwin system checks - 2 hours
 4. Audit error management system - 2 hours
 
 ### Quick Wins (High Impact, Low Effort)
+
 5. Create basic README.md - 2 hours
 6. Final package cleanup - 2 hours
 7. Create architecture diagram - 3 hours
 
 ### Foundation Work (Enables Future Work)
+
 8. Create module reference - 4 hours
 9. Add automated tests - 4 hours
 10. Create deployment guide - 4 hours

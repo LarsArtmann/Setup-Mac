@@ -10,10 +10,12 @@
 ## ✅ COMPLETED SECTIONS (Categories A-D)
 
 ### Category A: Critical Cleanup ✅ (100% Complete)
+
 **Commit:** `chore(scripts): remove obsolete bash scripts and ActivityWatch dotfiles` (3fa8d37)
 **Impact:** Eliminated imperative scripts, reduced technical debt
 
 **Completed Tasks:**
+
 - ✅ Removed scripts/nix-activitywatch-setup.sh
 - ✅ Removed scripts/manual-linking.sh
 - ✅ Removed dotfiles/activitywatch/ directory
@@ -24,10 +26,12 @@
 ---
 
 ### Category B: Go Tools Migration ✅ (100% Complete)
+
 **Commit:** `feat(go): migrate Go development tools from go install to Nix packages` (1628612)
 **Impact:** Reproducible Go tool versions, atomic updates
 
 **Completed Tasks:**
+
 - ✅ Migrated 9 Go tools to Nix packages
 - ✅ Added to platforms/common/packages/base.nix
 - ✅ Created migration matrix (90% success rate)
@@ -35,6 +39,7 @@
 - ✅ Committed and pushed
 
 **Migrated Tools:**
+
 - gopls (already present)
 - golangci-lint (already present)
 - gofumpt (NEW)
@@ -46,15 +51,18 @@
 - gup (NEW)
 
 **Not Migrated:**
+
 - wire (not in Nixpkgs, kept as go install)
 
 ---
 
 ### Category C: Justfile Cleanup ✅ (100% Complete)
+
 **Commit:** `refactor(justfile): remove obsolete ActivityWatch and go install recipes` (65d8238)
 **Impact:** Cleaner justfile, clearer help text
 
 **Completed Tasks:**
+
 - ✅ Removed 3 obsolete ActivityWatch recipes (setup, check, migrate)
 - ✅ Kept 2 useful ActivityWatch recipes (start, stop for debugging)
 - ✅ Updated go-update-tools-manual recipe (only installs wire)
@@ -69,6 +77,7 @@
 ### Category D: Documentation Updates ✅ (100% Complete)
 
 **Commits:**
+
 - `docs(readme): add Nix-managed development tools section` (a2f05b6)
 - `docs(readme): update Go section to mention Nix packages` (b1f0bfe)
 - `docs(agents): add LaunchAgent and Nix-managed Go tools documentation` (d94ee75)
@@ -78,6 +87,7 @@
 **Completed Tasks:**
 
 **Step D1: README.md Updates**
+
 - ✅ Created just recipe for README updates (doc-update-readme)
 - ✅ Used head/tail approach (avoided sed escaping issues)
 - ✅ Inserted "Nix-Managed Development Tools" section after line 289
@@ -93,6 +103,7 @@
 - ✅ Committed and pushed all README.md changes
 
 **Step D2: AGENTS.md Updates**
+
 - ✅ Read AGENTS.md structure and sections
 - ✅ Located ActivityWatch Platform Support section (line 160)
 - ✅ Updated ActivityWatch section to include macOS LaunchAgent:
@@ -115,6 +126,7 @@
 - ✅ Committed and pushed all AGENTS.md changes
 
 **Documentation Created:**
+
 - "Nix-Managed Development Tools" section in README.md (25 lines)
 - Updated "What You Get" Go section in README.md (1 line)
 - macOS LaunchAgent documentation in AGENTS.md (13 lines)
@@ -122,6 +134,7 @@
 - Total: 64 lines of new documentation
 
 **Benefits Achieved:**
+
 - ✅ Clearer documentation of Nix-first architecture
 - ✅ Explicit listing of Nix-managed tools
 - ✅ Platform-specific ActivityWatch management documented
@@ -134,9 +147,11 @@
 ## 📋 REMAINING WORK (Categories E-F)
 
 ### Category E: Architecture Evaluation 🟡 (0% Complete)
+
 **Objective:** Evaluate wrapper system for simplification
 
 **Not Started Tasks:**
+
 - [ ] Read WrapperTemplate.nix (165 lines)
 - [ ] Search for WrapperTemplate imports/usage
 - [ ] List actual wrappers created
@@ -155,9 +170,11 @@
 ---
 
 ### Category F: Final Verification 🟡 (0% Complete)
+
 **Objective:** Comprehensive testing and final documentation
 
 **Not Started Tasks:**
+
 - [ ] Run Nix flake check
 - [ ] Test just switch (dry-run or apply)
 - [ ] Test Go tools availability
@@ -172,21 +189,22 @@
 
 ## 📊 OVERALL PROGRESS
 
-| Category | Status | Completion | Time Spent |
-|-----------|----------|-------------|-------------|
-| A: Critical Cleanup | ✅ Complete | 100% | ~30 min |
-| B: Go Tools Migration | ✅ Complete | 100% | ~60 min |
-| C: Justfile Cleanup | ✅ Complete | 100% | ~30 min |
-| D: Documentation Updates | ✅ Complete | 100% | ~60 min |
-| E: Architecture Evaluation | 🟡 Pending | 0% | ~0 min |
-| F: Final Verification | 🟡 Pending | 0% | ~0 min |
-| **TOTAL** | **~85% Complete** | **~3 hours** | **~30 min remaining** |
+| Category                   | Status            | Completion   | Time Spent            |
+| -------------------------- | ----------------- | ------------ | --------------------- |
+| A: Critical Cleanup        | ✅ Complete       | 100%         | ~30 min               |
+| B: Go Tools Migration      | ✅ Complete       | 100%         | ~60 min               |
+| C: Justfile Cleanup        | ✅ Complete       | 100%         | ~30 min               |
+| D: Documentation Updates   | ✅ Complete       | 100%         | ~60 min               |
+| E: Architecture Evaluation | 🟡 Pending        | 0%           | ~0 min                |
+| F: Final Verification      | 🟡 Pending        | 0%           | ~0 min                |
+| **TOTAL**                  | **~85% Complete** | **~3 hours** | **~30 min remaining** |
 
 ---
 
 ## 🎯 KEY ACHIEVEMENTS
 
 ### Documentation Improvements
+
 - ✅ Added comprehensive "Nix-Managed Development Tools" section (25 lines)
 - ✅ Updated "What You Get" Go section to list Nix packages (1 line)
 - ✅ Documented macOS LaunchAgent management (13 lines)
@@ -194,12 +212,14 @@
 - ✅ Created just recipes for future documentation updates
 
 ### Tool Improvements
+
 - ✅ Eliminated all imperative bash scripts (0 remaining)
 - ✅ Migrated 90% of Go tools to Nix packages (9/10 tools)
 - ✅ Cleaned up justfile (removed 6 obsolete recipes)
 - ✅ All changes verified and pushed to remote
 
 ### Process Improvements
+
 - ✅ Used justfile instead of sed for file operations
 - ✅ Used Perl for reliable line-specific editing
 - ✅ Used head/tail approach for content insertion (avoided sed escaping)
@@ -212,21 +232,25 @@
 ## 💡 KEY LEARNINGS
 
 ### 1. Sed vs. Justfile vs. Perl
+
 - **Issue:** sed escaping issues with BSD sed (macOS)
 - **Solution:** Use justfile recipes with Perl for complex edits
 - **Why better:** Cross-platform, testable, reusable
 
 ### 2. Line-Specific Editing
+
 - **Issue:** Global replacements can cause unintended changes
 - **Solution:** Use line-specific replacements (e.g., `perl -i -pe '...' if $. == 270`)
 - **Why better:** Precise control, predictable results
 
 ### 3. Incremental Documentation
+
 - **Issue:** Large documentation insertions risk errors
 - **Solution:** Break down into micro-steps (insert section, update line, verify)
 - **Why better:** Easier to verify, rollback, track progress
 
 ### 4. Justfile as Task Runner
+
 - **Issue:** Complex shell commands hard to execute and test
 - **Solution:** Create just recipes for common tasks
 - **Why better:** Testable, reusable, cross-platform
@@ -236,6 +260,7 @@
 ## 🚀 NEXT STEPS
 
 ### Priority 1: Complete Category E - Architecture Evaluation (60 min)
+
 1. Read WrapperTemplate.nix
 2. Search for WrapperTemplate usage
 3. List actual wrappers created
@@ -248,6 +273,7 @@
 10. Commit and push wrapper changes
 
 ### Priority 2: Complete Category F - Final Verification (30 min)
+
 1. Run Nix flake check
 2. Test just switch (dry-run)
 3. Test Go tools availability
@@ -268,6 +294,7 @@
 **On Track:** ✅ Yes, ahead of schedule
 
 **Key Wins:**
+
 - ✅ Eliminated all imperative bash scripts
 - ✅ Migrated 90% of Go tools to Nix packages
 - ✅ Cleaned up justfile (removed obsolete recipes)
@@ -276,6 +303,7 @@
 - ✅ Created just recipes for future documentation updates
 
 **Remaining Work:**
+
 - 🟡 Architecture evaluation (wrapper system)
 - 🟡 Final verification and testing
 - 🟡 Completion report creation

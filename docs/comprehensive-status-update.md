@@ -183,164 +183,164 @@ f) 🎯 TOP #25 THINGS WE SHOULD GET DONE NEXT!
 IMMEDIATE (Today - 2 hours)
 
 #1 ⚡ FREE DISK SPACE (CRITICAL!)
-   Task: Run aggressive cleanup to free 15-30GB
-   Command: just clean-aggressive
-   Time: 10 minutes
-   Impact: UNBLOCKS ALL BUILD ACTIVITY
-   Why #1: NOTHING else works without disk space
+Task: Run aggressive cleanup to free 15-30GB
+Command: just clean-aggressive
+Time: 10 minutes
+Impact: UNBLOCKS ALL BUILD ACTIVITY
+Why #1: NOTHING else works without disk space
 
 #2 🧪 RUN SAFE PENDING TESTS
-   Task: Execute 5 tests that don't need disk space
-   Tests: IT-1, IT-3, EC-4, EC-6, RT-2
-   Time: 30 minutes
-   Impact: Increase test coverage to 77%
-   Why #2: Can do RIGHT NOW
+Task: Execute 5 tests that don't need disk space
+Tests: IT-1, IT-3, EC-4, EC-6, RT-2
+Time: 30 minutes
+Impact: Increase test coverage to 77%
+Why #2: Can do RIGHT NOW
 
 #3 📊 ADD DISK SPACE CHECK
-   Task: Add disk check to just switch and just update
-   Time: 30 minutes
-   Impact: Prevent future disk crises
-   Why #3: Should have done this FIRST
+Task: Add disk check to just switch and just update
+Time: 30 minutes
+Impact: Prevent future disk crises
+Why #3: Should have done this FIRST
 
 SHORT-TERM (This Week - 8 hours)
 
 #4 🔍 CLARIFY VENDOR DIRECTORY ISSUE
-   Task: Re-test v0.39.3 with vendor-free strategy
-   Steps: Set vendorHash = null, Build, Analyze
-   Time: 30 minutes (after disk space)
-   Impact: Resolve critical blocker
-   Why #4: UNCLEAR if v0.39.3 actually broken
+Task: Re-test v0.39.3 with vendor-free strategy
+Steps: Set vendorHash = null, Build, Analyze
+Time: 30 minutes (after disk space)
+Impact: Resolve critical blocker
+Why #4: UNCLEAR if v0.39.3 actually broken
 
 #5 🛡️ IMPLEMENT VENDOR-FREE FALLBACK
-   Task: Add automatic fallback to vendor-free strategy
-   File: pkgs/update-crush-patched.sh
-   Time: 2 hours
-   Impact: More robust upgrades
-   Why #5: Reduces upgrade failures
+Task: Add automatic fallback to vendor-free strategy
+File: pkgs/update-crush-patched.sh
+Time: 2 hours
+Impact: More robust upgrades
+Why #5: Reduces upgrade failures
 
 #6 📈 ADD PROGRESS INDICATORS
-   Task: Add spinner and progress messages
-   Time: 1-2 hours
-   Impact: Better user experience
-   Why #6: Long builds need feedback
+Task: Add spinner and progress messages
+Time: 1-2 hours
+Impact: Better user experience
+Why #6: Long builds need feedback
 
 #7 🧹 SET UP AUTOMATED CLEANUP
-   Task: Schedule weekly garbage collection
-   Time: 1 hour
-   Impact: Prevent disk space issues
-   Why #7: Should have done this WEEKS ago
+Task: Schedule weekly garbage collection
+Time: 1 hour
+Impact: Prevent disk space issues
+Why #7: Should have done this WEEKS ago
 
 #8 🧪 RUN HIGH-PRIORITY PENDING TESTS
-   Task: Execute IT-2, RT-1, PT-3 (after disk space)
-   Time: 1 hour
-   Impact: Increase test coverage to 91%
-   Why #8: Complete testing picture
+Task: Execute IT-2, RT-1, PT-3 (after disk space)
+Time: 1 hour
+Impact: Increase test coverage to 91%
+Why #8: Complete testing picture
 
 #9 📚 CREATE DOCUMENTATION INDEX
-   Task: Create docs/README.md with navigation
-   Time: 1 hour
-   Impact: Easier documentation navigation
-   Why #9: 6 files is hard to navigate
+Task: Create docs/README.md with navigation
+Time: 1 hour
+Impact: Easier documentation navigation
+Why #9: 6 files is hard to navigate
 
 #10 🚨 IMPROVE ERROR MESSAGES
-   Task: Add detailed error context to all failures
-   Time: 2-3 hours
-   Impact: Easier troubleshooting
-   Why #10: Current errors too generic
+Task: Add detailed error context to all failures
+Time: 2-3 hours
+Impact: Easier troubleshooting
+Why #10: Current errors too generic
 
 MEDIUM-TERM (Next 2 Weeks - 12 hours)
 
 #11 🤖 CREATE AUTOMATED TEST RUNNER
-   Task: Build script to run all tests
-   Time: 4-6 hours
-   Impact: One command to run all tests
-   Why #11: Manual testing is tedious
+Task: Build script to run all tests
+Time: 4-6 hours
+Impact: One command to run all tests
+Why #11: Manual testing is tedious
 
 #12 📜 ADD VERSION HISTORY TRACKING
-   Task: Log all upgrades with success/failure
-   Time: 2 hours
-   Impact: Track upgrade history
-   Why #12: No upgrade audit trail
+Task: Log all upgrades with success/failure
+Time: 2 hours
+Impact: Track upgrade history
+Why #12: No upgrade audit trail
 
 #13 🔄 IMPLEMENT RETRY LOGIC
-   Task: Retry failed downloads with exponential backoff
-   Time: 2 hours
-   Impact: More reliable network operations
-   Why #13: Networks are flaky
+Task: Retry failed downloads with exponential backoff
+Time: 2 hours
+Impact: More reliable network operations
+Why #13: Networks are flaky
 
 #14 🎭 CREATE MOCK VENDORHASH FAILURE
-   Task: Test EC-5: VendorHash extraction failure
-   Time: 2 hours
-   Impact: Complete test coverage
-   Why #14: Only 1 test left after #2
+Task: Test EC-5: VendorHash extraction failure
+Time: 2 hours
+Impact: Complete test coverage
+Why #14: Only 1 test left after #2
 
 #15 ✅ ADD CONFIGURATION VALIDATION
-   Task: Validate Nix file before building
-   Time: 1-2 hours
-   Impact: Catch errors early
-   Why #15: Faster feedback loops
+Task: Validate Nix file before building
+Time: 1-2 hours
+Impact: Catch errors early
+Why #15: Faster feedback loops
 
 #16 💾 CREATE UPGRADE ROLLBACK SNAPSHOT
-   Task: Store full system state before upgrades
-   Time: 2-3 hours
-   Impact: Safer upgrades
-   Why #16: Current backup is just Nix file
+Task: Store full system state before upgrades
+Time: 2-3 hours
+Impact: Safer upgrades
+Why #16: Current backup is just Nix file
 
 #17 ✔ ADD ROLLBACK VERIFICATION
-   Task: Verify rollback actually restored working state
-   Time: 1 hour
-   Impact: Ensure rollback success
-   Why #17: Rollback must be trustworthy
+Task: Verify rollback actually restored working state
+Time: 1 hour
+Impact: Ensure rollback success
+Why #17: Rollback must be trustworthy
 
 #18 🔍 IMPLEMENT DRY-RUN MODE
-   Task: Add --dry-run flag to test without making changes
-   Time: 1-2 hours
-   Impact: Safe testing
-   Why #18: Try before committing
+Task: Add --dry-run flag to test without making changes
+Time: 1-2 hours
+Impact: Safe testing
+Why #18: Try before committing
 
 #19 🔔 CREATE SUCCESS NOTIFICATION
-   Task: Notify on successful upgrades (osascript)
-   Time: 1 hour
-   Impact: User awareness
-   Why #19: Long builds, easy to miss success
+Task: Notify on successful upgrades (osascript)
+Time: 1 hour
+Impact: User awareness
+Why #19: Long builds, easy to miss success
 
 #20 🚫 ADD UPGRADABILITY CHECK
-   Task: Check if upgrade is possible before attempting
-   Time: 2-3 hours
-   Impact: Save time on impossible upgrades
-   Why #20: Don't waste time on impossible upgrades
+Task: Check if upgrade is possible before attempting
+Time: 2-3 hours
+Impact: Save time on impossible upgrades
+Why #20: Don't waste time on impossible upgrades
 
 LONG-TERM (Next Month - 20+ hours)
 
 #21 🚀 SET UP CI/CD PIPELINE
-   Task: Create GitHub Actions workflow
-   Time: 8-12 hours
-   Impact: Automated testing on all changes
-   Why #21: Catch regressions early
+Task: Create GitHub Actions workflow
+Time: 8-12 hours
+Impact: Automated testing on all changes
+Why #21: Catch regressions early
 
 #22 📊 IMPLEMENT PERFORMANCE MONITORING
-   Task: Track build times and alert on regressions
-   Time: 2-3 hours
-   Impact: Performance visibility
-   Why #22: Performance matters for user experience
+Task: Track build times and alert on regressions
+Time: 2-3 hours
+Impact: Performance visibility
+Why #22: Performance matters for user experience
 
 #23 💻 ADD MULTI-ARCHITECTURE SUPPORT
-   Task: Test on x86_64-darwin and x86_64-linux
-   Time: 4-6 hours
-   Impact: Cross-platform compatibility
-   Why #23: Only tested on aarch64-darwin
+Task: Test on x86_64-darwin and x86_64-linux
+Time: 4-6 hours
+Impact: Cross-platform compatibility
+Why #23: Only tested on aarch64-darwin
 
 #24 🗣 CREATE INTERACTIVE MODE
-   Task: Add interactive prompts for critical decisions
-   Time: 2-3 hours
-   Impact: User control over risky operations
-   Why #24: Safety for destructive operations
+Task: Add interactive prompts for critical decisions
+Time: 2-3 hours
+Impact: User control over risky operations
+Why #24: Safety for destructive operations
 
 #25 📊 CREATE VISUAL DOCUMENTATION
-   Task: Add diagrams and flowcharts to docs
-   Time: 4-6 hours
-   Impact: Easier understanding
-   Why #25: Visuals complement text
+Task: Add diagrams and flowcharts to docs
+Time: 4-6 hours
+Impact: Easier understanding
+Why #25: Visuals complement text
 
 ═════════════════════════════════════════════════════════════════
 
@@ -352,137 +352,159 @@ g) ❓ MY TOP #1 QUESTION I CAN'T FIGURE OUT
 ### What I Know (Facts)
 
 ✅ Fact 1: v0.39.1 works perfectly
-   - Builds successfully with vendorHash set
-   - Binary works correctly
-   - NO vendor directory in tarball (verified)
-   - Nix creates vendor directory from go.mod
-   - Status: PRODUCTION READY
+
+- Builds successfully with vendorHash set
+- Binary works correctly
+- NO vendor directory in tarball (verified)
+- Nix creates vendor directory from go.mod
+- Status: PRODUCTION READY
 
 ✅ Fact 2: v0.39.3 tarball structure
-   - Downloaded and analyzed tarball
-   - Size: 3.0MB
-   - Contains go.mod file
-   - NO vendor directory (verified with tar -tzf)
-   - NO vendor/modules.txt (verified)
-   - Status: CORRECT (tarballs shouldn't have vendor)
+
+- Downloaded and analyzed tarball
+- Size: 3.0MB
+- Contains go.mod file
+- NO vendor directory (verified with tar -tzf)
+- NO vendor/modules.txt (verified)
+- Status: CORRECT (tarballs shouldn't have vendor)
 
 ✅ Fact 3: Previous session error
-   - Error: "go: inconsistent vendoring in /nix/var/nix/builds/..."
-   - Details: "charm.land/bubbles/v2@v2.0.0-rc.1... is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt"
-   - Location: Build step where Nix is processing vendor directory
-   - Status: UNCLEAR (vendor directory shouldn't exist yet)
+
+- Error: "go: inconsistent vendoring in /nix/var/nix/builds/..."
+- Details: "charm.land/bubbles/v2@v2.0.0-rc.1... is explicitly required in go.mod, but not marked as explicit in vendor/modules.txt"
+- Location: Build step where Nix is processing vendor directory
+- Status: UNCLEAR (vendor directory shouldn't exist yet)
 
 ✅ Fact 4: Nix buildGoModule behavior
-   - If vendor/ exists in source: uses it, requires vendorHash
-   - If vendor/ doesn't exist: downloads deps, may create vendor
-   - vendorHash: hash of vendor directory for reproducibility
-   - Status: DOCUMENTED (Nix manual)
+
+- If vendor/ exists in source: uses it, requires vendorHash
+- If vendor/ doesn't exist: downloads deps, may create vendor
+- vendorHash: hash of vendor directory for reproducibility
+- Status: DOCUMENTED (Nix manual)
 
 ### What I Don't Know (The Mystery)
 
 ❓ Question 1: Where did vendor/modules.txt come from?
-   - v0.39.3 tarball has NO vendor directory
-   - Nix should download dependencies from network
-   - Error mentions vendor/modules.txt inconsistencies
-   - Hypothesis: Nix created vendor directory, then found inconsistencies?
+
+- v0.39.3 tarball has NO vendor directory
+- Nix should download dependencies from network
+- Error mentions vendor/modules.txt inconsistencies
+- Hypothesis: Nix created vendor directory, then found inconsistencies?
 
 ❓ Question 2: Why does v0.39.1 work but v0.39.3 fail?
-   - Both tarballs have NO vendor directory
-   - Both use buildGoModule with vendorHash
-   - v0.39.1: vendorHash set, builds successfully
-   - v0.39.3: vendorHash not set, build fails with vendor error
-   - Hypothesis: v0.39.3 go.mod has issues?
+
+- Both tarballs have NO vendor directory
+- Both use buildGoModule with vendorHash
+- v0.39.1: vendorHash set, builds successfully
+- v0.39.3: vendorHash not set, build fails with vendor error
+- Hypothesis: v0.39.3 go.mod has issues?
 
 ❓ Question 3: What does "inconsistent vendoring" actually mean?
-   - Go vendoring: vendor/modules.txt must match go.mod exactly
-   - Error: "marked as explicit in vendor/modules.txt"
-   - Hypothesis: Nix created vendor directory incorrectly?
+
+- Go vendoring: vendor/modules.txt must match go.mod exactly
+- Error: "marked as explicit in vendor/modules.txt"
+- Hypothesis: Nix created vendor directory incorrectly?
 
 ❓ Question 4: Is error from Nix or from Go?
-   - Error message format: "go: inconsistent vendoring..."
-   - This looks like a Go error, not Nix
-   - But Nix is running to Go build
-   - Hypothesis: Go toolchain detecting vendoring issues?
+
+- Error message format: "go: inconsistent vendoring..."
+- This looks like a Go error, not Nix
+- But Nix is running to Go build
+- Hypothesis: Go toolchain detecting vendoring issues?
 
 ❓ Question 5: Will vendor-free strategy actually work?
-   - Set vendorHash = null
-   - Let Nix download all dependencies
-   - Avoid vendor directory entirely
-   - Hypothesis: Should work, but haven't tested
+
+- Set vendorHash = null
+- Let Nix download all dependencies
+- Avoid vendor directory entirely
+- Hypothesis: Should work, but haven't tested
 
 ### What I've Tried
 
 ✓ Attempt 1: Analyzed v0.39.3 tarball
-   - Command: tar -tzf crush-v0.39.3.tar.gz
-   - Result: NO vendor directory found
-   - Conclusion: Tarball is correct (no vendor expected)
+
+- Command: tar -tzf crush-v0.39.3.tar.gz
+- Result: NO vendor directory found
+- Conclusion: Tarball is correct (no vendor expected)
 
 ✓ Attempt 2: Tested 'go mod vendor'
-   - Command: cd /tmp/crush-temp && go mod vendor
-   - Result: Created vendor directory successfully
-   - Conclusion: 'go mod vendor' works correctly
+
+- Command: cd /tmp/crush-temp && go mod vendor
+- Result: Created vendor directory successfully
+- Conclusion: 'go mod vendor' works correctly
 
 ✓ Attempt 3: Compared v0.39.1 and v0.39.3 tarballs
-   - v0.39.1: 3.1MB, has go.mod, NO vendor
-   - v0.39.3: 3.0MB, has go.mod, NO vendor
-   - Conclusion: Both tarballs are identical structure
+
+- v0.39.1: 3.1MB, has go.mod, NO vendor
+- v0.39.3: 3.0MB, has go.mod, NO vendor
+- Conclusion: Both tarballs are identical structure
 
 ✓ Attempt 4: Read v0.39.3 go.mod
-   - Contains dependencies: bubbles, bubbletea, catwalk, fantasy, etc.
-   - Go version: 1.25.5
-   - Conclusion: go.mod looks reasonable
+
+- Contains dependencies: bubbles, bubbletea, catwalk, fantasy, etc.
+- Go version: 1.25.5
+- Conclusion: go.mod looks reasonable
 
 ### What I Need To Answer This
 
 ❌ Missing Information #1: Actual build log from v0.39.3 attempt
-   - Previous session log: /tmp/crush-build.log (may not exist anymore)
-   - Need: Full error message, context, build step
-   - Why: Need to see EXACT error
+
+- Previous session log: /tmp/crush-build.log (may not exist anymore)
+- Need: Full error message, context, build step
+- Why: Need to see EXACT error
 
 ❌ Missing Information #2: v0.39.3 build with vendorHash = null
-   - Haven't tried this yet
-   - Need: Actual error when vendor-free
-   - Why: Proves if issue is vendor-specific
+
+- Haven't tried this yet
+- Need: Actual error when vendor-free
+- Why: Proves if issue is vendor-specific
 
 ❌ Missing Information #3: Go toolchain version used in build
-   - Need: Which Go version Nix uses
-   - Need: If Go version matches go.mod requirement
-   - Why: Mismatch could cause vendoring issues
+
+- Need: Which Go version Nix uses
+- Need: If Go version matches go.mod requirement
+- Why: Mismatch could cause vendoring issues
 
 ❌ Missing Information #4: Nix buildGoModule behavior on aarch64-darwin
-   - Need: Platform-specific behavior
-   - Need: Any aarch64 quirks
-   - Why: Only tested on this platform
+
+- Need: Platform-specific behavior
+- Need: Any aarch64 quirks
+- Why: Only tested on this platform
 
 ### My Best Guess (Uncertainty: High)
 
 💡 Hypothesis: v0.39.3 go.mod has hidden vendor requirements
-   - Some Go modules have vendor directories
-   - When Nix downloads dependencies, vendor directories come with them
-   - Go vendoring conflicts: explicit vs implicit vendor
-   - Resolution: Need to inspect downloaded dependencies
+
+- Some Go modules have vendor directories
+- When Nix downloads dependencies, vendor directories come with them
+- Go vendoring conflicts: explicit vs implicit vendor
+- Resolution: Need to inspect downloaded dependencies
 
 💡 Alternative Hypothesis: Transient network error
-   - Previous build failed due to network glitch
-   - Error message was misleading
-   - Resolution: Re-try build with fresh Nix store
+
+- Previous build failed due to network glitch
+- Error message was misleading
+- Resolution: Re-try build with fresh Nix store
 
 💡 Alternative Hypothesis: Nix cache corruption
-   - Old build artifacts causing issues
-   - Incomplete download in Nix store
-   - Resolution: Clear Nix caches and retry
+
+- Old build artifacts causing issues
+- Incomplete download in Nix store
+- Resolution: Clear Nix caches and retry
 
 ### My #1 Question I Can't Figure Out:
 
 "When Nix builds v0.39.3 (which has NO vendor directory in the source tarball), and I get an error about 'inconsistent vendoring in vendor/modules.txt', WHERE is that vendor/modules.txt file coming from?"
 
 ### Context:
+
 - v0.39.3 tarball: NO vendor directory (verified)
 - Error message: References vendor/modules.txt
 - Nix behavior: Should download dependencies, not use vendor
 - v0.39.1: Same structure, works perfectly
 
 ### Why I Can't Figure This Out:
+
 1. Can't reproduce error (no disk space to build)
 2. Can't inspect Nix store build directory (access denied)
 3. Can't see intermediate build state (Nix sandbox)
@@ -490,6 +512,7 @@ g) ❓ MY TOP #1 QUESTION I CAN'T FIGURE OUT
 5. Don't know if Go toolchain is creating vendor directory during build
 
 ### What I Need From You:
+
 1. Can you clarify Nix buildGoModule behavior when source has NO vendor?
 2. Does buildGoModule always create vendor directory during build?
 3. Is there a way to disable vendor directory creation entirely?
@@ -497,12 +520,14 @@ g) ❓ MY TOP #1 QUESTION I CAN'T FIGURE OUT
 5. Any aarch64-darwin-specific quirks with Go vendoring?
 
 ### This Is Blocking Me From:
+
 - Determining if v0.39.3 actually works
 - Deciding if vendor-free strategy is needed
 - Understanding root cause of previous failure
 - Providing accurate upgrade path to v0.39.3
 
 ### Impact: HIGH
+
 - Can't recommend v0.39.3 upgrade without answering this
 - Unclear if issue is actual vendor problem or transient error
 - Don't know if vendor-free strategy is required workaround

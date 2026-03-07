@@ -9,6 +9,7 @@
 ## Executive Summary
 
 This report documents a complete audit of all LaunchAgents on the system, identifying:
+
 - **1 Nix-managed service** (ActivityWatch)
 - **6 Legacy imperative LaunchAgents** requiring migration
 - **3 App-managed services** needing evaluation
@@ -23,11 +24,12 @@ This report documents a complete audit of all LaunchAgents on the system, identi
 
 ### ✅ Nix-Managed (Gold Standard)
 
-| Service | Label | Management | Health |
-|---------|-------|------------|--------|
+| Service           | Label                             | Management                                   | Health     |
+| ----------------- | --------------------------------- | -------------------------------------------- | ---------- |
 | **ActivityWatch** | `net.activitywatch.ActivityWatch` | `platforms/darwin/services/launchagents.nix` | ✅ Healthy |
 
 **Features:**
+
 - Declarative configuration
 - Structured logging to `~/.local/share/activitywatch/`
 - Configurable restart behavior
@@ -41,12 +43,13 @@ These services run from imperative plist files in `~/Library/LaunchAgents/` and 
 
 #### 1. System Monitoring Stack
 
-| Service | Label | Purpose | Current Issues |
-|---------|-------|---------|----------------|
+| Service     | Label               | Purpose                                       | Current Issues                     |
+| ----------- | ------------------- | --------------------------------------------- | ---------------------------------- |
 | **Netdata** | `com.netdata.agent` | Real-time system monitoring (localhost:19999) | Imperative config, hardcoded paths |
-| **ntopng** | `com.ntopng.daemon` | Network traffic analysis (localhost:3000) | Runs as root, imperative config |
+| **ntopng**  | `com.ntopng.daemon` | Network traffic analysis (localhost:3000)     | Runs as root, imperative config    |
 
 **Current Configuration:**
+
 ```bash
 # Netdata
 Program: /run/current-system/sw/bin/netdata
@@ -63,12 +66,13 @@ Logs: ~/monitoring/ntopng/logs/
 
 #### 2. Maintenance Automation
 
-| Service | Label | Schedule | Purpose |
-|---------|-------|----------|---------|
-| **Daily Maintenance** | `com.setup-mac.daily-maintenance` | 2:30 AM daily | Cleanup, cache clearing |
-| **Weekly Maintenance** | `com.setup-mac.weekly-maintenance` | 3:00 AM Sunday | Deep cleanup, updates |
+| Service                | Label                              | Schedule       | Purpose                 |
+| ---------------------- | ---------------------------------- | -------------- | ----------------------- |
+| **Daily Maintenance**  | `com.setup-mac.daily-maintenance`  | 2:30 AM daily  | Cleanup, cache clearing |
+| **Weekly Maintenance** | `com.setup-mac.weekly-maintenance` | 3:00 AM Sunday | Deep cleanup, updates   |
 
 **Current Issues:**
+
 - Scripts located at deprecated path: `~/Desktop/Setup-Mac/scripts/`
 - Should be: `~/projects/SystemNix/scripts/`
 - Imperative scheduling
@@ -77,19 +81,19 @@ Logs: ~/monitoring/ntopng/logs/
 
 #### 3. Browser/Editor Utilities
 
-| Service | Label | Schedule | Purpose |
-|---------|-------|----------|---------|
-| **Sublime Sync** | `com.larsartmann.sublime-sync` | 6:00 PM daily | Export Sublime Text settings |
-| **uBlock Update** | `com.larsartmann.ublock-update` | 9:00 AM daily | Update ad-blocker filters |
+| Service           | Label                           | Schedule      | Purpose                      |
+| ----------------- | ------------------------------- | ------------- | ---------------------------- |
+| **Sublime Sync**  | `com.larsartmann.sublime-sync`  | 6:00 PM daily | Export Sublime Text settings |
+| **uBlock Update** | `com.larsartmann.ublock-update` | 9:00 AM daily | Update ad-blocker filters    |
 
 **Migration Priority:** LOW (evaluate if still needed)
 
 #### 4. File Management (CRITICAL: DUPLICATES)
 
-| Service | Label | Type | Issue |
-|---------|-------|------|-------|
-| **Screenshot Renamer** | `com.screenshotrenamer.watcher` | KeepAlive daemon | DUPLICATE |
-| **File Renamer** | `com.user.file-and-image-renamer` | RunAtLoad service | DUPLICATE |
+| Service                | Label                             | Type              | Issue     |
+| ---------------------- | --------------------------------- | ----------------- | --------- |
+| **Screenshot Renamer** | `com.screenshotrenamer.watcher`   | KeepAlive daemon  | DUPLICATE |
+| **File Renamer**       | `com.user.file-and-image-renamer` | RunAtLoad service | DUPLICATE |
 
 **Problem:** Both services run the same script: `~/.config/file-and-image-renamer/watch-wrapper.sh`
 
@@ -99,10 +103,10 @@ Logs: ~/monitoring/ntopng/logs/
 
 #### 5. External Services (Out of Scope)
 
-| Service | Label | Purpose | Action |
-|---------|-------|---------|--------|
-| **External AI Monitor** | `com.external.ai.monitor` | Third-party AI workspace monitoring | Leave as-is (external dependency) |
-| **Steam Clean** | `com.valvesoftware.steamclean` | Steam cache management | Evaluate if still needed |
+| Service                 | Label                          | Purpose                             | Action                            |
+| ----------------------- | ------------------------------ | ----------------------------------- | --------------------------------- |
+| **External AI Monitor** | `com.external.ai.monitor`      | Third-party AI workspace monitoring | Leave as-is (external dependency) |
+| **Steam Clean**         | `com.valvesoftware.steamclean` | Steam cache management              | Evaluate if still needed          |
 
 ---
 
@@ -110,22 +114,22 @@ Logs: ~/monitoring/ntopng/logs/
 
 These are installed by applications and run outside Nix/Homebrew.
 
-| Service | Label | Source | Recommendation |
-|---------|-------|--------|----------------|
-| **PostgreSQL** | `homebrew.mxcl.postgresql@14` | Homebrew | ✅ Keep - standard Homebrew service |
-| **Podman Desktop** | `io.podman_desktop.PodmanDesktop` | Podman.app | ❓ Evaluate - do you actively use Podman? |
-| **Hyprnote** | `Hyprnote` | Hyprnote.app | ❓ Evaluate - do you actively use Hyprnote? |
-| **VPN by Google One** | `VPN by Google One` | Google One | ❓ Evaluate - do you actively use this VPN? |
+| Service               | Label                             | Source       | Recommendation                              |
+| --------------------- | --------------------------------- | ------------ | ------------------------------------------- |
+| **PostgreSQL**        | `homebrew.mxcl.postgresql@14`     | Homebrew     | ✅ Keep - standard Homebrew service         |
+| **Podman Desktop**    | `io.podman_desktop.PodmanDesktop` | Podman.app   | ❓ Evaluate - do you actively use Podman?   |
+| **Hyprnote**          | `Hyprnote`                        | Hyprnote.app | ❓ Evaluate - do you actively use Hyprnote? |
+| **VPN by Google One** | `VPN by Google One`               | Google One   | ❓ Evaluate - do you actively use this VPN? |
 
 ---
 
 ### ✅ Recently Removed
 
-| Service | Action | Status |
-|---------|--------|--------|
-| Adobe Creative Cloud | Deleted `/Library/LaunchAgents/com.adobe.*` | ✅ Complete |
-| Adobe CCXProcess | Deleted `/Library/LaunchAgents/com.adobe.ccxprocess.plist` | ✅ Complete |
-| Sensei | Pending full uninstall | ⏳ Waiting for manual removal |
+| Service              | Action                                                     | Status                        |
+| -------------------- | ---------------------------------------------------------- | ----------------------------- |
+| Adobe Creative Cloud | Deleted `/Library/LaunchAgents/com.adobe.*`                | ✅ Complete                   |
+| Adobe CCXProcess     | Deleted `/Library/LaunchAgents/com.adobe.ccxprocess.plist` | ✅ Complete                   |
+| Sensei               | Pending full uninstall                                     | ⏳ Waiting for manual removal |
 
 ---
 
@@ -136,6 +140,7 @@ These are installed by applications and run outside Nix/Homebrew.
 **Goal:** Establish Nix module structure and migrate monitoring stack.
 
 1. **Create LaunchAgent Module**
+
    ```
    platforms/darwin/modules/launchagents/
    ├── default.nix          # Module entry point
@@ -146,6 +151,7 @@ These are installed by applications and run outside Nix/Homebrew.
    ```
 
 2. **Define Types**
+
    ```nix
    types.launchAgent = {
      enable = mkEnableOption "service";
@@ -234,6 +240,7 @@ These are installed by applications and run outside Nix/Homebrew.
 **Goal:** Add management utilities and documentation.
 
 1. **Add `just` Commands**
+
    ```just
    launchagent-status    # Show all managed services
    launchagent-logs SERVICE  # Tail logs for service
@@ -313,13 +320,13 @@ Leverage existing `platforms/common/core/` infrastructure:
 
 ## Risks & Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Service interruption during migration | Medium | Medium | Test with `just test` before `just switch`; keep backups |
-| Path changes break scripts | Low | High | Update script paths first; use symlinks during transition |
-| Duplicate services conflict | Medium | High | Unload legacy plists before activating Nix versions |
-| Root privileges for ntopng | Certain | Low | Use `launchd.daemons` instead of `userLaunchAgents` |
-| External AI service dependency | Low | Medium | Leave as-is; document external dependencies |
+| Risk                                  | Likelihood | Impact | Mitigation                                                |
+| ------------------------------------- | ---------- | ------ | --------------------------------------------------------- |
+| Service interruption during migration | Medium     | Medium | Test with `just test` before `just switch`; keep backups  |
+| Path changes break scripts            | Low        | High   | Update script paths first; use symlinks during transition |
+| Duplicate services conflict           | Medium     | High   | Unload legacy plists before activating Nix versions       |
+| Root privileges for ntopng            | Certain    | Low    | Use `launchd.daemons` instead of `userLaunchAgents`       |
+| External AI service dependency        | Low        | Medium | Leave as-is; document external dependencies               |
 
 ---
 
@@ -349,32 +356,32 @@ Leverage existing `platforms/common/core/` infrastructure:
 
 ### User LaunchAgents (`~/Library/LaunchAgents/`)
 
-| File | Size | Modified | Status |
-|------|------|----------|--------|
-| `net.activitywatch.ActivityWatch.plist` | 918 B | 2026-01-20 | ✅ Nix-managed |
-| `com.netdata.agent.plist` | 1.3 KB | 2025-07-20 | ⚠️ Migrate |
-| `com.ntopng.daemon.plist` | 1.5 KB | 2025-07-20 | ⚠️ Migrate |
-| `com.setup-mac.daily-maintenance.plist` | 1.2 KB | 2025-07-20 | ⚠️ Migrate |
-| `com.setup-mac.weekly-maintenance.plist` | 1.3 KB | 2025-07-20 | ⚠️ Migrate |
-| `com.larsartmann.sublime-sync.plist` | 858 B | 2025-07-20 | ❓ Evaluate |
-| `com.larsartmann.ublock-update.plist` | 785 B | 2025-07-20 | ❓ Evaluate |
-| `com.screenshotrenamer.watcher.plist` | 1.4 KB | 2026-01-27 | ⚠️ Consolidate |
-| `com.user.file-and-image-renamer.plist` | 1.0 KB | 2026-01-27 | ⚠️ Consolidate |
-| `com.valvesoftware.steamclean.plist` | 882 B | 2024-12-16 | ❓ Evaluate |
-| `homebrew.mxcl.postgresql@14.plist` | 929 B | 2025-07-17 | ✅ Keep |
-| `io.podman_desktop.PodmanDesktop.plist` | 940 B | 2025-04-16 | ❓ Evaluate |
-| `Hyprnote.plist` | 415 B | 2025-10-04 | ❓ Evaluate |
-| `VPN by Google One.plist` | 472 B | 2023-10-12 | ❓ Evaluate |
-| `com.external.ai.monitor.plist` | 1.5 KB | 2025-02-07 | 🔌 External |
-| `environment.plist` | 420 B | 2025-05-23 | 🔧 Nix env |
+| File                                     | Size   | Modified   | Status         |
+| ---------------------------------------- | ------ | ---------- | -------------- |
+| `net.activitywatch.ActivityWatch.plist`  | 918 B  | 2026-01-20 | ✅ Nix-managed |
+| `com.netdata.agent.plist`                | 1.3 KB | 2025-07-20 | ⚠️ Migrate     |
+| `com.ntopng.daemon.plist`                | 1.5 KB | 2025-07-20 | ⚠️ Migrate     |
+| `com.setup-mac.daily-maintenance.plist`  | 1.2 KB | 2025-07-20 | ⚠️ Migrate     |
+| `com.setup-mac.weekly-maintenance.plist` | 1.3 KB | 2025-07-20 | ⚠️ Migrate     |
+| `com.larsartmann.sublime-sync.plist`     | 858 B  | 2025-07-20 | ❓ Evaluate    |
+| `com.larsartmann.ublock-update.plist`    | 785 B  | 2025-07-20 | ❓ Evaluate    |
+| `com.screenshotrenamer.watcher.plist`    | 1.4 KB | 2026-01-27 | ⚠️ Consolidate |
+| `com.user.file-and-image-renamer.plist`  | 1.0 KB | 2026-01-27 | ⚠️ Consolidate |
+| `com.valvesoftware.steamclean.plist`     | 882 B  | 2024-12-16 | ❓ Evaluate    |
+| `homebrew.mxcl.postgresql@14.plist`      | 929 B  | 2025-07-17 | ✅ Keep        |
+| `io.podman_desktop.PodmanDesktop.plist`  | 940 B  | 2025-04-16 | ❓ Evaluate    |
+| `Hyprnote.plist`                         | 415 B  | 2025-10-04 | ❓ Evaluate    |
+| `VPN by Google One.plist`                | 472 B  | 2023-10-12 | ❓ Evaluate    |
+| `com.external.ai.monitor.plist`          | 1.5 KB | 2025-02-07 | 🔌 External    |
+| `environment.plist`                      | 420 B  | 2025-05-23 | 🔧 Nix env     |
 
 ### System LaunchAgents (`/Library/LaunchAgents/`)
 
-| File | Status |
-|------|--------|
-| `com.google.keystone.*` | ✅ Google auto-update (keep) |
-| `com.citrix.*` | 🔌 Citrix (keep if using) |
-| `us.zoom.updater.*` | 🔌 Zoom (keep if using) |
+| File                              | Status                           |
+| --------------------------------- | -------------------------------- |
+| `com.google.keystone.*`           | ✅ Google auto-update (keep)     |
+| `com.citrix.*`                    | 🔌 Citrix (keep if using)        |
+| `us.zoom.updater.*`               | 🔌 Zoom (keep if using)          |
 | `org.cindori.SenseiMonitor.plist` | ❌ **REMOVE** (Sensei uninstall) |
 
 ---

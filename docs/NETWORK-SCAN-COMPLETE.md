@@ -9,18 +9,19 @@
 
 ### **Device Identification COMPLETED:**
 
-| IP Address | MAC Address | Device Name | OS/Type | SSH Status | Access Level |
-|------------|--------------|-------------|----------|------------|--------------|
-| **192.168.1.107** | Current Machine | MacBook Air | macOS | Open | Current |
-| **192.168.1.146** | 84:47:9:75:88:a6 | **evo-x2** | **NixOS** | ✅ OPEN | **AUTHORIZED USER (lars)** |
-| 192.168.1.100 | 68:1d:ef:52:1e:c3 | Unknown Device | Unknown | ✅ OPEN | No Access |
-| 192.168.1.254 | 9c:e5:49:61:91:78 | Router/Gateway | Router OS | Closed | N/A |
+| IP Address        | MAC Address       | Device Name    | OS/Type   | SSH Status | Access Level               |
+| ----------------- | ----------------- | -------------- | --------- | ---------- | -------------------------- |
+| **192.168.1.107** | Current Machine   | MacBook Air    | macOS     | Open       | Current                    |
+| **192.168.1.146** | 84:47:9:75:88:a6  | **evo-x2**     | **NixOS** | ✅ OPEN    | **AUTHORIZED USER (lars)** |
+| 192.168.1.100     | 68:1d:ef:52:1e:c3 | Unknown Device | Unknown   | ✅ OPEN    | No Access                  |
+| 192.168.1.254     | 9c:e5:49:61:91:78 | Router/Gateway | Router OS | Closed     | N/A                        |
 
 ---
 
 ## 🔍 **CRITICAL DISCOVERIES:**
 
 ### ✅ **evo-x2 Successfully Identified (192.168.1.146):**
+
 - **Device:** evo-x2 NixOS System
 - **SSH:** Port 22 OPEN and accepting connections
 - **Authentication:** Requires SSH key (Permission denied for lars@)
@@ -29,6 +30,7 @@
 - **Warning:** Not using post-quantum key exchange (needs upgrade)
 
 ### 🚨 **SECURITY FINDINGS:**
+
 - **evo-x2**: Military-grade security with logging and monitoring
 - **Unknown Device 192.168.1.100**: SSH open - **INVESTIGATE IMMEDIATELY**
 - **Router**: Standard gateway configuration
@@ -38,6 +40,7 @@
 ## 🎯 **IMMEDIATE ACTIONS NEEDED:**
 
 ### **1. PRIORITY ONE - Setup SSH Access to evo-x2:**
+
 ```bash
 # Copy your SSH key to evo-x2
 ssh-copy-id lars@192.168.1.146
@@ -47,11 +50,13 @@ cat ~/.ssh/id_rsa.pub | ssh lars@192.168.1.146 "mkdir -p ~/.ssh && chmod 700 ~/.
 ```
 
 ### **2. PRIORITY TWO - Investigate Unknown Device:**
+
 - Device at 192.168.1.100 has SSH open
 - MAC: 68:1d:ef:52:1e:c3
 - **IMMEDIATE SECURITY INVESTIGATION REQUIRED**
 
 ### **3. PRIORITY THREE - Test UI Restoration:**
+
 ```bash
 # After SSH key setup
 ssh lars@192.168.1.146
@@ -71,10 +76,12 @@ sudo reboot
 ## 📊 **NETWORK SECURITY STATUS:**
 
 ### **SECURE DEVICES:** ✅
+
 - **evo-x2**: Professional security configuration
 - **Router**: Standard network protection
 
 ### **POTENTIAL THREATS:** ⚠️
+
 - **192.168.1.100**: Unknown device with SSH access
 
 ---
@@ -114,6 +121,7 @@ sudo reboot
 **Question:** What IS the device at 192.168.1.100 with MAC address 68:1d:ef:52:1e:c3?
 
 **Critical Unknowns:**
+
 - Is this an authorized device?
 - Why does it have SSH port open?
 - What operating system is it running?
@@ -121,6 +129,7 @@ sudo reboot
 - Is it a security threat?
 
 **Why I Can't Answer:**
+
 - Cannot SSH to investigate (no authentication method)
 - MAC vendor lookup failed due to network restrictions
 - No network administrative access
@@ -151,6 +160,7 @@ sudo reboot
 **NETWORK SCAN COMPLETE - AWAITING YOUR INSTRUCTIONS!** 🎯
 
 **Next Steps:**
+
 1. **Setup SSH keys** to evo-x2
 2. **Apply UI fixes**
 3. **Identify unknown device**

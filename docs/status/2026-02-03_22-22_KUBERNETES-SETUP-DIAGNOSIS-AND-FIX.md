@@ -23,6 +23,7 @@ Changes made to improve PATH configuration for kubernetes tools across all shell
 ## Initial Report
 
 **User stated:**
+
 - "I need my kubernetes setup fixed"
 - "Headlamp, K9s, and kubectl" not working
 - "Somehow I have kubectl in: PATH="/usr/local/bin:$PATH""
@@ -45,30 +46,33 @@ NIX_PATH: '' (empty - expected with flakes)
 
 ### 2. Tool Locations Verified
 
-| Tool | Location | Status | Version |
-|------|----------|--------|---------|
-| kubectl | `/usr/local/bin/kubectl` (symlink to OrbStack) | ✅ Working | v1.32.7 |
-| k9s | `~/.nix-profile/bin/k9s` | ✅ Working | v0.50.18 |
-| OrbStack | `/Applications/OrbStack.app` | ✅ Installed | Active |
-| Nix | `/run/current-system/sw/bin/nix` | ✅ Working | 2.31.3 |
-| nix-daemon | Running | ✅ Active | PID 1080 |
-| darwin-rebuild | Available | ✅ Working | - |
+| Tool           | Location                                       | Status       | Version  |
+| -------------- | ---------------------------------------------- | ------------ | -------- |
+| kubectl        | `/usr/local/bin/kubectl` (symlink to OrbStack) | ✅ Working   | v1.32.7  |
+| k9s            | `~/.nix-profile/bin/k9s`                       | ✅ Working   | v0.50.18 |
+| OrbStack       | `/Applications/OrbStack.app`                   | ✅ Installed | Active   |
+| Nix            | `/run/current-system/sw/bin/nix`               | ✅ Working   | 2.31.3   |
+| nix-daemon     | Running                                        | ✅ Active    | PID 1080 |
+| darwin-rebuild | Available                                      | ✅ Working   | -        |
 
 ### 3. Configuration Analysis
 
 **Flake Configuration:**
+
 - `flake.nix` - Valid, passes `nix flake check --no-build`
 - Using flake-parts for modular architecture
 - nix-darwin for macOS configuration
 - home-manager for user configuration
 
 **Current PATH in generated fish config:**
+
 ```fish
 /run/current-system/sw/bin
 /etc/profiles/per-user/$USER/bin
 ```
 
 **Missing from PATH:**
+
 - `/usr/local/bin` (needed for kubectl)
 - `~/.orbstack/bin` (needed for OrbStack tools)
 
@@ -81,10 +85,12 @@ NIX_PATH: '' (empty - expected with flakes)
 **File:** `platforms/darwin/programs/shells.nix`
 
 Added to **Fish**, **Zsh**, and **Bash** configurations:
+
 - `/usr/local/bin` - For kubectl (via OrbStack)
 - `~/.orbstack/bin` - For OrbStack CLI tools (docker, orb, orbctl)
 
 **Fish shell changes:**
+
 ```nix
 # Added to fish.shellInit
 fish_add_path --prepend --global /usr/local/bin
@@ -92,6 +98,7 @@ fish_add_path --prepend --global ~/.orbstack/bin
 ```
 
 **Zsh changes:**
+
 ```bash
 # OrbStack and local binaries (kubectl, docker, etc.)
 export PATH="/usr/local/bin:$PATH"
@@ -99,6 +106,7 @@ export PATH="$HOME/.orbstack/bin:$PATH"
 ```
 
 **Bash changes:**
+
 ```bash
 # OrbStack and local binaries (kubectl, docker, etc.)
 export PATH="/usr/local/bin:$PATH"
@@ -110,6 +118,7 @@ export PATH="$HOME/.orbstack/bin:$PATH"
 **File:** `platforms/common/packages/base.nix`
 
 Added `k9s` to development packages:
+
 ```nix
 # Kubernetes tools
 k9s # Kubernetes CLI To Manage Your Clusters In Style
@@ -120,6 +129,7 @@ k9s # Kubernetes CLI To Manage Your Clusters In Style
 **File:** `flake.nix`
 
 Added nix-homebrew integration:
+
 - Added `nix-homebrew` input
 - Added `homebrew-bundle` input
 - Added `homebrew-cask` input
@@ -128,6 +138,7 @@ Added nix-homebrew integration:
 **File:** `platforms/darwin/default.nix`
 
 Added Homebrew cask configuration:
+
 ```nix
 homebrew = {
   enable = true;
@@ -143,21 +154,23 @@ homebrew = {
 
 ### ✅ Working Now (Pre-Apply)
 
-| Tool | Command | Result |
-|------|---------|--------|
-| kubectl | `/usr/local/bin/kubectl version --client` | ✅ v1.32.7 |
-| k9s | `~/.nix-profile/bin/k9s version` | ✅ v0.50.18 |
-| OrbStack | `/Applications/OrbStack.app` | ✅ Installed |
+| Tool     | Command                                   | Result       |
+| -------- | ----------------------------------------- | ------------ |
+| kubectl  | `/usr/local/bin/kubectl version --client` | ✅ v1.32.7   |
+| k9s      | `~/.nix-profile/bin/k9s version`          | ✅ v0.50.18  |
+| OrbStack | `/Applications/OrbStack.app`              | ✅ Installed |
 
 ### ⚠️ Needs Application
 
 The configuration changes need to be applied with `just switch` to update:
+
 - Shell PATH configuration (Fish, Zsh, Bash)
 - Install headlamp via Homebrew cask
 
 ### 🔧 Pending Verification
 
 After `just switch` completes:
+
 - [ ] kubectl accessible in new shell
 - [ ] k9s accessible in new shell
 - [ ] headlamp installed in /Applications
@@ -171,6 +184,7 @@ After `just switch` completes:
 ### Why NIX_PATH is Empty (NOT A BUG)
 
 With Nix flakes, `NIX_PATH` is intentionally empty. Flakes use:
+
 - `flake.lock` for reproducible inputs
 - Pure evaluation (no implicit dependencies)
 - Self-contained configuration
@@ -180,6 +194,7 @@ This is **expected behavior** and indicates the system is using flakes correctly
 ### Why Tools Weren't in PATH
 
 The user was running commands in the Crush AI assistant context, which:
+
 - Does not source `/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish`
 - Does not inherit login shell environment
 - Is a non-interactive, non-login shell
@@ -189,6 +204,7 @@ The actual login shells (Fish) have the correct Nix setup.
 ### Build Time Explanation
 
 Initial `just switch` or `just test` takes 5-15 minutes because:
+
 - First-time builds download/compile packages
 - Subsequent builds are instant (cached in `/nix/store`)
 - This is normal Nix behavior
@@ -200,6 +216,7 @@ Initial `just switch` or `just test` takes 5-15 minutes because:
 ### 1. Minor: nix-homebrew Warning
 
 **Warning:**
+
 ```
 warning: input 'nix-homebrew' has an override for a non-existent input 'nixpkgs'
 ```
@@ -218,9 +235,11 @@ The system does not have `/etc/fish/config.fish` or `/etc/static/fish/config.fis
 ### Immediate (Required)
 
 1. **Apply Configuration**
+
    ```bash
    just switch
    ```
+
    Estimated time: 5-15 minutes (first build)
 
 2. **Open New Terminal Window**
@@ -263,12 +282,12 @@ The system does not have `/etc/fish/config.fish` or `/etc/static/fish/config.fis
 
 ## Files Modified
 
-| File | Changes | Status |
-|------|---------|--------|
-| `flake.nix` | Added nix-homebrew integration | ✅ Committed |
+| File                                   | Changes                                                   | Status       |
+| -------------------------------------- | --------------------------------------------------------- | ------------ |
+| `flake.nix`                            | Added nix-homebrew integration                            | ✅ Committed |
 | `platforms/darwin/programs/shells.nix` | Added PATH entries for /usr/local/bin and ~/.orbstack/bin | ✅ Committed |
-| `platforms/common/packages/base.nix` | Added k9s package | ✅ Committed |
-| `platforms/darwin/default.nix` | Added homebrew cask for headlamp | ✅ Committed |
+| `platforms/common/packages/base.nix`   | Added k9s package                                         | ✅ Committed |
+| `platforms/darwin/default.nix`         | Added homebrew cask for headlamp                          | ✅ Committed |
 
 ---
 
