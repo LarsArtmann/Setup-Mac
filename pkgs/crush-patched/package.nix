@@ -11,7 +11,7 @@ buildGoModule rec {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = lib.fakeHash;
+    hash = "sha256-Lmp2DYrlzxVnll9x1jcnw/QgYjhA9RHpciQZ7mAUK5Y=";
   };
 
   vendorHash = lib.fakeHash;
