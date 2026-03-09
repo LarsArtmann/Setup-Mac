@@ -14,7 +14,7 @@ buildGoModule rec {
     hash = "sha256-Lmp2DYrlzxVnll9x1jcnw/QgYjhA9RHpciQZ7mAUK5Y=";
   };
 
-  vendorHash = lib.fakeHash;
+  vendorHash = "sha256-pBZdmQRnPfvhz66+DGQx/ZMMiYeKBfWThybw4RXsjno=";
 
   postUnpack = ''
     rm -rf $sourceRoot/vendor
