@@ -1,60 +1,44 @@
 {
   lib,
   buildGoModule,
-  fetchurl,
-  fetchpatch,
+  fetchFromGitHub,
 }:
 buildGoModule rec {
   pname = "crush-patched";
-  version = "v0.46.1";
+  version = "0.47.2";
 
-  src = fetchurl {
-    url = "https://github.com/charmbracelet/crush/archive/refs/tags/${version}.tar.gz";
-    hash = "sha256-xQxn9BorzKzMKgpiacbiArx/kt7xGDS72KKh9XSZXFU=";
+  src = fetchFromGitHub {
+    owner = "charmbracelet";
+    repo = "crush";
+    rev = "v${version}";
+    hash = lib.fakeHash;
   };
 
-  # Note: Patches for v0.45.0:
-  # - PR #2181 (SQLite busy timeout) - merged upstream
-  # - PR #2180 (LSP files outside cwd) - merged upstream
-  # - PR #2161 (Regex cache memory leak) - merged upstream
-  # - PR #1589 (Slow consumer notification) - closed, obsolete (targets old internal/tui)
-  patches = [
-    # PR #2070: fix(ui): show grep search parameters in pending state
-    # Displays pattern, path, include filters while grep is running
-    # Still open, awaiting review
-    (fetchpatch {
-      url = "https://github.com/charmbracelet/crush/commit/e4aa1742699db27c2ccd5e9c2b9f4d0948870581.patch";
-      hash = "sha256-3G73sqv4UdwNZHs6HKr9mCYO8WWplJAnLrurDpEiK20=";
-    })
-  ];
+  vendorHash = lib.fakeHash;
 
-  # Build environment for optimal binary
+  postUnpack = ''
+    rm -rf $sourceRoot/vendor
+  '';
+
   env = {
-    # Enable experimental Green Tea garbage collector
     GOEXPERIMENT = "greenteagc";
-    # Disable CGO for static binary
     CGO_ENABLED = "0";
   };
 
-  # Linker flags: set version, strip symbols for smaller binary
   ldflags = [
-    "-s" # Strip symbol table
-    "-w" # Strip debug info
-    "-X=github.com/charmbracelet/crush/internal/version.Version=${version}"
+    "-s"
+    "-w"
+    "-X=github.com/charmbracelet/crush/internal/version.Version=v${version}"
   ];
 
-  # Additional build options for size optimization
   postBuild = ''
-    # Strip debug symbols and non-essential sections
     strip --strip-all --remove-section=.comment --remove-section=.note --strip-debug --discard-all $out/bin/crush 2>/dev/null || true
   '';
 
-  doCheck = false; # Tests require network access to fetch providers
-
-  vendorHash = "sha256-QNfuP8F0np4B+hzUvgrwqaZ5S6qdZf0iuM2uHlfElyU=";
+  doCheck = false;
 
   meta = with lib; {
-    description = "Crush CLI - AI-powered coding assistant (v0.46.1 + PR #2070 grep UI fix)";
+    description = "Crush CLI - AI-powered coding assistant";
     homepage = "https://github.com/charmbracelet/crush";
     license = licenses.mit;
     platforms = platforms.all;

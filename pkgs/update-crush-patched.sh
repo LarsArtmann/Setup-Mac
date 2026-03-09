@@ -46,11 +46,15 @@ if [[ "$NEW_VERSION" == "$CURRENT_VERSION" ]]; then
     exit 0
 fi
 
-# Prefetch source hash
+# Prefetch source hash (using nix-prefetch with SRI format)
 echo ""
 echo "📥 Fetching source hash for $NEW_VERSION..."
-SOURCE_URL="https://github.com/charmbracelet/crush/archive/refs/tags/${NEW_VERSION}.tar.gz"
-SOURCE_HASH=$(nix-prefetch-url --type sha256 "$SOURCE_URL" 2>/dev/null)
+SOURCE_HASH=$(nix-prefetch-url --type sha256 --unpack "https://github.com/charmbracelet/crush/archive/refs/tags/${NEW_VERSION}.tar.gz" 2>/dev/null | xargs -I{} nix hash to-sri --type sha256 {})
+
+# Fallback: try without --unpack if that fails
+if [[ -z "$SOURCE_HASH" ]]; then
+    SOURCE_HASH=$(nix store prefetch-file --hash-type sha256 --json "https://github.com/charmbracelet/crush/archive/refs/tags/${NEW_VERSION}.tar.gz" 2>/dev/null | jq -r '.hash')
+fi
 
 if [[ -z "$SOURCE_HASH" ]]; then
     echo "❌ Failed to fetch $NEW_VERSION"
@@ -69,8 +73,7 @@ echo ""
 echo "📝 Updating $NIX_FILE..."
 sed -i.tmp \
   -e "s|^  version = \".*\";|  version = \"$NEW_VERSION\";|" \
-  -e "s|^    url = \".*\";$|    url = \"$SOURCE_URL\";|" \
-  -e "s|^    sha256 = \".*\";|    sha256 = \"$SOURCE_HASH\";|" \
+  -e "s|^    hash = \".*\";|    hash = \"$SOURCE_HASH\";|" \
   -e "s|^  vendorHash = \".*\";|  vendorHash = null;|" \
   "$NIX_FILE"
 rm -f "${NIX_FILE}.tmp"
