@@ -2,6 +2,7 @@
   lib,
   buildGoModule,
   fetchFromGitHub,
+  fetchpatch,
 }:
 buildGoModule rec {
   pname = "crush-patched";
@@ -13,6 +14,14 @@ buildGoModule rec {
     rev = "v${version}";
     hash = "sha256-Lmp2DYrlzxVnll9x1jcnw/QgYjhA9RHpciQZ7mAUK5Y=";
   };
+
+  patches = [
+    (fetchpatch {
+      name = "grep-show-search-params.patch";
+      url = "https://github.com/charmbracelet/crush/commit/e4aa1742699db27c2ccd5e9c2b9f4d0948870581.patch";
+      hash = "sha256-3G73sqv4UdwNZHs6HKr9mCYO8WWplJAnLrurDpEiK20=";
+    })
+  ];
 
   vendorHash = "sha256-pBZdmQRnPfvhz66+DGQx/ZMMiYeKBfWThybw4RXsjno=";
 
