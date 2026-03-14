@@ -9,6 +9,7 @@ ntopng is a high-performance network traffic monitoring tool that provides detai
 ### Adding ntopng to Nix Configuration
 
 Add ntopng to `dotfiles/nix/environment.nix`:
+
 ```nix
 systemPackages = with pkgs; [
   # ... existing packages
@@ -18,6 +19,7 @@ systemPackages = with pkgs; [
 ```
 
 Apply the configuration:
+
 ```bash
 just switch
 # or
@@ -25,6 +27,7 @@ cd dotfiles/nix && darwin-rebuild switch --flake .
 ```
 
 ### Verify Installation
+
 ```bash
 which ntopng
 ntopng --version
@@ -33,6 +36,7 @@ ntopng --version
 ## Quick Start
 
 ### 1. Basic Launch
+
 ```bash
 # Start ntopng with default settings (requires sudo for packet capture)
 sudo ntopng -i en0
@@ -42,11 +46,13 @@ sudo ntopng -i en0 -P /opt/ntopng/var/lib/ntopng/ntopng.pid -d /opt/ntopng/var/l
 ```
 
 ### 2. Access Web Interface
+
 - Default URL: `http://localhost:3000`
 - Default credentials: `admin/admin`
 - Change password immediately after first login
 
 ### 3. Find Network Interfaces
+
 ```bash
 # List available network interfaces
 ntopng -i help
@@ -62,6 +68,7 @@ ntopng -i help
 ### Configuration File Setup
 
 Create ntopng configuration directory:
+
 ```bash
 sudo mkdir -p /usr/local/etc/ntopng
 sudo mkdir -p /usr/local/var/lib/ntopng
@@ -69,7 +76,9 @@ sudo mkdir -p /usr/local/var/log/ntopng
 ```
 
 ### Main Configuration File
+
 Create `/usr/local/etc/ntopng/ntopng.conf`:
+
 ```ini
 # Network Interface Configuration
 -i=en0                          # Primary network interface
@@ -112,6 +121,7 @@ Create `/usr/local/etc/ntopng/ntopng.conf`:
 ### macOS-Specific Configuration
 
 #### Interface Detection
+
 ```bash
 # Detect active network interfaces
 networksetup -listallhardwareports
@@ -124,6 +134,7 @@ sudo ntopng -i en0,en1 --http-port 3000
 ```
 
 #### Packet Capture Permissions
+
 ```bash
 # Add user to specific groups (if needed)
 sudo dseditgroup -o edit -a $(whoami) -t user access_bpf
@@ -137,6 +148,7 @@ sudo chmod 644 /dev/bpf*
 ### Database Integration
 
 #### SQLite Configuration (Recommended for Development)
+
 ```ini
 # In ntopng.conf
 --data-dir=/usr/local/var/lib/ntopng
@@ -145,6 +157,7 @@ sudo chmod 644 /dev/bpf*
 ```
 
 #### MySQL Configuration (Production)
+
 ```ini
 # MySQL configuration
 --mysql-host=localhost
@@ -156,6 +169,7 @@ sudo chmod 644 /dev/bpf*
 ```
 
 Set up MySQL database:
+
 ```sql
 CREATE DATABASE ntopng;
 CREATE USER 'ntopng'@'localhost' IDENTIFIED BY 'ntopng_password';
@@ -166,6 +180,7 @@ FLUSH PRIVILEGES;
 ### Performance Optimization
 
 #### Memory Optimization
+
 ```ini
 # Optimize for development machine
 --max-num-flows=50000
@@ -175,6 +190,7 @@ FLUSH PRIVILEGES;
 ```
 
 #### CPU Optimization
+
 ```ini
 # Reduce CPU usage
 --cpu-affinity=0              # Bind to specific CPU core
@@ -185,6 +201,7 @@ FLUSH PRIVILEGES;
 ### Security Configuration
 
 #### Authentication Setup
+
 ```ini
 # Enable authentication (production)
 --user=admin:admin            # Default user (change immediately)
@@ -195,6 +212,7 @@ FLUSH PRIVILEGES;
 ```
 
 #### Access Control
+
 ```ini
 # Restrict access
 --allowed-nets=127.0.0.1/32,192.168.1.0/24
@@ -202,6 +220,7 @@ FLUSH PRIVILEGES;
 ```
 
 #### Privacy Settings
+
 ```ini
 # Privacy configuration
 --dont-change-user           # Don't drop privileges
@@ -212,7 +231,9 @@ FLUSH PRIVILEGES;
 ## Integration with Development Workflow
 
 ### Just Task Integration
+
 Add to `justfile`:
+
 ```bash
 # Network monitoring tasks
 ntopng-start:
@@ -244,7 +265,9 @@ monitor-app APP_PORT:
 ```
 
 ### Automated Startup (LaunchDaemon)
+
 Create `/Library/LaunchDaemons/com.ntopng.daemon.plist`:
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -272,6 +295,7 @@ Create `/Library/LaunchDaemons/com.ntopng.daemon.plist`:
 ```
 
 Load the daemon:
+
 ```bash
 sudo launchctl load /Library/LaunchDaemons/com.ntopng.daemon.plist
 ```
@@ -279,24 +303,28 @@ sudo launchctl load /Library/LaunchDaemons/com.ntopng.daemon.plist
 ## Key Features and Metrics
 
 ### Network Traffic Analysis
+
 - **Real-time Traffic**: Live network traffic monitoring
 - **Protocol Analysis**: HTTP, HTTPS, DNS, FTP, SSH, etc.
 - **Geographic Distribution**: Traffic by country/region
 - **Top Talkers**: Most active hosts and applications
 
 ### Application Monitoring
+
 - **Application Protocols**: Detailed application-level analysis
 - **Flow Analysis**: Network flows and connections
 - **Bandwidth Usage**: Per-application bandwidth consumption
 - **Performance Metrics**: Latency, packet loss, throughput
 
 ### Security Monitoring
+
 - **Threat Detection**: Malware detection and analysis
 - **Anomaly Detection**: Unusual traffic patterns
 - **DPI (Deep Packet Inspection)**: Content analysis
 - **Blacklist Monitoring**: Known malicious hosts/domains
 
 ### Historical Analysis
+
 - **Traffic Trends**: Historical traffic patterns
 - **Capacity Planning**: Bandwidth utilization trends
 - **Performance Analysis**: Network performance over time
@@ -305,6 +333,7 @@ sudo launchctl load /Library/LaunchDaemons/com.ntopng.daemon.plist
 ## Development-Specific Use Cases
 
 ### API Development Monitoring
+
 ```bash
 # Monitor API traffic on specific port
 sudo ntopng -i en0 --http-port 3000 --packet-filter="port 8080"
@@ -314,6 +343,7 @@ sudo ntopng -i lo0 --http-port 3000 --packet-filter="port 5432 or port 3306"
 ```
 
 ### Microservices Monitoring
+
 ```bash
 # Monitor service mesh traffic
 sudo ntopng -i en0 --http-port 3000 --packet-filter="portrange 8000-9000"
@@ -323,6 +353,7 @@ sudo ntopng -i docker0 --http-port 3000
 ```
 
 ### Security Testing
+
 ```bash
 # Monitor during penetration testing
 sudo ntopng -i en0 --http-port 3000 --verbose=3
@@ -334,6 +365,7 @@ sudo ntopng -i en0 --http-port 3000 --packet-filter="src host target_ip"
 ## Performance Tuning
 
 ### System Resource Optimization
+
 ```ini
 # Low resource configuration
 --max-num-flows=10000
@@ -344,6 +376,7 @@ sudo ntopng -i en0 --http-port 3000 --packet-filter="src host target_ip"
 ```
 
 ### High Performance Configuration
+
 ```ini
 # High performance configuration
 --max-num-flows=1000000
@@ -354,6 +387,7 @@ sudo ntopng -i en0 --http-port 3000 --packet-filter="src host target_ip"
 ```
 
 ### Memory Management
+
 ```bash
 # Monitor ntopng memory usage
 ps aux | grep ntopng
@@ -368,6 +402,7 @@ sudo killall ntopng && sleep 2 && sudo ntopng --config-file=/usr/local/etc/ntopn
 ### Common Issues
 
 #### Permission Denied
+
 ```bash
 # Fix packet capture permissions
 sudo chmod 644 /dev/bpf*
@@ -380,6 +415,7 @@ ls -la /dev/bpf*
 ```
 
 #### Interface Not Found
+
 ```bash
 # List available interfaces
 ifconfig -l
@@ -390,6 +426,7 @@ sudo ntopng -i $(route get default | grep interface | awk '{print $2}')
 ```
 
 #### High CPU Usage
+
 ```ini
 # Reduce monitoring frequency
 --max-num-flows=25000
@@ -401,6 +438,7 @@ sudo ntopng -i $(route get default | grep interface | awk '{print $2}')
 ```
 
 #### Web Interface Issues
+
 ```bash
 # Check if port is in use
 lsof -i :3000
@@ -412,6 +450,7 @@ sudo ntopng -i en0 --http-port 3001
 ```
 
 ### Debug Commands
+
 ```bash
 # Verbose startup
 sudo ntopng -i en0 --verbose=6
@@ -428,6 +467,7 @@ tail -f /usr/local/var/log/ntopng/ntopng.log
 ```
 
 ### Performance Diagnostics
+
 ```bash
 # Check network interface statistics
 netstat -i
@@ -445,6 +485,7 @@ netstat -an | grep :3000
 ## API and Integration
 
 ### REST API Usage
+
 ```bash
 # Get interface statistics
 curl "http://localhost:3000/lua/rest/v2/get/interface/data.lua?ifid=0"
@@ -460,6 +501,7 @@ curl "http://localhost:3000/lua/rest/v2/get/alert/data.lua"
 ```
 
 ### Data Export
+
 ```bash
 # Export flow data
 curl "http://localhost:3000/lua/rest/v2/export/flow/data.lua?ifid=0" > flows.json
@@ -469,7 +511,9 @@ curl "http://localhost:3000/lua/rest/v2/export/host/data.lua?ifid=0" > hosts.jso
 ```
 
 ### Webhook Integration
+
 Configure webhooks in ntopng web interface:
+
 - **URL**: `http://localhost:8080/webhooks/ntopng`
 - **Events**: Alerts, Flow events, Host events
 - **Format**: JSON
@@ -477,18 +521,21 @@ Configure webhooks in ntopng web interface:
 ## Best Practices
 
 ### Development Environment
+
 1. **Start/Stop with Development**: Include in development startup scripts
 2. **Monitor Resource Usage**: Keep an eye on CPU/memory consumption
 3. **Use Packet Filters**: Focus on relevant traffic only
 4. **Regular Cleanup**: Clear old data periodically
 
 ### Security
+
 1. **Change Default Credentials**: Always change admin/admin
 2. **Use HTTPS**: Enable SSL for production monitoring
 3. **Restrict Access**: Limit access to development team only
 4. **Monitor Logs**: Regularly check ntopng logs
 
 ### Performance
+
 1. **Tune for Your Needs**: Adjust flow/host limits based on network size
 2. **Use Database Storage**: Enable historical data for trend analysis
 3. **Regular Maintenance**: Restart ntopng periodically to clear memory

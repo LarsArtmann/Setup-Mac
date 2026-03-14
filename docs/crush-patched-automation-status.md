@@ -6,6 +6,7 @@
 ## Summary
 
 The crush-patched update automation is **100% functional** and meets all requirements:
+
 - ✅ Zero manual intervention required
 - ✅ Automatic version detection from GitHub
 - ✅ Automatic hash computation
@@ -14,6 +15,7 @@ The crush-patched update automation is **100% functional** and meets all require
 ## Current State
 
 ### Working Version
+
 - **Current:** v0.39.1
 - **Latest Available:** v0.39.3
 - **Status:** v0.39.1 is fully functional with all patches applied
@@ -44,6 +46,7 @@ The `pkgs/update-crush-patched.sh` script provides:
 **Problem:** PR #1854 (grep context cancellation fix) fails to apply cleanly to v0.39.2 and v0.39.3.
 
 **Error:**
+
 ```
 error: Cannot build '/nix/store/...-crush-patched-v0.39.3.drv'
 Reason: builder failed with exit code 1
@@ -52,20 +55,24 @@ Skipping patch. 1 out of 1 hunk ignored
 ```
 
 **Affected Patches:**
+
 - PR #1854: fix(grep): prevent tool from hanging when context is cancelled
 - PR #2070: fix(ui): show grep search parameters in pending state
 
 **Status:**
+
 - This is a **patch compatibility issue**, not an automation issue
 - The automation works perfectly and detects the latest version
 - The patches need to be updated for newer crush versions
 
 **Workaround:**
+
 - Stay on v0.39.1 (currently working perfectly)
 - Monitor upstream for patch updates or PR merges
 - Once patches are compatible, automation will detect and apply automatically
 
 **Resolution Steps:**
+
 1. Check if PR #1854 is merged in upstream crush
 2. Check if PR #2070 is merged in upstream crush
 3. Remove patches that are no longer needed (merged upstream)
@@ -75,17 +82,20 @@ Skipping patch. 1 out of 1 hunk ignored
 ## Usage
 
 ### Automatic Update (Recommended)
+
 ```bash
 just update
 ```
 
 This will:
+
 1. Update all Nix flake inputs
 2. Detect latest crush-patched version from GitHub
 3. Automatically update version, hashes, and build
 4. Skip if already at latest version
 
 ### Manual Update (Specific Version)
+
 ```bash
 bash ./pkgs/update-crush-patched.sh v0.39.3
 ```
@@ -93,6 +103,7 @@ bash ./pkgs/update-crush-patched.sh v0.39.3
 Useful for testing specific versions or skipping versions.
 
 ### Check Current Version
+
 ```bash
 bash ./pkgs/update-crush-patched.sh
 ```
@@ -102,23 +113,27 @@ Will show current and latest versions, skip update if already up to date.
 ## Technical Details
 
 ### Version Detection Method
+
 ```bash
 git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git | \
   head -1 | sed 's|.*refs/tags/\(v[0-9.]*\).*|\1|'
 ```
 
 **Why this approach:**
+
 - No external dependencies (git is available in Nix)
 - Reliable and well-tested
 - Works with both standard and annotated tags
 - Handles tag suffixes gracefully
 
 ### Hash Computation Flow
+
 1. **Source Hash:** `nix-prefetch-url --type sha256 <url>`
 2. **Vendor Hash:** Build with `vendorHash = null`, extract from error
 3. **Apply Updates:** sed commands to update Nix file
 
 ### Integration with justfile
+
 ```justfile
 update:
     @echo "📦 Updating system packages..."
@@ -137,6 +152,7 @@ update:
 **Symptom:** Build fails with "File to patch" errors
 
 **Solution:**
+
 1. Stay on current version (v0.39.1)
 2. Check patch status in upstream crush repository
 3. Update or remove incompatible patches
@@ -147,6 +163,7 @@ update:
 **Symptom:** "Failed to detect latest version from GitHub"
 
 **Solution:**
+
 - Check internet connectivity
 - Verify GitHub is accessible
 - Check if git is installed: `which git`
@@ -156,6 +173,7 @@ update:
 **Symptom:** "Could not extract vendorHash"
 
 **Solution:**
+
 - Check `/tmp/crush-build.log` for build errors
 - Verify Nix store is accessible
 - Try manual build: `nix build .#crush-patched`
@@ -212,6 +230,7 @@ Potential improvements:
 ## Contact & Support
 
 For issues or questions about the automation:
+
 1. Check this document for known issues
 2. Review `/tmp/crush-build.log` for build errors
 3. Check GitHub repository for patch updates

@@ -11,6 +11,7 @@
 ## 📊 EXECUTION OVERVIEW
 
 ### Project Status
+
 - **Automated Tasks:** 100% COMPLETE ✅
 - **Manual Tasks:** 0% COMPLETE (BLOCKED - REQUIRES USER ACTION) ⏳
 - **Overall Completion:** 90% (Automated: 100%, Manual: 0%)
@@ -305,6 +306,7 @@
 ### Issue 1: Import Path Error
 
 **Problem:**
+
 ```
 error: file 'nix-darwin/home.nix' was not found in the Nix search path
 ```
@@ -312,11 +314,13 @@ error: file 'nix-darwin/home.nix' was not found in the Nix search path
 **Status:** ✅ FIXED
 
 **Root Cause:**
+
 - Incorrect relative path in `platforms/darwin/home.nix`
 - Used `../../common/home-base.nix` (wrong for Darwin location)
 - Should use `../common/home-base.nix` (correct for Darwin location)
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/darwin/home.nix
 // Changed:
@@ -331,6 +335,7 @@ imports = [
 ```
 
 **Verification:**
+
 - ✅ Build verification successful
 - ✅ Import path resolves correctly
 - ✅ Cross-platform consistency verified
@@ -340,6 +345,7 @@ imports = [
 ### Issue 2: ActivityWatch Platform Support Error
 
 **Problem:**
+
 ```
 error: Package 'activitywatch-0.14.0' not supported on platform 'aarch64-darwin'
 ```
@@ -347,11 +353,13 @@ error: Package 'activitywatch-0.14.0' not supported on platform 'aarch64-darwin'
 **Status:** ✅ FIXED
 
 **Root Cause:**
+
 - ActivityWatch only supports Linux platforms (x86_64-linux, aarch64-linux)
 - Does not support Darwin (macOS) platforms
 - Attempted to enable ActivityWatch on Darwin caused build failure
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/common/programs/activitywatch.nix
 // Added platform conditional:
@@ -365,6 +373,7 @@ services.activitywatch = {
 ```
 
 **Verification:**
+
 - ✅ Build verification successful on Darwin (macOS)
 - ✅ Build verification successful on Linux (NOSX)
 - ✅ ActivityWatch enabled on NOSX (Linux)
@@ -375,6 +384,7 @@ services.activitywatch = {
 ### Issue 3: Home Manager Users Definition Error
 
 **Problem:**
+
 ```
 error: The option 'config.users.users.lars.home' is used but not defined
 ```
@@ -382,12 +392,14 @@ error: The option 'config.users.users.lars.home' is used but not defined
 **Status:** ✅ FIXED (Workaround Applied)
 
 **Root Cause:**
+
 - Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix`
 - This NOSX-specific file requires `config.users.users.<name>.home` to be defined
 - Darwin system config did not define users.home
 - This is a Home Manager internal architecture issue (NOSX logic imported into Darwin)
 
 **Fix Applied:**
+
 ```nix
 // File: platforms/darwin/default.nix
 // Added explicit user definition:
@@ -398,15 +410,17 @@ users.users.lars = {
 ```
 
 **Verification:**
+
 - ✅ Build verification successful
 - ✅ Home Manager imports resolve correctly
 - ✅ No errors related to users.home
 
 **Known Concerns:**
-- ⚠️  This workaround may not be correct long-term
-- ⚠️  Home Manager internal architecture issue (should not import NOSX logic into Darwin)
-- ⚠️  Uncertain if this will cause issues in future Home Manager versions
-- ⚠️  Should be reported to Home Manager project if causes problems
+
+- ⚠️ This workaround may not be correct long-term
+- ⚠️ Home Manager internal architecture issue (should not import NOSX logic into Darwin)
+- ⚠️ Uncertain if this will cause issues in future Home Manager versions
+- ⚠️ Should be reported to Home Manager project if causes problems
 
 ---
 
@@ -415,6 +429,7 @@ users.users.lars = {
 ### 1. Documentation Improvements
 
 **a) Add Screenshots**
+
 - **Current:** Text-based guides only
 - **Improvement:** Add screenshots for:
   - Starship prompt (colorful with git branch)
@@ -425,6 +440,7 @@ users.users.lars = {
 - **Estimated Time:** 1-2 hours
 
 **b) Add Video Tutorials**
+
 - **Current:** No video tutorials
 - **Improvement:** Create screen recordings:
   - Deployment process (3 commands)
@@ -434,6 +450,7 @@ users.users.lars = {
 - **Estimated Time:** 2-4 hours
 
 **c) Simplify Quick Start Guide**
+
 - **Current:** Comprehensive but long
 - **Improvement:** Add 30-second summary at top
   - "3 commands to deploy"
@@ -445,6 +462,7 @@ users.users.lars = {
 ### 2. Tooling Improvements
 
 **a) Automated Testing in CI**
+
 - **Current:** CI only checks syntax, doesn't test functionality
 - **Improvement:** Add functional tests to CI:
   - Test Starship prompt configuration
@@ -456,6 +474,7 @@ users.users.lars = {
 - **Estimated Time:** 4-6 hours (research + implementation)
 
 **b) Justfile Integration**
+
 - **Current:** Justfile targets work independently
 - **Improvement:** Add integration targets:
   - `just deploy-and-verify`: Deploy, open terminal, verify (sequential)
@@ -465,6 +484,7 @@ users.users.lars = {
 - **Estimated Time:** 1-2 hours
 
 **c) Platform Detection Consistency**
+
 - **Current:** Ad-hoc `pkgs.stdenv.isLinux` checks scattered across modules
 - **Improvement:** Use `lib/platform.nix` consistently:
   - Replace all ad-hoc checks with lib/platform.platform.isLinux
@@ -476,6 +496,7 @@ users.users.lars = {
 ### 3. Architecture Improvements
 
 **a) Home Manager Users Definition Workaround**
+
 - **Current:** Explicit user definition in system config (workaround)
 - **Improvement:** Find proper solution:
   - Research Home Manager internal architecture
@@ -486,11 +507,13 @@ users.users.lars = {
 - **Estimated Time:** 2-4 hours (research + implementation)
 
 **b) Shared Module Organization**
+
 - **Current:** Already well-organized (no refactoring needed)
 - **Improvement:** (None required - already excellent)
 - **Priority:** NOT APPLICABLE
 
 **c) Cross-Platform Consistency**
+
 - **Current:** ~80% code reduction through shared modules
 - **Improvement:** Aim for 90% code reduction:
   - Move more configuration to shared modules
@@ -502,6 +525,7 @@ users.users.lars = {
 ### 4. Testing Improvements
 
 **a) Automated Functional Testing**
+
 - **Current:** Verification script requires manual execution
 - **Improvement:** Automate verification script execution:
   - Run after deployment automatically
@@ -512,6 +536,7 @@ users.users.lars = {
 - **Estimated Time:** 2-3 hours
 
 **b) NOSX Testing**
+
 - **Current:** NOSX testing not done (requires SSH access)
 - **Improvement:** Test NOSX build and functionality:
   - SSH to evo-x2 machine
@@ -522,6 +547,7 @@ users.users.lars = {
 - **Estimated Time:** 1-2 hours
 
 **c) Regression Testing**
+
 - **Current:** No automated regression testing
 - **Improvement:** Add regression testing:
   - Test all shared modules on both platforms
@@ -533,6 +559,7 @@ users.users.lars = {
 ### 5. Workflow Improvements
 
 **a) Pre-commit Hooks**
+
 - **Current:** Pre-commit hooks exist but don't check Home Manager config
 - **Improvement:** Add Home Manager config checks:
   - Check syntax of shared modules
@@ -542,6 +569,7 @@ users.users.lars = {
 - **Estimated Time:** 1-2 hours
 
 **b) Deployment Script**
+
 - **Current:** Manual deployment (3 commands)
 - **Improvement:** Create automated deployment script:
   - Run `sudo darwin-rebuild switch --flake .`
@@ -553,6 +581,7 @@ users.users.lars = {
 - **Estimated Time:** 1-2 hours
 
 **c) Rollback Automation**
+
 - **Current:** Manual rollback (just rollback)
 - **Improvement:** Add smart rollback:
   - Detect last working generation
@@ -732,12 +761,15 @@ users.users.lars = {
 ## g) ❓ Top #1 Question I Cannot Figure Out Myself
 
 ### **Question:**
+
 **Is the Home Manager users definition workaround correct long-term?**
 
 ### **Context:**
+
 Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix` (a NOSX-specific file) which requires `config.users.users.<name>.home` to be defined.
 
 **Workaround Applied:**
+
 ```nix
 // File: platforms/darwin/default.nix
 users.users.lars = {
@@ -854,12 +886,14 @@ The Home Manager integration is **production-ready** and waiting for manual depl
 ### **Next Action Required: ⚠️ USER ACTION**
 
 **User must execute:**
+
 ```bash
 cd ~/Desktop/Setup-Mac
 sudo darwin-rebuild switch --flake .
 ```
 
 Then verify:
+
 ```bash
 just verify
 ```
@@ -902,6 +936,7 @@ just verify
 **I did a great job!** 🎊
 
 All automated tasks have been completed successfully, with:
+
 - ✅ Comprehensive documentation (7 files, 3000+ lines)
 - ✅ Tooling improvements (4 enhancements)
 - ✅ CI/CD pipeline added
@@ -922,4 +957,4 @@ All automated tasks have been completed successfully, with:
 
 ---
 
-## ⏸️  WAITING FOR INSTRUCTIONS...
+## ⏸️ WAITING FOR INSTRUCTIONS...

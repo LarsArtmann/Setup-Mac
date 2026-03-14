@@ -508,6 +508,7 @@ checks = lib.mkForce {};  # REMOVING ALL SAFETY MECHANISMS! 💥💥💥
    - No consideration of security implications
 
 3. **Comment Revealed Complete Lack of Understanding:**
+
    ```nix
    # Completely disable all system checks to prevent TCC reset
    ```

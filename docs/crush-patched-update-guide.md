@@ -23,6 +23,7 @@ just switch
 ### `just update` (Routine Updates)
 
 Updates Nix flake and crush-patched version:
+
 1. Updates Nix flake inputs (`nix flake update`)
 2. Updates crush-patched version and source hash
 3. Does NOT build or update vendorHash
@@ -30,6 +31,7 @@ Updates Nix flake and crush-patched version:
 **Use this for:** Routine updates where you want version updates but will build later.
 
 **Next steps:**
+
 ```bash
 just update    # Updates versions
 just switch     # Builds and applies (may need manual vendorHash fix)
@@ -38,6 +40,7 @@ just switch     # Builds and applies (may need manual vendorHash fix)
 ### `just crush-full-update` (Complete Rebuild)
 
 Fully automated workflow that:
+
 1. Fetches latest Crush version from GitHub
 2. Updates version, URL, and source hash in `pkgs/crush-patched.nix`
 3. Builds with temporary vendor hash (may fail initially)
@@ -51,6 +54,7 @@ Fully automated workflow that:
 ### `just crush-update`
 
 Updates version and source hash only. Manual workflow:
+
 ```bash
 just crush-update      # Update version/source
 just crush-build       # Build (may fail)
@@ -62,17 +66,18 @@ just crush-build       # Rebuild with correct hash
 
 ## Comparison: `just update` vs `just crush-full-update`
 
-| Aspect | `just update` | `just crush-full-update` |
-|--------|--------------|------------------------|
-| Nix flake update | ✅ Yes | ❌ No |
-| Crush version update | ✅ Yes | ✅ Yes |
-| Build crush-patched | ❌ No | ✅ Yes |
-| Update vendorHash | ❌ No | ✅ Yes |
-| Verify binary | ❌ No | ✅ Yes |
-| Time taken | Fast (~10s) | Slow (~2-5min) |
-| When to use | Routine updates | Complete rebuild & test |
+| Aspect               | `just update`   | `just crush-full-update` |
+| -------------------- | --------------- | ------------------------ |
+| Nix flake update     | ✅ Yes          | ❌ No                    |
+| Crush version update | ✅ Yes          | ✅ Yes                   |
+| Build crush-patched  | ❌ No           | ✅ Yes                   |
+| Update vendorHash    | ❌ No           | ✅ Yes                   |
+| Verify binary        | ❌ No           | ✅ Yes                   |
+| Time taken           | Fast (~10s)     | Slow (~2-5min)           |
+| When to use          | Routine updates | Complete rebuild & test  |
 
 **Recommended workflow:**
+
 ```bash
 # Daily/Weekly routine:
 just update && just switch
@@ -95,6 +100,7 @@ Builds crush-patched and logs output to `/tmp/crush-build.log`.
 ### `just crush-info`
 
 Shows current version and applied patches:
+
 ```bash
 just crush-info
 # Output:
@@ -120,6 +126,7 @@ just crush-info
 - Source URL and hash for new version
 
 **What is NOT updated with `just update`:**
+
 - Vendor hash (requires build)
 - Binary (requires build)
 - Patches (manual)
@@ -127,11 +134,13 @@ just crush-info
 ### What Gets Updated with `just crush-full-update`
 
 1. **Version**: `pkgs/crush-patched.nix:7`
+
    ```nix
    version = "v0.37.0" → version = "v0.38.0"
    ```
 
 2. **Source URL & Hash**: `pkgs/crush-patched.nix:9-12`
+
    ```nix
    src = pkgs.fetchurl {
      url = "https://github.com/charmbracelet/crush/archive/refs/tags/v0.37.0.tar.gz";
@@ -149,6 +158,7 @@ just crush-info
 Patches are NOT automatically updated. After version update:
 
 1. **Check build output** for patch conflicts:
+
    ```
    Hunk #1 FAILED at line 42
    1 out of 3 hunks FAILED
@@ -167,11 +177,13 @@ Patches are NOT automatically updated. After version update:
 ### Vendor Hash Explanation
 
 Crush uses Go modules (vendor directory). The hash changes with each version because:
+
 - Go modules lock file (`go.mod`, `go.sum`) changes
 - Dependency versions may change
 - Nix needs deterministic hash for reproducibility
 
 **Workflow:**
+
 1. Use `lib.fakeHash` initially
 2. Nix builds and computes actual hash
 3. Extract hash from error: `got: sha256:...`
@@ -182,7 +194,7 @@ Crush uses Go modules (vendor directory). The hash changes with each version bec
 
 If you prefer manual control, or if `just update` fails:
 
-```bash
+````bash
 
 ```bash
 # Step 1: Update version
@@ -202,7 +214,7 @@ nix build .#crush-patched
 
 # Step 6: Verify
 ./result/bin/crush --version
-```
+````
 
 ## Troubleshooting
 

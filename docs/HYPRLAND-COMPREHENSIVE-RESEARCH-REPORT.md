@@ -49,12 +49,14 @@ Your Hyprland setup on NixOS (evo-x2, AMD Ryzen AI Max+ 395) is **well-structure
 ### Issue 1: Waybar Media Module Errors (HIGH PRIORITY)
 
 **Error in logs:**
+
 ```
 [error] custom/media: mixing manual and automatic argument indexing is no longer supported;
 try replacing "{}" with "{text}" in your format specifier
 ```
 
 **Location:** `platforms/nixos/desktop/waybar.nix:135`
+
 ```nix
 exec = "playerctl metadata --format '{{artist}} - {{title}}' || echo 'Nothing playing'";
 ```
@@ -67,11 +69,13 @@ exec = "playerctl metadata --format '{{artist}} - {{title}}' || echo 'Nothing pl
 ### Issue 2: Missing Security Script (HIGH PRIORITY)
 
 **Error in logs:**
+
 ```
 sh: line 1: /home/lars/.config/waybar/security-status.sh: No such file or directory
 ```
 
 **Location:** `platforms/nixos/desktop/waybar.nix:151`
+
 ```nix
 exec = "~/.config/waybar/security-status.sh";
 ```
@@ -84,6 +88,7 @@ exec = "~/.config/waybar/security-status.sh";
 ### Issue 3: Ghost Wallpaper Module Not Integrated (MEDIUM)
 
 **Location:** `platforms/nixos/desktop/hyprland.nix:34`
+
 ```nix
 # Note: btop-bg is now handled by ghost-btop-wallpaper module
 ```
@@ -111,6 +116,7 @@ exec = "~/.config/waybar/security-status.sh";
 ### Priority 1: Fix Waybar Errors (Immediate)
 
 **1. Fix Media Module Format String**
+
 ```nix
 # platforms/nixos/desktop/waybar.nix:135
 # Change from:
@@ -123,6 +129,7 @@ exec = "playerctl metadata --format '{artist} - {title}' || echo 'Nothing playin
 **2. Create Security Script or Remove Module**
 
 Option A - Create script:
+
 ```bash
 #!/usr/bin/env fish
 # ~/.config/waybar/security-status.sh
@@ -134,6 +141,7 @@ end
 ```
 
 Option B - Remove module (if not needed):
+
 ```nix
 # Comment out line 33 in waybar.nix
 # "custom/security",
@@ -146,6 +154,7 @@ Option B - Remove module (if not needed):
 **Recommended Plugins:**
 
 1. **Hyprland-hy3** (i3-like layout)
+
 ```nix
 # platforms/nixos/desktop/hyprland.nix
 plugins = [
@@ -155,11 +164,13 @@ plugins = [
 ```
 
 2. **Hyprsplit** (multi-monitor workspace management)
+
 ```nix
 # Add via flake input (recommended for stability)
 ```
 
 **Benefits:**
+
 - Better multi-monitor support
 - i3-style layouts (many developers prefer)
 - Improved workspace organization
@@ -169,6 +180,7 @@ plugins = [
 ### Priority 3: Enhance Keybindings for Development Workflows
 
 **Add Development-Focused Keybindings:**
+
 ```nix
 # Add to platforms/nixos/desktop/hyprland.nix
 
@@ -197,6 +209,7 @@ plugins = [
 ### Priority 4: Add Performance Optimizations
 
 **Add to hyprland.nix:**
+
 ```nix
 render = {
   direct_scanout = 1;           # Reduced latency
@@ -225,6 +238,7 @@ input = {
 ### Priority 5: Improve Workspace Organization
 
 **Add Workspace Naming:**
+
 ```nix
 workspace = 1, name:💻 Dev
 workspace = 2, name:🌐 Web
@@ -239,6 +253,7 @@ workspace = 10, name:🌟 Misc
 ```
 
 **Add Workspace-on-Monitor Rules (for future multi-monitor):**
+
 ```nix
 workspace = 1, monitor:HDMI-A-1
 workspace = 2, monitor:HDMI-A-1
@@ -250,6 +265,7 @@ workspace = 2, monitor:HDMI-A-1
 ### Priority 6: Window Rules Enhancements
 
 **Add More Useful Rules:**
+
 ```nix
 windowrulev2 = [
   # Dialogs should float
@@ -280,6 +296,7 @@ windowrulev2 = [
 ### Priority 7: Add Idle Management
 
 **Create hypridle configuration:**
+
 ```nix
 # platforms/nixos/desktop/hyprland.nix
 services.hypridle = {
@@ -310,13 +327,13 @@ services.hypridle = {
 
 **Based on research, here's comparison:**
 
-| Window Manager | Pros | Cons | For You? |
-|---|---|---|---|
-| **Hyprland** | Modern, Wayland, fast, rich ecosystem | Newer, smaller community | ✅ **YES** - You have this, keep it |
-| **i3** | Mature, stable, huge community | X11 only, no Wayland | ❌ No - Hyprland better |
-| **Sway** | i3-compatible, Wayland | Less active development | ⚠️ Maybe - If you want i3-style |
-| **bspwm** | Lightweight, fast | Tiling only, no floating | ❌ No - Hyprland more features |
-| **awesome** | Lua-configurable, very flexible | Steeper learning curve | ❌ No - Too complex |
+| Window Manager | Pros                                  | Cons                     | For You?                            |
+| -------------- | ------------------------------------- | ------------------------ | ----------------------------------- |
+| **Hyprland**   | Modern, Wayland, fast, rich ecosystem | Newer, smaller community | ✅ **YES** - You have this, keep it |
+| **i3**         | Mature, stable, huge community        | X11 only, no Wayland     | ❌ No - Hyprland better             |
+| **Sway**       | i3-compatible, Wayland                | Less active development  | ⚠️ Maybe - If you want i3-style     |
+| **bspwm**      | Lightweight, fast                     | Tiling only, no floating | ❌ No - Hyprland more features      |
+| **awesome**    | Lua-configurable, very flexible       | Steeper learning curve   | ❌ No - Too complex                 |
 
 **Recommendation:** **Stay with Hyprland** - It's best choice for 2025 with Wayland support and active development.
 
@@ -327,6 +344,7 @@ services.hypridle = {
 ### 1. Developer Workflow Optimizations
 
 **Workspace Strategy:**
+
 ```
 Workspace 1 (💻): Main terminal + IDE
 Workspace 2 (🌐): Browser + docs
@@ -339,13 +357,16 @@ Special Workspace (📋): Scratchpads (keepassxc, notes)
 ```
 
 **Terminal Integration:**
+
 - Use tmux for session management
 - Set up different sessions: `dev`, `sys`, `ops`
 - Quick access with keybindings
 
 **Clipboard Management:**
+
 - You have `cliphist` installed ✅
 - Add keybinding to access history:
+
 ```nix
 "$mod, V, exec, cliphist list | rofi -dmenu | cliphist decode | wl-copy"
 ```
@@ -365,6 +386,7 @@ environment.sessionVariables = {
 ```
 
 **Monitor GPU Performance:**
+
 ```bash
 # Add to autostart
 nvtop &  # GPU monitoring
@@ -375,6 +397,7 @@ nvtop &  # GPU monitoring
 ### 3. Visual Enhancements
 
 **Add swww for animated wallpapers:**
+
 ```nix
 # Already have swww installed
 # Add to exec-once in hyprland.nix
@@ -385,6 +408,7 @@ nvtop &  # GPU monitoring
 ```
 
 **Create wallpaper rotation script:**
+
 ```bash
 #!/usr/bin/env fish
 # ~/.local/bin/rotate-wallpaper
@@ -398,31 +422,37 @@ swww img $random_wallpaper --transition-type grow --transition-fps 60
 ## 📝 IMPLEMENTATION ROADMAP
 
 ### Phase 1: Critical Fixes (30 minutes)
+
 1. ✅ Fix Waybar media module format string
 2. ✅ Create security-status.sh or remove module
 3. ✅ Test to verify errors are gone
 
 ### Phase 2: Plugin Installation (1 hour)
+
 1. ✅ Add hy3 plugin
 2. ✅ Test hy3 layout
 3. ✅ Configure hy3 keybindings
 
 ### Phase 3: Enhanced Keybindings (1 hour)
+
 1. ✅ Add development-focused shortcuts
 2. ✅ Create resize submap
 3. ✅ Add clipboard history shortcut
 
 ### Phase 4: Performance Optimizations (30 minutes)
+
 1. ✅ Add render settings
 2. ✅ Add misc optimizations
 3. ✅ Test performance impact
 
 ### Phase 5: Visual Enhancements (1 hour)
+
 1. ✅ Add workspace naming
 2. ✅ Configure swww wallpapers
 3. ✅ Create rotation script
 
 ### Phase 6: Advanced Features (optional, 2 hours)
+
 1. ⚠️ Add hyprsplit for multi-monitor
 2. ⚠️ Configure hypridle
 3. ⚠️ Integrate ghost-wallpaper module properly
@@ -444,6 +474,7 @@ Total time: **~16 minutes** for immediate improvements
 ## 📈 SYSTEM HEALTH
 
 ### Current State
+
 - ✅ AMD GPU: No errors in dmesg
 - ✅ Hyprland: Starts successfully
 - ✅ Waybar: Running but with errors
@@ -452,6 +483,7 @@ Total time: **~16 minutes** for immediate improvements
 - ✅ Performance: Good (optimizations applied)
 
 ### Monitor Commands
+
 ```bash
 # Check Hyprland status
 hyprctl systeminfo
@@ -493,6 +525,7 @@ journalctl -f -u hyprland* --user
 ## ✅ SUMMARY
 
 **Your Hyprland setup is solid!** The main issues are:
+
 1. Waybar errors (quick fix)
 2. Missing plugins (medium effort)
 3. Can enhance keybindings and visual polish

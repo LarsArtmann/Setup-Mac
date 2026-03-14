@@ -23,6 +23,7 @@ When running `nh darwin switch`, the tool follows this sequence:
    - Build completes successfully
 
 2. **Elevation Phase (FAILS):**
+
    ```bash
    sudo env ... nix build --no-link --profile /nix/var/nix/profiles/system
    /var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T/nh-osslW3wu/result

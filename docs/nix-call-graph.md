@@ -237,11 +237,13 @@ Level 7 (External): Input flakes and external integrations
 ## 🚀 Performance Considerations
 
 ### Hot Paths (Frequently Evaluated)
+
 - `core/Validation.nix` - Called for every package
 - `core/TypeSafetySystem.nix` - Type checking throughout
 - `environment.nix` - Package resolution
 
 ### Cold Paths (Evaluated Once)
+
 - `flake.nix` - Only during system rebuild
 - External flake inputs - Only during updates
 - Template definitions - Only during build
@@ -249,17 +251,20 @@ Level 7 (External): Input flakes and external integrations
 ## 🔧 Maintenance Guidelines
 
 ### Safe Refactoring Zones
+
 - Application wrappers (low coupling)
 - External integrations (well-isolated)
 - Configuration modules (clear interfaces)
 
 ### High-Risk Areas (Caution Required)
+
 - Core validation system
 - Type definitions
 - flake.nix entry point
 - Wrapper template system
 
 ### Testing Strategy
+
 - **Unit Tests**: Individual core modules
 - **Integration Tests**: Wrapper system
 - **System Tests**: Full configuration rebuild
@@ -279,6 +284,6 @@ Level 7 (External): Input flakes and external integrations
 
 ---
 
-*Generated on: November 10, 2025*
-*System: Nix-Darwin + Homebrew Hybrid Setup*
-*Architecture: Modular, Type-Safe, Declarative*
+_Generated on: November 10, 2025_
+_System: Nix-Darwin + Homebrew Hybrid Setup_
+_Architecture: Modular, Type-Safe, Declarative_

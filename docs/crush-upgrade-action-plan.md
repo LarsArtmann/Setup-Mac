@@ -10,6 +10,7 @@
 ## 📊 Current Situation
 
 ### Working System
+
 - ✅ **v0.39.1** builds successfully
 - ✅ All patches removed (correct decision - they were obsolete)
 - ✅ Automation script works 100% correctly
@@ -17,12 +18,15 @@
 - ✅ System always in consistent state
 
 ### Blocking Issues
+
 - ❌ **Disk Space Critical**: Only 2.9GB available (99% used)
 - ❌ **v0.39.3 Upstream Issue**: Vendor directory inconsistent
 - ❌ **Cannot Build**: Go builds require ~20GB free space
 
 ### Automation System Status
+
 ✅ **All Components Working**:
+
 1. Version detection from GitHub API
 2. Backup creation before changes
 3. VendorHash extraction from build errors
@@ -37,22 +41,26 @@
 ### Issue 1: Disk Space (Critical)
 
 **Symptom**:
+
 ```
 mkdir /nix/var/nix/builds/.../go-build2392749035/b995/: no space left on device
 ```
 
 **Current State**:
+
 ```
 Filesystem      Size  Used Avail Use% Mounted on
 /dev/disk3s7    229G  226G  2.9G  99% /nix
 ```
 
 **Root Cause**:
+
 - Go builds require temporary space during compilation
 - Build artifacts, sources, and modules all use Nix store
 - Current free space insufficient for any Go builds
 
 **Attempted Solutions**:
+
 - ✅ `nix-collect-garbage -d` - Ran but freed minimal space
 - ✅ `nix-store --optimize` - Already optimized (hard-linking saves 4.9GB)
 - ✅ Removed `pkgs/result` symlink - Helped but not enough
@@ -60,6 +68,7 @@ Filesystem      Size  Used Avail Use% Mounted on
 
 **Analysis**:
 All Nix store paths are kept alive by GC roots:
+
 - System generations (3 total)
 - Home Manager generation (1 total)
 - Current system profile
@@ -71,6 +80,7 @@ All Nix store paths are kept alive by GC roots:
 ### Issue 2: v0.39.2+ Vendor Directory (Upstream)
 
 **Symptom**:
+
 ```
 go: inconsistent vendoring in /nix/var/nix/builds/...:
   charm.land/bubbles/v2@v2.0.0-rc.1.0.20260109112849-ae99f46cec66:
@@ -83,13 +93,16 @@ The upstream Crush repository has an inconsistent vendor directory in v0.39.2+ r
 The `vendor/modules.txt` file doesn't match the dependencies in `go.mod`.
 
 **Affected Versions**:
+
 - v0.39.2: ❌ Vendor directory broken
 - v0.39.3: ❌ Vendor directory broken
 
 **Working Versions**:
+
 - v0.39.1: ✅ Vendor directory consistent
 
 **Attempts to Fix**:
+
 1. ❌ Remove all patches - Still failed with vendor errors
 2. ❌ Add `preBuild` with `go mod vendor` - Vendor still broken
 3. ❌ Add `GOFLAGS = "-mod=mod"` - Still failed
@@ -107,6 +120,7 @@ Our automation correctly detects the problem and rolls back.
 ### Phase 1: Free Disk Space (Required Before Any Build)
 
 **Option A: Aggressive Cleanup** (Requires ~15-20GB)
+
 ```bash
 # This will remove ALL old generations (not just old ones)
 # Some tools may need reinstalling after this
@@ -121,11 +135,13 @@ nix-store --optimize    # Deduplicate files
 **Expected Result**: Free ~15-30GB
 
 **Side Effects**:
+
 - Old system generations removed
 - Some packages may need rebuilding
 - Initial `just switch` will take longer
 
 **Option B: External Cleanup** (If above insufficient)
+
 ```bash
 # Check what's taking space outside Nix
 du -sh ~/Library/Caches/* | sort -rh | head -20
@@ -136,6 +152,7 @@ du -sh /Users/larsartmann/.cache/* | sort -rh | head -20
 ```
 
 **Option C: Nix Store Relocation** (Nuclear option)
+
 ```bash
 # Move Nix store to larger disk
 # This is complex and risky - only attempt if absolutely necessary
@@ -149,11 +166,13 @@ du -sh /Users/larsartmann/.cache/* | sort -rh | head -20
 
 **Option A: Wait for Upstream Fix** (Recommended)
 Monitor GitHub for:
+
 1. New release (v0.39.4 or later) that fixes vendoring
 2. Issue/PR addressing vendor directory consistency
 3. Announcement of fix
 
 **How to Monitor**:
+
 ```bash
 # Check GitHub issues for vendor-related problems
 gh issue list --repo charmbracelet/crush --search vendor
@@ -164,6 +183,7 @@ gh release list --repo charmbracelet/crush --limit 5
 
 **Option B: Patch Nix Expression** (If upstream slow)
 Create workaround in `pkgs/crush-patched.nix`:
+
 ```nix
 # Add postUnpack to regenerate vendor directory
 postUnpack = ''
@@ -175,6 +195,7 @@ postUnpack = ''
 **Note**: This may not work if upstream `go.mod` is also broken.
 
 **Option C: Use buildGoModule Without Vendor**
+
 ```nix
 # Remove vendorHash, let Nix download dependencies
 buildGoModule {
@@ -192,10 +213,12 @@ buildGoModule {
 ### Phase 3: Test v0.39.3 Upgrade
 
 **Prerequisites**:
+
 - ✅ At least 20GB free disk space
 - ✅ Vendor directory issue resolved (or workaround in place)
 
 **Steps**:
+
 ```bash
 # 1. Try automatic update (will handle everything)
 just update
@@ -212,6 +235,7 @@ crush --version
 ```
 
 **What Automation Will Do**:
+
 1. Detect latest version (v0.39.3)
 2. Backup current Nix file
 3. Update version to v0.39.3
@@ -221,6 +245,7 @@ crush --version
 7. If success: Clean up backup
 
 **Expected Outcome**:
+
 - If vendor fixed: ✅ Upgrade succeeds, new version installed
 - If vendor broken: ⚠️ Rollback, system unchanged, clear error message
 
@@ -240,6 +265,7 @@ A local copy of all dependencies in the `vendor/` directory.
 `vendor/modules.txt` must match `go.mod` exactly. When they differ, Go builds fail.
 
 **Why v0.39.1 works but v0.39.2+ doesn't?**
+
 - v0.39.1: `go.mod` and `vendor/modules.txt` consistent
 - v0.39.2+: Dependency updates broke synchronization
 - Likely cause: Manual vendoring without updating modules.txt
@@ -248,6 +274,7 @@ A local copy of all dependencies in the `vendor/` directory.
 
 **What keeps paths alive?**
 GC roots (symlinks) prevent deletion:
+
 - System generations
 - User profiles
 - Build result symlinks
@@ -258,6 +285,7 @@ All large packages (llvm, rustc, etc.) are in active system generations.
 
 **Why 99% used?**
 Go builds + source files + compiled binaries = large storage
+
 - LLVM source: 1.4GB
 - Rustc builds: ~878MB each
 - Multiple versions kept for rollback safety
@@ -267,6 +295,7 @@ Go builds + source files + compiled binaries = large storage
 ## ✅ What Works Right Now
 
 ### Current System
+
 ```bash
 # This works perfectly (v0.39.1)
 just switch      # ✅ Applies current config
@@ -277,6 +306,7 @@ just update      # ⚠️ Will try v0.39.3, roll back on failure
 ```
 
 ### Automation System
+
 ```bash
 # Version detection (tested)
 ./pkgs/update-crush-patched.sh
@@ -300,6 +330,7 @@ just update      # ⚠️ Will try v0.39.3, roll back on failure
 ## 📋 Summary
 
 ### Current State: 🟡 Partial Success
+
 - Automation: ✅ 100% working
 - v0.39.1: ✅ Building and working
 - v0.39.3: ❌ Blocked by upstream vendor issue
@@ -332,18 +363,21 @@ just update      # ⚠️ Will try v0.39.3, roll back on failure
 ## 🎓 Lessons Learned
 
 ### What Worked Well
+
 1. ✅ **Automation with rollback** - System never in broken state
 2. ✅ **Comprehensive testing** - All logic paths validated
 3. ✅ **Clear error messages** - User knows exactly what's happening
 4. ✅ **Modular design** - Easy to test individual components
 
 ### What We Discovered
+
 1. **Go vendor directory complexity** - More fragile than expected
 2. **Nix store GC limitations** - Can't remove actively used packages
 3. **Disk space critical** - Go builds need significant temporary space
 4. **Upstream dependency** - Sometimes need to wait for fixes
 
 ### What We'd Do Differently
+
 1. **Proactive monitoring** - Watch GitHub for breaking changes
 2. **Staging environment** - Test upgrades before production
 3. **Larger disk** 50GB+ buffer for Nix builds
@@ -401,12 +435,12 @@ cat pkgs/crush-patched.nix | grep "version ="
 
 ## 📅 Timeline Estimate
 
-| Task | Estimate | Dependencies |
-|------|----------|--------------|
-| Free disk space | 10 min | None |
-| Upstream vendor fix | 1-2 weeks | External (Crush team) |
-| Test v0.39.3 | 5 min | Disk space + vendor fix |
-| Complete upgrade | 1 hour | All above |
+| Task                | Estimate  | Dependencies            |
+| ------------------- | --------- | ----------------------- |
+| Free disk space     | 10 min    | None                    |
+| Upstream vendor fix | 1-2 weeks | External (Crush team)   |
+| Test v0.39.3        | 5 min     | Disk space + vendor fix |
+| Complete upgrade    | 1 hour    | All above               |
 
 **Total Time**: 1-2 weeks (mostly waiting for upstream fix)
 

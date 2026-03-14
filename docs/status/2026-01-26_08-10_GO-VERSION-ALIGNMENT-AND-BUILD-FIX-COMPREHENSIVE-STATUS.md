@@ -268,6 +268,7 @@ golangci-lint version
    - Check system path for netscanner references
 
 5. **Run Comprehensive Health Check**
+
    ```bash
    just health
    ```
@@ -343,6 +344,7 @@ golangci-lint version
    - Update with each new package addition
 
 10. **Audit Current Common Packages**
+
     ```bash
     # Check each package in platforms/common/packages/base.nix
     for pkg in glow bottom procs btop htop sd dust coreutils findutils gnused graphviz taskwarrior3 timewarrior; do

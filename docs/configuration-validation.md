@@ -44,6 +44,7 @@ This framework provides bulletproof validation to prevent configuration errors b
 ### Setup
 
 1. **Install pre-commit hooks:**
+
    ```bash
    just setup-hooks
    # or manually:
@@ -137,43 +138,51 @@ just benchmark       # Performance benchmarking
 ### Nix Configuration Validation
 
 #### Syntax Validation
+
 - **Flake check:** `nix flake check` with timeout protection
 - **Individual file parsing:** Validates each `.nix` file syntax
 - **Lock file consistency:** Ensures `flake.lock` is valid and consistent
 
 #### Security Scanning
+
 - **Hardcoded secrets detection:** Scans for passwords, keys, tokens
 - **Insecure settings:** Identifies `allowUnfree`, `allowBroken` usage
 - **Path validation:** Checks for hardcoded sensitive paths
 
 #### Home Manager Integration
+
 - **Configuration validation:** Tests Home Manager build process
 - **Syntax checking:** Validates `home.nix` structure
 
 ### Shell Configuration Validation
 
 #### Fish Shell
+
 - **Syntax validation:** `fish -n` for syntax checking
 - **Startup performance:** Measures startup time with thresholds
 - **Configuration testing:** Tests Fish-specific configurations
 
 #### Zsh Configuration
+
 - **Syntax validation:** `zsh -n` for syntax checking
 - **Startup performance:** Monitors Zsh initialization time
 - **Profile validation:** Checks `.zshrc`, `.zprofile`, `.zshenv`
 
 #### Bash Configuration
+
 - **Syntax validation:** `bash -n` for syntax checking
 - **Profile validation:** Checks `.bashrc`, `.bash_profile`, `.profile`
 
 ### Dependency Conflict Detection
 
 #### Package Manager Conflicts
+
 - **Nix vs Homebrew:** Detects packages installed by both managers
 - **PATH analysis:** Identifies duplicate entries and conflicts
 - **Version conflicts:** Checks for incompatible package versions
 
 #### Service Conflicts
+
 - **macOS services:** Monitors launchd service conflicts
 - **Port conflicts:** Identifies services competing for same ports
 - **Process conflicts:** Detects conflicting background processes
@@ -193,6 +202,7 @@ NIX_BUILD_TIMEOUT=300
 ### Performance Monitoring
 
 The framework monitors:
+
 - Shell startup times for Fish, Zsh, and Bash
 - Nix evaluation and build times
 - Validation execution duration
@@ -204,7 +214,7 @@ The framework monitors:
 
 Pre-commit hooks automatically run validation on:
 
-- **Nix files (*.nix):** Quick Nix validation
+- **Nix files (\*.nix):** Quick Nix validation
 - **Shell files:** Shell configuration validation
 - **Package files:** Dependency conflict checking
 
@@ -240,12 +250,14 @@ repos:
 ### Recovery Strategies
 
 #### Backup and Restore
+
 ```bash
 just backup           # Create configuration backup
 just restore BACKUP   # Restore from backup
 ```
 
 #### Incremental Validation
+
 ```bash
 # Validate specific components
 just validate-nix     # Only Nix issues
@@ -254,6 +266,7 @@ just validate-deps    # Only dependency issues
 ```
 
 #### Debug Mode
+
 ```bash
 ./scripts/config-validate.sh --verbose nix
 just debug
@@ -315,6 +328,7 @@ just validate-report custom.md    # Custom report name
 ### Common Issues
 
 #### Nix Flake Check Failures
+
 ```bash
 # Debug with verbose output
 nix flake check --show-trace
@@ -324,6 +338,7 @@ nix-instantiate --parse file.nix
 ```
 
 #### Shell Startup Performance
+
 ```bash
 # Benchmark all shells
 just benchmark
@@ -333,6 +348,7 @@ time fish -c "echo test"
 ```
 
 #### Dependency Conflicts
+
 ```bash
 # Check specific conflicts
 just validate-deps --verbose
@@ -390,6 +406,7 @@ validate_custom_rule() {
 ### Sensitive Data Detection
 
 The framework scans for:
+
 - Hardcoded passwords and API keys
 - SSH private key paths
 - GPG key directories
@@ -441,4 +458,4 @@ just --list          # All available commands
 
 ---
 
-*This documentation covers the comprehensive configuration validation framework designed to prevent configuration errors and ensure system reliability through careful, thorough validation processes.*
+_This documentation covers the comprehensive configuration validation framework designed to prevent configuration errors and ensure system reliability through careful, thorough validation processes._

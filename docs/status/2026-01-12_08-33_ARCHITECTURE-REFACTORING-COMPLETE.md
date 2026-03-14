@@ -490,6 +490,7 @@ Find idiomatic Nix/nix-darwin pattern for:
    - Priority: Low
 
 7. **`darwin/networking/default.nix`** (Line 5)
+
    ```nix
    # TODO: Add any Darwin-specific networking settings here
    ```

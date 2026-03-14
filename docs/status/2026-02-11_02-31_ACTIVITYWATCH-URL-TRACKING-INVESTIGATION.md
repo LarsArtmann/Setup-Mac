@@ -66,6 +66,7 @@ GET http://localhost:5600/api/0/buckets/aw-watcher-window_Lars-MacBook-Air.local
    - Logs: `~/.local/share/activitywatch/stdout.log`
 
 3. **Local Config** (`~/Library/Application Support/activitywatch/aw-watcher-window/aw-watcher-window.toml`):
+
    ```toml
    [aw-watcher-window]
    #exclude_title = false

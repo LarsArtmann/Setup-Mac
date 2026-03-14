@@ -1,6 +1,9 @@
 # Report: Setup-Mac Dendritic Pattern Analysis
+
 ## Target Agent: AI Code Reviewer / Refactoring Agent
+
 ## Project: Setup-Mac Nix Configuration System
+
 ## Analysis Date: 2025-01-29
 
 ---
@@ -10,6 +13,7 @@
 The **Setup-Mac** project is a **nix-darwin + NixOS** system flake that demonstrates **partial adoption** of the Dendritic Pattern architecture. While it correctly uses **`flake-parts`** as its modular framework, it **significantly deviates** from full Dendritic Pattern compliance due to the **absence of `import-tree`** and heavy reliance on **manual relative imports**.
 
 ### Current State: **PARTIAL DENDRITIC PATTERN**
+
 - **✅ Correct**: Uses `flake-parts` framework
 - **❌ Missing**: No `import-tree` dependency or recursive module discovery
 - **❌ Anti-Pattern**: Extensive use of relative imports (`imports = [ ./path/... ]`)
@@ -20,6 +24,7 @@ The **Setup-Mac** project is a **nix-darwin + NixOS** system flake that demonstr
 ## 2. Core Dependencies & Setup Analysis
 
 ### Current `flake.nix` Dependencies
+
 ```nix
 {
   inputs = {
@@ -42,6 +47,7 @@ The **Setup-Mac** project is a **nix-darwin + NixOS** system flake that demonstr
 ```
 
 ### Current Root Logic Pattern
+
 ```nix
 outputs = inputs @ { flake-parts, ... }:
   flake-parts.lib.mkFlake { inherit inputs; } {
@@ -90,6 +96,7 @@ The current Setup-Mac project **partially uses** `flake-parts but **does not fol
 ### Current Module Structure: **BROKEN RULE**
 
 **Violation #1: Raw NixOS Module Syntax**
+
 ```nix
 # File: platforms/darwin/home.nix
 { pkgs, ... }: {  # ❌ ANTI-PATTERN: Raw module, not flake-parts wrapper
@@ -103,6 +110,7 @@ The current Setup-Mac project **partially uses** `flake-parts but **does not fol
 ```
 
 **Correct Dendritic Pattern:**
+
 ```nix
 # Should be:
 { inputs, ... }: {
@@ -117,6 +125,7 @@ The current Setup-Mac project **partially uses** `flake-parts but **does not fol
 ```
 
 **Violation #2: Raw Home Manager Module**
+
 ```nix
 # File: platforms/common/programs/fish.nix
 _: {  # ❌ ANTI-PATTERN: Raw module, expecting to be imported
@@ -129,6 +138,7 @@ _: {  # ❌ ANTI-PATTERN: Raw module, expecting to be imported
 ```
 
 **Correct Dendritic Pattern:**
+
 ```nix
 { inputs, ... }: {
   flake.homeModules.fish = { pkgs, ... }: {
@@ -142,6 +152,7 @@ _: {  # ❌ ANTI-PATTERN: Raw module, expecting to be imported
 ```
 
 **Violation #3: Raw Package Definition**
+
 ```nix
 # File: platforms/common/packages/base.nix
 { pkgs, lib, llm-agents, helium, ... }: let
@@ -152,6 +163,7 @@ in {
 ```
 
 **Correct Dendritic Pattern:**
+
 ```nix
 { inputs, ... }: {
   perSystem = { pkgs, lib, ... }: {
@@ -192,6 +204,7 @@ platforms/darwin/default.nix:  imports = [
 ### Specific Import Violations:
 
 **Violation #1: Cross-file Dependencies via Paths**
+
 ```nix
 # platforms/common/home-base.nix
 imports = [
@@ -204,6 +217,7 @@ imports = [
 ```
 
 **Violation #2: Parent Directory References**
+
 ```nix
 # platforms/darwin/home.nix
 imports = [
@@ -213,6 +227,7 @@ imports = [
 ```
 
 **Violation #3: Deep Nesting**
+
 ```nix
 # platforms/common/packages/base.nix
 # Line 9: Deep relative import of crush-patched
@@ -261,6 +276,7 @@ platforms/common/
 **Missing Co-location Opportunities:**
 
 **Problem #1: Split Configuration Logic**
+
 ```nix
 # platforms/common/programs/fish.nix
 # - Fish shell configuration
@@ -269,6 +285,7 @@ platforms/common/
 ```
 
 **Problem #2: Package Definitions Split from System Config**
+
 ```nix
 # packages/base.nix defines which packages to install
 # But system configuration (how they're configured) is elsewhere
@@ -276,6 +293,7 @@ platforms/common/
 ```
 
 **Problem #3: Platform Logic Fragmented**
+
 ```
 platforms/
 ├── common/          # Shared across platforms
@@ -289,6 +307,7 @@ platforms/
 ```
 
 **Should be (Dendritic Pattern):**
+
 ```
 modules/
 ├── hosts/
@@ -310,6 +329,7 @@ modules/
 ### Current Issues Detected:
 
 **Issue #1: Nested Module Merging Risk**
+
 ```nix
 # flake.nix lines 91-121:
 # Darwin configuration with inline Home Manager module
@@ -327,6 +347,7 @@ modules/
 ```
 
 **Issue #2: External Options Access Pattern**
+
 ```nix
 # Platform files access external modules via function arguments
 # This is fragile compared to Dendritic Pattern
@@ -341,6 +362,7 @@ in {
 ```
 
 **Correct Pattern:**
+
 ```nix
 # Should access everything via inputs:
 { inputs, ... }: {
@@ -359,6 +381,7 @@ in {
 ### To convert Setup-Mac to Full Dendritic Pattern:
 
 **Step 1: Add import-tree Dependency**
+
 ```nix
 # flake.nix
 inputs = {
@@ -374,6 +397,7 @@ outputs = inputs @ { flake-parts, import-tree, ... }:
 ```
 
 **Step 2: Create modules/ Directory Structure**
+
 ```bash
 mkdir -p modules/{hosts,profiles,systems}
 
@@ -390,6 +414,7 @@ mv platforms/common/packages/base.nix modules/profiles/packages-base.nix
 **Step 3: Wrap Every File in flake-parts Module Format**
 
 Convert from:
+
 ```nix
 # Before: modules/profiles/shell-fish.nix
 { config, pkgs, ... }: {
@@ -398,6 +423,7 @@ Convert from:
 ```
 
 To:
+
 ```nix
 # After: modules/profiles/shell-fish.nix
 { inputs, ... }: {
@@ -410,6 +436,7 @@ To:
 **Step 4: Replace All Relative Imports with self References**
 
 Convert from:
+
 ```nix
 # Before
 imports = [
@@ -419,6 +446,7 @@ imports = [
 ```
 
 To:
+
 ```nix
 # After
 { inputs, self, ... }: {
@@ -434,12 +462,14 @@ To:
 **Step 5: Re-map Output Types**
 
 Convert from:
+
 ```nix
 # Before: packages defined in environment.systemPackages
 environment.systemPackages = with pkgs; [ git fish starship ];
 ```
 
 To:
+
 ```nix
 # After: packages as proper flake outputs
 { inputs, ... }: {
@@ -461,12 +491,14 @@ To:
 ### Readability: **PARTIAL** ⚠️
 
 **Current State:**
+
 - Files are organized by domain (good)
 - But module types are inconsistent
 - Dependencies are implicit via relative paths
 - Hard to trace where modules are used
 
 **Dendritic Target:**
+
 - Every file self-documents via `flake.*` exports
 - Clear dependencies via `self.nixosModules.*`
 - Easy to trace module usage throughout flake
@@ -475,6 +507,7 @@ To:
 ### Portability: **BROKEN** ❌
 
 **Current State:**
+
 ```bash
 $ nix run .#crush-patched
 # ✅ Works - defined in perSystem.packages
@@ -485,6 +518,7 @@ $ nix run .#some-package-from-base.nix
 ```
 
 **Dendritic Target:**
+
 ```bash
 $ nix run .#packages.aarch64-darwin.crush-patched
 # ✅ Works - properly exported via perSystem
@@ -496,6 +530,7 @@ $ nix run .#packages.x86_64-linux.essential-packages
 ### Scalability: **LIMITED** ⚠️
 
 **Current State:**
+
 - Adding a new file requires:
   1. Create the file
   2. Add relative import to parent
@@ -503,11 +538,13 @@ $ nix run .#packages.x86_64-linux.essential-packages
   4. Update flake.nix if new configuration type
 
 **Dendritic Target:**
+
 - Adding a new file requires:
   1. Create the file (exports itself via `flake.*`)
   2. ✅ Nothing else! Automatic discovery
 
 **Test: Does adding a new file require modifying any other file?**
+
 - **Current Answer: YES** ❌ (must update imports)
 - **Target Answer: NO** ✅ (automatic via import-tree)
 
@@ -518,6 +555,7 @@ $ nix run .#packages.x86_64-linux.essential-packages
 Despite deviations, Setup-Mac has **excellent architecture patterns:**
 
 ### Strength #1: Clear Separation of Concerns
+
 ```
 platforms/
 ├── common/      # 80% shared code
@@ -528,6 +566,7 @@ platforms/
 This is **better than typical** Nix projects and aligns with Dendritic goals.
 
 ### Strength #2: Type Safety System (Ghost Systems)
+
 ```
 platforms/common/core/
 ├── Types.nix       # Type definitions
@@ -539,6 +578,7 @@ platforms/common/core/
 This is **exceptional** and should be preserved in Dendritic migration.
 
 ### Strength #3: Cross-Platform Design
+
 - 80% code sharing between macOS and NixOS
 - Platform-specific overrides minimal
 - Home Manager for unified user experience
@@ -546,6 +586,7 @@ This is **exceptional** and should be preserved in Dendritic migration.
 This **aligns perfectly** with Dendritic Pattern principles.
 
 ### Strength #4: Documentation & Tooling
+
 - Comprehensive AGENTS.md documentation
 - Well-structured justfile
 - Pre-commit hooks and testing
@@ -561,21 +602,25 @@ This **exceeds typical** Dendritic Pattern implementations.
 Rather than full rewrite, **gradually migrate to Dendritic Pattern**:
 
 **Phase 1: Add import-tree (Low Risk)**
+
 - Add `import-tree` to flake.nix
 - Create `modules/` directory
 - Move one simple module (e.g., fish) to test pattern
 
 **Phase 2: Migrate Modules (Medium Risk)**
+
 - Convert `platforms/common/programs/` to `modules/profiles/`
 - Wrap each in `flake-parts` format
 - Update references to use `self`
 
 **Phase 3: Migrate Configurations (High Risk)**
+
 - Convert host configurations to Dendritic format
 - Test thoroughly on both macOS and NixOS
 - Remove old platforms/ directory
 
 **Phase 4: Full Dendritic (Completion)**
+
 - Remove all relative imports
 - Enable automatic discovery everywhere
 - Add CI/CD verification
@@ -583,16 +628,19 @@ Rather than full rewrite, **gradually migrate to Dendritic Pattern**:
 ### Risk Mitigation
 
 **Backup Before Migration:**
+
 ```bash
 just backup  # Create full configuration backup
 ```
 
 **Rollback Strategy:**
+
 ```bash
 just restore setup-mac-pre-dendritic  # Restore if issues
 ```
 
 **Testing Strategy:**
+
 ```bash
 just test           # Ensure no syntax errors
 just switch         # Test on current system
@@ -606,6 +654,7 @@ just health         # Full system verification
 ### Current State: **7/10 Architecture**
 
 Setup-Mac demonstrates **better-than-average** Nix architecture with:
+
 - ✅ Modular design
 - ✅ Cross-platform support
 - ✅ Type safety system
@@ -613,6 +662,7 @@ Setup-Mac demonstrates **better-than-average** Nix architecture with:
 - ✅ Working justfile automation
 
 **BUT** deviates from Dendritic Pattern in critical ways:
+
 - ❌ No automatic discovery
 - ❌ Manual relative imports everywhere
 - ❌ Mixed module types
@@ -621,6 +671,7 @@ Setup-Mac demonstrates **better-than-average** Nix architecture with:
 ### Target State: **10/10 Dendritic Pattern**
 
 Full migration would provide:
+
 - ✅ **Automatic** module discovery
 - ✅ **Zero** relative imports
 - ✅ **Consistent** module wrapping
@@ -639,29 +690,34 @@ The **benefits outweigh the risks**, especially when executed in phases with pro
 ## 12. Action Items
 
 **Immediate (Before Migration):**
+
 - [ ] Create comprehensive backup: `just backup`
 - [ ] Document current architecture in AGENTS.md
 - [ ] Run full test suite: `just test && just health`
 
 **Phase 1 (Week 1):**
+
 - [ ] Add `import-tree` to flake.nix
 - [ ] Create `modules/` directory structure
 - [ ] Migrate one simple module (fish) to Dendritic format
 - [ ] Test: `just test && just switch`
 
 **Phase 2 (Week 1-2):**
+
 - [ ] Migrate all program modules to `modules/profiles/`
 - [ ] Update references to use `self`
 - [ ] Test both macOS and NixOS hosts
 - [ ] Update AGENTS.md with Dendritic documentation
 
 **Phase 3 (Week 2-3):**
+
 - [ ] Migrate host configurations
 - [ ] Remove old platforms/ directory
 - [ ] Full system testing
 - [ ] Performance benchmarking: `just benchmark-all`
 
 **Phase 4 (Week 3-4):**
+
 - [ ] CI/CD integration for automatic testing
 - [ ] Documentation updates
 - [ ] Team training on new architecture

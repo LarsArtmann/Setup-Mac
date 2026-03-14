@@ -13,6 +13,7 @@ This module configures Technitium DNS Server as a network-wide DNS service for y
 ## Configuration
 
 The DNS server runs on:
+
 - Port 53 (DNS - UDP/TCP) - **Open to network**
 - Port 5380 (Web Console - HTTP) - **Open to network**
 - Port 53443 (Web Console - HTTPS) - **Open to network**
@@ -25,12 +26,14 @@ The DNS server runs on:
 ## Security Considerations
 
 ### Web Console Access
+
 - ⚠️ **WARNING:** Web console is exposed to network!
 - **RECOMMENDED:** Use reverse proxy with authentication
 - **ALTERNATIVE:** Use VPN for remote access
 - **REQUIRED:** Change default password immediately
 
 ### Firewall Configuration
+
 - All DNS ports are open to network
 - Allows any device on network to use this DNS server
 - Consider restricting to specific subnets if needed
@@ -38,6 +41,7 @@ The DNS server runs on:
 ## Network Deployment
 
 ### Option 1: Configure Router DHCP (Recommended)
+
 ```bash
 # 1. Access router admin panel
 #    Usually: http://192.168.1.1 or http://router
@@ -55,6 +59,7 @@ The DNS server runs on:
 ```
 
 ### Option 2: Manual Configuration
+
 ```bash
 # Configure each device individually
 
@@ -76,6 +81,7 @@ dig @192.168.1.100 google.com
 ```
 
 ### Option 3: Use Technitium's Built-in DHCP
+
 ```nix
 # Uncomment in dns.nix configuration:
 # services.dhcpcd.enable = false;
@@ -88,6 +94,7 @@ dig @192.168.1.100 google.com
 ## Setup Steps
 
 ### 1. Deploy Module
+
 ```bash
 # Import this module in Private Cloud configuration
 # platforms/nixos/private-cloud/default.nix
@@ -102,6 +109,7 @@ sudo nixos-rebuild switch --flake .#private-cloud-hostname
 ```
 
 ### 2. Access Web Console
+
 ```bash
 # Replace with actual Private Cloud IP
 xdg-open http://192.168.1.100:5380
@@ -112,6 +120,7 @@ firefox http://192.168.1.100:5380
 ### 3. Configure DNS Server (via Web Console)
 
 #### Initial Setup
+
 1. **Security:** Change admin password
    - Settings > General > Admin Password
    - Use strong password
@@ -142,6 +151,7 @@ firefox http://192.168.1.100:5380
    - Enable Log Queries, Log Responses
 
 ### 4. Configure Network Devices
+
 ```bash
 # Option A: Configure router DHCP (recommended)
 # See "Option 1" above
@@ -154,6 +164,7 @@ firefox http://192.168.1.100:5380
 ```
 
 ### 5. Test from Client Devices
+
 ```bash
 # From another device on network
 dig @192.168.1.100 google.com
@@ -174,11 +185,13 @@ dig @192.168.1.100 +dnssec example.net
 ## Monitoring
 
 ### Web Console Monitoring
+
 - Query Log: Real-time DNS requests from all devices
 - Statistics: Request rates, cache hit rate, blocked queries
 - Dashboard: Overview of DNS server status
 
 ### Command Line Monitoring
+
 ```bash
 # Check service status
 systemctl status technitium-dns-server
@@ -196,6 +209,7 @@ sudo iptables -L -n | grep 53
 ## Advanced Configuration
 
 ### Split DNS (Internal vs External)
+
 ```bash
 # Configure internal zones for local network
 # DNS Settings > Zones > Add Zone
@@ -208,6 +222,7 @@ sudo iptables -L -n | grep 53
 ```
 
 ### Conditional Forwarding
+
 ```bash
 # Forward specific domains to specific DNS servers
 # DNS Settings > Conditional Forwarders
@@ -218,6 +233,7 @@ sudo iptables -L -n | grep 53
 ```
 
 ### DNS-over-HTTPS/TLS for Privacy
+
 ```bash
 # Enable encrypted DNS to forwarders
 # DNS Settings > Forwarders > Edit Forwarder
@@ -233,6 +249,7 @@ sudo iptables -L -n | grep 53
 ```
 
 ### Clustering (Multiple DNS Servers)
+
 ```bash
 # Set up clustering for redundancy
 # Settings > Clustering > Configure Clustering
@@ -247,6 +264,7 @@ sudo iptables -L -n | grep 53
 ## Troubleshooting
 
 ### DNS Resolution Fails from Client
+
 ```bash
 # Check if DNS server is running
 systemctl status technitium-dns-server
@@ -265,6 +283,7 @@ journalctl -u technitium-dns-server -n 50
 ```
 
 ### Ad Blocking Not Working
+
 ```bash
 # Check blocklists in web console
 # Block Lists tab > Verify lists downloaded
@@ -276,6 +295,7 @@ dig @192.168.1.100 doubleclick.net
 ```
 
 ### Slow DNS Resolution
+
 ```bash
 # Check cache hit rate
 # Web Console > Statistics > Cache Hit Rate
@@ -291,6 +311,7 @@ dig @1.1.1.1 google.com +time=5
 ```
 
 ### Web Console Inaccessible
+
 ```bash
 # Check if service is listening
 ss -tulpn | grep 5380
@@ -303,6 +324,7 @@ sudo systemctl restart technitium-dns-server
 ```
 
 ### High Resource Usage
+
 ```bash
 # Check resource usage
 systemctl status technitium-dns-server
@@ -321,6 +343,7 @@ systemctl status technitium-dns-server
 ## Backup & Recovery
 
 ### Backup Configuration
+
 ```bash
 # Backup state directory
 sudo tar -czf backups/technitium-dns-$(date +%Y%m%d).tar.gz \
@@ -332,6 +355,7 @@ git commit -m "backup: Technitium DNS configuration"
 ```
 
 ### Restore Configuration
+
 ```bash
 # Stop service
 sudo systemctl stop technitium-dns-server
@@ -347,6 +371,7 @@ systemctl status technitium-dns-server
 ```
 
 ### NixOS Rollback
+
 ```bash
 # If DNS configuration causes issues
 sudo nixos-rebuild switch --rollback
@@ -359,6 +384,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 ## Performance Tuning
 
 ### Cache Settings
+
 - **Cache Size:** 500 MB - 2 GB (network-wide usage)
 - **Persistent Cache:** Enabled (faster startup)
 - **Serve Stale:** Enabled (works offline)
@@ -366,12 +392,14 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 - **Concurrent Queries:** 100-500 (depending on network size)
 
 ### Blocklist Optimization
+
 - Start with 5-10 blocklists
 - Monitor performance impact
 - Remove underperforming blocklists
 - Update weekly (automatic)
 
 ### Forwarder Optimization
+
 - Use multiple forwarders (redundancy)
 - Prefer encrypted protocols (DoH/DoT)
 - Test latency (choose fastest)
@@ -380,6 +408,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 ## Security Hardening
 
 ### Web Console Security
+
 - **Change default password** (critical!)
 - Enable HTTPS (port 53443) instead of HTTP
 - Use reverse proxy with authentication
@@ -387,6 +416,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 - Enable TOTP 2FA
 
 ### DNS Security
+
 - Enable DNSSEC validation
 - Use encrypted forwarders (DoH/DoT)
 - Enable query logging (audit trail)
@@ -394,6 +424,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 - Use VPN for remote management
 
 ### Network Security
+
 - Restrict access to trusted subnets
 - Use VPN for remote DNS access
 - Enable firewall logging
@@ -403,6 +434,7 @@ sudo nixos-rebuild switch --profile /nix/var/nix/profiles/system \
 ## Integration with Services
 
 ### Docker DNS Configuration
+
 ```nix
 # Configure Docker to use Private Cloud DNS
 virtualisation.docker = {
@@ -412,6 +444,7 @@ virtualisation.docker = {
 ```
 
 ### Kubernetes DNS Configuration
+
 ```bash
 # Configure CoreDNS to use Private Cloud
 # Edit CoreDNS ConfigMap
@@ -422,6 +455,7 @@ forward . 192.168.1.100 {
 ```
 
 ### VPN DNS Configuration
+
 ```bash
 # Configure VPN clients to use Private Cloud DNS
 # Prevents DNS leaks
@@ -436,6 +470,7 @@ forward . 192.168.1.100 {
 ## Monitoring & Alerting
 
 ### System Monitoring
+
 ```bash
 # Monitor with Netdata
 # Netdata dashboard: DNS section
@@ -445,6 +480,7 @@ forward . 192.168.1.100 {
 ```
 
 ### Alerting
+
 ```bash
 # Set up alerts for:
 # - DNS server down
@@ -457,6 +493,7 @@ forward . 192.168.1.100 {
 ## Benefits
 
 ### Before (Individual Device DNS)
+
 - ❌ No ad blocking
 - ❌ No caching (per-device)
 - ❌ No DNS visibility
@@ -464,6 +501,7 @@ forward . 192.168.1.100 {
 - ❌ No privacy features
 
 ### After (Private Cloud DNS)
+
 - ✅ Network-wide ad blocking
 - ✅ Shared cache (better performance)
 - ✅ Full DNS visibility (all devices)
@@ -482,6 +520,7 @@ forward . 192.168.1.100 {
 ## Support
 
 For Private Cloud-specific issues:
+
 ```bash
 # Check DNS configuration
 cat platforms/nixos/private-cloud/dns.nix
@@ -494,6 +533,7 @@ cat platforms/nixos/private-cloud/networking.nix
 ```
 
 For general Technitium DNS issues:
+
 - Web Console Help: http://192.168.1.100:5380/help.html
 - GitHub Issues: https://github.com/TechnitiumSoftware/DnsServer/issues
 - Technitium Support: https://technitium.com/contact/

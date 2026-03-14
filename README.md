@@ -57,23 +57,27 @@ platforms/
 ### Shared Modules
 
 **Fish Shell** (`platforms/common/programs/fish.nix`):
+
 - Common aliases: `l` (list), `t` (tree)
 - Platform-specific alias placeholders
 - Fish greeting disabled (performance)
 - Fish history settings configured
 
 **Starship Prompt** (`platforms/common/programs/starship.nix`):
+
 - Identical on both platforms
 - Fish integration automatic
 - Settings: `add_newline = false`, `format = "$all$character"`
 
 **Tmux** (`platforms/common/programs/tmux.nix`):
+
 - Identical on both platforms
 - Clock24 enabled, mouse enabled
 - Base index: 1, terminal: screen-256color
 - History limit: 100000
 
 **ActivityWatch** (`platforms/common/programs/activitywatch.nix`):
+
 - Platform-conditional: `enable = pkgs.stdenv.isLinux`
 - Darwin: DISABLED (not supported on macOS)
 - NixOS: ENABLED (supported on Linux)
@@ -81,11 +85,13 @@ platforms/
 ### Platform-Specific Overrides
 
 **Darwin** (`platforms/darwin/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (darwin-rebuild)
 - Fish init: Homebrew integration, Carapace completions
 - No Starship/Tmux overrides (uses shared modules)
 
 **NixOS** (`platforms/nixos/users/home.nix`):
+
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (nixos-rebuild)
 - Session variables: Wayland, Qt, NixOS_OZONE_WL
 - Packages: pavucontrol (audio), xdg utils
@@ -104,6 +110,7 @@ platforms/
    - `platforms/nixos/users/home.nix` - NixOS-specific overrides
 
 3. **Validate configuration**:
+
    ```bash
    # Fast syntax check (no build)
    just test-fast
@@ -113,6 +120,7 @@ platforms/
    ```
 
 4. **Apply changes**:
+
    ```bash
    # Darwin (macOS)
    just switch
@@ -129,6 +137,7 @@ platforms/
 ### Import Paths
 
 **Darwin Home Manager** (`platforms/darwin/home.nix`):
+
 ```nix
 imports = [
   ../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -136,6 +145,7 @@ imports = [
 ```
 
 **NixOS Home Manager** (`platforms/nixos/users/home.nix`):
+
 ```nix
 imports = [
   ../../common/home-base.nix  // Resolves to platforms/common/home-base.nix
@@ -147,9 +157,11 @@ imports = [
 ### Known Issues
 
 #### Home Manager Users Definition (Darwin)
+
 **Issue**: Home Manager's `nix-darwin/default.nix` imports `../nixos/common.nix` (NixOS-specific file) which requires `config.users.users.<name>.home` to be defined.
 
 **Workaround**: Added explicit user definition in `platforms/darwin/default.nix`:
+
 ```nix
 users.users.lars = {
   name = "lars";
@@ -162,6 +174,7 @@ users.users.lars = {
 **Note**: This may be a Home Manager architecture issue. Consider reporting if causes problems in future versions.
 
 #### ActivityWatch Platform Support
+
 **Issue**: ActivityWatch only supports Linux platforms, not Darwin (macOS).
 
 **Workaround**: Made conditional - `enable = pkgs.stdenv.isLinux` in `platforms/common/programs/activitywatch.nix`.
@@ -171,8 +184,10 @@ users.users.lars = {
 ### Troubleshooting
 
 #### Starship Prompt Not Appearing
+
 **Problem**: Default Fish prompt instead of Starship
 **Solution**:
+
 ```bash
 # Restart shell
 exec fish
@@ -185,8 +200,10 @@ which starship
 ```
 
 #### Fish Aliases Not Working
+
 **Problem**: `nixup` command not found
 **Solution**:
+
 ```bash
 # Reload Fish config
 source ~/.config/fish/config.fish
@@ -197,8 +214,10 @@ type nixup
 ```
 
 #### Tmux Not Configured
+
 **Problem**: Default Tmux config instead of custom
 **Solution**:
+
 ```bash
 # Check Tmux config
 cat ~/.config/tmux/tmux.conf
@@ -208,8 +227,10 @@ tmux kill-server && tmux new-session
 ```
 
 #### Environment Variables Not Set
+
 **Problem**: `EDITOR` or `LANG` not set
 **Solution**:
+
 ```bash
 # Check environment
 echo $EDITOR
@@ -222,6 +243,7 @@ exec fish
 ### Documentation
 
 For detailed information:
+
 - **[Deployment Guide](./docs/verification/HOME-MANAGER-DEPLOYMENT-GUIDE.md)** - Step-by-step deployment and verification
 - **[Verification Template](./docs/verification/HOME-MANAGER-VERIFICATION-TEMPLATE.md)** - Comprehensive checklist
 - **[Cross-Platform Report](./docs/verification/CROSS-PLATFORM-CONSISTENCY-REPORT.md)** - Architecture analysis
@@ -240,11 +262,13 @@ For detailed information:
 ### Installation
 
 1. **Install Nix (Determinate Systems installer recommended):**
+
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
    ```
 
 2. **Clone and apply configuration:**
+
    ```bash
    git clone https://github.com/LarsArtmann/SystemNix.git ~/projects/SystemNix
    cd ~/projects/SystemNix
@@ -267,6 +291,7 @@ For detailed information:
 After installation, you'll have access to 100+ development tools including:
 
 **Languages & Runtimes:**
+
 - Go (Nix-managed: gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup + templ, sqlc, go-tools)
 - Node.js, Bun, pnpm
 - Java (JDK 21), Kotlin
@@ -274,12 +299,14 @@ After installation, you'll have access to 100+ development tools including:
 - Python utilities (uv)
 
 **Cloud & DevOps:**
+
 - AWS CLI, Google Cloud SDK
 - Kubernetes (kubectl, k9s, Helm)
 - Terraform, Docker Buildx
 - Infrastructure tools
 
 **Development:**
+
 - Git + GitHub CLI + Git Town
 - JetBrains Toolbox
 - VS Code, Sublime Text
@@ -290,6 +317,7 @@ See the [complete setup guide](./docs/development/setup.md) for details.
 ### Nix-Managed Development Tools
 
 All development tools are managed through Nix packages, providing:
+
 - **Reproducible Builds**: Same tool versions across all machines
 - **Atomic Updates**: Managed via `just update && just switch`
 - **Declarative Configuration**: Tools defined in Nix, not installed imperatively
@@ -299,6 +327,7 @@ All development tools are managed through Nix packages, providing:
 All Go tools (gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup) are installed via Nix packages defined in `platforms/common/packages/base.nix`.
 
 To view available Go tools:
+
 ```bash
 just go-tools-version    # Show all Go tool versions
 just go-dev             # Full Go development workflow
@@ -306,6 +335,7 @@ just go-dev             # Full Go development workflow
 
 **ActivityWatch (macOS):**
 ActivityWatch auto-start is managed declaratively via Nix LaunchAgent configuration in `platforms/darwin/services/launchagents.nix`. No manual setup scripts required.
+
 ## 🚀 Development Workflow
 
 ### Using Just Commands (Preferred)
@@ -332,6 +362,7 @@ just health         # System health check
 ```
 
 ### Configuration Changes Workflow
+
 1. **Edit configuration files** in `platforms/darwin/` (macOS) or `platforms/nixos/` (NixOS)
 2. **Validate with type safety**: `just test`
 3. **Apply changes**: `just switch`
@@ -342,6 +373,7 @@ just health         # System health check
 ### Adding New Tools
 
 **Nix packages** (preferred for CLI tools):
+
 ```bash
 # Edit dotfiles/nix/environment.nix
 systemPackages = with pkgs; [
@@ -350,6 +382,7 @@ systemPackages = with pkgs; [
 ```
 
 **Homebrew packages** (for GUI apps):
+
 ```bash
 # Edit dotfiles/nix/homebrew.nix
 casks = [
@@ -360,6 +393,7 @@ casks = [
 ### Shell Aliases and Environment
 
 Shell aliases are defined in `dotfiles/nix/environment.nix`:
+
 ```nix
 shellAliases = {
   your-alias = "your-command";
@@ -399,6 +433,7 @@ darwin-rebuild --list-generations
 ### Pre-commit Hooks
 
 Installed automatically with the configuration:
+
 - **Gitleaks**: Prevents committing secrets and API keys
 - **Code quality**: Trailing whitespace, file endings, YAML validation
 - **Security**: Detection of private keys and large files
@@ -469,12 +504,14 @@ Setup-Mac/
 ## Maintenance
 
 The configuration is designed to be:
+
 - **Self-documenting**: Clear structure and comments
 - **Version controlled**: All changes tracked in Git
 - **Rollback capable**: Easy to revert problematic changes
 - **Update friendly**: Simple commands to keep everything current
 
 Regular maintenance:
+
 ```bash
 # Weekly: Update and cleanup
 nix flake update && nixup
@@ -489,31 +526,34 @@ nix doctor
 This configuration uses a **type-safe, modular architecture** with the following components:
 
 ### Core Type Safety System
+
 - **`core/Types.nix`**: Strong type definitions for all configurations
 - **`core/State.nix`**: Centralized single source of truth for paths and state
 - **`core/Validation.nix`**: Configuration validation and error prevention
 - **`core/TypeSafetySystem.nix`**: Unified type safety enforcement
 
 ### Configuration Modules
+
 - **`environment.nix`**: Environment variables, shell aliases, and PATH configuration
 - **`programs.nix`**: User program configurations (shells, editors, tools)
 - **`system.nix`**: macOS defaults and system settings
 - **`core.nix`**: Core packages, security configurations, and system services
 
 ### Build System
+
 - **`flake.nix`**: Nix flake for reproducible builds
 - **`justfile`**: Task runner with comprehensive commands
 - **`home.nix`**: Home Manager configuration entry point
 
 ### Type Safety Features
+
 - **Compile-time validation**: All types checked at evaluation time
 - **Zero runtime errors**: Type system prevents configuration errors
 - **Centralized state**: Single source of truth eliminates inconsistencies
 - **Comprehensive testing**: Built-in validation and assertion framework
 
-
-
 ### Dependency Visualization
+
 - **nix-visualize**: Automated Nix dependency graph generation
 - **`just dep-graph`**: Generate system dependency visualizations
 - **`docs/architecture/Setup-Mac-Darwin.svg`**: Current dependency graph (471 packages)
@@ -527,12 +567,14 @@ just dep-graph-update
 ```
 
 **Output:**
+
 - System dependency graph showing all 471 packages
 - 1,233 dependency relationships
 - 19 levels of dependency depth
 - Available in SVG and PNG formats
 
 **Usage:**
+
 ```bash
 # Generate Darwin graph
 just dep-graph
@@ -548,9 +590,11 @@ just dep-graph-all
 ```
 
 **Documentation:** See `docs/architecture/nix-visualize-integration.md` for complete guide
+
 ## 🚀 Development Workflow
 
 ### Using Just Commands
+
 The project uses **Just** as a task runner for all operations:
 
 ```bash
@@ -573,25 +617,28 @@ just health         # System health check
 ```
 
 ### Configuration Changes Workflow
+
 1. **Edit configuration files** in `dotfiles/nix/`
 2. **Validate with type safety**: `just type-check`
 3. **Apply changes**: `just switch`
 4. **Test functionality**: `just test`
 
 ### Type Safety Development
+
 - **All configurations use strong types** from `core/Types.nix`
 - **Automatic validation** prevents runtime errors
 - **Compile-time type checking** ensures correctness
 - **Centralized state** eliminates inconsistencies
-
 
 ## 🛠️ Troubleshooting
 
 ### Common Issues & Solutions
 
 #### GPG Signing Not Working
+
 **Problem**: `gpg: command not found` or signing fails
 **Solution**:
+
 ```bash
 # Install GPG via nix
 nix profile add nixpkgs#gnupg
@@ -601,8 +648,10 @@ nix profile add nixpkgs#gnupg
 ```
 
 #### Build Errors
+
 **Problem**: `evaluation warning` or build failures
 **Solution**:
+
 ```bash
 # Check configuration type safety
 just type-check
@@ -615,8 +664,10 @@ just build | grep -i warning
 ```
 
 #### Package Not Found
+
 **Problem**: `error: package 'xyz' not found`
 **Solution**:
+
 ```bash
 # Search nixpkgs
 nix search nixpkgs xyz
@@ -626,8 +677,10 @@ nix-env -qaP | grep xyz
 ```
 
 #### Path Issues
+
 **Problem**: Configuration file not found errors
 **Solution**:
+
 ```bash
 # Verify path resolution
 just debug-paths
@@ -637,6 +690,7 @@ cat dotfiles/nix/core/State.nix
 ```
 
 ### Getting Help
+
 - **Check issues**: [GitHub Issues](https://github.com/LarsArtmann/Setup-Mac/issues)
 - **Review documentation**: [Development Guide](./docs/development/setup.md)
 - **Run diagnostics**: `just health`
@@ -654,21 +708,27 @@ For a command like `sudo dd if=result of=/dev/nvme0n1 bs=4M`, finding the correc
 ### Step-by-Step Device Identification Process:
 
 1. **List all disk devices:**
+
    ```bash
    diskutil list
    ```
+
    This shows all mounted and unmounted disks with their identifiers.
 
 2. **Get detailed disk information:**
+
    ```bash
    diskutil info /dev/diskX  # Replace X with the disk number
    ```
+
    This provides size, type, and other identifying information.
 
 3. **List block devices (alternative):**
+
    ```bash
    ls -la /dev/disk*
    ```
+
    Shows all disk device nodes with their major/minor numbers.
 
 4. **For NVMe specifically, check:**
@@ -689,6 +749,7 @@ For a command like `sudo dd if=result of=/dev/nvme0n1 bs=4M`, finding the correc
    - APFS containers: `/dev/disk3`, with volumes inside
 
 3. **Safety Verification Steps:**
+
    ```bash
    # Verify disk size before writing
    diskutil info /dev/diskX | grep "Disk Size"
@@ -704,6 +765,7 @@ For a command like `sudo dd if=result of=/dev/nvme0n1 bs=4M`, finding the correc
 ### Risks and Dangers:
 
 ⚠️ **EXTREMELY DANGEROUS OPERATIONS:**
+
 - Wrong device selection = COMPLETE DATA LOSS
 - macOS handles devices differently than Linux
 - System Integrity Protection (SIP) may interfere
@@ -712,6 +774,7 @@ For a command like `sudo dd if=result of=/dev/nvme0n1 bs=4M`, finding the correc
 ### Safer Alternatives on macOS:
 
 1. **Use macOS-native tools when possible:**
+
    ```bash
    # For disk imaging/restore
    asr --source /path/to/source --target /dev/diskX
@@ -727,4 +790,3 @@ For a command like `sudo dd if=result of=/dev/nvme0n1 bs=4M`, finding the correc
    ```
 
 **REMEMBER: On macOS, device paths follow different naming conventions. Always verify with `diskutil list` and `diskutil info` before any disk operations.**
-

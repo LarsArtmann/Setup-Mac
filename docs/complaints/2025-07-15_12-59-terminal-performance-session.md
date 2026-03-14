@@ -3,6 +3,7 @@
 Date: 2025-07-15T12:59:41+02:00
 
 I was asked to perform:
+
 - Debug and optimize terminal shell performance from 13+ seconds to <73.9ms target
 - Implement Fish + Carapace + Starship via Nix for ultimate "min-max" performance
 - Create comprehensive benchmarks and verify performance improvements
@@ -10,6 +11,7 @@ I was asked to perform:
 - Manage GitHub issues and create comprehensive documentation
 
 I was given these context information's:
+
 - Performance budget: <500ms 95%tile, <250ms 50%tile (corrected from 1250ms)
 - Starship timeout adjustments: 400ms command timeout, 100ms scan timeout
 - Nix configuration structure and existing files
@@ -17,6 +19,7 @@ I was given these context information's:
 - Existing ZSH performance issues with compinit taking 25+ seconds
 
 I was missing these information:
+
 - Clear verification procedures for each deployment step
 - Proper rollback strategies before making system changes
 - Understanding that timeout during darwin-rebuild doesn't mean failure
@@ -25,14 +28,16 @@ I was missing these information:
 - Clear git workflow integration with system configuration changes
 
 I was confused by:
+
 - Whether darwin-rebuild timeout indicated success or failure
 - How to properly verify Fish shell is set as default after deployment
-- When to use nix-darwin programs.* vs manual configuration files
+- When to use nix-darwin programs.\* vs manual configuration files
 - How to handle system-level changes like /etc/shells modifications
 - Which packages might have valgrind dependencies causing build failures
 - Whether to commit during or after system deployment phases
 
 What I wish for the future is:
+
 - Explicit success/failure criteria for each deployment step
 - Automated verification scripts that check system state post-deployment
 - Clear separation between Nix configuration and system activation steps

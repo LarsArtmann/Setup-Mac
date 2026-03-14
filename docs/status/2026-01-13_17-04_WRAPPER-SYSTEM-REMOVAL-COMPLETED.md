@@ -481,6 +481,7 @@ Use '--all-systems' to check all.
     - Clarify what goes in `common/` vs `darwin/` vs `nixos/`
 
 15. **Cross-Platform Health Check**
+
     ```bash
     just health-cross-platform
     ```

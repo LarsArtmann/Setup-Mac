@@ -93,6 +93,7 @@ platforms/{darwin,nixos}/programs/shells.nix
    - **Error:** `Bad configuration option: usekeychain`
 
 2. **Deprecation Warning (Non-Blocking)**
+
    ```
    programs.ssh` default values will be removed in future.
    Consider setting `programs.ssh.enableDefaultConfig` to false
