@@ -1,37 +1,36 @@
 {
   lib,
-  buildGoModule,
+  buildGo126Module,
   fetchFromGitHub,
   fetchpatch,
 }:
-buildGoModule rec {
+buildGo126Module rec {
   pname = "crush-patched";
-  version = "0.47.2";
+  version = "0.49.0";
 
   src = fetchFromGitHub {
     owner = "charmbracelet";
     repo = "crush";
     rev = "v${version}";
-    hash = "sha256-Lmp2DYrlzxVnll9x1jcnw/QgYjhA9RHpciQZ7mAUK5Y=";
+    hash = "sha256-/1Z5S28yJCxjpQwM5hLTmgKU7OxAcxjmBROktQSstTE=";
   };
 
-  patches = [
-    (fetchpatch {
-      name = "grep-show-search-params.patch";
-      url = "https://github.com/charmbracelet/crush/commit/e4aa1742699db27c2ccd5e9c2b9f4d0948870581.patch";
-      hash = "sha256-3G73sqv4UdwNZHs6HKr9mCYO8WWplJAnLrurDpEiK20=";
-    })
-  ];
+  # Patch may need updating for v0.49.0 - test without first
+  # patches = [
+  #   (fetchpatch {
+  #     name = "grep-show-search-params.patch";
+  #     url = "https://github.com/charmbracelet/crush/commit/e4aa1742699db27c2ccd5e9c2b9f4d0948870581.patch";
+  #     hash = "sha256-3G73sqv4UdwNZHs6HKr9mCYO8WWplJAnLrurDpEiK20=";
+  #   })
+  # ];
 
-  vendorHash = "sha256-pBZdmQRnPfvhz66+DGQx/ZMMiYeKBfWThybw4RXsjno=";
+  vendorHash = "sha256-xakV5Alm3EwDk5VkSINxJM1C3uF492QzA+BQkqZ6qB4=";
 
-  postUnpack = ''
-    rm -rf $sourceRoot/vendor
-  '';
-
+  # Force module mode and regenerate vendor directory
   env = {
     GOEXPERIMENT = "greenteagc";
     CGO_ENABLED = "0";
+    GOFLAGS = "-mod=mod";
   };
 
   ldflags = [

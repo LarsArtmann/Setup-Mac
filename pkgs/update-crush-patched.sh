@@ -21,15 +21,18 @@ fi
 # If no version provided, auto-detect latest from GitHub
 if [[ -z "$NEW_VERSION" ]]; then
     echo "🔍 Detecting latest version from GitHub..."
-    LATEST_VERSION=$(git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git \
+    LATEST_TAG=$(git ls-remote --tags --sort=-v:refname https://github.com/charmbracelet/crush.git \
       | head -1 | sed 's|.*refs/tags/\(v[0-9.]*\).*|\1|')
 
-    if [[ -z "$LATEST_VERSION" ]]; then
+    if [[ -z "$LATEST_TAG" ]]; then
         echo "❌ Failed to detect latest version from GitHub"
         exit 1
     fi
 
-    echo "Latest:  $LATEST_VERSION"
+    echo "Latest:  $LATEST_TAG"
+
+    # Strip 'v' prefix for version comparison and storage (package.nix adds it via rev = "v${version}")
+    LATEST_VERSION="${LATEST_TAG#v}"
 
     if [[ "$LATEST_VERSION" == "$CURRENT_VERSION" ]]; then
         echo "✅ Already at latest version $CURRENT_VERSION"
@@ -47,13 +50,14 @@ if [[ "$NEW_VERSION" == "$CURRENT_VERSION" ]]; then
 fi
 
 # Prefetch source hash (using nix-prefetch with SRI format)
+# Note: Add 'v' prefix for GitHub URL since version is stored without it
 echo ""
-echo "📥 Fetching source hash for $NEW_VERSION..."
-SOURCE_HASH=$(nix-prefetch-url --type sha256 --unpack "https://github.com/charmbracelet/crush/archive/refs/tags/${NEW_VERSION}.tar.gz" 2>/dev/null | xargs -I{} nix hash to-sri --type sha256 {})
+echo "📥 Fetching source hash for v$NEW_VERSION..."
+SOURCE_HASH=$(nix-prefetch-url --type sha256 --unpack "https://github.com/charmbracelet/crush/archive/refs/tags/v${NEW_VERSION}.tar.gz" 2>/dev/null | xargs -I{} nix hash to-sri --type sha256 {})
 
 # Fallback: try without --unpack if that fails
 if [[ -z "$SOURCE_HASH" ]]; then
-    SOURCE_HASH=$(nix store prefetch-file --hash-type sha256 --json "https://github.com/charmbracelet/crush/archive/refs/tags/${NEW_VERSION}.tar.gz" 2>/dev/null | jq -r '.hash')
+    SOURCE_HASH=$(nix store prefetch-file --hash-type sha256 --json "https://github.com/charmbracelet/crush/archive/refs/tags/v${NEW_VERSION}.tar.gz" 2>/dev/null | jq -r '.hash')
 fi
 
 if [[ -z "$SOURCE_HASH" ]]; then

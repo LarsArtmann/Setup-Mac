@@ -66,14 +66,14 @@
       ];
     };
 
-    # Pin Go to version 1.26
+    # Pin Go to version 1.26.1
     nixpkgs.overlays = [
       (final: prev: {
         go = prev.go_1_26.overrideAttrs (oldAttrs: {
-          version = "1.26.0";
+          version = "1.26.1";
           src = prev.fetchurl {
-            url = "https://go.dev/dl/go1.26.0.src.tar.gz";
-            hash = "sha256:c9132a8a1f6bd2aa4aad1d74b8231d95274950483a4950657ee6c56e6e817790";
+            url = "https://go.dev/dl/go1.26.1.src.tar.gz";
+            hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
           };
         });
       })
