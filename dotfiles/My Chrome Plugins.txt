@@ -17,6 +17,7 @@ My Chrome Plugins.txt
 - GitHub Better Line Counts
 - GitHub Milestones Timeline
 - Lovely forks
+- CRW-Extension (https://github.com/FULU-Foundation/CRW-Extension/releases)
 -
 
 
