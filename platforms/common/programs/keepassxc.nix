@@ -5,7 +5,7 @@
   ...
 }: let
   cfg = config.programs.keepassxc;
-  keepassxcPkg = cfg.package;
+  keepassxcPkg = pkgs.keepassxc;
 
   # Wrapper that provides Chromium-native messaging manifests.
   # nixpkgs keepassxc only ships $out/lib/mozilla/ (Firefox format).
@@ -21,7 +21,7 @@
       description = "KeePassXC integration with native messaging support";
       path = "${keepassxcPkg}/bin/keepassxc-proxy";
       type = "stdio";
-      allowed_origins = [ "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/" ];
+      allowed_origins = ["chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"];
     }}
     MANIFEST
   '';
@@ -39,8 +39,7 @@
     type = "stdio";
     allowed_origins = ["chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"];
   };
-in
-{
+in {
   programs.keepassxc = {
     enable = true;
     package = keepassxcWithChromiumManifests;
@@ -53,19 +52,17 @@ in
   };
 
   # Helium browser native messaging host (non-standard config path)
-  home.file =
-    lib.mkIf pkgs.stdenv.isDarwin {
-      "Library/Application Support/net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
-        text = heliumManifest;
-        force = true;
-      };
+  home.file = lib.mkIf pkgs.stdenv.isDarwin {
+    "Library/Application Support/net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
+      text = heliumManifest;
+      force = true;
     };
+  };
 
-  xdg.configFile =
-    lib.mkIf pkgs.stdenv.isLinux {
-      "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
-        text = heliumManifest;
-        force = true;
-      };
+  xdg.configFile = lib.mkIf pkgs.stdenv.isLinux {
+    "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
+      text = heliumManifest;
+      force = true;
     };
+  };
 }

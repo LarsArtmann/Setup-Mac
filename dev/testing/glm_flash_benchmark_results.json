@@ -1,0 +1,11 @@
+[
+  {
+    "model": "glm-4.7-flash:latest",
+    "avg_prompt_tps": 0,
+    "avg_eval_tps": 0,
+    "avg_total_time": 0,
+    "num_runs": 0,
+    "skipped": true,
+    "reason": "Benchmark failed"
+  }
+]
