@@ -1,29 +1,21 @@
 {pkgs, ...}: {
-  # AMD ROCm configuration for AI acceleration
+  # AMD Vulkan configuration for AI acceleration
+  # Strix Halo (gfx1100/gfx1101) is not yet supported by ROCm in nixpkgs.
+  # Vulkan via RADV works and provides GPU acceleration.
   # Note: GPU hardware is configured in ../hardware/amd-gpu.nix
-  # Note: AI environment variables at service-level (services.ollama.environmentVariables)
-  # This is the correct NixOS pattern for service-specific GPU configuration
 
   # Ollama service for AI models
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-rocm; # Use AMD GPU version
-    rocmOverrideGfx = "11.0.0"; # Sets HSA_OVERRIDE_GFX_VERSION automatically
+    package = pkgs.ollama-vulkan;
     host = "127.0.0.1";
     port = 11434;
     environmentVariables = {
-      # GPU selection
-      HIP_VISIBLE_DEVICES = "0";
-
-      # ROCm path
-      ROCM_PATH = "${pkgs.rocmPackages.rocm-runtime}";
-
-      # PyTorch-specific GPU architecture
-      PYTORCH_ROCM_ARCH = "gfx1100";
-
-      # Performance tuning (optional)
+      # Performance tuning
       OLLAMA_FLASH_ATTENTION = "1";
-      OLLAMA_NUM_PARALLEL = "10";
+      # Keep parallel low: only 62 GiB visible to OS (rest reserved for GPU/NPU),
+      # BF16 model alone is 60 GiB. High parallelism = guaranteed OOM.
+      OLLAMA_NUM_PARALLEL = "1";
     };
   };
 
