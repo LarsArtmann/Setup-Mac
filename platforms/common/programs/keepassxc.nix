@@ -3,14 +3,17 @@ let
   cfg = config.programs.keepassxc;
   keepassxcPkg = cfg.package;
 
-  # Native messaging host manifest for KeePassXC browser extension
-  # Required because nixpkgs keepassxc only ships a Firefox manifest
   manifest = builtins.toJSON {
     name = "org.keepassxc.keepassxc_browser";
     description = "KeePassXC integration with native messaging support";
     path = "${keepassxcPkg}/bin/keepassxc-proxy";
     type = "stdio";
     allowed_origins = [ "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/" ];
+  };
+
+  chromiumManifests = {
+    "BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
+    "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
   };
 in
 {
@@ -24,22 +27,23 @@ in
     };
   };
 
-  # Helium uses custom user data directory (not standard Chromium path)
-  # macOS: ~/Library/Application Support/net.imput.helium/
-  # Linux: ~/.config/helium/ (or ~/.config/net.imput.helium/)
+  # Chromium-based browsers native messaging host manifests
+  # nixpkgs keepassxc only ships a Firefox manifest at $out/lib/mozilla/
+  # Home Manager's programs.chromium.nativeMessagingHosts expects $out/etc/chromium/
+  # so we place manifests directly into each browser's NativeMessagingHosts directory
   home.file =
-    lib.mkIf pkgs.stdenv.isDarwin {
-      "Library/Application Support/net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
-        text = manifest;
-        force = true;
-      };
-    };
+    lib.mkIf pkgs.stdenv.isDarwin
+      (lib.mapAttrs' (name: value:
+        lib.nameValuePair
+          ("Library/Application Support/${name}")
+          { text = value; force = true; }
+      ) chromiumManifests);
 
   xdg.configFile =
-    lib.mkIf pkgs.stdenv.isLinux {
-      "helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
-        text = manifest;
-        force = true;
-      };
-    };
+    lib.mkIf pkgs.stdenv.isLinux
+      (lib.mapAttrs' (name: value:
+        lib.nameValuePair
+          name
+          { text = value; force = true; }
+      ) chromiumManifests);
 }
