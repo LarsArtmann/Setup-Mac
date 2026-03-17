@@ -23,12 +23,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Add llm-agents.nix for CRUSH and other AI tools
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Helium Browser
     helium = {
       url = "github:vikingnope/helium-browser-nix-flake";
@@ -73,7 +67,6 @@
     home-manager,
     helium,
     nur,
-    llm-agents,
     nix-visualize,
     nix-colors,
     nix-homebrew,
@@ -118,7 +111,6 @@
         };
 
         packages = {
-          crush-patched = pkgs.callPackage ./pkgs/crush-patched/package.nix {};
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
@@ -147,7 +139,7 @@
           system = "aarch64-darwin";
           specialArgs = {
             inherit (inputs.self) inputs;
-            inherit (inputs) llm-agents nixpkgs;
+            inherit nixpkgs;
             inherit helium;
             inherit nur;
             inherit nix-visualize;
@@ -218,7 +210,6 @@
           system = "x86_64-linux";
           specialArgs = {
             inherit (inputs.self) inputs;
-            inherit (inputs) llm-agents;
             inherit helium;
             inherit nur;
             inherit nix-visualize;

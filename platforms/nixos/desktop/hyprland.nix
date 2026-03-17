@@ -62,18 +62,15 @@ in {
           "col.active_border" = "rgba(33ccffee) rgba(00ff99ee) 45deg";
           "col.inactive_border" = "rgba(595959aa)";
           layout = "dwindle";
-          # Cursor theme - uses XCursor (bibata-cursors) since hyprcursor version not in nixpkgs
-          # Hyprland will use XCursor fallback automatically
-          cursor_theme = "Bibata-Modern-Classic";
-          # Enable workspace back-and-forth (toggle between current and previous workspace)
+        };
+
+        # workspace_back_and_forth moved to binds in Hyprland 0.54
+        binds = {
           workspace_back_and_forth = true;
         };
 
         # Dwindle layout with smart gaps
         dwindle = {
-          # Smart gaps - no gaps when only one window
-          no_gaps_when_only = true;
-          # Other dwindle settings
           pseudotile = true;
           preserve_split = true;
           smart_split = false;
@@ -130,8 +127,7 @@ in {
             "specialWorkspace, 1, 3, md3_decel, slidefadevert"
             # Layers - standard
             "layers, 1, 3, md3_standard, slide"
-            # Scroll - quick response
-            "scroll, 1, 2, md3_standard"
+            # Scroll animation removed - not supported in Hyprland 0.54
           ];
         };
 
@@ -372,17 +368,7 @@ in {
               fi
           ''}/bin/zellij-session-menu"
 
-          # Smart gaps toggle
-          "$mod SHIFT, M, exec, ${pkgs.writeShellScriptBin "toggle-smart-gaps" ''
-            current=$(${pkgs.hyprland}/bin/hyprctl getoption dwindle:no_gaps_when_only -j | ${pkgs.jq}/bin/jq -r '.int')
-            if [ "$current" = "1" ]; then
-              ${pkgs.hyprland}/bin/hyprctl keyword dwindle:no_gaps_when_only 0
-              ${pkgs.libnotify}/bin/notify-send "Smart Gaps" "Disabled"
-            else
-              ${pkgs.hyprland}/bin/hyprctl keyword dwindle:no_gaps_when_only 1
-              ${pkgs.libnotify}/bin/notify-send "Smart Gaps" "Enabled"
-            fi
-          ''}/bin/toggle-smart-gaps"
+          # Smart gaps toggle removed - no_gaps_when_only removed in Hyprland 0.54
 
           # Wallpaper cycling
           "SUPER SHIFT, W, exec, ${pkgs.writeShellScriptBin "swww-next" ''

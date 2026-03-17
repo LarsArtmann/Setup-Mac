@@ -1,14 +1,10 @@
 {
   pkgs,
   lib,
-  llm-agents,
   helium,
   otel-tui,
   ...
 }: let
-  # Import custom packages - using callPackage for proper composability
-  crush-patched = pkgs.callPackage ../../../pkgs/crush-patched/package.nix {};
-
   # Import modernize from local pkgs if available
   inherit (pkgs.stdenv.hostPlatform) system;
   modernizePackage =
@@ -25,8 +21,6 @@
     '';
   };
 
-  # Import crush from llm-agents packages (only used as fallback)
-  crush = llm-agents.packages.${system}.crush or pkgs.crush or null;
   heliumPackage =
     if builtins.hasAttr "packages" helium && builtins.hasAttr system helium.packages
     then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
@@ -212,8 +206,7 @@
       duti # macOS file association utility (used by activation scripts)
     ];
 
-  # AI tools (using patched version with Lars' PRs)
-  aiPackages = [crush-patched];
+  aiPackages = [pkgs.crush];
 in {
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
