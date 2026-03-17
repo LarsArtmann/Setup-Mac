@@ -163,19 +163,55 @@
         };
 
         "custom/media" = {
-          format = "{icon} {text}";
-          format-icons = {
-            DEFAULT = "🎵";
-            spotify = "";
-            firefox = "";
-            chromium = "";
-          };
-          exec = "playerctl metadata --format '{artist} - {title}' 2>/dev/null || echo 'Nothing playing'";
-          interval = 5;
-          tooltip = false;
+          exec = pkgs.writeShellScript "waybar-media" ''
+            status=$(playerctl status 2>/dev/null)
+            if [ "$status" != "Playing" ] && [ "$status" != "Paused" ]; then
+              echo ""
+              exit 0
+            fi
+
+            artist=$(playerctl metadata artist 2>/dev/null || echo "")
+            title=$(playerctl metadata title 2>/dev/null || echo "")
+            album=$(playerctl metadata album 2>/dev/null || echo "")
+            player=$(playerctl metadata --format '{{playerName}}' 2>/dev/null || echo "")
+            position=$(playerctl position 2>/dev/null || echo "0")
+            length=$(playerctl metadata mpris:length 2>/dev/null || echo "0")
+
+            case "$player" in
+              spotify) icon="" ;;
+              firefox) icon="" ;;
+              chromium) icon="" ;;
+              *) icon="🎵" ;;
+            esac
+
+            if [ "$status" = "Paused" ]; then
+              icon="⏸"
+            fi
+
+            # Escape for Pango markup
+            artist=$(echo "$artist" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+            title=$(echo "$title" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+            album=$(echo "$album" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+            player=$(echo "$player" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
+
+            pos_sec=$(echo "$position" | cut -d. -f1)
+            len_sec=$(echo "$length" | cut -d. -f1)
+            if [ "$len_sec" -gt 0 ] 2>/dev/null; then
+              pos_fmt=$(printf "%02d:%02d" $((pos_sec/60)) $((pos_sec%60)))
+              len_fmt=$(printf "%02d:%02d" $((len_sec/60)) $((len_sec%60)))
+              time_info="$pos_fmt / $len_fmt"
+            else
+              time_info=""
+            fi
+
+            echo "{\"text\": \"$icon  ''${artist} - ''${title}\", \"tooltip\": \"<b>Now ''${status}</b>\\n''${title}\\n<b>''${artist}</b>\\n<i>''${album}</i>\\n''${time_info}\\nvia ''${player}\"}"
+          '';
+          return-type = "json";
+          interval = 2;
           on-click = "playerctl play-pause";
           on-scroll-up = "playerctl next";
           on-scroll-down = "playerctl previous";
+          max-length = 50;
         };
 
         "backlight" = {
@@ -370,8 +406,15 @@
       }
 
       #custom-media {
-        background: rgba(166, 227, 233, 0.15);
-        color: #94e2d5;
+        background: rgba(180, 190, 254, 0.12);
+        color: #b4befe;
+        font-size: 15px;
+        max-width: 320px;
+        overflow: hidden;
+      }
+
+      #custom-media:hover {
+        background: rgba(180, 190, 254, 0.22);
       }
 
       #idle_inhibitor {
