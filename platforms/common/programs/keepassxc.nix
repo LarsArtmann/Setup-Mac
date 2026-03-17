@@ -1,5 +1,9 @@
-{ config, pkgs, lib, ... }:
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
   cfg = config.programs.keepassxc;
   keepassxcPkg = cfg.package;
 
@@ -8,15 +12,14 @@ let
     description = "KeePassXC integration with native messaging support";
     path = "${keepassxcPkg}/bin/keepassxc-proxy";
     type = "stdio";
-    allowed_origins = [ "chrome-extension://oboonakemofpalcgghocfoadofidjkkk/" ];
+    allowed_origins = ["chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"];
   };
 
   chromiumManifests = {
     "BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
     "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
   };
-in
-{
+in {
   programs.keepassxc = {
     enable = true;
     settings = {
@@ -33,17 +36,27 @@ in
   # so we place manifests directly into each browser's NativeMessagingHosts directory
   home.file =
     lib.mkIf pkgs.stdenv.isDarwin
-      (lib.mapAttrs' (name: value:
-        lib.nameValuePair
-          ("Library/Application Support/${name}")
-          { text = value; force = true; }
-      ) chromiumManifests);
+    (lib.mapAttrs' (
+        name: value:
+          lib.nameValuePair
+          "Library/Application Support/${name}"
+          {
+            text = value;
+            force = true;
+          }
+      )
+      chromiumManifests);
 
   xdg.configFile =
     lib.mkIf pkgs.stdenv.isLinux
-      (lib.mapAttrs' (name: value:
-        lib.nameValuePair
+    (lib.mapAttrs' (
+        name: value:
+          lib.nameValuePair
           name
-          { text = value; force = true; }
-      ) chromiumManifests);
+          {
+            text = value;
+            force = true;
+          }
+      )
+      chromiumManifests);
 }

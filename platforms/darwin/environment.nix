@@ -10,7 +10,7 @@
   environment.variables = {
     # macOS-specific additions (don't override common settings)
     BROWSER = "helium";
-    TERMINAL = "iTerm2"; ## TODO: <-- should we move this to the dedicated iterm2 config?
+    TERMINAL = "iTerm2";
   };
 
   # Darwin-specific packages - NOTE: iterm2 now in common/packages/base.nix

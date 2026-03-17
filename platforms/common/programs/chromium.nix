@@ -1,8 +1,12 @@
 # Chromium-based browser configuration with extension management
 # Note: Home Manager's extension management works with Chromium, Brave, Vivaldi,
 # but NOT with Google Chrome due to Google Chrome's enterprise policy restrictions.
-{ config, pkgs, lib, ... }:
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}: let
   # YouTube Shorts Blocker extension by Umut Seven
   # - Open source: https://github.com/umutseven92/shorts-blocker
   # - Chrome Web Store: https://chromewebstore.google.com/detail/shorts-blocker/ckagfhpboagdopichicnebandlofghbc
@@ -12,8 +16,7 @@ let
     # Chrome Web Store update URL
     updateUrl = "https://clients2.google.com/service/update2/crx";
   };
-in
-{
+in {
   # Chromium browser with declarative extension management
   # NOTE: This Home Manager module is only used on Darwin (macOS).
   # On NixOS, extension management is handled system-wide via programs.chromium
@@ -35,7 +38,7 @@ in
     # Extensions to install declaratively
     extensions = [
       # YouTube Shorts Blocker - hides Shorts from homepage, subscriptions, search
-      { id = ytShortsBlocker.id; }
+      {inherit (ytShortsBlocker) id;}
 
       # uBlock Origin - ad blocker (optional, uncomment if desired)
       # { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; }

@@ -194,7 +194,7 @@
             # Import Home Manager module for Darwin
             inputs.home-manager.darwinModules.home-manager
 
-            ## TODO: Why can't this be in it's how file?
+            # Define Home Manager configuration inline for top-level visibility
             {
               # Home Manager configuration
               home-manager = {

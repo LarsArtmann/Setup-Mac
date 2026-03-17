@@ -14,7 +14,7 @@ in {
   environment.userLaunchAgents = {
     # ActivityWatch auto-start service
     # NOTE: Binary is aw-qt, not ActivityWatch (Homebrew-installed app bundle)
-    # TODO: Migrate ActivityWatch to Nix package when available (currently only in unstable)
+    # Note: ActivityWatch is currently installed via Homebrew cask due to macOS Nixpkgs support issues
     "net.activitywatch.ActivityWatch.plist" = {
       enable = true; # Set to false to disable
       text = ''

@@ -855,10 +855,10 @@ health:
     @echo "=== Shell Configuration ==="
     @echo -n "Starship prompt: "
     @if command -v starship >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
-    @echo -n "Zsh completions: "
-    @if zsh -c 'autoload -Uz compinit && echo "✅ Working"' 2>/dev/null; then echo "✅ Working"; else echo "❌ Broken"; fi
-    @echo -n "Git completions: "
-    @if zsh -c 'autoload -Uz _git && echo "✅ Working"' 2>/dev/null; then echo "✅ Working"; else echo "❌ Missing"; fi
+    @echo -n "Fish completions: "
+    @if command -v fish >/dev/null 2>&1; then echo "✅ Working"; else echo "❌ Broken"; fi
+    @echo -n "Fish integration: "
+    @if command -v fish >/dev/null 2>&1; then echo "✅ Working"; else echo "❌ Missing"; fi
     @echo ""
     @echo "=== Essential Tools ==="
     @echo -n "Bun: "
@@ -879,26 +879,22 @@ health:
     @if command -v gopls >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
     @echo -n "modernize: "
     @if command -v modernize >/dev/null 2>&1; then \
-        if go version -m $(which modernize) 2>&1 | grep -q "go1.26rc2"; then \
-            echo "✅ Built with Go 1.26rc2"; \
-        else \
-            echo "⚠️ Built with $(go version -m $(which modernize) 2>&1 | head -1)"; \
-        fi; \
+        echo "✅ Built with $(go version -m $(which modernize) 2>&1 | head -1 | awk '{print $NF}')"; \
     else \
         echo "❌ Missing"; \
     fi
     @echo ""
     @echo "=== Dotfile Links ==="
-    @echo -n ".zshrc link: "
-    @if [ -L ~/.zshrc ]; then echo "✅ Linked to $(readlink ~/.zshrc)"; else echo "❌ Not linked"; fi
+    @echo -n "Fish config: "
+    @if [ -f ~/.config/fish/config.fish ]; then echo "✅ Present"; else echo "❌ Missing"; fi
     @echo -n "Starship config: "
     @if [ -f ~/.config/starship.toml ]; then echo "✅ Present"; else echo "❌ Missing"; fi
     @echo -n "Git config: "
-    @if [ -L ~/.gitconfig ]; then echo "✅ Linked"; else echo "❌ Not linked"; fi
+    @if [ -f ~/.config/git/config ] || [ -f ~/.gitconfig ]; then echo "✅ Present"; else echo "❌ Missing"; fi
     @echo ""
     @echo "=== Shell Startup Test ==="
-    @echo -n "Zsh startup errors: "
-    @if zsh -i -c 'exit' 2>&1 | grep -q "error\|Error\|ERROR\|WARN"; then echo "❌ Has errors/warnings"; else echo "✅ Clean startup"; fi
+    @echo -n "Fish startup errors: "
+    @if fish -c 'exit' 2>&1 | grep -q "error\|Error\|ERROR\|WARN"; then echo "❌ Has errors/warnings"; else echo "✅ Clean startup"; fi
     @echo ""
     @echo "✅ Health check complete"
 
