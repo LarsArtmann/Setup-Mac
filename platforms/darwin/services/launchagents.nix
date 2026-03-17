@@ -1,6 +1,10 @@
 # LaunchAgent Management for macOS (nix-darwin)
 # Declarative service management to replace imperative bash scripts
-{config, pkgs, ...}: let
+{
+  config,
+  pkgs,
+  ...
+}: let
   # User home directory (from nix-darwin users option - guaranteed to exist)
   userHome = config.users.users.larsartmann.home;
 in {
