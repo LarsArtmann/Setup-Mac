@@ -26,6 +26,7 @@
     ../desktop/display-manager.nix
     ../desktop/audio.nix
     ../desktop/hyprland-config.nix
+    ../desktop/niri-config.nix
     ../desktop/security-hardening.nix
     ../desktop/ai-stack.nix
     ../desktop/monitoring.nix

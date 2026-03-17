@@ -53,6 +53,12 @@
       flake = false;
     };
 
+    # Niri scrollable-tiling Wayland compositor
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # OpenTelemetry TUI viewer
     otel-tui = {
       url = "github:ymtdzzz/otel-tui";
@@ -72,6 +78,7 @@
     nix-homebrew,
     homebrew-bundle,
     homebrew-cask,
+    niri,
     otel-tui,
     ...
   }:
@@ -214,6 +221,7 @@
             inherit nur;
             inherit nix-visualize;
             inherit nix-colors;
+            inherit niri;
             inherit otel-tui;
           };
           modules = [
@@ -226,6 +234,8 @@
               # Add NUR overlay to make nur.repos available
               nixpkgs.overlays = [
                 nur.overlays.default
+                # Niri flake overlay for stable/unstable packages
+                inputs.niri.overlays.niri
                 # Custom ActivityWatch watcher for system utilization monitoring
                 (final: prev: {
                   aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
@@ -249,6 +259,7 @@
             }
 
             # Import the existing NixOS configuration
+            inputs.niri.nixosModules.niri
             ./platforms/nixos/system/configuration.nix
           ];
         };
