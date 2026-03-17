@@ -41,7 +41,7 @@ _: {
 
         # Standard formatting and linting hooks
         - repo: https://github.com/pre-commit/pre-commit-hooks
-          rev: v4.4.0
+          rev: v6.0.0
           hooks:
             # Basic file checks
             - id: check-added-large-files
