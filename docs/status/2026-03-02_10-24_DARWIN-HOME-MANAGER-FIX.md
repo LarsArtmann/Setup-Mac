@@ -1,8 +1,8 @@
 # Status Report: Darwin Home Manager User Workaround Fix
 
-**Date:** 2026-03-02 10:24 CET  
-**Reporter:** Crush (AI Assistant)  
-**Scope:** platforms/darwin - Home Manager user configuration fix  
+**Date:** 2026-03-02 10:24 CET
+**Reporter:** Crush (AI Assistant)
+**Scope:** platforms/darwin - Home Manager user configuration fix
 **Branch:** master (5 commits ahead of origin)
 
 ---
@@ -168,5 +168,5 @@ Home Manager's Darwin module reuses the NixOS common module for user configurati
 
 **Status:** ✅ RESOLVED - System now builds and switches successfully
 
-**Report Generated:** 2026-03-02 10:24 CET  
+**Report Generated:** 2026-03-02 10:24 CET
 **Assistant:** Crush v0.46.1

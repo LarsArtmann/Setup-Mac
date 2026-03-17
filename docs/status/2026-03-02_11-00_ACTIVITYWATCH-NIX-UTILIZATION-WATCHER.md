@@ -1,8 +1,8 @@
 # Status Report: ActivityWatch Nix-Managed Utilization Watcher
 
-**Date:** 2026-03-02 11:00 CET  
-**Reporter:** Crush (AI Assistant)  
-**Scope:** ActivityWatch aw-watcher-utilization - Nix-native Darwin configuration  
+**Date:** 2026-03-02 11:00 CET
+**Reporter:** Crush (AI Assistant)
+**Scope:** ActivityWatch aw-watcher-utilization - Nix-native Darwin configuration
 **Branch:** master (up to date with origin)
 
 ---
@@ -311,6 +311,6 @@ The manual install anti-pattern has been identified and replaced with proper Nix
 
 ---
 
-**Report Generated:** 2026-03-02 11:00 CET  
-**Assistant:** Crush v0.46.1  
+**Report Generated:** 2026-03-02 11:00 CET
+**Assistant:** Crush v0.46.1
 **Status:** 🟡 CONFIG STAGED - Build pending

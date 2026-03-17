@@ -1,9 +1,9 @@
 # SystemNix - COMPREHENSIVE EXECUTIVE STATUS UPDATE
 
-**Date:** March 5, 2026 01:56 CET  
-**Classification:** CRITICAL - Strategic Assessment  
-**Branch:** master  
-**Commit:** 4711280  
+**Date:** March 5, 2026 01:56 CET
+**Classification:** CRITICAL - Strategic Assessment
+**Branch:** master
+**Commit:** 4711280
 **Status:** STABLE WITH KNOWN ISSUES
 
 ---
@@ -414,7 +414,7 @@ bd7d4c6 docs(status): add status report for Darwin Home Manager user workaround 
 
 ---
 
-**Report Generated:** 2026-03-05 01:56 CET  
-**Classification:** Internal Strategic Assessment  
-**Next Review:** 2026-03-12 or after significant changes  
+**Report Generated:** 2026-03-05 01:56 CET
+**Classification:** Internal Strategic Assessment
+**Next Review:** 2026-03-12 or after significant changes
 **Distribution:** SystemNix Project Team
