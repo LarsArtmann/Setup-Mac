@@ -60,13 +60,36 @@ repos:
         files: \.nix$
         pass_filenames: false
 
+      # JSON: Validate flake.lock integrity
+      - id: flake-lock-validate
+        name: flake.lock validation (JSON + merge conflicts)
+        entry: bash
+        args:
+          [
+            -c,
+            'jq empty flake.lock && ! grep -qE "^(<<<<<<<|=======|>>>>>>>)" flake.lock || { echo "ERROR: flake.lock is invalid JSON or contains merge conflicts"; exit 1; }',
+          ]
+        language: system
+        files: ^flake\.lock$
+        pass_filenames: false
+
+      # Merge conflict detection across all files
+      - id: check-merge-conflicts
+        name: check for merge conflicts
+        entry: bash
+        args: [-c, "! grep -rnE '^(<<<<<<<|=======|>>>>>>>)' --include='*.nix' --include='*.lock' --include='*.json' --include='*.yaml' --include='*.yml' . || { echo 'ERROR: Found merge conflict markers - resolve before committing'; exit 1; }"]
+        language: system
+        pass_filenames: false
+
 # Hook Execution Order:
-# 1. gitleaks           - Security check
-# 2. trailing-whitespace - Cleanup formatting
-# 3. deadnix           - Detect dead code
-# 4. statix            - Lint and detect antipatterns
-# 5. alejandra         - Check code formatting
-# 6. nix-check         - Validate syntax and build
+# 1. gitleaks             - Security check
+# 2. trailing-whitespace  - Cleanup formatting
+# 3. deadnix              - Detect dead code
+# 4. statix               - Lint and detect antipatterns
+# 5. alejandra            - Check code formatting
+# 6. nix-check            - Validate syntax and build
+# 7. flake-lock-validate  - Validate flake.lock JSON integrity
+# 8. check-merge-conflicts - Catch unresolved merge markers
 #
 # Tools Used:
 # - gitleaks  (secret detection)
