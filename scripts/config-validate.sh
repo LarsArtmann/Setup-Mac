@@ -152,7 +152,7 @@ validate_nix_lock_consistency() {
     fi
 
     # Check for merge conflict markers before JSON validation
-    if grep -qE '^(<<<<<<<|=======|>>>>>>>)' "$lock_file" 2>/dev/null; then
+    if grep -qE '^<{7} |^={7}$|^>{7} ' "$lock_file" 2>/dev/null; then
         log "ERROR" "flake.lock contains unresolved merge conflict markers - resolve before continuing"
         return 1
     fi

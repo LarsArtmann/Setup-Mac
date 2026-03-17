@@ -413,6 +413,16 @@ check-nix-syntax:
     nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Nix syntax valid"
 
+# Check for unresolved merge conflict markers in all tracked files
+conflict-check:
+    @echo "🔍 Checking for merge conflicts..."
+    @if grep -rnE '^<{7} |^={7}$$|^>{7} ' --include='*.nix' --include='*.lock' --include='*.json' --include='*.yaml' --include='*.yml' --include='*.toml' . 2>/dev/null; then \
+        echo "❌ Found merge conflict markers above - resolve before committing"; \
+        exit 1; \
+    else \
+        echo "✅ No merge conflict markers found"; \
+    fi
+
 # Format code using treefmt
 format:
     @echo "🎨 Formatting code..."

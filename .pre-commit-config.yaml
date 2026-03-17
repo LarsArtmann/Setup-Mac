@@ -67,7 +67,7 @@ repos:
         args:
           [
             -c,
-            'jq empty flake.lock && ! grep -qE "^(<<<<<<<|=======|>>>>>>>)" flake.lock || { echo "ERROR: flake.lock is invalid JSON or contains merge conflicts"; exit 1; }',
+            'jq empty flake.lock && ! grep -qE "^<{7} |^={7}$$|^>{7} " flake.lock || { echo "ERROR: flake.lock is invalid JSON or contains merge conflicts"; exit 1; }',
           ]
         language: system
         files: ^flake\.lock$
@@ -77,7 +77,7 @@ repos:
       - id: check-merge-conflicts
         name: check for merge conflicts
         entry: bash
-        args: [-c, "! grep -rnE '^(<<<<<<<|=======|>>>>>>>)' --include='*.nix' --include='*.lock' --include='*.json' --include='*.yaml' --include='*.yml' . || { echo 'ERROR: Found merge conflict markers - resolve before committing'; exit 1; }"]
+        args: [-c, "! grep -rnE '^<{7} |^={7}$$|^>{7} ' --include='*.nix' --include='*.lock' --include='*.json' --include='*.yaml' --include='*.yml' . || { echo 'ERROR: Found merge conflict markers - resolve before committing'; exit 1; }"]
         language: system
         pass_filenames: false
 
