@@ -56,6 +56,7 @@
       fd
       eza
       bat
+      trash-cli
 
       # Data manipulation
       jq
