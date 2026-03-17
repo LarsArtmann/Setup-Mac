@@ -96,9 +96,10 @@
     # Note: Font packages are now imported from common/packages/fonts.nix
     # to avoid duplication across platforms
     fonts.fontconfig.defaultFonts = {
-      monospace = ["JetBrains Mono"];
-      sansSerif = ["DejaVu Sans"];
-      serif = ["DejaVu Serif"];
+      monospace = ["JetBrains Mono" "Noto Sans Mono"];
+      sansSerif = ["DejaVu Sans" "Noto Sans"];
+      serif = ["DejaVu Serif" "Noto Serif"];
+      emoji = ["Noto Color Emoji"];
     };
 
     # Experimental features

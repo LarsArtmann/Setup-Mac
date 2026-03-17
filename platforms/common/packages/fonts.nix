@@ -10,6 +10,13 @@
         pkgs.fira-code
         pkgs.iosevka-bin
 
+        # Unicode fallback fonts for full UTF-8 coverage
+        # Covers: emoji, CJK, Arabic, Devanagari, and other non-Latin scripts
+        pkgs.noto-fonts
+        pkgs.noto-fonts-color-emoji
+        pkgs.noto-fonts-cjk-sans
+        pkgs.noto-fonts-extra
+
         # Linux-only: Bibata cursor theme for Hyprcursor
       ]
       ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
