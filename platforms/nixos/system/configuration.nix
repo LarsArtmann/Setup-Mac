@@ -31,6 +31,8 @@
     ../desktop/ai-stack.nix
     ../desktop/monitoring.nix
     ../desktop/multi-wm.nix
+    # Chrome/Chromium policy configuration for extension management
+    ../programs/chrome.nix
   ];
 
   # Define color scheme option

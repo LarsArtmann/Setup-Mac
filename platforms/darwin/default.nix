@@ -15,6 +15,7 @@
     ./system/activation.nix
     ./system/settings.nix
     ./environment.nix
+    ./programs/chrome.nix # Chrome policy configuration for extension management
     ../common/packages/base.nix
     ../common/packages/fonts.nix
   ];

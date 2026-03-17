@@ -17,6 +17,10 @@
     ./programs/fzf.nix
     ./programs/pre-commit.nix
     ./programs/ublock-filters.nix
+    ./programs/keepassxc.nix
+
+    # Browser configuration with extension management
+    ./programs/chromium.nix
   ];
 
   # Cross-platform shell configurations (Fish, Zsh, Bash)
