@@ -7,6 +7,12 @@
   cfg = config.programs.keepassxc;
   keepassxcPkg = cfg.package;
 
+  # Native messaging manifest for KeePassXC browser extension
+  # HM's keepassxc module handles Brave/Chromium/Firefox via nativeMessagingHosts,
+  # but Helium has a non-standard user data directory that HM doesn't know about.
+  # Helium uses net.imput.helium (from imputnet/helium change-chromium-branding.patch).
+  #   macOS: ~/Library/Application Support/net.imput.helium/
+  #   Linux: $XDG_CONFIG_HOME/net.imput.helium/
   manifest = builtins.toJSON {
     name = "org.keepassxc.keepassxc_browser";
     description = "KeePassXC integration with native messaging support";
@@ -14,12 +20,8 @@
     type = "stdio";
     allowed_origins = ["chrome-extension://oboonakemofpalcgghocfoadofidjkkk/"];
   };
-
-  chromiumManifests = {
-    "BraveSoftware/Brave-Browser/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
-    "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = manifest;
-  };
-in {
+in
+{
   programs.keepassxc = {
     enable = true;
     settings = {
@@ -30,33 +32,20 @@ in {
     };
   };
 
-  # Chromium-based browsers native messaging host manifests
-  # nixpkgs keepassxc only ships a Firefox manifest at $out/lib/mozilla/
-  # Home Manager's programs.chromium.nativeMessagingHosts expects $out/etc/chromium/
-  # so we place manifests directly into each browser's NativeMessagingHosts directory
+  # Helium browser native messaging host (non-standard config path)
   home.file =
-    lib.mkIf pkgs.stdenv.isDarwin
-    (lib.mapAttrs' (
-        name: value:
-          lib.nameValuePair
-          "Library/Application Support/${name}"
-          {
-            text = value;
-            force = true;
-          }
-      )
-      chromiumManifests);
+    lib.mkIf pkgs.stdenv.isDarwin {
+      "Library/Application Support/net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
+        text = manifest;
+        force = true;
+      };
+    };
 
   xdg.configFile =
-    lib.mkIf pkgs.stdenv.isLinux
-    (lib.mapAttrs' (
-        name: value:
-          lib.nameValuePair
-          name
-          {
-            text = value;
-            force = true;
-          }
-      )
-      chromiumManifests);
+    lib.mkIf pkgs.stdenv.isLinux {
+      "net.imput.helium/NativeMessagingHosts/org.keepassxc.keepassxc_browser.json" = {
+        text = manifest;
+        force = true;
+      };
+    };
 }
