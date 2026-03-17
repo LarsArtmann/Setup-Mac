@@ -23,7 +23,6 @@ in {
 
       # Plugins
       plugins = with pkgs.hyprlandPlugins; [
-        hyprwinwrap # Background windows
         hy3 # i3-style tiling (tabbed/stacked layouts)
         hyprsplit # Dynamic window splitting
       ];
@@ -41,9 +40,10 @@ in {
 
         # Plugin
         plugin = {
-          hyprwinwrap = {
-            class = "btop-bg";
-          };
+          # hyprwinwrap disabled - incompatible with Hyprland 0.54.2
+          # hyprwinwrap = {
+          #   class = "btop-bg";
+          # };
         };
 
         # Input (typed: int, str, bool validated by Nix)

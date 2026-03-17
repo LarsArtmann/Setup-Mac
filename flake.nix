@@ -122,9 +122,7 @@
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
           };
-          jscpd = pkgs.callPackage ./pkgs/jscpd.nix {};
           aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
-          portless = pkgs.callPackage ./pkgs/portless.nix {};
         };
 
         # Development shells for different program categories

@@ -40,6 +40,6 @@
 
     # Development tools for AI
     jupyter # Interactive development
-    python311 # Python for AI/ML development
+    python313 # Python for AI/ML development (3.11 doc build fails with Sphinx 9.1.0)
   ];
 }
