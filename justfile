@@ -52,9 +52,6 @@ update:
     @echo "📦 Updating system packages..."
     @echo "Updating Nix flake..."
     nix flake update
-    @echo ""
-    @echo "Updating crush-patched to latest version..."
-    @bash ./pkgs/update-crush-patched.sh || echo "⚠️  crush-patched update skipped (manual intervention needed)"
     @echo "✅ System updated"
     @echo ""
     @echo "💡 Next steps:"
@@ -1202,7 +1199,7 @@ help:
     @echo "Main Commands:"
     @echo "  setup          - Complete initial setup (run after cloning)"
     @echo "  switch         - Apply Nix configuration changes"
-    @echo "  update         - Update Nix flake, packages, and crush-patched"
+    @echo "  update         - Update Nix flake and packages"
     @echo "  clean          - Clean up caches and old packages (comprehensive, needs sudo)"
     @echo "  clean-storage  - Quick cache cleanup (safe, no sudo needed)"
     @echo ""
@@ -1270,33 +1267,12 @@ help:
     @echo "  pre-commit-run     - Run pre-commit on all files"
     @echo "  status             - Show git status and recent commits"
     @echo ""
-    @echo "Crush-Patched Management:"
-    @echo "  crush-build          - Build crush-patched (see pkgs/README.md for updates)"
-    @echo "  crush-info           - Show current version and patches"
-    @echo ""
     @echo "Utilities:"
     @echo "  info           - Show system information"
     @echo "  ssh-setup      - Create SSH directories"
     @echo "  rollback       - Emergency rollback to previous generation"
     @echo ""
     @echo "Run 'just <command>' to execute any task."
-
-# Crush-Patched Management
-# ======================
-
-# Build crush-patched
-crush-build:
-    @echo "🔨 Building crush-patched..."
-    @nix build .#crush-patched
-
-# Show current crush-patched version info
-crush-info:
-    @echo "📋 Crush-Patched Information"
-    @echo "=========================="
-    @grep -A 3 "pname = \"crush-patched\"" pkgs/crush-patched.nix | head -4 | sed 's/^/  /'
-    @echo ""
-    @echo "Patches applied:"
-    @grep -E "PR #|pull/.*patch" pkgs/crush-patched.nix | sed 's/^/  /'
 
 # Documentation Management Commands
 # ================================
