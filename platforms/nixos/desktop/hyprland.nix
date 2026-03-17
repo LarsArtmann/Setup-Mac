@@ -23,8 +23,8 @@ in {
 
       # Plugins
       plugins = with pkgs.hyprlandPlugins; [
-        hy3 # i3-style tiling (tabbed/stacked layouts)
-        hyprsplit # Dynamic window splitting
+        # hy3 # i3-style tiling (tabbed/stacked layouts) - disabled until compatible with Hyprland 0.54.2
+        # hyprsplit # Dynamic window splitting - disabled until compatible with Hyprland 0.54.2
       ];
 
       # System integration
