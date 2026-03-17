@@ -50,6 +50,9 @@
       implementation = "broker";
     };
 
+    # GNOME Keyring for secrets storage (creates /run/wrappers/bin/gnome-keyring-daemon)
+    gnome.gnome-keyring.enable = true;
+
     # Audit log forwarding disabled (depends on auditd)
     # journald.audit = true;
 
