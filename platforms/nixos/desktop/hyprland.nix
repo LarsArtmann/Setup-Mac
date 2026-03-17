@@ -150,61 +150,61 @@ in {
         ];
 
         # Window rules
-        windowrulev2 = [
-          "workspace 1,class:^(kitty)$"
-          "workspace 1,class:^(ghostty)$"
-          "workspace 1,class:^(alacritty)$"
-          "workspace 2,class:^(firefox)$"
-          "workspace 2,class:^(chromium)$"
-          "workspace 2,class:^(helium)$"
-          "workspace 3,class:^(dolphin)$"
-          "workspace 3,class:^(thunar)$"
-          "workspace 3,class:^(nautilus)$"
-          "workspace 4,class:^(nvim)$"
-          "workspace 4,class:^(code)$"
-          "workspace 4,class:^(codium)$"
-          "workspace 5,class:^(signal)$"
-          "workspace 5,class:^(discord)$"
-          "float, title:^(Open File|Save As|Choose File)"
-          "float, title:^(Picture-in-Picture)"
-          "pin, title:^(Picture-in-Picture)"
-          "float, class:^(nm-connection-editor|blueman-manager|pavucontrol)$"
-          "center, class:^(nm-connection-editor|blueman-manager|pavucontrol)$"
-          "noblur, class:^(kitty|ghostty|alacritty)$"
-          "float,class:^(htop-bg)$"
-          "nofocus,class:^(htop-bg)$"
-          "noblur,class:^(htop-bg)$"
-          "noshadow,class:^(htop-bg)$"
-          "noborder,class:^(htop-bg)$"
-          "size 800 600,class:^(htop-bg)$"
-          "move 100 100,class:^(htop-bg)$"
-          "float,class:^(logs-bg)$"
-          "nofocus,class:^(logs-bg)$"
-          "noblur,class:^(logs-bg)$"
-          "noshadow,class:^(logs-bg)$"
-          "noborder,class:^(logs-bg)$"
-          "size 800 600,class:^(logs-bg)$"
-          "move 920 100,class:^(logs-bg)$"
-          "float,class:^(nvim-bg)$"
-          "nofocus,class:^(nvim-bg)$"
-          "noblur,class:^(nvim-bg)$"
-          "noshadow,class:^(nvim-bg)$"
-          "noborder,class:^(nvim-bg)$"
-          "size 800 600,class:^(nvim-bg)$"
-          "move 100 720,class:^(nvim-bg)$"
+        windowrule = [
+          "workspace 1, match:class ^(kitty)$"
+          "workspace 1, match:class ^(ghostty)$"
+          "workspace 1, match:class ^(alacritty)$"
+          "workspace 2, match:class ^(firefox)$"
+          "workspace 2, match:class ^(chromium)$"
+          "workspace 2, match:class ^(helium)$"
+          "workspace 3, match:class ^(dolphin)$"
+          "workspace 3, match:class ^(thunar)$"
+          "workspace 3, match:class ^(nautilus)$"
+          "workspace 4, match:class ^(nvim)$"
+          "workspace 4, match:class ^(code)$"
+          "workspace 4, match:class ^(codium)$"
+          "workspace 5, match:class ^(signal)$"
+          "workspace 5, match:class ^(discord)$"
+          "float on, match:title ^(Open File|Save As|Choose File)"
+          "float on, match:title ^(Picture-in-Picture)"
+          "pin on, match:title ^(Picture-in-Picture)"
+          "float on, match:class ^(nm-connection-editor|blueman-manager|pavucontrol)$"
+          "center on, match:class ^(nm-connection-editor|blueman-manager|pavucontrol)$"
+          "no_blur on, match:class ^(kitty|ghostty|alacritty)$"
+          "float on, match:class ^(htop-bg)$"
+          "no_focus on, match:class ^(htop-bg)$"
+          "no_blur on, match:class ^(htop-bg)$"
+          "no_shadow on, match:class ^(htop-bg)$"
+          "border_size 0, match:class ^(htop-bg)$"
+          "size 800 600, match:class ^(htop-bg)$"
+          "move 100 100, match:class ^(htop-bg)$"
+          "float on, match:class ^(logs-bg)$"
+          "no_focus on, match:class ^(logs-bg)$"
+          "no_blur on, match:class ^(logs-bg)$"
+          "no_shadow on, match:class ^(logs-bg)$"
+          "border_size 0, match:class ^(logs-bg)$"
+          "size 800 600, match:class ^(logs-bg)$"
+          "move 920 100, match:class ^(logs-bg)$"
+          "float on, match:class ^(nvim-bg)$"
+          "no_focus on, match:class ^(nvim-bg)$"
+          "no_blur on, match:class ^(nvim-bg)$"
+          "no_shadow on, match:class ^(nvim-bg)$"
+          "border_size 0, match:class ^(nvim-bg)$"
+          "size 800 600, match:class ^(nvim-bg)$"
+          "move 100 720, match:class ^(nvim-bg)$"
 
           # Zellij float window rules
-          "float,class:^(zellij-float)$"
-          "size 90% 80%,class:^(zellij-float)$"
-          "center,class:^(zellij-float)$"
-          "noborder,class:^(zellij-float)$"
+          "float on, match:class ^(zellij-float)$"
+          "size 90% 80%, match:class ^(zellij-float)$"
+          "center on, match:class ^(zellij-float)$"
+          "border_size 0, match:class ^(zellij-float)$"
 
           # Quake terminal rules (dropdown terminal)
-          "float,class:^(kitty-quake)$"
-          "size 80% 40%,class:^(kitty-quake)$"
-          "move 10% 5%,class:^(kitty-quake)$"
-          "noborder,class:^(kitty-quake)$"
-          "noshadow,class:^(kitty-quake)$"
+          "float on, match:class ^(kitty-quake)$"
+          "size 80% 40%, match:class ^(kitty-quake)$"
+          "move 10% 5%, match:class ^(kitty-quake)$"
+          "border_size 0, match:class ^(kitty-quake)$"
+          "no_shadow on, match:class ^(kitty-quake)$"
         ];
 
         # Startup
@@ -389,11 +389,6 @@ in {
           # Lock/unlock group focus
           "$mod CTRL, G, lockactivegroup, toggle"
 
-          # hy3 layout switching (i3-style tiling)
-          "$mod, W, hy3:changegroup, hsplit"
-          "$mod, Y, hy3:changegroup, toggletab"
-          "$mod, E, hy3:makegroup, hsplit"
-          "$mod SHIFT, E, hy3:makegroup, vsplit"
           "$mod, O, exec, ${pkgs.writeShellScriptBin "clipboard-menu" ''
             ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
           ''}/bin/clipboard-menu"
@@ -470,7 +465,7 @@ in {
         };
         inherit (settings) monitor;
         workspaces = settings.workspace;
-        windowRules = settings.windowrulev2;
+        windowRules = settings.windowrule;
         keybindings = settings.bind;
         mouseBindings = settings.bindm;
       };
