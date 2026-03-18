@@ -8,6 +8,9 @@ _: {
     l = "ls -laSh";
     t = "tree -h -L 2 -C --dirsfirst";
 
+    # Password manager shortcuts
+    kop = "keepassxc &";
+
     # Development shortcuts
     gs = "git status";
     gd = "git diff";
