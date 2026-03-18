@@ -66,25 +66,25 @@ counter=0
 while true; do
     clear
     printf '\033[H'
-    
+
     echo "=== GPU Monitoring ==="
     echo "Time: $(date '+%H:%M:%S')"
     echo ""
-    
+
     get_gpu_stats
     echo ""
     get_ollama_mem
     echo ""
     get_ollama_logs
     echo ""
-    
+
     # Show recent Ollama device usage
     echo "=== Recent Device Activity ==="
     journalctl -u ollama --no-pager -n 30 | grep -iE 'device.*=.*vulkan|GPULayers' | tail -5 | sed 's/^/  /'
-    
+
     echo ""
     echo "Updates every 1 second. Ctrl+C to stop."
-    
+
     sleep 1
     counter=$((counter + 1))
 done

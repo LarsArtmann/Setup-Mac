@@ -57,7 +57,7 @@ monitor_log="/tmp/ollama-test-monitor.log"
             gpu_busy=$(cat /sys/class/drm/card0/device/gpu_busy_percent 2>/dev/null || echo "0")
             echo "[$timestamp] GPU Busy: $gpu_busy%" >> "$monitor_log"
         fi
-        
+
         # Check Ollama process memory
         ollama_pid=$(pgrep -x ollama | head -1 || true)
         if [[ -n "$ollama_pid" ]]; then
@@ -65,7 +65,7 @@ monitor_log="/tmp/ollama-test-monitor.log"
             mem_mb=$((mem_kb / 1024))
             echo "[$timestamp] Ollama Memory: ${mem_mb} MB" >> "$monitor_log"
         fi
-        
+
         sleep 0.5
     done
 ) &
@@ -90,7 +90,7 @@ try:
         },
         timeout=60
     )
-    
+
     if response.status_code == 200:
         result = response.json()
         tokens = result.get('eval_count', 0)
@@ -104,7 +104,7 @@ try:
     else:
         print(f"❌ Request failed: {response.status_code}")
         sys.exit(1)
-        
+
 except Exception as e:
     print(f"❌ Error: {e}")
     sys.exit(1)
