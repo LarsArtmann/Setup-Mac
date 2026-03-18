@@ -165,6 +165,7 @@ in {
           "workspace 4, match:class ^(codium)$"
           "workspace 5, match:class ^(signal)$"
           "workspace 5, match:class ^(discord)$"
+          "workspace 6, match:class ^(org.keepassxc.KeePassXC)$"
           "float on, match:title ^(Open File|Save As|Choose File)"
           "float on, match:title ^(Picture-in-Picture)"
           "pin on, match:title ^(Picture-in-Picture)"
