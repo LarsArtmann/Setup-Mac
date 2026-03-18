@@ -1,37 +1,46 @@
 {pkgs, ...}: {
-  # AMD Vulkan configuration for AI acceleration
-  # Strix Halo (gfx1100/gfx1101) is not yet supported by ROCm in nixpkgs.
-  # Vulkan via RADV works and provides GPU acceleration.
-  # Note: GPU hardware is configured in ../hardware/amd-gpu.nix
+  # AMD Strix Halo AI Stack
+  # Three inference backends: NPU (FastFlowLM), GPU (vLLM/Vulkan), GPU (Ollama)
 
-  # Ollama service for AI models
+  # Ollama - GPU inference via Vulkan backend (simple, good compatibility)
   services.ollama = {
     enable = true;
     package = pkgs.ollama-vulkan;
     host = "127.0.0.1";
     port = 11434;
     environmentVariables = {
-      # Performance tuning
       OLLAMA_FLASH_ATTENTION = "1";
-      # Keep parallel low: only 62 GiB visible to OS (rest reserved for GPU/NPU),
-      # BF16 model alone is 60 GiB. High parallelism = guaranteed OOM.
       OLLAMA_NUM_PARALLEL = "1";
     };
   };
 
-  # AI/ML tools and libraries
+  # vLLM - high-performance GPU inference (ROCm, for larger models / batch workloads)
+  # Note: vLLM on Strix Halo requires custom ROCm build or container.
+  # The package is installed here; runtime needs HSA_OVERRIDE_GFX_VERSION=gfx1100
+  # and may need containerized toolboxes from kyuz0/amd-strix-halo-toolboxes.
+
+  # FastFlowLM - NPU inference (50 TOPS XDNA2, best power efficiency)
+  # Installed as a system package. Requires NPU driver (see hardware/amd-npu.nix).
+  # Provides OpenAI-compatible API on port 52625 via `flm serve`.
+
   environment.systemPackages = with pkgs; [
-    # Model management and serving
-    ollama # Model server
-    llama-cpp # Alternative inference
-    vllm # High-performance inference server
+    # Inference servers
+    ollama
+    llama-cpp
+    vllm
 
-    # OCR tools
-    tesseract4 # Better OCR (includes tesseract binary)
-    poppler-utils # PDF utilities
+    # OCR
+    tesseract4
+    poppler-utils
 
-    # Development tools for AI
-    jupyter # Interactive development
-    python313 # Python for AI/ML development (3.11 doc build fails with Sphinx 9.1.0)
+    # AI/ML development
+    jupyter
+    python313
   ];
+
+  environment.sessionVariables = {
+    # vLLM ROCm targeting Strix Halo gfx1100
+    HSA_OVERRIDE_GFX_VERSION = "gfx1100";
+    ROCBLAS_USE_HIPBLASLT = "1";
+  };
 }

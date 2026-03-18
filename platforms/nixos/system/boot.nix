@@ -11,12 +11,14 @@
     # Use latest kernel for Ryzen AI Max+ support
     kernelPackages = pkgs.linuxPackages_latest;
 
-    # AMD GPU optimization kernel parameters
+    # AMD GPU + NPU optimization kernel parameters
     kernelParams = [
-      "amdgpu.ppfeaturemask=0xfffd7fff" # Enable all GPU features
-      "amdgpu.deepfl=1" # Enable deep frequency control
-      "amd_pstate=guided" # Performance mode for AMD CPUs
-      "processor.max_cstate=1" # C-state optimization
+      "amdgpu.ppfeaturemask=0xfffd7fff"
+      "amdgpu.deepfl=1"
+      "amd_pstate=guided"
+      "processor.max_cstate=1"
+      # NPU: increase TTM page limit for unified memory AI workloads
+      "amdgpu.ttm.pages_limit=29360128"
     ];
   };
 

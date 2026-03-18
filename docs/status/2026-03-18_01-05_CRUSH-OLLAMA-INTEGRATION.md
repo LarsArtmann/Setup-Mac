@@ -66,7 +66,7 @@ crush run -m "ollama/glm-4.7-flash:q8_0" "Refactor this code to be more idiomati
 
 **Recommendation:** Stick to `ollama/glm-4.7-flash:latest` (the Q4_K_M quantisation) for daily interactive use.
 
-**Reasoning:** 
-1. **Memory constraints:** Your system has 128GB of RAM, but it's unified memory. Approximately 64GB is reserved for the GPU/NPU, leaving ~62GB visible to the OS. 
+**Reasoning:**
+1. **Memory constraints:** Your system has 128GB of RAM, but it's unified memory. Approximately 64GB is reserved for the GPU/NPU, leaving ~62GB visible to the OS.
 2. **OOM Risks:** The BF16 model is 60GB on its own. Loading it leaves almost zero headroom for the OS, KV cache, or Crush itself, leading to swapping or Out-Of-Memory (OOM) crashes.
 3. **Speed:** During testing, the `latest` tag (Q4_K_M) was successfully queried and returned accurate results, while larger models will be significantly slower due to memory pressure and memory bandwidth limits.

@@ -64,6 +64,12 @@
       url = "github:ymtdzzz/otel-tui";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # AMD NPU (XDNA) driver for Ryzen AI Max+ Strix Halo
+    nix-amd-npu = {
+      url = "github:robcohen/nix-amd-npu";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -80,6 +86,7 @@
     homebrew-cask,
     niri,
     otel-tui,
+    nix-amd-npu,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -260,6 +267,7 @@
 
             # Import the existing NixOS configuration
             inputs.niri.nixosModules.niri
+            inputs.nix-amd-npu.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];
         };
