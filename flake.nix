@@ -143,6 +143,14 @@
               shellcheck
               just # Task runner
             ];
+            # Shell hook to provide jscpd command via bunx
+            shellHook = ''
+              # jscpd - code duplication detector
+              jscpd() {
+                exec bunx jscpd "$@"
+              }
+              export -f jscpd
+            '';
           };
         };
       };
