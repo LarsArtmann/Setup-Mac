@@ -866,7 +866,7 @@
 
 - [ ] **[MEDIUM]** Add security scanning tools
 - [ ] **[MEDIUM]** Configure firewall basics
-- [x] **[MEDIUM]** Add password manager  # Done: KeePassXC with Helium native messaging
+- [x] **[MEDIUM]** Add password manager # Done: KeePassXC with Helium native messaging
 - [ ] **[MEDIUM]** Configure authentication
 - [ ] **[HIGH]** Test security setup
 
