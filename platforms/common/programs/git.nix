@@ -229,6 +229,9 @@ _: {
       # Generated files
       "*_templ.go" ## https://templ.guide/
       "*.sql.go" ## https://sqlc.dev
+
+      # Nix
+      ".auto-deduplicate.lock"
     ];
   };
 }
