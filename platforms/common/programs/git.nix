@@ -96,7 +96,6 @@ _: {
 
       safe = {
         "directory" = [
-          "/Users/larsartmann/projects/todo-list-ai"
           "/Users/larsartmann/projects"
         ];
       };
