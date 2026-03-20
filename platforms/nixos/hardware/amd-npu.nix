@@ -4,7 +4,7 @@
   # Provides: XRT runtime, XDNA shim plugin, udev rules, memlock limits
 
   hardware.amd-npu = {
-    enable = true;
+    enable = false;
     enableDevTools = true;
     memlockLimit = "unlimited";
   };
