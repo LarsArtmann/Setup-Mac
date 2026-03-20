@@ -22,7 +22,7 @@ The system is highly functional, though some bleeding-edge hardware features (AM
 * **Browser Extensions:** Declarative YouTube Shorts blocker extension management fully implemented across platforms.
 
 ### Security & Password Management
-* **KeePassXC Integration:** 
+* **KeePassXC Integration:**
   * Implemented KeePassXC Hyprland window rules for seamless popup behavior.
   * Added `kop` shell alias for quick access.
   * Split and simplified native messaging manifests for Chromium and Helium browsers.
