@@ -1,0 +1,22 @@
+# Files to ignore for formatting
+# oxfmt respects .prettierignore
+
+# TOML files (not supported, causes panic)
+*.toml
+
+# Markdown files
+*.md
+
+# Nix files (use alejandra instead)
+*.nix
+
+# Configuration files
+*.yaml
+*.yml
+*.json
+*.lock
+
+# Sublime Text files
+*.sublime-keymap
+*.sublime-settings
+*.sublime-theme
