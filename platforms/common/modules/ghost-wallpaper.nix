@@ -4,26 +4,27 @@
   lib,
   ...
 }:
-with lib; let
+
+let
   cfg = config.programs.ghost-btop-wallpaper;
 in {
   options.programs.ghost-btop-wallpaper = {
-    enable = mkEnableOption "Ghost Window btop wallpaper (authentic btop)";
+    enable = lib.mkEnableOption "Ghost Window btop wallpaper (authentic btop)";
 
-    updateRate = mkOption {
-      type = types.int;
+    updateRate = lib.mkOption {
+      type = lib.types.int;
       default = 2000;
       description = "btop update rate in milliseconds";
     };
 
-    backgroundOpacity = mkOption {
-      type = types.str;
+    backgroundOpacity = lib.mkOption {
+      type = lib.types.str;
       default = "0.0";
       description = "Background opacity (0.0 = transparent, 1.0 = solid)";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # Step 1: Ghost terminal configuration
     xdg.configFile."kitty/btop-bg.conf".text = ''
       # FONT & COLORS
@@ -100,7 +101,7 @@ in {
     '';
 
     # Step 4: Window manager configuration (Linux only - Hyprland doesn't exist on macOS)
-    wayland.windowManager.hyprland = mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
+    wayland.windowManager.hyprland = lib.mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
       settings = {
         # Auto-start the ghost script
         exec-once = ["launch-btop-bg"];
@@ -128,7 +129,7 @@ in {
     # Note: macOS setup script is included in home.packages above
 
     # Step 6: macOS auto-start (if requested)
-    launchd.agents.btop-wallpaper = mkIf (config.programs.ghost-btop-wallpaper.enable && pkgs.stdenv.isDarwin) {
+    launchd.agents.btop-wallpaper = lib.mkIf (config.programs.ghost-btop-wallpaper.enable && pkgs.stdenv.isDarwin) {
       enable = true;
       config = {
         Label = "com.user.btop-wallpaper";

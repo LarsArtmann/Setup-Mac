@@ -40,11 +40,11 @@ in
     doCheck = false;
     pythonImportsCheck = [];
 
-    meta = with lib; {
+    meta = {
       description = "Monitors CPU, RAM, disk, network, and sensor usage for ActivityWatch";
       homepage = "https://github.com/Alwinator/aw-watcher-utilization";
-      license = licenses.mpl20;
-      platforms = platforms.all;
+      license = lib.licenses.mpl20;
+      platforms = lib.platforms.all;
       mainProgram = "aw-watcher-utilization";
     };
   }

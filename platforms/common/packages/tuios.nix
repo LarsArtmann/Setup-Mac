@@ -16,7 +16,7 @@ pkgs.buildGoModule rec {
 
   vendorHash = "sha256-tu8GXE/wMq2i61gTlgdbfL38ehVppa/fz1WVXrsX+vk=";
 
-  meta = with lib; {
+  meta = {
     description = "Terminal UI Operating System (Terminal Multiplexer)";
     longDescription = ''
       TUIOS is a terminal-based window manager that provides a modern,
@@ -26,9 +26,9 @@ pkgs.buildGoModule rec {
       shortcuts, workspace support, and mouse interaction.
     '';
     homepage = "https://github.com/Gaurav-Gosain/tuios";
-    license = licenses.mit;
+    license = lib.licenses.mit;
     mainProgram = "tuios";
-    platforms = platforms.unix;
-    maintainers = with maintainers; [];
+    platforms = lib.platforms.unix;
+    maintainers = lib.maintainers;
   };
 }

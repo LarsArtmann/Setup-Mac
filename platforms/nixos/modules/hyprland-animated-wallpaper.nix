@@ -4,40 +4,41 @@
   lib,
   ...
 }:
-with lib; let
+
+let
   cfg = config.programs.hyprland-animated-wallpaper;
 in {
   options.programs.hyprland-animated-wallpaper = {
-    enable = mkEnableOption "Hyprland animated wallpaper with swww";
+    enable = lib.mkEnableOption "Hyprland animated wallpaper with swww";
 
-    updateInterval = mkOption {
-      type = types.int;
+    updateInterval = lib.mkOption {
+      type = lib.types.int;
       default = 30;
       description = "Wallpaper update interval in seconds";
     };
 
-    transitionType = mkOption {
-      type = types.str;
+    transitionType = lib.mkOption {
+      type = lib.types.str;
       default = "any";
       description = "swww transition type: any, left, right, top, bottom, center, outer, random";
     };
 
-    transitionStep = mkOption {
-      type = types.int;
+    transitionStep = lib.mkOption {
+      type = lib.types.int;
       default = 90;
       description = "Transition step (0-255, higher = faster)";
     };
 
-    transitionDuration = mkOption {
-      type = types.int;
+    transitionDuration = lib.mkOption {
+      type = lib.types.int;
       default = 3;
       description = "Transition duration in seconds";
     };
 
-    enableGradient = mkEnableOption "Use gradient animations instead of static wallpapers";
+    enableGradient = lib.mkEnableOption "Use gradient animations instead of static wallpapers";
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # Wallpapers directory
     xdg.dataFile."wallpapers".source = pkgs.linkFarm "wallpapers" [
       {
@@ -116,8 +117,8 @@ in {
     ];
 
     # swww daemon and control scripts
-    home.packages = with pkgs; [
-      (writeShellScriptBin "swww-anim-wallpaper" ''
+    home.packages = [
+      (pkgs.writeShellScriptBin "swww-anim-wallpaper" ''
         #!/bin/bash
         # Hyprland Animated Wallpaper Script with swww
 
@@ -170,7 +171,7 @@ in {
         done
       '')
 
-      (writeShellScriptBin "swww-next" ''
+      (pkgs.writeShellScriptBin "swww-next" ''
         #!/bin/bash
         # Switch to next wallpaper manually
 
@@ -204,7 +205,7 @@ in {
           --transition-duration ${toString cfg.transitionDuration}
       '')
 
-      (writeShellScriptBin "swww-prev" ''
+      (pkgs.writeShellScriptBin "swww-prev" ''
         #!/bin/bash
         # Switch to previous wallpaper manually
 
@@ -240,7 +241,7 @@ in {
     ];
 
     # Auto-start in Hyprland
-    wayland.windowManager.hyprland = mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
+    wayland.windowManager.hyprland = lib.mkIf (!pkgs.stdenv.isDarwin && config.wayland.windowManager.hyprland.enable) {
       settings = {
         exec-once = ["swww-anim-wallpaper"];
       };

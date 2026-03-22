@@ -4,26 +4,27 @@
   lib,
   ...
 }:
-with lib; let
+
+let
   cfg = config.programs.ublock-filters;
 in {
   options.programs.ublock-filters = {
-    enable = mkEnableOption "uBlock Origin custom filter management";
+    enable = lib.mkEnableOption "uBlock Origin custom filter management";
 
-    enableAutoUpdate = mkOption {
-      type = types.bool;
+    enableAutoUpdate = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       description = "Enable automatic filter list updates via LaunchAgent";
     };
 
-    updateInterval = mkOption {
-      type = types.str;
+    updateInterval = lib.mkOption {
+      type = lib.types.str;
       default = "09:00";
       description = "Time for automatic filter updates (HH:MM format)";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # uBlock Origin custom filters and configuration
     xdg.configFile = {
       "ublock-origin/filters/custom-filters.txt".text = ''
@@ -184,7 +185,7 @@ in {
     };
 
     # Automatic filter updates via LaunchAgent (Darwin only)
-    launchd.agents."com.larsartmann.ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isDarwin) {
+    launchd.agents."com.larsartmann.ublock-filter-update" = lib.mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isDarwin) {
       enable = true;
       config = {
         Label = "com.larsartmann.ublock-filter-update";
@@ -221,14 +222,14 @@ in {
     };
 
     # Systemd timer (NixOS only)
-    systemd.user.timers."ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
+    systemd.user.timers."ublock-filter-update" = lib.mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
       timerConfig = {
         OnCalendar = cfg.updateInterval;
         Unit = "ublock-filter-update.service";
       };
     };
 
-    systemd.user.services."ublock-filter-update" = mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
+    systemd.user.services."ublock-filter-update" = lib.mkIf (cfg.enableAutoUpdate && pkgs.stdenv.isLinux) {
       serviceConfig = {
         ExecStart = "/bin/sh -c 'echo \"uBlock filters updated\" | systemd-cat -t ublock'";
         Type = "oneshot";

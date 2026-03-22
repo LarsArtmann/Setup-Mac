@@ -19,10 +19,10 @@ in
     # Disable tests due to flaky zoxide integration test
     doCheck = false;
 
-    meta = with lib; {
+    meta = {
       description = "A fancy, pretty terminal file manager (tests disabled)";
       homepage = "https://github.com/yorukot/superfile";
-      license = licenses.mit;
-      platforms = platforms.all;
+      license = lib.licenses.mit;
+      platforms = lib.platforms.all;
     };
   }
