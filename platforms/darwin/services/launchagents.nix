@@ -114,5 +114,37 @@ in {
         </plist>
       '';
     };
+
+    # Crush AI provider update service
+    # Runs daily at midnight to update AI provider configurations
+    "com.larsartmann.crush-update-providers.plist" = {
+      enable = true;
+      text = ''
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>Label</key>
+            <string>com.larsartmann.crush-update-providers</string>
+            <key>ProgramArguments</key>
+            <array>
+                <string>/run/current-system/sw/bin/crush</string>
+                <string>update-providers</string>
+            </array>
+            <key>StartCalendarInterval</key>
+            <dict>
+                <key>Hour</key>
+                <integer>0</integer>
+                <key>Minute</key>
+                <integer>0</integer>
+            </dict>
+            <key>StandardOutPath</key>
+            <string>${userHome}/.local/share/crush/update-providers.log</string>
+            <key>StandardErrorPath</key>
+            <string>${userHome}/.local/share/crush/update-providers.error.log</string>
+        </dict>
+        </plist>
+      '';
+    };
   };
 }
