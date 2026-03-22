@@ -10,6 +10,9 @@ _: {
 
       # Key-based authentication only
       PubkeyAuthentication = true;
+      # Accept both modern (rsa-sha2-256/512) and legacy (ssh-rsa) key algorithms
+      # OpenSSH 10.2p1 removed ssh-rsa from defaults; macOS clients may still offer it
+      PubkeyAcceptedAlgorithms = "+ssh-rsa";
       AuthorizedKeysFile = ".ssh/authorized_keys";
 
       # Security settings

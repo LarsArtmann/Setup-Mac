@@ -124,6 +124,8 @@
           ];
         };
 
+        formatter = pkgs.alejandra;
+
         packages = {
           modernize = import ./pkgs/modernize.nix {
             inherit pkgs;
