@@ -29,6 +29,6 @@ pkgs.buildGoModule rec {
     license = lib.licenses.mit;
     mainProgram = "tuios";
     platforms = lib.platforms.unix;
-    maintainers = lib.maintainers;
+    maintainers = [];
   };
 }

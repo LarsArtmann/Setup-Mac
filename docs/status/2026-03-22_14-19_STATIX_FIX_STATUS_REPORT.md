@@ -1,8 +1,8 @@
 # SystemNix Status Report
 
-**Generated:** 2026-03-22 14:19 CET  
-**Author:** Crush AI (via CLI)  
-**Date Range:** 2026-03-22  
+**Generated:** 2026-03-22 14:19 CET
+**Author:** Crush AI (via CLI)
+**Date Range:** 2026-03-22
 
 ---
 

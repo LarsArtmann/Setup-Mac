@@ -3,9 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-
-let
+}: let
   cfg = config.programs.ghost-btop-wallpaper;
 in {
   options.programs.ghost-btop-wallpaper = {

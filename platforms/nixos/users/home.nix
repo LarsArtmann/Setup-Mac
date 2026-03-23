@@ -143,7 +143,7 @@
     brightnessctl
     cliphist
     wl-clipboard
-    wl-clip-persist  # Keeps clipboard content after programs close
+    wl-clip-persist # Keeps clipboard content after programs close
     zellij # Terminal multiplexer (modern tmux alternative)
     # Scripts dependencies
     jq # JSON processing for hyprctl scripts

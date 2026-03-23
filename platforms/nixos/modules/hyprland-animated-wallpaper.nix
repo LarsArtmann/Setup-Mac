@@ -3,9 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-
-let
+}: let
   cfg = config.programs.hyprland-animated-wallpaper;
 in {
   options.programs.hyprland-animated-wallpaper = {

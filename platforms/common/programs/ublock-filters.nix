@@ -3,9 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-
-let
+}: let
   cfg = config.programs.ublock-filters;
 in {
   options.programs.ublock-filters = {
