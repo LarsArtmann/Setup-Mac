@@ -23,10 +23,11 @@ exclude:
   - dist
   - "*.pb.go"
   - "*.gen.go"
+  - flake
 
 # Auto-fix settings
 auto_fix: false
 
 # Logging
 verbose: false
-log_level: info
+log_level: info"
