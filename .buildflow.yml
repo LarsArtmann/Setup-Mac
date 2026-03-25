@@ -30,4 +30,4 @@ auto_fix: false
 
 # Logging
 verbose: false
-log_level: info"
+log_level: info
