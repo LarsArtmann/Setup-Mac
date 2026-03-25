@@ -56,8 +56,8 @@
     # Audit log forwarding disabled (depends on auditd)
     # journald.audit = true;
 
-    # Fail2ban for intrusion prevention
-    fail2ban.enable = true;
+    # Fail2ban for intrusion prevention (disabled)
+    fail2ban.enable = false;
 
     # ClamAV antivirus
     clamav.daemon.enable = true;
