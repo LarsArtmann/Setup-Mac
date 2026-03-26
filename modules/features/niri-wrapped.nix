@@ -43,9 +43,7 @@
       settings = {
         # Spawn terminal at startup
         spawn-at-startup = [
-          {
-            command = ["kitty"];
-          }
+          ["kitty"]
         ];
 
         # XWayland support
@@ -96,38 +94,38 @@
         # Keybindings
         binds = {
           # Terminal
-          "Mod+Return".spawn = "kitty";
-          "Mod+Shift+Return".spawn = "foot";
+          "Mod+Return".spawn = ["kitty"];
+          "Mod+Shift+Return".spawn = ["foot"];
 
           # Window management
-          "Mod+Q".close-window = [];
-          "Mod+Shift+Q".quit = [];
+          "Mod+Q".close-window = null;
+          "Mod+Shift+Q".quit = null;
 
           # Focus movement
-          "Mod+Left".focus-column-left = [];
-          "Mod+Right".focus-column-right = [];
-          "Mod+Up".focus-window-up = [];
-          "Mod+Down".focus-window-down = [];
-          "Mod+H".focus-column-left = [];
-          "Mod+L".focus-column-right = [];
-          "Mod+K".focus-window-up = [];
-          "Mod+J".focus-window-down = [];
+          "Mod+Left".focus-column-left = null;
+          "Mod+Right".focus-column-right = null;
+          "Mod+Up".focus-window-up = null;
+          "Mod+Down".focus-window-down = null;
+          "Mod+H".focus-column-left = null;
+          "Mod+L".focus-column-right = null;
+          "Mod+K".focus-window-up = null;
+          "Mod+J".focus-window-down = null;
 
           # Move windows
-          "Mod+Shift+Left".move-column-left = [];
-          "Mod+Shift+Right".move-column-right = [];
-          "Mod+Shift+Up".move-window-up = [];
-          "Mod+Shift+Down".move-window-down = [];
-          "Mod+Shift+H".move-column-left = [];
-          "Mod+Shift+L".move-column-right = [];
-          "Mod+Shift+K".move-window-up = [];
-          "Mod+Shift+J".move-window-down = [];
+          "Mod+Shift+Left".move-column-left = null;
+          "Mod+Shift+Right".move-column-right = null;
+          "Mod+Shift+Up".move-window-up = null;
+          "Mod+Shift+Down".move-window-down = null;
+          "Mod+Shift+H".move-column-left = null;
+          "Mod+Shift+L".move-column-right = null;
+          "Mod+Shift+K".move-window-up = null;
+          "Mod+Shift+J".move-window-down = null;
 
           # Column width
-          "Mod+BracketLeft".consume-window-into-column = [];
-          "Mod+BracketRight".expel-window-from-column = [];
-          "Mod+R".switch-preset-column-width = [];
-          "Mod+Shift+R".reset-window-height = [];
+          "Mod+BracketLeft".consume-window-into-column = null;
+          "Mod+BracketRight".expel-window-from-column = null;
+          "Mod+R".switch-preset-column-width = null;
+          "Mod+Shift+R".reset-window-height = null;
           "Mod+Minus".set-column-width = "-10%";
           "Mod+Equal".set-column-width = "+10%";
 
@@ -153,40 +151,40 @@
           "Mod+Shift+9".move-column-to-workspace = 9;
 
           # Apps
-          "Mod+D".spawn = "rofi -show drun";
-          "Mod+Shift+E".spawn = "emacs";
-          "Mod+Shift+F".spawn = "firefox";
+          "Mod+D".spawn-sh = "rofi -show drun";
+          "Mod+Shift+E".spawn-sh = "emacs";
+          "Mod+Shift+F".spawn-sh = "firefox";
 
           # System
-          "Mod+Shift+L".spawn = "hyprlock";
-          "Mod+Shift+P".power-off-monitors = [];
-          "Mod+Shift+S".suspend = [];
+          "Mod+Shift+L".spawn-sh = "hyprlock";
+          "Mod+Shift+P".power-off-monitors = null;
+          "Mod+Shift+S".suspend = null;
 
           # Screenshot
-          "Print".spawn = "grimblast copy area";
-          "Shift+Print".spawn = "grimblast save area ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png";
+          "Print".spawn-sh = "grimblast copy area";
+          "Shift+Print".spawn-sh = "grimblast save area ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png";
 
           # Audio
           "XF86AudioRaiseVolume" = {
-            spawn = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
+            spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
             allow-when-locked = true;
           };
           "XF86AudioLowerVolume" = {
-            spawn = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
+            spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
             allow-when-locked = true;
           };
           "XF86AudioMute" = {
-            spawn = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+            spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
             allow-when-locked = true;
           };
 
           # Brightness
           "XF86MonBrightnessUp" = {
-            spawn = "brightnessctl set +5%";
+            spawn-sh = "brightnessctl set +5%";
             allow-when-locked = true;
           };
           "XF86MonBrightnessDown" = {
-            spawn = "brightnessctl set 5%-";
+            spawn-sh = "brightnessctl set 5%-";
             allow-when-locked = true;
           };
         };
