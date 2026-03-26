@@ -505,6 +505,73 @@ For detailed information:
 6. **ALWAYS test configuration** before applying (`just test`)
 7. **OPEN NEW TERMINAL** after `just switch` (shell changes require new session)
 
+### Wrapped Packages (Vimjoyer Pattern)
+
+#### Overview
+
+The project uses the **wrapper-modules** pattern to create packages with embedded configuration. This allows programs to be fully declarative with their settings baked into the package itself.
+
+**Benefits:**
+- Configuration is version-controlled with the flake
+- No runtime configuration files needed
+- Self-contained packages that work out-of-the-box
+- Can reference other wrapped packages from the same flake
+
+#### Architecture
+
+```
+flake.nix                              # Package definition using wrapper-modules
+└── platforms/nixos/programs/          # Extracted configuration files
+    └── niri-wrapped.nix               # Niri settings (imported by flake.nix)
+```
+
+#### Usage Pattern
+
+```nix
+# In flake.nix perSystem.packages:
+niri-wrapped = wrapper-modules.wrappers.niri.wrap {
+  inherit pkgs;  # CRITICAL: must include
+  settings = import ./platforms/nixos/programs/niri-wrapped.nix { inherit pkgs lib; };
+};
+```
+
+#### Configuration File Structure
+
+Configuration files are functions that return settings:
+
+```nix
+# platforms/nixos/programs/niri-wrapped.nix
+{ pkgs, lib }:
+{
+  spawn-at-startup = [ ["kitty"] ];
+  binds = {
+    "Mod+Q".close-window = null;      # null for actions
+    "Mod+Return".spawn = ["kitty"];   # list for spawn
+    "Mod+D".spawn-sh = "rofi -show drun";  # string for shell commands
+  };
+}
+```
+
+#### Wrapper-Modules API (Niri)
+
+| Type | Syntax | Example |
+|------|--------|---------|
+| Action | `bind."key".action = null;` | `"Mod+Q".close-window = null;` |
+| Spawn | `bind."key".spawn = ["cmd"];` | `"Mod+Return".spawn = ["kitty"];` |
+| Shell | `bind."key".spawn-sh = "cmd";` | `"Mod+D".spawn-sh = "rofi -show drun";` |
+| Complex | `bind."key" = { ... };` | `{"XF86AudioRaiseVolume" = { spawn-sh = "..."; allow-when-locked = true; };}` |
+
+#### Platform Considerations
+
+- **Linux-only packages**: Use `lib.optionalAttrs pkgs.stdenv.isLinux` to wrap Linux-specific packages
+- **Niri**: Only available on Linux (x86_64-linux)
+- **Reference**: [Vimjoyer Video](https://www.vimjoyer.com/vid79-parts-wrapped) | [Template](https://github.com/vimjoyer/flake-parts-wrapped-template)
+
+#### Known Limitations
+
+- **mkMerge incompatibility**: `lib.mkMerge` does not work with flake-parts modules. Use inline configuration or imports instead.
+- **Import-tree approach**: The `import-tree` library cannot be combined with `mkMerge` in flake-parts outputs.
+
 ---
 
 ## 🚀 ESSENTIAL COMMANDS
