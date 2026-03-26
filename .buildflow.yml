@@ -31,3 +31,30 @@ auto_fix: false
 # Logging
 verbose: false
 log_level: info
+
+# Skip Go-specific steps (this is a Nix configuration project, not Go)
+skip:
+  # Go module management (no go.mod in this project)
+  - go-mod-tidy
+  - go-mod-update
+  - go-mod-ignore-check
+  - go-mod-version-check
+
+  # Go code generation (no Go source files)
+  - go-generate
+  - sqlc-generate
+  - templ-generate
+  - gvalid-generate
+
+  # Go testing (no Go source files)
+  - test-race
+  - test-coverage
+  - test-fuzz
+
+  # Go linting (no Go source files)
+  - golangci-lint
+  - go-fix
+  - modernize
+
+  # Version management
+  - ginkgo-version-fix

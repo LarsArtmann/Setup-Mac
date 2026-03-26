@@ -92,6 +92,17 @@ result-*
 .DS_Store
 **/.DS_Store
 
+# iTerm2
+*.itermexport
+
+# Binary documentation (should not be committed)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.pdf
+
 # Claude AI configuration
 .claude/
 

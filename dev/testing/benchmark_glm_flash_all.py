@@ -176,7 +176,7 @@ def benchmark_single(model_tag, prompt_tokens, max_tokens, num_runs):
         print(f"    response length: {warmup['response_len']} chars")
         print(f"    thinking length: {warmup['thinking_len']} chars")
         if warmup["thinking_len"] > 0 and warmup["response_len"] == 0:
-            print(f"  NOTE: All output in 'thinking' field (expected for reasoning models). eval_count still valid.")
+            print(f"  INFO: All output in 'thinking' field (expected for reasoning models). eval_count still valid.")
 
     results = []
     for run in range(1, num_runs + 1):

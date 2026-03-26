@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# BuildFlow wrapper for Nix-only projects
+# This script runs only the relevant steps for a Nix configuration project
+# Run this instead of `buildflow` when working on this project
+#
+# Usage: ./scripts/buildflow-nix [--fix]
+#
+# The --fix flag is passed to buildflow for auto-fix support
+
+set -euo pipefail
+
+# Relevant runnable steps for Nix projects (non-Go)
+# Note: duplications-checker and some other validators are run automatically
+# by buildflow but cannot be run individually via --step
+STEPS=(
+    "detect-language"
+    "nix-flake-update"
+    "binary-check"
+    "gitleaks"
+    "code-metrics"
+    "doc-files-age-check"
+    "agents-md-exists-check"
+    "todo-check"
+)
+
+# Parse flags
+FIX_FLAG=""
+for arg in "$@"; do
+    case $arg in
+        --fix|-f)
+            FIX_FLAG="--fix"
+            ;;
+    esac
+done
+
+# Run buildflow with each relevant step
+FAILED=0
+for step in "${STEPS[@]}"; do
+    echo ""
+    echo "=== Running: $step ==="
+    if buildflow --step "$step" $FIX_FLAG 2>&1; then
+        echo "✓ $step passed"
+    else
+        echo "✗ $step failed"
+        FAILED=1
+    fi
+done
+
+echo ""
+if [ $FAILED -eq 0 ]; then
+    echo "All Nix-relevant steps passed!"
+    exit 0
+else
+    echo "Some steps failed."
+    exit 1
+fi
