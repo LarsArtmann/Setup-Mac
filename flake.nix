@@ -129,15 +129,17 @@
 
         formatter = pkgs.alejandra;
 
-        packages = {
-          modernize = import ./pkgs/modernize.nix {
-            inherit pkgs;
-          };
-          aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
-
-          # Wrapped niri with embedded configuration
-          # Following the vimjoyer pattern: https://www.vimjoyer.com/vid79-parts-wrapped
-          niri-wrapped = wrapper-modules.wrappers.niri.wrap {
+        packages =
+          {
+            modernize = import ./pkgs/modernize.nix {
+              inherit pkgs;
+            };
+            aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
+          }
+          // lib.optionalAttrs pkgs.stdenv.isLinux {
+            # Wrapped niri with embedded configuration (Linux only)
+            # Following the vimjoyer pattern: https://www.vimjoyer.com/vid79-parts-wrapped
+            niri-wrapped = wrapper-modules.wrappers.niri.wrap {
             inherit pkgs; # CRITICAL: Must inherit pkgs!
 
             settings = {
