@@ -17,6 +17,12 @@
     # Add flake-parts for modular architecture
     flake-parts.url = "github:hercules-ci/flake-parts";
 
+    # import-tree for automatic module loading
+    import-tree.url = "github:vic/import-tree";
+
+    # wrapper-modules for creating configured/wrapped packages
+    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
+
     # Add NUR (Nix User Repository) for other packages
     nur = {
       url = "github:nix-community/NUR";
@@ -74,6 +80,7 @@
 
   outputs = inputs @ {
     flake-parts,
+    import-tree,
     nix-darwin,
     nixpkgs,
     home-manager,
@@ -88,87 +95,38 @@
     otel-tui,
     nix-amd-npu,
     ...
-  }:
-    flake-parts.lib.mkFlake {inherit inputs;} {
-      systems = ["aarch64-darwin" "x86_64-linux"];
+  }: let
+    # Import modules from the modules directory using import-tree
+    # This automatically loads all .nix files in ./modules
+    # Following the vimjoyer pattern: https://www.vimjoyer.com/vid79-parts-wrapped
+    modulesFromTree = import-tree ./modules;
+  in
+    flake-parts.lib.mkFlake {inherit inputs;} (
+      # Merge import-tree modules with the existing configuration
+      # This allows gradual migration to the new module structure
+      nixpkgs.lib.mkMerge [
+        # Import modules from ./modules directory (vimjoyer pattern)
+        # Each file in modules/ defines flake-parts modules (perSystem, flake, etc.)
+        modulesFromTree
 
-      # Per-system configuration (packages, devShells, etc.)
-      perSystem = {
-        pkgs,
-        system,
-        ...
-      }: {
-        # Allow unfree and broken packages for all systems
-        _module.args.pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-          config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
-          overlays = [
-            # Pin Go to version 1.26.1 for all systems
-            # Note: buildGo126Module already exists in nixpkgs, no need to override buildGoModule
-            (final: prev: {
-              go = prev.go_1_26.overrideAttrs (oldAttrs: {
-                version = "1.26.1";
-                src = prev.fetchurl {
-                  url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-                  hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-                };
-              });
-            })
-            # Custom ActivityWatch watcher for system utilization monitoring
-            (final: prev: {
-              aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-            })
-          ];
-        };
+        # Existing inline configuration (backward compatible)
+        {
+          systems = ["aarch64-darwin" "x86_64-linux"];
 
-        formatter = pkgs.alejandra;
-
-        packages = {
-          modernize = import ./pkgs/modernize.nix {
-            inherit pkgs;
-          };
-          aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
-        };
-
-        # Development shells for different program categories
-        devShells = {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              git
-              nixfmt
-              alejandra
-              treefmt
-              deadnix
-              shellcheck
-              just # Task runner
-            ];
-            # Shell hook to provide jscpd command via bunx
-            shellHook = ''
-              # jscpd - code duplication detector
-              alias jscpd="bunx jscpd"
-            '';
-          };
-        };
-      };
-
-      # System configurations (maintain backward compatibility)
-      flake = {
-        darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          specialArgs = {
-            inherit (inputs.self) inputs;
-            inherit nixpkgs;
-            inherit helium;
-            inherit nur;
-            inherit nix-visualize;
-            inherit nix-colors;
-            inherit otel-tui;
-          };
-          modules = [
-            # Pin Go to version 1.26 for all packages in system
-            {
-              nixpkgs.overlays = [
+          # Per-system configuration (packages, devShells, etc.)
+          perSystem = {
+            pkgs,
+            system,
+            ...
+          }: {
+            # Allow unfree and broken packages for all systems
+            _module.args.pkgs = import nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+              config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
+              overlays = [
+                # Pin Go to version 1.26.1 for all systems
+                # Note: buildGo126Module already exists in nixpkgs, no need to override buildGoModule
                 (final: prev: {
                   go = prev.go_1_26.overrideAttrs (oldAttrs: {
                     version = "1.26.1";
@@ -177,122 +135,187 @@
                       hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
                     };
                   });
-                  buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
-                  buildGoModule = prev.buildGoModule.override {inherit (final) go;};
                 })
                 # Custom ActivityWatch watcher for system utilization monitoring
                 (final: prev: {
                   aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
                 })
               ];
-            }
+            };
 
-            # Import nix-homebrew for declarative Homebrew management
-            nix-homebrew.darwinModules.nix-homebrew
-            {
-              nix-homebrew = {
-                enable = true;
-                enableRosetta = true;
-                user = "larsartmann";
-                autoMigrate = true;
-                # Pin Homebrew taps to flake inputs for reproducibility
-                taps = {
-                  "homebrew/bundle" = homebrew-bundle;
-                  "homebrew/cask" = homebrew-cask;
-                };
+            formatter = pkgs.alejandra;
+
+            packages = {
+              modernize = import ./pkgs/modernize.nix {
+                inherit pkgs;
               };
-            }
+              aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
+            };
 
-            # Import Home Manager module for Darwin
-            inputs.home-manager.darwinModules.home-manager
-
-            # Define Home Manager configuration inline for top-level visibility
-            {
-              # Home Manager configuration
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = "backup";
-                overwriteBackup = true;
-                users.larsartmann = import ./platforms/darwin/home.nix;
-                extraSpecialArgs = {inherit nix-colors;};
+            # Development shells for different program categories
+            devShells = {
+              default = pkgs.mkShell {
+                packages = with pkgs; [
+                  git
+                  nixfmt
+                  alejandra
+                  treefmt
+                  deadnix
+                  shellcheck
+                  just # Task runner
+                ];
+                # Shell hook to provide jscpd command via bunx
+                shellHook = ''
+                  # jscpd - code duplication detector
+                  alias jscpd="bunx jscpd"
+                '';
               };
-            }
-
-            # Core Darwin configuration with Ghost Systems integration
-            ./platforms/darwin/default.nix
-          ];
-        };
-
-        # NixOS configuration
-        nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          specialArgs = {
-            inherit (inputs.self) inputs;
-            inherit helium;
-            inherit nur;
-            inherit nix-visualize;
-            inherit nix-colors;
-            inherit niri;
-            inherit otel-tui;
+            };
           };
-          modules = [
-            # Core system configuration
-            {
-              system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
-              # Allow unfree packages in NixOS
-              nixpkgs.config.allowUnfree = true;
 
-              # Add NUR overlay to make nur.repos available
-              nixpkgs.overlays = [
-                nur.overlays.default
-                # Niri flake overlay for stable/unstable packages
-                inputs.niri.overlays.niri
-                # Custom ActivityWatch watcher for system utilization monitoring
-                (final: prev: {
-                  aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-                })
+          # System configurations (maintain backward compatibility)
+          flake = {
+            darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
+              system = "aarch64-darwin";
+              specialArgs = {
+                inherit (inputs.self) inputs;
+                inherit nixpkgs;
+                inherit helium;
+                inherit nur;
+                inherit nix-visualize;
+                inherit nix-colors;
+                inherit otel-tui;
+              };
+              modules = [
+                # Pin Go to version 1.26 for all packages in system
+                {
+                  nixpkgs.overlays = [
+                    (final: prev: {
+                      go = prev.go_1_26.overrideAttrs (oldAttrs: {
+                        version = "1.26.1";
+                        src = prev.fetchurl {
+                          url = "https://go.dev/dl/go1.26.1.src.tar.gz";
+                          hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
+                        };
+                      });
+                      buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
+                      buildGoModule = prev.buildGoModule.override {inherit (final) go;};
+                    })
+                    # Custom ActivityWatch watcher for system utilization monitoring
+                    (final: prev: {
+                      aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+                    })
+                  ];
+                }
+
+                # Import nix-homebrew for declarative Homebrew management
+                nix-homebrew.darwinModules.nix-homebrew
+                {
+                  nix-homebrew = {
+                    enable = true;
+                    enableRosetta = true;
+                    user = "larsartmann";
+                    autoMigrate = true;
+                    # Pin Homebrew taps to flake inputs for reproducibility
+                    taps = {
+                      "homebrew/bundle" = homebrew-bundle;
+                      "homebrew/cask" = homebrew-cask;
+                    };
+                  };
+                }
+
+                # Import Home Manager module for Darwin
+                inputs.home-manager.darwinModules.home-manager
+
+                # Define Home Manager configuration inline for top-level visibility
+                {
+                  # Home Manager configuration
+                  home-manager = {
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
+                    backupFileExtension = "backup";
+                    overwriteBackup = true;
+                    users.larsartmann = import ./platforms/darwin/home.nix;
+                    extraSpecialArgs = {inherit nix-colors;};
+                  };
+                }
+
+                # Core Darwin configuration with Ghost Systems integration
+                ./platforms/darwin/default.nix
               ];
-            }
+            };
 
-            # Import Home Manager module for NixOS
-            home-manager.nixosModules.home-manager
-            nur.modules.nixos.default
-
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = "backup";
-                overwriteBackup = true;
-                users.lars = import ./platforms/nixos/users/home.nix;
-                extraSpecialArgs = {inherit nix-colors;};
+            # NixOS configuration
+            nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
+              system = "x86_64-linux";
+              specialArgs = {
+                inherit (inputs.self) inputs;
+                inherit helium;
+                inherit nur;
+                inherit nix-visualize;
+                inherit nix-colors;
+                inherit niri;
+                inherit otel-tui;
               };
-            }
+              modules = [
+                # Core system configuration
+                {
+                  system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
+                  # Allow unfree packages in NixOS
+                  nixpkgs.config.allowUnfree = true;
 
-            # Import the existing NixOS configuration
-            inputs.niri.nixosModules.niri
-            inputs.nix-amd-npu.nixosModules.default
-            ./platforms/nixos/system/configuration.nix
-          ];
-        };
+                  # Add NUR overlay to make nur.repos available
+                  nixpkgs.overlays = [
+                    nur.overlays.default
+                    # Niri flake overlay for stable/unstable packages
+                    inputs.niri.overlays.niri
+                    # Custom ActivityWatch watcher for system utilization monitoring
+                    (final: prev: {
+                      aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+                    })
+                  ];
+                }
 
-        # Standalone Home Manager configurations for CLI use
-        homeConfigurations = let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        in {
-          "evo-x2" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {inherit nix-colors;};
-            modules = [
-              ./platforms/nixos/users/home.nix
-              {
-                home.username = "lars";
-                home.homeDirectory = "/home/lars";
-              }
-            ];
+                # Import Home Manager module for NixOS
+                home-manager.nixosModules.home-manager
+                nur.modules.nixos.default
+
+                {
+                  home-manager = {
+                    useGlobalPkgs = true;
+                    useUserPackages = true;
+                    backupFileExtension = "backup";
+                    overwriteBackup = true;
+                    users.lars = import ./platforms/nixos/users/home.nix;
+                    extraSpecialArgs = {inherit nix-colors;};
+                  };
+                }
+
+                # Import the existing NixOS configuration
+                inputs.niri.nixosModules.niri
+                inputs.nix-amd-npu.nixosModules.default
+                ./platforms/nixos/system/configuration.nix
+              ];
+            };
+
+            # Standalone Home Manager configurations for CLI use
+            homeConfigurations = let
+              pkgs = nixpkgs.legacyPackages.x86_64-linux;
+            in {
+              "evo-x2" = home-manager.lib.homeManagerConfiguration {
+                inherit pkgs;
+                extraSpecialArgs = {inherit nix-colors;};
+                modules = [
+                  ./platforms/nixos/users/home.nix
+                  {
+                    home.username = "lars";
+                    home.homeDirectory = "/home/lars";
+                  }
+                ];
+              };
+            };
           };
-        };
-      };
-    };
+        }
+      ]
+    );
 }
