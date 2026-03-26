@@ -105,6 +105,7 @@
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays = [
             # Pin Go to version 1.26.1 for all systems
+            # Note: buildGo126Module already exists in nixpkgs, no need to override buildGoModule
             (final: prev: {
               go = prev.go_1_26.overrideAttrs (oldAttrs: {
                 version = "1.26.1";
@@ -113,9 +114,6 @@
                   hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
                 };
               });
-              buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
-              # Override buildGoModule to use Go 1.26 instead of default
-              buildGoModule = prev.buildGoModule.override {inherit (final) go;};
             })
             # Custom ActivityWatch watcher for system utilization monitoring
             (final: prev: {
