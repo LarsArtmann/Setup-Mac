@@ -11,23 +11,21 @@
 {
   pkgs,
   lib,
-}:
-let
+}: let
   # Helper for spawn commands
-  spawn = cmd: { spawn = [ cmd ]; };
-  spawn-sh = cmd: { spawn-sh = cmd; };
+  spawn = cmd: {spawn = [cmd];};
+  spawn-sh = cmd: {spawn-sh = cmd;};
 
   # Helper for null actions (close-window, quit, etc.)
   action = _: null;
 
   # Helper for workspace commands
-  focus-workspace = n: { focus-workspace = n; };
-  move-to-workspace = n: { move-column-to-workspace = n; };
-in
-{
+  focus-workspace = n: {focus-workspace = n;};
+  move-to-workspace = n: {move-column-to-workspace = n;};
+in {
   # Spawn terminal at startup
   spawn-at-startup = [
-    [ "kitty" ]
+    ["kitty"]
   ];
 
   # XWayland support
@@ -56,11 +54,11 @@ in
     gaps = 8;
     center-focused-column = "never";
     preset-column-widths = [
-      { proportion = 0.33333; }
-      { proportion = 0.5; }
-      { proportion = 0.66667; }
+      {proportion = 0.33333;}
+      {proportion = 0.5;}
+      {proportion = 0.66667;}
     ];
-    default-column-width = { proportion = 0.5; };
+    default-column-width = {proportion = 0.5;};
   };
 
   # Focus ring (Catppuccin Mocha theme)
@@ -78,8 +76,8 @@ in
   # Keybindings
   binds = {
     # Terminal
-    "Mod+Return".spawn = [ "kitty" ];
-    "Mod+Shift+Return".spawn = [ "foot" ];
+    "Mod+Return".spawn = ["kitty"];
+    "Mod+Shift+Return".spawn = ["foot"];
 
     # Window management
     "Mod+Q".close-window = null;
