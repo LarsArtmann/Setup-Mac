@@ -3,6 +3,10 @@ _: {
     enable = true;
     lfs.enable = true;
 
+    # Explicitly set signing format to silence Home Manager deprecation warning
+    # (default changed from "openpgp" to null in Home Manager 25.05)
+    signing.format = "openpgp";
+
     settings = {
       user = {
         name = "Lars Artmann";

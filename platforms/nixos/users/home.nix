@@ -158,6 +158,9 @@
     userDirs = {
       enable = true;
       createDirectories = true;
+      # Explicitly disable session variables to silence Home Manager deprecation warning
+      # (default changed from true to false in Home Manager 26.05)
+      setSessionVariables = false;
     };
 
     # Default applications for MIME types
@@ -186,6 +189,9 @@
   # GTK settings for Catppuccin Mocha theme
   gtk = {
     enable = true;
+    # Explicitly disable GTK4 theme to silence Home Manager deprecation warning
+    # (default changed from config.gtk.theme to null in Home Manager 26.05)
+    gtk4.theme = null;
     font = {
       name = "Sans";
       size = 16; # Increased for TV viewing (2m distance)
