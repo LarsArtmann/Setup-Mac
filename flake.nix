@@ -147,7 +147,10 @@
 
             # dnsblockd - serves HTML block pages for DNS-filtered domains
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
-              src = lib.cleanSourceWith { filter = path: type: baseNameOf path != "package.nix"; src = ./platforms/nixos/programs/dnsblockd; };
+              src = lib.cleanSourceWith {
+                filter = path: type: baseNameOf path != "package.nix";
+                src = ./platforms/nixos/programs/dnsblockd;
+              };
             };
           };
 

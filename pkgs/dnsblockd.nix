@@ -1,4 +1,8 @@
-{lib, buildGoModule, src}:
+{
+  lib,
+  buildGoModule,
+  src,
+}:
 buildGoModule rec {
   pname = "dnsblockd";
   version = "0.1.0";

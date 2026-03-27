@@ -1,9 +1,12 @@
 # Generate a self-signed certificate for dnsblockd HTTPS server
 # This cert is added to the system trust store so browsers don't show warnings
-{ runCommand, openssl, ... }:
-
+{
+  runCommand,
+  openssl,
+  ...
+}:
 runCommand "dnsblockd-cert" {
-  nativeBuildInputs = [ openssl ];
+  nativeBuildInputs = [openssl];
 } ''
   mkdir -p $out
 

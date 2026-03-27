@@ -15,33 +15,43 @@
 
   # Generate unbound local-data entries from a hosts file at build time
   # This is done at eval time from fetchurl results
-  fetchBlocklist = { name, url, hash }:
-    let
-      raw = pkgs.fetchurl { inherit url hash; name = "${name}-raw"; };
-      text = builtins.readFile raw;
-      lines = lib.splitString "\n" text;
-      parseLine = line:
-        let
-          trimmed = lib.trim line;
-          isComment = trimmed == "" || lib.hasPrefix "#" trimmed;
-          parts = lib.filter (p: p != "") (lib.splitString " " (lib.replaceStrings ["\t"] [" "] trimmed));
-          domain = if builtins.length parts >= 2 then lib.elemAt parts 1 else null;
-        in
-          if isComment || domain == null then null
-          else if domain == "localhost" || domain == "localhost.localdomain" then null
-          else domain;
-      domains = lib.filter (d: d != null) (map parseLine lines);
-      entries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') domains;
-    in {
-      inherit name url;
-      content = ''
-        # Blocklist: ${name}
-        # Source: ${url}
-        # Domains: ${toString (builtins.length domains)}
-
-        ${lib.concatStringsSep "\n" entries}
-      '';
+  fetchBlocklist = {
+    name,
+    url,
+    hash,
+  }: let
+    raw = pkgs.fetchurl {
+      inherit url hash;
+      name = "${name}-raw";
     };
+    text = builtins.readFile raw;
+    lines = lib.splitString "\n" text;
+    parseLine = line: let
+      trimmed = lib.trim line;
+      isComment = trimmed == "" || lib.hasPrefix "#" trimmed;
+      parts = lib.filter (p: p != "") (lib.splitString " " (lib.replaceStrings ["\t"] [" "] trimmed));
+      domain =
+        if builtins.length parts >= 2
+        then lib.elemAt parts 1
+        else null;
+    in
+      if isComment || domain == null
+      then null
+      else if domain == "localhost" || domain == "localhost.localdomain"
+      then null
+      else domain;
+    domains = lib.filter (d: d != null) (map parseLine lines);
+    entries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') domains;
+  in {
+    inherit name url;
+    content = ''
+      # Blocklist: ${name}
+      # Source: ${url}
+      # Domains: ${toString (builtins.length domains)}
+
+      ${lib.concatStringsSep "\n" entries}
+    '';
+  };
 
   # Combine all blocklists + extra domains
   extraDomainsEntries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') cfg.extraDomains;
@@ -86,9 +96,18 @@ in {
     blocklists = mkOption {
       type = types.listOf (types.submodule {
         options = {
-          name = mkOption { type = types.str; description = "Blocklist name"; };
-          url = mkOption { type = types.str; description = "URL to fetch hosts file"; };
-          hash = mkOption { type = types.str; description = "SHA256 hash of fetched file"; };
+          name = mkOption {
+            type = types.str;
+            description = "Blocklist name";
+          };
+          url = mkOption {
+            type = types.str;
+            description = "URL to fetch hosts file";
+          };
+          hash = mkOption {
+            type = types.str;
+            description = "SHA256 hash of fetched file";
+          };
         };
       });
       default = [
@@ -105,14 +124,14 @@ in {
     whitelist = mkOption {
       type = types.listOf types.str;
       default = [];
-      example = [ "ads.example.com" ];
+      example = ["ads.example.com"];
       description = "Domains to never block (whitelist)";
     };
 
     extraDomains = mkOption {
       type = types.listOf types.str;
       default = [];
-      example = [ "360.cn" "baidu.com" ];
+      example = ["360.cn" "baidu.com"];
       description = "Additional domains to block (not in blocklists)";
     };
 
@@ -148,10 +167,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # Disable conflicting resolvers
-    services.resolved.enable = lib.mkForce false;
-    networking.resolvconf.enable = lib.mkForce false;
-
     # Configure unbound
     services.unbound = {
       enable = true;
@@ -188,11 +203,13 @@ in {
           local-zone = map (d: ''"${d}" transparent'') cfg.whitelist;
         };
 
-        forward-zone = [{
-          name = ".";
-          forward-addr = cfg.upstreamDNS;
-          forward-tls-upstream = true;
-        }];
+        forward-zone = [
+          {
+            name = ".";
+            forward-addr = cfg.upstreamDNS;
+            forward-tls-upstream = true;
+          }
+        ];
       };
     };
 
@@ -202,7 +219,7 @@ in {
     '';
 
     # Add dnsblockd cert to system trust store
-    security.pki.certificateFiles = [ "${dnsblockdCert}/dnsblockd.crt" ];
+    security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd.crt"];
 
     # dnsblockd service
     systemd.services.dnsblockd = {
@@ -212,7 +229,8 @@ in {
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.dnsblockd}/bin/dnsblockd"
+        ExecStart =
+          "${pkgs.dnsblockd}/bin/dnsblockd"
           + " -addr ${cfg.blockIP}"
           + " -port ${toString cfg.blockPort}"
           + " -tls-port ${toString cfg.blockTLSPort}"
@@ -220,7 +238,11 @@ in {
           + " -key ${dnsblockdCert}/dnsblockd.key"
           + " -stats-addr 127.0.0.1"
           + " -stats-port ${toString cfg.statsPort}"
-          + (if cfg.categories != {} then " -categories ${categoriesJSON}" else "");
+          + (
+            if cfg.categories != {}
+            then " -categories ${categoriesJSON}"
+            else ""
+          );
         Restart = "on-failure";
         RestartSec = "3s";
 
@@ -233,14 +255,24 @@ in {
       };
     };
 
-    # System uses unbound
-    networking.nameservers = ["127.0.0.1"];
+    # System uses unbound and local resolver config
+    networking = {
+      resolvconf.enable = lib.mkForce false;
+      nameservers = ["127.0.0.1"];
+      localCommands = ''
+        ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/8 dev lo 2>/dev/null || true
+      '';
+    };
 
-    # Disable Firefox DNS-over-HTTPS so it uses local DNS blocker
+    # Firefox policies: disable DoH, install dnsblockd cert, suppress default browser prompt
     programs.firefox.policies = {
       DNSOverHTTPS = {
         Enabled = false;
         Locked = true;
+      };
+      # Install dnsblockd cert into Firefox's own certificate store (NSS doesn't use system certs)
+      Certificates = {
+        Install = ["${dnsblockdCert}/dnsblockd.crt"];
       };
       # Disable "set as default browser" popup
       Preferences = {
@@ -249,6 +281,27 @@ in {
           Status = "locked";
         };
       };
+    };
+
+    # Import dnsblockd cert into NSS database for Chromium-based browsers (Helium, Chrome, etc.)
+    # Chromium on Linux uses ~/.pki/nssdb, not the system trust store
+    systemd.user.services.dnsblockd-cert-import = {
+      description = "Import dnsblockd CA cert into NSS database";
+      wantedBy = ["default.target"];
+      after = ["nss-user-lookup.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      path = [pkgs.nss];
+      script = ''
+        # Create NSS db if it doesn't exist
+        mkdir -p $HOME/.pki/nssdb
+        certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
+        # Import the cert (remove old version first if exists)
+        certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
+        certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd.crt
+      '';
     };
   };
 }
