@@ -17,6 +17,10 @@ in {
   ];
 
   config = {
+    home.packages = with pkgs; [
+      wlr-randr
+      kanshi
+    ];
     # Type-safe Hyprland configuration with custom validation
     wayland.windowManager.hyprland = {
       enable = true;
@@ -131,8 +135,8 @@ in {
           ];
         };
 
-        # Monitor
-        monitor = "HDMI-A-1,preferred,auto,1.5";
+        # Monitor - auto-detect via kanshi for dynamic hotplug
+        monitor = "DP-3,auto,auto,1";
 
         # Workspaces
         workspace = [
@@ -172,40 +176,8 @@ in {
           "float on, match:class ^(nm-connection-editor|blueman-manager|pavucontrol)$"
           "center on, match:class ^(nm-connection-editor|blueman-manager|pavucontrol)$"
           "no_blur on, match:class ^(kitty|ghostty|alacritty)$"
-          "float on, match:class ^(htop-bg)$"
-          "no_focus on, match:class ^(htop-bg)$"
-          "no_blur on, match:class ^(htop-bg)$"
-          "no_shadow on, match:class ^(htop-bg)$"
-          "border_size 0, match:class ^(htop-bg)$"
-          "size 800 600, match:class ^(htop-bg)$"
-          "move 100 100, match:class ^(htop-bg)$"
-          "float on, match:class ^(logs-bg)$"
-          "no_focus on, match:class ^(logs-bg)$"
-          "no_blur on, match:class ^(logs-bg)$"
-          "no_shadow on, match:class ^(logs-bg)$"
-          "border_size 0, match:class ^(logs-bg)$"
-          "size 800 600, match:class ^(logs-bg)$"
-          "move 920 100, match:class ^(logs-bg)$"
-          "float on, match:class ^(nvim-bg)$"
-          "no_focus on, match:class ^(nvim-bg)$"
-          "no_blur on, match:class ^(nvim-bg)$"
-          "no_shadow on, match:class ^(nvim-bg)$"
-          "border_size 0, match:class ^(nvim-bg)$"
-          "size 800 600, match:class ^(nvim-bg)$"
-          "move 100 720, match:class ^(nvim-bg)$"
 
           # Zellij float window rules
-          "float on, match:class ^(zellij-float)$"
-          "size 90% 80%, match:class ^(zellij-float)$"
-          "center on, match:class ^(zellij-float)$"
-          "border_size 0, match:class ^(zellij-float)$"
-
-          # Quake terminal rules (dropdown terminal)
-          "float on, match:class ^(kitty-quake)$"
-          "size 80% 40%, match:class ^(kitty-quake)$"
-          "move 10% 5%, match:class ^(kitty-quake)$"
-          "border_size 0, match:class ^(kitty-quake)$"
-          "no_shadow on, match:class ^(kitty-quake)$"
         ];
 
         # Startup
@@ -213,9 +185,10 @@ in {
           "waybar"
           "dunst"
           "wl-paste --watch cliphist store"
-          "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e ${pkgs.htop}/bin/htop"
-          "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"
-          "${pkgs.kitty}/bin/kitty --class kitty-quake --name Quake -e zsh"
+          # Background floating windows disabled - use Super+H for btop instead
+          # "${pkgs.kitty}/bin/kitty --class htop-bg --hold -e ${pkgs.htop}/bin/htop"
+          # "${pkgs.kitty}/bin/kitty --class logs-bg --hold -e journalctl -f"
+          # "${pkgs.kitty}/bin/kitty --class kitty-quake --name Quake -e zsh"
         ];
 
         # Keybindings
@@ -451,6 +424,39 @@ in {
           damage_blink = false;
         };
       };
+    };
+
+    # Dynamic display management - kanshi auto-applies profiles on monitor hotplug
+    services.kanshi = {
+      enable = true;
+      settings = [
+        {
+          profile.name = "tv-4k";
+          profile.outputs = [
+            {
+              criteria = "DP-3";
+              mode = "3840x2160@30";
+              position = "0,0";
+              scale = 1.0;
+            }
+          ];
+        }
+        {
+          profile.name = "tv-1080";
+          profile.outputs = [
+            {
+              criteria = "DP-3";
+              mode = "1920x1080@120";
+              position = "0,0";
+              scale = 1.0;
+            }
+          ];
+        }
+        {
+          profile.name = "undocked";
+          profile.outputs = [];
+        }
+      ];
     };
 
     # Type safety assertions - catch config errors at build time using HyprlandTypes validation
