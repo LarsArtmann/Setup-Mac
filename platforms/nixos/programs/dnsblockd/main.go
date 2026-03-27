@@ -2,10 +2,18 @@ package main
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/json"
+	"encoding/pem"
 	"flag"
 	"fmt"
 	"log"
+	"math/big"
 	"net"
 	"net/http"
 	"os"
@@ -17,18 +25,21 @@ import (
 )
 
 type Config struct {
-	ListenAddr string
-	Port       int
-	StatsAddr  string
-	StatsPort  int
-	Categories map[string]string
+	ListenAddr  string
+	Port        int
+	TLSPort     int
+	StatsAddr   string
+	StatsPort   int
+	CertFile    string
+	KeyFile     string
+	Categories  map[string]string
 }
 
 type Stats struct {
-	TotalBlocked   atomic.Int64 `json:"total_blocked"`
-	TopDomains     []DomainHit  `json:"top_domains"`
-	RecentBlocks   []BlockEntry `json:"recent_blocks"`
-	Start          time.Time    `json:"start_time"`
+	TotalBlocked atomic.Int64 `json:"total_blocked"`
+	TopDomains   []DomainHit  `json:"top_domains"`
+	RecentBlocks []BlockEntry `json:"recent_blocks"`
+	Start        time.Time    `json:"start_time"`
 }
 
 type DomainHit struct {
@@ -207,15 +218,59 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
+func generateSelfSignedCert(certFile, keyFile string) error {
+	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return fmt.Errorf("failed to generate private key: %v", err)
+	}
+
+	template := &x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject: pkix.Name{
+			Organization: []string{"dnsblockd"},
+			CommonName:   "dnsblockd",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(10 * 365 * 24 * time.Hour),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		DNSNames:              []string{"*"},
+		IPAddresses:           []net.IP{net.ParseIP("127.0.0.2")},
+	}
+
+	certDER, err := x509.CreateCertificate(rand.Reader, template, template, &priv.PublicKey, priv)
+	if err != nil {
+		return fmt.Errorf("failed to create certificate: %v", err)
+	}
+
+	certOut, err := os.Create(certFile)
+	if err != nil {
+		return fmt.Errorf("failed to create cert file: %v", err)
+	}
+	defer certOut.Close()
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
+
+	keyOut, err := os.Create(keyFile)
+	if err != nil {
+		return fmt.Errorf("failed to create key file: %v", err)
+	}
+	defer keyOut.Close()
+	privBytes, _ := x509.MarshalECPrivateKey(priv)
+	pem.Encode(keyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
+
+	return nil
+}
+
 func main() {
 	cfg := &Config{
 		Categories: map[string]string{
-			".doubleclick.net":    "Advertising",
+			".doubleclick.net":     "Advertising",
 			".googlesyndication.com": "Advertising",
 			".googleadservices.com":  "Advertising",
-			".adnxs.com":           "Advertising",
-			".adsrvr.org":          "Advertising",
-			".facebook.net":        "Tracking",
+			".adnxs.com":            "Advertising",
+			".adsrvr.org":           "Advertising",
+			".facebook.net":         "Tracking",
 			".analytics.google.com": "Analytics",
 			".google-analytics.com": "Analytics",
 		},
@@ -223,8 +278,11 @@ func main() {
 
 	flag.StringVar(&cfg.ListenAddr, "addr", "0.0.0.0", "HTTP listen address")
 	flag.IntVar(&cfg.Port, "port", 80, "HTTP listen port")
+	flag.IntVar(&cfg.TLSPort, "tls-port", 443, "HTTPS listen port (0 to disable)")
 	flag.StringVar(&cfg.StatsAddr, "stats-addr", "127.0.0.1", "Stats API listen address")
 	flag.IntVar(&cfg.StatsPort, "stats-port", 9090, "Stats API listen port")
+	flag.StringVar(&cfg.CertFile, "cert", "", "TLS certificate file (auto-generated if not provided)")
+	flag.StringVar(&cfg.KeyFile, "key", "", "TLS key file (auto-generated if not provided)")
 
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
 	flag.Parse()
@@ -240,8 +298,8 @@ func main() {
 		log.Printf("loaded %d category rules from %s", len(cfg.Categories), *categoriesFile)
 	}
 
-	if cfg.Port == 80 || cfg.Port == 443 {
-		log.Printf("WARNING: port %d requires root. Consider using a high port with reverse proxy.", cfg.Port)
+	if cfg.Port == 80 || cfg.Port == 443 || cfg.TLSPort == 443 {
+		log.Printf("WARNING: low ports require root. Consider using high ports with reverse proxy.")
 	}
 
 	mux := http.NewServeMux()
@@ -259,14 +317,46 @@ func main() {
 	statsMux.HandleFunc("/stats", statsHandler)
 	statsMux.HandleFunc("/health", healthHandler)
 
-	done := make(chan error, 2)
+	done := make(chan error, 3)
 
+	// HTTP server
 	go func() {
 		addr := net.JoinHostPort(cfg.ListenAddr, fmt.Sprintf("%d", cfg.Port))
-		log.Printf("dnsblockd %s listening on %s (block page)", version, addr)
+		log.Printf("dnsblockd %s listening on %s (HTTP block page)", version, addr)
 		done <- http.ListenAndServe(addr, mux)
 	}()
 
+	// HTTPS server (for blocked HTTPS sites)
+	if cfg.TLSPort > 0 {
+		go func() {
+			certFile := cfg.CertFile
+			keyFile := cfg.KeyFile
+
+			if certFile == "" || keyFile == "" {
+				certFile = "/tmp/dnsblockd.crt"
+				keyFile = "/tmp/dnsblockd.key"
+				if err := generateSelfSignedCert(certFile, keyFile); err != nil {
+					log.Printf("failed to generate cert: %v, skipping HTTPS", err)
+					return
+				}
+				log.Printf("generated self-signed certificate for HTTPS")
+			}
+
+			addr := net.JoinHostPort(cfg.ListenAddr, fmt.Sprintf("%d", cfg.TLSPort))
+			log.Printf("dnsblockd listening on %s (HTTPS block page)", addr)
+
+			server := &http.Server{
+				Addr:    addr,
+				Handler: mux,
+				TLSConfig: &tls.Config{
+					MinVersion: tls.VersionTLS12,
+				},
+			}
+			done <- server.ListenAndServeTLS(certFile, keyFile)
+		}()
+	}
+
+	// Stats API
 	go func() {
 		addr := net.JoinHostPort(cfg.StatsAddr, fmt.Sprintf("%d", cfg.StatsPort))
 		log.Printf("dnsblockd stats API on %s", addr)

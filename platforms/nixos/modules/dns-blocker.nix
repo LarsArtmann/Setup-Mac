@@ -7,6 +7,9 @@
   cfg = config.services.dns-blocker;
   inherit (lib) mkEnableOption mkOption types;
 
+  # Self-signed cert for HTTPS block pages (added to system trust store)
+  dnsblockdCert = pkgs.callPackage ../../../pkgs/dnsblockd-cert.nix {};
+
   # Categories JSON for dnsblockd
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 
@@ -66,6 +69,12 @@ in {
       type = types.port;
       default = 80;
       description = "Port for dnsblockd HTTP server";
+    };
+
+    blockTLSPort = mkOption {
+      type = types.port;
+      default = 443;
+      description = "Port for dnsblockd HTTPS server (self-signed cert)";
     };
 
     statsPort = mkOption {
@@ -192,6 +201,9 @@ in {
       ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/8 dev lo 2>/dev/null || true
     '';
 
+    # Add dnsblockd cert to system trust store
+    security.pki.certificateFiles = [ "${dnsblockdCert}/dnsblockd.crt" ];
+
     # dnsblockd service
     systemd.services.dnsblockd = {
       description = "DNS Block Page Server";
@@ -203,6 +215,9 @@ in {
         ExecStart = "${pkgs.dnsblockd}/bin/dnsblockd"
           + " -addr ${cfg.blockIP}"
           + " -port ${toString cfg.blockPort}"
+          + " -tls-port ${toString cfg.blockTLSPort}"
+          + " -cert ${dnsblockdCert}/dnsblockd.crt"
+          + " -key ${dnsblockdCert}/dnsblockd.key"
           + " -stats-addr 127.0.0.1"
           + " -stats-port ${toString cfg.statsPort}"
           + (if cfg.categories != {} then " -categories ${categoriesJSON}" else "");
