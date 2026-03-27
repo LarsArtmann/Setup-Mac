@@ -144,6 +144,11 @@
               inherit pkgs; # CRITICAL: Must inherit pkgs!
               settings = import ./platforms/nixos/programs/niri-wrapped.nix {inherit pkgs lib;};
             };
+
+            # dnsblockd - serves HTML block pages for DNS-filtered domains
+            dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
+              src = lib.cleanSourceWith { filter = path: type: baseNameOf path != "package.nix"; src = ./platforms/nixos/programs/dnsblockd; };
+            };
           };
 
         # Development shells for different program categories
