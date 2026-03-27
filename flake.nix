@@ -142,7 +142,7 @@
             # Configuration extracted to platforms/nixos/programs/niri-wrapped.nix
             niri-wrapped = wrapper-modules.wrappers.niri.wrap {
               inherit pkgs; # CRITICAL: Must inherit pkgs!
-              settings = import ./platforms/nixos/programs/niri-wrapped.nix { inherit pkgs lib; };
+              settings = import ./platforms/nixos/programs/niri-wrapped.nix {inherit pkgs lib;};
             };
           };
 
