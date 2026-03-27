@@ -100,7 +100,8 @@ _: {
 
       safe = {
         "directory" = [
-          "/Users/larsartmann/projects"
+          "~" # User home directory (works on both Darwin and NixOS)
+          "~/projects" # Projects directory
         ];
       };
 

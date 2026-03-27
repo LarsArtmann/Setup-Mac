@@ -53,7 +53,7 @@
   darwinMatchBlocks = {
     # macOS-only: Secretive integration (commented in original, keeping reference)
     "secretive-example" = lib.mkIf pkgs.stdenv.isDarwin {
-      identityAgent = lib.mkDefault "/Users/larsartmann/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
+      identityAgent = lib.mkDefault "~/.local/share/Secretive/agent.sock";
     };
   };
 

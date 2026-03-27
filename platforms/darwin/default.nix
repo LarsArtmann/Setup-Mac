@@ -49,15 +49,8 @@
     colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
     colorSchemeLib = nix-colors.lib;
 
-    ## TODO: Should we move these nixpkgs configs to ../common/?
-    # Enable unfree packages for Chrome and Terraform
-    nixpkgs.config = {
-      allowUnfree = true;
-      allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) ["terraform"];
-      permittedInsecurePackages = [
-        "google-chrome-144.0.7559.97"
-      ];
-    };
+    # Note: nixpkgs.config is now centralized in ../common/core/nix-settings.nix
+    # This eliminates duplicate allowUnfree and permittedInsecurePackages declarations
 
     # Homebrew casks for GUI applications not available in nixpkgs
     homebrew = {

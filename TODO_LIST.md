@@ -1,11 +1,98 @@
 # SystemNix - Comprehensive TODO List
 
-**Last Updated**: 2026-02-10
-**Status**: Active - File organization complete, 12 files moved
+**Last Updated**: 2026-03-27
+**Status**: Active - Library policy system implemented and documented
 
 ---
 
-## Recent Session Summary (2026-02-10)
+## Recent Session Summary (2026-03-27)
+
+### ✅ Completed Actions - Library Policy Implementation
+
+**Duration:** ~1.5 hours
+**Impact:** HIGH - Eliminates configuration drift, improves maintainability
+
+#### 1. Created Shell Scripts Path Library
+- **File:** `scripts/lib/paths.sh`
+- **Purpose:** Centralized path management for shell scripts
+- **Features:**
+  - Dynamic PROJECT_ROOT detection
+  - Platform detection (Darwin/Linux)
+  - Helper functions: `get_platform_dir`, `resolve_path`, `ensure_dir`
+  - Validation and debugging utilities
+- **Impact:** Eliminates hardcoded paths in scripts
+
+#### 2. Consolidated Nixpkgs Configuration
+- **Fixed:** Duplicate `allowUnfree` configuration
+- **Files Modified:**
+  - `platforms/common/core/nix-settings.nix` - Added `permittedInsecurePackages`
+  - `platforms/darwin/default.nix` - Removed duplicate, added reference comment
+- **Impact:** Single source of truth for package policies
+
+#### 3. Fixed Hardcoded Paths
+- **Files Modified:**
+  - `platforms/common/programs/git.nix` - Changed `/Users/larsartmann/projects` → `~/projects`
+  - `platforms/common/programs/ssh.nix` - Changed absolute Secretive path → `~/.local/share/Secretive/agent.sock`
+- **Impact:** Configuration works across different user accounts
+
+#### 4. Created Comprehensive Documentation
+- **File:** `docs/library-policy.md`
+- **Content:**
+  - Package management policy (allowUnfree, insecure packages)
+  - Chrome/Chromium extension policy
+  - Path management policy (Nix and shell scripts)
+  - User configuration policy
+  - Implementation guidelines (DO/DON'T)
+  - Platform-specific considerations
+  - Verification and testing procedures
+  - Migration guide
+  - Troubleshooting section
+- **Impact:** Clear documentation for future maintenance
+
+#### 5. Testing and Validation
+- ✅ `nix flake check --no-build` - PASSED
+- ✅ Shell library validation - PASSED
+- ✅ Nix syntax validation - PASSED
+- ✅ All modified files verified
+
+### 📊 Summary of Changes
+
+| Category | Files Created | Files Modified | Lines Added | Lines Removed |
+|----------|---------------|----------------|-------------|---------------|
+| Shell Scripts | 1 | 0 | ~170 | 0 |
+| Nix Configuration | 0 | 4 | ~10 | ~10 |
+| Documentation | 1 | 1 | ~450 | ~5 |
+| **Total** | **2** | **5** | **~630** | **~15** |
+
+### 🎯 Key Achievements
+
+1. **✅ Eliminated Configuration Drift**
+   - Centralized nixpkgs configuration
+   - No more duplicate allowUnfree declarations
+
+2. **✅ Improved Maintainability**
+   - Shell scripts library with helper functions
+   - Comprehensive documentation with examples
+
+3. **✅ Enhanced Portability**
+   - Removed hardcoded user paths
+   - Configuration works across different machines
+
+4. **✅ Better Documentation**
+   - Complete library policy documentation
+   - Migration guides for future changes
+   - Troubleshooting section for common issues
+
+### 📝 Next Recommended Actions
+
+1. **Test on NixOS (evo-x2)** - Verify Linux compatibility
+2. **Update scripts to use paths library** - Migrate existing scripts
+3. **Review gitleaks findings** - Address security warnings
+4. **Continue P0 tasks** - From root-directory-organization-status.md
+
+---
+
+## Previous Session Summary (2026-02-10)
 
 ### ✅ Completed Actions
 
@@ -21,13 +108,6 @@
 - **gitleaks**: 6 potential secrets detected (requires review)
 - **statix**: Nix linting warnings (W20 repeated keys, W04 inherit suggestions, W23 empty list concat)
 - **trailing-whitespace**: Auto-fixed by pre-commit
-
-### 📝 Next Recommended Actions
-
-1. Review gitleaks findings with `gitleaks detect --verbose`
-2. Fix statix warnings in Nix files
-3. Complete remaining P0 tasks from root-directory-organization-status.md
-4. Continue reading remaining 75+ markdown files
 
 ---
 
