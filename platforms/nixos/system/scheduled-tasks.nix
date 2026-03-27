@@ -16,7 +16,8 @@
       description = "Update Crush AI providers";
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.crush}/bin/crush update-providers";
+        # Use NUR (Nix User Repository) for the most up-to-date version of Crush
+        ExecStart = "${pkgs.nur.repos.charmbracelet.crush}/bin/crush update-providers";
         StandardOutput = "journal";
         StandardError = "journal";
       };

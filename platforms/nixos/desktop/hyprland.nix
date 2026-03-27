@@ -182,7 +182,6 @@ in {
 
         # Startup
         exec-once = [
-          "waybar"
           "dunst"
           "wl-paste --watch cliphist store"
           # Background floating windows disabled - use Super+H for btop instead

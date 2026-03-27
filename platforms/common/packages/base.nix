@@ -207,7 +207,9 @@
       duti # macOS file association utility (used by activation scripts)
     ];
 
-  aiPackages = [pkgs.crush];
+  # Use NUR (Nix User Repository) for the most up-to-date version of Crush
+  # NUR is updated much more frequently than nixpkgs unstable
+  aiPackages = [pkgs.nur.repos.charmbracelet.crush];
 in {
   # System packages list
   environment.systemPackages = essentialPackages ++ developmentPackages ++ guiPackages ++ aiPackages ++ linuxUtilities;
