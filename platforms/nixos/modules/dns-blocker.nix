@@ -227,6 +227,10 @@ in {
         Enabled = false;
         Locked = true;
       };
+      # Disable "set as default browser" popup
+      Preferences = {
+        "browser.shell.checkDefaultBrowser" = false;
+      };
     };
   };
 }
