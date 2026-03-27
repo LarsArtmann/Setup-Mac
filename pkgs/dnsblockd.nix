@@ -5,7 +5,7 @@ buildGoModule rec {
 
   inherit src;
 
-  vendorHash = lib.fakeHash;
+  vendorHash = null;
 
   ldflags = ["-s" "-w" "-X main.version=${version}"];
 
