@@ -40,10 +40,11 @@
     stealthenabled = false;
   };
 
-  # Wake-on-LAN support
-  # Allows waking the Mac via network magic packets
-  # Note: Requires "Wake for network access" in Energy Saver settings
-  system.defaults.wakeOnLan = lib.mkDefault true;
+  # Wake-on-LAN support - DISABLED
+  # Wake-on-LAN is disabled for MacBook Air as it's a laptop
+  # and wakes frequently when closed. Use Power Nap instead for
+  # background updates while sleeping.
+  # system.defaults.wakeOnLan = lib.mkDefault false;
 
   # Additional notes:
   # - DNS settings are managed via System Preferences > Network
