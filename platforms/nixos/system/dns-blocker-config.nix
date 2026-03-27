@@ -30,6 +30,12 @@
       # Add domains here that you want to allow despite being in blocklists
     ];
 
+    # Extra domains to block (not in blocklists)
+    extraDomains = [
+      "360.cn"
+      "www.360.cn"
+    ];
+
     # Upstream DNS-over-TLS servers
     upstreamDNS = [
       "9.9.9.9@853#dns.quad9.net"

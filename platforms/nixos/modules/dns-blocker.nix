@@ -40,12 +40,17 @@
       '';
     };
 
-  # Combine all blocklists
+  # Combine all blocklists + extra domains
+  extraDomainsEntries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') cfg.extraDomains;
   combinedBlocklist = pkgs.writeText "dns-blocker-combined.conf" ''
     # Combined DNS Blocklist
     # Blocklists: ${toString (builtins.length cfg.blocklists)}
+    # Extra domains: ${toString (builtins.length cfg.extraDomains)}
 
     ${lib.concatStringsSep "\n\n" (map (bl: bl.content) (map fetchBlocklist cfg.blocklists))}
+
+    # Extra manually blocked domains
+    ${lib.concatStringsSep "\n" extraDomainsEntries}
   '';
 in {
   options.services.dns-blocker = {
@@ -93,6 +98,13 @@ in {
       default = [];
       example = [ "ads.example.com" ];
       description = "Domains to never block (whitelist)";
+    };
+
+    extraDomains = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      example = [ "360.cn" "baidu.com" ];
+      description = "Additional domains to block (not in blocklists)";
     };
 
     upstreamDNS = mkOption {
@@ -208,5 +220,13 @@ in {
 
     # System uses unbound
     networking.nameservers = ["127.0.0.1"];
+
+    # Disable Firefox DNS-over-HTTPS so it uses local DNS blocker
+    programs.firefox.policies = {
+      DNSOverHTTPS = {
+        Enabled = false;
+        Locked = true;
+      };
+    };
   };
 }
