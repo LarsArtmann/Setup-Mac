@@ -15,18 +15,46 @@ _detect_pkg_manager:
         echo "none"; \
     fi
 
+# Detect current platform (Darwin or Linux)
+_detect_platform:
+    @if [ "$(uname -s)" = "Darwin" ]; then \
+        echo "darwin"; \
+    elif [ "$(uname -s)" = "Linux" ]; then \
+        echo "linux"; \
+    else \
+        echo "unknown"; \
+    fi
+
+# Get Nix host name based on platform
+_get_nix_host:
+    @if [ "$(just _detect_platform)" = "darwin" ]; then \
+        echo "Lars-MacBook-Air"; \
+    else \
+        echo "evo-x2"; \
+    fi
+
 # Default recipe to display help
 default:
     @just --list
 
 # Initial system setup - run this after cloning the repository
 setup:
-    @echo "🚀 Setting up macOS configuration..."
-    @just ssh-setup
-    @echo "ℹ️  Dotfiles are now managed by Home Manager (manual linking deprecated)"
-    @just switch
-    @just pre-commit-install
-    @echo "✅ Setup complete! Your macOS configuration is ready."
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🚀 Setting up macOS configuration..."; \
+        PLATFORM_NAME="macOS"; \
+    elif [ "$PLATFORM" = "linux" ]; then \
+        echo "🚀 Setting up NixOS configuration..."; \
+        PLATFORM_NAME="NixOS"; \
+    else \
+        echo "🚀 Setting up configuration..."; \
+        PLATFORM_NAME="Unknown"; \
+    fi; \
+    just ssh-setup; \
+    echo "ℹ️  Dotfiles are now managed by Home Manager (manual linking deprecated)"; \
+    just switch; \
+    just pre-commit-install; \
+    echo "✅ Setup complete! Your $PLATFORM_NAME configuration is ready."
 
 # Create SSH directories (manual work mentioned in README)
 ssh-setup:
@@ -36,8 +64,20 @@ ssh-setup:
 
 # Apply Nix configuration changes (equivalent to nixup alias)
 switch:
-    echo "🔄 Applying Nix configuration..."
-    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./ --print-build-logs
+    @PLATFORM=$(just _detect_platform); \
+    HOST=$(just _get_nix_host); \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🔄 Applying macOS configuration..."; \
+        sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./ --print-build-logs; \
+    elif [ "$PLATFORM" = "linux" ]; then \
+        echo "🔄 Applying NixOS configuration for $HOST..."; \
+        sudo nixos-rebuild switch --flake ./#"$HOST" --print-build-logs; \
+        echo "🔄 Applying Home Manager configuration..."; \
+        home-manager switch --flake ./#"$HOST"; \
+    else \
+        echo "❌ Unknown platform: $PLATFORM"; \
+        exit 1; \
+    fi; \
     echo "✅ Nix configuration applied"
 
 # Update Nix itself using nix upgrade-nix (works without switch)
@@ -89,127 +129,150 @@ activitywatch-install-utilization:
 
 # Clean up caches and old packages (comprehensive cleanup)
 clean:
-    @echo "🧹 Starting comprehensive system cleanup..."
-    @echo ""
-    @echo "=== Quick Cache Cleanup ==="
-    @echo "💡 Tip: Run 'just clean-storage' for safe cache-only cleanup (no sudo)"
-    @./scripts/storage-cleanup.sh
-    @echo ""
-    @echo "=== Nix Store Cleanup ==="
-    @echo "📊 Current store size:"
-    @du -sh /nix/store || echo "Could not measure store size"
-    @echo "🗑️  Cleaning Nix generations older than 1 day..."
-    @echo "  Note: Use 'sudo -S' if password prompt appears"
-    nix-collect-garbage -d --delete-older-than 1d || sudo -S nix-collect-garbage -d --delete-older-than 1d
-    @echo "⚡ Optimizing Nix store (deduplicating files)..."
-    @echo "  This may take several minutes for large stores..."
-    nix-store --optimize || sudo -S nix-store --optimize
-    @echo "🧹 Cleaning user Nix profiles..."
-    nix profile wipe-history --profile /Users/$(whoami)/.local/state/nix/profiles/profile || true
-    @echo ""
-    @echo "=== Package Manager Cleanup ==="
-    @echo "🍺 Cleaning Homebrew..."
-    brew autoremove || echo "  ⚠️  Homebrew autoremove failed or not needed"
-    brew cleanup --prune=all -s || echo "  ⚠️  Homebrew cleanup failed"
-    @echo "📦 Cleaning npm/pnpm caches..."
-    npm cache clean --force || echo "  ⚠️  npm cache clean failed (npm not installed?)"
-    pnpm store prune || echo "  ⚠️  pnpm store prune failed (pnpm not installed?)"
-    @echo "🐹 Cleaning Go caches..."
-    go clean -cache -testcache -modcache || echo "  ⚠️  Go cache clean failed (Go not installed?)"
-    @echo "🗑️  Cleaning Go build cache folders..."
-    find /private/var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T -name "go-build*" -type d -print0 | xargs -0 trash 2>/dev/null || echo "  ⚠️  Go build cache folders not found or couldn't be removed"
-    @echo "🦀 Cleaning Rust/Cargo cache..."
-    cargo cache --autoclean || echo "  ⚠️  Cargo cache clean failed (cargo-cache not installed?)"
-    @echo "🔧 Cleaning build caches..."
-    rm -rf ~/.bun/install/cache || echo "  ⚠️  Bun cache not found"
-    rm -rf ~/.gradle/caches/* || echo "  ⚠️  Gradle cache not found"
-    rm -rf ~/.cache/puppeteer || echo "  ⚠️  Puppeteer cache not found"
-    rm -rf ~/.nuget/packages || echo "  ⚠️  NuGet cache not found"
-    @echo ""
-    @echo "=== System Cache Cleanup ==="
-    @echo "🔦 Cleaning Spotlight metadata..."
-    [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || echo "  ⚠️  Spotlight metadata not found"
-    @echo "🗂️  Cleaning system temp files..."
-    rm -rf /tmp/nix-build-* || echo "  ⚠️  No nix-build temp files found"
-    rm -rf /tmp/nix-shell-* || echo "  ⚠️  No nix-shell temp files found"
-    @echo "📱 Cleaning iOS simulators (if Xcode installed)..."
-    xcrun simctl delete unavailable 2>/dev/null || echo "  ⚠️  Xcode/simulators not found or no unavailable simulators"
-    @echo "🐳 Cleaning Docker (if installed)..."
-    docker system prune -af 2>/dev/null || echo "  ⚠️  Docker not installed or no containers to clean"
-    @echo ""
-    @echo "=== Final Results ==="
-    @echo "📊 New store size:"
-    @du -sh /nix/store || echo "Could not measure store size"
-    @echo "💽 Free disk space:"
-    @df -h / | tail -1 | awk '{print "  Available: " $4 " of " $2 " (" $5 " used)"}'
-    @echo ""
-    @echo "✅ Comprehensive cleanup complete!"
-    @echo "💡 Tip: Run 'just clean-aggressive' for nuclear cleanup options"
+    @PLATFORM=$(just _detect_platform); \
+    echo "🧹 Starting comprehensive system cleanup..."; \
+    echo ""; \
+    echo "=== Quick Cache Cleanup ==="; \
+    echo "💡 Tip: Run 'just clean-storage' for safe cache-only cleanup (no sudo)"; \
+    ./scripts/storage-cleanup.sh; \
+    echo ""; \
+    echo "=== Nix Store Cleanup ==="; \
+    echo "📊 Current store size:"; \
+    du -sh /nix/store || echo "Could not measure store size"; \
+    echo "🗑️  Cleaning Nix generations older than 1 day..."; \
+    echo "  Note: Use 'sudo -S' if password prompt appears"; \
+    nix-collect-garbage -d --delete-older-than 1d || sudo -S nix-collect-garbage -d --delete-older-than 1d; \
+    echo "⚡ Optimizing Nix store (deduplicating files)..."; \
+    echo "  This may take several minutes for large stores..."; \
+    nix-store --optimize || sudo -S nix-store --optimize; \
+    echo "🧹 Cleaning user Nix profiles..."; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        nix profile wipe-history --profile /Users/$(whoami)/.local/state/nix/profiles/profile || true; \
+    else \
+        nix profile wipe-history --profile ~/.local/state/nix/profiles/profile || true; \
+    fi; \
+    echo ""; \
+    echo "=== Package Manager Cleanup ==="; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🍺 Cleaning Homebrew..."; \
+        brew autoremove || echo "  ⚠️  Homebrew autoremove failed or not needed"; \
+        brew cleanup --prune=all -s || echo "  ⚠️  Homebrew cleanup failed"; \
+    fi; \
+    echo "📦 Cleaning npm/pnpm caches..."; \
+    npm cache clean --force || echo "  ⚠️  npm cache clean failed (npm not installed?)"; \
+    pnpm store prune || echo "  ⚠️  pnpm store prune failed (pnpm not installed?)"; \
+    echo "🐹 Cleaning Go caches..."; \
+    go clean -cache -testcache -modcache || echo "  ⚠️  Go cache clean failed (Go not installed?)"; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🗑️  Cleaning Go build cache folders..."; \
+        find /private/var/folders/07/y9f_lh8s1zq2kr67_k94w22h0000gn/T -name "go-build*" -type d -print0 2>/dev/null | xargs -0 trash 2>/dev/null || echo "  ⚠️  Go build cache folders not found or couldn't be removed"; \
+    fi; \
+    echo "🦀 Cleaning Rust/Cargo cache..."; \
+    cargo cache --autoclean || echo "  ⚠️  Cargo cache clean failed (cargo-cache not installed?)"; \
+    echo "🔧 Cleaning build caches..."; \
+    rm -rf ~/.bun/install/cache || echo "  ⚠️  Bun cache not found"; \
+    rm -rf ~/.gradle/caches/* || echo "  ⚠️  Gradle cache not found"; \
+    rm -rf ~/.cache/puppeteer || echo "  ⚠️  Puppeteer cache not found"; \
+    rm -rf ~/.nuget/packages || echo "  ⚠️  NuGet cache not found"; \
+    echo ""; \
+    echo "=== System Cache Cleanup ==="; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🔦 Cleaning Spotlight metadata..."; \
+        [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || echo "  ⚠️  Spotlight metadata not found"; \
+    fi; \
+    echo "🗂️  Cleaning system temp files..."; \
+    rm -rf /tmp/nix-build-* || echo "  ⚠️  No nix-build temp files found"; \
+    rm -rf /tmp/nix-shell-* || echo "  ⚠️  No nix-shell temp files found"; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "📱 Cleaning iOS simulators (if Xcode installed)..."; \
+        xcrun simctl delete unavailable 2>/dev/null || echo "  ⚠️  Xcode/simulators not found or no unavailable simulators"; \
+    fi; \
+    echo "🐳 Cleaning Docker (if installed)..."; \
+    docker system prune -af 2>/dev/null || echo "  ⚠️  Docker not installed or no containers to clean"; \
+    echo ""; \
+    echo "=== Final Results ==="; \
+    echo "📊 New store size:"; \
+    du -sh /nix/store || echo "Could not measure store size"; \
+    echo "💽 Free disk space:"; \
+    df -h / | tail -1 | awk '{print "  Available: " $4 " of " $2 " (" $5 " used)"}'; \
+    echo ""; \
+    echo "✅ Comprehensive cleanup complete!"; \
+    echo "💡 Tip: Run 'just clean-aggressive' for nuclear cleanup options"
 
 # Quick daily cleanup (fast, safe, no store optimization)
 clean-quick:
-    @echo "🚀 Quick daily cleanup..."
-    @echo "🍺 Cleaning Homebrew..."
-    brew autoremove && brew cleanup || echo "  ⚠️  Homebrew cleanup failed"
-    @echo "📦 Cleaning package managers..."
-    npm cache clean --force || echo "  ⚠️  npm not available"
-    pnpm store prune || echo "  ⚠️  pnpm not available"
-    go clean -cache || echo "  ⚠️  Go not available"
-    @echo "🗂️  Cleaning temp files..."
-    rm -rf /tmp/nix-build-* /tmp/nix-shell-* || echo "  ⚠️  No temp files found"
-    @echo "🐳 Cleaning Docker (light)..."
-    docker system prune -f 2>/dev/null || echo "  ⚠️  Docker not available"
-    @echo "✅ Quick cleanup done! (No Nix store changes)"
+    @PLATFORM=$(just _detect_platform); \
+    echo "🚀 Quick daily cleanup..."; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "🍺 Cleaning Homebrew..."; \
+        brew autoremove && brew cleanup || echo "  ⚠️  Homebrew cleanup failed"; \
+    fi; \
+    echo "📦 Cleaning package managers..."; \
+    npm cache clean --force || echo "  ⚠️  npm not available"; \
+    pnpm store prune || echo "  ⚠️  pnpm not available"; \
+    go clean -cache || echo "  ⚠️  Go not available"; \
+    echo "🗂️  Cleaning temp files..."; \
+    rm -rf /tmp/nix-build-* /tmp/nix-shell-* || echo "  ⚠️  No temp files found"; \
+    echo "🐳 Cleaning Docker (light)..."; \
+    docker system prune -f 2>/dev/null || echo "  ⚠️  Docker not available"; \
+    echo "✅ Quick cleanup done! (No Nix store changes)"
 
 # Aggressive cleanup - removes more data but might need reinstalls
 clean-aggressive:
-    @echo "⚠️  AGGRESSIVE CLEANUP MODE - This will remove more data!"
-    @echo "📋 This will clean:"
-    @echo "  - All Nix generations (not just 1+ days old)"
-    @echo "  - All user Nix profiles"
-    @echo "  - All language version managers"
-    @echo "  - All development caches"
-    @echo "  - Docker images and containers"
-    @echo "  - iOS simulators and Xcode derived data"
-    @echo ""
-    @echo "🚨 Some tools may need reinstalling after this!"
-    @echo "Continue? (Ctrl+C to abort, Enter to proceed)"
-    @read
-    @echo ""
-    @echo "🧹 Starting aggressive cleanup..."
-    @echo ""
-    @echo "=== Nix Nuclear Option ==="
-    nix-collect-garbage ''-d'' || sudo -S nix-collect-garbage ''-d''
-    nix profile wipe-history || true
-    nix-store --optimize || sudo -S nix-store --optimize
-    @echo ""
-    @echo "=== Language Managers ==="
-    @echo "🟢 Cleaning Node.js versions..."
-    rm -rf ~/.nvm/versions/node/* || true
-    @echo "🐍 Cleaning Python versions..."
-    rm -rf ~/.pyenv/versions/* || true
-    @echo "💎 Cleaning Ruby versions..."
-    rm -rf ~/.rbenv/versions/* || true
-    @echo ""
-    @echo "=== Development Caches ==="
-    @echo "🏗️  Cleaning all build caches..."
-    rm -rf ~/.cache || true && mkdir -p ~/.cache
-    rm -rf ~/Library/Caches/CocoaPods || true
-    rm -rf ~/Library/Caches/Homebrew || true
-    rm -rf ~/Library/Developer/Xcode/DerivedData || true
-    @echo "🐳 Removing all Docker data..."
-    docker system prune -af --volumes 2>/dev/null || true
-    @echo "📱 Removing all iOS simulators..."
-    xcrun simctl delete all 2>/dev/null || true
-    @echo ""
-    @echo "=== Final Optimization ==="
-    @echo "📊 Final store size:"
-    @du -sh /nix/store || echo "Could not measure"
-    @echo "💾 Disk space recovered:"
-    @df -h / | tail -1 | awk '{print "  " $4 " available of " $2}'
-    @echo ""
-    @echo "✅ Aggressive cleanup complete!"
-    @echo "⚡ You may need to reinstall some development tools"
+    @PLATFORM=$(just _detect_platform); \
+    echo "⚠️  AGGRESSIVE CLEANUP MODE - This will remove more data!"; \
+    echo "📋 This will clean:"; \
+    echo "  - All Nix generations (not just 1+ days old)"; \
+    echo "  - All user Nix profiles"; \
+    echo "  - All language version managers"; \
+    echo "  - All development caches"; \
+    echo "  - Docker images and containers"; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "  - iOS simulators and Xcode derived data"; \
+    fi; \
+    echo ""; \
+    echo "🚨 Some tools may need reinstalling after this!"; \
+    echo "Continue? (Ctrl+C to abort, Enter to proceed)"; \
+    read; \
+    echo ""; \
+    echo "🧹 Starting aggressive cleanup..."; \
+    echo ""; \
+    echo "=== Nix Nuclear Option ==="; \
+    nix-collect-garbage -d || sudo -S nix-collect-garbage -d; \
+    nix profile wipe-history || true; \
+    nix-store --optimize || sudo -S nix-store --optimize; \
+    echo ""; \
+    echo "=== Language Managers ==="; \
+    echo "🟢 Cleaning Node.js versions..."; \
+    rm -rf ~/.nvm/versions/node/* || true; \
+    echo "🐍 Cleaning Python versions..."; \
+    rm -rf ~/.pyenv/versions/* || true; \
+    echo "💎 Cleaning Ruby versions..."; \
+    rm -rf ~/.rbenv/versions/* || true; \
+    echo ""; \
+    echo "=== Development Caches ==="; \
+    echo "🏗️  Cleaning all build caches..."; \
+    rm -rf ~/.cache || true && mkdir -p ~/.cache; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        rm -rf ~/Library/Caches/CocoaPods || true; \
+        rm -rf ~/Library/Caches/Homebrew || true; \
+        rm -rf ~/Library/Developer/Xcode/DerivedData || true; \
+    fi; \
+    echo "🐳 Removing all Docker data..."; \
+    docker system prune -af --volumes 2>/dev/null || true; \
+    if [ "$PLATFORM" = "darwin" ]; then \
+        echo "📱 Removing all iOS simulators..."; \
+        xcrun simctl delete all 2>/dev/null || true; \
+    fi; \
+    echo ""; \
+    echo "=== Final Optimization ==="; \
+    echo "📊 Final store size:"; \
+    du -sh /nix/store || echo "Could not measure"; \
+    echo "💾 Disk space recovered:"; \
+    df -h / | tail -1 | awk '{print "  " $4 " available of " $2}'; \
+    echo ""; \
+    echo "✅ Aggressive cleanup complete!"; \
+    echo "⚡ You may need to reinstall some development tools"
 
 # KeyChain management commands
 keychain-list:
