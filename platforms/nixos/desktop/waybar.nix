@@ -410,7 +410,6 @@
         color: #b4befe;
         font-size: 15px;
         min-width: 100px;
-        overflow: hidden;
       }
 
       #custom-media:hover {
