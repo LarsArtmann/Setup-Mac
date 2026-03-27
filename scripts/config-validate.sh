@@ -260,10 +260,9 @@ validate_fish_config() {
         return 0
     fi
 
-    # Find Fish config files
+    # Find Fish config files (use $HOME for cross-platform compatibility)
     local fish_configs=(
         "$HOME/.config/fish/config.fish"
-        "/Users/larsartmann/.config/fish/config.fish"
     )
 
     for config in "${fish_configs[@]}"; do

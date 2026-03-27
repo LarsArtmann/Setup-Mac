@@ -5,8 +5,12 @@
 
 set -e
 
-# Configuration
-SETUP_DIR="/Users/larsartmann/projects/SystemNix"
+# Source path library for cross-platform compatibility
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/paths.sh"
+
+# Configuration (uses paths library)
+SETUP_DIR="$PROJECT_ROOT"
 SCRIPTS_DIR="$SETUP_DIR/scripts"
 DOTFILES_DIR="$SETUP_DIR/dotfiles"
 
@@ -204,8 +208,8 @@ if [[ -f "${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor/monitoring-hook.zs
 fi
 
 # Load lazy loading system (optional - for advanced users)
-# if [[ -f "/Users/larsartmann/projects/SystemNix/scripts/plugin-lazy-loader.zsh" ]]; then
-#     source "/Users/larsartmann/projects/SystemNix/scripts/plugin-lazy-loader.zsh"
+# if [[ -f "$PROJECT_ROOT/scripts/plugin-lazy-loader.zsh" ]]; then
+#     source "$PROJECT_ROOT/scripts/plugin-lazy-loader.zsh"
 # fi
 EOF
 
