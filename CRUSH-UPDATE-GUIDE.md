@@ -85,6 +85,6 @@ NUR gives you the best of both worlds: **bleeding-edge updates** with **zero mai
 
 ---
 
-*Last updated: March 27, 2026*  
-*Current NUR Crush: v0.53.0*  
+*Last updated: March 27, 2026*
+*Current NUR Crush: v0.53.0*
 *Previous nixpkgs Crush: v0.49.0*
