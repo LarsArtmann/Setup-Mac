@@ -409,7 +409,7 @@
         background: rgba(180, 190, 254, 0.12);
         color: #b4befe;
         font-size: 15px;
-        max-width: 320px;
+        min-width: 100px;
         overflow: hidden;
       }
 
