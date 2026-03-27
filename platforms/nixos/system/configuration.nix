@@ -12,7 +12,7 @@
     # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
     ./boot.nix
     ./networking.nix
-    ./dns-config.nix # Technitium DNS Server for local caching and ad blocking
+    ./dns-blocker-config.nix # DNS blocker with unbound + block page (replaces Technitium)
     ./snapshots.nix # BTRFS snapshots with Timeshift
     ./scheduled-tasks.nix # Daily scheduled tasks (crush update-providers, etc.)
     ./sudo.nix # Passwordless sudo for wheel group

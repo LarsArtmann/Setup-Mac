@@ -291,6 +291,15 @@
                 (final: prev: {
                   aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
                 })
+                # dnsblockd - DNS block page server
+                (final: prev: {
+                  dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
+                    src = prev.lib.cleanSourceWith {
+                      filter = path: type: baseNameOf path != "package.nix";
+                      src = ./platforms/nixos/programs/dnsblockd;
+                    };
+                  };
+                })
               ];
             }
 
