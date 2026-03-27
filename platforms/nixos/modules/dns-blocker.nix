@@ -244,7 +244,10 @@ in {
       };
       # Disable "set as default browser" popup
       Preferences = {
-        "browser.shell.checkDefaultBrowser" = false;
+        "browser.shell.checkDefaultBrowser" = {
+          Value = false;
+          Status = "locked";
+        };
       };
     };
   };
