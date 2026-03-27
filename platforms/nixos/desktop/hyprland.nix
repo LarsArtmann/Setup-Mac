@@ -136,7 +136,7 @@ in {
         };
 
         # Monitor - auto-detect via kanshi for dynamic hotplug
-        monitor = "DP-3,auto,auto,1";
+        monitor = "DP-3,preferred,auto,1";
 
         # Workspaces
         workspace = [
