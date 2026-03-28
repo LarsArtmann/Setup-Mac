@@ -92,10 +92,10 @@
     ${lib.concatStringsSep "\n" (map (d: ''local-data: "${d} A ${cfg.blockIP}"'') blockedDomains)}
   '';
 
-  # Unbound include file that pulls in blocklist + temp allowlist
+  # Unbound include file that pulls in blocklist
+  # TODO: Add temp-allowlist include once tmpfiles issue is resolved
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
     include: ${combinedBlocklist}
-    include: /var/lib/dnsblockd/temp-allowlist.json.conf
   '';
 in {
   options.services.dns-blocker = {
@@ -199,10 +199,11 @@ in {
 
   config = lib.mkIf cfg.enable {
     # Create state directory and empty temp-allowlist BEFORE unbound starts
+    # Use 'w' (write) to overwrite any existing broken file from failed deploy
     systemd.tmpfiles.rules = [
       "d /var/lib/dnsblockd 0755 root root -"
-      "f /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
-      "f /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
+      "w /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
+      "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
     ];
 
     # Configure unbound
