@@ -78,8 +78,10 @@ var (
 type BlockPageData struct {
 	Domain          string
 	Category        string
+	CategoryIcon    string
 	BlocklistSource string
 	Timestamp       string
+	TotalBlocked    int64
 }
 
 type contextKey struct{}
@@ -105,26 +107,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#f38ba8}
 .domain{font-family:monospace;font-size:clamp(1rem,2.5dvw,1.4rem);padding:0.75rem 1.5rem;background:#1e1e2e;border-radius:12px;margin:1.5rem 0;word-break:break-all;color:#cdd6f4}
 .source{font-family:monospace;font-size:clamp(0.8rem,2dvw,1rem);color:#74c7ec;margin-bottom:1rem}
-.category{display:inline-block;padding:0.4rem 1rem;background:#313244;border-radius:999px;font-size:clamp(0.85rem,2dvw,1.1rem);margin-bottom:2rem;color:#a6adc8}
+.category{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;background:#313244;border-radius:999px;font-size:clamp(0.85rem,2dvw,1.1rem);margin-bottom:1rem;color:#a6adc8}
 p{font-size:clamp(1rem,2.5dvw,1.2rem);color:#6c7086;line-height:1.7;margin-bottom:1.5rem}
 .meta{font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#45475a;margin-top:2.5rem}
 a{color:#89b4fa;text-decoration:none}
+.stats{display:flex;justify-content:center;gap:2rem;margin:1.5rem 0;font-size:clamp(0.85rem,2dvw,1rem);color:#7f849c}
+.stat-item{text-align:center}
+.stat-value{font-size:clamp(1.2rem,3dvw,1.6rem);font-weight:600;color:#cba6f7}
 .bypass{margin-top:2rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center}
 .bypass form{display:inline}
 .bypass-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:0.6rem 1.2rem;border-radius:8px;font-size:clamp(0.8rem,2dvw,1rem);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
 .bypass-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,0.4)}
 .bypass-btn:active{transform:translateY(0)}
+.report-btn{background:linear-gradient(135deg,#f87171 0%,#dc2626 100%)}
+.report-btn:hover{box-shadow:0 4px 12px rgba(248,113,113,0.4)}
 </style>
 </head>
 <body>
 <div class="container">
-<div class="shield">&#x1F6E1;</div>
+<div class="shield">{{.CategoryIcon}}</div>
 <h1>Domain Blocked</h1>
 <div class="domain">{{.Domain}}</div>
 {{ if .BlocklistSource }}<div class="source">{{.BlocklistSource}}</div>{{ end }}
-{{ if .Category }}<div class="category">{{.Category}}</div>{{ end }}
-<p>This domain has been blocked by your DNS filter. If you believe this is an error, you can whitelist it in your dns-blocker configuration.</p>
+{{ if .Category }}<div class="category"><span>{{.Category}}</span></div>{{ end }}
+<div class="stats">
+<div class="stat-item"><div class="stat-value">{{.TotalBlocked}}</div><div>Total Blocked</div></div>
+</div>
+<p>This domain has been blocked by your DNS filter. If you believe this is an error, you can report it as a false positive or temporarily allow it.</p>
 <div class="bypass">
+<form action="/api/report" method="post">
+<input type="hidden" name="domain" value="{{.Domain}}">
+<input type="hidden" name="category" value="{{.Category}}">
+<input type="hidden" name="source" value="{{.BlocklistSource}}">
+<button type="submit" class="bypass-btn report-btn">Report False Positive</button>
+</form>
 <form action="/api/allow" method="post">
 <input type="hidden" name="domain" value="{{.Domain}}">
 <button type="submit" class="bypass-btn">Allow 5m</button>
@@ -405,6 +421,27 @@ func getCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	return getCertForDomain(domain)
 }
 
+// categoryIcons maps category names to emoji icons
+var categoryIcons = map[string]string{
+	"Advertising": "📢",
+	"Tracking":    "👀",
+	"Analytics":   "📊",
+	"Malware":     "🦠",
+	"Phishing":    "🎣",
+	"Gambling":    "🎰",
+	"Adult":       "🔞",
+	"Social":      "💬",
+	"Crypto":      "💰",
+	"Scam":        "🎭",
+}
+
+func getCategoryIcon(category string) string {
+	if icon, ok := categoryIcons[category]; ok {
+		return icon
+	}
+	return "🛡️" // default shield
+}
+
 func categorize(domain string, categories map[string]string) string {
 	for suffix, cat := range categories {
 		if strings.HasSuffix(domain, suffix) || domain == suffix {
@@ -473,8 +510,10 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 	data := BlockPageData{
 		Domain:          host,
 		Category:        category,
+		CategoryIcon:    getCategoryIcon(category),
 		BlocklistSource: source,
 		Timestamp:       time.Now().Format("2006-01-02 15:04:05 MST"),
+		TotalBlocked:    stats.TotalBlocked.Load(),
 	}
 
 	type ExtendedData struct {
@@ -588,6 +627,92 @@ a{color:#89b4fa;text-decoration:none}
 `, domain, domain, durationStr, expiresAt.Format("3:04 PM"), domain, domain)
 }
 
+// FalsePositiveReport stores reported false positives
+type FalsePositiveReport struct {
+	Domain   string `json:"domain"`
+	Category string `json:"category"`
+	Source   string `json:"source"`
+	Time     string `json:"time"`
+}
+
+var (
+	falsePositiveReports []FalsePositiveReport
+	falsePositiveMu      sync.RWMutex
+)
+
+func reportFalsePositiveHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	domain := r.FormValue("domain")
+	if domain == "" {
+		http.Error(w, "domain required", http.StatusBadRequest)
+		return
+	}
+
+	report := FalsePositiveReport{
+		Domain:   domain,
+		Category: r.FormValue("category"),
+		Source:   r.FormValue("source"),
+		Time:     time.Now().Format(time.RFC3339),
+	}
+
+	falsePositiveMu.Lock()
+	falsePositiveReports = append(falsePositiveReports, report)
+	// Keep last 100 reports
+	if len(falsePositiveReports) > 100 {
+		falsePositiveReports = falsePositiveReports[len(falsePositiveReports)-100:]
+	}
+	falsePositiveMu.Unlock()
+
+	log.Printf("false positive reported: domain=%s category=%s source=%s", domain, report.Category, report.Source)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reported - %s</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100dvw;height:100dvh}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2a 0%%23,#2d1d3a 100%%23,#3a3f4a);color:#e0e0e0;display:flex;align-items:center;justify-content:center}
+.container{max-width:min(90dvw,700px);padding:3rem;text-align:center}
+.icon{font-size:clamp(4rem,10dvw,6rem);margin-bottom:1.5rem}
+h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#fbbf24}
+.domain{font-family:monospace;font-size:clamp(1rem,2.5dvw,1.4rem);padding:0.75rem 1.5rem;background:rgba(251,191,36,0.2);border-radius:12px;margin:1.5rem 0;color:#fcd34d}
+.info{font-size:clamp(0.9rem,2dvw,1.1rem);color:#9ca3af;margin-bottom:1rem}
+.meta{margin-top:2rem;font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#64748b}
+a{color:#89b4fa;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="icon">📝</div>
+<h1>False Positive Reported</h1>
+<div class="domain">%s</div>
+<p class="info">Thank you for reporting this domain. The report has been logged and will be reviewed.</p>
+<p class="info">If this is a legitimate site, consider adding it to your whitelist in the DNS blocker configuration.</p>
+<p class="meta"><a href="https://%s">Try accessing %s again →</a></p>
+</div>
+</body>
+</html>
+`, domain, domain, domain, domain)
+}
+
+func falsePositivesHandler(w http.ResponseWriter, r *http.Request) {
+	falsePositiveMu.RLock()
+	reports := make([]FalsePositiveReport, len(falsePositiveReports))
+	copy(reports, falsePositiveReports)
+	falsePositiveMu.RUnlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(reports)
+}
+
 func tempAllowlistHandler(w http.ResponseWriter, r *http.Request) {
 	tempAllowlistMu.RLock()
 	defer tempAllowlistMu.RUnlock()
@@ -691,6 +816,8 @@ func main() {
 	statsMux.HandleFunc("/health", healthHandler)
 	statsMux.HandleFunc("/api/allow", allowHandler)
 	statsMux.HandleFunc("/api/temp-allowlist", tempAllowlistHandler)
+	statsMux.HandleFunc("/api/report", reportFalsePositiveHandler)
+	statsMux.HandleFunc("/api/false-positives", falsePositivesHandler)
 
 	done := make(chan error, 3)
 
