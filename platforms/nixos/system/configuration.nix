@@ -18,6 +18,7 @@
     ./sudo.nix # Passwordless sudo for wheel group
     ../services/ssh.nix
     ../services/default.nix
+    ../services/gitea.nix # Local Gitea for GitHub mirror sync
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix
