@@ -234,8 +234,8 @@ in {
           + " -addr ${cfg.blockIP}"
           + " -port ${toString cfg.blockPort}"
           + " -tls-port ${toString cfg.blockTLSPort}"
-          + " -cert ${dnsblockdCert}/dnsblockd.crt"
-          + " -key ${dnsblockdCert}/dnsblockd.key"
+          + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
+          + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
           + " -stats-addr 127.0.0.1"
           + " -stats-port ${toString cfg.statsPort}"
           + (

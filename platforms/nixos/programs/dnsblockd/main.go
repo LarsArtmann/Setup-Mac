@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
@@ -25,15 +24,24 @@ import (
 )
 
 type Config struct {
-	ListenAddr  string
-	Port        int
-	TLSPort     int
-	StatsAddr   string
-	StatsPort   int
-	CertFile    string
-	KeyFile     string
-	Categories  map[string]string
+	ListenAddr string
+	Port       int
+	TLSPort    int
+	StatsAddr  string
+	StatsPort  int
+	CACertFile string
+	CAKeyFile  string
+	Categories map[string]string
 }
+
+type CertCache struct {
+	caCert *x509.Certificate
+	caKey  *rsa.PrivateKey
+	mu     sync.RWMutex
+	certs  map[string]*tls.Certificate
+}
+
+var certCache CertCache
 
 type Stats struct {
 	TotalBlocked atomic.Int64 `json:"total_blocked"`
@@ -107,6 +115,123 @@ func init() {
 		log.Fatalf("failed to parse template: %v", err)
 	}
 	stats.Start = time.Now()
+	certCache.certs = make(map[string]*tls.Certificate)
+}
+
+func loadCA(certFile, keyFile string) error {
+	certPEM, err := os.ReadFile(certFile)
+	if err != nil {
+		return fmt.Errorf("failed to read CA cert: %v", err)
+	}
+
+	keyPEM, err := os.ReadFile(keyFile)
+	if err != nil {
+		return fmt.Errorf("failed to read CA key: %v", err)
+	}
+
+	block, _ := pem.Decode(certPEM)
+	if block == nil {
+		return fmt.Errorf("failed to decode CA cert PEM")
+	}
+	certCache.caCert, err = x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return fmt.Errorf("failed to parse CA cert: %v", err)
+	}
+
+	block, _ = pem.Decode(keyPEM)
+	if block == nil {
+		return fmt.Errorf("failed to decode CA key PEM")
+	}
+
+	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		key, err = x509.ParsePKCS1PrivateKey(block.Bytes)
+		if err != nil {
+			return fmt.Errorf("failed to parse CA key: %v", err)
+		}
+	}
+
+	var ok bool
+	certCache.caKey, ok = key.(*rsa.PrivateKey)
+	if !ok {
+		return fmt.Errorf("CA key is not RSA")
+	}
+
+	return nil
+}
+
+func getCertForDomain(domain string) (*tls.Certificate, error) {
+	certCache.mu.RLock()
+	if cert, ok := certCache.certs[domain]; ok {
+		certCache.mu.RUnlock()
+		return cert, nil
+	}
+	certCache.mu.RUnlock()
+
+	certCache.mu.Lock()
+	defer certCache.mu.Unlock()
+
+	if cert, ok := certCache.certs[domain]; ok {
+		return cert, nil
+	}
+
+	priv, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate key: %v", err)
+	}
+
+	serial, err := rand.Int(rand.Reader, new(big.Int).Lsh(big.NewInt(1), 128))
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate serial: %v", err)
+	}
+
+	template := &x509.Certificate{
+		SerialNumber: serial,
+		Subject: pkix.Name{
+			Organization: []string{"dnsblockd"},
+			CommonName:   domain,
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+		DNSNames:              []string{domain, "*." + domain},
+	}
+
+	if net.ParseIP(domain) != nil {
+		template.IPAddresses = []net.IP{net.ParseIP(domain)}
+	}
+
+	certDER, err := x509.CreateCertificate(rand.Reader, template, certCache.caCert, &priv.PublicKey, certCache.caKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cert: %v", err)
+	}
+
+	certPEM := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certDER})
+	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)})
+
+	cert, err := tls.X509KeyPair(certPEM, keyPEM)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load cert: %v", err)
+	}
+
+	certCache.certs[domain] = &cert
+	log.Printf("generated certificate for %s", domain)
+
+	return &cert, nil
+}
+
+func getCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	domain := hello.ServerName
+	if domain == "" {
+		domain = "127.0.0.2"
+	}
+
+	domain = strings.TrimPrefix(domain, "www.")
+	domain = strings.Split(domain, ":")[0]
+
+	return getCertForDomain(domain)
 }
 
 func categorize(domain string, categories map[string]string) string {
@@ -148,6 +273,7 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	host = strings.TrimPrefix(host, "www.")
+	host = strings.Split(host, ":")[0]
 
 	cfgVal := r.Context().Value(contextKey{})
 	cfg, ok := cfgVal.(*Config)
@@ -218,61 +344,17 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
-func generateSelfSignedCert(certFile, keyFile string) error {
-	priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		return fmt.Errorf("failed to generate private key: %v", err)
-	}
-
-	template := &x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			Organization: []string{"dnsblockd"},
-			CommonName:   "dnsblockd",
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(10 * 365 * 24 * time.Hour),
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		DNSNames:              []string{"*"},
-		IPAddresses:           []net.IP{net.ParseIP("127.0.0.2")},
-	}
-
-	certDER, err := x509.CreateCertificate(rand.Reader, template, template, &priv.PublicKey, priv)
-	if err != nil {
-		return fmt.Errorf("failed to create certificate: %v", err)
-	}
-
-	certOut, err := os.Create(certFile)
-	if err != nil {
-		return fmt.Errorf("failed to create cert file: %v", err)
-	}
-	defer certOut.Close()
-	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
-
-	keyOut, err := os.Create(keyFile)
-	if err != nil {
-		return fmt.Errorf("failed to create key file: %v", err)
-	}
-	defer keyOut.Close()
-	privBytes, _ := x509.MarshalECPrivateKey(priv)
-	pem.Encode(keyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
-
-	return nil
-}
-
 func main() {
 	cfg := &Config{
 		Categories: map[string]string{
-			".doubleclick.net":     "Advertising",
+			".doubleclick.net":      "Advertising",
 			".googlesyndication.com": "Advertising",
 			".googleadservices.com":  "Advertising",
-			".adnxs.com":            "Advertising",
-			".adsrvr.org":           "Advertising",
-			".facebook.net":         "Tracking",
-			".analytics.google.com": "Analytics",
-			".google-analytics.com": "Analytics",
+			".adnxs.com":             "Advertising",
+			".adsrvr.org":            "Advertising",
+			".facebook.net":          "Tracking",
+			".analytics.google.com":  "Analytics",
+			".google-analytics.com":  "Analytics",
 		},
 	}
 
@@ -281,8 +363,8 @@ func main() {
 	flag.IntVar(&cfg.TLSPort, "tls-port", 443, "HTTPS listen port (0 to disable)")
 	flag.StringVar(&cfg.StatsAddr, "stats-addr", "127.0.0.1", "Stats API listen address")
 	flag.IntVar(&cfg.StatsPort, "stats-port", 9090, "Stats API listen port")
-	flag.StringVar(&cfg.CertFile, "cert", "", "TLS certificate file (auto-generated if not provided)")
-	flag.StringVar(&cfg.KeyFile, "key", "", "TLS key file (auto-generated if not provided)")
+	flag.StringVar(&cfg.CACertFile, "ca-cert", "", "CA certificate file for signing dynamic certs")
+	flag.StringVar(&cfg.CAKeyFile, "ca-key", "", "CA private key file for signing dynamic certs")
 
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
 	flag.Parse()
@@ -296,6 +378,17 @@ func main() {
 			log.Fatalf("failed to parse categories file: %v", err)
 		}
 		log.Printf("loaded %d category rules from %s", len(cfg.Categories), *categoriesFile)
+	}
+
+	if cfg.TLSPort > 0 && (cfg.CACertFile == "" || cfg.CAKeyFile == "") {
+		log.Fatalf("-ca-cert and -ca-key are required when -tls-port > 0")
+	}
+
+	if cfg.TLSPort > 0 {
+		if err := loadCA(cfg.CACertFile, cfg.CAKeyFile); err != nil {
+			log.Fatalf("failed to load CA: %v", err)
+		}
+		log.Printf("loaded CA certificate from %s", cfg.CACertFile)
 	}
 
 	if cfg.Port == 80 || cfg.Port == 443 || cfg.TLSPort == 443 {
@@ -326,33 +419,21 @@ func main() {
 		done <- http.ListenAndServe(addr, mux)
 	}()
 
-	// HTTPS server (for blocked HTTPS sites)
+	// HTTPS server with dynamic cert generation
 	if cfg.TLSPort > 0 {
 		go func() {
-			certFile := cfg.CertFile
-			keyFile := cfg.KeyFile
-
-			if certFile == "" || keyFile == "" {
-				certFile = "/tmp/dnsblockd.crt"
-				keyFile = "/tmp/dnsblockd.key"
-				if err := generateSelfSignedCert(certFile, keyFile); err != nil {
-					log.Printf("failed to generate cert: %v, skipping HTTPS", err)
-					return
-				}
-				log.Printf("generated self-signed certificate for HTTPS")
-			}
-
 			addr := net.JoinHostPort(cfg.ListenAddr, fmt.Sprintf("%d", cfg.TLSPort))
-			log.Printf("dnsblockd listening on %s (HTTPS block page)", addr)
+			log.Printf("dnsblockd listening on %s (HTTPS block page, dynamic certs)", addr)
 
 			server := &http.Server{
 				Addr:    addr,
 				Handler: mux,
 				TLSConfig: &tls.Config{
-					MinVersion: tls.VersionTLS12,
+					MinVersion:     tls.VersionTLS12,
+					GetCertificate: getCertificate,
 				},
 			}
-			done <- server.ListenAndServeTLS(certFile, keyFile)
+			done <- server.ListenAndServeTLS("", "")
 		}()
 	}
 
