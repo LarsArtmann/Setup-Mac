@@ -1,7 +1,7 @@
 # Immich Server on NixOS: Isolation Strategy Research
 
 **Date:** 2026-03-28
-**Status:** Research Complete — Awaiting Decision
+**Status:** Research Complete — Implementation Done
 **Target Host:** evo-x2 (GMKtec AMD Ryzen AI Max+ 395, Strix Halo)
 **Filesystem:** BTRFS (single NVMe, compress=zstd, noatime)
 
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Immich is a self-hosted Google Photos alternative with native NixOS module support. Four isolation approaches were evaluated. **Incus/LXC is the recommended approach** if more isolated services are planned; otherwise, the **direct NixOS service module** is simplest.
+Immich is a self-hosted Google Photos alternative with native NixOS module support. Four isolation approaches were evaluated. **Direct NixOS service** chosen for initial deployment. **Incus/LXC** recommended if more isolated services are planned later.
 
 ---
 
@@ -19,10 +19,9 @@ Immich is a self-hosted Google Photos alternative with native NixOS module suppo
 
 | Component | Purpose | Notes |
 |-----------|---------|-------|
-| PostgreSQL | Metadata DB | Auto-configured by module |
-| Redis | Caching/queues | Auto-configured by module |
-| Typesense | Full-text search | Bundled with server |
-| Machine Learning | Face detection, CLIP search, Smart Search | CPU or GPU |
+| PostgreSQL + pgvector + vectorchord | Metadata + vector search | Auto-configured, uses Unix socket auth |
+| Redis | Caching/queues | Auto-configured, Unix socket (port 0) |
+| Machine Learning | Face detection, CLIP search, Smart Search | CPU-only on NixOS (see below) |
 
 ### Hardware Requirements
 
@@ -32,130 +31,15 @@ Immich is a self-hosted Google Photos alternative with native NixOS module suppo
 | CPU | 2 cores | 4 cores |
 | Storage | Library size + 20% | SSD for DB |
 
-### GPU Acceleration (AMD Strix Halo)
-
-- ROCm backend supported but can be finicky with newer AMD GPUs
-- Fallback to CPU inference available
-- Each ML worker consumes ~1-2 GB RAM
-- Configurable via `services.immich.accelerationDevices`
-
 ---
 
 ## 2. Isolation Approaches Compared
-
-### Option A: Direct NixOS Service (Simplest)
-
-```nix
-services.immich = {
-  enable = true;
-  port = 2283;
-  host = "0.0.0.0";
-  openFirewall = true;
-  mediaLocation = "/var/lib/immich";
-  accelerationDevices = null;
-};
-```
-
-| Aspect | Detail |
-|--------|--------|
-| Isolation | systemd service hardening (PrivateDevices, etc.) |
-| Complexity | Minimal — one module toggle |
-| GPU access | Needs `PrivateDevices = false` override |
-| Declarative | Fully declarative |
-| Management | `systemctl status immich-server` |
-
-**Pros:** Simplest, fully declarative, no extra daemons
-**Cons:** Not truly isolated, shares host PID/network/FS namespace
-
-### Option B: NixOS Declarative Container (systemd-nspawn)
-
-```nix
-containers.immich = {
-  autoStart = true;
-  privateNetwork = true;
-  hostAddress = "192.168.100.10";
-  localAddress = "192.168.100.11";
-  bindMounts."/var/lib/immich" = {
-    hostPath = "/srv/immich";
-    isReadOnly = false;
-  };
-  config = { config, pkgs, ... }: {
-    services.immich = {
-      enable = true;
-      host = "0.0.0.0";
-      port = 2283;
-    };
-    networking.firewall.allowedTCPPorts = [ 2283 ];
-    system.stateVersion = "24.11";
-  };
-};
-```
-
-| Aspect | Detail |
-|--------|--------|
-| Isolation | Network + PID + mount namespace |
-| Complexity | Moderate — NixOS native |
-| GPU access | Manual systemd override per service |
-| Declarative | Fully declarative |
-| Management | `nixos-container start/stop/root-login immich` |
-
-**Pros:** True isolation, fully declarative, no extra daemons
-**Cons:** GPU passthrough requires manual systemd overrides, limited tooling
-
-### Option C: Incus/LXC (Recommended for Multi-Service)
-
-```nix
-virtualisation.incus = {
-  enable = true;
-  ui.enable = true;
-  preseed = {
-    networks = [{
-      name = "incusbr0";
-      type = "bridge";
-      config = {
-        "ipv4.address" = "10.0.100.1/24";
-        "ipv4.nat" = "true";
-      };
-    }];
-    storage_pools = [{
-      name = "default";
-      driver = "btrfs";
-      config.source = "/var/lib/incus/storage-pools/default";
-    }];
-  };
-};
-
-networking.nftables.enable = true;
-users.users.lars.extraGroups = [ "incus-admin" ];
-```
-
-| Aspect | Detail |
-|--------|--------|
-| Isolation | Full container or VM |
-| Complexity | Higher — additional daemon |
-| GPU access | Clean: `incus config device add immich gpu ...` |
-| Declarative | Infrastructure yes, instances no (nixpkgs #386841) |
-| Management | Web UI + `incus` CLI |
-
-**Pros:** Best isolation, GPU passthrough, snapshots, Web UI, BTRFS native driver, can run VMs too
-**Cons:** Requires nftables migration, instance creation is imperative, additional daemon to maintain
-
-### Option D: MicroVM (Overkill)
-
-Uses `microvm.nix` for VM-level isolation via QEMU/KVM.
-
-**Pros:** Strongest isolation (hardware-enforced)
-**Cons:** Significant overhead, complex networking, unnecessary for a media server
-
----
-
-## 3. Decision Matrix
 
 | Factor | Direct Service | nspawn | Incus | MicroVM |
 |--------|---------------|--------|-------|---------|
 | Setup effort | Minimal | Low | Medium | High |
 | Isolation strength | Weak | Medium | Strong | Strongest |
-| GPU passthrough | Hacky | Manual | Clean | Complex |
+| GPU passthrough | Module handles it | Manual | Clean | Complex |
 | BTRFS snapshots | Host-level | Host-level | Native driver | N/A |
 | Network isolation | None | Private network | Bridge/NAT | Full |
 | Resource limits | systemd | Partial | cgroups v2 | Full |
@@ -165,59 +49,40 @@ Uses `microvm.nix` for VM-level isolation via QEMU/KVM.
 
 ---
 
-## 4. Recommendation
+## 3. Chosen Approach: Direct NixOS Service
 
-### If Immich is the only isolated service → **Option A** (Direct)
+### Module Hardening (built into NixOS module)
 
-Simplest path. Add a module at `platforms/nixos/services/immich.nix`:
+| `accelerationDevices` | `PrivateDevices` | Effective Access |
+|-----------------------|------------------|------------------|
+| `[]` (default) | `true` | No devices |
+| `null` | `false` | All devices |
+| `["/dev/dri/..."]` | `false` | All devices (DeviceAllow is no-op without PrivateDevices) |
 
-```nix
-{ config, pkgs, lib, ... }:
-{
-  services.immich = {
-    enable = true;
-    port = 2283;
-    host = "0.0.0.0";
-    openFirewall = true;
-    accelerationDevices = null;
-  };
+### GPU Acceleration — Likely CPU-Only
 
-  users.users.immich.extraGroups = [ "video" "render" ];
-}
-```
+The NixOS Immich ML package is built **without ROCm/MIGraphX**. The Docker image bundles ROCm 7.2 with MIGraphX, but the native NixOS package uses CPU-only ONNX Runtime.
 
-### If more isolated services are planned → **Option C** (Incus)
+- `accelerationDevices = null` gives the service access to `/dev/dri` but the ML code **won't use the GPU**
+- Face detection, CLIP search, Smart Search will run on **CPU** (slower but functional)
+- GPU acceleration would require running in Docker/Podman with the ROCm image, or a custom NixOS overlay
+- ROCm 7.2 (in nixpkgs) supports Strix Halo (gfx1151) natively — no `HSA_OVERRIDE_GFX_VERSION` needed
+- The Immich ML component falls back to `CPUExecutionProvider` automatically if GPU init fails
 
-One management plane for Immich, future Nextcloud, Jellyfin, etc. Invest in the Incus setup once, reuse for all services.
+### Ollama GPU Competition
 
-**Migration path:** Start with Option A, move to Incus later if needed. Immich data is portable (mediaLocation + pg_dump).
+Ollama (`ai-stack.nix`, port 11434) shares the same AMD GPU. Since Immich ML runs CPU-only, there is **no conflict**. If GPU acceleration is added later, both services would compete for GPU memory.
 
 ---
 
-## 5. Considerations for This Setup
+## 4. Considerations for This Setup
 
-### DNS Blocker Interaction
+### DNS Blocker Whitelist
 
-The existing `dns-blocker.nix` module could block Immich's external connections:
-- ML model downloads
-- Map tile sources (reverse geocoding)
-- OAuth providers (if configured)
-- `api.immich.app` (version checks)
-
-Whitelist these domains in the blocker config.
-
-### Reverse Proxy / Remote Access
-
-Mobile app requires a reachable HTTPS URL. Options:
-
-| Approach | Complexity | Security |
-|----------|-----------|----------|
-| Tailscale Serve/Funnel | Low | High (no open ports) |
-| Caddy + Let's Encrypt | Medium | High |
-| Nginx + ACME | Medium | High |
-| Self-signed cert | Low | Mobile apps may reject |
-
-Tailscale is the cleanest fit for LAN-only evo-x2.
+Added to `dns-blocker-config.nix`:
+- `api.immich.app`, `immich.app` — version checks
+- `github.com`, `github-releases.githubusercontent.com`, `objects.githubusercontent.com` — ML model downloads
+- `nominatim.openstreetmap.org`, `tile.openstreetmap.org` — reverse geocoding, map tiles
 
 ### Storage Layout (BTRFS)
 
@@ -226,78 +91,54 @@ Consider a dedicated subvolume for Immich data:
 - Keeps Timeshift snapshots from bloating with media data
 - BTRFS compression (`zstd`) helps with thumbnails
 - Single NVMe means DB and media share the same physical device
+- Create at deploy time: `btrfs subvolume create /var/lib/immich`
 
 ### Backup Strategy
 
-Photos are irreplaceable. Recommended approach:
+Daily `pg_dump` timer configured. Photos are irreplaceable — add off-site backup:
+1. DB consistency: `pg_dump` before backup (configured)
+2. Local backup: Borg/Restic to external drive or NAS
+3. Off-site backup: Borg to remote storage (e.g., rsync.net, S3)
 
-1. **DB consistency**: `pg_dump` before backup (Immich DB + media must be in sync)
-2. **Local backup**: Borg/Restic to external drive or NAS
-3. **Off-site backup**: Borg to remote storage (e.g., rsync.net, S3)
-4. **BTRFS snapshots**: Not sufficient alone (not off-site)
+### Reverse Proxy / Remote Access (Future)
 
-Example systemd timer for DB dump:
-```nix
-systemd.services.immich-db-backup = {
-  serviceConfig.Type = "oneshot";
-  path = [ config.services.postgresql.package ];
-  script = ''
-    pg_dump --clean --if-exists --dbname=immich > /var/lib/immich/database-backup/immich.sql
-  '';
-};
-```
+Mobile app requires a reachable HTTPS URL. Options:
+- Tailscale Serve/Funnel — cleanest for LAN-only
+- Caddy + Let's Encrypt — if exposing publicly
 
 ### Existing Service Conflicts
 
-- **Docker**: Already enabled. Incus and Docker can coexist but Incus's nftables requirement may conflict with Docker's iptables manipulation.
-- **PostgreSQL**: Immich module auto-provisions its own PG instance. If other services need PG, verify port/version conflicts.
-- **Redis**: Same concern as PostgreSQL.
-
-### nftables Migration (Incus prerequisite)
-
-Incus requires `networking.nftables.enable = true`. Current setup likely uses iptables (NixOS default). Verify:
-- `dns-blocker.nix` firewall rules work with nftables
-- Docker compatibility with nftables (may need `virtualisation.docker.extraOptions` adjustments)
-- Any custom `networking.firewall.extraCommands` need rewriting
-
-### Update Cadence
-
-Immich releases frequently with occasional breaking DB migrations:
-- Pin to specific version in config
-- Test updates in Incus snapshot before applying
-- Read release notes before major version bumps
+- **Docker**: Coexists fine. Immich uses native NixOS services, not Docker.
+- **PostgreSQL**: Immich module auto-provisions its own PG instance (Unix socket, peer auth). No port conflict (Gitea uses SQLite).
+- **Redis**: No other Redis service exists in the config.
+- **Ollama**: Shares GPU but no conflict since Immich ML is CPU-only.
 
 ---
 
-## 6. Implementation Plan (If Proceeding)
+## 5. Implementation Status
 
-### Phase 1: Direct Service (1-2 hours)
+### Completed
 
-1. Create `platforms/nixos/services/immich.nix`
-2. Import in NixOS configuration
-3. Configure storage (BTRFS subvolume)
-4. Test build with `just test`
-5. Apply with `just switch`
-6. Access at `http://evo-x2:2283`
+- [x] `platforms/nixos/services/immich.nix` — service module with backup timer
+- [x] Import in `configuration.nix`
+- [x] DNS blocker whitelist for Immich domains
+- [x] Build verification (`just test-fast` passes)
+- [x] Research doc
 
-### Phase 2: Remote Access (optional)
+### Deploy Steps (on evo-x2)
 
-1. Configure Tailscale Serve for Immich
-2. Test mobile app connectivity
-3. Set up HTTPS
+1. `git add platforms/nixos/services/immich.nix` (already staged)
+2. `just switch`
+3. Optionally create BTRFS subvolume first: `btrfs subvolume create /var/lib/immich`
+4. Access `http://evo-x2:2283` to create admin account
+5. Install mobile app, point to `http://evo-x2:2283`
 
-### Phase 3: Backup (essential)
+### Future Work
 
-1. Add `pg_dump` timer
-2. Configure Borg/Restic job
-3. Test restore procedure
-
-### Phase 4: Incus Migration (optional, future)
-
-1. Enable `virtualisation.incus`
-2. Migrate nftables
-3. Create Immich container/VM
-4. Migrate data from direct service
+- [ ] Off-site backup (Borg/Restic)
+- [ ] Tailscale Serve for remote access
+- [ ] GPU acceleration via Docker ROCm image (if CPU ML is too slow)
+- [ ] Incus migration if more isolated services needed
 
 ---
 
@@ -309,3 +150,4 @@ Immich releases frequently with occasional breaking DB migrations:
 - Immich docs: https://immich.app/docs/overview
 - Incus docs: https://linuxcontainers.org/incus/
 - Declarative Incus issue: https://github.com/NixOS/nixpkgs/issues/386841
+- AMD Strix Halo ROCm: https://github.com/th3cavalry/GZ302-Linux-Setup
