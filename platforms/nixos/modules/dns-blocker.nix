@@ -287,7 +287,7 @@ in {
       tmpfiles.rules = [
         "d /var/lib/dnsblockd 0755 root root -"
         "w /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
-        "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
+        "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root - # placeholder"
       ];
 
       # dnsblockd service

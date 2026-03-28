@@ -1,3 +1,0 @@
-  # Temp allowlist management - generate entries from blocklist at runtime
-    # Read temp-allowlist file and generate unbound config entries
-    temp-allowlist-file = let tempAllowlistFile = pkgs.writeText 
