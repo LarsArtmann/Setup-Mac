@@ -20,7 +20,7 @@
     ../services/default.nix
     ../services/gitea.nix # Local Gitea for GitHub mirror sync
     ../services/immich.nix # Self-hosted photo/video management
-    ../services/caddy.nix  # Reverse proxy for local domains
+    ../services/caddy.nix # Reverse proxy for local domains
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix

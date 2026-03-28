@@ -249,7 +249,12 @@
         open-floating = true;
       }
       {
-        matches = [{app-id = "^org.keepassxc.KeePassXC$"; title = "Generate Password";}];
+        matches = [
+          {
+            app-id = "^org.keepassxc.KeePassXC$";
+            title = "Generate Password";
+          }
+        ];
         open-floating = true;
       }
       {
