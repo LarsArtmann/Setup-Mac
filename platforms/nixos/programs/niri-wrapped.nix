@@ -1,184 +1,227 @@
-# Niri Wrapped Configuration
-#
-# This module provides the niri settings for the wrapped package.
-# Separated from flake.nix for maintainability.
-#
-# Usage in flake.nix:
-#   niri-wrapped = wrapper-modules.wrappers.niri.wrap {
-#     inherit pkgs;
-#     settings = import ./platforms/nixos/programs/niri-wrapped.nix { inherit pkgs lib; };
-#   };
-{
-  pkgs,
-  lib,
-}: let
-  # Helper for spawn commands
-  spawn = cmd: {spawn = [cmd];};
-  spawn-sh = cmd: {spawn-sh = cmd;};
+{pkgs, lib, ...}: {
+  programs.niri.settings = {
+    prefer-no-csd = true;
 
-  # Helper for null actions (close-window, quit, etc.)
-  action = _: null;
+    screenshot-path = "~/Pictures/screenshots/%Y-%m-%d %H-%M-%S.png";
 
-  # Helper for workspace commands
-  focus-workspace = n: {focus-workspace = n;};
-  move-to-workspace = n: {move-column-to-workspace = n;};
-in {
-  # Spawn terminal at startup
-  spawn-at-startup = [
-    ["kitty"]
-  ];
+    spawn-at-startup = [
+      {argv = ["kitty"];}
+    ];
 
-  # XWayland support
-  xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
+    xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
 
-  # Input configuration
-  input = {
-    keyboard = {
-      xkb = {
-        layout = "us";
-        variant = "";
+    input = {
+      keyboard = {
+        xkb = {
+          layout = "us";
+          variant = "";
+        };
+        repeat-delay = 300;
+        repeat-rate = 50;
+        track-layout = "window";
+      };
+
+      touchpad = {
+        tap = true;
+        dwt = true;
+        dwtp = true;
+        natural-scroll = true;
+        tap-button-map = "left-middle-right";
+        click-method = "clickfinger";
+      };
+
+      mouse = {
+        natural-scroll = false;
+        accel-profile = "flat";
+      };
+
+      trackball = {
+        scroll-method = "on-button-down";
+        scroll-button = 273;
+      };
+
+      tablet = {
+        map-to-output = "eDP-1";
+      };
+
+      warp-mouse-to-focus = true;
+      focus-follows-mouse = {
+        max-scroll-amount = "10%";
+      };
+      workspace-auto-back-and-forth = true;
+    };
+
+    layout = {
+      gaps = 8;
+      center-focused-column = "on-overflow";
+      always-center-single-column = true;
+      background-color = "#1e1e2e";
+
+      preset-column-widths = [
+        {proportion = 0.33333;}
+        {proportion = 0.5;}
+        {proportion = 0.66667;}
+      ];
+
+      default-column-width = {proportion = 0.5;};
+
+      focus-ring = {
+        width = 2;
+        active = {
+          color = "#89b4fa";
+        };
+        inactive = {
+          color = "#45475a";
+        };
+        urgent = {
+          color = "#f38ba8";
+        };
+      };
+
+      border = {
+        width = 0;
+      };
+
+      shadow = {
+        enable = true;
+        softness = 30;
+        spread = 5;
+        offset = {
+          x = 0;
+          y = 5;
+        };
+        draw-behind-window = true;
+        color = "#00000060";
+      };
+
+      struts = {
+        left = 0;
+        right = 0;
+        top = 0;
+        bottom = 0;
       };
     };
-    touchpad = {
-      tap = true;
-      natural-scroll = true;
-      dwt = true;
-    };
-    mouse = {
-      natural-scroll = false;
-    };
-  };
 
-  # Layout configuration
-  layout = {
-    gaps = 8;
-    center-focused-column = "never";
-    preset-column-widths = [
-      {proportion = 0.33333;}
-      {proportion = 0.5;}
-      {proportion = 0.66667;}
-    ];
-    default-column-width = {proportion = 0.5;};
-  };
+    binds = let
+      sh = cmd: ["sh" "-c" cmd];
+    in {
+      "Mod+Return".action.spawn = ["kitty"];
+      "Mod+Shift+Return".action.spawn = ["foot"];
 
-  # Focus ring (Catppuccin Mocha theme)
-  focus-ring = {
-    enable = true;
-    width = 2;
-    active = {
-      color = "#89b4fa"; # Catppuccin Mocha blue
-    };
-    inactive = {
-      color = "#45475a"; # Catppuccin Mocha surface0
-    };
-  };
+      "Mod+Q".action.close-window = {};
+      "Mod+Shift+Q".action.quit = {};
+      "Mod+F".action.fullscreen-window = {};
+      "Mod+Shift+Space".action.toggle-window-floating = {};
+      "Mod+Shift+M".action.maximize-column = {};
+      "Mod+T".action.toggle-column-tabbed-display = {};
 
-  # Keybindings
-  binds = {
-    # Terminal
-    "Mod+Return".spawn = ["kitty"];
-    "Mod+Shift+Return".spawn = ["foot"];
+      "Mod+Left".action.focus-column-left = {};
+      "Mod+Right".action.focus-column-right = {};
+      "Mod+Up".action.focus-window-up = {};
+      "Mod+Down".action.focus-window-down = {};
 
-    # Window management
-    "Mod+Q".close-window = null;
-    "Mod+Shift+Q".quit = null;
+      "Mod+H".action.focus-column-left = {};
+      "Mod+L".action.focus-column-right = {};
+      "Mod+K".action.focus-window-up = {};
+      "Mod+J".action.focus-window-down = {};
 
-    # Focus movement (arrow keys)
-    "Mod+Left".focus-column-left = null;
-    "Mod+Right".focus-column-right = null;
-    "Mod+Up".focus-window-up = null;
-    "Mod+Down".focus-window-down = null;
+      "Mod+Shift+Left".action.move-column-left = {};
+      "Mod+Shift+Right".action.move-column-right = {};
+      "Mod+Shift+Up".action.move-window-up = {};
+      "Mod+Shift+Down".action.move-window-down = {};
 
-    # Focus movement (hjkl)
-    "Mod+H".focus-column-left = null;
-    "Mod+L".focus-column-right = null;
-    "Mod+K".focus-window-up = null;
-    "Mod+J".focus-window-down = null;
+      "Mod+Shift+H".action.move-column-left = {};
+      "Mod+Shift+L".action.move-column-right = {};
+      "Mod+Shift+K".action.move-window-up = {};
+      "Mod+Shift+J".action.move-window-down = {};
 
-    # Move windows (arrow keys)
-    "Mod+Shift+Left".move-column-left = null;
-    "Mod+Shift+Right".move-column-right = null;
-    "Mod+Shift+Up".move-window-up = null;
-    "Mod+Shift+Down".move-window-down = null;
+      "Mod+BracketLeft".action.consume-window-into-column = {};
+      "Mod+BracketRight".action.expel-window-from-column = {};
+      "Mod+R".action.switch-preset-column-width = {};
+      "Mod+Shift+R".action.reset-window-height = {};
+      "Mod+Minus".action.set-column-width = "-10%";
+      "Mod+Equal".action.set-column-width = "+10%";
 
-    # Move windows (hjkl)
-    "Mod+Shift+H".move-column-left = null;
-    "Mod+Shift+L".move-column-right = null;
-    "Mod+Shift+K".move-window-up = null;
-    "Mod+Shift+J".move-window-down = null;
+      "Mod+1".action.focus-workspace = 1;
+      "Mod+2".action.focus-workspace = 2;
+      "Mod+3".action.focus-workspace = 3;
+      "Mod+4".action.focus-workspace = 4;
+      "Mod+5".action.focus-workspace = 5;
+      "Mod+6".action.focus-workspace = 6;
+      "Mod+7".action.focus-workspace = 7;
+      "Mod+8".action.focus-workspace = 8;
+      "Mod+9".action.focus-workspace = 9;
 
-    # Column width
-    "Mod+BracketLeft".consume-window-into-column = null;
-    "Mod+BracketRight".expel-window-from-column = null;
-    "Mod+R".switch-preset-column-width = null;
-    "Mod+Shift+R".reset-window-height = null;
-    "Mod+Minus".set-column-width = "-10%";
-    "Mod+Equal".set-column-width = "+10%";
+      "Mod+Shift+1".action.move-column-to-workspace = 1;
+      "Mod+Shift+2".action.move-column-to-workspace = 2;
+      "Mod+Shift+3".action.move-column-to-workspace = 3;
+      "Mod+Shift+4".action.move-column-to-workspace = 4;
+      "Mod+Shift+5".action.move-column-to-workspace = 5;
+      "Mod+Shift+6".action.move-column-to-workspace = 6;
+      "Mod+Shift+7".action.move-column-to-workspace = 7;
+      "Mod+Shift+8".action.move-column-to-workspace = 8;
+      "Mod+Shift+9".action.move-column-to-workspace = 9;
 
-    # Workspace focus (1-9)
-    "Mod+1".focus-workspace = 1;
-    "Mod+2".focus-workspace = 2;
-    "Mod+3".focus-workspace = 3;
-    "Mod+4".focus-workspace = 4;
-    "Mod+5".focus-workspace = 5;
-    "Mod+6".focus-workspace = 6;
-    "Mod+7".focus-workspace = 7;
-    "Mod+8".focus-workspace = 8;
-    "Mod+9".focus-workspace = 9;
+      "Mod+Page_Up".action.focus-workspace-up = {};
+      "Mod+Page_Down".action.focus-workspace-down = {};
+      "Mod+Shift+Page_Up".action.move-column-to-workspace-up = {};
+      "Mod+Shift+Page_Down".action.move-column-to-workspace-down = {};
 
-    # Move to workspace (1-9)
-    "Mod+Shift+1".move-column-to-workspace = 1;
-    "Mod+Shift+2".move-column-to-workspace = 2;
-    "Mod+Shift+3".move-column-to-workspace = 3;
-    "Mod+Shift+4".move-column-to-workspace = 4;
-    "Mod+Shift+5".move-column-to-workspace = 5;
-    "Mod+Shift+6".move-column-to-workspace = 6;
-    "Mod+Shift+7".move-column-to-workspace = 7;
-    "Mod+Shift+8".move-column-to-workspace = 8;
-    "Mod+Shift+9".move-column-to-workspace = 9;
+      "Mod+D".action.spawn = ["rofi" "-show" "drun"];
+      "Mod+Shift+E".action.spawn = ["emacs"];
+      "Mod+Shift+B".action.spawn = ["firefox"];
 
-    # Apps
-    "Mod+D".spawn-sh = "rofi -show drun";
-    "Mod+Shift+E".spawn-sh = "emacs";
-    "Mod+Shift+F".spawn-sh = "firefox";
+      "Mod+Shift+Escape".action.spawn = ["swaylock"];
+      "Mod+Shift+P".action.power-off-monitors = {};
+      "Mod+Shift+S".action.suspend = {};
 
-    # System
-    "Mod+Shift+L".spawn-sh = "hyprlock";
-    "Mod+Shift+P".power-off-monitors = null;
-    "Mod+Shift+S".suspend = null;
+      "Print".action.screenshot-screen = {};
+      "Shift+Print".action.screenshot = {};
 
-    # Screenshot
-    "Print".spawn-sh = "grimblast copy area";
-    "Shift+Print".spawn-sh = "grimblast save area ~/Pictures/screenshots/$(date +%Y-%m-%d_%H-%M-%S).png";
+      "XF86AudioRaiseVolume" = {
+        action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
+        allow-when-locked = true;
+      };
+      "XF86AudioLowerVolume" = {
+        action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
+        allow-when-locked = true;
+      };
+      "XF86AudioMute" = {
+        action.spawn = sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        allow-when-locked = true;
+      };
+      "XF86AudioMicMute" = {
+        action.spawn = sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+        allow-when-locked = true;
+      };
 
-    # Audio (allow when locked)
-    "XF86AudioRaiseVolume" = {
-      spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+";
-      allow-when-locked = true;
-    };
-    "XF86AudioLowerVolume" = {
-      spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
-      allow-when-locked = true;
-    };
-    "XF86AudioMute" = {
-      spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-      allow-when-locked = true;
+      "XF86AudioPlay" = {
+        action.spawn = sh "playerctl play-pause";
+        allow-when-locked = true;
+      };
+      "XF86AudioNext" = {
+        action.spawn = sh "playerctl next";
+        allow-when-locked = true;
+      };
+      "XF86AudioPrev" = {
+        action.spawn = sh "playerctl previous";
+        allow-when-locked = true;
+      };
+
+      "XF86MonBrightnessUp" = {
+        action.spawn = sh "brightnessctl set +5%";
+        allow-when-locked = true;
+      };
+      "XF86MonBrightnessDown" = {
+        action.spawn = sh "brightnessctl set 5%-";
+        allow-when-locked = true;
+      };
     };
 
-    # Brightness (allow when locked)
-    "XF86MonBrightnessUp" = {
-      spawn-sh = "brightnessctl set +5%";
-      allow-when-locked = true;
+    environment = {
+      NIXOS_OZONE_WL = "1";
+      DISPLAY = ":0";
+      WAYLAND_DISPLAY = "wayland-1";
     };
-    "XF86MonBrightnessDown" = {
-      spawn-sh = "brightnessctl set 5%-";
-      allow-when-locked = true;
-    };
-  };
-
-  # Environment variables
-  environment = {
-    DISPLAY = ":0";
-    WAYLAND_DISPLAY = "wayland-1";
   };
 }

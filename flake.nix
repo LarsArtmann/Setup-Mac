@@ -137,14 +137,6 @@
             aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            # Wrapped niri with embedded configuration (Linux only)
-            # Following the vimjoyer pattern: https://www.vimjoyer.com/vid79-parts-wrapped
-            # Configuration extracted to platforms/nixos/programs/niri-wrapped.nix
-            niri-wrapped = wrapper-modules.wrappers.niri.wrap {
-              inherit pkgs; # CRITICAL: Must inherit pkgs!
-              settings = import ./platforms/nixos/programs/niri-wrapped.nix {inherit pkgs lib;};
-            };
-
             # dnsblockd - serves HTML block pages for DNS-filtered domains
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
               src = lib.cleanSourceWith {
@@ -178,24 +170,6 @@
 
       # System configurations (maintain backward compatibility)
       flake = {
-        # NixOS module for using wrapped niri
-        nixosModules.niri-wrapped = {
-          pkgs,
-          lib,
-          ...
-        }: {
-          programs.niri = {
-            enable = true;
-            # Use our wrapped package instead of the default
-            package = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.niri-wrapped;
-          };
-
-          # xwayland-satellite for X11 app support
-          environment.systemPackages = with pkgs; [
-            xwayland-satellite
-          ];
-        };
-
         darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           specialArgs = {

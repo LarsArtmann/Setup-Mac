@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration
@@ -7,7 +7,9 @@
     ../programs/hyprlock.nix # Lock screen with Catppuccin theme
     ../programs/hypridle.nix # Idle management daemon
     ../programs/zellij.nix # Zellij terminal multiplexer
+    ../programs/niri-wrapped.nix # Niri scrollable-tiling compositor via niri-flake HM module
     ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
+    ../desktop/waybar.nix # Status bar (shared by Hyprland and niri)
     ../modules/hyprland-animated-wallpaper.nix
   ];
 
