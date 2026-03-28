@@ -48,13 +48,13 @@ services.gitea = {
   lfs.enable = true;
   dump.enable = true;
   dump.interval = "weekly";
-  
+
   settings.mirror = {
     ENABLED = true;
     DEFAULT_INTERVAL = "8h";
     MIN_INTERVAL = "10m";
   };
-  
+
   # Auto-sync every 30 min
   "cron.update_mirrors" = {
     ENABLED = true;
