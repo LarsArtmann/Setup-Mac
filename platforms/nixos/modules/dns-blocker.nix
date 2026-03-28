@@ -148,6 +148,16 @@ in {
           url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
           hash = "sha256-47DeQd0L68Tv4f7eZf0W6hDkZCVsSjL2W5Y2Ty6bFJk=";
         }
+        {
+          name = "HaGeZi-Light";
+          url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/light.txt";
+          hash = "sha256-soPw/BeHvV+CNRNJVbskht0lFGGnhhAAGrv9u3KkD9c=";
+        }
+        {
+          name = "BlockListProject-Ads";
+          url = "https://raw.githubusercontent.com/blocklistproject/Lists/master/ads.txt";
+          hash = "sha256-WmzCU8WQfh1HmNTloBSTH6ZQ310G4RRY/dbgour6l1c=";
+        }
       ];
       description = "Blocklists to fetch (hosts format)";
     };
