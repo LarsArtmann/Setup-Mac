@@ -303,14 +303,6 @@ in {
 
   # Systemd configuration
   systemd = {
-    # Restart on failure
-    services.gitea = {
-      serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = "5s";
-      };
-    };
-
     # GitHub sync service
     services.gitea-github-sync = {
       description = "Sync all GitHub repos to Gitea";
