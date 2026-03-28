@@ -67,9 +67,18 @@
 
   # Build domain -> source mapping for dnsblockd (deduplicated)
   blocklistDomainsMapping = builtins.listToAttrs (
-    lib.concatMap (bl: map (d: { name = d; value = "${bl.name}"; }) bl.domains) processedBlocklists
-    ++
-    map (d: { name = d; value = "Manual block"; }) cfg.extraDomains
+    lib.concatMap (bl:
+      map (d: {
+        name = d;
+        value = "${bl.name}";
+      })
+      bl.domains)
+    processedBlocklists
+    ++ map (d: {
+      name = d;
+      value = "Manual block";
+    })
+    cfg.extraDomains
   );
 
   blocklistMappingJSON = pkgs.writeText "dnsblockd-blocklist-mapping.json" (builtins.toJSON blocklistDomainsMapping);
@@ -81,6 +90,12 @@
     # Unique domains: ${toString (builtins.length blockedDomains)}
 
     ${lib.concatStringsSep "\n" (map (d: ''local-data: "${d} A ${cfg.blockIP}"'') blockedDomains)}
+  '';
+
+  # Unbound include file that pulls in blocklist + temp allowlist
+  unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
+    include: ${combinedBlocklist}
+    include: /var/lib/dnsblockd/temp-allowlist.json.conf
   '';
 in {
   options.services.dns-blocker = {
@@ -227,11 +242,8 @@ in {
           harden-below-nxdomain = true;
           harden-referral-path = true;
 
-          # Include blocklist
-          include = [
-            toString combinedBlocklist
-            "/var/lib/dnsblockd/temp-allowlist.json.conf"
-          ];
+          # Include blocklist (which also includes temp allowlist)
+          include = toString unboundIncludeFile;
 
           # Whitelist: return real IP (forward these normally)
           local-zone = map (d: ''"${d}" transparent'') cfg.whitelist;
