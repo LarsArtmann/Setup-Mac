@@ -44,7 +44,7 @@
         map-to-output = "eDP-1";
       };
 
-      warp-mouse-to-focus = true;
+      warp-mouse-to-focus.enable = true;
       focus-follows-mouse = {
         max-scroll-amount = "10%";
       };
