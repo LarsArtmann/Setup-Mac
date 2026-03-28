@@ -56,29 +56,31 @@
   # Process all blocklists
   processedBlocklists = map fetchBlocklist cfg.blocklists;
 
-  # Build domain -> source mapping for dnsblockd
-  # Use listToAttrs to avoid stack overflow with large domain lists
+  # Collect all domains from all blocklists + extra, then deduplicate
+  allDomains = lib.unique (
+    lib.concatMap (bl: bl.domains) processedBlocklists
+    ++ cfg.extraDomains
+  );
+
+  # Filter out whitelisted domains
+  blockedDomains = lib.filter (d: !builtins.elem d cfg.whitelist) allDomains;
+
+  # Build domain -> source mapping for dnsblockd (deduplicated)
   blocklistDomainsMapping = builtins.listToAttrs (
-    # Domains from blocklists
-    lib.concatMap (bl: map (d: { name = d; value = "${bl.name} (${bl.url})"; }) bl.domains) processedBlocklists
+    lib.concatMap (bl: map (d: { name = d; value = "${bl.name}"; }) bl.domains) processedBlocklists
     ++
-    # Extra domains
-    map (d: { name = d; value = "Manual block (extraDomains)"; }) cfg.extraDomains
+    map (d: { name = d; value = "Manual block"; }) cfg.extraDomains
   );
 
   blocklistMappingJSON = pkgs.writeText "dnsblockd-blocklist-mapping.json" (builtins.toJSON blocklistDomainsMapping);
 
-  # Combine all blocklists + extra domains
-  extraDomainsEntries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') cfg.extraDomains;
+  # Combined blocklist with deduplication
   combinedBlocklist = pkgs.writeText "dns-blocker-combined.conf" ''
-    # Combined DNS Blocklist
+    # Combined DNS Blocklist (deduplicated)
     # Blocklists: ${toString (builtins.length cfg.blocklists)}
-    # Extra domains: ${toString (builtins.length cfg.extraDomains)}
+    # Unique domains: ${toString (builtins.length blockedDomains)}
 
-    ${lib.concatStringsSep "\n\n" (map (bl: bl.content) processedBlocklists)}
-
-    # Extra manually blocked domains
-    ${lib.concatStringsSep "\n" extraDomainsEntries}
+    ${lib.concatStringsSep "\n" (map (d: ''local-data: "${d} A ${cfg.blockIP}"'') blockedDomains)}
   '';
 in {
   options.services.dns-blocker = {
@@ -129,8 +131,22 @@ in {
         {
           name = "StevenBlack-basic";
           url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-          # Update this hash after first build fails with the correct one
           hash = "sha256-47DeQd0L68Tv4f7eZf0W6hDkZCVsSjL2W5Y2Ty6bFJk=";
+        }
+        {
+          name = "OISD-small";
+          url = "https://small.oisd.nl/domainswild2";
+          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        }
+        {
+          name = "HaGeZi-TIF";
+          url = "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/hosts/tif.txt";
+          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+        }
+        {
+          name = "NoCoin";
+          url = "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt";
+          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
         }
       ];
       description = "Blocklists to fetch (hosts format)";
@@ -212,7 +228,10 @@ in {
           harden-referral-path = true;
 
           # Include blocklist
-          include = toString combinedBlocklist;
+          include = [
+            toString combinedBlocklist
+            "/var/lib/dnsblockd/temp-allowlist.json.conf"
+          ];
 
           # Whitelist: return real IP (forward these normally)
           local-zone = map (d: ''"${d}" transparent'') cfg.whitelist;
@@ -254,11 +273,13 @@ in {
           + " -stats-addr 127.0.0.1"
           + " -stats-port ${toString cfg.statsPort}"
           + " -blocklist-mapping ${blocklistMappingJSON}"
+          + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
           + (
             if cfg.categories != {}
             then " -categories ${categoriesJSON}"
             else ""
           );
+        StateDirectory = "dnsblockd";
         Restart = "on-failure";
         RestartSec = "3s";
 

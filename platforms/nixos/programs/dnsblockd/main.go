@@ -16,6 +16,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -24,15 +25,16 @@ import (
 )
 
 type Config struct {
-	ListenAddr         string
-	Port               int
-	TLSPort            int
-	StatsAddr          string
-	StatsPort          int
-	CACertFile         string
-	CAKeyFile          string
-	Categories         map[string]string
-	BlocklistMapping   map[string]string // domain -> source
+	ListenAddr        string
+	Port              int
+	TLSPort           int
+	StatsAddr         string
+	StatsPort         int
+	CACertFile        string
+	CAKeyFile         string
+	Categories        map[string]string
+	BlocklistMapping  map[string]string // domain -> source
+	TempAllowlistPath string            // path to persist temp allowlist
 }
 
 type CertCache struct {
@@ -62,11 +64,22 @@ type BlockEntry struct {
 	Time     string `json:"time"`
 }
 
+type TempAllowEntry struct {
+	Domain    string    `json:"domain"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
+var (
+	tempAllowlist     map[string]TempAllowEntry
+	tempAllowlistMu   sync.RWMutex
+	tempAllowlistPath string
+)
+
 type BlockPageData struct {
-	Domain        string
-	Category      string
+	Domain          string
+	Category        string
 	BlocklistSource string
-	Timestamp     string
+	Timestamp       string
 }
 
 type contextKey struct{}
@@ -96,6 +109,11 @@ h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;colo
 p{font-size:clamp(1rem,2.5dvw,1.2rem);color:#6c7086;line-height:1.7;margin-bottom:1.5rem}
 .meta{font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#45475a;margin-top:2.5rem}
 a{color:#89b4fa;text-decoration:none}
+.bypass{margin-top:2rem;display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center}
+.bypass form{display:inline}
+.bypass-btn{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;padding:0.6rem 1.2rem;border-radius:8px;font-size:clamp(0.8rem,2dvw,1rem);cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
+.bypass-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,0.4)}
+.bypass-btn:active{transform:translateY(0)}
 </style>
 </head>
 <body>
@@ -106,6 +124,22 @@ a{color:#89b4fa;text-decoration:none}
 {{ if .BlocklistSource }}<div class="source">{{.BlocklistSource}}</div>{{ end }}
 {{ if .Category }}<div class="category">{{.Category}}</div>{{ end }}
 <p>This domain has been blocked by your DNS filter. If you believe this is an error, you can whitelist it in your dns-blocker configuration.</p>
+<div class="bypass">
+<form action="/api/allow" method="post">
+<input type="hidden" name="domain" value="{{.Domain}}">
+<button type="submit" class="bypass-btn">Allow 5m</button>
+</form>
+<form action="/api/allow" method="post">
+<input type="hidden" name="domain" value="{{.Domain}}">
+<input type="hidden" name="duration" value="15m">
+<button type="submit" class="bypass-btn">Allow 15m</button>
+</form>
+<form action="/api/allow" method="post">
+<input type="hidden" name="domain" value="{{.Domain}}">
+<input type="hidden" name="duration" value="60m">
+<button type="submit" class="bypass-btn">Allow 1h</button>
+</form>
+</div>
 <div class="meta">{{.Timestamp}} &middot; dnsblockd/{{ .Version }}</div>
 </div>
 </body>
@@ -121,6 +155,138 @@ func init() {
 	}
 	stats.Start = time.Now()
 	certCache.certs = make(map[string]*tls.Certificate)
+	tempAllowlist = make(map[string]TempAllowEntry)
+}
+
+func loadTempAllowlist(path string) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		if !os.IsNotExist(err) {
+			return
+		}
+		log.Printf("failed to read temp allowlist: %v", err)
+		return
+	}
+	var entries []TempAllowEntry
+	if err := json.Unmarshal(data, &entries); err != nil {
+		log.Printf("failed to parse temp allowlist: %v", err)
+		return
+	}
+	now := time.Now()
+	tempAllowlistMu.Lock()
+	defer tempAllowlistMu.Unlock()
+	for _, e := range entries {
+		if e.ExpiresAt.After(now) {
+			tempAllowlist[e.Domain] = e
+		}
+	}
+	log.Printf("loaded %d temp allowlist entries", len(tempAllowlist))
+}
+
+func saveTempAllowlist(path string) {
+	tempAllowlistMu.RLock()
+	entries := make([]TempAllowEntry, 0, len(tempAllowlist))
+	for _, e := range tempAllowlist {
+		entries = append(entries, e)
+	}
+	tempAllowlistMu.RUnlock()
+
+	data, err := json.MarshalIndent(entries, "", "  ")
+	if err != nil {
+		log.Printf("failed to marshal temp allowlist: %v", err)
+		return
+	}
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		log.Printf("failed to write temp allowlist: %v", err)
+	}
+}
+
+func addTempAllow(domain string, duration time.Duration) {
+	expiresAt := time.Now().Add(duration)
+	tempAllowlistMu.Lock()
+	tempAllowlist[domain] = TempAllowEntry{
+		Domain:    domain,
+		ExpiresAt: expiresAt,
+	}
+	tempAllowlistMu.Unlock()
+
+	if tempAllowlistPath != "" {
+		saveTempAllowlist(tempAllowlistPath)
+		if err := generateUnboundAllowlist(); err != nil {
+			log.Printf("failed to generate unbound allowlist: %v", err)
+		}
+		if err := reloadUnbound(); err != nil {
+			log.Printf("failed to reload unbound: %v", err)
+		}
+	}
+}
+
+func isTempAllowed(domain string) bool {
+	tempAllowlistMu.RLock()
+	defer tempAllowlistMu.RUnlock()
+	entry, ok := tempAllowlist[domain]
+	if !ok {
+		return false
+	}
+	return time.Now().Before(entry.ExpiresAt)
+}
+
+func cleanupExpiredTempAllows() {
+	now := time.Now()
+	changed := false
+
+	tempAllowlistMu.Lock()
+	defer tempAllowlistMu.Unlock()
+
+	for domain, entry := range tempAllowlist {
+		if now.After(entry.ExpiresAt) {
+			delete(tempAllowlist, domain)
+			changed = true
+		}
+	}
+
+	if changed && tempAllowlistPath != "" {
+		saveTempAllowlist(tempAllowlistPath)
+		if err := generateUnboundAllowlist(); err != nil {
+			log.Printf("failed to regenerate unbound allowlist: %v", err)
+		}
+		if err := reloadUnbound(); err != nil {
+			log.Printf("failed to reload unbound: %v", err)
+		}
+	}
+}
+
+func generateUnboundAllowlist() error {
+	if tempAllowlistPath == "" {
+		return nil
+	}
+	allowlistConf := tempAllowlistPath + ".conf"
+
+	tempAllowlistMu.RLock()
+	var lines []string
+	for domain, entry := range tempAllowlist {
+		if time.Now().Before(entry.ExpiresAt) {
+			lines = append(lines, fmt.Sprintf("local-zone: \"%s\" transparent", domain))
+		}
+	}
+	tempAllowlistMu.RUnlock()
+
+	content := "# Auto-generated by dnsblockd - DO NOT EDIT\n"
+	if len(lines) > 0 {
+		content += strings.Join(lines, "\n") + "\n"
+	}
+
+	return os.WriteFile(allowlistConf, []byte(content), 0644)
+}
+
+func reloadUnbound() error {
+	cmd := exec.Command("unbound-control", "reload")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("unbound-control reload failed: %v\n%s", err, output)
+	}
+	log.Printf("reloaded unbound with temp allowlist")
+	return nil
 }
 
 func loadCA(certFile, keyFile string) error {
@@ -280,6 +446,13 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 	host = strings.TrimPrefix(host, "www.")
 	host = strings.Split(host, ":")[0]
 
+	// Check if domain is temporarily allowed
+	if isTempAllowed(host) {
+		// Redirect to the actual domain
+		http.Redirect(w, r, "https://"+host, http.StatusTemporaryRedirect)
+		return
+	}
+
 	cfgVal := r.Context().Value(contextKey{})
 	cfg, ok := cfgVal.(*Config)
 	if !ok {
@@ -354,10 +527,84 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
+func allowHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	domain := r.FormValue("domain")
+	if domain == "" {
+		http.Error(w, "domain required", http.StatusBadRequest)
+		return
+	}
+
+	// Parse duration (default 5m)
+	durationStr := r.FormValue("duration")
+	duration := 5 * time.Minute
+	switch durationStr {
+	case "15m":
+		duration = 15 * time.Minute
+	case "60m":
+		duration = 60 * time.Minute
+	case "24h":
+		duration = 24 * time.Hour
+	}
+
+	addTempAllow(domain, duration)
+
+	expiresAt := time.Now().Add(duration)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Allowed - %s</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100dvw;height:100dvh}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2a 0%%2d1d3a 100%%3a3f4a);color:#e0e0e0;display:flex;align-items:center;justify-content:center}
+.container{max-width:min(90dvw,700px);padding:3rem;text-align:center}
+.icon{font-size:clamp(4rem,10dvw,6rem);margin-bottom:1.5rem}
+h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#22c55e}
+.domain{font-family:monospace;font-size:clamp(1rem,2.5dvw,1.4rem);padding:0.75rem 1.5rem;background:rgba(34,197,94,0.2);border-radius:12px;margin:1.5rem 0;color:#86efac}
+.info{font-size:clamp(0.9rem,2dvw,1.1rem);color:#9ca3af}
+.meta{margin-top:2rem;font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#64748b}
+a{color:#89b4fa;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="icon">✅</div>
+<h1>Temporarily Allowed</h1>
+<div class="domain">%s</div>
+<p class="info">This domain has been allowed for <strong>%s</strong>.</p>
+<p class="info">Blocklist bypass expires at <strong>%s</strong>.</p>
+<p class="meta"><a href="https://%s">Continue to %s →</a></p>
+</div>
+</body>
+</html>
+`, domain, domain, durationStr, expiresAt.Format("3:04 PM"), domain, domain)
+}
+
+func tempAllowlistHandler(w http.ResponseWriter, r *http.Request) {
+	tempAllowlistMu.RLock()
+	defer tempAllowlistMu.RUnlock()
+
+	entries := make([]TempAllowEntry, 0, len(tempAllowlist))
+	for _, e := range tempAllowlist {
+		entries = append(entries, e)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(entries)
+}
+
 func main() {
 	cfg := &Config{
 		Categories: map[string]string{
-			".doubleclick.net":      "Advertising",
+			".doubleclick.net":       "Advertising",
 			".googlesyndication.com": "Advertising",
 			".googleadservices.com":  "Advertising",
 			".adnxs.com":             "Advertising",
@@ -375,10 +622,20 @@ func main() {
 	flag.IntVar(&cfg.StatsPort, "stats-port", 9090, "Stats API listen port")
 	flag.StringVar(&cfg.CACertFile, "ca-cert", "", "CA certificate file for signing dynamic certs")
 	flag.StringVar(&cfg.CAKeyFile, "ca-key", "", "CA private key file for signing dynamic certs")
+	flag.StringVar(&tempAllowlistPath, "temp-allowlist", "", "Path to temp allowlist JSON file")
 
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
 	blocklistMappingFile := flag.String("blocklist-mapping", "", "JSON file mapping domains to their blocklist source")
 	flag.Parse()
+
+	if tempAllowlistPath != "" {
+		loadTempAllowlist(tempAllowlistPath)
+		go func() {
+			for range time.Tick(time.Minute) {
+				cleanupExpiredTempAllows()
+			}
+		}()
+	}
 
 	if *categoriesFile != "" {
 		data, err := os.ReadFile(*categoriesFile)
@@ -432,6 +689,8 @@ func main() {
 	statsMux := http.NewServeMux()
 	statsMux.HandleFunc("/stats", statsHandler)
 	statsMux.HandleFunc("/health", healthHandler)
+	statsMux.HandleFunc("/api/allow", allowHandler)
+	statsMux.HandleFunc("/api/temp-allowlist", tempAllowlistHandler)
 
 	done := make(chan error, 3)
 
