@@ -218,8 +218,8 @@ in {
       ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/8 dev lo 2>/dev/null || true
     '';
 
-    # Add dnsblockd cert to system trust store
-    security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd.crt"];
+    # Add dnsblockd CA cert to system trust store (server cert is signed by this CA)
+    security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd-ca.crt"];
 
     # dnsblockd service
     systemd.services.dnsblockd = {
@@ -255,24 +255,15 @@ in {
       };
     };
 
-    # System uses unbound and local resolver config
-    networking = {
-      resolvconf.enable = lib.mkForce false;
-      nameservers = ["127.0.0.1"];
-      localCommands = ''
-        ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/8 dev lo 2>/dev/null || true
-      '';
-    };
-
     # Firefox policies: disable DoH, install dnsblockd cert, suppress default browser prompt
     programs.firefox.policies = {
       DNSOverHTTPS = {
         Enabled = false;
         Locked = true;
       };
-      # Install dnsblockd cert into Firefox's own certificate store (NSS doesn't use system certs)
+      # Install dnsblockd CA cert into Firefox's own certificate store
       Certificates = {
-        Install = ["${dnsblockdCert}/dnsblockd.crt"];
+        Install = ["${dnsblockdCert}/dnsblockd-ca.crt"];
       };
       # Disable "set as default browser" popup
       Preferences = {
@@ -300,7 +291,7 @@ in {
         certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
         # Import the cert (remove old version first if exists)
         certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
-        certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd.crt
+        certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd-ca.crt
       '';
     };
   };
