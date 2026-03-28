@@ -148,21 +148,6 @@ in {
           url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
           hash = "sha256-47DeQd0L68Tv4f7eZf0W6hDkZCVsSjL2W5Y2Ty6bFJk=";
         }
-        {
-          name = "OISD-small";
-          url = "https://small.oisd.nl/domainswild2";
-          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        }
-        {
-          name = "HaGeZi-TIF";
-          url = "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/hosts/tif.txt";
-          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        }
-        {
-          name = "NoCoin";
-          url = "https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/hosts.txt";
-          hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
-        }
       ];
       description = "Blocklists to fetch (hosts format)";
     };
@@ -213,6 +198,13 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
+    # Create state directory and empty temp-allowlist BEFORE unbound starts
+    systemd.tmpfiles.rules = [
+      "d /var/lib/dnsblockd 0755 root root -"
+      "f /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
+      "f /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
+    ];
+
     # Configure unbound
     services.unbound = {
       enable = true;
