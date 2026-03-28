@@ -43,7 +43,7 @@
     domains = lib.filter (d: d != null) (map parseLine lines);
     entries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') domains;
   in {
-    inherit name url;
+    inherit name url domains;
     content = ''
       # Blocklist: ${name}
       # Source: ${url}
@@ -53,6 +53,21 @@
     '';
   };
 
+  # Process all blocklists
+  processedBlocklists = map fetchBlocklist cfg.blocklists;
+
+  # Build domain -> source mapping for dnsblockd
+  # Use listToAttrs to avoid stack overflow with large domain lists
+  blocklistDomainsMapping = builtins.listToAttrs (
+    # Domains from blocklists
+    lib.concatMap (bl: map (d: { name = d; value = "${bl.name} (${bl.url})"; }) bl.domains) processedBlocklists
+    ++
+    # Extra domains
+    map (d: { name = d; value = "Manual block (extraDomains)"; }) cfg.extraDomains
+  );
+
+  blocklistMappingJSON = pkgs.writeText "dnsblockd-blocklist-mapping.json" (builtins.toJSON blocklistDomainsMapping);
+
   # Combine all blocklists + extra domains
   extraDomainsEntries = map (d: ''local-data: "${d} A ${cfg.blockIP}"'') cfg.extraDomains;
   combinedBlocklist = pkgs.writeText "dns-blocker-combined.conf" ''
@@ -60,7 +75,7 @@
     # Blocklists: ${toString (builtins.length cfg.blocklists)}
     # Extra domains: ${toString (builtins.length cfg.extraDomains)}
 
-    ${lib.concatStringsSep "\n\n" (map (bl: bl.content) (map fetchBlocklist cfg.blocklists))}
+    ${lib.concatStringsSep "\n\n" (map (bl: bl.content) processedBlocklists)}
 
     # Extra manually blocked domains
     ${lib.concatStringsSep "\n" extraDomainsEntries}
@@ -238,6 +253,7 @@ in {
           + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
           + " -stats-addr 127.0.0.1"
           + " -stats-port ${toString cfg.statsPort}"
+          + " -blocklist-mapping ${blocklistMappingJSON}"
           + (
             if cfg.categories != {}
             then " -categories ${categoriesJSON}"

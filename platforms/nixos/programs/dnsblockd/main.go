@@ -24,14 +24,15 @@ import (
 )
 
 type Config struct {
-	ListenAddr string
-	Port       int
-	TLSPort    int
-	StatsAddr  string
-	StatsPort  int
-	CACertFile string
-	CAKeyFile  string
-	Categories map[string]string
+	ListenAddr         string
+	Port               int
+	TLSPort            int
+	StatsAddr          string
+	StatsPort          int
+	CACertFile         string
+	CAKeyFile          string
+	Categories         map[string]string
+	BlocklistMapping   map[string]string // domain -> source
 }
 
 type CertCache struct {
@@ -62,9 +63,10 @@ type BlockEntry struct {
 }
 
 type BlockPageData struct {
-	Domain    string
-	Category  string
-	Timestamp string
+	Domain        string
+	Category      string
+	BlocklistSource string
+	Timestamp     string
 }
 
 type contextKey struct{}
