@@ -10,8 +10,10 @@
         spacing = 8;
 
         modules-left = [
+          "niri/workspaces"
           "hyprland/workspaces"
           "hyprland/submap"
+          "niri/window"
           "hyprland/window"
           "custom/gpu"
         ];
@@ -39,6 +41,27 @@
         ];
 
         # Modules configuration
+        "niri/workspaces" = {
+          format = "{icon}";
+          format-icons = {
+            default = "";
+            focused = "󰮯";
+            active = "󰮯";
+            urgent = "";
+            empty = "";
+          };
+        };
+
+        "niri/window" = {
+          format = "{title}";
+          icon = true;
+          icon-size = 20;
+          rewrite = {
+            "(.+) — Mozilla Firefox" = " $1";
+            "(.+) - Mozilla Firefox" = " $1";
+          };
+        };
+
         "hyprland/workspaces" = {
           disable-scroll = true;
           all-outputs = true;

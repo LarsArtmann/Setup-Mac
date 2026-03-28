@@ -182,6 +182,8 @@
       "Print".action.screenshot-screen = {};
       "Shift+Print".action.screenshot = {};
 
+      "Ctrl+Print".action.screenshot-window = {};
+
       "XF86AudioRaiseVolume" = {
         action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
         allow-when-locked = true;
@@ -221,6 +223,47 @@
         allow-when-locked = true;
       };
     };
+
+    window-rules = [
+      {
+        matches = [{is-floating = false;}];
+        geometry-corner-radius = {
+          top-left = 8.0;
+          top-right = 8.0;
+          bottom-left = 8.0;
+          bottom-right = 8.0;
+        };
+        clip-to-geometry = true;
+        draw-border-with-background = false;
+      }
+      {
+        matches = [{title = "^Picture-in-Picture$";}];
+        open-floating = true;
+      }
+      {
+        matches = [{app-id = "^pavucontrol$";}];
+        open-floating = true;
+      }
+      {
+        matches = [{app-id = "^xdg-desktop-portal-gtk$";}];
+        open-floating = true;
+      }
+      {
+        matches = [{app-id = "^org.keepassxc.KeePassXC$"; title = "Generate Password";}];
+        open-floating = true;
+      }
+      {
+        matches = [
+          {app-id = "^firefox$";}
+          {app-id = "^Firefox$";}
+        ];
+        default-column-width = {proportion = 0.75;};
+      }
+      {
+        matches = [{app-id = "^emacs$";}];
+        default-column-width = {proportion = 0.66667;};
+      }
+    ];
 
     environment = {
       NIXOS_OZONE_WL = "1";
