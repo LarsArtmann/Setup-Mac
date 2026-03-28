@@ -198,14 +198,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # Create state directory and empty temp-allowlist BEFORE unbound starts
-    # Use 'w' (write) to overwrite any existing broken file from failed deploy
-    systemd.tmpfiles.rules = [
-      "d /var/lib/dnsblockd 0755 root root -"
-      "w /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
-      "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
-    ];
-
     # Configure unbound
     services.unbound = {
       enable = true;
@@ -260,43 +252,6 @@ in {
     # Add dnsblockd CA cert to system trust store (server cert is signed by this CA)
     security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd-ca.crt"];
 
-    # dnsblockd service
-    systemd.services.dnsblockd = {
-      description = "DNS Block Page Server";
-      after = ["network.target"];
-      wantedBy = ["multi-user.target"];
-
-      serviceConfig = {
-        Type = "simple";
-        ExecStart =
-          "${pkgs.dnsblockd}/bin/dnsblockd"
-          + " -addr ${cfg.blockIP}"
-          + " -port ${toString cfg.blockPort}"
-          + " -tls-port ${toString cfg.blockTLSPort}"
-          + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
-          + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
-          + " -stats-addr 127.0.0.1"
-          + " -stats-port ${toString cfg.statsPort}"
-          + " -blocklist-mapping ${blocklistMappingJSON}"
-          + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
-          + (
-            if cfg.categories != {}
-            then " -categories ${categoriesJSON}"
-            else ""
-          );
-        StateDirectory = "dnsblockd";
-        Restart = "on-failure";
-        RestartSec = "3s";
-
-        # Sandboxing
-        ProtectSystem = "strict";
-        ProtectHome = true;
-        PrivateTmp = true;
-        NoNewPrivileges = true;
-        RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
-      };
-    };
-
     # Firefox policies: disable DoH, install dnsblockd cert, suppress default browser prompt
     programs.firefox.policies = {
       DNSOverHTTPS = {
@@ -316,25 +271,72 @@ in {
       };
     };
 
-    # Import dnsblockd cert into NSS database for Chromium-based browsers (Helium, Chrome, etc.)
-    # Chromium on Linux uses ~/.pki/nssdb, not the system trust store
-    systemd.user.services.dnsblockd-cert-import = {
-      description = "Import dnsblockd CA cert into NSS database";
-      wantedBy = ["default.target"];
-      after = ["nss-user-lookup.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
+    systemd = {
+      # Create state directory and empty temp-allowlist BEFORE unbound starts
+      # Use 'w' (write) to overwrite any existing broken file from failed deploy
+      tmpfiles.rules = [
+        "d /var/lib/dnsblockd 0755 root root -"
+        "w /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
+        "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root -"
+      ];
+
+      # dnsblockd service
+      services.dnsblockd = {
+        description = "DNS Block Page Server";
+        after = ["network.target"];
+        wantedBy = ["multi-user.target"];
+
+        serviceConfig = {
+          Type = "simple";
+          ExecStart =
+            "${pkgs.dnsblockd}/bin/dnsblockd"
+            + " -addr ${cfg.blockIP}"
+            + " -port ${toString cfg.blockPort}"
+            + " -tls-port ${toString cfg.blockTLSPort}"
+            + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
+            + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
+            + " -stats-addr 127.0.0.1"
+            + " -stats-port ${toString cfg.statsPort}"
+            + " -blocklist-mapping ${blocklistMappingJSON}"
+            + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
+            + (
+              if cfg.categories != {}
+              then " -categories ${categoriesJSON}"
+              else ""
+            );
+          StateDirectory = "dnsblockd";
+          Restart = "on-failure";
+          RestartSec = "3s";
+
+          # Sandboxing
+          ProtectSystem = "strict";
+          ProtectHome = true;
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+        };
       };
-      path = [pkgs.nss];
-      script = ''
-        # Create NSS db if it doesn't exist
-        mkdir -p $HOME/.pki/nssdb
-        certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
-        # Import the cert (remove old version first if exists)
-        certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
-        certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd-ca.crt
-      '';
+
+      # Import dnsblockd cert into NSS database for Chromium-based browsers (Helium, Chrome, etc.)
+      # Chromium on Linux uses ~/.pki/nssdb, not the system trust store
+      user.services.dnsblockd-cert-import = {
+        description = "Import dnsblockd CA cert into NSS database";
+        wantedBy = ["default.target"];
+        after = ["nss-user-lookup.target"];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        path = [pkgs.nss];
+        script = ''
+          # Create NSS db if it doesn't exist
+          mkdir -p $HOME/.pki/nssdb
+          certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
+          # Import the cert (remove old version first if exists)
+          certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
+          certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd-ca.crt
+        '';
+      };
     };
   };
 }
