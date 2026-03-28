@@ -19,6 +19,7 @@
     ../services/ssh.nix
     ../services/default.nix
     ../services/gitea.nix # Local Gitea for GitHub mirror sync
+    ../services/immich.nix # Self-hosted photo/video management
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix

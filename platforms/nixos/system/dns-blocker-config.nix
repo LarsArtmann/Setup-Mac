@@ -27,7 +27,15 @@
 
     # Whitelist - domains that should never be blocked
     whitelist = [
-      # Add domains here that you want to allow despite being in blocklists
+      # Immich: model downloads, map tiles, version checks
+      "api.immich.app"
+      "immich.app"
+      "github.com"
+      "github-releases.githubusercontent.com"
+      "objects.githubusercontent.com"
+      # Reverse geocoding / map tiles
+      "nominatim.openstreetmap.org"
+      "tile.openstreetmap.org"
     ];
 
     # Extra domains to block (not in blocklists)
