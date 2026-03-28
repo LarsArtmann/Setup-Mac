@@ -8,52 +8,40 @@
   services.dns-blocker = {
     enable = true;
 
-    # Block page configuration
     blockIP = "127.0.0.2";
     blockPort = 80;
     statsPort = 9090;
 
-    # Blocklists (hosts format, fetched at build time)
-    # Note: Update hashes after first build attempt shows the correct hash
     blocklists = [
       {
         name = "StevenBlack-ads";
         url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-        # Run `nix build` once, it will fail with hash mismatch showing the correct hash
-        # Then update this hash with the one from the error message
         hash = "sha256-Lhkn7vQHJc7RQKddUbafgwfR0koiUSr0Xoj27HLGWK0=";
       }
     ];
 
-    # Whitelist - domains that should never be blocked
     whitelist = [
-      # Immich: model downloads, map tiles, version checks
       "api.immich.app"
       "immich.app"
       "github.com"
       "github-releases.githubusercontent.com"
       "objects.githubusercontent.com"
-      # Reverse geocoding / map tiles
       "nominatim.openstreetmap.org"
       "tile.openstreetmap.org"
     ];
 
-    # Extra domains to block (not in blocklists)
     extraDomains = [
       "360.cn"
       "www.360.cn"
     ];
 
-    # Upstream DNS-over-TLS servers
     upstreamDNS = [
       "9.9.9.9@853#dns.quad9.net"
       "1.1.1.1@853#cloudflare-dns.com"
     ];
 
-    # DNSSEC validation
     enableDNSSEC = true;
 
-    # Category mapping for block page display
     categories = {
       ".doubleclick.net" = "Advertising";
       ".googlesyndication.com" = "Advertising";
@@ -64,5 +52,10 @@
       ".analytics.google.com" = "Analytics";
       ".google-analytics.com" = "Analytics";
     };
+  };
+
+  services.unbound.settings.server = {
+    local-zone = [''"lan." static''];
+    local-data = [''"immich.lan. IN A 127.0.0.1"''];
   };
 }
