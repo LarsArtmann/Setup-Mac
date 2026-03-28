@@ -83,14 +83,15 @@ const blockPageHTML = `<!DOCTYPE html>
 <title>Blocked - {{.Domain}}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f0f1a;color:#e0e0e0;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.container{max-width:560px;padding:2rem;text-align:center}
-.shield{font-size:4rem;margin-bottom:1rem;opacity:0.8}
-h1{font-size:1.5rem;font-weight:600;margin-bottom:0.5rem;color:#f38ba8}
-.domain{font-family:monospace;font-size:1.1rem;padding:0.5rem 1rem;background:#1e1e2e;border-radius:8px;margin:1rem 0;word-break:break-all;color:#cdd6f4}
-.category{display:inline-block;padding:0.25rem 0.75rem;background:#313244;border-radius:999px;font-size:0.85rem;margin-bottom:1.5rem;color:#a6adc8}
-p{color:#6c7086;line-height:1.6;margin-bottom:1rem}
-.meta{font-size:0.75rem;color:#45475a;margin-top:2rem}
+html,body{width:100dvw;height:100dvh}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f0f1a;color:#e0e0e0;display:flex;align-items:center;justify-content:center}
+.container{max-width:min(90dvw,700px);padding:3rem;text-align:center}
+.shield{font-size:clamp(4rem,10dvw,8rem);margin-bottom:1.5rem;opacity:0.8}
+h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#f38ba8}
+.domain{font-family:monospace;font-size:clamp(1rem,2.5dvw,1.4rem);padding:0.75rem 1.5rem;background:#1e1e2e;border-radius:12px;margin:1.5rem 0;word-break:break-all;color:#cdd6f4}
+.category{display:inline-block;padding:0.4rem 1rem;background:#313244;border-radius:999px;font-size:clamp(0.85rem,2dvw,1.1rem);margin-bottom:2rem;color:#a6adc8}
+p{font-size:clamp(1rem,2.5dvw,1.2rem);color:#6c7086;line-height:1.7;margin-bottom:1.5rem}
+.meta{font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#45475a;margin-top:2.5rem}
 a{color:#89b4fa;text-decoration:none}
 </style>
 </head>
