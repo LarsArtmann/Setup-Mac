@@ -91,6 +91,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .shield{font-size:clamp(4rem,10dvw,8rem);margin-bottom:1.5rem;opacity:0.8}
 h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#f38ba8}
 .domain{font-family:monospace;font-size:clamp(1rem,2.5dvw,1.4rem);padding:0.75rem 1.5rem;background:#1e1e2e;border-radius:12px;margin:1.5rem 0;word-break:break-all;color:#cdd6f4}
+.source{font-family:monospace;font-size:clamp(0.8rem,2dvw,1rem);color:#74c7ec;margin-bottom:1rem}
 .category{display:inline-block;padding:0.4rem 1rem;background:#313244;border-radius:999px;font-size:clamp(0.85rem,2dvw,1.1rem);margin-bottom:2rem;color:#a6adc8}
 p{font-size:clamp(1rem,2.5dvw,1.2rem);color:#6c7086;line-height:1.7;margin-bottom:1.5rem}
 .meta{font-size:clamp(0.75rem,1.5dvw,0.9rem);color:#45475a;margin-top:2.5rem}
@@ -102,6 +103,7 @@ a{color:#89b4fa;text-decoration:none}
 <div class="shield">&#x1F6E1;</div>
 <h1>Domain Blocked</h1>
 <div class="domain">{{.Domain}}</div>
+{{ if .BlocklistSource }}<div class="source">{{.BlocklistSource}}</div>{{ end }}
 {{ if .Category }}<div class="category">{{.Category}}</div>{{ end }}
 <p>This domain has been blocked by your DNS filter. If you believe this is an error, you can whitelist it in your dns-blocker configuration.</p>
 <div class="meta">{{.Timestamp}} &middot; dnsblockd/{{ .Version }}</div>
@@ -285,6 +287,10 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	category := categorize(host, cfg.Categories)
+	source := ""
+	if cfg.BlocklistMapping != nil {
+		source = cfg.BlocklistMapping[host]
+	}
 
 	recordBlock(host, category)
 
@@ -292,9 +298,10 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	data := BlockPageData{
-		Domain:    host,
-		Category:  category,
-		Timestamp: time.Now().Format("2006-01-02 15:04:05 MST"),
+		Domain:          host,
+		Category:        category,
+		BlocklistSource: source,
+		Timestamp:       time.Now().Format("2006-01-02 15:04:05 MST"),
 	}
 
 	type ExtendedData struct {
@@ -370,6 +377,7 @@ func main() {
 	flag.StringVar(&cfg.CAKeyFile, "ca-key", "", "CA private key file for signing dynamic certs")
 
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
+	blocklistMappingFile := flag.String("blocklist-mapping", "", "JSON file mapping domains to their blocklist source")
 	flag.Parse()
 
 	if *categoriesFile != "" {
@@ -381,6 +389,18 @@ func main() {
 			log.Fatalf("failed to parse categories file: %v", err)
 		}
 		log.Printf("loaded %d category rules from %s", len(cfg.Categories), *categoriesFile)
+	}
+
+	if *blocklistMappingFile != "" {
+		data, err := os.ReadFile(*blocklistMappingFile)
+		if err != nil {
+			log.Fatalf("failed to read blocklist mapping file: %v", err)
+		}
+		cfg.BlocklistMapping = make(map[string]string)
+		if err := json.Unmarshal(data, &cfg.BlocklistMapping); err != nil {
+			log.Fatalf("failed to parse blocklist mapping file: %v", err)
+		}
+		log.Printf("loaded %d domain->source mappings from %s", len(cfg.BlocklistMapping), *blocklistMappingFile)
 	}
 
 	if cfg.TLSPort > 0 && (cfg.CACertFile == "" || cfg.CAKeyFile == "") {
