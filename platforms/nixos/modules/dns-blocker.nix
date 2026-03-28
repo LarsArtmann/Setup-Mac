@@ -92,10 +92,10 @@
     ${lib.concatStringsSep "\n" (map (d: ''local-data: "${d} A ${cfg.blockIP}"'') blockedDomains)}
   '';
 
-  # Unbound include file that pulls in blocklist
-  # TODO: Add temp-allowlist include once tmpfiles issue is resolved
+  # Unbound include file that pulls in blocklist and temp-allowlist
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
     include: ${combinedBlocklist}
+    include: /var/lib/dnsblockd/temp-allowlist.json.conf
   '';
 in {
   options.services.dns-blocker = {
