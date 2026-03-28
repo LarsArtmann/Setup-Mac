@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration

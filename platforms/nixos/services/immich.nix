@@ -33,11 +33,14 @@ in {
       Group = "immich";
     };
     script = ''
+      set -euo pipefail
       backupDir="${cfg.mediaLocation}/database-backup"
       mkdir -p "$backupDir"
+      stamp="$(date +%Y%m%d-%H%M%S)"
       pg_dump --host=/run/postgresql --clean --if-exists --dbname=${cfg.database.name} \
-        > "$backupDir/immich-$(date +%Y%m%d).sql"
+        > "$backupDir/immich-$stamp.sql"
       find "$backupDir" -name "immich-*.sql" -mtime +7 -delete
+      echo "immich-db-backup: completed -> immich-$stamp.sql"
     '';
   };
 

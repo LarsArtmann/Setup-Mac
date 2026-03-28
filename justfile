@@ -1672,3 +1672,76 @@ dns-diagnostics:
     @just dns-stats
     @echo ""
     @echo "✅ DNS diagnostics complete"
+
+# ========================================
+# Immich Photo/Video Management Commands
+# ========================================
+
+# Check Immich service status
+immich-status:
+    @echo "📸 Checking Immich status..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        echo ""; \
+        echo "Immich Server:"; \
+        systemctl is-active immich-server && echo "  ✅ Running (http://localhost:2283)" || echo "  ❌ Not running"; \
+        echo ""; \
+        echo "Immich Machine Learning:"; \
+        systemctl is-active immich-machine-learning && echo "  ✅ Running" || echo "  ❌ Not running"; \
+        echo ""; \
+        echo "PostgreSQL:"; \
+        systemctl is-active postgresql && echo "  ✅ Running" || echo "  ❌ Not running"; \
+        echo ""; \
+        echo "Redis (immich):"; \
+        systemctl is-active redis-immich && echo "  ✅ Running" || echo "  ❌ Not running"; \
+        echo ""; \
+        echo "Backup Timer:"; \
+        systemctl list-timers immich-db-backup.timer --no-pager 2>/dev/null | grep -q "immich" && echo "  ✅ Scheduled" || echo "  ❌ Not scheduled"; \
+    fi
+
+# View Immich server logs
+immich-logs:
+    @echo "📋 Viewing Immich server logs..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        journalctl -u immich-server -f --no-pager -n 50; \
+    fi
+
+# View Immich ML logs (check for GPU/CPU provider)
+immich-logs-ml:
+    @echo "📋 Viewing Immich machine learning logs..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        journalctl -u immich-machine-learning -f --no-pager -n 50; \
+    fi
+
+# Run Immich database backup manually
+immich-backup:
+    @echo "💾 Running Immich database backup..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        sudo systemctl start immich-db-backup && echo "✅ Backup complete" || echo "❌ Backup failed"; \
+        echo "Location: /var/lib/immich/database-backup/"; \
+    fi
+
+# List Immich database backups
+immich-backups:
+    @echo "📋 Immich database backups..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        ls -lh /var/lib/immich/database-backup/ 2>/dev/null || echo "  No backups found"; \
+    fi
+
+# Restart all Immich services
+immich-restart:
+    @echo "🔄 Restarting Immich services..."
+    @if [ "$(uname)" = "Darwin" ]; then \
+        echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
+    else \
+        sudo systemctl restart immich-server immich-machine-learning && echo "✅ Immich services restarted" || echo "❌ Restart failed"; \
+    fi
