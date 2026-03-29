@@ -4,6 +4,7 @@
   ...
 }: let
   port = 8082;
+  stateDir = "/var/lib/homepage-dashboard";
 in {
   systemd.services.homepage-dashboard = {
     description = "Homepage Dashboard";
@@ -11,11 +12,14 @@ in {
     after = ["network.target"];
     serviceConfig = {
       ExecStart = "${pkgs.homepage-dashboard}/bin/homepage";
-      WorkingDirectory = "/var/lib/homepage";
-      Environment = "PORT=${toString port}";
+      WorkingDirectory = stateDir;
+      Environment = [
+        "PORT=${toString port}"
+        "HOMEPAGE_CONFIG_DIR=${stateDir}"
+      ];
       User = "homepage";
       Group = "homepage";
-      StateDirectory = "homepage";
+      StateDirectory = "homepage-dashboard";
       Restart = "on-failure";
       RestartSec = "5s";
     };
@@ -24,7 +28,7 @@ in {
   users.users.homepage = {
     isSystemUser = true;
     group = "homepage";
-    home = "/var/lib/homepage";
+    home = stateDir;
   };
   users.groups.homepage = {};
 
@@ -112,11 +116,11 @@ in {
   '';
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/homepage 0755 homepage homepage -"
-    "L+ /var/lib/homepage/services.yaml - - - - /etc/homepage/services.yaml"
-    "L+ /var/lib/homepage/settings.yaml - - - - /etc/homepage/settings.yaml"
-    "L+ /var/lib/homepage/bookmarks.yaml - - - - ${pkgs.writeText "bookmarks.yaml" ""}"
-    "L+ /var/lib/homepage/widgets.yaml - - - - ${pkgs.writeText "widgets.yaml" ""}"
-    "L+ /var/lib/homepage/docker.yaml - - - - ${pkgs.writeText "docker.yaml" ""}"
+    "d ${stateDir} 0755 homepage homepage -"
+    "L+ ${stateDir}/services.yaml - - - - /etc/homepage/services.yaml"
+    "L+ ${stateDir}/settings.yaml - - - - /etc/homepage/settings.yaml"
+    "L+ ${stateDir}/bookmarks.yaml - - - - ${pkgs.writeText "bookmarks.yaml" ""}"
+    "L+ ${stateDir}/widgets.yaml - - - - ${pkgs.writeText "widgets.yaml" ""}"
+    "L+ ${stateDir}/docker.yaml - - - - ${pkgs.writeText "docker.yaml" ""}"
   ];
 }
