@@ -1,10 +1,10 @@
 # Comprehensive Status Report
 
-**Date:** 2026-03-29 15:04  
-**System:** evo-x2 | AMD Ryzen AI Max+ 395 | 62 GiB RAM | NixOS 26.05  
-**Disk:** 512 GB NVMe — 280 GB used (55%)  
-**Uptime:** 1 day 18h56  
-**Load:** 3.11 / 3.49 / 3.79  
+**Date:** 2026-03-29 15:04
+**System:** evo-x2 | AMD Ryzen AI Max+ 395 | 62 GiB RAM | NixOS 26.05
+**Disk:** 512 GB NVMe — 280 GB used (55%)
+**Uptime:** 1 day 18h56
+**Load:** 3.11 / 3.49 / 3.79
 
 ---
 
