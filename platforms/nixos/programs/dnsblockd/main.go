@@ -227,13 +227,7 @@ func addTempAllow(domain string, duration time.Duration) {
 	tempAllowlistMu.Unlock()
 
 	if tempAllowlistPath != "" {
-		saveTempAllowlist(tempAllowlistPath)
-		if err := generateUnboundAllowlist(); err != nil {
-			log.Printf("failed to generate unbound allowlist: %v", err)
-		}
-		if err := reloadUnbound(); err != nil {
-			log.Printf("failed to reload unbound: %v", err)
-		}
+		updateUnboundAllowlist(true)
 	}
 }
 
@@ -262,13 +256,21 @@ func cleanupExpiredTempAllows() {
 	}
 
 	if changed && tempAllowlistPath != "" {
-		saveTempAllowlist(tempAllowlistPath)
-		if err := generateUnboundAllowlist(); err != nil {
-			log.Printf("failed to regenerate unbound allowlist: %v", err)
-		}
-		if err := reloadUnbound(); err != nil {
-			log.Printf("failed to reload unbound: %v", err)
-		}
+		updateUnboundAllowlist(true)
+	}
+}
+
+// updateUnboundAllowlist saves the temp allowlist and updates Unbound if needed
+func updateUnboundAllowlist(changed bool) {
+	if !changed || tempAllowlistPath == "" {
+		return
+	}
+	saveTempAllowlist(tempAllowlistPath)
+	if err := generateUnboundAllowlist(); err != nil {
+		log.Printf("failed to regenerate unbound allowlist: %v", err)
+	}
+	if err := reloadUnbound(); err != nil {
+		log.Printf("failed to reload unbound: %v", err)
 	}
 }
 
@@ -555,15 +557,19 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(statsJSON)
+	if _, err := w.Write(statsJSON); err != nil {
+		log.Printf("failed to write stats response: %v", err)
+	}
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, `{"status":"ok","blocked":%d,"uptime":"%s"}`,
+	if _, err := fmt.Fprintf(w, `{"status":"ok","blocked":%d,"uptime":"%s"}`,
 		stats.TotalBlocked.Load(),
 		time.Since(stats.Start).Truncate(time.Second).String(),
-	)
+	); err != nil {
+		log.Printf("failed to write health response: %v", err)
+	}
 }
 
 func allowHandler(w http.ResponseWriter, r *http.Request) {
@@ -594,7 +600,7 @@ func allowHandler(w http.ResponseWriter, r *http.Request) {
 
 	expiresAt := time.Now().Add(duration)
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<!DOCTYPE html>
+	if _, err := fmt.Fprintf(w, `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -624,7 +630,9 @@ a{color:#89b4fa;text-decoration:none}
 </div>
 </body>
 </html>
-`, domain, domain, durationStr, expiresAt.Format("3:04 PM"), domain, domain)
+`, domain, domain, durationStr, expiresAt.Format("3:04 PM"), domain, domain); err != nil {
+		log.Printf("failed to write allow response: %v", err)
+	}
 }
 
 // FalsePositiveReport stores reported false positives
@@ -670,7 +678,7 @@ func reportFalsePositiveHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("false positive reported: domain=%s category=%s source=%s", domain, report.Category, report.Source)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, `<!DOCTYPE html>
+	if _, err := fmt.Fprintf(w, `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -700,7 +708,9 @@ a{color:#89b4fa;text-decoration:none}
 </div>
 </body>
 </html>
-`, domain, domain, domain, domain)
+`, domain, domain, domain, domain); err != nil {
+		log.Printf("failed to write report response: %v", err)
+	}
 }
 
 func falsePositivesHandler(w http.ResponseWriter, r *http.Request) {
@@ -710,7 +720,9 @@ func falsePositivesHandler(w http.ResponseWriter, r *http.Request) {
 	falsePositiveMu.RUnlock()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(reports)
+	if err := json.NewEncoder(w).Encode(reports); err != nil {
+		log.Printf("failed to encode false positives: %v", err)
+	}
 }
 
 func tempAllowlistHandler(w http.ResponseWriter, r *http.Request) {
@@ -723,7 +735,9 @@ func tempAllowlistHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(entries)
+	if err := json.NewEncoder(w).Encode(entries); err != nil {
+		log.Printf("failed to encode temp allowlist: %v", err)
+	}
 }
 
 func main() {
