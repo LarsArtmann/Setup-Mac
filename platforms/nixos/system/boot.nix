@@ -16,7 +16,6 @@
       "amdgpu.ppfeaturemask=0xfffd7fff"
       "amdgpu.deepfl=1"
       "amd_pstate=guided"
-      "processor.max_cstate=1"
       # NPU: increase TTM page limit for unified memory AI workloads
       "amdgpu.ttm.pages_limit=29360128"
     ];

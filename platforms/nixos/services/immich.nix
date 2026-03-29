@@ -9,8 +9,8 @@ in {
   services.immich = {
     enable = true;
     port = 2283;
-    host = "0.0.0.0";
-    openFirewall = true;
+    host = "127.0.0.1";
+    openFirewall = false;
     mediaLocation = "/var/lib/immich";
 
     accelerationDevices = null;

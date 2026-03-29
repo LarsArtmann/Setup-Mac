@@ -57,7 +57,16 @@
     # journald.audit = true;
 
     # Fail2ban for intrusion prevention (disabled)
-    fail2ban.enable = false;
+    fail2ban = {
+      enable = true;
+      jails.sshd.settings = {
+        port = "ssh";
+        mode = "aggressive";
+        maxretry = 3;
+        findtime = 600;
+        bantime = 3600;
+      };
+    };
 
     # ClamAV antivirus
     clamav.daemon.enable = true;

@@ -34,11 +34,21 @@ check_service immich-machine-learning
 check_service postgresql
 check_service unbound
 check_service dnsblockd
+check_service prometheus
+check_service grafana
+check_service gitea
+check_service ollama
+check_service homepage-dashboard
 
 # URL checks
 check_url "http://localhost:2283" "immich-web"
 check_url "http://immich.lan" "caddy-proxy"
 check_url "http://127.0.0.2:9090/stats" "dnsblockd-stats"
+check_url "http://localhost:3001" "grafana-web"
+check_url "http://localhost:9091/-/healthy" "prometheus-healthy"
+check_url "http://localhost:8082" "homepage-web"
+check_url "http://localhost:3000" "gitea-web"
+check_url "http://localhost:11434/api/tags" "ollama-api"
 
 if [ -n "$FAILED" ]; then
     notify-send -u critical "Health Check FAILED" "$(echo -e "$FAILED")"

@@ -15,7 +15,8 @@
     enable = true;
 
     blockIP = "127.0.0.2";
-    blockPort = 80;
+    blockPort = 8080;
+    blockTLSPort = 8443;
     statsPort = 9090;
 
     blocklists = [

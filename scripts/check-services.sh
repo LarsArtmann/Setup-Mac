@@ -14,7 +14,7 @@ ss -tlnp 2>/dev/null | grep -E '(9091|3001|8082|9100|9187|9121|2019|80|443|2283|
 echo ""
 echo "=== DNS Resolution ==="
 for domain in home.lan grafana.lan gitea.lan immich.lan; do
-  ip=$(dig +short "$domain" @127.0.0.1 2>/dev/null || echo "FAIL")
+  ip=$(host "$domain" 127.0.0.1 2>/dev/null | grep 'has address' | awk '{print $NF}' || echo "FAIL")
   printf "%-20s %s\n" "$domain" "$ip"
 done
 
