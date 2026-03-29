@@ -262,13 +262,39 @@
           {app-id = "^firefox$";}
           {app-id = "^Firefox$";}
         ];
+        open-on-workspace = "browser";
         default-column-width = {proportion = 0.75;};
       }
       {
         matches = [{app-id = "^emacs$";}];
+        open-on-workspace = "dev";
         default-column-width = {proportion = 0.66667;};
       }
+      {
+        matches = [
+          {app-id = "^Slack$";}
+          {app-id = "^discord$";}
+          {app-id = "^vesktop$";}
+          {app-id = "^telegramdesktop$";}
+        ];
+        open-on-workspace = "chat";
+      }
+      {
+        matches = [
+          {app-id = "^Spotify$";}
+          {app-id = "^spotify$";}
+        ];
+        open-on-workspace = "media";
+      }
     ];
+
+    workspaces = {
+      main = {};
+      browser = {};
+      dev = {};
+      chat = {};
+      media = {};
+    };
 
     environment = {
       NIXOS_OZONE_WL = "1";

@@ -25,6 +25,7 @@
         ];
 
         modules-right = [
+          "custom/dns-stats"
           "custom/privacy"
           "pulseaudio"
           "network"
@@ -60,6 +61,33 @@
             "(.+) — Mozilla Firefox" = " $1";
             "(.+) - Mozilla Firefox" = " $1";
           };
+        };
+
+        "custom/dns-stats" = {
+          format = " {} {text}";
+          exec = pkgs.writeShellScript "waybar-dns-stats" ''
+            STATS=$(${pkgs.curl}/bin/curl -sf --connect-timeout 2 http://127.0.0.2:9090/stats 2>/dev/null || echo "")
+            if [ -z "$STATS" ]; then
+              echo "DNS: off"
+              exit 0
+            fi
+            TOTAL=$(echo "$STATS" | ${pkgs.jq}/bin/jq -r '.totalBlocked // 0' 2>/dev/null)
+            if [ "$TOTAL" = "null" ] || [ -z "$TOTAL" ]; then
+              TOTAL=0
+            fi
+            if [ "$TOTAL" -ge 1000000 ]; then
+              FMT=$(echo "scale=1; $TOTAL / 1000000" | ${pkgs.bc}/bin/bc)M
+            elif [ "$TOTAL" -ge 1000 ]; then
+              FMT=$(echo "scale=1; $TOTAL / 1000" | ${pkgs.bc}/bin/bc)K
+            else
+              FMT="$TOTAL"
+            fi
+            RECENT=$(echo "$STATS" | ${pkgs.jq}/bin/jq -r '.recentBlocks[:3] | map(.domain) | join(", ")' 2>/dev/null || echo "")
+            echo "{\"text\": \"$FMT blocked\", \"tooltip\": \"DNS Blocker\\nTotal: $TOTAL domains\\nRecent: $RECENT\"}"
+          '';
+          return-type = "json";
+          interval = 30;
+          on-click = "xdg-open http://127.0.0.2:9090/stats";
         };
 
         "hyprland/workspaces" = {
@@ -615,6 +643,16 @@
       #custom-netbandwidth {
         background: rgba(137, 180, 250, 0.15);
         color: #89b4fa;
+      }
+
+      #custom-dns-stats {
+        background: rgba(166, 227, 161, 0.15);
+        color: #a6e3a1;
+        font-size: 15px;
+      }
+
+      #custom-dns-stats:hover {
+        background: rgba(166, 227, 161, 0.25);
       }
 
       #custom-privacy {

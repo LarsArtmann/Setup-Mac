@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Service health checker for evo-x2
+# Checks critical services and sends desktop notification on failure
+set -euo pipefail
+
+export DISPLAY=:0
+export WAYLAND_DISPLAY=wayland-1
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+
+FAILED=""
+
+check_service() {
+    if systemctl is-active --quiet "$1" 2>/dev/null; then
+        return 0
+    else
+        FAILED="$FAILED\n  $1"
+        return 1
+    fi
+}
+
+check_url() {
+    if python3 -c "import urllib.request; urllib.request.urlopen('$1', timeout=5)" 2>/dev/null; then
+        return 0
+    else
+        FAILED="$FAILED\n  $2"
+        return 1
+    fi
+}
+
+# Service checks
+check_service caddy
+check_service immich-server
+check_service immich-machine-learning
+check_service postgresql
+check_service unbound
+check_service dnsblockd
+
+# URL checks
+check_url "http://localhost:2283" "immich-web"
+check_url "http://immich.lan" "caddy-proxy"
+check_url "http://127.0.0.2:9090/stats" "dnsblockd-stats"
+
+if [ -n "$FAILED" ]; then
+    notify-send -u critical "Health Check FAILED" "$(echo -e "$FAILED")"
+    echo "FAILED:$(echo -e "$FAILED")"
+    exit 1
+else
+    echo "OK: all services healthy"
+    exit 0
+fi

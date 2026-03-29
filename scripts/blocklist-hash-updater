@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Auto-updates blocklist hashes in dns-blocker-config.nix
+# Runs weekly via systemd timer
+set -euo pipefail
+
+CONFIG="/home/lars/Setup-Mac/platforms/nixos/system/dns-blocker-config.nix"
+FLAKE_DIR="/home/lars/Setup-Mac"
+
+log() { echo "[blocklist-updater] $*"; }
+
+cd "$FLAKE_DIR"
+
+# Extract name, url, current-hash triples from nix config
+parse_blocklists() {
+    awk '
+        /blocklists = \[/ { in_bl=1; next }
+        /^\s*\];/ && in_bl { in_bl=0; next }
+        in_bl && /name = / { name=$0; sub(/.*name = "/, "", name); sub(/".*/, "", name) }
+        in_bl && /url = / { url=$0; sub(/.*url = "/, "", url); sub(/".*/, "", url) }
+        in_bl && /hash = / { hash=$0; sub(/.*hash = "/, "", hash); sub(/".*/, "", hash)
+            if (name && url) print name"|"$url"|"hash
+            name=""; url=""
+        }
+    ' "$CONFIG"
+}
+
+updated=0
+unchanged=0
+failed=0
+
+while IFS='|' read -r name url old_hash; do
+    [ -z "$name" ] && continue
+    log "Checking $name..."
+
+    tmpfile=$(mktemp)
+    if ! python3 -c "import urllib.request; urllib.request.urlretrieve('$url', '$tmpfile')" 2>/dev/null; then
+        log "  FAILED to download"
+        rm -f "$tmpfile"
+        ((failed++)) || true
+        continue
+    fi
+
+    new_hash=$(nix hash file --type sha256 --base64 "$tmpfile" 2>/dev/null || true)
+    rm -f "$tmpfile"
+
+    if [ -z "$new_hash" ]; then
+        log "  FAILED to hash"
+        ((failed++)) || true
+        continue
+    fi
+
+    # nix hash file outputs sha256-XXXX format, prefix with hash type for nix
+    new_sri="sha256-${new_hash}"
+
+    if [ "$old_hash" = "$new_sri" ]; then
+        log "  UNCHANGED"
+        ((unchanged++)) || true
+        continue
+    fi
+
+    sed -i "/name = \"${name}\"/,/hash = /s|hash = \"[^\"]*\"|hash = \"${new_sri}\"|" "$CONFIG"
+    log "  UPDATED"
+    ((updated++)) || true
+done < <(parse_blocklists)
+
+log "Summary: $updated updated, $unchanged unchanged, $failed failed"
+
+if [ "$updated" -gt 0 ]; then
+    log "Committing and rebuilding..."
+    git add "$CONFIG"
+    git commit -m "chore(dns): auto-update blocklist hashes ($updated changed)"
+    nh os switch . 2>&1 || log "WARNING: rebuild failed"
+else
+    log "No changes needed"
+fi
