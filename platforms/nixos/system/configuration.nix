@@ -98,7 +98,6 @@
     programs.fish.enable = true;
 
     # AMD GPU Support - imported from hardware module
-    # AMD GPU Support - imported from hardware module
     #
     # Font configuration (cross-platform)
     # Note: Font packages are now imported from common/packages/fonts.nix

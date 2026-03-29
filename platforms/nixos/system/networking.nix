@@ -16,7 +16,7 @@ _: {
       persistent = true; # Keep DHCP lease across reboots
       extraConfig = ''
         # Let NixOS networking.nameservers manage DNS
-        # This allows Technitium DNS (127.0.0.1) or Quad9 to be set via config
+        # Uses unbound (dns-blocker-config.nix) on 127.0.0.1
         nooption domain_name_servers
         # Disable IPv6 completely
         noipv6
@@ -27,23 +27,8 @@ _: {
       '';
     };
 
-    # DNS configuration - FORCE Quad9 only
-    # NOTE: If Technitium DNS is enabled (see dns-config.nix),
-    # this setting will be overridden to use 127.0.0.1 (local DNS)
-    nameservers = ["9.9.9.10" "9.9.9.11"];
-
-    # Note: DNS options like timeout/attempts are managed by glibc resolver
-    # and can be set in /etc/resolv.conf manually if needed
-    #
-    # Technitium DNS Setup:
-    # - dns-config.nix enables local Technitium DNS server
-    # - System DNS is configured to use 127.0.0.1
-    # - Access web console at http://localhost:5380
-    # - Configure forwarders, blocklists, and caching via web interface
-    #
-    # To disable Technitium DNS and use Quad9 directly:
-    # 1. Remove import of dns-config.nix from configuration.nix
-    # 2. Rebuild: sudo nixos-rebuild switch --flake .#evo-x2
+    # DNS uses unbound via dns-blocker-config.nix
+    nameservers = ["127.0.0.1"];
   };
 
   # Use NetworkManager for WiFi management only (if needed)
@@ -75,6 +60,4 @@ _: {
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
-  # Note: Fonts are now handled by hyprland-system.nix
-  # to avoid duplication and maintain consistency
 }

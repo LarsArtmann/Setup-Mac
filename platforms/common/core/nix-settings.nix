@@ -79,10 +79,6 @@
           "castlabs-electron" # needed for tidal-hifi
           "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
         ];
-      # Allow specific insecure packages that are necessary
-      permittedInsecurePackages = [
-        "google-chrome-144.0.7559.97" # Required for Chrome browser on Darwin
-      ];
     };
   };
 

@@ -74,6 +74,24 @@ The NixOS configuration manages secrets (API tokens, service credentials) via pl
 - Maps directly to existing `EnvironmentFile` patterns in systemd units
 - age keys derivable from SSH host keys (minimal key management)
 
+### Critical: SSH Host Key Backup Requirement
+
+**The SSH host key `/etc/ssh/ssh_host_ed25519_key` is the master decryption key for ALL sops-nix secrets. Loss of this key means ALL secrets become permanently undecryptable.**
+
+A **3-2-1 backup** must be established:
+
+| Rule | Requirement | Implementation |
+|------|-------------|----------------|
+| **3** copies | Production + 2 backups | evo-x2 machine + USB drive + cloud storage |
+| **2** different media | Different storage types | Local SSD + USB/Cloud |
+| **1** offsite | Geographic separation | Cloud storage (e.g., Backblaze B2, S3) |
+
+Files to back up:
+- `/etc/ssh/ssh_host_ed25519_key` (private key — **NEVER commit to git**)
+- `/etc/ssh/ssh_host_ed25519_key.pub` (public key — for reference)
+
+**Status: NOT YET IMPLEMENTED** — Must be completed before relying on sops-nix for production secrets.
+
 ### Negative
 
 - No secret rotation (must re-encrypt manually)
