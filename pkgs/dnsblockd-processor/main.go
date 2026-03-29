@@ -37,7 +37,7 @@ func processHostsFile(
 ) {
 	f, err := os.Open(path) //nolint:gosec // path from CLI args
 	if err != nil {
-		fmt.Fprintf(
+		fmt.Fprintf( //nolint:gosec // stderr warning in CLI tool
 			os.Stderr,
 			"warning: cannot open %s: %v\n",
 			path,
