@@ -103,6 +103,15 @@
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["aarch64-darwin" "x86_64-linux"];
 
+      # Import dendritic modules - each file is a self-contained flake-parts module
+      imports = [
+        ./modules/nixos/services/immich.nix
+        ./modules/nixos/services/gitea.nix
+        ./modules/nixos/services/caddy.nix
+        ./modules/nixos/services/grafana.nix
+        ./modules/nixos/services/ssh.nix
+      ];
+
       # Per-system configuration (packages, devShells, etc.)
       perSystem = {
         pkgs,
@@ -319,6 +328,11 @@
             inputs.niri.nixosModules.niri
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
+            inputs.self.nixosModules.immich
+            inputs.self.nixosModules.gitea
+            inputs.self.nixosModules.caddy
+            inputs.self.nixosModules.grafana
+            inputs.self.nixosModules.ssh
             ./platforms/nixos/system/configuration.nix
           ];
         };

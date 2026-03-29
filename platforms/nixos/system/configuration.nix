@@ -17,14 +17,14 @@
     ./snapshots.nix # BTRFS snapshots with Timeshift
     ./scheduled-tasks.nix # Daily scheduled tasks (crush update-providers, etc.)
     ./sudo.nix # Passwordless sudo for wheel group
-    ../services/ssh.nix
+    # ../services/ssh.nix # SSH hardening - now loaded via flake module
     ../services/default.nix
-    ../services/gitea.nix # Local Gitea for GitHub mirror sync
+    # ../services/gitea.nix # Local Gitea for GitHub mirror sync - now loaded via flake module
     ../services/sops.nix # Secrets management via sops-nix
-    ../services/immich.nix # Self-hosted photo/video management
-    ../services/caddy.nix # Reverse proxy for local domains
+    # ../services/immich.nix # Self-hosted photo/video management - now loaded via flake module
+    # ../services/caddy.nix # Reverse proxy for local domains - now loaded via flake module
     ../services/monitoring.nix # Prometheus + exporters
-    ../services/grafana.nix # Monitoring dashboards
+    # ../services/grafana.nix # Monitoring dashboards - now loaded via flake module
     ../services/homepage.nix # Service overview dashboard
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
