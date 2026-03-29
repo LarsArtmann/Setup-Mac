@@ -1,4 +1,4 @@
-{lib, ...}: {
+{lib, pkgs, ...}: {
   # Common Nix settings (platform-agnostic)
   nix = {
     enable = true;
@@ -32,11 +32,17 @@
     };
 
     # Automatic garbage collection
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
+    gc =
+      {
+        automatic = true;
+        options = "--delete-older-than 7d";
+      }
+      // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        interval = {Weekday = 0;};
+      }
+      // lib.optionalAttrs (!pkgs.stdenv.isDarwin) {
+        dates = "weekly";
+      };
 
     optimise.automatic = true;
 

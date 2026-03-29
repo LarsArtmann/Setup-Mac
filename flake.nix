@@ -211,7 +211,9 @@
           modules = [
             # Pin Go to version 1.26 for all packages in system
             {
+              nixpkgs.config.allowUnfree = true;
               nixpkgs.overlays = [
+                nur.overlays.default
                 (final: prev: {
                   go = prev.go_1_26.overrideAttrs (oldAttrs: {
                     version = "1.26.1";
@@ -220,8 +222,6 @@
                       hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
                     };
                   });
-                  buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
-                  buildGoModule = prev.buildGoModule.override {inherit (final) go;};
                 })
                 # Custom ActivityWatch watcher for system utilization monitoring
                 (final: prev: {

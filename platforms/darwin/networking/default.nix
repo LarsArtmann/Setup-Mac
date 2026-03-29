@@ -23,18 +23,12 @@
   # macOS Application Firewall configuration
   # Note: This is the built-in macOS firewall (ALF - Application Layer Firewall)
   # For per-app network rules, Little Snitch is used instead
-  system.defaults.alf = {
-    # Enable firewall (0=off, 1=on for specific services, 2=block all incoming)
-    globalstate = 1;
-
-    # Allow built-in signed apps to receive connections
-    allowsignedenabled = true;
-
-    # Allow downloaded signed apps to receive connections
-    allowdownloadsignedenabled = true;
-
-    # Stealth mode - don't respond to ping/scan requests
-    stealthenabled = false;
+  networking.applicationFirewall = {
+    enable = true;
+    blockAllIncoming = false;
+    allowSigned = true;
+    allowSignedApp = true;
+    enableStealthMode = false;
   };
 
   # Wake-on-LAN support - DISABLED

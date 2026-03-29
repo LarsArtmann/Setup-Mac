@@ -10,6 +10,13 @@
 
     spawn-at-startup = [
       {argv = ["kitty"];}
+      {
+        argv = [
+          "${pkgs.bash}/bin/bash"
+          "-c"
+          "${pkgs.swww}/bin/swww init && sleep 1 && img=$(${pkgs.coreutils}/bin/ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
+        ];
+      }
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
@@ -178,6 +185,8 @@
       "Mod+Shift+Escape".action.spawn = ["swaylock"];
       "Mod+Shift+P".action.power-off-monitors = {};
       "Mod+Shift+S".action.suspend = {};
+
+      "Mod+W".action.spawn = sh "img=$(ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
 
       "Print".action.screenshot-screen = {};
       "Shift+Print".action.screenshot = {};
