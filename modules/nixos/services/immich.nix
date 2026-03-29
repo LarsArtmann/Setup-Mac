@@ -39,12 +39,12 @@
 
     # Systemd restart policies for Immich services
     systemd.services.immich-server.serviceConfig = {
-      Restart = "on-failure";
-      RestartSec = "5s";
+      Restart = lib.mkForce "on-failure";
+      RestartSec = lib.mkForce "5s";
     };
     systemd.services.immich-machine-learning.serviceConfig = {
-      Restart = "on-failure";
-      RestartSec = "10s";
+      Restart = lib.mkForce "on-failure";
+      RestartSec = lib.mkForce "10s";
     };
 
     systemd.services.immich-db-backup = {

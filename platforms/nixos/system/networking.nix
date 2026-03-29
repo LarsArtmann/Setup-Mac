@@ -77,16 +77,4 @@ _: {
 
   # Automatic Nix store optimization
   nix.settings.auto-optimise-store = true;
-
-  # fail2ban for SSH brute-force protection
-  services.fail2ban = {
-    enable = true;
-    maxretry = 5;
-    bantime = "1h";
-    jails.sshd.settings = {
-      port = 22;
-      filter = "sshd";
-      logpath = "/var/log/auth.log";
-    };
-  };
 }

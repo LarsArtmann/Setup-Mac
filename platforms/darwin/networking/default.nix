@@ -15,9 +15,6 @@
     # Derived from computerName but can be customized
     localHostName = "Lars-MacBook-Air";
 
-    # Enable IPv6 for modern networks
-    ipv6.enable = true;
-
     # Use natural sort order for network interfaces
     # (affects interface naming consistency on macOS)
     # naturalSortInterfaces = true;

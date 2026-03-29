@@ -8,7 +8,7 @@
     ...
   }: {
     sops = {
-      defaultSopsFile = ./../../platforms/nixos/secrets/secrets.yaml;
+      defaultSopsFile = ./../../../platforms/nixos/secrets/secrets.yaml;
       age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
 
       secrets = {
