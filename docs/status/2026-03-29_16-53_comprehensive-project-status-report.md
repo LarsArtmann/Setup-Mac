@@ -1,8 +1,8 @@
 # SystemNix - Comprehensive Project Status Report
 
-**Report Date**: 2026-03-29 16:53:33  
-**Report Type**: Comprehensive Status Assessment  
-**Branch**: master  
+**Report Date**: 2026-03-29 16:53:33
+**Report Type**: Comprehensive Status Assessment
+**Branch**: master
 **Status**: ✅ ACTIVE DEVELOPMENT
 
 ---
@@ -16,7 +16,7 @@ This report provides a comprehensive assessment of the SystemNix project state, 
 ## a) FULLY DONE ✅
 
 ### 1. NixOS Dendritic Modules Architecture ✅
-**Status**: COMPLETED 2026-03-29  
+**Status**: COMPLETED 2026-03-29
 **Impact**: HIGH
 
 Successfully migrated 5 NixOS services to flake-parts dendritic modules:
@@ -33,7 +33,7 @@ Successfully migrated 5 NixOS services to flake-parts dendritic modules:
 - Type-safe via flake-parts
 
 ### 2. TODO List Cleanup ✅
-**Status**: COMPLETED 2026-03-29  
+**Status**: COMPLETED 2026-03-29
 **Impact**: MEDIUM
 
 - Reduced TODO_LIST.md from 1,642 lines to 146 lines (91% reduction)
@@ -42,7 +42,7 @@ Successfully migrated 5 NixOS services to flake-parts dendritic modules:
 - Clear categorization: Actionable (3), Placeholders (1), External (2)
 
 ### 3. File Organization ✅
-**Status**: COMPLETED 2026-02-10 / 2026-03-29  
+**Status**: COMPLETED 2026-02-10 / 2026-03-29
 **Impact**: MEDIUM
 
 - Moved 12 files from root to proper directories:
@@ -52,7 +52,7 @@ Successfully migrated 5 NixOS services to flake-parts dendritic modules:
 - Consolidated `bin/` into `scripts/` directory
 
 ### 4. Pre-commit Hooks ✅
-**Status**: OPERATIONAL  
+**Status**: OPERATIONAL
 **Impact**: HIGH
 
 Active hooks:
@@ -63,8 +63,8 @@ Active hooks:
 - Alejandra (formatting)
 
 ### 5. DNS Infrastructure (unbound + dnsblockd) ✅
-**Status**: IMPLEMENTED  
-**Impact**: HIGH  
+**Status**: IMPLEMENTED
+**Impact**: HIGH
 **Replaces**: Technitium DNS (original plan)
 
 Custom DNS blocker solution:
@@ -75,7 +75,7 @@ Custom DNS blocker solution:
 - **Location**: `dns-blocker-config.nix`, `pkgs/dnsblockd*/`
 
 ### 6. Security Hardening (NixOS) ✅
-**Status**: IMPLEMENTED  
+**Status**: IMPLEMENTED
 **Impact**: CRITICAL
 
 - SSH: Key-only auth, strong ciphers, limited users
@@ -85,7 +85,7 @@ Custom DNS blocker solution:
 - SSH host key backup requirements (ADR-004)
 
 ### 6. Documentation Structure ✅
-**Status**: ESTABLISHED  
+**Status**: ESTABLISHED
 **Impact**: MEDIUM
 
 - 426 Markdown files across comprehensive structure
@@ -99,7 +99,7 @@ Custom DNS blocker solution:
 ## b) PARTIALLY DONE 🟡
 
 ### 1. GitHub → Gitea Mirror Automation 🟡
-**Status**: 80% COMPLETE  
+**Status**: 80% COMPLETE
 **Blockers**: Token setup required post-deployment
 
 **Completed**:
@@ -114,7 +114,7 @@ Custom DNS blocker solution:
 - Verify cron.update_mirrors scheduling
 
 ### 2. Grafana Dashboard Provisioning 🟡
-**Status**: 90% COMPLETE  
+**Status**: 90% COMPLETE
 **Blockers**: Dashboard path resolved 2026-03-29
 
 **Completed**:
@@ -127,7 +127,7 @@ Custom DNS blocker solution:
 - Test dashboard loading on fresh deploy
 
 ### 3. Immich ML Acceleration 🟡
-**Status**: CONFIGURED, NOT TESTED  
+**Status**: CONFIGURED, NOT TESTED
 **Blockers**: Hardware testing on evo-x2
 
 **Completed**:
@@ -142,7 +142,7 @@ Custom DNS blocker solution:
 - Verify backup restoration
 
 ### 4. Caddy Reverse Proxy 🟡
-**Status**: CONFIGURED  
+**Status**: CONFIGURED
 **Blockers**: DNS/local domain setup
 
 **Completed**:
@@ -156,7 +156,7 @@ Custom DNS blocker solution:
 - Test all domains resolve correctly
 
 ### 5. Darwin (macOS) Configuration 🟡
-**Status**: FUNCTIONAL, STALE  
+**Status**: FUNCTIONAL, STALE
 **Blockers**: Testing on Apple Silicon
 
 **Completed**:
@@ -174,8 +174,8 @@ Custom DNS blocker solution:
 ## c) NOT STARTED 🔴
 
 ### 1. Local DNS for `.lan` Domains 🔴
-**Priority**: HIGH  
-**Impact**: Infrastructure dependency  
+**Priority**: HIGH
+**Impact**: Infrastructure dependency
 **Note**: Technitium was REPLACED with unbound + custom dnsblockd
 
 **Current Status**: unbound + dnsblockd DNS blocker is configured in `dns-blocker-config.nix`
@@ -186,30 +186,30 @@ Custom DNS blocker solution:
 
 **Action Required**: Add local zone configuration to unbound for `.lan` domains pointing to localhost, OR configure `/etc/hosts` entries for:
 - immich.lan → 127.0.0.1
-- gitea.lan → 127.0.0.1  
+- gitea.lan → 127.0.0.1
 - grafana.lan → 127.0.0.1
 - home.lan → 127.0.0.1
 
 ### 2. Complete Documentation Consolidation 🔴
-**Priority**: MEDIUM  
+**Priority**: MEDIUM
 **Files**: AUDIO_CASTING_HISTORY.md, BLUETOOTH_SETUP_GUIDE.md, BLUETOOTH_QUICK_SUMMARY.md
 
 Three overlapping Bluetooth documents should be merged into one comprehensive guide.
 
 ### 3. File Organization Automation 🔴
-**Priority**: MEDIUM  
+**Priority**: MEDIUM
 **Just Command**: `just organize`
 
 Auto-sort loose files, enforce directory structure, prevent root file proliferation.
 
 ### 4. Path Constants Library 🔴
-**Priority**: MEDIUM  
+**Priority**: MEDIUM
 **Location**: `scripts/lib/paths.sh`
 
 Centralize PROJECT_ROOT and other path constants to prevent hardcoded paths.
 
 ### 5. Cross-Platform Path Handling 🔴
-**Priority**: LOW  
+**Priority**: LOW
 **Scope**: Darwin/NixOS compatibility
 
 Unified path handling for cross-platform scripts.
@@ -219,7 +219,7 @@ Unified path handling for cross-platform scripts.
 ## d) TOTALLY FUCKED UP! ❌
 
 ### 1. Grafana Dashboard Path Resolution ❌
-**Status**: FIXED 2026-03-29  
+**Status**: FIXED 2026-03-29
 **Severity**: HIGH (blocked flake check)
 
 **Problem**: Dendritic module `modules/nixos/services/grafana.nix` referenced dashboards at `./../../platforms/nixos/services/dashboards`, but Nix path resolution in flake-parts contexts made this fail.
@@ -235,27 +235,27 @@ Unified path handling for cross-platform scripts.
 ## e) WHAT WE SHOULD IMPROVE! 💡
 
 ### 1. Documentation Discoverability 💡
-**Issue**: 426 markdown files spread across 15+ subdirectories  
+**Issue**: 426 markdown files spread across 15+ subdirectories
 **Solution**: Add index/TOC automation, searchable documentation portal
 
 ### 2. Test Coverage 💡
-**Issue**: Manual testing required for NixOS changes  
+**Issue**: Manual testing required for NixOS changes
 **Solution**: Add `nixos-rebuild build` CI checks, VM-based integration tests
 
 ### 3. Secret Management UX 💡
-**Issue**: SOPS-nix requires manual key setup  
+**Issue**: SOPS-nix requires manual key setup
 **Solution**: Document key backup/restore workflow (ADR-004 mentions this)
 
 ### 4. Service Dependency Visualization 💡
-**Issue**: Unclear which services depend on which  
+**Issue**: Unclear which services depend on which
 **Solution**: Generate dependency graph (Caddy→Services, Monitoring stack)
 
 ### 5. Shell Script Standardization 💡
-**Issue**: 57 shell scripts with varying patterns  
+**Issue**: 57 shell scripts with varying patterns
 **Solution**: Enforce `scripts/lib/paths.sh`, standard headers, shellcheck
 
 ### 6. Commit Message Automation 💡
-**Issue**: Manual commit message writing  
+**Issue**: Manual commit message writing
 **Solution**: The user already uses Crush with `--verbose --model="minimax-m2.7-highspeed"`
 
 ---
@@ -370,6 +370,6 @@ The SystemNix project is in **strong operational status** with:
 
 ---
 
-*Report Generated*: 2026-03-29 16:53:33  
-*Generated By*: Crush AI Assistant  
+*Report Generated*: 2026-03-29 16:53:33
+*Generated By*: Crush AI Assistant
 *Next Review Recommended*: After evo-x2 deployment

@@ -332,10 +332,14 @@
             inputs.niri.nixosModules.niri
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
-            inputs.self.nixosModules.immich
-            inputs.self.nixosModules.gitea
             inputs.self.nixosModules.caddy
+            inputs.self.nixosModules.default-services
+            inputs.self.nixosModules.gitea
             inputs.self.nixosModules.grafana
+            inputs.self.nixosModules.homepage
+            inputs.self.nixosModules.immich
+            inputs.self.nixosModules.monitoring
+            inputs.self.nixosModules.sops-secrets
             inputs.self.nixosModules.ssh
             ./platforms/nixos/system/configuration.nix
           ];

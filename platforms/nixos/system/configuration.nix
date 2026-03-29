@@ -18,14 +18,14 @@
     ./scheduled-tasks.nix # Daily scheduled tasks (crush update-providers, etc.)
     ./sudo.nix # Passwordless sudo for wheel group
     # ../services/ssh.nix # SSH hardening - now loaded via flake module
-    ../services/default.nix
+    # ../services/default.nix # Docker + default services - now loaded via flake module
     # ../services/gitea.nix # Local Gitea for GitHub mirror sync - now loaded via flake module
-    ../services/sops.nix # Secrets management via sops-nix
+    # ../services/sops.nix # Secrets management via sops-nix - now loaded via flake module
     # ../services/immich.nix # Self-hosted photo/video management - now loaded via flake module
     # ../services/caddy.nix # Reverse proxy for local domains - now loaded via flake module
-    ../services/monitoring.nix # Prometheus + exporters
+    # ../services/monitoring.nix # Prometheus + exporters - now loaded via flake module
     # ../services/grafana.nix # Monitoring dashboards - now loaded via flake module
-    ../services/homepage.nix # Service overview dashboard
+    # ../services/homepage.nix # Service overview dashboard - now loaded via flake module
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix
