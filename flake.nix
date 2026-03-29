@@ -144,6 +144,13 @@
                 src = ./platforms/nixos/programs/dnsblockd;
               };
             };
+            # dnsblockd-processor - Go tool to merge/dedup blocklists at build time (replaces slow Nix eval)
+            dnsblockd-processor = pkgs.callPackage ./pkgs/dnsblockd-processor/package.nix {
+              src = lib.cleanSourceWith {
+                filter = path: type: !lib.hasSuffix (baseNameOf path) ".nix";
+                src = ./pkgs/dnsblockd-processor;
+              };
+            };
           };
 
         # Development shells for different program categories
@@ -268,12 +275,18 @@
                 (final: prev: {
                   aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
                 })
-                # dnsblockd - DNS block page server
+                # dnsblockd - DNS block page server + blocklist processor
                 (final: prev: {
                   dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
                     src = prev.lib.cleanSourceWith {
                       filter = path: type: baseNameOf path != "package.nix";
                       src = ./platforms/nixos/programs/dnsblockd;
+                    };
+                  };
+                  dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
+                    src = prev.lib.cleanSourceWith {
+                      filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
+                      src = ./pkgs/dnsblockd-processor;
                     };
                   };
                 })
