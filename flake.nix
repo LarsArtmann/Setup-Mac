@@ -73,6 +73,12 @@
       url = "github:robcohen/nix-amd-npu";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Secrets management via sops + age
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -90,6 +96,7 @@
     niri,
     otel-tui,
     nix-amd-npu,
+    sops-nix,
     wrapper-modules,
     ...
   }:
@@ -311,6 +318,7 @@
             # Import the existing NixOS configuration
             inputs.niri.nixosModules.niri
             inputs.nix-amd-npu.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
             ./platforms/nixos/system/configuration.nix
           ];
         };

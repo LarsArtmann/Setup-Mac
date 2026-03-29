@@ -18,8 +18,8 @@ in {
 
       security = {
         admin_user = "admin";
-        admin_password = "admin";
-        secret_key = "SW2YcwTIb9zpOOhoPsMm";
+        admin_password = "$__file{${config.sops.secrets.grafana_admin_password.path}}";
+        secret_key = "$__file{${config.sops.secrets.grafana_secret_key.path}}";
       };
 
       analytics.reporting_enabled = false;

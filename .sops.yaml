@@ -1,0 +1,8 @@
+keys:
+  - &evo-x2 age133ckftlye8snhzga95fnl4np7npjry90qr3g84ya0kddctecx5hsx9uyh6
+
+creation_rules:
+  - path_regex: ^platforms/nixos/secrets/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *evo-x2

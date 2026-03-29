@@ -112,3 +112,12 @@ result-*
 .crush/*.db*
 
 dotfiles/sublime-text/backups/
+
+# Secrets management (sops-nix)
+# Age private key - NEVER commit
+.keys/
+*.age.key
+
+# Plaintext secret files that may exist locally
+.env.private
+gitea-sync.env

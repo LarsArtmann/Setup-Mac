@@ -7,7 +7,7 @@
   # Script to mirror all user repos from GitHub
   mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''
     # Mirror all repos from GitHub to Gitea
-    # Requires: GITEA_TOKEN, GITHUB_TOKEN, GITHUB_USER in ~/.config/gitea-sync.env
+    # Secrets managed via sops-nix (see platforms/nixos/services/sops.nix)
     set -euo pipefail
 
     GITEA_URL="http://localhost:3000"
@@ -313,7 +313,7 @@ in {
       serviceConfig = {
         Type = "oneshot";
         User = "lars";
-        EnvironmentFile = "-/home/lars/.config/gitea-sync.env";
+        EnvironmentFile = config.sops.templates."gitea-sync.env".path;
         ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
       };
     };

@@ -20,6 +20,7 @@
     ../services/ssh.nix
     ../services/default.nix
     ../services/gitea.nix # Local Gitea for GitHub mirror sync
+    ../services/sops.nix # Secrets management via sops-nix
     ../services/immich.nix # Self-hosted photo/video management
     ../services/caddy.nix # Reverse proxy for local domains
     ../services/monitoring.nix # Prometheus + exporters
