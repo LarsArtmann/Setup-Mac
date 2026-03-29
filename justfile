@@ -72,8 +72,6 @@ switch:
     elif [ "$PLATFORM" = "linux" ]; then \
         echo "🔄 Applying NixOS configuration for $HOST..."; \
         sudo nixos-rebuild switch --flake ./#"$HOST" --print-build-logs; \
-        echo "🔄 Applying Home Manager configuration..."; \
-        home-manager switch --flake ./#"$HOST"; \
     else \
         echo "❌ Unknown platform: $PLATFORM"; \
         exit 1; \

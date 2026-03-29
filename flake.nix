@@ -314,23 +314,6 @@
             ./platforms/nixos/system/configuration.nix
           ];
         };
-
-        # Standalone Home Manager configurations for CLI use
-        homeConfigurations = let
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-        in {
-          "evo-x2" = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {inherit nix-colors;};
-            modules = [
-              ./platforms/nixos/users/home.nix
-              {
-                home.username = "lars";
-                home.homeDirectory = "/home/lars";
-              }
-            ];
-          };
-        };
       };
     };
 }

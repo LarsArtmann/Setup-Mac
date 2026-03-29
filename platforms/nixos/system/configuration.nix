@@ -7,6 +7,7 @@
   imports = [
     # Import common packages shared with macOS
     ../../common/packages/base.nix
+    ../../common/packages/fonts.nix
     # Include hardware configuration - essential for NixOS to boot
     ../hardware/hardware-configuration.nix
     # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
@@ -79,8 +80,6 @@
         (builtins.readFile ../../../ssh-keys/lars.pub);
       packages = with pkgs; [
         firefox
-        home-manager # Install Home Manager CLI for manual management
-        # Desktop packages are now managed via Home Manager (see platforms/nixos/desktop/hyprland.nix)
       ];
     };
 
