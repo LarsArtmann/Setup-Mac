@@ -310,10 +310,15 @@
                     };
                   };
                 })
+                # Disable heavy ML test suites (timm runs pytest for 2+ hours)
+                (final: prev: {
+                  python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+                    timm = pyPrev.timm.overridePythonAttrs (old: { doCheck = false; });
+                    xformers = pyPrev.xformers.overridePythonAttrs (old: { doCheck = false; });
+                  });
+                })
               ];
             }
-
-            # Import Home Manager module for NixOS
             home-manager.nixosModules.home-manager
             nur.modules.nixos.default
 
