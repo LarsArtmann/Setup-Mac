@@ -1,0 +1,81 @@
+version: "2"
+run:
+  timeout: 5m
+  go: 1.26.0
+  build-tags: []
+  allow-parallel-runners: false
+  allow-serial-runners: false
+  issues-exit-code: 1
+  tests: true
+output:
+  formats: {}
+linters:
+  enable:
+    - errname
+    - misspell
+    - wastedassign
+    - maintidx
+    - mirror
+    - sloglint
+    - errorlint
+    - wrapcheck
+    - copyloopvar
+    - forcetypeassert
+    - intrange
+    - loggercheck
+    - revive
+    - unused
+    - durationcheck
+    - zerologlint
+    - exhaustive
+    - ginkgolinter
+    - gochecknoglobals
+    - gochecknoinits
+    - musttag
+    - nolintlint
+    - goconst
+    - bodyclose
+    - gosec
+    - sqlclosecheck
+    - govet
+    - cyclop
+    - funlen
+    - nilnesserr
+    - predeclared
+    - unconvert
+    - contextcheck
+    - errchkjson
+    - gocritic
+    - gocyclo
+    - interfacebloat
+    - nestif
+    - nilnil
+    - reassign
+    - staticcheck
+    - exhaustruct
+    - protogetter
+    - rowserrcheck
+    - thelper
+    - spancheck
+    - nakedret
+    - paralleltest
+    - perfsprint
+    - recvcheck
+    - dupl
+    - gochecksumtype
+    - nilerr
+    - testifylint
+    - usetesting
+    - ineffassign
+    - errcheck
+    - gocognit
+    - gosmopolitan
+    - noctx
+    - prealloc
+    - unparam
+formatters:
+  enable:
+    - golines
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 10
