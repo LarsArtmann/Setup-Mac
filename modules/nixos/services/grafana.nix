@@ -51,7 +51,7 @@
             disableDeletion = false;
             editable = true;
             options = {
-              path = ./../../platforms/nixos/services/dashboards;
+              path = ./dashboards;
               foldersFromFilesStructure = false;
             };
           }
