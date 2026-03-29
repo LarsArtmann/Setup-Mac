@@ -62,7 +62,19 @@ Active hooks:
 - Statix (Nix linting)
 - Alejandra (formatting)
 
-### 5. Security Hardening (NixOS) ✅
+### 5. DNS Infrastructure (unbound + dnsblockd) ✅
+**Status**: IMPLEMENTED  
+**Impact**: HIGH  
+**Replaces**: Technitium DNS (original plan)
+
+Custom DNS blocker solution:
+- **unbound**: Recursive DNS resolver with DNS-over-TLS
+- **dnsblockd**: Custom Go HTTP server for block pages
+- **dnsblockd-processor**: Blocklist compiler with category support
+- **Features**: Category-based blocking, custom block page, stats API
+- **Location**: `dns-blocker-config.nix`, `pkgs/dnsblockd*/`
+
+### 6. Security Hardening (NixOS) ✅
 **Status**: IMPLEMENTED  
 **Impact**: CRITICAL
 
@@ -139,7 +151,7 @@ Active hooks:
 - Reverse proxy rules for all services
 
 **Remaining**:
-- Local DNS configuration (systemd-resolved/Technitium)
+- Local DNS configuration (unbound + dnsblockd replaces Technitium)
 - TLS certificate setup (local CA or self-signed)
 - Test all domains resolve correctly
 
@@ -161,11 +173,22 @@ Active hooks:
 
 ## c) NOT STARTED 🔴
 
-### 1. Technitium DNS Server 🔴
+### 1. Local DNS for `.lan` Domains 🔴
 **Priority**: HIGH  
-**Impact**: Infrastructure dependency
+**Impact**: Infrastructure dependency  
+**Note**: Technitium was REPLACED with unbound + custom dnsblockd
 
-Local DNS for `.lan` domains required by Caddy virtual hosts. Blocks full service accessibility.
+**Current Status**: unbound + dnsblockd DNS blocker is configured in `dns-blocker-config.nix`
+- DNS resolution: Working (unbound on 127.0.0.1:53)
+- Block page: Custom Go HTTP server (dnsblockd) serves block pages
+- Categories: Configurable via module
+- **Missing**: `.lan` domain resolution for Caddy virtual hosts
+
+**Action Required**: Add local zone configuration to unbound for `.lan` domains pointing to localhost, OR configure `/etc/hosts` entries for:
+- immich.lan → 127.0.0.1
+- gitea.lan → 127.0.0.1  
+- grafana.lan → 127.0.0.1
+- home.lan → 127.0.0.1
 
 ### 2. Complete Documentation Consolidation 🔴
 **Priority**: MEDIUM  
@@ -247,7 +270,7 @@ Unified path handling for cross-platform scripts.
 5. [ ] **Verify Immich ML acceleration** - Test AMD GPU workloads
 
 ### HIGH (P1)
-6. [ ] **Technitium DNS setup** - Enable `.lan` domain resolution
+6. [ ] **Local DNS `.lan` setup** - Configure unbound or /etc/hosts for `.lan` domains (Technitium REPLACED by unbound+dnsblockd)
 7. [ ] **Test Caddy virtual hosts** - Verify all services accessible
 8. [ ] **Grafana dashboard expansion** - Add more monitoring dashboards
 9. [ ] **Complete Bluetooth documentation merge** - Consolidate 3 docs into 1
