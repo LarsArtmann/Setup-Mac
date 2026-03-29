@@ -88,7 +88,7 @@ func writeUnbound(path string, entries []string) error {
 
 	for _, entry := range entries {
 		if _, err := fmt.Fprintln(f, entry); err != nil {
-			return fmt.Errorf("writing unbound output: %w", err)
+			return fmt.Errorf("writing unbound output to %s: %w", path, err)
 		}
 	}
 
@@ -106,7 +106,7 @@ func writeMapping(path string, mapping map[string]string) error {
 	enc.SetEscapeHTML(false)
 
 	if err := enc.Encode(mapping); err != nil {
-		return fmt.Errorf("encoding mapping JSON: %w", err)
+		return fmt.Errorf("encoding mapping JSON to %s: %w", path, err)
 	}
 
 	return nil
