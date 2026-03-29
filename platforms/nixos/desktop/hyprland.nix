@@ -314,7 +314,7 @@ in {
           "$mod, F2, exec, hyprctl dispatch focuswindow ^htop-bg$"
           "$mod, F3, exec, hyprctl dispatch focuswindow ^logs-bg$"
           "$mod, F4, exec, hyprctl dispatch focuswindow ^nvim-bg$"
-          "$mod, G, exec, ${pkgs.gitui}/bin/gitui"
+          "$mod SHIFT, G, exec, ${pkgs.gitui}/bin/gitui"
           "$mod, A, exec, ${pkgs.neovim}/bin/nvim ~/todo.md"
 
           # System tools
