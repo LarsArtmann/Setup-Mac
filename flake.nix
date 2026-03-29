@@ -105,10 +105,14 @@
 
       # Import dendritic modules - each file is a self-contained flake-parts module
       imports = [
-        ./modules/nixos/services/immich.nix
-        ./modules/nixos/services/gitea.nix
         ./modules/nixos/services/caddy.nix
+        ./modules/nixos/services/default.nix
+        ./modules/nixos/services/gitea.nix
         ./modules/nixos/services/grafana.nix
+        ./modules/nixos/services/homepage.nix
+        ./modules/nixos/services/immich.nix
+        ./modules/nixos/services/monitoring.nix
+        ./modules/nixos/services/sops.nix
         ./modules/nixos/services/ssh.nix
       ];
 
