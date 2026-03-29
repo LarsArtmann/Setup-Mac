@@ -3,12 +3,9 @@
   fonts = {
     packages =
       [
-        # Primary programming font
-        pkgs.jetbrains-mono
-
-        # Additional Nerd Fonts for variety
-        pkgs.fira-code
-        pkgs.iosevka-bin
+        pkgs.nerd-fonts.jetbrains-mono
+        pkgs.nerd-fonts.fira-code
+        pkgs.nerd-fonts.iosevka
 
         # Unicode fallback fonts for full UTF-8 coverage
         # Covers: emoji, CJK, Arabic, Devanagari, and other non-Latin scripts
