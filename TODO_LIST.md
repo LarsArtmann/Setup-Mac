@@ -97,7 +97,7 @@
 ### ✅ Completed Actions
 
 - **File Organization**: Moved 12 files from root to proper directories
-  - bin/: 6 shell scripts (cast-all-audio.sh, fix-dns.sh, fix-network-deep.sh, rebuild-after-fix.sh, apply-config.sh, my-project-remote-install.sh)
+  - scripts/: 6 shell scripts (cast-all-audio.sh, fix-dns.sh, fix-network-deep.sh, rebuild-after-fix.sh, apply-config.sh, my-project-remote-install.sh)
   - dev/testing/: 2 Python files (benchmark_ollama.py, test_streaming.py)
   - docs/archives/: 4 documentation files (AUDIO_CASTING_HISTORY.md, BLUETOOTH_SETUP_GUIDE.md, BLUETOOTH_QUICK_SUMMARY.md, gpt-oss-benchmark-report.md)
 - **Testing**: Ran pre-commit hooks, identified issues to address
@@ -422,22 +422,22 @@
 
 #### Files Pending Move
 
-- [x] **[P0]** Move cast-all-audio.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move cast-all-audio.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:288
   - Context: Files Pending Move
-- [x] **[P0]** Move fix-dns.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move fix-dns.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:289
   - Context: Files Pending Move
-- [x] **[P0]** Move fix-network-deep.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move fix-network-deep.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:290
   - Context: Files Pending Move
-- [x] **[P0]** Move rebuild-after-fix.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move rebuild-after-fix.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:291
   - Context: Files Pending Move
-- [x] **[P0]** Move apply-config.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move apply-config.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:292
   - Context: Files Pending Move
-- [x] **[P0]** Move my-project-remote-install.sh → bin/ ✅ 2026-02-10
+- [x] **[P0]** Move my-project-remote-install.sh → scripts/ ✅ 2026-03-29 (was: root→bin 2026-02-10)
   - Source: 2026-02-06_22-11_root-directory-organization-status.md:293
   - Context: Files Pending Move
 - [x] **[P1]** Move benchmark_ollama.py → dev/testing/ ✅ 2026-02-10

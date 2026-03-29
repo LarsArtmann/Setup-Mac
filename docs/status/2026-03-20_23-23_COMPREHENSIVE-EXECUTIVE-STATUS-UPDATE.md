@@ -98,7 +98,7 @@
 
 **Completed:**
 - 12 files moved to proper directories
-- 6 shell scripts → bin/
+- 6 shell scripts → scripts/ (moved from root→bin→scripts)
 - 2 Python files → dev/testing/
 - 4 docs → docs/archives/
 

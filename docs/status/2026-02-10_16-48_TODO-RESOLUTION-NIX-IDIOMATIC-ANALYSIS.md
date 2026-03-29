@@ -173,7 +173,7 @@ A comprehensive analysis of non-Nix-idiomatic patterns was conducted across the 
 
 **Files**:
 
-- `bin/my-project-remote-install.sh` (Lines 10-12)
+- `scripts/my-project-remote-install.sh` (Lines 10-12)
 
 **Current Pattern**:
 
@@ -325,8 +325,8 @@ end
 
 **Files**:
 
-- `bin/fix-dns.sh` (Lines 13-22)
-- `bin/fix-network-deep.sh` (Lines 13-21, 27-34)
+- `scripts/fix-dns.sh` (Lines 13-22)
+- `scripts/fix-network-deep.sh` (Lines 13-21, 27-34)
 
 **Current Pattern**:
 
@@ -402,7 +402,7 @@ sudo sed -i '' 's/nameserver.*/nameserver 1.1.1.1/' /etc/resolv.conf
 ### Short Term (This Week)
 
 1. **Address Bash LaunchAgent scripts** – Move `ublock-origin-setup.sh`, `sublime-text-sync.sh` LaunchAgents to Nix modules
-2. **Replace `go install`** – Migrate `bin/my-project-remote-install.sh` tools to Nix packages
+2. **Replace `go install`** – Migrate `scripts/my-project-remote-install.sh` tools to Nix packages
 3. **Eliminate Homebrew cask** – Find or build Nix package for "headlamp"
 
 ### Medium Term (This Month)
