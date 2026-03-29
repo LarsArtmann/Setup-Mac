@@ -14,7 +14,7 @@
   boot = {
     initrd = {
       availableKernelModules = ["nvme" "xhci_pci" "thunderbolt" "usbhid" "sdhci_pci"];
-      kernelModules = [];
+      kernelModules = ["amdgpu"];
     };
     # Restore critical network drivers (Realtek 2.5G Ethernet + MediaTek WiFi)
     kernelModules = ["kvm-amd" "mt7925e" "r8125"];

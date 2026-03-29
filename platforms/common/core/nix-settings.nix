@@ -31,10 +31,14 @@
       warn-dirty = false;
     };
 
-    # Note: Garbage collection and optimization handled via systemd timers
-    # Automatic GC: nix-collect-garbage -d
-    # Manual optimization: nix-store --optimize
-    # These can be automated via systemd timers if needed
+    # Automatic garbage collection
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
+    };
+
+    optimise.automatic = true;
 
     # Additional Nix configuration for robustness
     checkConfig = true;

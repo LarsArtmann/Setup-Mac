@@ -115,5 +115,13 @@
 
     # System state version
     system.stateVersion = "25.11";
+
+    services.fstrim.enable = true;
+
+    services.smartd = {
+      enable = true;
+      autodetect = true;
+      defaults.monitored = "-a -o on -s (S/../.././02|L/../../6/03)";
+    };
   };
 }
