@@ -12,7 +12,6 @@
         pkgs.noto-fonts
         pkgs.noto-fonts-color-emoji
         pkgs.noto-fonts-cjk-sans
-        pkgs.noto-fonts-extra
 
         # Linux-only: Bibata cursor theme for Hyprcursor
       ]
