@@ -1,9 +1,9 @@
 # Comprehensive Status Report: Dendritic Pattern Migration
 
-**Date:** 2026-03-29 16:53:40 CEST  
-**System:** evo-x2 | AMD Ryzen AI Max+ 395 | 62 GiB RAM | NixOS 26.05  
-**Disk:** 512 GB NVMe — 280 GB used (55%)  
-**Uptime:** 1 day 18h56  
+**Date:** 2026-03-29 16:53:40 CEST
+**System:** evo-x2 | AMD Ryzen AI Max+ 395 | 62 GiB RAM | NixOS 26.05
+**Disk:** 512 GB NVMe — 280 GB used (55%)
+**Uptime:** 1 day 18h56
 **Load:** 3.11 / 3.49 / 3.79
 
 **Commit:** `26312a2` — refactor(nixos): migrate services to dendritic flake-parts modules
@@ -308,5 +308,5 @@ flake.nix
 
 ---
 
-*Report generated 2026-03-29 16:53:40 CEST*  
+*Report generated 2026-03-29 16:53:40 CEST*
 *Migration commit: `26312a2`*
