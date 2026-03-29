@@ -12,14 +12,16 @@
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 
   # Fetch each blocklist file at eval time (fast - just metadata lookup)
-  fetchedBlocklists = map (bl: {
-    name = bl.name;
-    file = pkgs.fetchurl {
-      inherit (bl) url;
-      hash = bl.hash;
-      name = "${bl.name}-raw";
-    };
-  }) cfg.blocklists;
+  fetchedBlocklists =
+    map (bl: {
+      inherit (bl) name;
+      file = pkgs.fetchurl {
+        inherit (bl) url;
+        inherit (bl) hash;
+        name = "${bl.name}-raw";
+      };
+    })
+    cfg.blocklists;
 
   # Whitelist file
   whitelistFile = pkgs.writeText "dns-blocker-whitelist.txt" (
@@ -31,21 +33,23 @@
     lib.concatMap (bl: [
       (toString bl.file)
       bl.name
-    ]) fetchedBlocklists
+    ])
+    fetchedBlocklists
   );
 
   # Run Go processor at build time instead of Nix eval-time string processing
-  processedBlocklist = pkgs.runCommand "dns-blocker-processed" {
-    nativeBuildInputs = [pkgs.dnsblockd-processor];
-  } ''
-    mkdir -p $out
-    dnsblockd-processor \
-      ${cfg.blockIP} \
-      ${whitelistFile} \
-      $out/unbound.conf \
-      $out/mapping.json \
-      ${processorArgs}
-  '';
+  processedBlocklist =
+    pkgs.runCommand "dns-blocker-processed" {
+      nativeBuildInputs = [pkgs.dnsblockd-processor];
+    } ''
+      mkdir -p $out
+      dnsblockd-processor \
+        ${cfg.blockIP} \
+        ${whitelistFile} \
+        $out/unbound.conf \
+        $out/mapping.json \
+        ${processorArgs}
+    '';
 
   # Unbound include file that pulls in blocklist and temp-allowlist
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
