@@ -22,6 +22,9 @@
     ../services/gitea.nix # Local Gitea for GitHub mirror sync
     ../services/immich.nix # Self-hosted photo/video management
     ../services/caddy.nix # Reverse proxy for local domains
+    ../services/monitoring.nix # Prometheus + exporters
+    ../services/grafana.nix # Monitoring dashboards
+    ../services/homepage.nix # Service overview dashboard
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix

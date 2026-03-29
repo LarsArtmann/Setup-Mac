@@ -155,6 +155,11 @@
 
   services.unbound.settings.server = {
     local-zone = [''"lan." static''];
-    local-data = [''"immich.lan. IN A 127.0.0.1"''];
+    local-data = [
+      ''"immich.lan. IN A 127.0.0.1"''
+      ''"gitea.lan. IN A 127.0.0.1"''
+      ''"grafana.lan. IN A 127.0.0.1"''
+      ''"home.lan. IN A 127.0.0.1"''
+    ];
   };
 }

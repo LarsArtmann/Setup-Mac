@@ -6,10 +6,36 @@
   services.caddy = {
     enable = true;
 
-    virtualHosts."immich.lan" = {
-      extraConfig = ''
-        reverse_proxy localhost:${toString config.services.immich.port}
-      '';
+    globalConfig = ''
+      servers {
+        metrics
+      }
+    '';
+
+    virtualHosts = {
+      "immich.lan" = {
+        extraConfig = ''
+          reverse_proxy localhost:${toString config.services.immich.port}
+        '';
+      };
+
+      "gitea.lan" = {
+        extraConfig = ''
+          reverse_proxy localhost:3000
+        '';
+      };
+
+      "grafana.lan" = {
+        extraConfig = ''
+          reverse_proxy localhost:3001
+        '';
+      };
+
+      "home.lan" = {
+        extraConfig = ''
+          reverse_proxy localhost:8082
+        '';
+      };
     };
   };
 
