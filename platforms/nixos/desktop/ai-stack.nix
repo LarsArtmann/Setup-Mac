@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   # AMD Strix Halo AI Stack
-  # Three inference backends: NPU (FastFlowLM), GPU (vLLM/Vulkan), GPU (Ollama)
+  # Inference backends: NPU (FastFlowLM), GPU (Ollama/Vulkan), CPU (llama-cpp)
 
   # Ollama - GPU inference via Vulkan backend (simple, good compatibility)
   services.ollama = {
@@ -14,11 +14,6 @@
     };
   };
 
-  # vLLM - high-performance GPU inference (ROCm, for larger models / batch workloads)
-  # Note: vLLM on Strix Halo requires custom ROCm build or container.
-  # The package is installed here; runtime needs HSA_OVERRIDE_GFX_VERSION=gfx1100
-  # and may need containerized toolboxes from kyuz0/amd-strix-halo-toolboxes.
-
   # FastFlowLM - NPU inference (50 TOPS XDNA2, best power efficiency)
   # Installed as a system package. Requires NPU driver (see hardware/amd-npu.nix).
   # Provides OpenAI-compatible API on port 52625 via `flm serve`.
@@ -27,7 +22,6 @@
     # Inference servers
     ollama
     llama-cpp
-    vllm
 
     # OCR
     tesseract4
@@ -39,7 +33,7 @@
   ];
 
   environment.sessionVariables = {
-    # vLLM ROCm targeting Strix Halo gfx1100
+    # ROCm targeting Strix Halo gfx1100
     HSA_OVERRIDE_GFX_VERSION = "gfx1100";
     ROCBLAS_USE_HIPBLASLT = "1";
   };
