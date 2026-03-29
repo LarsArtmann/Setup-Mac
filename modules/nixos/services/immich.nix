@@ -26,6 +26,27 @@
 
     users.users.immich.extraGroups = ["video" "render"];
 
+    # PostgreSQL tuning for Immich workload
+    services.postgresql.settings = {
+      shared_buffers = "512MB";
+      effective_cache_size = "2GB";
+      work_mem = "16MB";
+      maintenance_work_mem = "256MB";
+      max_connections = 100;
+      checkpoint_completion_target = "0.9";
+      random_page_cost = "1.1";
+    };
+
+    # Systemd restart policies for Immich services
+    systemd.services.immich-server.serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5s";
+    };
+    systemd.services.immich-machine-learning.serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "10s";
+    };
+
     systemd.services.immich-db-backup = {
       description = "Immich PostgreSQL database backup";
       path = [config.services.postgresql.package];

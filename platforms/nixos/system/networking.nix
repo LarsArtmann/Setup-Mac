@@ -6,6 +6,13 @@ _: {
     # networkmanager.enable = true;
     enableIPv6 = false; # IPv6 is unreachable, disable entirely
 
+    # Firewall - deny by default, only allow needed ports
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [22 80 443];
+      allowedUDPPorts = [53];
+    };
+
     # Use dhcpcd for network and DNS management
     # This provides better control over DNS settings
     useDHCP = true;
@@ -60,4 +67,26 @@ _: {
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
+
+  # Automatic Nix garbage collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
+  # Automatic Nix store optimization
+  nix.settings.auto-optimise-store = true;
+
+  # fail2ban for SSH brute-force protection
+  services.fail2ban = {
+    enable = true;
+    maxretry = 5;
+    bantime = "1h";
+    jails.sshd.settings = {
+      port = 22;
+      filter = "sshd";
+      logpath = "/var/log/auth.log";
+    };
+  };
 }

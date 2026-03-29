@@ -451,16 +451,23 @@ keychain-help:
 
 # Check system status and outdated packages
 check:
-    @echo "🔍 Checking system status..."
-    @echo "=== Nix System Info ==="
-    darwin-version
-    @echo "\n=== Homebrew Status ==="
-    brew doctor || true
-    @echo "\n=== Outdated Homebrew Packages ==="
-    brew outdated || echo "All Homebrew packages are up to date"
-    @echo "\n=== Git Status ==="
-    git status --porcelain || true
-    @echo "✅ System check complete"
+    @PLATFORM=$(just _detect_platform); \
+    echo "🔍 Checking system status..."; \
+    echo "=== Nix System Info ==="; \
+    nix --version; \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        darwin-version; \
+        echo "\n=== Homebrew Status ==="; \
+        brew doctor || true; \
+        echo "\n=== Outdated Homebrew Packages ==="; \
+        brew outdated || echo "All Homebrew packages are up to date"; \
+    else \
+        echo "\n=== NixOS Version ==="; \
+        nixos-version; \
+    fi; \
+    echo "\n=== Git Status ==="; \
+    git status --porcelain || true; \
+    echo "✅ System check complete"
 
 # Validate Nix configuration syntax
 validate:
@@ -615,19 +622,30 @@ rebuild-completions:
 info:
     @echo "ℹ️  System Information"
     @echo "===================="
-    @echo "macOS Version: $(sw_vers -productVersion)"
-    @echo "Nix Version: $(nix --version)"
-    @echo "Darwin Rebuild: $(darwin-version)"
-    @echo "Homebrew Version: $(brew --version | head -1)"
-    @echo "Git Version: $(git --version)"
-    @echo "Shell: $SHELL"
-    @echo "Current Directory: $(pwd)"
+    @PLATFORM=$(just _detect_platform); \
+    echo "Platform: $$PLATFORM"; \
+    echo "Nix Version: $(nix --version)"; \
+    echo "Git Version: $(git --version)"; \
+    echo "Shell: $$SHELL"; \
+    echo "Current Directory: $$(pwd)"; \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        echo "macOS Version: $$(sw_vers -productVersion)"; \
+        echo "Darwin Rebuild: $$(darwin-version)"; \
+        echo "Homebrew Version: $$(brew --version | head -1)"; \
+    else \
+        echo "NixOS Version: $$(nixos-version)"; \
+    fi
 
 # Test configuration without applying changes
 test:
     @echo "🧪 Testing Nix configuration..."
     nix --extra-experimental-features "nix-command flakes" flake check --all-systems
-    sudo /run/current-system/sw/bin/darwin-rebuild check --flake ./
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        sudo /run/current-system/sw/bin/darwin-rebuild check --flake ./; \
+    else \
+        sudo nixos-rebuild test --flake .#evo-x2; \
+    fi
     @echo "✅ Configuration test passed"
 
 # Fast test - syntax validation only (skips heavy packages)
@@ -641,7 +659,12 @@ deploy:
     @echo "🚀 Deploying Home Manager configuration..."
     @echo "ℹ️  Note: This requires sudo access"
     @echo "ℹ️  Note: Open new terminal after deployment for shell changes to take effect"
-    sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./; \
+    else \
+        sudo nixos-rebuild switch --flake .#evo-x2; \
+    fi
     @echo "✅ Home Manager deployment complete!"
     @echo ""
     @echo "🔄 Next steps:"
@@ -658,7 +681,12 @@ verify:
 rollback:
     @echo "↩️  Rolling back to previous generation..."
     @echo "ℹ️  Note: This requires sudo access"
-    sudo /run/current-system/sw/bin/darwin-rebuild switch --rollback
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        sudo /run/current-system/sw/bin/darwin-rebuild switch --rollback; \
+    else \
+        sudo nixos-rebuild switch --rollback; \
+    fi
     @echo "✅ Rollback complete!"
     @echo ""
     @echo "ℹ️  Note: Open new terminal window for shell changes to take effect"
@@ -666,7 +694,12 @@ rollback:
 # List available generations
 list-generations:
     @echo "📋 Listing available generations..."
-    /run/current-system/sw/bin/darwin-rebuild --list-generations
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        /run/current-system/sw/bin/darwin-rebuild --list-generations; \
+    else \
+        sudo nix-env --list-generations --profile /nix/var/nix/profiles/system; \
+    fi
 
 # Show git status and recent commits
 status:

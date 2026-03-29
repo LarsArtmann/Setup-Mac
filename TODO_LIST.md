@@ -1,4 +1,4 @@
-# SystemNix - TODO List
+# SystemNix - Comprehensive TODO List
 
 **Last Updated**: 2026-03-29
 **Status**: Active
@@ -9,138 +9,219 @@
 
 | Category | Count |
 |----------|-------|
-| **Actionable TODOs** | 3 |
-| **Documentation placeholders** | 1 |
-| **External/Non-actionable** | 2 |
+| **Code TODOs** | 3 |
+| **Desktop Improvements (Phase 1)** | 21 |
+| **Desktop Improvements (Phase 2)** | 21 |
+| **Desktop Improvements (Phase 3)** | 13 |
+| **Security Hardening** | 2 |
+| **Nix Architecture (Ghost Systems)** | 14 |
+| **Documentation/Research** | 1 |
 
 ---
 
-## Actionable TODOs (3)
+## Code TODOs (Active in Source)
 
 ### 1. Re-enable Audit Daemon (NixOS)
-
-**File**: `platforms/nixos/desktop/security-hardening.nix`
-**Line**: 14
-**Priority**: MEDIUM
-**Category**: Security
-**Blocked by**: Upstream NixOS bug
-
+**File**: `platforms/nixos/desktop/security-hardening.nix:14`
+**Priority**: MEDIUM | **Blocked by**: Upstream NixOS bug #483085
 ```nix
 # TODO: Re-enable after NixOS resolves the audit-rules service bug
 ```
-
-**Context**:
-- Audit daemon disabled due to AppArmor conflicts
-- NixOS 26.05 (Jan 2026) has bug where `audit-rules-nixos.service` fails with "No rules" error
-- Issue: https://github.com/NixOS/nixpkgs/issues/483085
-
-**Action**: Monitor upstream issue and re-enable once resolved.
-
----
+**Action**: Monitor https://github.com/NixOS/nixpkgs/issues/483085
 
 ### 2. Re-enable Audit Kernel Module (NixOS)
-
-**File**: `platforms/nixos/desktop/security-hardening.nix`
-**Line**: 21
-**Priority**: MEDIUM
-**Category**: Security
-**Blocked by**: AppArmor conflicts
-
+**File**: `platforms/nixos/desktop/security-hardening.nix:21`
+**Priority**: MEDIUM | **Blocked by**: AppArmor conflicts
 ```nix
 # TODO: Re-enable after fixing audit kernel module (AppArmor conflicts)
 ```
-
-**Context**: Audit rules configuration disabled due to AppArmor conflicts with audit kernel module.
-
-**Action**: Research and resolve AppArmor/audit compatibility, then re-enable.
-
----
+**Action**: Research and resolve AppArmor/audit compatibility
 
 ### 3. Update Home Manager Issue Reference (Darwin)
-
-**File**: `platforms/darwin/default.nix`
-**Line**: 85
+**File**: `platforms/darwin/default.nix:85`
 **Priority**: LOW
-**Category**: Documentation
-
 ```nix
 # See: https://github.com/nix-community/home-manager/issues/XXXX
 ```
-
-**Context**: Placeholder XXXX should be replaced with actual GitHub issue number for the Home Manager + nix-darwin user definition workaround.
-
-**Action**: Find the relevant Home Manager GitHub issue and update the URL.
+**Action**: Find and replace XXXX with actual Home Manager issue number
 
 ---
 
-## Documentation Placeholders (1)
+## Desktop Improvements (from DESKTOP-IMPROVEMENT-ROADMAP.md)
 
-### .buildflow.yml TODO Comment
+### Phase 1: High Priority (21 items)
 
-**File**: `.buildflow.yml`
-**Line**: 15
-**Type**: Configuration comment (not a task)
+#### Config Reloader
+- [ ] **Add hot-reload capability** - Ctrl+Alt+R keybinding for Hyprland config reload
+  - **File**: `platforms/nixos/desktop/hyprland.nix`
+  - **Time**: 10min | **Impact**: High
 
-```yaml
-# TODO comment severity: debug, info, warn, error
-todo_severity: info
-```
+#### Privacy & Locking (7 items)
+- [ ] Add blur effect for lock screen (hyprlock blur) - 1h
+- [ ] Add privacy mode (grayscale screen toggle) - 1h
+- [ ] Add screenshot detection indicator in Waybar - 1h
+- [ ] Add lock screen with camera preview - 1h
+- [ ] Add per-workspace privacy mode - 1h
+- [ ] Add temporary privacy toggle (Ctrl+Alt+P) - 1h
+- [ ] Add visual feedback when taking screenshots - 1h
 
-**Context**: This is explaining the `todo_severity` setting, not an actual TODO task. The comment describes what the setting does.
+#### Productivity Scripts (5 items)
+- [ ] Create Quake Terminal dropdown script (F12) - 2h
+- [ ] Create Screenshot + OCR script (extract text) - 2h
+- [ ] Create Color Picker script - 2h
+- [ ] Create Clipboard History Viewer - 2h
+- [ ] Create App Workspace Spawner - 2h
+
+#### Monitoring (5 items)
+- [ ] Add GPU temperature module (AMD GPU) - 1.5h
+- [ ] Add CPU usage module (per-core) - 1.5h
+- [ ] Add Memory usage module (used/total) - 1.5h
+- [ ] Add Network bandwidth module (up/down) - 1.5h
+- [ ] Add Disk usage module (key mount points) - 1.5h
+
+#### Window Management (4 items)
+- [ ] Add Scratchpad Workspaces (Alt+S) - 30m
+- [ ] Add Better Floating Rules (size/position defaults) - 30m
+- [ ] Add Focus Follows Mouse toggle - 30m
+- [ ] Add Auto Back-and-Forth toggle - 30m
+
+### Phase 2: Medium Priority (21 items)
+
+#### Keyboard & Input (4 items)
+- [ ] Optimize keyboard repeat rate (faster typing) - 20m
+- [ ] Map Caps Lock to Escape/Control - 20m
+- [ ] Add keyboard layout switcher in Waybar - 20m
+- [ ] Improve trackpad gestures (3-finger swipe) - 20m
+
+#### Audio & Media (7 items)
+- [ ] Add audio visualizer (real-time) - 1h
+- [ ] Add microphone status indicator - 1h
+- [ ] Add media player integration (Now playing) - 1h
+- [ ] Add volume control with visual feedback - 1h
+- [ ] Add per-app volume control - 1h
+- [ ] Add noise suppression toggle - 1h
+- [ ] Add Bluetooth device switcher - 1h
+
+#### Dev Tools (4 items)
+- [ ] Add Git branch display in Waybar - 1h
+- [ ] Add terminal multiplexer integration (tmux/zellij) - 1h
+- [ ] Add editor-specific window rules (nvim/vscode) - 1h
+- [ ] Create dev environment launcher - 1h
+
+#### Desktop Environment (4 items)
+- [ ] Add better window borders and shadows - 30m
+- [ ] Tune animations (smoother transitions) - 30m
+- [ ] Add workspace naming persistence - 30m
+- [ ] Add application autostart management - 30m
+
+### Phase 3: Long-term (13 items)
+
+#### Backup & Config (4 items)
+- [ ] Create automated config backups (hourly/daily) - 3h
+- [ ] Add workspace state preservation (remember apps) - 3h
+- [ ] Create one-click config sync (multiple machines) - 3h
+- [ ] Add config versioning with rollback - 3h
+
+#### Gaming (4 items)
+- [ ] Create game mode toggle (disable compositor) - 2h
+- [ ] Add GPU optimization profiles - 2h
+- [ ] Add frame rate statistics in Waybar - 2h
+- [ ] Add game-specific workspace themes - 2h
+
+#### Window Rules (4 items)
+- [ ] Add auto-group similar windows (tabs) - 1h
+- [ ] Add per-application layout rules - 1h
+- [ ] Add smart window positioning - 1h
+- [ ] Add window grouping by workflow - 1h
+
+#### AI Integration (4 items)
+- [ ] Add AI-powered workspace suggestions - 8h+
+- [ ] Add smart window arrangement - 8h+
+- [ ] Add voice command integration - 8h+
+- [ ] Add activity-based automation - 8h+
 
 ---
 
-## External/Non-Actionable (2)
+## Nix Architecture (from nix-architecture-refactoring-plan.md)
 
-### Patch File TODOs (Upstream Code)
+### 1% Effort (51% Value) - Critical
+- [ ] Import core/Types.nix in flake - 15min
+- [ ] Import core/State.nix in flake - 15min
+- [ ] Import core/Validation.nix in flake - 15min
+- [ ] Enable TypeSafetySystem in flake - 30min
 
-**File**: `patches/2019.patch`
-**Lines**: 295, 862
-**Type**: External patch (Crush upstream)
-**Actionable**: NO - This is third-party code
+### 4% Effort (13% Additional Value) - High Impact
+- [ ] Consolidate user config (eliminate split brain) - 45min
+- [ ] Consolidate path config - 30min
+- [ ] Enable SystemAssertions - 30min
+- [ ] Enable ModuleAssertions - 30min
 
-```go
-// TODO: when we support multiple agents we need to change this so that we pass in the agent specific model config
-// TODO: remove the app instance from here
-```
+### 20% Effort (16% Additional Value) - Comprehensive
+- [ ] Split system.nix (397 lines → 3 files) - 90min
+- [ ] Replace bool with State enum - 60min
+- [ ] Replace debug bool with LogLevel enum - 45min
+- [ ] Split BehaviorDrivenTests.nix - 60min
+- [ ] Split ErrorManagement.nix - 60min
+- [ ] Add ConfigAssertions integration - 45min
 
-**Context**: These TODOs are in a patch file for the Crush CLI tool, not in this project's code. They're upstream issues to be handled by the Crush maintainers.
+---
+
+## Security Hardening Tasks
+
+- [ ] Research audit kernel module compatibility issues - 2-4h
+- [ ] Test with NixOS current kernel version - 30min
+- [ ] Re-enable if compatibility issues resolved - 15min
+- [ ] Document reason if permanently disabled - 30min
+
+---
+
+## Bluetooth Setup (NixOS)
+
+- [ ] Rebuild NixOS - Required for kernel modules
+- [ ] Reboot - Required for Bluetooth kernel modules to load
+- [ ] Pair with Nest Audio - Use blueman-manager or bluetoothctl
+- [ ] Set Nest Audio as Default Audio Output - Use pactl or pavucontrol
+- [ ] Test audio output - Play test sound or music
+- [ ] Enable auto-connect for Nest Audio
+- [ ] Test Bluetooth range - Walk around
+- [ ] Check A2DP profile active - pactl list cards
+
+---
+
+## Research & Investigation
+
+- [ ] Research TouchID authentication extensions for macOS - 2-3h
+  - **Source**: `platforms/darwin/security/pam.nix:7`
+  - **Question**: Are there other touchIdAuth services to enable?
 
 ---
 
 ## Verification Commands
 
 ```bash
-# Find all TODOs in source code (excluding patches and docs)
+# Find TODOs in source code
 grep -rn "TODO\|FIXME\|XXX\|HACK" \
   --include="*.nix" --include="*.sh" \
-  --include="*.py" --include="*.go" \
   --exclude-dir=.git --exclude-dir=.crush \
   --exclude-dir=patches \
   .
 
-# Count actionable TODOs only
-grep -rn "^\s*#.*TODO" \
-  --include="*.nix" \
-  --exclude-dir=patches \
-  platforms/ 2>/dev/null | wc -l
+# List all markdown files in docs/status/
+ls -la docs/status/*.md | wc -l
+
+# List all planning documents
+ls -la docs/planning/*.md | wc -l
 ```
-
----
-
-## History
-
-- **2026-03-29**: Comprehensive audit completed. Found only 3 actionable TODOs in actual source code.
-- **2026-03-27**: Library policy implementation completed (paths.sh, consolidated nixpkgs config)
-- **2026-02-10**: File organization completed (12 files moved to proper directories)
 
 ---
 
 ## Notes
 
-- Previous counts of "445 TODOs" were misleading - included documentation TODOs and planning documents
-- Shell scripts (62+ files): Zero TODOs found
-- Python files: Zero TODOs found
-- Go files (dnsblockd): Zero TODOs found
-- Only Nix configuration files contain actionable TODOs
-- Patch files contain upstream TODOs that are not this project's responsibility
+- Desktop improvements sourced from `DESKTOP-IMPROVEMENT-ROADMAP.md`
+- Architecture tasks sourced from `2025-11-15_14-10-nix-architecture-refactoring-plan.md`
+- Code TODOs are the only items with inline markers in source files
+- Planning document tasks are high-level and may need refinement before execution
+
+---
+
+**Total Tracked Items**: ~75+ actionable tasks across all categories

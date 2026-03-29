@@ -339,7 +339,7 @@
             inputs.self.nixosModules.homepage
             inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring
-            inputs.self.nixosModules.sops-secrets
+            inputs.self.nixosModules.sops
             inputs.self.nixosModules.ssh
             ./platforms/nixos/system/configuration.nix
           ];
