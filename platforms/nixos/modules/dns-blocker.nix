@@ -38,6 +38,7 @@
   processedBlocklist = pkgs.runCommand "dns-blocker-processed" {
     nativeBuildInputs = [pkgs.dnsblockd-processor];
   } ''
+    mkdir -p $out
     dnsblockd-processor \
       ${cfg.blockIP} \
       ${whitelistFile} \
