@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # Shell Context Detection and Performance Analysis
 # Detects shell usage patterns and provides context-based loading recommendations

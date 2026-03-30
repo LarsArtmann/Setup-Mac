@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Test script for NixOS evo-x2 Home Manager configuration fix
+set -euo pipefail
 
 echo "🔧 Testing NixOS evo-x2 configuration build..."
 echo "======================================================"

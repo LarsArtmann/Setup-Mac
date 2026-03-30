@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
 # Test script for NixOS configuration
 # Run this on evo-x2 (NixOS system) to verify the configuration builds correctly
 

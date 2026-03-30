@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 # System Health Check Script for Setup-Mac
 # Provides color-coded system status information
 

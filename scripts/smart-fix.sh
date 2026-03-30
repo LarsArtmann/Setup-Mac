@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 echo "🔧 Applying Smart Nix Configuration Fix"
 echo "====================================="
