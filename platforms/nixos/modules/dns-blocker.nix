@@ -257,11 +257,21 @@ in {
             ProtectSystem = "strict";
             ProtectHome = true;
             PrivateTmp = true;
-            NoNewPrivileges = true;
             RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_NETLINK"];
+            AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
+            CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
           }
           // lib.optionalAttrs (cfg.blockInterface != "lo") {
-            ExecStartPre = "${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true";
+            ExecStartPre = let
+              addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
+                ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+              '';
+            in "+-${addIPScript}";
+            ExecStopPost = let
+              delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
+                ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+              '';
+            in "+-${delIPScript}";
           };
       };
 

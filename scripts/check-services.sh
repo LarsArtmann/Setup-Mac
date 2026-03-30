@@ -3,13 +3,13 @@ set -euo pipefail
 
 echo "=== Service Status ==="
 for svc in prometheus grafana homepage-dashboard prometheus-node-exporter prometheus-postgres-exporter prometheus-redis-exporter caddy dnsblockd unbound postgresql immich-server immich-machine-learning gitea ollama docker; do
-  status=$(systemctl is-active "$svc" 2>/dev/null || echo "unknown")
+  status=$(sudo systemctl is-active "$svc" 2>/dev/null || echo "unknown")
   printf "%-40s %s\n" "$svc" "$status"
 done
 
 echo ""
 echo "=== Listening Ports ==="
-ss -tlnp 2>/dev/null | grep -E '(9091|3001|8082|9100|9187|9121|2019|80|443|2283|3000|53|9090|6379|11434)' || true
+sudo ss -tlnp 2>/dev/null | grep -E '(9091|3001|8082|9100|9187|9121|2019|80|443|2283|3000|53|9090|6379|11434)' || true
 
 echo ""
 echo "=== DNS Resolution ==="
@@ -27,4 +27,4 @@ done
 
 echo ""
 echo "=== Failed Units ==="
-systemctl --failed --no-pager 2>/dev/null || true
+sudo systemctl --failed --no-pager 2>/dev/null || true

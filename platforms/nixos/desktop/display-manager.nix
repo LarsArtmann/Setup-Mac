@@ -1,29 +1,56 @@
 {pkgs, ...}: {
-  # Enable X11 windowing system
   services.xserver = {
     enable = true;
-
-    # Configure keymap in X11
     xkb = {
       layout = "us";
       variant = "";
     };
   };
 
-  # Enable SDDM (Simple Desktop Display Manager) with Wayland support
-  # Replaces heavier GDM/GNOME setup
-  # Note: Wayland enabled for modern experience (AMD GPU stable in 2025)
-  services.displayManager.sddm = {
+  programs.regreet = {
     enable = true;
-    wayland.enable = true; # Enabled for modern Wayland experience
-    theme = "sugar-dark";
-    enableHidpi = true;
-    autoNumlock = true;
-    extraPackages = [pkgs.sddm-sugar-dark];
+
+    theme = {
+      name = "Catppuccin-Mocha-Compact-Lavender-Dark";
+      package = pkgs.catppuccin-gtk.override {
+        accents = ["lavender"];
+        size = "compact";
+        variant = "mocha";
+      };
+    };
+
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
+
+    cursorTheme = {
+      name = "Bibata-Modern-Classic";
+      package = pkgs.bibata-cursors;
+    };
+
+    font = {
+      name = "Cantarell";
+      size = 16;
+      package = pkgs.cantarell-fonts;
+    };
+
     settings = {
-      General = {
-        GreeterEnvironment = "QT_SCREEN_SCALE_FACTORS=2,QT_FONT_DPI=96";
-        Session = "hyprland"; # Default session, others available via F1/selector
+      commands = {
+        reboot = ["loginctl" "reboot"];
+        poweroff = ["loginctl" "poweroff"];
+      };
+    };
+
+    cageArgs = ["-s"];
+    extraCss = ./regreet.css;
+  };
+
+  services.greetd = {
+    restart = true;
+    settings = {
+      default_session = {
+        user = "greeter";
       };
     };
   };

@@ -1,0 +1,235 @@
+@define-color base #1e1e2e;
+@define-color mantle #181825;
+@define-color crust #11111b;
+
+@define-color surface0 #313244;
+@define-color surface1 #45475a;
+@define-color surface2 #585b70;
+
+@define-color overlay0 #6c7086;
+@define-color overlay1 #7f849c;
+@define-color overlay2 #9399b2;
+
+@define-color text #cdd6f4;
+@define-color subtext1 #bac2de;
+@define-color subtext0 #a6adc8;
+
+@define-color lavender #b4befe;
+@define-color blue #89b4fa;
+@define-color sapphire #74c7ec;
+@define-color sky #89dceb;
+@define-color teal #94e2d5;
+@define-color green #a6e3a1;
+@define-color yellow #f9e2af;
+@define-color peach #fab387;
+@define-color maroon #eba0ac;
+@define-color red #f38ba8;
+@define-color mauve #cba6f7;
+@define-color pink #f5c2e7;
+@define-color flamingo #f2cdcd;
+@define-color rosewater #f5e0dc;
+
+window {
+  background-color: @base;
+  color: @text;
+  padding: 48px;
+}
+
+label {
+  color: @text;
+}
+
+label:disabled {
+  color: @overlay0;
+}
+
+entry {
+  background-color: @surface0;
+  color: @text;
+  border: 2px solid @surface1;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15pt;
+  caret-color: @lavender;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+entry:focus {
+  border-color: @lavender;
+  box-shadow: 0 0 0 3px alpha(@lavender, 0.25);
+}
+
+entry:disabled {
+  background-color: @mantle;
+  color: @overlay0;
+}
+
+entry selection {
+  background-color: alpha(@lavender, 0.4);
+  color: @text;
+}
+
+button {
+  background-color: @surface0;
+  color: @text;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+}
+
+button:hover {
+  background-color: @surface1;
+  border-color: @surface2;
+}
+
+button:active {
+  background-color: @lavender;
+  color: @crust;
+  border-color: @lavender;
+}
+
+button:checked {
+  background-color: @lavender;
+  color: @crust;
+  border-color: @lavender;
+}
+
+button:disabled {
+  background-color: @mantle;
+  color: @overlay0;
+}
+
+dropdown {
+  background-color: @surface0;
+  color: @text;
+  border: 2px solid @surface1;
+  border-radius: 12px;
+}
+
+dropdown > button {
+  background-color: transparent;
+  border: none;
+  border-radius: 12px;
+}
+
+dropdown > button:hover {
+  background-color: @surface1;
+}
+
+popover {
+  background-color: @surface0;
+  border: 1px solid @surface1;
+  border-radius: 12px;
+}
+
+popover > contents {
+  background-color: @surface0;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+row {
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: @text;
+  transition: background-color 150ms ease;
+}
+
+row:hover {
+  background-color: @surface1;
+}
+
+row:selected {
+  background-color: @lavender;
+  color: @crust;
+}
+
+row:active {
+  background-color: @blue;
+  color: @crust;
+}
+
+scrollbar {
+  background-color: transparent;
+}
+
+scrollbar slider {
+  background-color: @surface2;
+  border-radius: 4px;
+  min-width: 6px;
+}
+
+scrollbar slider:hover {
+  background-color: @overlay1;
+}
+
+separator {
+  background-color: @surface1;
+  min-height: 1px;
+}
+
+check,
+radio {
+  background-color: @surface0;
+  color: @text;
+  border: 2px solid @surface2;
+  border-radius: 4px;
+}
+
+check:checked,
+radio:checked {
+  background-color: @lavender;
+  color: @crust;
+  border-color: @lavender;
+}
+
+spinbutton {
+  background-color: @surface0;
+  color: @text;
+  border: 2px solid @surface1;
+  border-radius: 12px;
+}
+
+spinbutton > button {
+  background-color: transparent;
+  border: none;
+}
+
+levelbar trough {
+  background-color: @surface0;
+  border-radius: 8px;
+}
+
+levelbar block {
+  background-color: @lavender;
+  border-radius: 8px;
+}
+
+progressbar trough {
+  background-color: @surface0;
+  border-radius: 8px;
+}
+
+progressbar progress {
+  background-color: @lavender;
+  border-radius: 8px;
+}
+
+image {
+  color: @text;
+}
+
+selection {
+  background-color: alpha(@lavender, 0.4);
+  color: @text;
+}
+
+.error {
+  color: @red;
+}
+
+.success {
+  color: @green;
+}
