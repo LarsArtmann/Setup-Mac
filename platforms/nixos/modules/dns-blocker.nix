@@ -7,7 +7,7 @@
   cfg = config.services.dns-blocker;
   inherit (lib) mkEnableOption mkOption types;
 
-  dnsblockdCert = pkgs.callPackage ../../../pkgs/dnsblockd-cert.nix {};
+  dnsblockdCert = pkgs.dnsblockd-cert;
 
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 

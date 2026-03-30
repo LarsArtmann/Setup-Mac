@@ -115,6 +115,7 @@
     };
 
     dnsblockdOverlay = final: prev: {
+      dnsblockd-cert = prev.callPackage ./pkgs/dnsblockd-cert.nix {};
       dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
         src = prev.lib.cleanSourceWith {
           filter = path: type: baseNameOf path != "package.nix";
