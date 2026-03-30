@@ -46,80 +46,80 @@ in {
     # Wallpapers directory (only when gradient mode enabled)
     xdg.dataFile."wallpapers" = lib.mkIf cfg.enableGradient {
       source = pkgs.linkFarm "wallpapers" [
-      {
-        name = "gradient1.png";
-        path = pkgs.writeText "gradient1.svg" ''
-          <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
-            <defs>
-              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#0f0c29;stop-opacity:1" />
-                <stop offset="50%" style="stop-color:#302b63;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#24243e;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grad1)"/>
-          </svg>
-        '';
-      }
-      {
-        name = "gradient2.png";
-        path = pkgs.writeText "gradient2.svg" ''
-          <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
-            <defs>
-              <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#141E30;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#243B55;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grad2)"/>
-          </svg>
-        '';
-      }
-      {
-        name = "gradient3.png";
-        path = pkgs.writeText "gradient3.svg" ''
-          <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
-            <defs>
-              <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#0f2027;stop-opacity:1" />
-                <stop offset="50%" style="stop-color:#203a43;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#2c5364;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grad3)"/>
-          </svg>
-        '';
-      }
-      {
-        name = "gradient4.png";
-        path = pkgs.writeText "gradient4.svg" ''
-          <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
-            <defs>
-              <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#654ea3;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#eaafc8;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grad4)"/>
-          </svg>
-        '';
-      }
-      {
-        name = "gradient5.png";
-        path = pkgs.writeText "gradient5.svg" ''
-          <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
-            <defs>
-              <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:#ff0099;stop-opacity:1" />
-                <stop offset="50%" style="stop-color:#493240;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#0f0c29;stop-opacity:1" />
-              </linearGradient>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grad5)"/>
-          </svg>
-        '';
-      }
-    ];
+        {
+          name = "gradient1.png";
+          path = pkgs.writeText "gradient1.svg" ''
+            <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+              <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#0f0c29;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#302b63;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#24243e;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grad1)"/>
+            </svg>
+          '';
+        }
+        {
+          name = "gradient2.png";
+          path = pkgs.writeText "gradient2.svg" ''
+            <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+              <defs>
+                <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#141E30;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#243B55;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grad2)"/>
+            </svg>
+          '';
+        }
+        {
+          name = "gradient3.png";
+          path = pkgs.writeText "gradient3.svg" ''
+            <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+              <defs>
+                <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#0f2027;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#203a43;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#2c5364;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grad3)"/>
+            </svg>
+          '';
+        }
+        {
+          name = "gradient4.png";
+          path = pkgs.writeText "gradient4.svg" ''
+            <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+              <defs>
+                <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#654ea3;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#eaafc8;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grad4)"/>
+            </svg>
+          '';
+        }
+        {
+          name = "gradient5.png";
+          path = pkgs.writeText "gradient5.svg" ''
+            <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080">
+              <defs>
+                <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ff0099;stop-opacity:1" />
+                  <stop offset="50%" style="stop-color:#493240;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#0f0c29;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              <rect width="100%" height="100%" fill="url(#grad5)"/>
+            </svg>
+          '';
+        }
+      ];
     };
 
     # swww daemon and control scripts
@@ -212,7 +212,7 @@ in {
         #!/bin/bash
         # Switch to previous wallpaper manually
 
-        WALLPAPER_DIR="$HOME/.local/share/wallpapers"
+        WALLPAPER_DIR="${cfg.wallpaperDir}"
         WALLPAPERS=("$WALLPAPER_DIR"/*)
         WALLPAPER_COUNT=''${#WALLPAPERS[@]}
 

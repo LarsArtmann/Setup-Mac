@@ -26,6 +26,7 @@
       transitionType = "random"; # Random transition direction
       transitionStep = 90; # Faster transition
       transitionDuration = 3; # 3 second transition
+      wallpaperDir = "/home/lars/projects/wallpapers"; # User-managed wallpapers
     };
 
     # Kitty terminal configuration (TV-friendly font size)
