@@ -113,6 +113,7 @@
 
     # Script to update GitHub token in sops (run manually)
     updateGithubTokenScript = pkgs.writeShellScriptBin "gitea-update-github-token" ''
+      SOPS="${pkgs.sops}/bin/sops"
       # Update GitHub token in sops secrets using gh CLI
       # Auto-detects repo location or uses FLAKE_ROOT env var
       set -euo pipefail
@@ -187,13 +188,13 @@
       echo "Updating sops secrets..."
       cd "$(dirname "$SECRETS_FILE")"
 
-      sops set "$SECRETS_FILE" '["github_token"]' "\"$GITHUB_TOKEN\""
+      $SOPS set "$SECRETS_FILE" '["github_token"]' "\"$GITHUB_TOKEN\""
 
       # Update github_user if needed
-      CURRENT_USER=$(sops -d --extract '["github_user"]' "$SECRETS_FILE" 2>/dev/null || echo "")
+      CURRENT_USER=$($SOPS -d --extract '["github_user"]' "$SECRETS_FILE" 2>/dev/null || echo "")
       if [[ "$CURRENT_USER" != "$GITHUB_USER" ]]; then
         echo "Updating github_user: $CURRENT_USER → $GITHUB_USER"
-        sops set "$SECRETS_FILE" '["github_user"]' "\"$GITHUB_USER\""
+        $SOPS set "$SECRETS_FILE" '["github_user"]' "\"$GITHUB_USER\""
       fi
 
       echo ""
@@ -221,11 +222,12 @@
     };
 
     config = lib.mkIf cfg.enable {
-      # Ensure gh is available
+      # Ensure gh and sops are available
       environment.systemPackages = [
         ensureReposScript
         updateGithubTokenScript
         pkgs.gh
+        pkgs.sops
       ];
 
       # Systemd service to ensure repos exist
