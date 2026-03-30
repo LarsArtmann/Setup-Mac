@@ -114,11 +114,48 @@
     # Script to update GitHub token in sops (run manually)
     updateGithubTokenScript = pkgs.writeShellScriptBin "gitea-update-github-token" ''
       # Update GitHub token in sops secrets using gh CLI
+      # Auto-detects repo location or uses FLAKE_ROOT env var
       set -euo pipefail
 
-      SECRETS_FILE="/home/lars/projects/SystemNix/platforms/nixos/secrets/secrets.yaml"
+      # Find the SystemNix repo
+      find_repo() {
+        # Check FLAKE_ROOT first (set by nix commands)
+        if [[ -n "''${FLAKE_ROOT:-}" ]] && [[ -d "$FLAKE_ROOT/platforms/nixos/secrets" ]]; then
+          echo "$FLAKE_ROOT"
+          return 0
+        fi
+
+        # Check common locations
+        for dir in "$HOME/Setup-Mac" "$HOME/projects/SystemNix" "$HOME/SystemNix"; do
+          if [[ -d "$dir/platforms/nixos/secrets" ]]; then
+            echo "$dir"
+            return 0
+          fi
+        done
+
+        # Try to find from current directory
+        local curr="$PWD"
+        while [[ "$curr" != "/" ]]; do
+          if [[ -d "$curr/platforms/nixos/secrets" ]]; then
+            echo "$curr"
+            return 0
+          fi
+          curr="$(dirname "$curr")"
+        done
+
+        return 1
+      }
+
+      REPO_ROOT=$(find_repo) || {
+        echo "Error: Could not find SystemNix repo"
+        echo "Make sure you're in the repo directory or set FLAKE_ROOT"
+        exit 1
+      }
+
+      SECRETS_FILE="$REPO_ROOT/platforms/nixos/secrets/secrets.yaml"
 
       echo "=== Update GitHub Token ==="
+      echo "Repo: $REPO_ROOT"
       echo ""
 
       # Get token from gh CLI
@@ -163,7 +200,7 @@
       echo "✅ Token updated in sops!"
       echo ""
       echo "Next steps:"
-      echo "  sudo nixos-rebuild switch --flake .#evo-x2"
+      echo "  cd $REPO_ROOT && sudo nixos-rebuild switch --flake .#evo-x2"
     '';
   in {
     options.services.gitea-repos = {
