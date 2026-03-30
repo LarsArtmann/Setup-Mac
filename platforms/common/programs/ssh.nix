@@ -21,6 +21,17 @@
       user = "root";
     };
 
+    # GMKtec evo-x2 (NixOS workstation) - keepalive prevents timeout during idle
+    "evo-x2" = {
+      hostname = "192.168.1.162";
+      user = "lars";
+      serverAliveInterval = 60;
+      serverAliveCountMax = 3;
+      extraOptions = {
+        TCPKeepAlive = "yes";
+      };
+    };
+
     # GitHub with connection pooling and optimizations (cross-platform)
     "github.com" = {
       user = "git";
@@ -41,7 +52,8 @@
       forwardAgent = lib.mkDefault false;
       addKeysToAgent = lib.mkDefault "no";
       compression = lib.mkDefault false;
-      serverAliveInterval = lib.mkDefault 0;
+      # Send keepalive every 60s to prevent connection timeout
+      serverAliveInterval = lib.mkDefault 60;
       serverAliveCountMax = lib.mkDefault 3;
       hashKnownHosts = lib.mkDefault false;
       userKnownHostsFile = lib.mkDefault "~/.ssh/known_hosts";
