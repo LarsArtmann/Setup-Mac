@@ -34,44 +34,45 @@
       random_page_cost = "1.1";
     };
 
-    # Systemd restart policies for Immich services
-    systemd.services.immich-server.serviceConfig = {
-      Restart = lib.mkForce "on-failure";
-      RestartSec = lib.mkForce "5s";
-    };
-    systemd.services.immich-machine-learning.serviceConfig = {
-      Restart = lib.mkForce "on-failure";
-      RestartSec = lib.mkForce "10s";
-    };
-
-    systemd.services.immich-db-backup = {
-      description = "Immich PostgreSQL database backup";
-      path = [config.services.postgresql.package];
-      after = ["postgresql.service" "immich-server.service"];
-      requires = ["postgresql.service"];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "immich";
-        Group = "immich";
+    systemd = {
+      services = {
+        immich-server.serviceConfig = {
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5s";
+        };
+        immich-machine-learning.serviceConfig = {
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "10s";
+        };
+        immich-db-backup = {
+          description = "Immich PostgreSQL database backup";
+          path = [config.services.postgresql.package];
+          after = ["postgresql.service" "immich-server.service"];
+          requires = ["postgresql.service"];
+          serviceConfig = {
+            Type = "oneshot";
+            User = "immich";
+            Group = "immich";
+          };
+          script = ''
+            set -euo pipefail
+            backupDir="${cfg.mediaLocation}/database-backup"
+            mkdir -p "$backupDir"
+            stamp="$(date +%Y%m%d-%H%M%S)"
+            pg_dump --host=/run/postgresql --clean --if-exists --dbname=${cfg.database.name} \
+              > "$backupDir/immich-$stamp.sql"
+            find "$backupDir" -name "immich-*.sql" -mtime +7 -delete
+            echo "immich-db-backup: completed -> immich-$stamp.sql"
+          '';
+        };
       };
-      script = ''
-        set -euo pipefail
-        backupDir="${cfg.mediaLocation}/database-backup"
-        mkdir -p "$backupDir"
-        stamp="$(date +%Y%m%d-%H%M%S)"
-        pg_dump --host=/run/postgresql --clean --if-exists --dbname=${cfg.database.name} \
-          > "$backupDir/immich-$stamp.sql"
-        find "$backupDir" -name "immich-*.sql" -mtime +7 -delete
-        echo "immich-db-backup: completed -> immich-$stamp.sql"
-      '';
-    };
-
-    systemd.timers.immich-db-backup = {
-      description = "Daily Immich database backup";
-      wantedBy = ["timers.target"];
-      timerConfig = {
-        OnCalendar = "daily";
-        Persistent = true;
+      timers.immich-db-backup = {
+        description = "Daily Immich database backup";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnCalendar = "daily";
+          Persistent = true;
+        };
       };
     };
   };

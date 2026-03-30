@@ -60,6 +60,18 @@ in {
   options.services.dns-blocker = {
     enable = mkEnableOption "DNS blocker with unbound + block page";
 
+    blockInterface = mkOption {
+      type = types.str;
+      default = "lo";
+      description = "Network interface for block IP address";
+    };
+
+    blockIPPrefix = mkOption {
+      type = types.int;
+      default = 8;
+      description = "Network prefix length for block IP";
+    };
+
     blockIP = mkOption {
       type = types.str;
       default = "127.0.0.2";
@@ -184,8 +196,8 @@ in {
       };
     };
 
-    networking.localCommands = ''
-      ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/8 dev lo 2>/dev/null || true
+    networking.localCommands = lib.mkIf (cfg.blockInterface == "lo") ''
+      ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev lo 2>/dev/null || true
     '';
 
     security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd-ca.crt"];
@@ -218,34 +230,38 @@ in {
         after = ["network.target"];
         wantedBy = ["multi-user.target"];
 
-        serviceConfig = {
-          Type = "simple";
-          ExecStart =
-            "${pkgs.dnsblockd}/bin/dnsblockd"
-            + " -addr ${cfg.blockIP}"
-            + " -port ${toString cfg.blockPort}"
-            + " -tls-port ${toString cfg.blockTLSPort}"
-            + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
-            + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
-            + " -stats-addr 127.0.0.1"
-            + " -stats-port ${toString cfg.statsPort}"
-            + " -blocklist-mapping ${processedBlocklist}/mapping.json"
-            + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
-            + (
-              if cfg.categories != {}
-              then " -categories ${categoriesJSON}"
-              else ""
-            );
-          StateDirectory = "dnsblockd";
-          Restart = "on-failure";
-          RestartSec = "3s";
+        serviceConfig =
+          {
+            Type = "simple";
+            ExecStart =
+              "${pkgs.dnsblockd}/bin/dnsblockd"
+              + " -addr ${cfg.blockIP}"
+              + " -port ${toString cfg.blockPort}"
+              + " -tls-port ${toString cfg.blockTLSPort}"
+              + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
+              + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
+              + " -stats-addr 127.0.0.1"
+              + " -stats-port ${toString cfg.statsPort}"
+              + " -blocklist-mapping ${processedBlocklist}/mapping.json"
+              + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
+              + (
+                if cfg.categories != {}
+                then " -categories ${categoriesJSON}"
+                else ""
+              );
+            StateDirectory = "dnsblockd";
+            Restart = "on-failure";
+            RestartSec = "3s";
 
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
-        };
+            ProtectSystem = "strict";
+            ProtectHome = true;
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            RestrictAddressFamilies = ["AF_INET" "AF_INET6"];
+          }
+          // lib.optionalAttrs (cfg.blockInterface != "lo") {
+            ExecStartPre = "${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true";
+          };
       };
 
       user.services.dnsblockd-cert-import = {

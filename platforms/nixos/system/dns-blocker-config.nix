@@ -14,9 +14,11 @@
   services.dns-blocker = {
     enable = true;
 
-    blockIP = "127.0.0.2";
-    blockPort = 8080;
-    blockTLSPort = 8443;
+    blockIP = "192.168.1.163";
+    blockPort = 80;
+    blockTLSPort = 443;
+    blockInterface = "enp1s0";
+    blockIPPrefix = 24;
     statsPort = 9090;
 
     blocklists = [

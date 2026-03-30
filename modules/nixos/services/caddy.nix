@@ -16,24 +16,28 @@
       virtualHosts = {
         "immich.lan" = {
           extraConfig = ''
+            bind 192.168.1.162
             reverse_proxy localhost:${toString config.services.immich.port}
           '';
         };
 
         "gitea.lan" = {
           extraConfig = ''
+            bind 192.168.1.162
             reverse_proxy localhost:3000
           '';
         };
 
         "grafana.lan" = {
           extraConfig = ''
+            bind 192.168.1.162
             reverse_proxy localhost:3001
           '';
         };
 
         "home.lan" = {
           extraConfig = ''
+            bind 192.168.1.162
             reverse_proxy localhost:8082
           '';
         };

@@ -1623,11 +1623,11 @@ dns-test:
         echo "  google.com:"; \
         dig google.com +short | head -1 || echo "    ❌ Resolution failed"; \
         echo ""; \
-        echo "Testing ad blocking (should return 127.0.0.2 for blocked domains)..."; \
+        echo "Testing ad blocking (should return 192.168.1.163 for blocked domains)..."; \
         echo "  doubleclick.net:"; \
         RESULT=$$(dig doubleclick.net +short); \
-        if [ "$$RESULT" = "127.0.0.2" ]; then \
-            echo "    ✅ Blocked (127.0.0.2)"; \
+        if [ "$$RESULT" = "192.168.1.163" ]; then \
+            echo "    ✅ Blocked (192.168.1.163)"; \
         elif [ -z "$$RESULT" ]; then \
             echo "    ✅ Blocked (NXDOMAIN)"; \
         else \

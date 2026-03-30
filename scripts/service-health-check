@@ -42,7 +42,7 @@ check_service "postgresql"
 check_service "redis-immich"
 check_url "Immich Web" "http://localhost:2283"
 check_url "Caddy Proxy" "http://immich.lan"
-check_url "dnsblockd Stats" "http://127.0.0.2:9090/stats"
+check_url "dnsblockd Stats" "http://127.0.0.1:9090/stats"
 check_dns
 
 # Notify

@@ -73,6 +73,7 @@ var (
 	tempAllowlist     map[string]TempAllowEntry
 	tempAllowlistMu   sync.RWMutex
 	tempAllowlistPath string
+	fallbackDomain    string
 )
 
 type BlockPageData struct {
@@ -414,7 +415,7 @@ func getCertForDomain(domain string) (*tls.Certificate, error) {
 func getCertificate(hello *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	domain := hello.ServerName
 	if domain == "" {
-		domain = "127.0.0.2"
+		domain = fallbackDomain
 	}
 
 	domain = strings.TrimPrefix(domain, "www.")
@@ -766,6 +767,7 @@ func main() {
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
 	blocklistMappingFile := flag.String("blocklist-mapping", "", "JSON file mapping domains to their blocklist source")
 	flag.Parse()
+	fallbackDomain = cfg.ListenAddr
 
 	if tempAllowlistPath != "" {
 		loadTempAllowlist(tempAllowlistPath)

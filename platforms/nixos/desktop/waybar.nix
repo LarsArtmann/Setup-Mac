@@ -67,7 +67,7 @@
         "custom/dns-stats" = {
           format = " {} {text}";
           exec = pkgs.writeShellScript "waybar-dns-stats" ''
-            STATS=$(${pkgs.curl}/bin/curl -sf --connect-timeout 2 http://127.0.0.2:9090/stats 2>/dev/null || echo "")
+            STATS=$(${pkgs.curl}/bin/curl -sf --connect-timeout 2 http://127.0.0.1:9090/stats 2>/dev/null || echo "")
             if [ -z "$STATS" ]; then
               echo "DNS: off"
               exit 0
@@ -88,7 +88,7 @@
           '';
           return-type = "json";
           interval = 30;
-          on-click = "xdg-open http://127.0.0.2:9090/stats";
+          on-click = "xdg-open http://127.0.0.1:9090/stats";
         };
 
         "hyprland/workspaces" = {
