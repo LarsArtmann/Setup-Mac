@@ -100,6 +100,36 @@
     wrapper-modules,
     ...
   }:
+    let
+      goOverlay = final: prev: {
+        go = prev.go_1_26.overrideAttrs (oldAttrs: {
+          version = "1.26.1";
+          src = prev.fetchurl {
+            url = "https://go.dev/dl/go1.26.1.src.tar.gz";
+            hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
+          };
+        });
+      };
+
+      awWatcherOverlay = final: prev: {
+        aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+      };
+
+      dnsblockdOverlay = final: prev: {
+        dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
+          src = prev.lib.cleanSourceWith {
+            filter = path: type: baseNameOf path != "package.nix";
+            src = ./platforms/nixos/programs/dnsblockd;
+          };
+        };
+        dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
+          src = prev.lib.cleanSourceWith {
+            filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
+            src = ./pkgs/dnsblockd-processor;
+          };
+        };
+      };
+    in
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["aarch64-darwin" "x86_64-linux"];
 
@@ -129,21 +159,8 @@
           config.allowUnfree = true;
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays = [
-            # Pin Go to version 1.26.1 for all systems
-            # Note: buildGo126Module already exists in nixpkgs, no need to override buildGoModule
-            (final: prev: {
-              go = prev.go_1_26.overrideAttrs (oldAttrs: {
-                version = "1.26.1";
-                src = prev.fetchurl {
-                  url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-                  hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-                };
-              });
-            })
-            # Custom ActivityWatch watcher for system utilization monitoring
-            (final: prev: {
-              aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-            })
+            goOverlay
+            awWatcherOverlay
           ];
         };
 
@@ -154,17 +171,15 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            aw-watcher-utilization = pkgs.callPackage ./pkgs/aw-watcher-utilization.nix {};
+            aw-watcher-utilization = pkgs.aw-watcher-utilization;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            # dnsblockd - serves HTML block pages for DNS-filtered domains
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
               src = lib.cleanSourceWith {
                 filter = path: type: baseNameOf path != "package.nix";
                 src = ./platforms/nixos/programs/dnsblockd;
               };
             };
-            # dnsblockd-processor - Go tool to merge/dedup blocklists at build time (replaces slow Nix eval)
             dnsblockd-processor = pkgs.callPackage ./pkgs/dnsblockd-processor/package.nix {
               src = lib.cleanSourceWith {
                 filter = path: type: !lib.hasSuffix (baseNameOf path) ".nix";
@@ -209,24 +224,11 @@
             inherit otel-tui;
           };
           modules = [
-            # Pin Go to version 1.26 for all packages in system
             {
               nixpkgs.config.allowUnfree = true;
               nixpkgs.overlays = [
                 nur.overlays.default
-                (final: prev: {
-                  go = prev.go_1_26.overrideAttrs (oldAttrs: {
-                    version = "1.26.1";
-                    src = prev.fetchurl {
-                      url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-                      hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-                    };
-                  });
-                })
-                # Custom ActivityWatch watcher for system utilization monitoring
-                (final: prev: {
-                  aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-                })
+                awWatcherOverlay
               ];
             }
 
@@ -289,28 +291,10 @@
               # Add NUR overlay to make nur.repos available
               nixpkgs.overlays = [
                 nur.overlays.default
-                # Niri flake overlay for stable/unstable packages
                 inputs.niri.overlays.niri
-                # Custom ActivityWatch watcher for system utilization monitoring
-                (final: prev: {
-                  aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-                })
-                # dnsblockd - DNS block page server + blocklist processor
-                (final: prev: {
-                  dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
-                    src = prev.lib.cleanSourceWith {
-                      filter = path: type: baseNameOf path != "package.nix";
-                      src = ./platforms/nixos/programs/dnsblockd;
-                    };
-                  };
-                  dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
-                    src = prev.lib.cleanSourceWith {
-                      filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
-                      src = ./pkgs/dnsblockd-processor;
-                    };
-                  };
-                })
-                # Disable heavy ML test suites (timm runs pytest for 2+ hours)
+                goOverlay
+                awWatcherOverlay
+                dnsblockdOverlay
                 (final: prev: {
                   python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
                     timm = pyPrev.timm.overridePythonAttrs (old: { doCheck = false; });

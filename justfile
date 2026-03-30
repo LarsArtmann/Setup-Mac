@@ -929,18 +929,18 @@ context ACTION="detect":
 # Run full performance analysis
 perf-full-analysis:
     @echo "🚀 Running comprehensive performance analysis..."
-    @just benchmark-all
-    @just perf-benchmark
-    @just context-analyze
-    @just context-recommend
-    @just perf-report
+    @just benchmark all
+    @just perf benchmark
+    @just context analyze
+    @just context recommend
+    @just perf report
     @echo "✅ Full performance analysis complete"
 
 # Setup all automation systems
 automation-setup:
     @echo "🤖 Setting up all automation systems..."
-    @just perf-setup
-    @just context-setup
+    @just perf setup
+    @just context setup
     @echo "✅ All automation systems setup complete"
 
 # Debug shell startup with verbose logging
