@@ -34,11 +34,18 @@ in {
     };
 
     enableGradient = lib.mkEnableOption "Use gradient animations instead of static wallpapers";
+
+    wallpaperDir = lib.mkOption {
+      type = lib.types.str;
+      default = "$HOME/.local/share/wallpapers";
+      description = "Directory containing wallpaper images";
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    # Wallpapers directory
-    xdg.dataFile."wallpapers".source = pkgs.linkFarm "wallpapers" [
+    # Wallpapers directory (only when gradient mode enabled)
+    xdg.dataFile."wallpapers" = lib.mkIf cfg.enableGradient {
+      source = pkgs.linkFarm "wallpapers" [
       {
         name = "gradient1.png";
         path = pkgs.writeText "gradient1.svg" ''
@@ -113,6 +120,7 @@ in {
         '';
       }
     ];
+    };
 
     # swww daemon and control scripts
     home.packages = [
@@ -120,14 +128,11 @@ in {
         #!/bin/bash
         # Hyprland Animated Wallpaper Script with swww
 
-        WALLPAPER_DIR="$HOME/.local/share/wallpapers"
+        WALLPAPER_DIR="${cfg.wallpaperDir}"
         INTERVAL=${toString cfg.updateInterval}
         TRANSITION="${cfg.transitionType}"
         STEP=${toString cfg.transitionStep}
         DURATION=${toString cfg.transitionDuration}
-
-        # Create wallpaper directory if it doesn't exist
-        mkdir -p "$WALLPAPER_DIR"
 
         # Initialize swww daemon
         echo "🎨 Initializing swww..."
@@ -173,7 +178,7 @@ in {
         #!/bin/bash
         # Switch to next wallpaper manually
 
-        WALLPAPER_DIR="$HOME/.local/share/wallpapers"
+        WALLPAPER_DIR="${cfg.wallpaperDir}"
         WALLPAPERS=("$WALLPAPER_DIR"/*)
         WALLPAPER_COUNT=''${#WALLPAPERS[@]}
 
