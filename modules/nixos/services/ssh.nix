@@ -1,7 +1,4 @@
-{
-  inputs,
-  ...
-}: {
+{inputs, ...}: {
   flake.nixosModules.ssh = _: {
     # Enable OpenSSH daemon with hardening
     services.openssh = {

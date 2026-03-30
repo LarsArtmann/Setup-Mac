@@ -1,4 +1,8 @@
-{lib, pkgs, ...}: {
+{
+  lib,
+  pkgs,
+  ...
+}: {
   # Common Nix settings (platform-agnostic)
   nix = {
     enable = true;

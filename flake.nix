@@ -99,37 +99,36 @@
     sops-nix,
     wrapper-modules,
     ...
-  }:
-    let
-      goOverlay = final: prev: {
-        go = prev.go_1_26.overrideAttrs (oldAttrs: {
-          version = "1.26.1";
-          src = prev.fetchurl {
-            url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-            hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-          };
-        });
-      };
-
-      awWatcherOverlay = final: prev: {
-        aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
-      };
-
-      dnsblockdOverlay = final: prev: {
-        dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
-          src = prev.lib.cleanSourceWith {
-            filter = path: type: baseNameOf path != "package.nix";
-            src = ./platforms/nixos/programs/dnsblockd;
-          };
+  }: let
+    goOverlay = final: prev: {
+      go = prev.go_1_26.overrideAttrs (oldAttrs: {
+        version = "1.26.1";
+        src = prev.fetchurl {
+          url = "https://go.dev/dl/go1.26.1.src.tar.gz";
+          hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
         };
-        dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
-          src = prev.lib.cleanSourceWith {
-            filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
-            src = ./pkgs/dnsblockd-processor;
-          };
+      });
+    };
+
+    awWatcherOverlay = final: prev: {
+      aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
+    };
+
+    dnsblockdOverlay = final: prev: {
+      dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
+        src = prev.lib.cleanSourceWith {
+          filter = path: type: baseNameOf path != "package.nix";
+          src = ./platforms/nixos/programs/dnsblockd;
         };
       };
-    in
+      dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
+        src = prev.lib.cleanSourceWith {
+          filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
+          src = ./pkgs/dnsblockd-processor;
+        };
+      };
+    };
+  in
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["aarch64-darwin" "x86_64-linux"];
 
@@ -171,7 +170,7 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            aw-watcher-utilization = pkgs.aw-watcher-utilization;
+            inherit (pkgs) aw-watcher-utilization;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
@@ -297,8 +296,8 @@
                 dnsblockdOverlay
                 (final: prev: {
                   python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-                    timm = pyPrev.timm.overridePythonAttrs (old: { doCheck = false; });
-                    xformers = pyPrev.xformers.overridePythonAttrs (old: { doCheck = false; });
+                    timm = pyPrev.timm.overridePythonAttrs (old: {doCheck = false;});
+                    xformers = pyPrev.xformers.overridePythonAttrs (old: {doCheck = false;});
                   });
                 })
               ];

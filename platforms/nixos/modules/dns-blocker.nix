@@ -147,8 +147,12 @@ in {
 
       settings = {
         server = {
-          interface = ["127.0.0.1" "::1"];
-          access-control = ["127.0.0.0/8 allow" "::1/128 allow"];
+          interface = ["0.0.0.0" "::0"];
+          access-control = [
+            "127.0.0.0/8 allow"
+            "::1/128 allow"
+            "192.168.1.0/24 allow"
+          ];
 
           num-threads = 2;
           msg-cache-size = "64m";

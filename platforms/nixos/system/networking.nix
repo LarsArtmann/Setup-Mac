@@ -9,7 +9,7 @@ _: {
     # Firewall - deny by default, only allow needed ports
     firewall = {
       enable = true;
-      allowedTCPPorts = [22 80 443];
+      allowedTCPPorts = [22 53 80 443];
       allowedUDPPorts = [53];
     };
 
