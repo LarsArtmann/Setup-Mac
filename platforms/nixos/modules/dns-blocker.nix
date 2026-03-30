@@ -221,6 +221,7 @@ in {
     systemd = {
       tmpfiles.rules = [
         "d /var/lib/dnsblockd 0755 root root -"
+        "f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - # dnsblockd temp allowlist placeholder"
       ];
 
       services.dnsblockd = {
