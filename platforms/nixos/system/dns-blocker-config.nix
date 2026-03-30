@@ -143,6 +143,10 @@
 
     enableDNSSEC = true;
 
+    # Temporarily allow all DNS queries (disable blocking)
+    # Set to true to bypass all DNS blocking
+    tempAllowAll = true;
+
     categories = {
       ".doubleclick.net" = "Advertising";
       ".googlesyndication.com" = "Advertising";
