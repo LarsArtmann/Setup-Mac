@@ -122,6 +122,9 @@
       "objects.githubusercontent.com"
       "nominatim.openstreetmap.org"
       "tile.openstreetmap.org"
+      "huggingface.co"
+      "cdn-lfs.huggingface.co"
+      "cdn-lfs-us-1.huggingface.co"
     ];
 
     extraDomains = [
@@ -163,6 +166,7 @@
       ''"gitea.lan. IN A 192.168.1.162"''
       ''"grafana.lan. IN A 192.168.1.162"''
       ''"home.lan. IN A 192.168.1.162"''
+      ''"photomap.lan. IN A 192.168.1.162"''
     ];
   };
 }

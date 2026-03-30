@@ -47,6 +47,14 @@
             reverse_proxy localhost:8082
           '';
         };
+
+        "photomap.lan" = {
+          extraConfig = ''
+            bind 192.168.1.162
+            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            reverse_proxy localhost:8050
+          '';
+        };
       };
     };
 

@@ -142,6 +142,7 @@
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
         ./modules/nixos/services/monitoring.nix
+        ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
         ./modules/nixos/services/ssh.nix
       ];
@@ -328,6 +329,7 @@
             inputs.self.nixosModules.homepage
             inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring
+            inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
             inputs.self.nixosModules.ssh
             ./platforms/nixos/system/configuration.nix
