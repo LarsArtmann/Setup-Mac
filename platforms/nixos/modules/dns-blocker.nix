@@ -51,8 +51,9 @@
         ${processorArgs}
     '';
 
-  # Unbound include file that pulls in blocklist
+  # Unbound include file: temp-allowlist BEFORE blocklist so transparent zones win
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
+    include: /var/lib/dnsblockd/temp-allowlist.conf
     include: ${processedBlocklist}/unbound.conf
   '';
 in {
@@ -231,6 +232,10 @@ in {
         serviceConfig =
           {
             Type = "simple";
+            ExecStartPre = "+${pkgs.writeShellScript "dnsblockd-init" ''
+              install -d /var/lib/dnsblockd
+              [ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\n' > /var/lib/dnsblockd/temp-allowlist.conf
+            ''}";
             ExecStart =
               "${pkgs.dnsblockd}/bin/dnsblockd"
               + " -addr ${cfg.blockIP}"
@@ -242,6 +247,7 @@ in {
               + " -stats-port ${toString cfg.statsPort}"
               + " -blocklist-mapping ${processedBlocklist}/mapping.json"
               + " -unbound-control ${pkgs.unbound}/bin/unbound-control"
+              + " -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf"
               + (
                 if cfg.categories != {}
                 then " -categories ${categoriesJSON}"
