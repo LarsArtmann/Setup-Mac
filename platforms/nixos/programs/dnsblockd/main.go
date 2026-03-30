@@ -229,6 +229,7 @@ func addTempAllow(domain string, duration time.Duration) {
 
 	if tempAllowlistPath != "" {
 		updateUnboundAllowlist(true)
+		go flushUnboundCache(domain)
 	}
 }
 
@@ -306,6 +307,21 @@ func reloadUnbound() error {
 	}
 	log.Printf("reloaded unbound with temp allowlist")
 	return nil
+}
+
+func flushUnboundCache(domain string) {
+	for _, cmd := range []*exec.Cmd{
+		exec.Command("unbound-control", "flush", domain),
+		exec.Command("unbound-control", "flush", "www."+domain),
+		exec.Command("unbound-control", "flush_type", domain, "A"),
+		exec.Command("unbound-control", "flush_type", domain, "AAAA"),
+		exec.Command("unbound-control", "flush_type", domain, "HTTPS"),
+	} {
+		if output, err := cmd.CombinedOutput(); err != nil {
+			log.Printf("unbound cache flush failed for %s: %v (%s)", domain, err, strings.TrimSpace(string(output)))
+		}
+	}
+	log.Printf("flushed unbound cache for %s", domain)
 }
 
 func loadCA(certFile, keyFile string) error {
