@@ -120,6 +120,7 @@
       "github.com"
       "github-releases.githubusercontent.com"
       "objects.githubusercontent.com"
+      "linkedin.com"
       "nominatim.openstreetmap.org"
       "tile.openstreetmap.org"
       "huggingface.co"
