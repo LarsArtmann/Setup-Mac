@@ -125,6 +125,7 @@
       "huggingface.co"
       "cdn-lfs.huggingface.co"
       "cdn-lfs-us-1.huggingface.co"
+      "us.i.posthog.com"
     ];
 
     extraDomains = [
