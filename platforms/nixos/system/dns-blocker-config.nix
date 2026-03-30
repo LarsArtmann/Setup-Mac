@@ -17,7 +17,7 @@
     blockIP = "192.168.1.163";
     blockPort = 80;
     blockTLSPort = 443;
-    blockInterface = "enp1s0";
+    blockInterface = "eno1";
     blockIPPrefix = 24;
     statsPort = 9090;
 
