@@ -2,7 +2,7 @@
 # Network & DNS Diagnostic Script for NixOS evo-x2
 # Run this on the NixOS machine to diagnose DNS issues
 
-set -e
+set -euo pipefail
 
 echo "╔══════════════════════════════════════════════════════╗"
 echo "║  NIXOS DNS & NETWORK DIAGNOSTIC TOOL                    ║"

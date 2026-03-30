@@ -2,7 +2,7 @@
 # Stream system audio to Google Nest Audio
 # Usage: ./cast-all-audio.sh <nest-ip>
 
-set -e
+set -euo pipefail
 
 NEST_IP="${1:-192.168.1.150}"
 LOCAL_IP=$(hostname -I | awk '{print $1}')

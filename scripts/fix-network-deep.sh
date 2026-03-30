@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 echo "🔧 DEEP FIX: NetworkManager → dhcpcd migration"
 echo "==============================================="

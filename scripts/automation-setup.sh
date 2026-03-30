@@ -3,7 +3,7 @@
 # Automation Setup Script
 # Sets up all GROUP 4 automation and monitoring tools
 
-set -e
+set -euo pipefail
 
 # Source path library for cross-platform compatibility
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

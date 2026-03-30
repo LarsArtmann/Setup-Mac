@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 echo "🔧 Fixing Nix cache DNS issues..."
 echo ""

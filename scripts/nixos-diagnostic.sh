@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Comprehensive diagnostic script for NixOS Home Manager errors
 
-set -e
+set -euo pipefail
 
 echo "🔍 NixOS Home Manager Diagnostic Tool"
 echo "====================================="

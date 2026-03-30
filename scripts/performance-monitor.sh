@@ -3,7 +3,7 @@
 # Performance Monitoring System
 # Tracks shell startup times, monitors regressions, and manages caching
 
-set -e
+set -euo pipefail
 
 # Configuration
 MONITOR_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/performance-monitor"

@@ -3,7 +3,7 @@
 # Improved System Performance Benchmark Script
 # Automated monitoring for shell startup, build tools, and system performance
 
-set -e
+set -euo pipefail
 
 # Configuration
 BENCHMARK_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/benchmarks"

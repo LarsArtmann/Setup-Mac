@@ -5,7 +5,7 @@
 # Usage: ./scripts/update-crush-latest.sh [--switch]
 #   --switch: Automatically switch to the new configuration after building
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"

@@ -4,7 +4,7 @@
 # This script provides instructions for manually adding Spotlight Privacy exclusions
 # These exclusions significantly improve indexing performance and prevent unnecessary indexing
 
-set -e
+set -euo pipefail
 
 echo "🔍 Spotlight Privacy Exclusions Setup"
 echo "====================================="

@@ -227,7 +227,8 @@ in {
 
       services.dnsblockd = {
         description = "DNS Block Page Server";
-        after = ["network.target"];
+        after = ["network-online.target"];
+        wants = ["network-online.target"];
         wantedBy = ["multi-user.target"];
 
         serviceConfig =
