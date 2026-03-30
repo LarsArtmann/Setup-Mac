@@ -51,9 +51,10 @@
         ${processorArgs}
     '';
 
-  # Unbound include file that pulls in blocklist
+  # Unbound include file that pulls in blocklist and temp-allowlist
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
     include: ${processedBlocklist}/unbound.conf
+    include: /var/lib/dnsblockd/temp-allowlist.json.conf
   '';
 in {
   options.services.dns-blocker = {
@@ -220,6 +221,8 @@ in {
     systemd = {
       tmpfiles.rules = [
         "d /var/lib/dnsblockd 0755 root root -"
+        "w /var/lib/dnsblockd/temp-allowlist.json 0644 root root - []"
+        "w /var/lib/dnsblockd/temp-allowlist.json.conf 0644 root root - # placeholder"
       ];
 
       services.dnsblockd = {
@@ -241,6 +244,7 @@ in {
               + " -stats-addr 127.0.0.1"
               + " -stats-port ${toString cfg.statsPort}"
               + " -blocklist-mapping ${processedBlocklist}/mapping.json"
+              + " -temp-allowlist /var/lib/dnsblockd/temp-allowlist.json"
               + (
                 if cfg.categories != {}
                 then " -categories ${categoriesJSON}"
