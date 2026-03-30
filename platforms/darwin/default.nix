@@ -82,7 +82,7 @@
     # Home Manager workaround: Explicit user definition required
     # Home Manager's nix-darwin/default.nix imports ../nixos/common.nix which
     # requires config.users.users.<name>.home to be defined for home.directory
-    # See: https://github.com/nix-community/home-manager/issues/XXXX
+    # See: https://github.com/nix-community/home-manager/issues/6036
     users.users.larsartmann = {
       name = "larsartmann";
       home = "/Users/larsartmann";
