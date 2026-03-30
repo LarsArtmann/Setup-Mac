@@ -80,6 +80,11 @@
               description: Photo & Video Management
               icon: immich.png
               ping: localhost:2283
+          - PhotoMapAI:
+              href: http://photomap.lan
+              description: CLIP Embedding Vector Map
+              icon: network-map.png
+              ping: localhost:8050
           - DNS Blocker:
               href: http://localhost:9090/stats
               description: DNS Block Stats

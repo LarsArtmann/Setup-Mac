@@ -138,6 +138,7 @@
         ./modules/nixos/services/caddy.nix
         ./modules/nixos/services/default.nix
         ./modules/nixos/services/gitea.nix
+        ./modules/nixos/services/gitea-repos.nix
         ./modules/nixos/services/grafana.nix
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
@@ -325,6 +326,7 @@
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea
+            inputs.self.nixosModules.gitea-repos
             inputs.self.nixosModules.grafana
             inputs.self.nixosModules.homepage
             inputs.self.nixosModules.immich

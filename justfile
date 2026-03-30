@@ -125,6 +125,37 @@ activitywatch-install-utilization:
     @echo ""
     @bash dotfiles/activitywatch/install-utilization.sh
 
+# Gitea repository management (NixOS only)
+gitea-update-token:
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$PLATFORM" != "linux" ]; then \
+        echo "❌ This command only works on NixOS (evo-x2)"; \
+        echo "   SSH to evo-x2 and run: just gitea-update-token"; \
+        exit 1; \
+    fi; \
+    echo "🔑 Updating GitHub token from gh CLI..."; \
+    gitea-update-github-token
+
+gitea-sync-repos:
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$PLATFORM" != "linux" ]; then \
+        echo "❌ This command only works on NixOS (evo-x2)"; \
+        echo "   SSH to evo-x2 and run: just gitea-sync-repos"; \
+        exit 1; \
+    fi; \
+    echo "🔄 Syncing GitHub repos to Gitea..."; \
+    gitea-ensure-repos
+
+gitea-setup:
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$PLATFORM" != "linux" ]; then \
+        echo "❌ This command only works on NixOS (evo-x2)"; \
+        echo "   SSH to evo-x2 and run: just gitea-setup"; \
+        exit 1; \
+    fi; \
+    echo "🚀 Gitea setup helper..."; \
+    gitea-setup
+
 # Clean up caches and old packages (comprehensive cleanup)
 clean:
     @PLATFORM=$(just _detect_platform); \
