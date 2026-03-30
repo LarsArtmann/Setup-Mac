@@ -32,9 +32,9 @@
           on-resume = "hyprctl dispatch dpms on";
         }
         {
-          # Suspend after 60 minutes
+          # Suspend after 60 minutes (only if no active SSH sessions)
           timeout = 3600;
-          on-timeout = "systemctl suspend";
+          on-timeout = "sh -c '! ss -tn | grep -q \":22.*ESTABLISHED\" && systemctl suspend'";
         }
       ];
     };
