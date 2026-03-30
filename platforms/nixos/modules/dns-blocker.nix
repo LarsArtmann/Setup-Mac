@@ -52,8 +52,11 @@
     '';
 
   # Unbound include file: temp-allowlist BEFORE blocklist so transparent zones win
+  tempAllowlistConf = pkgs.writeText "temp-allowlist.conf" ''
+    # dnsblockd temp allowlist - modified at runtime via unbound-control reload
+  '';
   unboundIncludeFile = pkgs.writeText "dns-blocker-unbound.conf" ''
-    include: /var/lib/dnsblockd/temp-allowlist.conf
+    include: ${tempAllowlistConf}
     include: ${processedBlocklist}/unbound.conf
   '';
 in {
