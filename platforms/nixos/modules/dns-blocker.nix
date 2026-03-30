@@ -149,6 +149,12 @@ in {
       default = {};
       description = "Domain suffix -> category for block page";
     };
+
+    tempAllowAll = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Temporarily allow all DNS queries (disable blocking). Write 'local-zone: \".\" transparent' to temp-allowlist.conf";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -186,6 +192,10 @@ in {
           local-zone = map (d: ''"${d}" transparent'') cfg.whitelist;
         };
 
+        remote-control = {
+          control-enable = true;
+        };
+
         forward-zone = [
           {
             name = ".";
@@ -221,8 +231,8 @@ in {
     systemd = {
       tmpfiles.rules = [
         "d /var/lib/dnsblockd 0755 root root -"
-        "f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - # dnsblockd temp allowlist placeholder"
-      ];
+      ] ++ lib.optional (!cfg.tempAllowAll) ''f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - # dnsblockd temp allowlist placeholder''
+        ++ lib.optional cfg.tempAllowAll ''f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - 'local-zone: "." transparent\n' '';
 
       services.dnsblockd = {
         description = "DNS Block Page Server";
@@ -230,13 +240,26 @@ in {
         wants = ["network-online.target"];
         wantedBy = ["multi-user.target"];
 
-        serviceConfig =
+        serviceConfig = let
+          initScript = pkgs.writeShellScript "dnsblockd-init" ''
+            install -d /var/lib/dnsblockd
+            ${if cfg.tempAllowAll then "printf 'local-zone: \".\" transparent\\n' > /var/lib/dnsblockd/temp-allowlist.conf" else "[ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\\n' > /var/lib/dnsblockd/temp-allowlist.conf"}
+          '';
+          addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
+            ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+          '';
+          delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
+            ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+          '';
+        in
           {
             Type = "simple";
-            ExecStartPre = "+${pkgs.writeShellScript "dnsblockd-init" ''
-              install -d /var/lib/dnsblockd
-              [ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\n' > /var/lib/dnsblockd/temp-allowlist.conf
-            ''}";
+            ExecStartPre = if cfg.blockInterface == "lo"
+              then "+${initScript}"
+              else [
+                "+-${addIPScript}"
+                "+${initScript}"
+              ];
             ExecStart =
               "${pkgs.dnsblockd}/bin/dnsblockd"
               + " -addr ${cfg.blockIP}"
@@ -266,16 +289,7 @@ in {
             CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
           }
           // lib.optionalAttrs (cfg.blockInterface != "lo") {
-            ExecStartPre = let
-              addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
-                ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
-              '';
-            in "+-${addIPScript}";
-            ExecStopPost = let
-              delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
-                ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
-              '';
-            in "+-${delIPScript}";
+            ExecStopPost = "+-${delIPScript}";
           };
       };
 
