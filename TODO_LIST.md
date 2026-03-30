@@ -37,13 +37,12 @@
 ```
 **Action**: Research and resolve AppArmor/audit compatibility
 
-### 3. Update Home Manager Issue Reference (Darwin)
+### 3. Update Home Manager Issue Reference (Darwin) — RESOLVED
 **File**: `platforms/darwin/default.nix:85`
-**Priority**: LOW
-```nix
-# See: https://github.com/nix-community/home-manager/issues/XXXX
+**Priority**: LOW ~~nix
+# See: https://github.com/nix-community/home-manager/issues/6036
 ```
-**Action**: Find and replace XXXX with actual Home Manager issue number
+**Status**: Done - tracked to issue #6036 about darwin user home directory requirement
 
 ---
 
