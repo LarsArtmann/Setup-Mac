@@ -126,6 +126,7 @@
     grimblast
     playerctl
     brightnessctl
+    ddcutil
     cliphist
     wl-clipboard
     wl-clip-persist # Keeps clipboard content after programs close
