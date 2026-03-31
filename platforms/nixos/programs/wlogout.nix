@@ -7,7 +7,7 @@
     layout = [
       {
         label = "lock";
-        action = "${pkgs.hyprlock}/bin/hyprlock";
+        action = "swaylock";
         text = "Lock";
         keybind = "l";
       }
@@ -19,7 +19,7 @@
       }
       {
         label = "logout";
-        action = "hyprctl dispatch exit";
+        action = "niri msg action quit";
         text = "Logout";
         keybind = "e";
       }

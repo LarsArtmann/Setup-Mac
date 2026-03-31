@@ -1,5 +1,5 @@
 {pkgs, ...}: {
-  # Enable backup window manager alongside Hyprland
+  # Backup window manager alongside Niri
   # This allows switching between different WMs at SDDM login screen
 
   programs = {

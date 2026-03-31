@@ -8,27 +8,13 @@
     ../programs/shells.nix # NixOS shell configuration
     ../programs/rofi.nix # Rofi launcher with Catppuccin theme
     ../programs/wlogout.nix # Power menu with Catppuccin theme
-    ../programs/hyprlock.nix # Lock screen with Catppuccin theme
-    ../programs/hypridle.nix # Idle management daemon
     ../programs/zellij.nix # Zellij terminal multiplexer
     ../programs/niri-wrapped.nix # Niri scrollable-tiling compositor via niri-flake HM module
-    ../desktop/hyprland.nix # RE-ENABLED for desktop functionality
-    ../desktop/waybar.nix # Status bar (shared by Hyprland and niri)
-    ../modules/hyprland-animated-wallpaper.nix
+    ../desktop/waybar.nix # Status bar for niri
   ];
 
   # Programs configuration
   programs = {
-    # Enable animated wallpaper with swww
-    hyprland-animated-wallpaper = {
-      enable = true;
-      updateInterval = 30; # Change wallpaper every 30 seconds
-      transitionType = "random"; # Random transition direction
-      transitionStep = 90; # Faster transition
-      transitionDuration = 3; # 3 second transition
-      wallpaperDir = "/home/lars/projects/wallpapers"; # User-managed wallpapers
-    };
-
     # Kitty terminal configuration (TV-friendly font size)
     kitty = {
       enable = true;
@@ -92,13 +78,12 @@
 
   # NixOS-specific session variables
   home.sessionVariables = {
-    # Wayland/Hyprland specific
+    # Wayland specific
     MOZ_ENABLE_WAYLAND = "1";
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
 
-    # Cursor theme for Hyprland (Wayland)
-    # Note: XCURSOR_SIZE does NOT work in Wayland/Hyprland
+    # Cursor theme for Wayland compositors
     # Cursor size is determined by the cursor theme's built-in sizes
     # Bibata has XL size (96px) built-in
     XCURSOR_THEME = "Bibata-Modern-Classic";
@@ -133,15 +118,10 @@
     # Note: rofi moved to multi-wm.nix for system-wide availability
     # Note: xdg-utils moved to base.nix for cross-platform consistency
 
-    # Hyprland-specific packages (moved from desktop/hyprland.nix to avoid NixOS module conflict)
+    # Desktop packages
     kitty
     ghostty
     foot
-    hyprpaper
-    hyprlock
-    hypridle
-    hyprpicker
-    hyprsunset
     dunst
     libnotify
     wlogout
@@ -153,8 +133,8 @@
     wl-clip-persist # Keeps clipboard content after programs close
     zellij # Terminal multiplexer (modern tmux alternative)
     # Scripts dependencies
-    jq # JSON processing for hyprctl scripts
-    gawk # Text processing for zellij session menu
+    jq # JSON processing
+    gawk # Text processing
   ];
 
   # XDG configuration (Linux specific)

@@ -188,7 +188,7 @@
       lm_sensors # Hardware monitoring (GPU/CPU temperature)
 
       # Additional ricing tools discovered from community configs
-      hyprpicker # Color picker for Wayland
+      wl-color-picker # Color picker for Wayland
       swappy # Screenshot annotation tool
       imv # Minimal image viewer
       wf-recorder # Screen recorder

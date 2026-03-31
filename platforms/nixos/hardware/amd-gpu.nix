@@ -4,7 +4,7 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-    # Use unstable Mesa for better performance with latest Hyprland
+    # Use latest Mesa for best performance with Wayland compositors
     package = pkgs.mesa;
     package32 = pkgs.pkgsi686Linux.mesa;
     # Note: amdvlk has been deprecated, RADV is now the default driver
@@ -25,7 +25,7 @@
     AMD_VULKAN_ICD = "RADV";
     # Performance optimization
     MESA_VK_WSI_PRESENT_MODE = "fifo";
-    # Remove problematic variables that can cause issues with modern Hyprland
+    # Remove problematic variables that can cause issues with modern Wayland compositors
     # WLR_RENDERER_ALLOW_SOFTWARE = "1";  # Only for debugging
     # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
   };

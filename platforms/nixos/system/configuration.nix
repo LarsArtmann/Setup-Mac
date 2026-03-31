@@ -31,11 +31,9 @@
     ../hardware/bluetooth.nix
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
-    # Desktop modules - reorganized for better separation of concerns
-    # Note: hyprland-system.nix was split into separate modules (commit 5174b9b)
+    # Desktop modules
     ../desktop/display-manager.nix
     ../desktop/audio.nix
-    ../desktop/hyprland-config.nix
     ../desktop/niri-config.nix
     ../desktop/security-hardening.nix
     ../desktop/ai-stack.nix

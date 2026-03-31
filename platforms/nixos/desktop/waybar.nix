@@ -12,10 +12,7 @@
 
         modules-left = [
           "niri/workspaces"
-          "hyprland/workspaces"
-          "hyprland/submap"
           "niri/window"
-          "hyprland/window"
           "custom/gpu"
         ];
 
@@ -89,23 +86,6 @@
           return-type = "json";
           interval = 30;
           on-click = "xdg-open http://127.0.0.1:9090/stats";
-        };
-
-        "hyprland/workspaces" = {
-          disable-scroll = true;
-          all-outputs = true;
-          format = "{name}";
-          swap-icon-label = false;
-          format-icons = {
-            persistent = "";
-            default = "";
-            urgent = "";
-            active = "󰮯";
-          };
-        };
-
-        "hyprland/submap" = {
-          format = "<span style='italic'> {text}</span>";
         };
 
         "idle_inhibitor" = {

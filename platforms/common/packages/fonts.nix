@@ -13,7 +13,7 @@
         pkgs.noto-fonts-color-emoji
         pkgs.noto-fonts-cjk-sans
 
-        # Linux-only: Bibata cursor theme for Hyprcursor
+        # Linux-only: Bibata cursor theme for Wayland
       ]
       ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
         pkgs.bibata-cursors
