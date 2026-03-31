@@ -234,12 +234,13 @@
     };
 
     config = lib.mkIf cfg.enable {
-      # Ensure gh and sops are available
+      # Ensure gh, sops, and age are available
       environment.systemPackages = [
         ensureReposScript
         updateGithubTokenScript
         pkgs.gh
         pkgs.sops
+        pkgs.age
       ];
 
       # Systemd service to ensure repos exist
