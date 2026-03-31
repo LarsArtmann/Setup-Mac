@@ -194,6 +194,7 @@ in {
 
         remote-control = {
           control-enable = true;
+          control-interface = "/run/unbound/unbound.ctl";
         };
 
         forward-zone = [
@@ -271,6 +272,7 @@ in {
               + " -stats-port ${toString cfg.statsPort}"
               + " -blocklist-mapping ${processedBlocklist}/mapping.json"
               + " -unbound-control ${pkgs.unbound}/bin/unbound-control"
+              + " -unbound-socket /run/unbound/unbound.ctl"
               + " -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf"
               + (
                 if cfg.categories != {}
@@ -281,6 +283,7 @@ in {
             Restart = "on-failure";
             RestartSec = "3s";
 
+            SupplementaryGroups = ["unbound"];
             ProtectSystem = "strict";
             ProtectHome = true;
             PrivateTmp = true;

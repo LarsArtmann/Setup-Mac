@@ -34,8 +34,9 @@ type Config struct {
 	CAKeyFile         string
 	Categories        map[string]string
 	BlocklistMapping  map[string]string // domain -> source
-	UnboundControl    string            // path to unbound-control binary
-	AllowlistConf     string            // path to temp allowlist unbound conf
+	UnboundControl    string // path to unbound-control binary
+	UnboundSocket     string // path to unbound control socket
+	AllowlistConf     string // path to temp allowlist unbound conf
 }
 
 type CertCache struct {
@@ -174,7 +175,7 @@ func init() {
 	certCache.certs = make(map[string]*tls.Certificate)
 }
 
-func addTempAllow(domain string, duration time.Duration, unboundControl string, allowlistConf string) {
+func addTempAllow(domain string, duration time.Duration, unboundControl string, unboundSocket string, allowlistConf string) {
 	expiresAt := time.Now().Add(duration)
 	tempAllowlistMu.Lock()
 	tempAllowlist[domain] = TempAllowEntry{
@@ -184,7 +185,7 @@ func addTempAllow(domain string, duration time.Duration, unboundControl string, 
 	tempAllowlistMu.Unlock()
 
 	if unboundControl != "" && allowlistConf != "" {
-		go writeAllowlistConfAndReload(allowlistConf, unboundControl)
+		go writeAllowlistConfAndReload(allowlistConf, unboundControl, unboundSocket)
 	}
 }
 
@@ -198,7 +199,7 @@ func isTempAllowed(domain string) bool {
 	return time.Now().Before(entry.ExpiresAt)
 }
 
-func cleanupExpiredTempAllows(unboundControl string, allowlistConf string) {
+func cleanupExpiredTempAllows(unboundControl string, unboundSocket string, allowlistConf string) {
 	now := time.Now()
 	var hadExpired bool
 
@@ -212,11 +213,11 @@ func cleanupExpiredTempAllows(unboundControl string, allowlistConf string) {
 	tempAllowlistMu.Unlock()
 
 	if hadExpired && unboundControl != "" && allowlistConf != "" {
-		go writeAllowlistConfAndReload(allowlistConf, unboundControl)
+		go writeAllowlistConfAndReload(allowlistConf, unboundControl, unboundSocket)
 	}
 }
 
-func writeAllowlistConfAndReload(allowlistConf, unboundControl string) {
+func writeAllowlistConfAndReload(allowlistConf, unboundControl, unboundSocket string) {
 	tempAllowlistMu.RLock()
 	var lines []string
 	for domain, entry := range tempAllowlist {
@@ -235,7 +236,7 @@ func writeAllowlistConfAndReload(allowlistConf, unboundControl string) {
 	}
 	log.Printf("wrote allowlist conf with %d entries", len(lines))
 
-	cmd := exec.Command(unboundControl, "reload")
+	cmd := exec.Command(unboundControl, "-s", unboundSocket, "reload")
 	if output, err := cmd.CombinedOutput(); err != nil {
 		log.Printf("unbound-control reload failed: %v (%s)", err, strings.TrimSpace(string(output)))
 		return
@@ -250,7 +251,7 @@ func writeAllowlistConfAndReload(allowlistConf, unboundControl string) {
 			{"flush_type", domain, "A"},
 			{"flush_type", domain, "AAAA"},
 		} {
-			if output, err := exec.Command(unboundControl, args...).CombinedOutput(); err != nil {
+			if output, err := exec.Command(unboundControl, append([]string{"-s", unboundSocket}, args...)...).CombinedOutput(); err != nil {
 				log.Printf("unbound-control flush failed for %s: %v (%s)", domain, err, strings.TrimSpace(string(output)))
 			}
 		}
@@ -568,7 +569,7 @@ func allowHandler(w http.ResponseWriter, r *http.Request) {
 		allowlistConf = cfg.AllowlistConf
 	}
 
-	addTempAllow(domain, duration, unboundControl, allowlistConf)
+	addTempAllow(domain, duration, unboundControl, cfg.UnboundSocket, allowlistConf)
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if _, err := fmt.Fprintf(w, `<!DOCTYPE html>
@@ -742,6 +743,7 @@ func main() {
 	flag.StringVar(&cfg.CACertFile, "ca-cert", "", "CA certificate file for signing dynamic certs")
 	flag.StringVar(&cfg.CAKeyFile, "ca-key", "", "CA private key file for signing dynamic certs")
 	flag.StringVar(&cfg.UnboundControl, "unbound-control", "", "Path to unbound-control binary")
+	flag.StringVar(&cfg.UnboundSocket, "unbound-socket", "", "Path to unbound control socket")
 	flag.StringVar(&cfg.AllowlistConf, "allowlist-conf", "", "Path to temp allowlist unbound conf file")
 
 	categoriesFile := flag.String("categories", "", "JSON file with domain->category mappings")
@@ -753,7 +755,7 @@ func main() {
 	if cfg.UnboundControl != "" && cfg.AllowlistConf != "" {
 		go func() {
 			for range time.Tick(time.Minute) {
-				cleanupExpiredTempAllows(cfg.UnboundControl, cfg.AllowlistConf)
+				cleanupExpiredTempAllows(cfg.UnboundControl, cfg.UnboundSocket, cfg.AllowlistConf)
 			}
 		}()
 	}

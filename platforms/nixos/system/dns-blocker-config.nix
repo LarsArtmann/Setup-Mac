@@ -145,7 +145,7 @@
 
     # Temporarily allow all DNS queries (disable blocking)
     # Set to true to bypass all DNS blocking
-    tempAllowAll = true;
+    tempAllowAll = false;
 
     categories = {
       ".doubleclick.net" = "Advertising";
