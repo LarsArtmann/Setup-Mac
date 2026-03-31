@@ -121,3 +121,7 @@ dotfiles/sublime-text/backups/
 # Plaintext secret files that may exist locally
 .env.private
 gitea-sync.env
+
+# Compiled Go binaries (built by Nix, not source)
+pkgs/dnsblockd-processor/dnsblockd-processor
+platforms/nixos/programs/dnsblockd/dnsblockd
