@@ -30,6 +30,8 @@
       volumes = [
         "${immichUploadDir}:/Pictures/upload:ro"
         "${immichLibraryDir}:/Pictures/library:ro"
+        "${photomapDataDir}/index/upload:/Pictures/upload/photomap_index"
+        "${photomapDataDir}/index/library:/Pictures/library/photomap_index"
         "${photomapDataDir}/index:/Pictures/index"
         "${photomapDataDir}/config:/root/.config/photomap"
         "${photomapDataDir}/data:/root/.local/share/photomap"
@@ -42,25 +44,17 @@
       ];
     };
 
-    systemd.services.docker-photomap = {
+    systemd.services.podman-photomap = {
       after = ["immich-server.service" "network-online.target"];
       wants = ["immich-server.service" "network-online.target"];
       requires = ["immich-server.service"];
+      preStart = ''
+        if [ ! -f ${photomapDataDir}/config/config.yaml ]; then
+          cp ${photomapConfig} ${photomapDataDir}/config/config.yaml
+          chmod 644 ${photomapDataDir}/config/config.yaml
+        fi
+      '';
       serviceConfig = {
-        # Wait for Immich to be ready before starting PhotoMap
-        ExecStartPre = pkgs.writeShellScript "wait-for-immich" ''
-          echo "Waiting for Immich to be ready..."
-          for i in {1..30}; do
-            if curl -s http://localhost:2283/api/server-info/ping &>/dev/null; then
-              echo "Immich is ready!"
-              exit 0
-            fi
-            echo "Immich not ready yet, attempt $i/30..."
-            sleep 2
-          done
-          echo "Immich failed to become ready after 60 seconds"
-          exit 1
-        '';
         Restart = "on-failure";
         RestartSec = "10s";
       };
@@ -71,7 +65,8 @@
       "d ${photomapDataDir}/config 0755 root root -"
       "d ${photomapDataDir}/data 0755 root root -"
       "d ${photomapDataDir}/index 0755 root root -"
-      "L+ ${photomapDataDir}/config/config.yaml - - - - ${photomapConfig}"
+      "d ${photomapDataDir}/index/upload 0755 root root -"
+      "d ${photomapDataDir}/index/library 0755 root root -"
     ];
   };
 }
