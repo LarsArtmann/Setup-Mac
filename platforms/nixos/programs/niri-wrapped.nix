@@ -142,7 +142,7 @@ in {
 
       "Mod+Q".action.close-window = {};
       "Mod+Shift+Q".action.quit = {};
-      "Mod+F".action.fullscreen-window = {};
+      "F11".action.fullscreen-window = {};
       "Mod+Shift+Space".action.toggle-window-floating = {};
       "Mod+Shift+M".action.maximize-column = {};
       "Mod+T".action.toggle-column-tabbed-display = {};
@@ -200,6 +200,7 @@ in {
       "Mod+Shift+Page_Down".action.move-column-to-workspace-down = {};
 
       "Mod+D".action.spawn = ["rofi" "-show" "drun"];
+      "Mod+Space".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Shift+Slash".action.spawn = sh "niri msg binds | rofi -dmenu -p 'Keybindings:' -theme-str 'window {width: 80%; height: 80%;}'";
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
@@ -210,10 +211,9 @@ in {
 
       "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
 
-      "Print".action.screenshot-screen = {};
-      "Shift+Print".action.screenshot = {};
-
-      "Ctrl+Print".action.screenshot-window = {};
+      "Mod+Shift+F11".action.spawn = sh "grim -g \"\$(slurp)\" - | swappy -f -";
+      "Mod+F11".action.spawn = sh "grim - | swappy -f -";
+      "Mod+Ctrl+F11".action.spawn = sh "grim -o \$(niri msg focused-output | head -1) - | swappy -f -";
 
       "XF86AudioRaiseVolume" = {
         action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
@@ -246,11 +246,11 @@ in {
       };
 
       "XF86MonBrightnessUp" = {
-        action.spawn = sh "brightnessctl set +5%";
+        action.spawn = sh "ddcutil setvcp 10 + 10 2>/dev/null || brightnessctl set +5%";
         allow-when-locked = true;
       };
       "XF86MonBrightnessDown" = {
-        action.spawn = sh "brightnessctl set 5%-";
+        action.spawn = sh "ddcutil setvcp 10 - 10 2>/dev/null || brightnessctl set 5%-";
         allow-when-locked = true;
       };
     };
@@ -295,6 +295,15 @@ in {
           {app-id = "^Firefox$";}
         ];
         open-on-workspace = "browser";
+        default-column-width = {proportion = 0.75;};
+      }
+      {
+        matches = [
+          {app-id = "^kitty$";}
+          {app-id = "^foot$";}
+          {app-id = "^helium$";}
+        ];
+        open-on-workspace = "main";
         default-column-width = {proportion = 0.75;};
       }
       {
