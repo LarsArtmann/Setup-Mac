@@ -66,6 +66,10 @@ func processHostsFile(
 			continue
 		}
 
+		if strings.HasSuffix(domain, ".lan") {
+			continue
+		}
+
 		if whitelist[domain] || seen[domain] {
 			continue
 		}

@@ -22,6 +22,8 @@
       then null
       else if domain == "localhost" || domain == "localhost.localdomain"
       then null
+      else if lib.hasSuffix ".lan" domain
+      then null
       else domain;
     domains = map parseLine lines;
   in

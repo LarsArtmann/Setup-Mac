@@ -428,6 +428,10 @@ func recordBlock(domain, category string) {
 	}
 }
 
+func isLANDomain(domain string) bool {
+	return strings.HasSuffix(domain, ".lan") || domain == "lan"
+}
+
 func blockHandler(w http.ResponseWriter, r *http.Request) {
 	host := r.Host
 	if host == "" {
@@ -436,6 +440,12 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 
 	host = strings.TrimPrefix(host, "www.")
 	host = strings.Split(host, ":")[0]
+
+	if isLANDomain(host) {
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		http.Error(w, "local domains are never blocked", http.StatusForbidden)
+		return
+	}
 
 	// Check if domain is temporarily allowed
 	if isTempAllowed(host) {
