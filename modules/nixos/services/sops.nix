@@ -22,17 +22,17 @@
         gitea_token = {
           owner = "lars";
           group = "users";
-          restartUnits = ["gitea-github-sync.service"];
+          restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
         };
         github_token = {
           owner = "lars";
           group = "users";
-          restartUnits = ["gitea-github-sync.service"];
+          restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
         };
         github_user = {
           owner = "lars";
           group = "users";
-          restartUnits = ["gitea-github-sync.service"];
+          restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
         };
       };
 
