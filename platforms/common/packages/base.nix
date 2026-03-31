@@ -116,7 +116,7 @@
       # JavaScript/TypeScript
       bun # Incredibly fast JavaScript runtime
       nodejs # Node.js JavaScript runtime
-      nodePackages.pnpm # Fast, disk space-efficient package manager
+      pnpm # Fast, disk space-efficient package manager
       vtsls # TypeScript language server for IDE LSP support
       esbuild # Fast JavaScript bundler and minifier
 
