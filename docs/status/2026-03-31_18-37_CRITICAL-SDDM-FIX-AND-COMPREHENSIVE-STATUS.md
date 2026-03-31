@@ -1,9 +1,9 @@
 # CRITICAL SDDM FIX + Comprehensive SystemNix Status Report
 
-**Date:** 2026-03-31 18:37 CEST  
-**Reporter:** Crush AI Assistant  
-**Branch:** master  
-**Commits Ahead of Origin:** 0 (up to date)  
+**Date:** 2026-03-31 18:37 CEST
+**Reporter:** Crush AI Assistant
+**Branch:** master
+**Commits Ahead of Origin:** 0 (up to date)
 **CRITICAL FIX APPLIED:** `services.displayManager.defaultSession = "niri";`
 
 ---
@@ -211,8 +211,8 @@ e2a246e feat(gitea-repos): add declarative GitHub repo mirroring with sops-nix
 
 ## BUILD STATUS
 
-**Last Verification:** 2026-03-31 18:37 CEST  
-**Command:** `nix flake check --no-build`  
+**Last Verification:** 2026-03-31 18:37 CEST
+**Command:** `nix flake check --no-build`
 **Result:** ✅ PASS (warning: aarch64-darwin incompatible, expected)
 
 **Configuration Status:**
@@ -261,5 +261,5 @@ e2a246e feat(gitea-repos): add declarative GitHub repo mirroring with sops-nix
 
 ---
 
-**Report Generated:** 2026-03-31 18:37 CEST  
+**Report Generated:** 2026-03-31 18:37 CEST
 **Next Review:** After SDDM fix verification and next rebuild

@@ -13,26 +13,21 @@ _: {
       allowedUDPPorts = [53];
     };
 
-    # Use dhcpcd for network and DNS management
-    # This provides better control over DNS settings
-    useDHCP = true;
-
-    # dhcpcd specific configuration
-    dhcpcd = {
-      enable = true;
-      persistent = true; # Keep DHCP lease across reboots
-      extraConfig = ''
-        # Let NixOS networking.nameservers manage DNS
-        # Uses unbound (dns-blocker-config.nix) on 127.0.0.1
-        nooption domain_name_servers
-        # Disable IPv6 completely
-        noipv6
-        noipv6rs
-        # Prevent dhcpcd from managing /etc/resolv.conf
-        # This avoids conflicts with NixOS's network-setup.service
-        nohook resolv.conf
-      '';
+    # Static IP configuration (192.168.1.150/24)
+    useDHCP = false;
+    interfaces.eno1 = {
+      useDHCP = false;
+      ipv4.addresses = [
+        {
+          address = "192.168.1.150";
+          prefixLength = 24;
+        }
+      ];
     };
+    defaultGateway = "192.168.1.1";
+
+    # dhcpcd disabled - using static IP
+    dhcpcd.enable = false;
 
     # DNS uses unbound via dns-blocker-config.nix
     nameservers = ["127.0.0.1"];
