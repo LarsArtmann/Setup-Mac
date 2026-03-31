@@ -356,7 +356,7 @@
           fi
           ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
 
-          # Create admin user if not exists
+          # Create admin user if not exists, sync password from file
           if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
             echo "Creating Gitea admin user: $ADMIN_USER"
             $GITEA admin user create \
@@ -365,6 +365,12 @@
               --email "$ADMIN_EMAIL" \
               --admin \
               --must-change-password=false
+          else
+            echo "Ensuring password matches for $ADMIN_USER"
+            $GITEA admin user change-password \
+              --username "$ADMIN_USER" \
+              --password "$ADMIN_PASS" \
+              --must-change-password=false 2>/dev/null || true
           fi
         '';
       in "${adminSetup}";
@@ -387,14 +393,11 @@
           set -euo pipefail
 
           ADMIN_USER="lars"
-          PASS_FILE="/var/lib/gitea/.admin-password"
           TOKEN_FILE="/var/lib/gitea/.admin-token.env"
           GITEA=${lib.getExe giteaPkg}
           export GITEA_WORK_DIR=/var/lib/gitea
 
           [ -f "$TOKEN_FILE" ] && exit 0
-
-          ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
 
           # Wait for Gitea to be ready
           for i in $(seq 1 30); do
@@ -405,21 +408,19 @@
           done
 
           TOKEN=""
-          # Try Gitea CLI first
+          TOKEN_NAME="sync-$(date +%s)"
+
+          # Generate new token via CLI (unique name avoids "already used" errors)
           TOKEN=$($GITEA admin user generate-access-token \
             --username "$ADMIN_USER" \
-            --token-name "sync-token" \
+            --token-name "$TOKEN_NAME" \
             --scopes all \
-            --raw 2>/dev/null) || true
+            --raw 2>/dev/null) || TOKEN=""
 
-          # Fallback to API
-          if [ -z "$TOKEN" ]; then
-            RESPONSE=$(${pkgs.curl}/bin/curl -sf -X POST \
-              "http://localhost:3000/api/v1/users/$ADMIN_USER/tokens" \
-              -u "$ADMIN_USER:$ADMIN_PASS" \
-              -H 'Content-Type: application/json' \
-              -d '{"name":"sync-token","scopes":["all"]}')
-            TOKEN=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r '.sha1 // .token // empty' 2>/dev/null) || true
+          # Validate: token must be a 40-char hex string
+          if ! echo "$TOKEN" | ${pkgs.gnugrep}/bin/grep -qE '^[0-9a-f]{40}$'; then
+            echo "CLI token generation failed or returned invalid token, clearing"
+            TOKEN=""
           fi
 
           if [ -n "$TOKEN" ]; then
