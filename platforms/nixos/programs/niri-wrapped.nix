@@ -2,7 +2,9 @@
   pkgs,
   lib,
   ...
-}: {
+}: let
+  wallpaperDir = "/home/lars/projects/wallpapers";
+in {
   programs.niri.settings = {
     prefer-no-csd = true;
 
@@ -14,9 +16,28 @@
         argv = [
           "${pkgs.bash}/bin/bash"
           "-c"
-          "img=$(${pkgs.coreutils}/bin/ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
+          "img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
         ];
       }
+      {
+        argv = [
+          "${pkgs.swayidle}/bin/swayidle"
+          "-w"
+          "timeout"
+          "300"
+          "${pkgs.swaylock}/bin/swaylock"
+          "-f"
+          "timeout"
+          "600"
+          "${pkgs.bash}/bin/bash"
+          "-c"
+          "${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true"
+          "before-sleep"
+          "${pkgs.swaylock}/bin/swaylock"
+          "-f"
+        ];
+      }
+      {argv = ["${pkgs.dunst}/bin/dunst"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
@@ -187,7 +208,7 @@
       "Mod+Shift+P".action.power-off-monitors = {};
       "Mod+Shift+S".action.suspend = {};
 
-      "Mod+W".action.spawn = sh "img=$(ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
+      "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
 
       "Print".action.screenshot-screen = {};
       "Shift+Print".action.screenshot = {};

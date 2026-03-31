@@ -23,7 +23,7 @@
 
     # GMKtec evo-x2 (NixOS workstation) - keepalive prevents timeout during idle
     "evo-x2" = {
-      hostname = "192.168.1.163";
+      hostname = "192.168.1.150";
       user = "lars";
       serverAliveInterval = 60;
       serverAliveCountMax = 3;

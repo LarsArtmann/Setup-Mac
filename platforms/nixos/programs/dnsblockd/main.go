@@ -450,12 +450,14 @@ func blockHandler(w http.ResponseWriter, r *http.Request) {
 	// Check if domain is temporarily allowed
 	if isTempAllowed(host) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		fmt.Fprintf(w, `<!DOCTYPE html>
+		if _, err := fmt.Fprintf(w, `<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Allowed - %s</title><style>*{margin:0;padding:0;box-sizing:border-box}html,body{width:100dvw;height:100dvh}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0f0f1a;color:#e0e0e0;display:flex;align-items:center;justify-content:center}.container{max-width:min(90dvw,700px);padding:3rem;text-align:center}h1{color:#22c55e;margin-bottom:1rem;font-size:clamp(1.5rem,4dvw,2.5rem)}p{color:#9ca3af;font-size:clamp(0.9rem,2dvw,1.1rem);margin-bottom:1rem}</style>
 </head><body><div class="container"><h1>Domain Allowed</h1><p>%s is temporarily allowed. DNS cache is being flushed.</p><p>Redirecting in 5 seconds...</p></div>
 <script>setTimeout(function(){window.location.href="https://%s";},5000);</script>
-</body></html>`, host, host, host)
+</body></html>`, host, host, host); err != nil {
+		log.Printf("error writing allowed page for %s: %v", host, err)
+	}
 		return
 	}
 

@@ -13,7 +13,7 @@ import (
 func loadWhitelist(path string) map[string]bool {
 	whitelist := make(map[string]bool)
 
-	f, err := os.Open(path) //nolint:gosec // path from CLI args
+	f, err := os.Open(path)
 	if err != nil {
 		return whitelist
 	}
@@ -35,9 +35,9 @@ func processHostsFile(
 	unboundEntries *[]string,
 	mapping map[string]string,
 ) {
-	f, err := os.Open(path) //nolint:gosec // path from CLI args
+	f, err := os.Open(path)
 	if err != nil {
-		fmt.Fprintf( //nolint:gosec // stderr warning in CLI tool
+		fmt.Fprintf(
 			os.Stderr,
 			"warning: cannot open %s: %v\n",
 			path,
@@ -84,7 +84,7 @@ func processHostsFile(
 }
 
 func writeUnbound(path string, entries []string) error {
-	f, err := os.Create(path) //nolint:gosec // path from CLI args
+	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("creating %s: %w", path, err)
 	}
@@ -100,7 +100,7 @@ func writeUnbound(path string, entries []string) error {
 }
 
 func writeMapping(path string, mapping map[string]string) error {
-	f, err := os.Create(path) //nolint:gosec // path from CLI args
+	f, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("creating %s: %w", path, err)
 	}
@@ -118,7 +118,7 @@ func writeMapping(path string, mapping map[string]string) error {
 
 func main() {
 	if len(os.Args) < 5 {
-		fmt.Fprintf( //nolint:gosec // stderr usage message in CLI tool
+		fmt.Fprintf(
 			os.Stderr,
 			"Usage: %s BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [HOSTS_FILE NAME]...\n",
 			os.Args[0],

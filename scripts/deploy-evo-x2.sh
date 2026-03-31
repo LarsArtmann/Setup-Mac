@@ -13,8 +13,8 @@ echo "=== dnsblockd status ==="
 sudo systemctl status dnsblockd --no-pager || true
 
 echo ""
-echo "=== Ping 192.168.1.163 ==="
-ping -c 2 -W 2 192.168.1.163 || true
+echo "=== Ping 192.168.1.150 ==="
+ping -c 2 -W 2 192.168.1.150 || true
 
 echo ""
 echo "=== IP addresses on enp1s0 ==="

@@ -17,9 +17,6 @@
     # Add flake-parts for modular architecture
     flake-parts.url = "github:hercules-ci/flake-parts";
 
-    # wrapper-modules for creating configured/wrapped packages
-    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
-
     # Add NUR (Nix User Repository) for other packages
     nur = {
       url = "github:nix-community/NUR";
@@ -103,7 +100,6 @@
     otel-tui,
     nix-amd-npu,
     sops-nix,
-    wrapper-modules,
     silent-sddm,
     ...
   }: let

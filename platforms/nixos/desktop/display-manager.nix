@@ -7,7 +7,6 @@
         variant = "";
       };
     };
-
     displayManager.defaultSession = "niri";
   };
 

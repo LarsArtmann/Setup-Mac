@@ -14,7 +14,7 @@
   services.dns-blocker = {
     enable = true;
 
-    blockIP = "192.168.1.163";
+    blockIP = "192.168.1.150";
     blockPort = 80;
     blockTLSPort = 8443;
     blockInterface = "eno1";
@@ -131,10 +131,7 @@
       "www.movieffm.net"
     ];
 
-    extraDomains = [
-      "360.cn"
-      "www.360.cn"
-    ];
+    extraDomains = [];
 
     upstreamDNS = [
       "9.9.9.9@853#dns.quad9.net"
@@ -170,11 +167,11 @@
   services.unbound.settings.server = {
     local-zone = [''"lan." static''];
     local-data = [
-      ''"immich.lan. IN A 192.168.1.163"''
-      ''"gitea.lan. IN A 192.168.1.163"''
-      ''"grafana.lan. IN A 192.168.1.163"''
-      ''"home.lan. IN A 192.168.1.163"''
-      ''"photomap.lan. IN A 192.168.1.163"''
+      ''"immich.lan. IN A 192.168.1.150"''
+      ''"gitea.lan. IN A 192.168.1.150"''
+      ''"grafana.lan. IN A 192.168.1.150"''
+      ''"home.lan. IN A 192.168.1.150"''
+      ''"photomap.lan. IN A 192.168.1.150"''
     ];
   };
 }

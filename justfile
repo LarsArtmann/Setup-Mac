@@ -1654,11 +1654,11 @@ dns-test:
         echo "  google.com:"; \
         dig google.com +short | head -1 || echo "    ❌ Resolution failed"; \
         echo ""; \
-        echo "Testing ad blocking (should return 192.168.1.163 for blocked domains)..."; \
+        echo "Testing ad blocking (should return 192.168.1.150 for blocked domains)..."; \
         echo "  doubleclick.net:"; \
         RESULT=$$(dig doubleclick.net +short); \
-        if [ "$$RESULT" = "192.168.1.163" ]; then \
-            echo "    ✅ Blocked (192.168.1.163)"; \
+        if [ "$$RESULT" = "192.168.1.150" ]; then \
+            echo "    ✅ Blocked (192.168.1.150)"; \
         elif [ -z "$$RESULT" ]; then \
             echo "    ✅ Blocked (NXDOMAIN)"; \
         else \
@@ -1807,3 +1807,7 @@ immich-restart:
     else \
         sudo systemctl restart immich-server immich-machine-learning && echo "✅ Immich services restarted" || echo "❌ Restart failed"; \
     fi
+
+# Reload Niri compositor config without full rebuild
+reload:
+    niri msg action reload-config

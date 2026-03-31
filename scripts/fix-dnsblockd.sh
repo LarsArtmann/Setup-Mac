@@ -13,5 +13,5 @@ echo "Checking dnsblockd status..."
 sudo systemctl status dnsblockd --no-pager || true
 
 echo ""
-echo "Pinging 192.168.1.163..."
-ping -c 2 -W 2 192.168.1.163
+echo "Pinging 192.168.1.150..."
+ping -c 2 -W 2 192.168.1.150

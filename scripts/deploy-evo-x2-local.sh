@@ -35,8 +35,8 @@ echo ""
 echo "--- unbound ---"
 sudo systemctl status unbound --no-pager || true
 echo ""
-echo "--- Ping 192.168.1.163 ---"
-ping -c 3 -W 2 192.168.1.163 || true
+echo "--- Ping 192.168.1.150 ---"
+ping -c 3 -W 2 192.168.1.150 || true
 echo ""
 echo "--- Failed units ---"
 sudo systemctl --failed --no-pager || true
