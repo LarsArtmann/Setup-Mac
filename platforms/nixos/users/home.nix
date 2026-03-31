@@ -120,8 +120,6 @@
 
     # Desktop packages
     kitty
-    ghostty
-    foot
     dunst
     libnotify
     wlogout

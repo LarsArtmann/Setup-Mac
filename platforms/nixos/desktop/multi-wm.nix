@@ -29,8 +29,7 @@
 
   # Additional packages needed for Sway backup WM
   environment.systemPackages = with pkgs; [
-    # Common terminal for all WMs
-    foot
+    # Common terminal - foot included in sway extraPackages above
 
     # Application launcher for all WMs
     wofi
@@ -47,9 +46,6 @@
 
     # Notification daemon
     mako
-
-    # Background settings
-    swaybg
 
     # Screenshot tools
     grim
