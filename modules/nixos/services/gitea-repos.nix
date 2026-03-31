@@ -112,11 +112,23 @@
     '';
 
     # Script to update GitHub token in sops (run manually)
+    # sops needs the age key derived from the SSH host key to decrypt.
+    # sops-nix stores this at /run/secrets.d/age-keys.txt (root:root 0600),
+    # so all sops calls must run via sudo with SOPS_AGE_KEY_FILE set.
     updateGithubTokenScript = pkgs.writeShellScriptBin "gitea-update-github-token" ''
       SOPS="${pkgs.sops}/bin/sops"
-      # Update GitHub token in sops secrets using gh CLI
-      # Auto-detects repo location or uses FLAKE_ROOT env var
+      AGE_KEY_FILE="/run/secrets.d/age-keys.txt"
       set -euo pipefail
+
+      # Verify we can escalate to access the age key
+      if ! sudo test -r "$AGE_KEY_FILE"; then
+        echo "Error: Cannot read $AGE_KEY_FILE (need sudo)"
+        exit 1
+      fi
+
+      sops_wrapper() {
+        sudo env SOPS_AGE_KEY_FILE="$AGE_KEY_FILE" "$SOPS" "$@"
+      }
 
       # Find the SystemNix repo
       find_repo() {
@@ -184,17 +196,17 @@
       echo "GitHub user: $GITHUB_USER"
       echo ""
 
-      # Update secrets using sops
+      # Update secrets using sops (via sudo with age key)
       echo "Updating sops secrets..."
       cd "$(dirname "$SECRETS_FILE")"
 
-      $SOPS set "$SECRETS_FILE" '["github_token"]' "\"$GITHUB_TOKEN\""
+      sops_wrapper set "$SECRETS_FILE" '["github_token"]' "\"$GITHUB_TOKEN\""
 
       # Update github_user if needed
-      CURRENT_USER=$($SOPS -d --extract '["github_user"]' "$SECRETS_FILE" 2>/dev/null || echo "")
+      CURRENT_USER=$(sops_wrapper -d --extract '["github_user"]' "$SECRETS_FILE" 2>/dev/null || echo "")
       if [[ "$CURRENT_USER" != "$GITHUB_USER" ]]; then
         echo "Updating github_user: $CURRENT_USER → $GITHUB_USER"
-        $SOPS set "$SECRETS_FILE" '["github_user"]' "\"$GITHUB_USER\""
+        sops_wrapper set "$SECRETS_FILE" '["github_user"]' "\"$GITHUB_USER\""
       fi
 
       echo ""
