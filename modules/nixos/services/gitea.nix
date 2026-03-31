@@ -5,6 +5,8 @@
     config,
     ...
   }: let
+    giteaPkg = config.services.gitea.package;
+
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''
       # Mirror all repos from GitHub to Gitea
@@ -86,10 +88,11 @@
               milestones: true,
               service: "git"
             }')"
-      done < /tmp/gitea-repos-$$
-      rm -f /tmp/gitea-repos-$$
+      done < /tmp/gitea-repos-$$.txt
+      count=$(wc -l < /tmp/gitea-repos-$$.txt)
+      rm -f /tmp/gitea-repos-$$.txt
 
-      echo "✓ Done! $(wc -l < /dev/stdin) repos processed"
+      echo "✓ Done! $count repos processed"
     '';
 
     # Script to mirror all starred repos from GitHub
@@ -176,8 +179,8 @@
               milestones: true,
               service: "git"
             }')"
-      done < /tmp/gitea-starred-$$
-      rm -f /tmp/gitea-starred-$$
+      done < /tmp/gitea-starred-$$.txt
+      rm -f /tmp/gitea-starred-$$.txt
 
       echo "✓ Done!"
     '';
@@ -314,7 +317,10 @@
         serviceConfig = {
           Type = "oneshot";
           User = "lars";
-          EnvironmentFile = config.sops.templates."gitea-sync.env".path;
+          EnvironmentFile = [
+            config.sops.templates."gitea-sync.env".path
+            "-/var/lib/gitea/.admin-token.env"
+          ];
           ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
         };
       };
@@ -330,6 +336,101 @@
           Persistent = true;
         };
       };
+    };
+
+    # Declarative admin user setup (runs in Gitea's preStart)
+    systemd.services.gitea = {
+      preStart = let
+        adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
+          set -euo pipefail
+
+          ADMIN_USER="lars"
+          ADMIN_EMAIL="lars@local"
+          PASS_FILE="/var/lib/gitea/.admin-password"
+          GITEA=${lib.getExe giteaPkg}
+
+          # Generate password if not exists
+          if [ ! -f "$PASS_FILE" ]; then
+            ${pkgs.coreutils}/bin/head -c 32 /dev/urandom | ${pkgs.coreutils}/bin/base64 > "$PASS_FILE"
+            chmod 600 "$PASS_FILE"
+          fi
+          ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
+
+          # Create admin user if not exists
+          if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
+            echo "Creating Gitea admin user: $ADMIN_USER"
+            $GITEA admin user create \
+              --username "$ADMIN_USER" \
+              --password "$ADMIN_PASS" \
+              --email "$ADMIN_EMAIL" \
+              --admin \
+              --must-change-password=false
+          fi
+        '';
+      in "${adminSetup}";
+    };
+
+    # Token generation (runs after Gitea is listening)
+    systemd.services.gitea-generate-token = {
+      description = "Generate Gitea API token";
+      after = ["gitea.service"];
+      requires = ["gitea.service"];
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "gitea";
+        Group = "gitea";
+        RemainAfterExit = true;
+      };
+      script = let
+        tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
+          set -euo pipefail
+
+          ADMIN_USER="lars"
+          PASS_FILE="/var/lib/gitea/.admin-password"
+          TOKEN_FILE="/var/lib/gitea/.admin-token.env"
+          GITEA=${lib.getExe giteaPkg}
+          export GITEA_WORK_DIR=/var/lib/gitea
+
+          [ -f "$TOKEN_FILE" ] && exit 0
+
+          ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
+
+          # Wait for Gitea to be ready
+          for i in $(seq 1 30); do
+            if ${pkgs.curl}/bin/curl -s -o /dev/null -w "" "http://localhost:3000/"; then
+              break
+            fi
+            sleep 1
+          done
+
+          TOKEN=""
+          # Try Gitea CLI first
+          TOKEN=$($GITEA admin user generate-access-token \
+            --username "$ADMIN_USER" \
+            --token-name "sync-token" \
+            --scopes all \
+            --raw 2>/dev/null) || true
+
+          # Fallback to API
+          if [ -z "$TOKEN" ]; then
+            RESPONSE=$(${pkgs.curl}/bin/curl -sf -X POST \
+              "http://localhost:3000/api/v1/users/$ADMIN_USER/tokens" \
+              -u "$ADMIN_USER:$ADMIN_PASS" \
+              -H 'Content-Type: application/json' \
+              -d '{"name":"sync-token","scopes":["all"]}')
+            TOKEN=$(echo "$RESPONSE" | ${pkgs.jq}/bin/jq -r '.sha1 // .token // empty' 2>/dev/null) || true
+          fi
+
+          if [ -n "$TOKEN" ]; then
+            printf 'GITEA_TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
+            chmod 644 "$TOKEN_FILE"
+            echo "API token written to $TOKEN_FILE"
+          else
+            echo "WARNING: Failed to generate API token"
+          fi
+        '';
+      in "${tokenGen}";
     };
 
     # CLI tools
