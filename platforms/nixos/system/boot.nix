@@ -11,6 +11,9 @@
     # Use latest kernel for Ryzen AI Max+ support
     kernelPackages = pkgs.linuxPackages_latest;
 
+    # Load I2C module for DDC/CI monitor brightness control
+    kernelModules = ["i2c-dev"];
+
     # AMD GPU + NPU optimization kernel parameters
     kernelParams = [
       "amdgpu.ppfeaturemask=0xfffd7fff"
