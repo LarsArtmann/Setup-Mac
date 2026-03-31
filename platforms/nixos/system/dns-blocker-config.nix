@@ -16,7 +16,7 @@
 
     blockIP = "192.168.1.163";
     blockPort = 80;
-    blockTLSPort = 443;
+    blockTLSPort = 8443;
     blockInterface = "eno1";
     blockIPPrefix = 24;
     statsPort = 9090;
@@ -170,11 +170,11 @@
   services.unbound.settings.server = {
     local-zone = [''"lan." static''];
     local-data = [
-      ''"immich.lan. IN A 192.168.1.162"''
-      ''"gitea.lan. IN A 192.168.1.162"''
-      ''"grafana.lan. IN A 192.168.1.162"''
-      ''"home.lan. IN A 192.168.1.162"''
-      ''"photomap.lan. IN A 192.168.1.162"''
+      ''"immich.lan. IN A 192.168.1.163"''
+      ''"gitea.lan. IN A 192.168.1.163"''
+      ''"grafana.lan. IN A 192.168.1.163"''
+      ''"home.lan. IN A 192.168.1.163"''
+      ''"photomap.lan. IN A 192.168.1.163"''
     ];
   };
 }
