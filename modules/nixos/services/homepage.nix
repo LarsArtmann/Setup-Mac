@@ -57,68 +57,78 @@
     environment.etc."homepage/services.yaml".source = pkgs.writeText "homepage-services.yaml" ''
       - Infrastructure:
           - Caddy:
-              href: http://immich.lan
+              href: https://home.lan
               description: Reverse Proxy
               icon: caddy.png
-              ping: localhost:80
+              statusStyle: dot
+              siteMonitor: https://home.lan
           - Unbound DNS:
               description: DNS Resolver + Blocker
               icon: unbound.png
-              ping: localhost:53
+              statusStyle: dot
+              siteMonitor: http://localhost:53
           - PostgreSQL:
               description: Database Server
               icon: postgres.png
-              ping: localhost:5432
           - Redis:
               description: Cache (Immich)
               icon: redis.png
-              ping: localhost:6379
 
       - Media:
           - Immich:
-              href: http://immich.lan
+              href: https://immich.lan
               description: Photo & Video Management
               icon: immich.png
-              ping: localhost:2283
+              statusStyle: dot
+              siteMonitor: https://immich.lan/api/server-info/ping
           - PhotoMapAI:
-              href: http://photomap.lan
+              href: https://photomap.lan
               description: CLIP Embedding Vector Map
               icon: network-map.png
-              ping: localhost:8050
+              statusStyle: dot
+              siteMonitor: https://photomap.lan
           - DNS Blocker:
-              href: http://localhost:9090/stats
+              href: https://localhost:8443/stats
               description: DNS Block Stats
               icon: shield.png
-              ping: localhost:9090
+              statusStyle: dot
+              siteMonitor: https://localhost:8443
 
       - Development:
           - Gitea:
-              href: http://gitea.lan
+              href: https://gitea.lan
               description: Git Mirror (GitHub Sync)
               icon: gitea.png
-              ping: localhost:3000
+              statusStyle: dot
+              siteMonitor: https://gitea.lan/api/v1/nodeinfo
           - Ollama:
               description: Local AI Inference
               icon: ollama.png
-              ping: localhost:11434
+              statusStyle: dot
+              siteMonitor: http://localhost:11434/api/tags
 
       - Monitoring:
           - Grafana:
-              href: http://grafana.lan
+              href: https://grafana.lan
               description: Metrics & Dashboards
               icon: grafana.png
-              ping: localhost:3001
+              statusStyle: dot
+              siteMonitor: https://grafana.lan/api/health
           - Prometheus:
               description: Metrics Collection
               icon: prometheus.png
-              ping: localhost:9091
+              statusStyle: dot
+              siteMonitor: http://localhost:9091/-/healthy
           - Node Exporter:
               description: System Metrics Agent
               icon: prometheus.png
-              ping: localhost:9100
+              statusStyle: dot
+              siteMonitor: http://localhost:9100/metrics
           - Homepage:
               description: This Page
               icon: homepage.png
+              statusStyle: dot
+              siteMonitor: https://home.lan
     '';
 
     systemd.tmpfiles.rules = [
