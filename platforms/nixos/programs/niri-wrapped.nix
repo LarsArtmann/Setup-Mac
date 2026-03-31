@@ -14,7 +14,7 @@
         argv = [
           "${pkgs.bash}/bin/bash"
           "-c"
-          "${pkgs.swww}/bin/swww init && sleep 1 && img=$(${pkgs.coreutils}/bin/ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
+          "img=$(${pkgs.coreutils}/bin/ls /home/lars/projects/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
         ];
       }
     ];

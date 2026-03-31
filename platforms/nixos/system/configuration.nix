@@ -115,22 +115,24 @@
     # System state version
     system.stateVersion = "25.11";
 
-    services.fstrim.enable = true;
+    services = {
+      fstrim.enable = true;
 
-    services.smartd = {
-      enable = true;
-      autodetect = true;
-      defaults.monitored = "-a -o on -s (S/../.././02|L/../../6/03)";
-    };
+      smartd = {
+        enable = true;
+        autodetect = true;
+        defaults.monitored = "-a -o on -s (S/../.././02|L/../../6/03)";
+      };
 
-    # Declarative Gitea repository mirroring
-    services.gitea-repos = {
-      enable = true;
-      repos = [
-        "git@github.com:LarsArtmann/dnsblockd.git"
-        "git@github.com:LarsArtmann/BuildFlow.git"
-      ];
-      autoSync = true;
+      # Declarative Gitea repository mirroring
+      gitea-repos = {
+        enable = true;
+        repos = [
+          "git@github.com:LarsArtmann/dnsblockd.git"
+          "git@github.com:LarsArtmann/BuildFlow.git"
+        ];
+        autoSync = true;
+      };
     };
   };
 }
