@@ -541,8 +541,29 @@
         "nixpkgs": "nixpkgs",
         "nur": "nur",
         "otel-tui": "otel-tui",
+        "silent-sddm": "silent-sddm",
         "sops-nix": "sops-nix",
         "wrapper-modules": "wrapper-modules"
+      }
+    },
+    "silent-sddm": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1771956684,
+        "narHash": "sha256-+EtzmEzGA2xqwIvKrP0euYaOzrmTQWEWAiWV+k2WBEM=",
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
+        "rev": "34f82e1fb8412fff78b82a0dcce763492b36054c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "uiriansan",
+        "repo": "SilentSDDM",
+        "type": "github"
       }
     },
     "sops-nix": {

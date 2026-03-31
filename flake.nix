@@ -79,6 +79,12 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # SilentSDDM - customizable SDDM theme with Catppuccin support
+    silent-sddm = {
+      url = "github:uiriansan/SilentSDDM";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -98,6 +104,7 @@
     nix-amd-npu,
     sops-nix,
     wrapper-modules,
+    silent-sddm,
     ...
   }: let
     goOverlay = final: prev: {
@@ -323,6 +330,7 @@
             inputs.niri.nixosModules.niri
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
+            inputs.silent-sddm.nixosModules.default
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea

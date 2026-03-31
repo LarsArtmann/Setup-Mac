@@ -179,6 +179,7 @@
       "Mod+Shift+Page_Down".action.move-column-to-workspace-down = {};
 
       "Mod+D".action.spawn = ["rofi" "-show" "drun"];
+      "Mod+Shift+Slash".action.spawn = sh "niri msg binds | rofi -dmenu -p 'Keybindings:' -theme-str 'window {width: 80%; height: 80%;}'";
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
 
