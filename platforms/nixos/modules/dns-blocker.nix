@@ -230,9 +230,11 @@ in {
     };
 
     systemd = {
-      tmpfiles.rules = [
-        "d /var/lib/dnsblockd 0755 root root -"
-      ] ++ lib.optional (!cfg.tempAllowAll) ''f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - # dnsblockd temp allowlist placeholder''
+      tmpfiles.rules =
+        [
+          "d /var/lib/dnsblockd 0755 root root -"
+        ]
+        ++ lib.optional (!cfg.tempAllowAll) ''f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - # dnsblockd temp allowlist placeholder''
         ++ lib.optional cfg.tempAllowAll ''f /var/lib/dnsblockd/temp-allowlist.conf 0644 root root - 'local-zone: "." transparent\n' '';
 
       services.dnsblockd = {
@@ -244,7 +246,11 @@ in {
         serviceConfig = let
           initScript = pkgs.writeShellScript "dnsblockd-init" ''
             install -d /var/lib/dnsblockd
-            ${if cfg.tempAllowAll then "printf 'local-zone: \".\" transparent\\n' > /var/lib/dnsblockd/temp-allowlist.conf" else "[ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\\n' > /var/lib/dnsblockd/temp-allowlist.conf"}
+            ${
+              if cfg.tempAllowAll
+              then "printf 'local-zone: \".\" transparent\\n' > /var/lib/dnsblockd/temp-allowlist.conf"
+              else "[ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\\n' > /var/lib/dnsblockd/temp-allowlist.conf"
+            }
           '';
           addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
             ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
@@ -255,7 +261,8 @@ in {
         in
           {
             Type = "simple";
-            ExecStartPre = if cfg.blockInterface == "lo"
+            ExecStartPre =
+              if cfg.blockInterface == "lo"
               then "+${initScript}"
               else [
                 "+-${addIPScript}"
