@@ -43,8 +43,27 @@
     };
 
     systemd.services.docker-photomap = {
-      after = ["immich-server.service"];
-      wants = ["immich-server.service"];
+      after = ["immich-server.service" "network-online.target"];
+      wants = ["immich-server.service" "network-online.target"];
+      requires = ["immich-server.service"];
+      serviceConfig = {
+        # Wait for Immich to be ready before starting PhotoMap
+        ExecStartPre = pkgs.writeShellScript "wait-for-immich" ''
+          echo "Waiting for Immich to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:2283/api/server-info/ping &>/dev/null; then
+              echo "Immich is ready!"
+              exit 0
+            fi
+            echo "Immich not ready yet, attempt $i/30..."
+            sleep 2
+          done
+          echo "Immich failed to become ready after 60 seconds"
+          exit 1
+        '';
+        Restart = "on-failure";
+        RestartSec = "10s";
+      };
     };
 
     systemd.tmpfiles.rules = [
