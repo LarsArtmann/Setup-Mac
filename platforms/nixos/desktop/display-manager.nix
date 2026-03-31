@@ -22,6 +22,9 @@
     ];
   };
 
+  # Default to Niri session
+  services.displayManager.defaultSession = "niri";
+
   environment.etc = {
     "sddm.conf".text = ''
       [Theme]
