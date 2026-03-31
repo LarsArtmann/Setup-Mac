@@ -8,6 +8,7 @@
     ../programs/shells.nix # NixOS shell configuration
     ../programs/rofi.nix # Rofi launcher with Catppuccin theme
     ../programs/wlogout.nix # Power menu with Catppuccin theme
+    ../programs/swaylock.nix # Screen locker with blur + Catppuccin theme
     ../programs/zellij.nix # Zellij terminal multiplexer
     ../programs/niri-wrapped.nix # Niri scrollable-tiling compositor via niri-flake HM module
     ../desktop/waybar.nix # Status bar for niri
@@ -211,17 +212,17 @@
     };
   };
 
-  # Dunst notification configuration (TV-friendly)
   services.dunst = {
     enable = true;
     settings = {
       global = {
-        font = "JetBrainsMono Nerd Font Bold 16";
+        font = "JetBrainsMono Nerd Font 13";
         markup = "full";
-        format = "<b><span foreground='#89b4fa'>%s</span></b>\\n%b";
+        format = "<b>%s</b>\n%b";
         sort = "yes";
         indicate_hidden = "yes";
         alignment = "left";
+        vertical_alignment = "center";
         show_age_threshold = 60;
         word_wrap = "yes";
         ignore_newline = "no";
@@ -229,7 +230,8 @@
         hide_duplicate_count = false;
         show_indicators = "yes";
         icon_position = "left";
-        max_icon_size = 128;
+        max_icon_size = 64;
+        min_icon_size = 32;
         sticky_history = "yes";
         history_length = 20;
         dmenu = "${pkgs.rofi}/bin/rofi -dmenu -p dunst:";
@@ -237,52 +239,59 @@
         always_run_script = true;
         title = "Dunst";
         class = "Dunst";
-        corner_radius = 16;
+        corner_radius = 12;
         ignore_dbusclose = false;
         layer = "overlay";
         force_xinerama = false;
         mouse_left_click = "close_current";
         mouse_middle_click = "do_action, close_current";
         mouse_right_click = "close_all";
-        padding = 24;
-        horizontal_padding = 24;
-        text_icon_padding = 24;
-        frame_width = 4;
-        frame_color = "#89b4fa";
-        separator_height = 2;
+        padding = 16;
+        horizontal_padding = 20;
+        text_icon_padding = 16;
+        frame_width = 0;
+        separator_height = 4;
         separator_color = "frame";
         progress_bar = true;
-        progress_bar_height = 12;
-        progress_bar_frame_width = 1;
+        progress_bar_height = 8;
+        progress_bar_frame_width = 0;
         progress_bar_min_width = 150;
-        progress_bar_max_width = 400;
-        progress_bar_corner_radius = 6;
-        transparency = 10;
+        progress_bar_max_width = 300;
+        progress_bar_corner_radius = 4;
+        transparency = 15;
         idle_threshold = 120;
+        origin = "top-right";
+        offset = "24x48";
+        width = "(350, 500)";
+        height = "(0, 300)";
+        notification_limit = 5;
       };
       experimental = {
         per_monitor_dpi = false;
       };
       urgency_low = {
-        background = "#1e1e2e";
+        background = "#1e1e2e90";
         foreground = "#cdd6f4";
         frame_color = "#89b4fa";
         timeout = 5;
         highlight = "#89b4fa";
+        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-information-symbolic.svg";
       };
       urgency_normal = {
-        background = "#1e1e2e";
+        background = "#1e1e2e90";
         foreground = "#cdd6f4";
         frame_color = "#89b4fa";
         timeout = 8;
         highlight = "#89b4fa";
+        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-information-symbolic.svg";
       };
       urgency_critical = {
-        background = "#1e1e2e";
+        background = "#1e1e2ef0";
         foreground = "#f38ba8";
         frame_color = "#f38ba8";
         timeout = 0;
         highlight = "#f38ba8";
+        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-warning-symbolic.svg";
       };
     };
   };

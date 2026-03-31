@@ -8,7 +8,7 @@
       enable = true;
       wrapperFeatures.gtk = true; # So that GTK applications work properly
       extraPackages = with pkgs; [
-        swaylock # Screen locker
+        swaylock-effects # Screen locker with blur effects
         swayidle # Idle management daemon
         waybar # Status bar
         wofi # Application launcher
@@ -36,7 +36,7 @@
     rofi
 
     # Screen lockers
-    swaylock
+    swaylock-effects
 
     # Status bars - REMOVED to avoid conflicts with Home Manager
     # waybar # Already configured in Home Manager waybar.nix
