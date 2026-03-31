@@ -71,10 +71,9 @@ in rec {
   in {
     # OCI container configuration
     virtualisation.oci-containers.containers.${containerName} = {
-      inherit (cfg) image autoStart;
+      inherit (cfg) image autoStart environment;
       ports = portStrings;
       volumes = volumeStrings;
-      environment = cfg.environment;
       extraOptions = allExtraOptions;
     };
 
