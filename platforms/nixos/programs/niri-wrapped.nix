@@ -237,6 +237,7 @@
     window-rules = [
       {
         matches = [{is-floating = false;}];
+        opacity = 0.95;
         geometry-corner-radius = {
           top-left = 8.0;
           top-right = 8.0;
