@@ -165,6 +165,7 @@
 
       # Nix helper tools
       nh
+      statix # Lints and suggestions for Nix code
 
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
