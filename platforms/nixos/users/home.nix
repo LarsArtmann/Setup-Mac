@@ -6,10 +6,11 @@
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration
-    ../programs/rofi.nix # Rofi launcher with Catppuccin theme
+    ../programs/rofi.nix # Rofi launcher with Catppuccin grid theme
     ../programs/wlogout.nix # Power menu with Catppuccin theme
     ../programs/swaylock.nix # Screen locker with blur + Catppuccin theme
     ../programs/zellij.nix # Zellij terminal multiplexer
+    ../programs/yazi.nix # Terminal file manager with Catppuccin theme
     ../programs/niri-wrapped.nix # Niri scrollable-tiling compositor via niri-flake HM module
     ../desktop/waybar.nix # Status bar for niri
   ];
@@ -96,7 +97,7 @@
   # NixOS-specific packages
   home.packages = with pkgs; [
     # GUI Tools
-    pavucontrol # Audio control (user-level access for audio settings)
+    pwvucontrol # Native PipeWire volume control (GTK, Rust)
     signal-desktop # Secure messaging application
 
     # XL Cursor theme for TV viewing (2 meters away)
@@ -129,7 +130,9 @@
     brightnessctl
     ddcutil
     cliphist
-    wl-clipboard
+    rofi-calc
+    rofi-emoji
+    bemoji
     wl-clip-persist # Keeps clipboard content after programs close
     zellij # Terminal multiplexer (modern tmux alternative)
     zed-editor # Modern code editor (Rust-based, collaborative)

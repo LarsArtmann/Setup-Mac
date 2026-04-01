@@ -22,6 +22,7 @@
 
         modules-right = [
           "custom/dns-stats"
+          "custom/weather"
           "pulseaudio"
           "network"
           "cpu"
@@ -131,7 +132,7 @@
             headset = "";
             default = ["" "" ""];
           };
-          on-click = "pavucontrol";
+          on-click = "pwvucontrol";
           on-scroll-up = "pamixer -i 5";
           on-scroll-down = "pamixer -d 5";
           tooltip-format = "{desc}  {volume}%";
@@ -193,6 +194,23 @@
           format = "";
           on-click = "wlogout";
           tooltip = "Power menu";
+        };
+
+        "custom/weather" = {
+          format = " {} {text}";
+          exec = pkgs.writeShellScript "waybar-weather" ''
+            WTTR=$(${pkgs.curl}/bin/curl -sf "wttr.in/?format=3" 2>/dev/null || echo "")
+            if [ -z "$WTTR" ]; then
+              echo "N/A"
+              exit 0
+            fi
+            TEMP=$(echo "$WTTR" | cut -d' ' -f1)
+            COND=$(echo "$WTTR" | cut -d' ' -f2- | tr -d '+')
+            echo "{\"text\": \"$TEMP $COND\", \"tooltip\": \"Weather: $TEMP $COND\"}"
+          '';
+          return-type = "json";
+          interval = 1800;
+          on-click = "xdg-open https://wttr.in";
         };
       };
     };

@@ -203,6 +203,9 @@ in {
       "Mod+Space".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Shift+Slash".action.spawn = sh "niri msg binds | rofi -dmenu -p 'Keybindings:' -theme-str 'window {width: 80%; height: 80%;}'";
       "Mod+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | cliphist decode | wl-copy";
+      "Mod+period".action.spawn = sh "rofi -modi emoji -show emoji -theme-str 'window {width: 40%;}'";
+      "Mod+Shift+C".action.spawn = sh "rofi -show calc -modi calc -no-show-match -no-sort -theme-str 'window {width: 30%;}'";
+      "Mod+Shift+N".action.spawn = sh "dunstctl history | rofi -dmenu -p 'Notifications:' -theme-str 'window {width: 60%; height: 60%;}'";
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
       "Mod+Z".action.spawn = ["zed"];
@@ -214,9 +217,9 @@ in {
 
       "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
 
-      "Mod+Shift+F11".action.spawn = sh "grim -g \"\$(slurp)\" - | swappy -f -";
-      "Mod+F11".action.spawn = sh "grim - | swappy -f -";
-      "Mod+Ctrl+F11".action.spawn = sh "grim -o \$(niri msg focused-output | head -1) - | swappy -f -";
+      "Mod+Shift+F11".action.spawn = sh "grim -g \"$(slurp)\" - | tee >(swappy -f -) | wl-copy";
+      "Mod+F11".action.spawn = sh "grim - | tee >(swappy -f -) | wl-copy";
+      "Mod+Ctrl+F11".action.spawn = sh "grim -o $(niri msg focused-output | head -1) - | tee >(swappy -f -) | wl-copy";
 
       "XF86AudioRaiseVolume" = {
         action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
@@ -278,6 +281,13 @@ in {
       {
         matches = [{app-id = "^pavucontrol$";}];
         open-floating = true;
+      }
+      {
+        matches = [{app-id = "^floating$";}];
+        open-floating = true;
+        default-floating-position = {x = 25%; y = 15%;};
+        default-width = {proportion = 0.5;};
+        default-height = {proportion = 0.7;};
       }
       {
         matches = [{app-id = "^xdg-desktop-portal-gtk$";}];
