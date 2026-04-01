@@ -131,7 +131,12 @@
       "www.movieffm.net"
     ];
 
-    extraDomains = [];
+    extraDomains = [
+      "reddit.com"
+      "redd.it"
+      "redditmedia.com"
+      "redditstatic.com"
+    ];
 
     upstreamDNS = [
       "9.9.9.9@853#dns.quad9.net"
@@ -161,6 +166,10 @@
       ".chaturbate.com" = "Adult Content";
       ".tiktok.com" = "Social Media";
       ".tiktokcdn.com" = "Social Media";
+      ".reddit.com" = "Social Media";
+      ".redd.it" = "Social Media";
+      ".redditmedia.com" = "Social Media";
+      ".redditstatic.com" = "Social Media";
     };
   };
 

@@ -189,7 +189,9 @@ in {
 
           include = toString unboundIncludeFile;
 
-          local-zone = map (d: ''"${d}" transparent'') cfg.whitelist;
+          local-zone =
+            map (d: ''"${d}" transparent'') cfg.whitelist
+            ++ map (d: ''"${d}" always_nxdomain'') cfg.extraDomains;
         };
 
         remote-control = {
