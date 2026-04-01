@@ -48,11 +48,20 @@ type CertCache struct {
 
 var certCache CertCache
 
-type Stats struct {
-	TotalBlocked atomic.Int64 `json:"total_blocked"`
+type StatsMixin struct {
 	TopDomains   []DomainHit  `json:"top_domains"`
 	RecentBlocks []BlockEntry `json:"recent_blocks"`
 	Start        time.Time    `json:"start_time"`
+}
+
+type Stats struct {
+	StatsMixin
+	TotalBlocked atomic.Int64 `json:"total_blocked"`
+}
+
+type StatsResponse struct {
+	StatsMixin
+	TotalBlocked int64 `json:"total_blocked"`
 }
 
 type DomainHit struct {
@@ -60,10 +69,18 @@ type DomainHit struct {
 	Count  int64  `json:"count"`
 }
 
-type BlockEntry struct {
+type BlockEntryMixin struct {
 	Domain   string `json:"domain"`
 	Category string `json:"category"`
 	Time     string `json:"time"`
+}
+
+type BlockEntry struct {
+	BlockEntryMixin
+}
+
+func (b BlockEntry) WithTime(time string) BlockEntry {
+	return BlockEntry{BlockEntryMixin{Domain: b.Domain, Category: b.Category, Time: time}}
 }
 
 type TempAllowEntry struct {
@@ -417,9 +434,11 @@ func recordBlock(domain, category string) {
 	}
 
 	entry := BlockEntry{
-		Domain:   domain,
-		Category: category,
-		Time:     time.Now().Format(time.RFC3339),
+		BlockEntryMixin: BlockEntryMixin{
+			Domain:   domain,
+			Category: category,
+			Time:     time.Now().Format(time.RFC3339),
+		},
 	}
 
 	stats.RecentBlocks = append(stats.RecentBlocks, entry)
@@ -506,18 +525,13 @@ func statsHandler(w http.ResponseWriter, r *http.Request) {
 		return true
 	})
 
-	type StatsResponse struct {
-		TotalBlocked int64        `json:"total_blocked"`
-		TopDomains   []DomainHit  `json:"top_domains"`
-		RecentBlocks []BlockEntry `json:"recent_blocks"`
-		Start        time.Time    `json:"start_time"`
-	}
-
 	resp := StatsResponse{
+		StatsMixin: StatsMixin{
+			TopDomains:   topDomains,
+			RecentBlocks: stats.RecentBlocks,
+			Start:       stats.Start,
+		},
 		TotalBlocked: stats.TotalBlocked.Load(),
-		TopDomains:   topDomains,
-		RecentBlocks: stats.RecentBlocks,
-		Start:        stats.Start,
 	}
 
 	statsJSON, err := json.MarshalIndent(resp, "", "  ")
@@ -550,15 +564,32 @@ func getCtxConfig(r *http.Request) *Config {
 	return cfg
 }
 
-func allowHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
+// requireDomain extracts domain from request form and responds with error if empty.
+func requireDomain(w http.ResponseWriter, r *http.Request) (string, bool) {
 	domain := r.FormValue("domain")
 	if domain == "" {
 		http.Error(w, "domain required", http.StatusBadRequest)
+		return "", false
+	}
+	return domain, true
+}
+
+// requirePost checks request method and responds with error if not POST.
+func requirePost(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return false
+	}
+	return true
+}
+
+func allowHandler(w http.ResponseWriter, r *http.Request) {
+	if !requirePost(w, r) {
+		return
+	}
+
+	domain, ok := requireDomain(w, r)
+	if !ok {
 		return
 	}
 
@@ -630,10 +661,8 @@ func formatDuration(d time.Duration) string {
 
 // FalsePositiveReport stores reported false positives
 type FalsePositiveReport struct {
-	Domain   string `json:"domain"`
-	Category string `json:"category"`
-	Source   string `json:"source"`
-	Time     string `json:"time"`
+	BlockEntryMixin
+	Source string `json:"source"`
 }
 
 var (
@@ -642,22 +671,22 @@ var (
 )
 
 func reportFalsePositiveHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	if !requirePost(w, r) {
 		return
 	}
 
-	domain := r.FormValue("domain")
-	if domain == "" {
-		http.Error(w, "domain required", http.StatusBadRequest)
+	domain, ok := requireDomain(w, r)
+	if !ok {
 		return
 	}
 
 	report := FalsePositiveReport{
-		Domain:   domain,
-		Category: r.FormValue("category"),
-		Source:   r.FormValue("source"),
-		Time:     time.Now().Format(time.RFC3339),
+		BlockEntryMixin: BlockEntryMixin{
+			Domain:   domain,
+			Category: r.FormValue("category"),
+			Time:     time.Now().Format(time.RFC3339),
+		},
+		Source: r.FormValue("source"),
 	}
 
 	falsePositiveMu.Lock()

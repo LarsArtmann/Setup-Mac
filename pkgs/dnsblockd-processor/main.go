@@ -116,6 +116,14 @@ func writeMapping(path string, mapping map[string]string) error {
 	return nil
 }
 
+// exitOnError checks err and exits with code 1 if error is not nil.
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
 func main() {
 	if len(os.Args) < 5 {
 		fmt.Fprintf(
@@ -145,15 +153,8 @@ func main() {
 		)
 	}
 
-	if err := writeUnbound(unboundOutput, unboundEntries); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-
-	if err := writeMapping(mappingOutput, mapping); err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
+	exitOnError(writeUnbound(unboundOutput, unboundEntries))
+	exitOnError(writeMapping(mappingOutput, mapping))
 
 	fmt.Fprintf(os.Stderr, "processed %d unique domains\n", len(unboundEntries))
 }
