@@ -34,6 +34,29 @@
           group = "users";
           restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
         };
+
+        dnsblockd_ca_cert = {
+          sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;
+          restartUnits = ["dnsblockd.service"];
+        };
+        dnsblockd_ca_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;
+          mode = "0400";
+          restartUnits = ["dnsblockd.service"];
+        };
+        dnsblockd_server_cert = {
+          sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;
+          owner = "caddy";
+          group = "caddy";
+          restartUnits = ["caddy.service"];
+        };
+        dnsblockd_server_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;
+          owner = "caddy";
+          group = "caddy";
+          mode = "0400";
+          restartUnits = ["caddy.service"];
+        };
       };
 
       templates."gitea-sync.env" = {
