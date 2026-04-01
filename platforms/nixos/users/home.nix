@@ -176,17 +176,18 @@
   };
 
   # GTK settings for Catppuccin Mocha theme
-  gtk = {
+  gtk = let
+    gtkThemeName = "Catppuccin-Mocha-Compact-Lavender-Dark";
+  in {
     enable = true;
-    # Explicitly disable GTK4 theme to silence Home Manager deprecation warning
-    # (default changed from config.gtk.theme to null in Home Manager 26.05)
-    gtk4.theme = null;
+    # GTK4 theme inherits from main theme (for Blueman and other GTK4 apps)
+    gtk4.theme.name = gtkThemeName;
     font = {
       name = "Sans";
       size = 16; # Increased for TV viewing (2m distance)
     };
     theme = {
-      name = "Catppuccin-Mocha-Compact-Lavender-Dark";
+      name = gtkThemeName;
       package = pkgs.catppuccin-gtk.override {
         accents = ["lavender"];
         size = "compact";

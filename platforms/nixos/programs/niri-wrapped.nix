@@ -206,7 +206,7 @@ in {
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
       "Mod+Z".action.spawn = ["zed"];
-      "Mod+Shift+Z".action.spawn = ["zed"];
+      "Mod+Shift+F".action.spawn = sh "kitty --class floating -e yazi";
 
       "Mod+Shift+Escape".action.spawn = ["swaylock"];
       "Mod+Shift+P".action.power-off-monitors = {};
