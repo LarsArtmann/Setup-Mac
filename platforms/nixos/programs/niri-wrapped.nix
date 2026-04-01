@@ -202,7 +202,7 @@ in {
       "Mod+D".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Space".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Shift+Slash".action.spawn = sh "niri msg binds | rofi -dmenu -p 'Keybindings:' -theme-str 'window {width: 80%; height: 80%;}'";
-      "Mod+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | cliphist decode | wl-copy";
+      "Alt+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | cliphist decode | wl-copy";
       "Mod+period".action.spawn = sh "rofi -modi emoji -show emoji -theme-str 'window {width: 40%;}'";
       "Mod+Shift+C".action.spawn = sh "rofi -show calc -modi calc -no-show-match -no-sort -theme-str 'window {width: 30%;}'";
       "Mod+Shift+N".action.spawn = sh "dunstctl history | rofi -dmenu -p 'Notifications:' -theme-str 'window {width: 60%; height: 60%;}'";
@@ -285,9 +285,9 @@ in {
       {
         matches = [{app-id = "^floating$";}];
         open-floating = true;
-        default-floating-position = {x = 25%; y = 15%;};
-        default-width = {proportion = 0.5;};
-        default-height = {proportion = 0.7;};
+        default-floating-position = {x = 0.25; y = 0.15; relative-to = "top-left";};
+        default-column-width = {proportion = 0.5;};
+        default-window-height = {proportion = 0.7;};
       }
       {
         matches = [{app-id = "^xdg-desktop-portal-gtk$";}];
