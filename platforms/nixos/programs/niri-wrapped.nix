@@ -205,6 +205,8 @@ in {
       "Mod+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | cliphist decode | wl-copy";
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
+      "Mod+Z".action.spawn = ["zed"];
+      "Mod+Shift+Z".action.spawn = ["zed"];
 
       "Mod+Shift+Escape".action.spawn = ["swaylock"];
       "Mod+Shift+P".action.power-off-monitors = {};

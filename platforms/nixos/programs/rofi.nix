@@ -32,15 +32,12 @@
           anchor: center;
           fullscreen: false;
           width: 800px;
-          x-offset: 0px;
-          y-offset: 0px;
-          enabled: true;
           margin: 0px;
           padding: 0px;
           border: 0px solid;
           border-radius: 16px;
           border-color: @selected;
-          background-color: @bg / 95%;
+          background-color: #1e1e2ef2;
           cursor: "default";
       }
 
@@ -127,29 +124,29 @@
       }
 
       element normal.urgent {
-          background-color: @urgent / 20%;
+          background-color: #f38ba833;
           text-color: @urgent;
       }
 
       element normal.active {
-          background-color: @active / 20%;
+          background-color: #a6e3a133;
           text-color: @active;
       }
 
       element selected.normal {
-          background-color: @selected / 15%;
+          background-color: #89b4fa26;
           text-color: @selected;
           border: 1px solid;
-          border-color: @selected / 40%;
+          border-color: #89b4fa66;
       }
 
       element selected.urgent {
-          background-color: @urgent / 30%;
+          background-color: #f38ba84d;
           text-color: @urgent;
       }
 
       element selected.active {
-          background-color: @active / 30%;
+          background-color: #a6e3a14d;
           text-color: @active;
       }
 
@@ -175,7 +172,7 @@
           border: 2px solid;
           border-radius: 12px;
           border-color: @urgent;
-          background-color: @bg / 90%;
+          background-color: #1e1e2ee6;
           text-color: @fg;
       }
 
