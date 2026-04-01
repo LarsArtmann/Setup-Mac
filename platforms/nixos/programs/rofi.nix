@@ -1,205 +1,203 @@
 {pkgs, ...}: {
-  # Rofi application launcher with Catppuccin Mocha theme
   programs.rofi = {
     enable = true;
-
-    # Rofi package with Wayland support (now merged into main rofi)
     package = pkgs.rofi;
 
-    # Catppuccin Mocha theme configuration
-    theme = builtins.toFile "catppuccin-mocha.rasi" ''
+    theme = builtins.toFile "catppuccin-grid.rasi" ''
       * {
           bg: #1e1e2e;
           bg-alt: #313244;
           fg: #cdd6f4;
           fg-alt: #a6adc8;
-
-          blue: #89b4fa;
-          lavender: #b4befe;
-          sapphire: #74c7ec;
-          sky: #89dceb;
-          teal: #94e2d5;
-          green: #a6e3a1;
-          yellow: #f9e2af;
-          peach: #fab387;
-          maroon: #eba0ac;
-          red: #f38ba8;
-          mauve: #cba6f7;
-          pink: #f5c2e7;
-          flamingo: #f2cdcd;
-          rosewater: #f5e0dc;
+          selected: #89b4fa;
+          active: #a6e3a1;
+          urgent: #f38ba8;
 
           background-color: @bg;
           text-color: @fg;
-          font: "JetBrainsMono Nerd Font 14";
+          font: "JetBrainsMono Nerd Font 10";
+      }
+
+      configuration {
+          modi: "drun";
+          show-icons: true;
+          display-drun: "  ";
+          drun-display-format: "{name}";
+          icon-theme: "Papirus";
       }
 
       window {
-          width: 50%;
-          height: 60%;
-          border: 3px;
-          border-color: @lavender;
+          transparency: "real";
+          location: center;
+          anchor: center;
+          fullscreen: false;
+          width: 800px;
+          x-offset: 0px;
+          y-offset: 0px;
+          enabled: true;
+          margin: 0px;
+          padding: 0px;
+          border: 0px solid;
           border-radius: 16px;
-          background-color: @bg;
-          padding: 20px;
+          border-color: @selected;
+          background-color: @bg / 95%;
+          cursor: "default";
       }
 
       mainbox {
+          enabled: true;
+          spacing: 16px;
+          margin: 0px;
+          padding: 24px;
+          border: 0px solid;
+          border-radius: 0px;
+          border-color: @selected;
           background-color: transparent;
-          children: [inputbar, listview];
-          spacing: 15px;
+          children: [ "inputbar", "listview" ];
       }
 
       inputbar {
-          background-color: @bg-alt;
-          border-radius: 12px;
-          padding: 12px 16px;
-          children: [prompt, entry];
+          enabled: true;
           spacing: 12px;
+          margin: 0px;
+          padding: 16px;
+          border: 0px solid;
+          border-radius: 12px;
+          border-color: @selected;
+          background-color: @bg-alt;
+          text-color: @fg;
+          children: [ "prompt", "entry" ];
       }
 
       prompt {
+          enabled: true;
           background-color: transparent;
-          text-color: @lavender;
-          font: "JetBrainsMono Nerd Font 16";
+          text-color: @selected;
+          font: "JetBrainsMono Nerd Font 14";
       }
 
       entry {
+          enabled: true;
           background-color: transparent;
           text-color: @fg;
+          cursor: text;
           placeholder: "Search...";
           placeholder-color: @fg-alt;
-          cursor: text;
       }
 
       listview {
-          background-color: transparent;
-          columns: 1;
-          lines: 8;
-          spacing: 8px;
-          fixed-height: false;
+          enabled: true;
+          columns: 5;
+          lines: 3;
+          cycle: true;
           dynamic: true;
+          scrollbar: false;
+          layout: vertical;
+          reverse: false;
+          fixed-height: true;
+          fixed-columns: true;
+          spacing: 8px;
+          margin: 0px;
+          padding: 0px;
+          border: 0px solid;
+          border-radius: 0px;
+          border-color: @selected;
+          background-color: transparent;
+          text-color: @fg;
+          cursor: "default";
       }
 
       element {
-          background-color: transparent;
-          padding: 12px 16px;
-          border-radius: 10px;
-          spacing: 12px;
-      }
-
-      element-icon {
-          background-color: transparent;
-          size: 24px;
-      }
-
-      element-text {
+          enabled: true;
+          spacing: 10px;
+          margin: 4px;
+          padding: 16px 8px;
+          border: 0px solid;
+          border-radius: 12px;
+          border-color: @selected;
           background-color: transparent;
           text-color: @fg;
-          vertical-align: 0.5;
+          orientation: vertical;
+          cursor: pointer;
       }
 
       element normal.normal {
           background-color: transparent;
+          text-color: @fg;
       }
 
       element normal.urgent {
-          background-color: @red;
-          text-color: @bg;
+          background-color: @urgent / 20%;
+          text-color: @urgent;
       }
 
       element normal.active {
-          background-color: @blue;
-          text-color: @bg;
+          background-color: @active / 20%;
+          text-color: @active;
       }
 
       element selected.normal {
-          background-color: @lavender;
-          text-color: @bg;
+          background-color: @selected / 15%;
+          text-color: @selected;
+          border: 1px solid;
+          border-color: @selected / 40%;
       }
 
       element selected.urgent {
-          background-color: @red;
-          text-color: @bg;
+          background-color: @urgent / 30%;
+          text-color: @urgent;
       }
 
       element selected.active {
-          background-color: @green;
-          text-color: @bg;
+          background-color: @active / 30%;
+          text-color: @active;
       }
 
-      element alternate.normal {
+      element-icon {
           background-color: transparent;
+          text-color: inherit;
+          size: 56px;
+          cursor: inherit;
       }
 
-      element alternate.urgent {
-          background-color: @red;
-          text-color: @bg;
-      }
-
-      element alternate.active {
-          background-color: @blue;
-          text-color: @bg;
-      }
-
-      mode-switcher {
-          background-color: @bg-alt;
-          border-radius: 12px;
-          padding: 8px;
-          spacing: 8px;
-      }
-
-      button {
+      element-text {
           background-color: transparent;
-          text-color: @fg-alt;
-          padding: 8px 12px;
-          border-radius: 8px;
+          text-color: inherit;
+          highlight: inherit;
+          cursor: inherit;
+          vertical-align: 0.5;
+          horizontal-align: 0.5;
+          font: "JetBrainsMono Nerd Font 9";
       }
 
-      button selected {
-          background-color: @lavender;
-          text-color: @bg;
-      }
-
-      message {
-          background-color: @bg-alt;
+      error-message {
+          padding: 16px;
+          border: 2px solid;
           border-radius: 12px;
-          padding: 12px;
+          border-color: @urgent;
+          background-color: @bg / 90%;
+          text-color: @fg;
       }
 
       textbox {
           background-color: transparent;
           text-color: @fg;
-      }
-
-      scrollbar {
-          background-color: @bg-alt;
-          border-radius: 8px;
-          width: 8px;
-          padding: 4px;
-      }
-
-      handle {
-          background-color: @lavender;
-          border-radius: 4px;
+          vertical-align: 0.5;
+          horizontal-align: 0.0;
+          highlight: none;
       }
     '';
 
-    # Additional configuration
     extraConfig = {
-      modi = "drun,run,window,ssh";
+      modi = "drun,run,window";
       show-icons = true;
       icon-theme = "Papirus";
       terminal = "kitty";
       drun-display-format = "{name}";
       location = 0;
       disable-history = false;
-      hide-scrollbar = false;
-      display-drun = "  Apps  ";
-      display-run = "  Run  ";
-      display-window = "  Window  ";
-      display-ssh = "  SSH  ";
-      sidebar-mode = true;
+      hide-scrollbar = true;
+      sidebar-mode = false;
     };
   };
 }

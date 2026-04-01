@@ -202,6 +202,7 @@ in {
       "Mod+D".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Space".action.spawn = ["rofi" "-show" "drun"];
       "Mod+Shift+Slash".action.spawn = sh "niri msg binds | rofi -dmenu -p 'Keybindings:' -theme-str 'window {width: 80%; height: 80%;}'";
+      "Mod+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | cliphist decode | wl-copy";
       "Mod+Shift+E".action.spawn = ["emacs"];
       "Mod+Shift+B".action.spawn = ["firefox"];
 
