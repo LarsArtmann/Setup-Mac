@@ -7,7 +7,7 @@
   cfg = config.services.dns-blocker;
   inherit (lib) mkEnableOption mkOption types;
 
-  dnsblockdCert = pkgs.dnsblockd-cert;
+  caCertFile = ./../secrets/dnsblockd-ca.crt;
 
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 
@@ -213,7 +213,7 @@ in {
       ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev lo 2>/dev/null || true
     '';
 
-    security.pki.certificateFiles = ["${dnsblockdCert}/dnsblockd-ca.crt"];
+    security.pki.certificateFiles = [caCertFile];
 
     programs.firefox.policies = {
       DNSOverHTTPS = {
@@ -221,7 +221,7 @@ in {
         Locked = true;
       };
       Certificates = {
-        Install = ["${dnsblockdCert}/dnsblockd-ca.crt"];
+        Install = [caCertFile];
       };
       Preferences = {
         "browser.shell.checkDefaultBrowser" = {
@@ -275,8 +275,8 @@ in {
               + " -addr ${cfg.blockIP}"
               + " -port ${toString cfg.blockPort}"
               + " -tls-port ${toString cfg.blockTLSPort}"
-              + " -ca-cert ${dnsblockdCert}/dnsblockd-ca.crt"
-              + " -ca-key ${dnsblockdCert}/dnsblockd-ca.key"
+              + " -ca-cert ${config.sops.secrets.dnsblockd_ca_cert.path}"
+              + " -ca-key ${config.sops.secrets.dnsblockd_ca_key.path}"
               + " -stats-addr 127.0.0.1"
               + " -stats-port ${toString cfg.statsPort}"
               + " -blocklist-mapping ${processedBlocklist}/mapping.json"
@@ -318,7 +318,7 @@ in {
           mkdir -p $HOME/.pki/nssdb
           certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
           certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
-          certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${dnsblockdCert}/dnsblockd-ca.crt
+          certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n dnsblockd-ca -i ${caCertFile}
         '';
       };
     };
