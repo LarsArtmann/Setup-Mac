@@ -4,7 +4,8 @@
     pkgs,
     ...
   }: let
-    dnsblockdCert = pkgs.dnsblockd-cert;
+    serverCert = config.sops.secrets.dnsblockd_server_cert.path;
+    serverKey = config.sops.secrets.dnsblockd_server_key.path;
   in {
     services.caddy = {
       enable = true;
@@ -19,35 +20,35 @@
       virtualHosts = {
         "immich.lan" = {
           extraConfig = ''
-            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            tls ${serverCert} ${serverKey}
             reverse_proxy localhost:${toString config.services.immich.port}
           '';
         };
 
         "gitea.lan" = {
           extraConfig = ''
-            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            tls ${serverCert} ${serverKey}
             reverse_proxy localhost:3000
           '';
         };
 
         "grafana.lan" = {
           extraConfig = ''
-            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            tls ${serverCert} ${serverKey}
             reverse_proxy localhost:3001
           '';
         };
 
         "home.lan" = {
           extraConfig = ''
-            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            tls ${serverCert} ${serverKey}
             reverse_proxy localhost:8082
           '';
         };
 
         "photomap.lan" = {
           extraConfig = ''
-            tls ${dnsblockdCert}/dnsblockd-server.crt ${dnsblockdCert}/dnsblockd-server.key
+            tls ${serverCert} ${serverKey}
             reverse_proxy localhost:8050
           '';
         };
