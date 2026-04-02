@@ -52,6 +52,13 @@
             reverse_proxy localhost:8050
           '';
         };
+
+        "unsloth.lan" = {
+          extraConfig = ''
+            tls ${serverCert} ${serverKey}
+            reverse_proxy localhost:8888
+          '';
+        };
       };
     };
 

@@ -57,6 +57,10 @@
           mode = "0400";
           restartUnits = ["caddy.service"];
         };
+
+        unsloth_jupyter_password = {
+          restartUnits = ["docker-unsloth-studio.service"];
+        };
       };
 
       templates."gitea-sync.env" = {
@@ -65,6 +69,12 @@
         content = ''
           GITHUB_TOKEN=${config.sops.placeholder.github_token}
           GITHUB_USER=${config.sops.placeholder.github_user}
+        '';
+      };
+
+      templates."unsloth-studio.env" = {
+        content = ''
+          JUPYTER_PASSWORD=${config.sops.placeholder.unsloth_jupyter_password}
         '';
       };
     };

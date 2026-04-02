@@ -106,6 +106,12 @@
               icon: ollama.png
               statusStyle: dot
               siteMonitor: http://localhost:11434/api/tags
+          - Unsloth Studio:
+              href: https://unsloth.lan
+              description: AI Model Training & Inference UI
+              icon: jupyter.png
+              statusStyle: dot
+              siteMonitor: https://unsloth.lan
 
       - Monitoring:
           - Grafana:
