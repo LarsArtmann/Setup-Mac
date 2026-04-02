@@ -2,16 +2,17 @@
   # llama.cpp with ROCm + rocWMMA for Strix Halo (gfx1151)
   # rocWMMA provides 2x prompt processing via wavefront matrix multiply-accumulate
   # MFMA enables matrix fused multiply-add for quantized matmul kernels
-  llama-cpp-rocwmma = (pkgs.llama-cpp.override {
-    rocmSupport = true;
-  }).overrideAttrs (finalAttrs: {
-    cmakeFlags =
-      finalAttrs.cmakeFlags
-      ++ [
-        "-DGGML_HIP_ROCWMMA_FATTN=ON"
-        "-DGGML_HIP_MMQ_MFMA=ON"
-      ];
-  });
+  llama-cpp-rocwmma =
+    (pkgs.llama-cpp.override {
+      rocmSupport = true;
+    }).overrideAttrs (finalAttrs: {
+      cmakeFlags =
+        finalAttrs.cmakeFlags
+        ++ [
+          "-DGGML_HIP_ROCWMMA_FATTN=ON"
+          "-DGGML_HIP_MMQ_MFMA=ON"
+        ];
+    });
 in {
   # AMD Strix Halo AI Stack
   # Inference backends: NPU (FastFlowLM), GPU (Ollama/ROCm), CPU (llama-cpp)
