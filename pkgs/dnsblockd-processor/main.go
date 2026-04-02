@@ -1,5 +1,6 @@
-// Package main provides a DNS block list processor that converts hosts files
-// into Unbound local-data entries and a domain-to-list mapping JSON file.
+// Package main provides a DNS block list processor that converts blocklists
+// (hosts, domains, dnsmasq, or adblock format) into Unbound local-data
+// entries and a domain-to-list mapping JSON file.
 package main
 
 import (
@@ -29,6 +30,39 @@ func loadWhitelist(path string) map[string]bool {
 	return whitelist
 }
 
+func extractDomain(line string) string {
+	if strings.HasPrefix(line, "||") {
+		domain := line[2:]
+		if idx := strings.Index(domain, "^"); idx > 0 {
+			domain = domain[:idx]
+		}
+		return domain
+	}
+
+	if strings.HasPrefix(line, "local=/") || strings.HasPrefix(line, "address=/") {
+		var rest string
+		if strings.HasPrefix(line, "local=/") {
+			rest = line[len("local=/"):]
+		} else {
+			rest = line[len("address=/"):]
+		}
+		if idx := strings.Index(rest, "/"); idx > 0 {
+			return rest[:idx]
+		}
+		return ""
+	}
+
+	fields := strings.Fields(line)
+	if len(fields) == 1 {
+		return fields[0]
+	}
+	if len(fields) >= 2 {
+		return fields[1]
+	}
+
+	return ""
+}
+
 func processHostsFile(
 	path, name, blockIP string,
 	whitelist, seen map[string]bool,
@@ -52,16 +86,15 @@ func processHostsFile(
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
+		if line == "" || line[0] == '#' || line[0] == '!' || line[0] == '[' || strings.HasPrefix(line, "@@") {
 			continue
 		}
 
-		fields := strings.Fields(line)
-		if len(fields) < 2 {
+		domain := extractDomain(line)
+		if domain == "" {
 			continue
 		}
 
-		domain := fields[1]
 		if domain == "localhost" || domain == "localhost.localdomain" {
 			continue
 		}
@@ -128,7 +161,7 @@ func main() {
 	if len(os.Args) < 5 {
 		fmt.Fprintf(
 			os.Stderr,
-			"Usage: %s BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [HOSTS_FILE NAME]...\n",
+			"Usage: %s BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [LIST_FILE NAME]...\n",
 			os.Args[0],
 		)
 		os.Exit(1)
