@@ -30,7 +30,7 @@ _: {
     dhcpcd.enable = false;
 
     # DNS uses unbound via dns-blocker-config.nix
-    nameservers = ["127.0.0.1"];
+    nameservers = ["127.0.0.1" "9.9.9.9"];
   };
 
   # Use NetworkManager for WiFi management only (if needed)
