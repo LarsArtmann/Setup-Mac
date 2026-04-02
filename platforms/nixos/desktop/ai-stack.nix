@@ -1,10 +1,14 @@
-{pkgs, config, ...}: let
+{
+  pkgs,
+  config,
+  ...
+}: let
   # llama.cpp with ROCm + rocWMMA for Strix Halo (gfx1151)
   # rocWMMA provides 2x prompt processing via wavefront matrix multiply-accumulate
   # MFMA enables matrix fused multiply-add for quantized matmul kernels
   # Upstream llama.cpp doesn't find_package rocwmma or add its include dirs,
   # so we patch the HIP backend CMakeLists to add target_include_directories
-  rocwmma = pkgs.rocmPackages.rocwmma;
+  inherit (pkgs.rocmPackages) rocwmma;
   llama-cpp-rocwmma =
     (pkgs.llama-cpp.override {
       rocmSupport = true;
@@ -79,7 +83,10 @@ in {
   ];
 
   # Unsloth Studio - no-code AI model training & inference web UI
-  # AMD GPU passthrough via /dev/dri for ROCm inference
+  # Note: Official image is CUDA-only (cu12.8). GPU training requires NVIDIA.
+  # On AMD Strix Halo: chat, data recipes, dataset creation, and model export work on CPU.
+  # For GPU inference, use host Ollama (localhost:11434) with exported GGUF models.
+  # Track ROCm image: https://github.com/unslothai/unsloth/issues (no official ROCm image yet)
   virtualisation.oci-containers.containers.unsloth-studio = {
     autoStart = true;
     image = "unsloth/unsloth:latest";
@@ -88,11 +95,6 @@ in {
     volumes = [
       "${unslothDataDir}/workspace:/workspace/work"
       "${unslothDataDir}/models:/root/.cache/huggingface"
-    ];
-    extraOptions = [
-      "--device=/dev/dri"
-      "--group-add=video"
-      "--group-add=render"
     ];
   };
 

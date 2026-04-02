@@ -357,6 +357,51 @@ in {
       media = {};
     };
 
+    animations = {
+      horizontal-view-movement = {
+        kind.spring = {
+          damping-ratio = 0.8;
+          stiffness = 1000;
+          epsilon = 0.0001;
+        };
+      };
+      window-open = {
+        kind.spring = {
+          damping-ratio = 0.7;
+          stiffness = 800;
+          epsilon = 0.0001;
+        };
+      };
+      window-close = {
+        kind.spring = {
+          damping-ratio = 0.7;
+          stiffness = 800;
+          epsilon = 0.0001;
+        };
+      };
+      window-movement = {
+        kind.spring = {
+          damping-ratio = 0.8;
+          stiffness = 1000;
+          epsilon = 0.0001;
+        };
+      };
+      window-resize = {
+        kind.spring = {
+          damping-ratio = 0.8;
+          stiffness = 800;
+          epsilon = 0.0001;
+        };
+      };
+      workspace-switch = {
+        kind.spring = {
+          damping-ratio = 0.8;
+          stiffness = 1000;
+          epsilon = 0.0001;
+        };
+      };
+    };
+
     environment = {
       NIXOS_OZONE_WL = "1";
       DISPLAY = ":0";

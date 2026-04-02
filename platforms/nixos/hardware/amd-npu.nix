@@ -1,4 +1,8 @@
-{pkgs, nix-amd-npu, ...}: let
+{
+  pkgs,
+  nix-amd-npu,
+  ...
+}: let
   # Fix XRT build with Boost 1.89.0 - boost_system was removed in 1.87+
   # Use callPackage to override the boost input to the XRT package
   xrt-fixed = pkgs.callPackage (nix-amd-npu + "/pkgs/xrt") {
