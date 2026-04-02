@@ -58,9 +58,6 @@
           restartUnits = ["caddy.service"];
         };
 
-        unsloth_jupyter_password = {
-          restartUnits = ["docker-unsloth-studio.service"];
-        };
       };
 
       templates."gitea-sync.env" = {
@@ -72,11 +69,6 @@
         '';
       };
 
-      templates."unsloth-studio.env" = {
-        content = ''
-          JUPYTER_PASSWORD=${config.sops.placeholder.unsloth_jupyter_password}
-        '';
-      };
     };
   };
 }

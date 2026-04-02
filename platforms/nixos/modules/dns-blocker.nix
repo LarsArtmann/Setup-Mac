@@ -264,6 +264,27 @@ in {
           delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
             ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
           '';
+          dnsblockdCmd =
+            "${pkgs.dnsblockd}/bin/dnsblockd"
+            + " -addr $(${detectIPScript})"
+            + " -port ${toString cfg.blockPort}"
+            + " -tls-port ${toString cfg.blockTLSPort}"
+            + " -ca-cert ${config.sops.secrets.dnsblockd_ca_cert.path}"
+            + " -ca-key ${config.sops.secrets.dnsblockd_ca_key.path}"
+            + " -stats-addr 127.0.0.1"
+            + " -stats-port ${toString cfg.statsPort}"
+            + " -blocklist-mapping ${processedBlocklist}/mapping.json"
+            + " -unbound-control ${pkgs.unbound}/bin/unbound-control"
+            + " -unbound-socket /run/unbound/unbound.ctl"
+            + " -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf"
+            + (
+              if cfg.categories != {}
+              then " -categories ${categoriesJSON}"
+              else ""
+            );
+          dnsblockdWrapper = pkgs.writeShellScript "dnsblockd-start" ''
+            exec ${dnsblockdCmd}
+          '';
         in
           {
             Type = "simple";
@@ -273,24 +294,7 @@ in {
               else [
                 "+-${initScript}"
               ];
-            ExecStart =
-              "${pkgs.dnsblockd}/bin/dnsblockd"
-              + " -addr $(${detectIPScript})"
-              + " -port ${toString cfg.blockPort}"
-              + " -tls-port ${toString cfg.blockTLSPort}"
-              + " -ca-cert ${config.sops.secrets.dnsblockd_ca_cert.path}"
-              + " -ca-key ${config.sops.secrets.dnsblockd_ca_key.path}"
-              + " -stats-addr 127.0.0.1"
-              + " -stats-port ${toString cfg.statsPort}"
-              + " -blocklist-mapping ${processedBlocklist}/mapping.json"
-              + " -unbound-control ${pkgs.unbound}/bin/unbound-control"
-              + " -unbound-socket /run/unbound/unbound.ctl"
-              + " -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf"
-              + (
-                if cfg.categories != {}
-                then " -categories ${categoriesJSON}"
-                else ""
-              );
+            ExecStart = "${dnsblockdWrapper}";
             StateDirectory = "dnsblockd";
             Restart = "on-failure";
             RestartSec = "3s";

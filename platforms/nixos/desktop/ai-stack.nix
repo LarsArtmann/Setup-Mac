@@ -91,7 +91,7 @@ in {
     autoStart = true;
     image = "unsloth/unsloth:latest";
     ports = ["127.0.0.1:8888:8888"];
-    environmentFiles = [config.sops.templates."unsloth-studio.env".path];
+    environmentFiles = ["${unslothDataDir}/unsloth.env"];
     volumes = [
       "${unslothDataDir}/workspace:/workspace/work"
       "${unslothDataDir}/models:/root/.cache/huggingface"
