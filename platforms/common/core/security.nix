@@ -17,7 +17,7 @@
       message = "Nix package must be available";
     }
     {
-      assertion = builtins.hasAttr "system" pkgs;
+      assertion = pkgs.stdenv.hostPlatform.system != null;
       message = "System information must be available";
     }
   ];

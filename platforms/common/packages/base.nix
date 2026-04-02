@@ -172,7 +172,7 @@
     ]
     ++ lib.optionals (modernizePackage != null) [modernizePackage]
     ++ lib.optionals stdenv.isLinux [
-      swww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
+      awww # Simple Wayland Wallpaper for animated wallpapers (Linux-only)
       geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities (Linux-only)
     ];
 

@@ -16,7 +16,7 @@ in {
         argv = [
           "${pkgs.bash}/bin/bash"
           "-c"
-          "img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.swww}/bin/swww img \"$img\" --transition-type random --transition-duration 3"
+          "img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3"
         ];
       }
       {
@@ -215,7 +215,7 @@ in {
       "Mod+Shift+P".action.power-off-monitors = {};
       "Mod+Shift+S".action.suspend = {};
 
-      "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
+      "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && awww img \"$img\" --transition-type random --transition-duration 3";
 
       "Mod+Shift+F11".action.spawn = sh "grim -g \"$(slurp)\" /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
       "Mod+F11".action.spawn = sh "grim /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";

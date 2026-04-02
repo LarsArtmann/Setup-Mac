@@ -24,7 +24,7 @@
         name = "JetBrainsMono Nerd Font";
         size = 16; # TV viewing size (2m distance)
       };
-      theme = "Catppuccin-Mocha";
+      themeFile = "Catppuccin-Mocha";
       settings = {
         bold_font = "auto";
         italic_font = "auto";
