@@ -284,6 +284,7 @@
             inherit nix-colors;
             inherit niri;
             inherit otel-tui;
+            inherit nix-amd-npu;
           };
           modules = [
             # Core system configuration

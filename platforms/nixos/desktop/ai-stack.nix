@@ -1,18 +1,11 @@
 {pkgs, ...}: let
-  # llama.cpp with ROCm + rocWMMA for Strix Halo (gfx1151)
-  # rocWMMA provides 2x prompt processing via wavefront matrix multiply-accumulate
-  # MFMA enables matrix fused multiply-add for quantized matmul kernels
-  llama-cpp-rocwmma =
-    (pkgs.llama-cpp.override {
+  # llama.cpp with ROCm for Strix Halo (gfx1151)
+  # rocWMMA temporarily disabled - not available in nixpkgs yet
+  # Re-enable when https://github.com/NixOS/nixpkgs/issues/??? adds rocwmma package
+  llama-cpp-rocm =
+    pkgs.llama-cpp.override {
       rocmSupport = true;
-    }).overrideAttrs (finalAttrs: {
-      cmakeFlags =
-        finalAttrs.cmakeFlags
-        ++ [
-          "-DGGML_HIP_ROCWMMA_FATTN=ON"
-          "-DGGML_HIP_MMQ_MFMA=ON"
-        ];
-    });
+    };
 in {
   # AMD Strix Halo AI Stack
   # Inference backends: NPU (FastFlowLM), GPU (Ollama/ROCm), CPU (llama-cpp)
@@ -53,7 +46,7 @@ in {
   environment.systemPackages = with pkgs; [
     # Inference servers
     ollama
-    llama-cpp-rocwmma # llama.cpp with ROCm + rocWMMA for Strix Halo
+    llama-cpp-rocm # llama.cpp with ROCm for Strix Halo
 
     # OCR
     tesseract4
