@@ -217,9 +217,9 @@ in {
 
       "Mod+W".action.spawn = sh "img=$(ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1) && [ -n \"$img\" ] && swww img \"$img\" --transition-type random --transition-duration 3";
 
-      "Mod+Shift+F11".action.spawn = sh "grim -g \"$(slurp)\" - | tee >(swappy -f -) | wl-copy";
-      "Mod+F11".action.spawn = sh "grim - | tee >(swappy -f -) | wl-copy";
-      "Mod+Ctrl+F11".action.spawn = sh "grim -o $(niri msg focused-output | head -1) - | tee >(swappy -f -) | wl-copy";
+      "Mod+Shift+F11".action.spawn = sh "grim -g \"$(slurp)\" /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
+      "Mod+F11".action.spawn = sh "grim /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
+      "Mod+Ctrl+F11".action.spawn = sh "grim -o $(niri msg focused-output | head -1) /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
 
       "XF86AudioRaiseVolume" = {
         action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
@@ -279,7 +279,10 @@ in {
         open-floating = true;
       }
       {
-        matches = [{app-id = "^pavucontrol$";}];
+        matches = [
+          {app-id = "^pavucontrol$";}
+          {app-id = "^com.saivert.pwvucontrol$";}
+        ];
         open-floating = true;
       }
       {

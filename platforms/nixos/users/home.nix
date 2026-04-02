@@ -24,6 +24,7 @@
         name = "JetBrainsMono Nerd Font";
         size = 16; # TV viewing size (2m distance)
       };
+      theme = "Catppuccin-Mocha";
       settings = {
         bold_font = "auto";
         italic_font = "auto";
@@ -126,14 +127,15 @@
     libnotify
     wlogout
     grimblast
+    swappy
     playerctl
     brightnessctl
     ddcutil
     cliphist
+    wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste)
+    wl-clip-persist # Keeps clipboard content after programs close
     rofi-calc
     rofi-emoji
-    bemoji
-    wl-clip-persist # Keeps clipboard content after programs close
     zellij # Terminal multiplexer (modern tmux alternative)
     zed-editor # Modern code editor (Rust-based, collaborative)
     yazi # Terminal file manager (Rust-based, async, image previews)
@@ -153,6 +155,22 @@
       # Explicitly disable session variables to silence Home Manager deprecation warning
       # (default changed from true to false in Home Manager 26.05)
       setSessionVariables = false;
+    };
+
+    # Application config files
+    configFile = {
+      "zed/settings.json".source = ../programs/zed/settings.json;
+      "swappy/config".text = ''
+        [Default]
+        save_dir=$HOME/Pictures/screenshots
+        save_filename_format=screenshot_%Y%m%d_%H%M%S.png
+        show_panel=false
+        line_size=5
+        text_size=20
+        text_font=JetBrainsMono Nerd Font
+        paint_mode=arrow
+        early_exit=true
+      '';
     };
 
     # Default applications for MIME types

@@ -36,11 +36,14 @@
         "niri/workspaces" = {
           format = "{icon}";
           format-icons = {
-            default = "";
+            main = "";
+            browser = "";
+            dev = "";
+            chat = "";
+            media = "";
             focused = "󰮯";
-            active = "󰮯";
+            default = "";
             urgent = "";
-            empty = "";
           };
         };
 
@@ -48,6 +51,7 @@
           format = "{title}";
           icon = true;
           icon-size = 18;
+          max-length = 50;
           rewrite = {
             "(.+) — Mozilla Firefox" = " $1";
             "(.+) - Mozilla Firefox" = " $1";
