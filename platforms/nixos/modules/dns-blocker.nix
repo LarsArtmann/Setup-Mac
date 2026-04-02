@@ -254,6 +254,10 @@ in {
               else "[ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\\n' > /var/lib/dnsblockd/temp-allowlist.conf"
             }
           '';
+          # Detect the actual primary IP at runtime instead of using hardcoded blockIP
+          detectIPScript = pkgs.writeShellScript "dnsblockd-detect-ip" ''
+            ${pkgs.iproute2}/bin/ip -4 addr show dev ${cfg.blockInterface} | ${pkgs.gnugrep}/bin/grep inet | ${pkgs.gnused}/bin/sed -n 's/.*inet \([0-9.]*\).*/\1/p' | ${pkgs.coreutils}/bin/head -1
+          '';
           addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
             ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
           '';
@@ -267,12 +271,11 @@ in {
               if cfg.blockInterface == "lo"
               then "+${initScript}"
               else [
-                "+-${addIPScript}"
-                "+${initScript}"
+                "+-${initScript}"
               ];
             ExecStart =
               "${pkgs.dnsblockd}/bin/dnsblockd"
-              + " -addr ${cfg.blockIP}"
+              + " -addr $(${detectIPScript})"
               + " -port ${toString cfg.blockPort}"
               + " -tls-port ${toString cfg.blockTLSPort}"
               + " -ca-cert ${config.sops.secrets.dnsblockd_ca_cert.path}"
