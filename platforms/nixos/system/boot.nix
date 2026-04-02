@@ -21,6 +21,8 @@
       "amd_pstate=guided"
       # NPU: increase TTM page limit for unified memory AI workloads
       "amdgpu.ttm.pages_limit=29360128"
+      # Disable IOMMU for ~6% memory read improvement on Strix Halo
+      "amd_iommu=off"
     ];
   };
 

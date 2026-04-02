@@ -30,6 +30,13 @@
     # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
   };
 
+  # KFD/DRM udev rules for GPU compute access
+  services.udev.extraRules = ''
+    SUBSYSTEM=="kfd", GROUP="render", MODE="0666"
+    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", GROUP="render", MODE="0666"
+    SUBSYSTEM=="drm", KERNEL=="renderD[0-9]*", GROUP="render", MODE="0666"
+  '';
+
   # Add essential system packages for AMD GPU
   environment.systemPackages = with pkgs; [
     # AMD GPU monitoring and control

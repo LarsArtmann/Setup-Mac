@@ -33,8 +33,8 @@
   ];
 
   environment.sessionVariables = {
-    # ROCm targeting Strix Halo gfx1100
-    HSA_OVERRIDE_GFX_VERSION = "gfx1100";
+    # ROCm targeting Strix Halo gfx1151 (natively supported on kernel 6.19+)
+    # HSA_OVERRIDE_GFX_VERSION removed - gfx1151 is auto-detected
     ROCBLAS_USE_HIPBLASLT = "1";
   };
 }
