@@ -285,7 +285,11 @@ in {
       {
         matches = [{app-id = "^floating$";}];
         open-floating = true;
-        default-floating-position = {x = 0.25; y = 0.15; relative-to = "top-left";};
+        default-floating-position = {
+          x = 0.25;
+          y = 0.15;
+          relative-to = "top-left";
+        };
         default-column-width = {proportion = 0.5;};
         default-window-height = {proportion = 0.7;};
       }
