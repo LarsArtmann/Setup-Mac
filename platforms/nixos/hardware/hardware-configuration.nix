@@ -24,17 +24,22 @@
   # Required for WiFi/Bluetooth hardware
   hardware.enableRedistributableFirmware = true;
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/0b629b65-a1b7-40df-a7dc-9ea5e0b04959";
-    fsType = "btrfs";
-    # Optimized for SSD: transparent compression + reduce write wear
-    options = ["subvol=@" "compress=zstd" "noatime"];
-  };
-
-  fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/80A3-73A9";
-    fsType = "vfat";
-    options = ["fmask=0077" "dmask=0077"];
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/0b629b65-a1b7-40df-a7dc-9ea5e0b04959";
+      fsType = "btrfs";
+      options = ["subvol=@" "compress=zstd" "noatime"];
+    };
+    "/data" = {
+      device = "/dev/disk/by-uuid/046ea663-da55-48b7-b516-0dcdb87ba710";
+      fsType = "btrfs";
+      options = ["compress=zstd:3" "noatime" "ssd" "discard=async" "space_cache=v2"];
+    };
+    "/boot" = {
+      device = "/dev/disk/by-uuid/80A3-73A9";
+      fsType = "vfat";
+      options = ["fmask=0077" "dmask=0077"];
+    };
   };
 
   swapDevices = [
