@@ -11,6 +11,9 @@
     # OpenCL support via ROCm
     extraPackages = with pkgs; [
       rocmPackages.clr.icd # OpenCL support
+      rocmPackages.rocblas # BLAS operations for AI/ML
+      rocmPackages.hipblaslt # Batched GEMM - enables ROCBLAS_USE_HIPBLASLT=1
+      rocmPackages.rocminfo # GPU detection and topology
       # amdvlk removed - RADV is now the default AMD Vulkan driver
       libva # Video acceleration API
       libvdpau-va-gl # VDPAU backend for video acceleration
@@ -30,19 +33,24 @@
     # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
   };
 
-  # KFD/DRM udev rules for GPU compute access
+  # KFD/DRM udev rules for GPU compute access + force high performance for AI workloads
   services.udev.extraRules = ''
     SUBSYSTEM=="kfd", GROUP="render", MODE="0666"
     SUBSYSTEM=="drm", KERNEL=="card[0-9]*", GROUP="render", MODE="0666"
     SUBSYSTEM=="drm", KERNEL=="renderD[0-9]*", GROUP="render", MODE="0666"
+    # Force GPU to high performance DPM state (fixes 10-15% perf loss from power saving)
+    SUBSYSTEM=="drm", KERNEL=="card*", ATTR{device/power_dpm_force_performance_level}="high"
   '';
 
-  # Add essential system packages for AMD GPU
+  # Add essential system packages for AMD GPU monitoring and control
   environment.systemPackages = with pkgs; [
     # AMD GPU monitoring and control
     amdgpu_top # GPU monitoring tool
     corectrl # AMD CPU control
     vulkan-tools # Vulkan utilities
     mesa-demos # GPU testing tools
+    # ROCm monitoring
+    rocmPackages.rocm-smi # Detailed GPU stats, clocks, memory usage
+    nvtopPackages.amd # htop-like GPU monitor
   ];
 }
