@@ -88,7 +88,7 @@
     # AccountsService avatar for SDDM login/lock screen
     environment.etc."AccountsService/users/lars".text = ''
       [User]
-      Icon=${../../../../wallpapers/cyberpunk-chinese-neon-cheongsam-character.jpeg}
+      Icon=/home/lars/projects/wallpapers/cyberpunk-chinese-neon-cheongsam-character.jpeg
     '';
 
     # Ensure Home Manager profile directory exists for user lars
