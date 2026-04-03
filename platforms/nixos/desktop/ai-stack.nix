@@ -114,6 +114,7 @@ in {
       Restart = "on-failure";
       RestartSec = "10s";
       SupplementaryGroups = ["render"];
+      TimeoutStartSec = "900";
     };
   };
 
