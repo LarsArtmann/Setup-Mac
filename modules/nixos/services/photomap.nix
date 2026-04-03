@@ -57,12 +57,6 @@
       serviceConfig = {
         Restart = "on-failure";
         RestartSec = "10s";
-        ExecStartPre = lib.mkBefore [
-          (pkgs.writeShellScript "podman-db-fix" ''
-            rm -rf /data/containers/storage/libpod
-            rm -rf /run/containers/storage/libpod
-          '')
-        ];
       };
     };
 
