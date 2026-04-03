@@ -83,25 +83,44 @@ in {
   ];
 
   # Unsloth Studio - no-code AI model training & inference web UI
-  # Note: Official image is CUDA-only (cu12.8). GPU training requires NVIDIA.
-  # On AMD Strix Halo: chat, data recipes, dataset creation, and model export work on CPU.
-  # For GPU inference, use host Ollama (localhost:11434) with exported GGUF models.
-  # Track ROCm image: https://github.com/unslothai/unsloth/issues (no official ROCm image yet)
-  virtualisation.oci-containers.containers.unsloth-studio = {
-    autoStart = true;
-    image = "unsloth/unsloth:latest";
-    ports = ["127.0.0.1:8888:8888"];
-    environmentFiles = ["${unslothDataDir}/unsloth.env"];
-    volumes = [
-      "${unslothDataDir}/workspace:/workspace/work"
-      "${unslothDataDir}/models:/root/.cache/huggingface"
-    ];
+  # Native ROCm GPU acceleration on AMD Strix Halo (gfx1151)
+  # Uses Python venv with PyTorch ROCm + unsloth[amd] for direct GPU access
+  systemd.services.unsloth-studio = {
+    description = "Unsloth Studio - AI Model Training & Inference UI";
+    after = ["network.target"];
+    wantedBy = ["multi-user.target"];
+    path = with pkgs; [python313 git gcc gnumake cmake ninja cacert rocmPackages.rocm-smi];
+    environment = {
+      HOME = unslothDataDir;
+      PYTHONDONTWRITEBYTECODE = "1";
+    };
+    preStart = ''
+      if [ ! -f ${unslothDataDir}/venv/bin/unsloth ]; then
+        ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
+        ${unslothDataDir}/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel
+        ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
+          torch torchvision torchaudio \
+          --index-url https://download.pytorch.org/whl/rocm6.3
+        ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
+          "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
+      fi
+    '';
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${unslothDataDir}/venv/bin/unsloth studio -H 127.0.0.1 -p 8888";
+      User = "lars";
+      Group = "video";
+      WorkingDirectory = "${unslothDataDir}/workspace";
+      Restart = "on-failure";
+      RestartSec = "10s";
+      SupplementaryGroups = ["render"];
+    };
   };
 
   systemd.tmpfiles.rules = [
-    "d ${unslothDataDir} 0755 root root -"
-    "d ${unslothDataDir}/workspace 0755 root root -"
-    "d ${unslothDataDir}/models 0755 root root -"
+    "d ${unslothDataDir} 0755 lars users -"
+    "d ${unslothDataDir}/workspace 0755 lars users -"
+    "d ${unslothDataDir}/models 0755 lars users -"
   ];
 
   environment.sessionVariables = {
