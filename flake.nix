@@ -217,7 +217,6 @@
       # System configurations (maintain backward compatibility)
       flake = {
         darwinConfigurations."Lars-MacBook-Air" = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
           specialArgs = {
             inherit (inputs.self) inputs;
             inherit nixpkgs;
@@ -229,6 +228,7 @@
           };
           modules = [
             {
+              nixpkgs.hostPlatform = "aarch64-darwin";
               nixpkgs.config.allowUnfree = true;
               nixpkgs.overlays = [
                 nur.overlays.default
@@ -275,7 +275,6 @@
 
         # NixOS configuration
         nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
           specialArgs = {
             inherit (inputs.self) inputs;
             inherit helium;
@@ -289,6 +288,7 @@
           modules = [
             # Core system configuration
             {
+              nixpkgs.hostPlatform = "x86_64-linux";
               system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
               # Allow unfree packages in NixOS
               nixpkgs.config.allowUnfree = true;
