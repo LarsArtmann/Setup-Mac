@@ -100,6 +100,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+
+    # Crush AI Agent Configuration — global AI assistant settings
+    # This ensures AGENTS.md and all references are synced across machines
+    crush-config = {
+      url = "git+file:///Users/larsartmann/.config/crush";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -122,6 +129,7 @@
     signoz-src,
     signoz-collector-src,
     nix-ssh-config,
+    crush-config,
     ...
   }: let
     goOverlay = final: prev: {
@@ -285,10 +293,15 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.larsartmann = import ./platforms/darwin/home.nix;
+                users.larsartmann = { config, pkgs, lib, nix-colors, nix-ssh-config, crush-config, ... }: {
+                  imports = [
+                    ../platforms/darwin/home.nix
+                  ];
+                };
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
+                  inherit crush-config;
                 };
               };
             }
@@ -309,6 +322,7 @@
             inherit niri;
             inherit otel-tui;
             inherit nix-amd-npu;
+            inherit crush-config;
           };
           modules = [
             # Core system configuration
@@ -342,10 +356,15 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.lars = import ./platforms/nixos/users/home.nix;
+                users.lars = { config, pkgs, lib, nix-colors, nix-ssh-config, crush-config, ... }: {
+                  imports = [
+                    ../platforms/nixos/users/home.nix
+                  ];
+                };
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
+                  inherit crush-config;
                 };
               };
             }
