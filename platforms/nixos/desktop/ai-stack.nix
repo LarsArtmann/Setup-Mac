@@ -88,7 +88,7 @@ in {
     wantedBy = ["multi-user.target"];
     path = with pkgs; [
       python313 git gcc gnumake cmake ninja cacert
-      nodejs_22 coreutils
+      nodejs_22 coreutils bash
     ];
     environment = {
       HOME = unslothDataDir;
@@ -193,7 +193,14 @@ in {
     path = with pkgs; [git python313];
     environment = {
       HOME = unslothDataDir;
-      LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
+      LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
+        stdenv.cc.cc.lib
+        zstd
+        rocmPackages.clr
+        rocmPackages.rocminfo
+        rocmPackages.rocrand
+        rocmPackages.rocblas
+      ];
     };
     unitConfig = {
       ConditionPathExists = setupDone;
