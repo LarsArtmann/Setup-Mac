@@ -84,27 +84,52 @@ in {
 
   # Unsloth Studio - no-code AI model training & inference web UI
   # Native ROCm GPU acceleration on AMD Strix Halo (gfx1151)
-  # Uses Python venv with PyTorch ROCm + unsloth[amd] for direct GPU access
-  systemd.services.unsloth-studio = {
-    description = "Unsloth Studio - AI Model Training & Inference UI";
-    after = ["network.target"];
+  # Two-service architecture:
+  #   1. unsloth-setup (oneshot) - installs venv on first boot, stays "active"
+  #   2. unsloth-studio (simple)  - runs the web UI, requires setup to complete first
+  systemd.services.unsloth-setup = {
+    description = "Unsloth Studio - First-time venv setup";
+    after = ["network-online.target"];
+    wants = ["network-online.target"];
     wantedBy = ["multi-user.target"];
-    path = with pkgs; [python313 git gcc gnumake cmake ninja cacert rocmPackages.rocm-smi];
+    path = with pkgs; [python313 git gcc gnumake cmake ninja cacert];
     environment = {
       HOME = unslothDataDir;
       PYTHONDONTWRITEBYTECODE = "1";
     };
-    preStart = ''
-      if [ ! -f ${unslothDataDir}/venv/bin/unsloth ]; then
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "unsloth-setup" ''
+        if [ -f ${unslothDataDir}/venv/bin/unsloth ]; then
+          echo "Unsloth venv already installed, skipping."
+          exit 0
+        fi
+        echo "Creating Python venv..."
         ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
+        echo "Upgrading pip..."
         ${unslothDataDir}/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel
+        echo "Installing PyTorch ROCm 6.3 (~4.9GB)..."
         ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
           torch torchvision torchaudio \
           --index-url https://download.pytorch.org/whl/rocm6.3
+        echo "Installing unsloth[amd]..."
         ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
           "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
-      fi
-    '';
+        echo "Setup complete."
+      '';
+      User = "lars";
+      Group = "users";
+      TimeoutStartSec = "1800";
+    };
+  };
+
+  systemd.services.unsloth-studio = {
+    description = "Unsloth Studio - AI Model Training & Inference UI";
+    after = ["network.target" "unsloth-setup.service"];
+    requires = ["unsloth-setup.service"];
+    wantedBy = ["multi-user.target"];
+    environment.HOME = unslothDataDir;
     serviceConfig = {
       Type = "simple";
       ExecStart = "${unslothDataDir}/venv/bin/unsloth studio -H 127.0.0.1 -p 8888";
@@ -114,7 +139,7 @@ in {
       Restart = "on-failure";
       RestartSec = "10s";
       SupplementaryGroups = ["render"];
-      TimeoutStartSec = "900";
+      TimeoutStartSec = "60";
     };
   };
 
