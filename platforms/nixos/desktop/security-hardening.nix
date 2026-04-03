@@ -56,15 +56,43 @@
     # Audit log forwarding disabled (depends on auditd)
     # journald.audit = true;
 
-    # Fail2ban for intrusion prevention (disabled)
+    # Fail2ban for intrusion prevention
     fail2ban = {
       enable = true;
-      jails.sshd.settings = {
-        port = "ssh";
-        mode = "aggressive";
-        maxretry = 3;
-        findtime = 600;
-        bantime = 3600;
+      daemonSettings = {
+        Definition.loglevel = "INFO";
+      };
+      jails = {
+        # SSH brute force protection
+        sshd.settings = {
+          enabled = true;
+          port = "ssh";
+          filter = "sshd";
+          mode = "aggressive";
+          maxretry = 3;
+          findtime = 600;
+          bantime = 3600;
+        };
+
+        # Gitea login brute force
+        gitea.settings = {
+          enabled = true;
+          filter = "gitea";
+          logpath = "/var/lib/gitea/log/gitea.log";
+          maxretry = 5;
+          findtime = 600;
+          bantime = 3600;
+        };
+
+        # Grafana login brute force
+        grafana.settings = {
+          enabled = true;
+          filter = "grafana";
+          logpath = "/var/lib/grafana/log/grafana.log";
+          maxretry = 5;
+          findtime = 600;
+          bantime = 3600;
+        };
       };
     };
 

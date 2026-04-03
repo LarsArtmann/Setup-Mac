@@ -46,5 +46,8 @@
   };
 
   # Enable ZRAM for better memory management
-  zramSwap.enable = true;
+  zramSwap = {
+    enable = true;
+    memoryPercent = 25; # Cap at 25% of RAM (~32GB on 128GB system)
+  };
 }
