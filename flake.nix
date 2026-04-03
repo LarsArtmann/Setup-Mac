@@ -275,6 +275,7 @@
 
         # NixOS configuration
         nixosConfigurations."evo-x2" = nixpkgs.lib.nixosSystem {
+          system = null;
           specialArgs = {
             inherit (inputs.self) inputs;
             inherit helium;
