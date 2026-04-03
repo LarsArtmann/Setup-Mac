@@ -157,8 +157,8 @@ in {
         # Phase 3: Build frontend with Nix-provided nodejs (no nvm)
         echo "Building frontend..."
         cd ${studioFrontend}
-        npm install --no-fund --no-audit --loglevel=error 2>&1 || true
-        npm run build 2>&1 || true
+        HOME=${unslothDataDir}/tmp/npm-tmp ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
+        HOME=${unslothDataDir}/tmp/npm-tmp ${pkgs.nodejs_22}/bin/npm run build
 
         # Phase 4: oxc-validator runtime (if present)
         if [ -f ${studioBackend}/core/data_recipe/oxc-validator/package.json ]; then
@@ -181,7 +181,10 @@ in {
     requires = ["unsloth-setup.service"];
     wantedBy = ["multi-user.target"];
     path = with pkgs; [git python313];
-    environment.HOME = unslothDataDir;
+    environment = {
+      HOME = unslothDataDir;
+      LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
+    };
     serviceConfig = {
       Type = "simple";
       ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
