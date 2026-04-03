@@ -122,6 +122,10 @@
     services = {
       fstrim.enable = true;
 
+      signoz = {
+        enable = true;
+      };
+
       smartd = {
         enable = true;
         autodetect = true;

@@ -114,6 +114,12 @@
               siteMonitor: https://unsloth.lan
 
       - Monitoring:
+          - SigNoz:
+              href: https://signoz.lan
+              description: Observability Platform
+              icon: signoz.png
+              statusStyle: dot
+              siteMonitor: https://signoz.lan
           - Grafana:
               href: https://grafana.lan
               description: Metrics & Dashboards

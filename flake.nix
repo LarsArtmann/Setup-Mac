@@ -351,6 +351,7 @@
             inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
             inputs.self.nixosModules.ssh
+            inputs.self.nixosModules.signoz
             ./platforms/nixos/system/configuration.nix
           ];
         };

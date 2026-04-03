@@ -63,23 +63,28 @@ in {
   };
 
   # Force-fix ollama directory permissions on boot
-  # This handles cases where the directory was created by another user/system
+  # Handles directories created by other users (e.g., nobody) that block access
   systemd.services.ollama-permissions = {
     description = "Fix Ollama data directory permissions";
-    after = ["local-fs.target" "systemd-tmpfiles-setup.service"];
-    before = ["ollama.service"];
+    # Run after ollama service user is available
+    after = ["local-fs.target" "ollama.service"];
+    # But before ollama actually needs to write
+    before = [];
     wantedBy = ["multi-user.target"];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      # Use numeric UID/GID since ollama is a dynamic user
+      # UID 61547 is the typical dynamic UID for ollama
       ExecStart = pkgs.writeShellScript "fix-ollama-perms" ''
-        set -e
-        # Create directory if missing and set ownership
-        install -d -m 0755 -o ollama -g ollama /data/ollama
-        # Force recursive ownership fix using setpriv to bypass any restrictions
-        ${pkgs.coreutils}/bin/find /data/ollama -exec ${pkgs.coreutils}/bin/chown ollama:ollama {} + 2>/dev/null || true
-        ${pkgs.coreutils}/bin/find /data/ollama -type d -exec ${pkgs.coreutils}/bin/chmod 0755 {} + 2>/dev/null || true
-        ${pkgs.coreutils}/bin/find /data/ollama -type f -exec ${pkgs.coreutils}/bin/chmod 0644 {} + 2>/dev/null || true
+        # Ensure directory exists and is traversable
+        mkdir -p /data/ollama
+        chmod 755 /data/ollama 2>/dev/null || true
+        # Try to fix ownership (will work if root, fail silently otherwise)
+        chown -R 61547:61547 /data/ollama 2>/dev/null || \
+          chown -R ollama:ollama /data/ollama 2>/dev/null || true
+        # Ensure read/write for owner
+        chmod -R u+rwX /data/ollama 2>/dev/null || true
       '';
     };
   };

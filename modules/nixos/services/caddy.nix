@@ -59,6 +59,13 @@
             reverse_proxy localhost:8888
           '';
         };
+
+        "signoz.lan" = {
+          extraConfig = ''
+            tls ${serverCert} ${serverKey}
+            reverse_proxy localhost:8080
+          '';
+        };
       };
     };
 
