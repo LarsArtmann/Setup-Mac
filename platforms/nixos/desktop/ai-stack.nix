@@ -3,11 +3,6 @@
   config,
   ...
 }: let
-  # llama.cpp with ROCm + rocWMMA for Strix Halo (gfx1151)
-  # rocWMMA provides 2x prompt processing via wavefront matrix multiply-accumulate
-  # MFMA enables matrix fused multiply-add for quantized matmul kernels
-  # Upstream llama.cpp doesn't find_package rocwmma or add its include dirs,
-  # so we patch the HIP backend CMakeLists to add target_include_directories
   inherit (pkgs.rocmPackages) rocwmma;
   llama-cpp-rocwmma =
     (pkgs.llama-cpp.override {
@@ -31,11 +26,11 @@
     });
 
   unslothDataDir = "/var/lib/unsloth";
+  studioVenvPython = "${unslothDataDir}/.unsloth/studio/unsloth_studio/bin/python";
 in {
   # AMD Strix Halo AI Stack
   # Inference backends: NPU (FastFlowLM), GPU (Ollama/ROCm), CPU (llama-cpp)
 
-  # System-wide memlock for ROCm/HIP large GTT buffer allocations
   security.pam.loginLimits = [
     {
       domain = "*";
@@ -51,7 +46,6 @@ in {
     }
   ];
 
-  # Ollama - GPU inference via ROCm backend (hipBLASLt for optimized GEMM)
   services.ollama = {
     enable = true;
     package = pkgs.ollama-rocm;
@@ -64,35 +58,38 @@ in {
     };
   };
 
-  # FastFlowLM - NPU inference (50 TOPS XDNA2, best power efficiency)
-  # Installed as a system package. Requires NPU driver (see hardware/amd-npu.nix).
-  # Provides OpenAI-compatible API on port 52625 via `flm serve`.
-
   environment.systemPackages = with pkgs; [
-    # Inference servers
     ollama
-    llama-cpp-rocwmma # llama.cpp with ROCm + rocWMMA for Strix Halo
-
-    # OCR
+    llama-cpp-rocwmma
     tesseract4
     poppler-utils
-
-    # AI/ML development
     jupyter
     python313
   ];
 
   # Unsloth Studio - no-code AI model training & inference web UI
   # Native ROCm GPU acceleration on AMD Strix Halo (gfx1151)
-  # Two-service architecture:
-  #   1. unsloth-setup (oneshot) - installs venv on first boot, stays "active"
-  #   2. unsloth-studio (simple)  - runs the web UI, requires setup to complete first
+  #
+  # setup.sh creates an inner venv at $HOME/.unsloth/studio/unsloth_studio/
+  # with ~100 pip packages + a Node.js-built frontend. This is inherently
+  # impure (PyPI + npm downloads) so it runs as a oneshot service, not a
+  # Nix derivation.
+  #
+  # Three-phase lifecycle:
+  #   1. unsloth-setup (oneshot) — creates outer venv + runs setup.sh for inner venv
+  #   2. unsloth-studio (simple)  — runs the web UI, gated by ConditionPathExists
+  #   3. On first boot, studio is skipped until setup finishes, then systemd
+  #      starts it on the next restart or via systemctl restart
+
   systemd.services.unsloth-setup = {
-    description = "Unsloth Studio - First-time venv setup";
+    description = "Unsloth Studio - First-time setup";
     after = ["network-online.target"];
     wants = ["network-online.target"];
     wantedBy = ["multi-user.target"];
-    path = with pkgs; [python313 git gcc gnumake cmake ninja cacert];
+    path = with pkgs; [
+      python313 git gcc gnumake cmake ninja cacert bash
+      curl nodejs_22 gawk coreutils
+    ];
     environment = {
       HOME = unslothDataDir;
       PYTHONDONTWRITEBYTECODE = "1";
@@ -101,26 +98,36 @@ in {
       Type = "oneshot";
       RemainAfterExit = true;
       ExecStart = pkgs.writeShellScript "unsloth-setup" ''
-        if [ -f ${unslothDataDir}/venv/bin/unsloth ]; then
-          echo "Unsloth venv already installed, skipping."
-          exit 0
+        set -euo pipefail
+
+        if [ ! -f ${unslothDataDir}/venv/bin/unsloth ]; then
+          echo "Creating Python venv..."
+          ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
+          ${unslothDataDir}/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel
+          echo "Installing PyTorch ROCm 6.3 (~4.9GB)..."
+          ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
+            torch torchvision torchaudio \
+            --index-url https://download.pytorch.org/whl/rocm6.3
+          echo "Installing unsloth[amd]..."
+          ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
+            "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
+          echo "CLI install complete."
+        else
+          echo "Unsloth CLI already installed, skipping."
         fi
-        echo "Creating Python venv..."
-        ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
-        echo "Upgrading pip..."
-        ${unslothDataDir}/venv/bin/pip install --no-cache-dir --upgrade pip setuptools wheel
-        echo "Installing PyTorch ROCm 6.3 (~4.9GB)..."
-        ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
-          torch torchvision torchaudio \
-          --index-url https://download.pytorch.org/whl/rocm6.3
-        echo "Installing unsloth[amd]..."
-        ${unslothDataDir}/venv/bin/pip install --no-cache-dir \
-          "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
-        echo "Setup complete."
+
+        if [ ! -f ${studioVenvPython} ]; then
+          echo "Running unsloth studio setup..."
+          rm -rf ${unslothDataDir}/.nvm
+          HOME=${unslothDataDir} ${unslothDataDir}/venv/bin/unsloth studio setup
+          echo "Studio setup complete."
+        else
+          echo "Studio inner venv already exists, skipping."
+        fi
       '';
       User = "lars";
       Group = "users";
-      TimeoutStartSec = "1800";
+      TimeoutStartSec = "3600";
     };
   };
 
@@ -128,6 +135,7 @@ in {
     description = "Unsloth Studio - AI Model Training & Inference UI";
     after = ["network.target" "unsloth-setup.service"];
     requires = ["unsloth-setup.service"];
+    wants = ["unsloth-setup.service"];
     wantedBy = ["multi-user.target"];
     environment.HOME = unslothDataDir;
     serviceConfig = {
@@ -140,6 +148,7 @@ in {
       RestartSec = "10s";
       SupplementaryGroups = ["render"];
       TimeoutStartSec = "60";
+      ConditionPathExists = studioVenvPython;
     };
   };
 
@@ -150,8 +159,6 @@ in {
   ];
 
   environment.sessionVariables = {
-    # ROCm targeting Strix Halo gfx1151 (natively supported on kernel 6.19+)
-    # HSA_OVERRIDE_GFX_VERSION removed - gfx1151 is auto-detected
     ROCBLAS_USE_HIPBLASLT = "1";
   };
 }
