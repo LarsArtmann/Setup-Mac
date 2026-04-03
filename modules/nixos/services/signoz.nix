@@ -172,6 +172,34 @@ in {
         systemd.tmpfiles.rules = [
           "d ${cfg.settings.queryService.dataDir} 0755 signoz signoz -"
         ];
+
+        environment.etc."signoz/signoz.yaml".text = lib.generators.toYAML {} {
+          gateway = {
+            url = "http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}";
+          };
+          telemetrystore = {
+            provider = "clickhouse";
+            clickhouse = {
+              dsn = cfg.settings.clickhouse.url;
+              cluster = "cluster";
+            };
+          };
+          sqlstore = {
+            provider = "sqlite";
+            sqlite = {
+              path = "${cfg.settings.queryService.dataDir}/signoz.db";
+              mode = "wal";
+              busy_timeout = "10s";
+            };
+          };
+          web = {
+            enabled = false;
+          };
+          instrumentation = {
+            logs.level = "info";
+            metrics.enabled = false;
+          };
+        };
       }
 
       (lib.mkIf cfg.components.clickhouse {
@@ -182,17 +210,14 @@ in {
         systemd.services.signoz = {
           description = "SigNoz Observability Platform";
           after = lib.optional cfg.components.clickhouse "clickhouse.service";
+          requires = lib.optional cfg.components.clickhouse "clickhouse.service";
           wantedBy = ["multi-user.target"];
-          environment = {
-            ClickHouseUrl = cfg.settings.clickhouse.url;
-            STORAGE = "clickhouse";
-          };
           serviceConfig = {
             Type = "simple";
             User = "signoz";
             Group = "signoz";
             WorkingDirectory = cfg.settings.queryService.dataDir;
-            ExecStart = "${packages.signoz}/bin/signoz --port ${toString cfg.settings.queryService.port} --host ${cfg.settings.queryService.host}";
+            ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
             Restart = "on-failure";
             RestartSec = 10;
           };
@@ -203,41 +228,68 @@ in {
         systemd.services.signoz-collector = {
           description = "SigNoz OTel Collector";
           after = ["signoz.service"];
+          wants = ["signoz.service"];
           wantedBy = ["multi-user.target"];
+          preStart = ''
+            ${packages.otelCollector}/bin/signoz-otel-collector migrate sync up \
+              --clickhouse-dsn "${cfg.settings.clickhouse.url}" \
+              --clickhouse-cluster "cluster" || true
+          '';
           serviceConfig = {
             Type = "simple";
             User = "signoz";
+            Group = "signoz";
+            WorkingDirectory = cfg.settings.queryService.dataDir;
             ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             Restart = "on-failure";
+            RestartSec = 10;
           };
         };
-        environment.etc."signoz/collector.yaml".text = ''
-          receivers:
-            otlp:
-              protocols:
-                grpc:
-                  endpoint: 0.0.0.0:${toString cfg.settings.collector.port}
-                http:
-                  endpoint: 0.0.0.0:${toString cfg.settings.collector.httpPort}
-          exporters:
-            clickhousetraces:
-              datasource: ${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.tracesDatabase}
-            signozclickhousemetrics:
-              dsn: ${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.database}
-            clickhouselogsexporter:
-              dsn: ${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.logsDatabase}
-          service:
-            pipelines:
-              traces:
-                receivers: [otlp]
-                exporters: [clickhousetraces]
-              metrics:
-                receivers: [otlp]
-                exporters: [signozclickhousemetrics]
-              logs:
-                receivers: [otlp]
-                exporters: [clickhouselogsexporter]
-        '';
+        environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {
+          receivers = {
+            otlp = {
+              protocols = {
+                grpc = {endpoint = "0.0.0.0:${toString cfg.settings.collector.port}";};
+                http = {endpoint = "0.0.0.0:${toString cfg.settings.collector.httpPort}";};
+              };
+            };
+          };
+          exporters = {
+            clickhousetraces = {
+              datasource = "${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.tracesDatabase}";
+              retry_on_failure = {
+                enabled = true;
+                initial_interval = "5s";
+                max_interval = "30s";
+                max_elapsed_time = "300s";
+              };
+            };
+            signozclickhousemetrics = {
+              dsn = "${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.database}";
+            };
+            clickhouselogsexporter = {
+              dsn = "${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.logsDatabase}";
+              timeout = "10s";
+              use_new_schema = true;
+            };
+          };
+          service = {
+            pipelines = {
+              traces = {
+                receivers = ["otlp"];
+                exporters = ["clickhousetraces"];
+              };
+              metrics = {
+                receivers = ["otlp"];
+                exporters = ["signozclickhousemetrics"];
+              };
+              logs = {
+                receivers = ["otlp"];
+                exporters = ["clickhouselogsexporter"];
+              };
+            };
+          };
+        };
       })
 
       {

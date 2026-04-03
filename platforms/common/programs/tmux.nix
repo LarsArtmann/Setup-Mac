@@ -49,11 +49,10 @@ in {
       set -g @resurrect-save-command-history 'on'
       set -g @resurrect-dir "$HOME/.local/share/tmux/resurrect"
 
-      # Copy-paste improvements
+      # Copy-paste improvements (tmux-yank handles clipboard integration)
       setw -g mode-keys vi
       bind P paste-buffer
       bind-key -T copy-mode-vi v send-keys -X begin-selection
-      bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
 
       # Status bar customization
       set -g status-interval 1

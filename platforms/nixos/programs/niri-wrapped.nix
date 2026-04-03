@@ -38,6 +38,7 @@ in {
         ];
       }
       {argv = ["${pkgs.dunst}/bin/dunst"];}
+      {argv = ["${pkgs.wl-clipboard}/bin/wl-paste" "--watch" "${pkgs.cliphist}/bin/cliphist" "store"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
