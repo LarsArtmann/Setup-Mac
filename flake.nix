@@ -92,6 +92,14 @@
       url = "github:SigNoz/signoz-otel-collector/v0.144.2";
       flake = false;
     };
+
+    # Modular SSH configuration (local development)
+    # For production, change to: url = "github:yourusername/nix-ssh-config";
+    nix-ssh-config = {
+      url = "git+file:///Users/larsartmann/projects/nix-ssh-config";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs = inputs @ {
@@ -113,6 +121,7 @@
     silent-sddm,
     signoz-src,
     signoz-collector-src,
+    nix-ssh-config,
     ...
   }: let
     goOverlay = final: prev: {
@@ -160,7 +169,7 @@
         ./modules/nixos/services/signoz.nix
         ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
-        ./modules/nixos/services/ssh.nix
+        # SSH module now loaded from nix-ssh-config flake input
       ];
 
       # Per-system configuration (packages, devShells, etc.)
@@ -277,7 +286,10 @@
                 backupFileExtension = "backup";
                 overwriteBackup = true;
                 users.larsartmann = import ./platforms/darwin/home.nix;
-                extraSpecialArgs = {inherit nix-colors;};
+                extraSpecialArgs = {
+                  inherit nix-colors;
+                  inherit nix-ssh-config;
+                };
               };
             }
 
@@ -331,7 +343,10 @@
                 backupFileExtension = "backup";
                 overwriteBackup = true;
                 users.lars = import ./platforms/nixos/users/home.nix;
-                extraSpecialArgs = {inherit nix-colors;};
+                extraSpecialArgs = {
+                  inherit nix-colors;
+                  inherit nix-ssh-config;
+                };
               };
             }
 
@@ -350,7 +365,7 @@
             inputs.self.nixosModules.monitoring
             inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
-            inputs.self.nixosModules.ssh
+            inputs.nix-ssh-config.nixosModules.ssh
             inputs.self.nixosModules.signoz
             ./platforms/nixos/system/configuration.nix
           ];

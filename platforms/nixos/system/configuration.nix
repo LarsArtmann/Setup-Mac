@@ -79,7 +79,9 @@
       shell = pkgs.fish;
       openssh.authorizedKeys.keys =
         lib.optional (builtins.pathExists ../../../ssh-keys/lars.pub)
-        (builtins.readFile ../../../ssh-keys/lars.pub);
+        (builtins.readFile ../../../ssh-keys/lars.pub)
+        ++ lib.optional (builtins.pathExists ../../../nix-ssh-config/ssh-keys/lars.pub)
+        (builtins.readFile ../../../nix-ssh-config/ssh-keys/lars.pub);
       packages = with pkgs; [
         firefox
       ];
@@ -130,6 +132,38 @@
         enable = true;
         autodetect = true;
         defaults.monitored = "-a -o on -s (S/../.././02|L/../../6/03)";
+      };
+
+      # SSH server with hardening (from nix-ssh-config)
+      ssh-server = {
+        enable = true;
+        allowUsers = ["lars"];
+        passwordAuthentication = false;
+        allowRootLogin = false;
+      };
+
+      # Configure fail2ban for SSH protection
+      fail2ban = {
+        enable = true;
+        daemonConfig = ''
+          [DEFAULT]
+          bantime = 3600
+          findtime = 600
+          maxretry = 3
+          backend = systemd
+        '';
+        jails = {
+          sshd = {
+            enabled = true;
+            settings = {
+              filter = "sshd";
+              action = "iptables-multiport[name=sshd, port=ssh, protocol=tcp]";
+              logpath = "/var/log/auth.log";
+              maxretry = 3;
+              bantime = 3600;
+            };
+          };
+        };
       };
 
       # Declarative Gitea repository mirroring

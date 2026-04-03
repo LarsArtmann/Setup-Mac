@@ -1,11 +1,13 @@
 {
   pkgs,
   lib,
+  nix-ssh-config,
   ...
 }: {
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration
+    nix-ssh-config.homeManagerModules.ssh
     ../programs/rofi.nix # Rofi launcher with Catppuccin grid theme
     ../programs/wlogout.nix # Power menu with Catppuccin theme
     ../programs/swaylock.nix # Screen locker with blur + Catppuccin theme
@@ -14,6 +16,43 @@
     ../programs/niri-wrapped.nix # Niri scrollable-tiling compositor via niri-flake HM module
     ../desktop/waybar.nix # Status bar for niri
   ];
+
+  # SSH client configuration (Linux-specific hosts)
+  ssh-config = {
+    enable = true;
+    user = "lars";
+    hosts = {
+      onprem = {
+        hostname = "192.168.1.100";
+        user = "root";
+      };
+      "evo-x2" = {
+        hostname = "192.168.1.150";
+        user = "lars";
+        serverAliveInterval = 60;
+        serverAliveCountMax = 3;
+        extraOptions = {
+          TCPKeepAlive = "yes";
+        };
+      };
+      "private-cloud-hetzner-0" = {
+        hostname = "37.27.217.205";
+        user = "root";
+      };
+      "private-cloud-hetzner-1" = {
+        hostname = "37.27.195.171";
+        user = "root";
+      };
+      "private-cloud-hetzner-2" = {
+        hostname = "37.27.24.111";
+        user = "root";
+      };
+      "private-cloud-hetzner-3" = {
+        hostname = "138.201.155.93";
+        user = "root";
+      };
+    };
+  };
 
   # Programs configuration
   programs = {

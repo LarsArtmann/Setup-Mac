@@ -9,7 +9,7 @@
     ./programs/nushell.nix
 
     # Other program configurations
-    ./programs/ssh.nix
+    # SSH config now loaded from nix-ssh-config flake input
     ./programs/starship.nix
     ./programs/activitywatch.nix
     ./programs/tmux.nix
