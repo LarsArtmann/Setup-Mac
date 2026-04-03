@@ -11,37 +11,36 @@
     src = inputs.signoz-src;
     collectorSrc = inputs.signoz-collector-src;
 
+    buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_25;};
+
     collectorVendorHash = "sha256-FEzjJTYItt6mMPUu2cFnfYP6oTjnWiqCVKO+dUIm1pg=";
 
-    schemaMigrator = pkgs.buildGoModule {
+    schemaMigrator = buildGoModule {
       pname = "signoz-schema-migrator";
       version = collectorVersion;
       src = collectorSrc;
       vendorHash = collectorVendorHash;
       subPackages = ["cmd/signozschemamigrator"];
-      go = pkgs.go_1_25;
       ldflags = ["-s" "-w"];
       postInstall = "mv $out/bin/signozschemamigrator $out/bin/signoz-schema-migrator";
     };
 
-    otelCollector = pkgs.buildGoModule {
+    otelCollector = buildGoModule {
       pname = "signoz-otel-collector";
       version = collectorVersion;
       src = collectorSrc;
       vendorHash = collectorVendorHash;
       subPackages = ["cmd/signozotelcollector"];
-      go = pkgs.go_1_25;
       ldflags = ["-s" "-w"];
       postInstall = "mv $out/bin/signozotelcollector $out/bin/signoz-otel-collector";
     };
 
-    signoz = pkgs.buildGoModule {
+    signoz = buildGoModule {
       pname = "signoz";
       inherit version;
       src = src;
       vendorHash = "sha256-z6WdVvDvFsbQ1apEr+jHFPB+mLLZj3jeUUX92atTuUk=";
       subPackages = ["cmd/community"];
-      go = pkgs.go_1_25;
       tags = ["timetzdata"];
 
       ldflags = [

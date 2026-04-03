@@ -62,6 +62,28 @@ in {
     };
   };
 
+  # Force-fix ollama directory permissions on boot
+  # This handles cases where the directory was created by another user/system
+  systemd.services.ollama-permissions = {
+    description = "Fix Ollama data directory permissions";
+    after = ["local-fs.target" "systemd-tmpfiles-setup.service"];
+    before = ["ollama.service"];
+    wantedBy = ["multi-user.target"];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "fix-ollama-perms" ''
+        set -e
+        # Create directory if missing and set ownership
+        install -d -m 0755 -o ollama -g ollama /data/ollama
+        # Force recursive ownership fix using setpriv to bypass any restrictions
+        ${pkgs.coreutils}/bin/find /data/ollama -exec ${pkgs.coreutils}/bin/chown ollama:ollama {} + 2>/dev/null || true
+        ${pkgs.coreutils}/bin/find /data/ollama -type d -exec ${pkgs.coreutils}/bin/chmod 0755 {} + 2>/dev/null || true
+        ${pkgs.coreutils}/bin/find /data/ollama -type f -exec ${pkgs.coreutils}/bin/chmod 0644 {} + 2>/dev/null || true
+      '';
+    };
+  };
+
   environment.systemPackages = with pkgs; [
     ollama
     llama-cpp-rocwmma
@@ -220,6 +242,9 @@ in {
   };
 
   systemd.tmpfiles.rules = [
+    # Recursively fix ownership/permissions on ollama data dir (handles pre-existing dirs)
+    "R /data/ollama 0755 ollama ollama - -"
+    # Ensure directory exists with correct ownership (in case it was deleted)
     "d /data/ollama 0755 ollama ollama -"
     "d ${unslothDataDir} 0755 lars users -"
     "d ${unslothDataDir}/workspace 0755 lars users -"
