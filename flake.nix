@@ -104,7 +104,7 @@
     # Crush AI Agent Configuration — global AI assistant settings
     # This ensures AGENTS.md and all references are synced across machines
     crush-config = {
-      url = "git+file:///Users/larsartmann/.config/crush";
+      url = "github:LarsArtmann/crush-config";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -323,6 +323,7 @@
             inherit otel-tui;
             inherit nix-amd-npu;
             inherit crush-config;
+            inherit nix-ssh-config;
           };
           modules = [
             # Core system configuration

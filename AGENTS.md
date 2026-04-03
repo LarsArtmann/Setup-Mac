@@ -589,7 +589,7 @@ The global Crush AI agent configuration (`~/.config/crush/`) is managed as a Nix
     └── flake.nix                # Standalone validation flake
 
 flake.nix (SystemNix)            # Consumes crush-config as input
-    ├── inputs.crush-config      # Flake input pointing to ~/.config/crush
+    ├── inputs.crush-config      # Flake input pointing to GitHub repo
     ├── platforms/darwin/home.nix     # Deploys crush files on macOS
     └── platforms/nixos/users/home.nix # Deploys crush files on NixOS
 ```
@@ -602,7 +602,7 @@ The crush-config is declared as a flake input in `flake.nix`:
 inputs = {
   # Crush AI Agent Configuration — global AI assistant settings
   crush-config = {
-    url = "git+file:///Users/larsartmann/.config/crush";
+    url = "github:LarsArtmann/crush-config";
     inputs.nixpkgs.follows = "nixpkgs";
   };
   # ... other inputs
@@ -622,26 +622,26 @@ This creates a symlink `~/.config/crush` → `/nix/store/...-crush-config`, maki
 
 #### Workflow
 
-1. **Edit crush configuration** (affects all machines):
+1. **Edit crush configuration** (in your local git repo):
    ```bash
    cd ~/.config/crush
    # Edit AGENTS.md, references/, etc.
    git commit -am "Update AI agent instructions"
-   git push
+   git push                 # Push to GitHub
    ```
 
 2. **Apply to current machine**:
    ```bash
    cd ~/projects/SystemNix
-   just switch              # Updates crush-config input and deploys files
+   just update              # Updates flake inputs (fetches latest crush-config)
+   just switch              # Deploys updated crush configuration
    ```
 
 3. **Update other machines**:
    ```bash
    # On each machine
    cd ~/projects/SystemNix
-   just update              # Updates all flake inputs including crush-config
-   just switch              # Applies updated crush configuration
+   just update && just switch
    ```
 
 #### Remote Repository Setup
