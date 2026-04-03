@@ -66,7 +66,7 @@
               description: DNS Resolver + Blocker
               icon: unbound.png
               statusStyle: dot
-              siteMonitor: http://localhost:53
+              # DNS runs on UDP/TCP 53 - no HTTP health check available
           - PostgreSQL:
               description: Database Server
               icon: postgres.png

@@ -45,9 +45,9 @@
     };
 
     systemd.services.podman-photomap = {
-      after = ["immich-server.service" "network-online.target"];
+      after = ["immich-server.service" "postgresql.service" "network-online.target"];
       wants = ["immich-server.service" "network-online.target"];
-      requires = ["immich-server.service"];
+      requires = ["immich-server.service" "postgresql.service"];
       preStart = ''
         if [ ! -f ${photomapDataDir}/config/config.yaml ]; then
           cp ${photomapConfig} ${photomapDataDir}/config/config.yaml

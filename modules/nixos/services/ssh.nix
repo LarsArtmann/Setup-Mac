@@ -14,7 +14,7 @@
         # Accept both modern (rsa-sha2-256/512) and legacy (ssh-rsa) key algorithms
         # OpenSSH 10.2p1 removed ssh-rsa from defaults; macOS clients may still offer it
         # Explicitly list all algorithms instead of + prefix for reliability
-        PubkeyAcceptedAlgorithms = "ssh-rsa,rsa-sha2-256,rsa-sha2-512,ssh-ed25519,sk-ssh-ed25519@openssh.com";
+        PubkeyAcceptedAlgorithms = "rsa-sha2-256,rsa-sha2-512,ssh-ed25519,sk-ssh-ed25519@openssh.com";
         AuthorizedKeysFile = "%h/.ssh/authorized_keys /etc/ssh/authorized_keys.d/%u";
 
         # Security settings
