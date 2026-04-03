@@ -13,12 +13,6 @@
       };
     };
 
-    virtualisation.containers.storage.settings.storage = {
-      driver = "overlay";
-      graphroot = "/data/containers/storage";
-      runroot = "/run/containers/storage";
-    };
-
     users.users.lars.extraGroups = ["docker"];
   };
 }

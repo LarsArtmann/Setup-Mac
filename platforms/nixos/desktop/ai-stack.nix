@@ -155,15 +155,25 @@ in {
         fi
 
         # Phase 3: Build frontend with Nix-provided nodejs (no nvm)
+        # Copy to temp dir — npm can't handle the venv's symlinked node_modules
         echo "Building frontend..."
-        cd ${studioFrontend}
-        HOME=${unslothDataDir}/tmp/npm-tmp ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
-        HOME=${unslothDataDir}/tmp/npm-tmp ${pkgs.nodejs_22}/bin/npm run build
+        tmpdir=$(mktemp -d)
+        cp -r ${studioFrontend}/* "$tmpdir"/
+        cd "$tmpdir"
+        ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
+        ${pkgs.nodejs_22}/bin/npm run build
+        mkdir -p ${studioFrontend}/dist
+        cp -r dist/* ${studioFrontend}/dist/
+        rm -rf "$tmpdir"
 
-        # Phase 4: oxc-validator runtime (if present)
+        # Phase 4: oxc-validator runtime
         if [ -f ${studioBackend}/core/data_recipe/oxc-validator/package.json ]; then
-          cd ${studioBackend}/core/data_recipe/oxc-validator
+          tmpdir=$(mktemp -d)
+          cp -r ${studioBackend}/core/data_recipe/oxc-validator/* "$tmpdir"/
+          cd "$tmpdir"
           ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
+          cp -r node_modules ${studioBackend}/core/data_recipe/oxc-validator/
+          rm -rf "$tmpdir"
         fi
 
         date -Iseconds > ${setupDone}
@@ -185,6 +195,9 @@ in {
       HOME = unslothDataDir;
       LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
     };
+    unitConfig = {
+      ConditionPathExists = setupDone;
+    };
     serviceConfig = {
       Type = "simple";
       ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
@@ -195,7 +208,6 @@ in {
       RestartSec = "10s";
       SupplementaryGroups = ["render"];
       TimeoutStartSec = "60";
-      ConditionPathExists = setupDone;
     };
   };
 
