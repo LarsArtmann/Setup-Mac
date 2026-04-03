@@ -281,7 +281,7 @@
         };
 
         session = {
-          COOKIE_SECURE = false; # localhost doesn't use HTTPS
+          COOKIE_SECURE = true; # Behind Caddy HTTPS reverse proxy
         };
 
         # Logging
