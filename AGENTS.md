@@ -574,6 +574,102 @@ Configuration files are functions that return settings:
 
 ---
 
+### Crush AI Agent Configuration
+
+The global Crush AI agent configuration (`~/.config/crush/`) is managed as a Nix flake input and deployed via Home Manager, ensuring synchronized AI agent behavior across all machines.
+
+#### Architecture
+
+```
+~/.config/crush/                 # Source of truth (private git repo)
+    ├── AGENTS.md                # Main AI agent instructions
+    ├── references/              # Reference documentation
+    ├── personalities/           # AI personality configurations
+    ├── tech-stacks/             # Language/framework guides
+    └── flake.nix                # Standalone validation flake
+
+flake.nix (SystemNix)            # Consumes crush-config as input
+    ├── inputs.crush-config      # Flake input pointing to ~/.config/crush
+    ├── platforms/darwin/home.nix     # Deploys crush files on macOS
+    └── platforms/nixos/users/home.nix # Deploys crush files on NixOS
+```
+
+#### Flake Integration
+
+The crush-config is declared as a flake input in `flake.nix`:
+
+```nix
+inputs = {
+  # Crush AI Agent Configuration — global AI assistant settings
+  crush-config = {
+    url = "git+file:///Users/larsartmann/.config/crush";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  # ... other inputs
+};
+```
+
+#### Home Manager Deployment
+
+Both platform configurations symlink the entire crush directory via `home.file`:
+
+```nix
+# platforms/darwin/home.nix AND platforms/nixos/users/home.nix
+home.file.".config/crush".source = crush-config;
+```
+
+This creates a symlink `~/.config/crush` → `/nix/store/...-crush-config`, making all files available instantly without duplication.
+
+#### Workflow
+
+1. **Edit crush configuration** (affects all machines):
+   ```bash
+   cd ~/.config/crush
+   # Edit AGENTS.md, references/, etc.
+   git commit -am "Update AI agent instructions"
+   git push
+   ```
+
+2. **Apply to current machine**:
+   ```bash
+   cd ~/projects/SystemNix
+   just switch              # Updates crush-config input and deploys files
+   ```
+
+3. **Update other machines**:
+   ```bash
+   # On each machine
+   cd ~/projects/SystemNix
+   just update              # Updates all flake inputs including crush-config
+   just switch              # Applies updated crush configuration
+   ```
+
+#### Remote Repository Setup
+
+For machines that don't have local access to `~/.config/crush`, change the flake input URL:
+
+```nix
+# For production/remote machines
+crush-config = {
+  url = "github:LarsArtmann/crush-config";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+```
+
+#### Status
+
+| Component | Status |
+|-----------|--------|
+| Flake input | ✅ Configured |
+| macOS deployment | ✅ `platforms/darwin/home.nix` |
+| NixOS deployment | ✅ `platforms/nixos/users/home.nix` |
+| AGENTS.md | ✅ Synced |
+| References | ✅ Synced |
+| Tech stacks | ✅ Synced |
+| Personalities | ✅ Synced |
+
+---
+
 ## 🚀 ESSENTIAL COMMANDS
 
 **ALWAYS use Just commands when available - never run raw Nix commands unless absolutely necessary!**
