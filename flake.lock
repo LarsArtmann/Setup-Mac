@@ -350,6 +350,29 @@
         "type": "github"
       }
     },
+    "nix-ssh-config": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775252645,
+        "narHash": "sha256-cVVEK9Y8f7XFqeNRHinMDvR8caPZP+VPJoSKlZE0FTQ=",
+        "ref": "refs/heads/master",
+        "rev": "a7e5332d81bc201e926ba53e17fc80190d426dca",
+        "revCount": 1,
+        "type": "git",
+        "url": "file:///Users/larsartmann/projects/nix-ssh-config"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///Users/larsartmann/projects/nix-ssh-config"
+      }
+    },
     "nix-visualize": {
       "inputs": {
         "flake-compat": "flake-compat",
@@ -521,6 +544,7 @@
         "nix-colors": "nix-colors",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
+        "nix-ssh-config": "nix-ssh-config",
         "nix-visualize": "nix-visualize",
         "nixpkgs": "nixpkgs",
         "nur": "nur",

@@ -145,13 +145,14 @@
       # Configure fail2ban for SSH protection
       fail2ban = {
         enable = true;
-        daemonConfig = ''
-          [DEFAULT]
-          bantime = 3600
-          findtime = 600
-          maxretry = 3
-          backend = systemd
-        '';
+        daemonSettings = {
+          DEFAULT = {
+            bantime = 3600;
+            findtime = 600;
+            maxretry = 3;
+            backend = "systemd";
+          };
+        };
         jails = {
           sshd = {
             enabled = true;
