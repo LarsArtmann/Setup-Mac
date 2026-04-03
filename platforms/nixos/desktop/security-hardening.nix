@@ -61,6 +61,7 @@
       enable = true;
       daemonSettings = {
         Definition.loglevel = "INFO";
+        DEFAULT.ignoreip = ["127.0.0.1/8" "::1" "192.168.1.0/24" "10.0.0.0/8" "172.16.0.0/12"];
       };
       jails = {
         # SSH brute force protection
@@ -72,6 +73,7 @@
           maxretry = 3;
           findtime = 600;
           bantime = 3600;
+          ignoreip = ["127.0.0.1/8" "::1" "192.168.1.0/24" "10.0.0.0/8" "172.16.0.0/12"];
         };
 
         # Grafana login brute force
@@ -82,6 +84,7 @@
           maxretry = 5;
           findtime = 600;
           bantime = 3600;
+          ignoreip = ["127.0.0.1/8" "::1" "192.168.1.0/24" "10.0.0.0/8" "172.16.0.0/12"];
         };
       };
     };

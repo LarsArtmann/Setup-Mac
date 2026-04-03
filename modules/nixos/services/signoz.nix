@@ -180,7 +180,7 @@ in {
             provider = "clickhouse";
             clickhouse = {
               dsn = cfg.settings.clickhouse.url;
-              cluster = "cluster";
+              cluster = "default";
             };
           };
           sqlstore = {
@@ -232,7 +232,7 @@ in {
           preStart = ''
             ${packages.otelCollector}/bin/signoz-otel-collector migrate sync up \
               --clickhouse-dsn "${cfg.settings.clickhouse.url}" \
-              --clickhouse-cluster "cluster" || true
+              --clickhouse-cluster "default" || true
           '';
           serviceConfig = {
             Type = "simple";
