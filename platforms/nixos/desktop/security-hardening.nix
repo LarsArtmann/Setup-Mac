@@ -74,21 +74,11 @@
           bantime = 3600;
         };
 
-        # Gitea login brute force
-        gitea.settings = {
-          enabled = true;
-          filter = "gitea";
-          logpath = "/var/lib/gitea/log/gitea.log";
-          maxretry = 5;
-          findtime = 600;
-          bantime = 3600;
-        };
-
         # Grafana login brute force
         grafana.settings = {
           enabled = true;
           filter = "grafana";
-          logpath = "/var/lib/grafana/log/grafana.log";
+          logpath = "/var/log/grafana/grafana.log";
           maxretry = 5;
           findtime = 600;
           bantime = 3600;

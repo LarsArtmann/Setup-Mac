@@ -525,8 +525,44 @@
         "nixpkgs": "nixpkgs",
         "nur": "nur",
         "otel-tui": "otel-tui",
+        "signoz-collector-src": "signoz-collector-src",
+        "signoz-src": "signoz-src",
         "silent-sddm": "silent-sddm",
         "sops-nix": "sops-nix"
+      }
+    },
+    "signoz-collector-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1772084630,
+        "narHash": "sha256-Z32qaaYuNiuLs8DzJqvteAKSybv5G8tzSFV7HqtHoDg=",
+        "owner": "SigNoz",
+        "repo": "signoz-otel-collector",
+        "rev": "fcf0ed445b6741330abb714ba6a14f66e356450b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "SigNoz",
+        "ref": "v0.144.2",
+        "repo": "signoz-otel-collector",
+        "type": "github"
+      }
+    },
+    "signoz-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1774519306,
+        "narHash": "sha256-y9FFtpvVKk1dRRM52hpEcA6IVh2Aqu/by1kFkeFS+Tg=",
+        "owner": "SigNoz",
+        "repo": "signoz",
+        "rev": "5db0501c02bcfe791858a3b2599b728ccfafdcf4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "SigNoz",
+        "ref": "v0.117.1",
+        "repo": "signoz",
+        "type": "github"
       }
     },
     "silent-sddm": {

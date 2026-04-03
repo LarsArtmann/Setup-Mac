@@ -82,6 +82,16 @@
       url = "github:uiriansan/SilentSDDM";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # SigNoz observability platform sources
+    signoz-src = {
+      url = "github:SigNoz/signoz/v0.117.1";
+      flake = false;
+    };
+    signoz-collector-src = {
+      url = "github:SigNoz/signoz-otel-collector/v0.144.2";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
@@ -101,6 +111,8 @@
     nix-amd-npu,
     sops-nix,
     silent-sddm,
+    signoz-src,
+    signoz-collector-src,
     ...
   }: let
     goOverlay = final: prev: {
@@ -145,6 +157,7 @@
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
         ./modules/nixos/services/monitoring.nix
+        ./modules/nixos/services/signoz.nix
         ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
         ./modules/nixos/services/ssh.nix
