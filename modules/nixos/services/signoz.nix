@@ -78,12 +78,11 @@ in {
   }: let
     packages = mkPackages pkgs;
   in {
-    packages =
-      lib.optionalAttrs pkgs.stdenv.isLinux {
-        signoz = packages.signoz;
-        signoz-otel-collector = packages.otelCollector;
-        signoz-schema-migrator = packages.schemaMigrator;
-      };
+    packages = lib.optionalAttrs pkgs.stdenv.isLinux {
+      signoz = packages.signoz;
+      signoz-otel-collector = packages.otelCollector;
+      signoz-schema-migrator = packages.schemaMigrator;
+    };
   };
 
   flake.nixosModules.signoz = {
@@ -274,6 +273,11 @@ in {
             };
           };
           service = {
+            telemetry = {
+              metrics = {
+                level = "none";
+              };
+            };
             pipelines = {
               traces = {
                 receivers = ["otlp"];

@@ -25,7 +25,7 @@
         '';
     });
 
-  unslothDataDir = "/var/lib/unsloth";
+  unslothDataDir = "/data/unsloth";
   venvPython = "${unslothDataDir}/venv/bin/python";
   venvPip = "${unslothDataDir}/venv/bin/pip";
   sitePkgs = "${unslothDataDir}/venv/lib/python3.13/site-packages";
@@ -59,6 +59,10 @@ in {
       OLLAMA_FLASH_ATTENTION = "1";
       OLLAMA_NUM_PARALLEL = "1";
       ROCBLAS_USE_HIPBLASLT = "1";
+      # GPU detection for AMD Strix Halo (gfx1151)
+      HSA_OVERRIDE_GFX_VERSION = "11.5.1";
+      # Fix for gfx11 APU SDMA issues
+      HSA_ENABLE_SDMA = "0";
     };
   };
 
@@ -115,8 +119,16 @@ in {
     wants = ["network-online.target"];
     wantedBy = ["multi-user.target"];
     path = with pkgs; [
-      python313 git gcc gnumake cmake ninja cacert
-      nodejs_22 coreutils bash
+      python313
+      git
+      gcc
+      gnumake
+      cmake
+      ninja
+      cacert
+      nodejs_22
+      coreutils
+      bash
     ];
     environment = {
       HOME = unslothDataDir;
@@ -221,14 +233,15 @@ in {
     path = with pkgs; [git python313];
     environment = {
       HOME = unslothDataDir;
-      LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath [
-        stdenv.cc.cc.lib
-        zstd
-        rocmPackages.clr
-        rocmPackages.rocminfo
-        rocmPackages.rocrand
-        rocmPackages.rocblas
-      ];
+      LD_LIBRARY_PATH = with pkgs;
+        lib.makeLibraryPath [
+          stdenv.cc.cc.lib
+          zstd
+          rocmPackages.clr
+          rocmPackages.rocminfo
+          rocmPackages.rocrand
+          rocmPackages.rocblas
+        ];
     };
     unitConfig = {
       ConditionPathExists = setupDone;
@@ -256,9 +269,19 @@ in {
     "d ${unslothDataDir}/models 0755 lars users -"
     "d ${unslothDataDir}/.unsloth 0755 lars users -"
     "d ${unslothDataDir}/.unsloth/studio 0755 lars users -"
+    # Centralized AI models directory
+    "d /data/models 0755 lars users -"
   ];
 
   environment.sessionVariables = {
     ROCBLAS_USE_HIPBLASLT = "1";
+    # HuggingFace cache locations (centralized on /data)
+    HF_HOME = "/data/cache/huggingface";
+    HUGGINGFACE_HUB_CACHE = "/data/cache/huggingface/hub";
+    TRANSFORMERS_CACHE = "/data/cache/huggingface/transformers";
+    # Unsloth model location
+    UNSLOTH_MODELS = "/data/models";
+    # Llama.cpp model location
+    LLAMA_MODEL_PATH = "/data/models";
   };
 }

@@ -57,7 +57,6 @@
           mode = "0400";
           restartUnits = ["caddy.service"];
         };
-
       };
 
       templates."gitea-sync.env" = {
@@ -68,7 +67,6 @@
           GITHUB_USER=${config.sops.placeholder.github_user}
         '';
       };
-
     };
   };
 }

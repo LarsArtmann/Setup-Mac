@@ -5,7 +5,7 @@ import os
 import time
 from pathlib import Path
 
-MODEL_DIR = Path.home() / ".ollama" / "models"
+MODEL_DIR = Path("/data/models")
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 FILES = [

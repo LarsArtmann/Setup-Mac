@@ -94,9 +94,9 @@
     };
 
     # Modular SSH configuration (local development)
-    # For production, change to: url = "github:yourusername/nix-ssh-config";
+    # Modular SSH configuration
     nix-ssh-config = {
-      url = "git+file:///Users/larsartmann/projects/nix-ssh-config";
+      url = "git+file:///home/lars/projects/nix-ssh-config";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
@@ -104,8 +104,7 @@
     # Crush AI Agent Configuration — global AI assistant settings
     # This ensures AGENTS.md and all references are synced across machines
     crush-config = {
-      url = "github:LarsArtmann/crush-config";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "git+file:///home/lars/.config/crush";
     };
   };
 
@@ -293,9 +292,17 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.larsartmann = { config, pkgs, lib, nix-colors, nix-ssh-config, crush-config, ... }: {
+                users.larsartmann = {
+                  config,
+                  pkgs,
+                  lib,
+                  nix-colors,
+                  nix-ssh-config,
+                  crush-config,
+                  ...
+                }: {
                   imports = [
-                    ../platforms/darwin/home.nix
+                    ./platforms/darwin/home.nix
                   ];
                 };
                 extraSpecialArgs = {
@@ -357,9 +364,17 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.lars = { config, pkgs, lib, nix-colors, nix-ssh-config, crush-config, ... }: {
+                users.lars = {
+                  config,
+                  pkgs,
+                  lib,
+                  nix-colors,
+                  nix-ssh-config,
+                  crush-config,
+                  ...
+                }: {
                   imports = [
-                    ../platforms/nixos/users/home.nix
+                    ./platforms/nixos/users/home.nix
                   ];
                 };
                 extraSpecialArgs = {

@@ -34,24 +34,18 @@
       }
     },
     "crush-config": {
-      "inputs": {
-        "flake-parts": "flake-parts",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
       "locked": {
-        "lastModified": 1774802845,
-        "narHash": "sha256-B4Dvic1kTZ/ZbOcX5eW6z5s+NmmD7612CYMRkXYk4ck=",
-        "owner": "LarsArtmann",
-        "repo": "crush-config",
-        "rev": "48f1f99fa4031ee8407d6afdee4f81bbadaaea16",
-        "type": "github"
+        "lastModified": 1775257678,
+        "narHash": "sha256-ImGLtZs/ca0MSqxlTiZpu5jxjFKFF7FeoEnUGPsLYHg=",
+        "ref": "refs/heads/master",
+        "rev": "36752b5cbb14bccd84d1325ad02f8b275662506c",
+        "revCount": 3,
+        "type": "git",
+        "url": "file:///home/lars/.config/crush"
       },
       "original": {
-        "owner": "LarsArtmann",
-        "repo": "crush-config",
-        "type": "github"
+        "type": "git",
+        "url": "file:///home/lars/.config/crush"
       }
     },
     "flake-compat": {
@@ -74,24 +68,6 @@
         "nixpkgs-lib": "nixpkgs-lib"
       },
       "locked": {
-        "lastModified": 1772408722,
-        "narHash": "sha256-rHuJtdcOjK7rAHpHphUb1iCvgkU3GpfvicLMwwnfMT0=",
-        "owner": "hercules-ci",
-        "repo": "flake-parts",
-        "rev": "f20dc5d9b8027381c474144ecabc9034d6a839a3",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hercules-ci",
-        "repo": "flake-parts",
-        "type": "github"
-      }
-    },
-    "flake-parts_2": {
-      "inputs": {
-        "nixpkgs-lib": "nixpkgs-lib_2"
-      },
-      "locked": {
         "lastModified": 1775087534,
         "narHash": "sha256-91qqW8lhL7TLwgQWijoGBbiD4t7/q75KTi8NxjVmSmA=",
         "owner": "hercules-ci",
@@ -105,9 +81,9 @@
         "type": "github"
       }
     },
-    "flake-parts_3": {
+    "flake-parts_2": {
       "inputs": {
-        "nixpkgs-lib": "nixpkgs-lib_3"
+        "nixpkgs-lib": "nixpkgs-lib_2"
       },
       "locked": {
         "lastModified": 1767609335,
@@ -123,7 +99,7 @@
         "type": "github"
       }
     },
-    "flake-parts_4": {
+    "flake-parts_3": {
       "inputs": {
         "nixpkgs-lib": [
           "nix-ssh-config",
@@ -145,9 +121,9 @@
         "type": "github"
       }
     },
-    "flake-parts_5": {
+    "flake-parts_4": {
       "inputs": {
-        "nixpkgs-lib": "nixpkgs-lib_5"
+        "nixpkgs-lib": "nixpkgs-lib_4"
       },
       "locked": {
         "lastModified": 1701473968,
@@ -163,7 +139,7 @@
         "type": "github"
       }
     },
-    "flake-parts_6": {
+    "flake-parts_5": {
       "inputs": {
         "nixpkgs-lib": [
           "nur",
@@ -335,7 +311,7 @@
     },
     "nix-amd-npu": {
       "inputs": {
-        "flake-parts": "flake-parts_3",
+        "flake-parts": "flake-parts_2",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -357,7 +333,7 @@
     "nix-colors": {
       "inputs": {
         "base16-schemes": "base16-schemes",
-        "nixpkgs-lib": "nixpkgs-lib_4"
+        "nixpkgs-lib": "nixpkgs-lib_3"
       },
       "locked": {
         "lastModified": 1707825078,
@@ -422,23 +398,23 @@
         "treefmt-full-flake": "treefmt-full-flake"
       },
       "locked": {
-        "lastModified": 1775256403,
-        "narHash": "sha256-kGTuholLhEUicOErk2WpLfsfe78Z6ni0E2adFOWFxh8=",
+        "lastModified": 1775255770,
+        "narHash": "sha256-BeW0hXU0T3KKZc0pFIKMtS/AjH01Bofd04uBN6mt41k=",
         "ref": "refs/heads/master",
-        "rev": "fa0724643168d5a1423239768562cb9b3c1e3a5e",
-        "revCount": 5,
+        "rev": "4650ca1f610f89e4c56bb1c126c091690435d3f8",
+        "revCount": 4,
         "type": "git",
-        "url": "file:///Users/larsartmann/projects/nix-ssh-config"
+        "url": "file:///home/lars/projects/nix-ssh-config"
       },
       "original": {
         "type": "git",
-        "url": "file:///Users/larsartmann/projects/nix-ssh-config"
+        "url": "file:///home/lars/projects/nix-ssh-config"
       }
     },
     "nix-visualize": {
       "inputs": {
         "flake-compat": "flake-compat",
-        "flake-parts": "flake-parts_5",
+        "flake-parts": "flake-parts_4",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -475,21 +451,6 @@
     },
     "nixpkgs-lib": {
       "locked": {
-        "lastModified": 1772328832,
-        "narHash": "sha256-e+/T/pmEkLP6BHhYjx6GmwP5ivonQQn0bJdH9YrRB+Q=",
-        "owner": "nix-community",
-        "repo": "nixpkgs.lib",
-        "rev": "c185c7a5e5dd8f9add5b2f8ebeff00888b070742",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "nixpkgs.lib",
-        "type": "github"
-      }
-    },
-    "nixpkgs-lib_2": {
-      "locked": {
         "lastModified": 1774748309,
         "narHash": "sha256-+U7gF3qxzwD5TZuANzZPeJTZRHS29OFQgkQ2kiTJBIQ=",
         "owner": "nix-community",
@@ -503,7 +464,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-lib_3": {
+    "nixpkgs-lib_2": {
       "locked": {
         "lastModified": 1765674936,
         "narHash": "sha256-k00uTP4JNfmejrCLJOwdObYC9jHRrr/5M/a/8L2EIdo=",
@@ -518,7 +479,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-lib_4": {
+    "nixpkgs-lib_3": {
       "locked": {
         "lastModified": 1697935651,
         "narHash": "sha256-qOfWjQ2JQSQL15KLh6D7xQhx0qgZlYZTYlcEiRuAMMw=",
@@ -533,7 +494,7 @@
         "type": "github"
       }
     },
-    "nixpkgs-lib_5": {
+    "nixpkgs-lib_4": {
       "locked": {
         "dir": "lib",
         "lastModified": 1701253981,
@@ -585,7 +546,7 @@
     },
     "nur": {
       "inputs": {
-        "flake-parts": "flake-parts_6",
+        "flake-parts": "flake-parts_5",
         "nixpkgs": [
           "nixpkgs"
         ]
@@ -628,7 +589,7 @@
     "root": {
       "inputs": {
         "crush-config": "crush-config",
-        "flake-parts": "flake-parts_2",
+        "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",
         "homebrew-bundle": "homebrew-bundle",
@@ -755,7 +716,7 @@
     },
     "treefmt-full-flake": {
       "inputs": {
-        "flake-parts": "flake-parts_4",
+        "flake-parts": "flake-parts_3",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       },
