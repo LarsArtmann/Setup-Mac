@@ -52,6 +52,7 @@ in {
   services.ollama = {
     enable = true;
     package = pkgs.ollama-rocm;
+    home = "/data/ollama";
     host = "127.0.0.1";
     port = 11434;
     environmentVariables = {
@@ -219,6 +220,7 @@ in {
   };
 
   systemd.tmpfiles.rules = [
+    "d /data/ollama 0755 ollama ollama -"
     "d ${unslothDataDir} 0755 lars users -"
     "d ${unslothDataDir}/workspace 0755 lars users -"
     "d ${unslothDataDir}/models 0755 lars users -"

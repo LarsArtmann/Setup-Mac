@@ -1,7 +1,7 @@
 # SigNoz NixOS Integration — Status Report
 
-**Date:** 2026-04-03  
-**Status:** 🟡 IN PROGRESS — Architecture complete, builds not yet tested  
+**Date:** 2026-04-03
+**Status:** 🟡 IN PROGRESS — Architecture complete, builds not yet tested
 **Goal:** Replace Prometheus + Grafana + Alertmanager with SigNoz (native NixOS packaging)
 
 ---
