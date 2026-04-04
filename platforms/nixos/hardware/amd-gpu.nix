@@ -49,6 +49,7 @@
     corectrl # AMD CPU control
     vulkan-tools # Vulkan utilities
     mesa-demos # GPU testing tools
+    libva-utils # VA-API diagnostics (vainfo)
     # ROCm monitoring
     rocmPackages.rocm-smi # Detailed GPU stats, clocks, memory usage
     nvtopPackages.amd # htop-like GPU monitor

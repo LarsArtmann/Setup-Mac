@@ -26,6 +26,32 @@
     then (helium.packages.${system}.default or helium.packages.${system}.helium or null)
     else null;
 
+  heliumWrapped =
+    if heliumPackage != null && pkgs.stdenv.isLinux
+    then
+      pkgs.symlinkJoin {
+        name = "helium";
+        paths = [heliumPackage];
+        nativeBuildInputs = [pkgs.makeWrapper];
+        postBuild = ''
+          # Add Widevine CDM for DRM streaming (Netflix, Max, Disney+, etc.)
+          rm $out/opt
+          cp -a ${heliumPackage}/opt $out/opt
+          chmod -R u+w $out/opt
+          ln -s ${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm $out/opt/helium/WidevineCdm
+
+          # Wrap binary with VAAPI hardware video acceleration flags
+          rm -rf $out/bin
+          cp -a ${heliumPackage}/bin $out/bin
+          chmod -R u+w $out/bin
+          wrapProgram $out/bin/helium \
+            --add-flags "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder,AcceleratedVideoDecoder,AcceleratedVideoEncoder" \
+            --add-flags "--ignore-gpu-blocklist" \
+            --add-flags "--enable-zero-copy"
+        '';
+      }
+    else heliumPackage;
+
   # Essential CLI tools that work across platforms
   essentialPackages = with pkgs;
     [
@@ -201,7 +227,7 @@
 
   # GUI Applications (cross-platform)
   guiPackages = with pkgs;
-    lib.optional (heliumPackage != null) heliumPackage
+    lib.optional (heliumWrapped != null) heliumWrapped
     ++ lib.optionals stdenv.isDarwin [
       google-chrome
       iterm2
