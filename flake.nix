@@ -93,14 +93,20 @@
       flake = false;
     };
 
-    # Modular SSH configuration (local development)
-    # Modular SSH configuration
     nix-ssh-config = {
-      url = "git+file:///home/lars/projects/nix-ssh-config";
+      url = "github:LarsArtmann/nix-ssh-config";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
+<<<<<<< Updated upstream
+=======
+    # Crush AI Agent Configuration — global AI assistant settings
+    # This ensures AGENTS.md and all references are synced across machines
+    crush-config = {
+      url = "github:LarsArtmann/crush-config";
+    };
+>>>>>>> Stashed changes
   };
 
   outputs = inputs @ {
