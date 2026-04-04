@@ -19,6 +19,19 @@
       database.enable = true;
       redis.enable = true;
       machine-learning.enable = true;
+
+      settings = {
+        oauth = {
+          enabled = true;
+          issuerUrl = "https://auth.lan";
+          clientId = "immich";
+          clientSecret._secret = config.sops.secrets.immich_oauth_client_secret.path;
+          scope = "openid profile email";
+          autoLaunch = false;
+          autoRegister = true;
+          buttonText = "Login with Authelia";
+        };
+      };
     };
 
     users.users.immich.extraGroups = ["video" "render"];
