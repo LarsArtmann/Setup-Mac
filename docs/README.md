@@ -1,75 +1,41 @@
-# Documentation Structure
+# SystemNix Documentation
 
-This directory contains all project documentation organized by category.
+Documentation for the SystemNix cross-platform Nix configuration (macOS + NixOS).
 
 ## Directory Structure
 
-```
-docs/
-├── architecture/           # System architecture & design docs
-├── architecture-understanding/  # Mermaid diagrams & visual architecture
-├── complaints/            # Issues discovered during sessions
-├── decisions/             # Architecture Decision Records (ADRs)
-├── learnings/             # Lessons learned from debugging/sessions
-├── operations/            # Operational procedures & manual steps
-├── planning/              # Roadmaps & planning documents
-├── prompts/               # Reusable debugging/analysis prompts
-├── sessions/              # Session summaries (not GitHub issues!)
-├── status/                # Status reports from work sessions
-└── troubleshooting/       # Known issues & their solutions
-```
+| Directory | Purpose |
+|-----------|---------|
+| `architecture/` | System architecture docs, ADRs, dependency graphs |
+| `learnings/` | Lessons learned from debugging and sessions |
+| `operations/` | Operational procedures and post-deployment checklists |
+| `planning/` | Roadmaps, planning documents, unimplemented proposals |
+| `prompts/` | Reusable debugging and analysis prompts |
+| `status/` | Status reports from work sessions (older reports in `status/archive/`) |
+| `troubleshooting/` | Known issues and their solutions |
 
 ## Key Documents
 
-### Architecture
+- **AGENTS.md** (repo root) — AI agent guide with architecture, patterns, and commands
+- **README.md** (repo root) — Project overview, services table, and `just` command reference
+- **architecture/** — ADRs (Architecture Decision Records), DNS guide, monitoring plans
+- **operations/manual-steps-after-deployment.md** — Post-deployment checklist
 
-- **cross-platform-strategy.md** - macOS → NixOS migration strategy
-- **wrapping-system-documentation.md** - Wrapper system architecture
-- **network-monitoring-implementation-plan.md** - Monitoring setup
+## Naming Convention
 
-### Operations
-
-- **manual-steps-after-deployment.md** - Post-deployment checklist
-
-### Troubleshooting
-
-- **fish-performance-issue.md** - Fish shell performance debugging
-- **fish-shell-activation.md** - Fish activation issues
-
-## Cross-Platform Note
-
-**IMPORTANT:** This setup currently uses Homebrew for some GUI apps on macOS, but is designed for future NixOS migration.
-
-See: `docs/architecture/cross-platform-strategy.md` for:
-
-- Why we use Homebrew on macOS (pragmatic choice)
-- How to migrate to NixOS (straightforward)
-- Platform package mapping
-- Zero reconfiguration needed for migration
-
-**TL;DR:** Using Homebrew NOW doesn't prevent NixOS migration LATER. All packages exist in nixpkgs for Linux.
-
-## Document Naming Convention
-
-Format: `YYYY-MM-DD_HH_MM-descriptive-name.md`
-
-Examples:
-
-- `2025-11-15_10_00-github-issues-comprehensive-organization.md`
-- `2025-11-15_07_49-wrapper-template-debugging.md`
+- Status reports: `YYYY-MM-DD_HH-MM_TOPIC.md` in `status/`
+- Decisions: `ADR-NNN-title.md` in `architecture/`
+- Planning: `descriptive-name.md` in `planning/`
 
 ## Adding New Documents
 
-1. **Architecture Decision:** → `decisions/YYYY-MM-DD-decision-name.md`
-2. **Status Report:** → `status/YYYY-MM-DD_HH_MM-topic.md`
-3. **Session Summary:** → `sessions/YYYY-MM-DD_description.md`
-4. **Learned Lesson:** → `learnings/YYYY-MM-DD_HH_MM-topic.md`
-5. **Reusable Prompt:** → `prompts/YYYY-MM-DD_HH_MM-purpose.md`
+1. **Status report** → `status/YYYY-MM-DD_HH-MM_TOPIC.md`
+2. **Architecture decision** → `architecture/ADR-NNN-title.md`
+3. **Lesson learned** → `learnings/YYYY-MM-DD_HH-MM_topic.md`
+4. **Planning doc** → `planning/descriptive-name.md`
 
 ## Cleanup Policy
 
-- Keep all status reports (historical record)
-- Keep all decisions (architecture history)
-- Keep all learnings (institutional knowledge)
-- Archive old complaints after resolution
-- Update planning docs (don't accumulate)
+- Status reports older than 30 days are moved to `status/archive/`
+- Archive directories (`archive/`, `archives/`) contain historical docs
+- Planning docs for completed or abandoned work stay in `planning/`
