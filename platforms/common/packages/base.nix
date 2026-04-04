@@ -35,7 +35,7 @@
         nativeBuildInputs = [pkgs.makeWrapper];
         postBuild = ''
           # Add Widevine CDM for DRM streaming (Netflix, Max, Disney+, etc.)
-          rm $out/opt
+          rm -rf $out/opt
           cp -a ${heliumPackage}/opt $out/opt
           chmod -R u+w $out/opt
           ln -s ${pkgs.widevine-cdm}/share/google/chrome/WidevineCdm $out/opt/helium/WidevineCdm

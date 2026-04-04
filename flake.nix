@@ -394,12 +394,14 @@
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             inputs.silent-sddm.nixosModules.default
-            inputs.self.nixosModules.authelia
+            # Disabled: secrets not configured - authelia_jwt_secret missing from secrets.yaml
+            # inputs.self.nixosModules.authelia
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea
             inputs.self.nixosModules.gitea-repos
-            inputs.self.nixosModules.grafana
+            # Disabled: secrets not configured - grafana_secret_key missing from secrets.yaml
+            # inputs.self.nixosModules.grafana
             inputs.self.nixosModules.homepage
             inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring

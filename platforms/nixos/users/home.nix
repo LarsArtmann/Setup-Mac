@@ -125,6 +125,10 @@
     QT_QPA_PLATFORM = "wayland";
     NIXOS_OZONE_WL = "1";
 
+    # Dark mode preference - respected by many apps and browsers
+    GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark:dark";
+    QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
+
     # Cursor theme for Wayland compositors
     # Cursor size is determined by the cursor theme's built-in sizes
     # Bibata has XL size (96px) built-in
@@ -198,6 +202,12 @@
 
     # Application config files
     configFile = {
+      # Dark mode preference for xdg-desktop-portal (respected by browsers and modern apps)
+      "xdg-desktop-portal/config".text = ''
+        [preferred]
+        color-scheme=dark
+      '';
+
       "zed/settings.json".source = ../programs/zed/settings.json;
       "swappy/config".text = ''
         [Default]
@@ -262,6 +272,13 @@
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
       size = 8;
+    };
+    # Force dark mode preference for all GTK applications
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
     };
   };
 

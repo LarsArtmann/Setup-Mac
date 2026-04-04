@@ -68,6 +68,13 @@
     # Fix for Home Manager + xdg.portal integration
     environment.pathsToLink = ["/share/applications" "/share/xdg-desktop-portal"];
 
+    # XDG Desktop Portal for app integration and dark mode preference
+    xdg.portal = {
+      enable = true;
+      extraPortals = [pkgs.xdg-desktop-portal-gtk];
+      config.common.default = ["*"];
+    };
+
     # Boot configuration is now handled by ./boot.nix module
     # which provides systemd-boot with proper nvme and Ryzen AI Max+ support
 

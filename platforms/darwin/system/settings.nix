@@ -13,6 +13,9 @@ _: {
 
         # Trackpad configuration
         "com.apple.trackpad.scaling" = 1.0;
+
+        # Dark mode preference
+        AppleInterfaceStyle = "Dark";
       };
 
       # Finder preferences
