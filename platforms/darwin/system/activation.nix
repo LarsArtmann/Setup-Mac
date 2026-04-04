@@ -2,12 +2,9 @@
   pkgs,
   lib,
   ...
-}: let
-  # Import centralized user configuration
-  userConfig = import ../../common/core/UserConfig.nix {inherit lib;};
-in {
+}: {
   system = {
-    primaryUser = userConfig.defaultUser.username;
+    primaryUser = "larsartmann";
 
     activationScripts = {
       # File associations (Darwin-specific)
