@@ -1826,3 +1826,136 @@ diagnose:
 test-aliases *ARGS:
     @echo "🧪 Testing shell aliases..."
     @bash scripts/test-shell-aliases.sh {{ ARGS }}
+
+# ========================================
+# Dagger CI/CD Commands
+# ========================================
+
+# Dagger - Initialize or update dagger module
+dagger-init:
+    @echo "🔧 Initializing Dagger module..."
+    dagger develop
+    @echo "✅ Dagger module initialized"
+
+# Dagger - Run full CI pipeline
+dagger-ci:
+    @echo "🚀 Running Dagger CI pipeline..."
+    dagger call nix --source=. ci
+    @echo "✅ Dagger CI complete"
+
+# Dagger - Run nix flake check
+dagger-check:
+    @echo "🔍 Running Dagger nix flake check..."
+    dagger call nix --source=. check
+    @echo "✅ Dagger flake check complete"
+
+# Dagger - Run Go lint on dnsblockd
+dagger-go-lint package="dnsblockd":
+    @echo "🔍 Running Dagger Go lint on {{ package }}..."
+    @if [ "{{ package }}" = "dnsblockd" ]; then \
+        dagger call go --source=./platforms/nixos/programs/dnsblockd --name=dnsblockd lint; \
+    elif [ "{{ package }}" = "dnsblockd-processor" ]; then \
+        dagger call go --source=./pkgs/dnsblockd-processor --name=dnsblockd-processor lint; \
+    else \
+        echo "❌ Unknown package: {{ package }}"; \
+        exit 1; \
+    fi
+    @echo "✅ Dagger Go lint complete"
+
+# Dagger - Build Go package
+dagger-go-build package="dnsblockd":
+    @echo "🔨 Running Dagger Go build for {{ package }}..."
+    @if [ "{{ package }}" = "dnsblockd" ]; then \
+        dagger call dnsblockd-build --source=.; \
+    elif [ "{{ package }}" = "dnsblockd-processor" ]; then \
+        dagger call dnsblockd-processor-build --source=.; \
+    else \
+        echo "❌ Unknown package: {{ package }}"; \
+        exit 1; \
+    fi
+    @echo "✅ Dagger Go build complete"
+
+# Dagger - Run all Go tests
+dagger-go-test package="dnsblockd":
+    @echo "🧪 Running Dagger Go tests for {{ package }}..."
+    @if [ "{{ package }}" = "dnsblockd" ]; then \
+        dagger call go --source=./platforms/nixos/programs/dnsblockd --name=dnsblockd test; \
+    elif [ "{{ package }}" = "dnsblockd-processor" ]; then \
+        dagger call go --source=./pkgs/dnsblockd-processor --name=dnsblockd-processor test; \
+    else \
+        echo "❌ Unknown package: {{ package }}"; \
+        exit 1; \
+    fi
+    @echo "✅ Dagger Go tests complete"
+
+# Dagger - Open interactive terminal
+dagger-shell:
+    @echo "🐚 Opening Dagger interactive shell..."
+    dagger call -i
+
+# Dagger - Show available functions
+dagger-functions:
+    @echo "📋 Listing Dagger functions..."
+    dagger functions
+
+# Dagger - Run deadnix linter
+dagger-deadnix:
+    @echo "🔍 Running Dagger deadnix..."
+    dagger call nix --source=. deadnix
+    @echo "✅ Dagger deadnix complete"
+
+# Dagger - Run statix linter
+dagger-statix:
+    @echo "🔍 Running Dagger statix..."
+    dagger call nix --source=. statix
+    @echo "✅ Dagger statix complete"
+
+# Dagger - Build Darwin configuration (dry-run)
+dagger-build-darwin:
+    @echo "🔨 Running Dagger Darwin build (dry-run)..."
+    dagger call nix --source=. build-darwin
+    @echo "✅ Dagger Darwin build complete"
+
+# Dagger - Build NixOS configuration (dry-run)
+dagger-build-nixos:
+    @echo "🔨 Running Dagger NixOS build (dry-run)..."
+    dagger call nix --source=. build-nixos
+    @echo "✅ Dagger NixOS build complete"
+
+# Dagger - Clean up Dagger caches
+dagger-clean:
+    @echo "🧹 Cleaning Dagger caches..."
+    dagger call --cleanup
+    @echo "✅ Dagger caches cleaned"
+
+# Dagger - Show help
+dagger-help:
+    @echo "🔥 Dagger CI/CD Commands"
+    @echo "========================"
+    @echo ""
+    @echo "Dagger is a programmable CI/CD engine that runs pipelines in containers."
+    @echo ""
+    @echo "Quick Start:"
+    @echo "  just dagger-init          - Initialize Dagger module"
+    @echo "  just dagger-ci            - Run full CI pipeline"
+    @echo "  just dagger-check         - Run nix flake check"
+    @echo ""
+    @echo "Go Development:"
+    @echo "  just dagger-go-lint [package]    - Lint Go code (default: dnsblockd)"
+    @echo "  just dagger-go-build [package]   - Build Go binary (default: dnsblockd)"
+    @echo "  just dagger-go-test [package]    - Run Go tests (default: dnsblockd)"
+    @echo ""
+    @echo "Nix Validation:"
+    @echo "  just dagger-deadnix       - Run deadnix linter"
+    @echo "  just dagger-statix        - Run statix linter"
+    @echo "  just dagger-build-darwin  - Test Darwin build (dry-run)"
+    @echo "  just dagger-build-nixos   - Test NixOS build (dry-run)"
+    @echo ""
+    @echo "Utilities:"
+    @echo "  just dagger-functions     - List available functions"
+    @echo "  just dagger-shell         - Open interactive shell"
+    @echo "  just dagger-clean         - Clean Dagger caches"
+    @echo ""
+    @echo "Available packages:"
+    @echo "  - dnsblockd"
+    @echo "  - dnsblockd-processor"
