@@ -99,14 +99,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-<<<<<<< Updated upstream
-=======
-    # Crush AI Agent Configuration — global AI assistant settings
-    # This ensures AGENTS.md and all references are synced across machines
-    crush-config = {
-      url = "github:LarsArtmann/crush-config";
-    };
->>>>>>> Stashed changes
   };
 
   outputs = inputs @ {
