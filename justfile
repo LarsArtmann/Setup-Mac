@@ -1811,3 +1811,18 @@ immich-restart:
 # Reload Niri compositor config without full rebuild
 reload:
     niri msg action reload-config
+
+# Deploy NixOS config to evo-x2 via nh
+deploy-evo:
+    @echo "🚀 Deploying to evo-x2..."
+    @bash scripts/deploy-evo-x2.sh
+
+# Run NixOS diagnostic
+diagnose:
+    @echo "🔍 Running NixOS diagnostics..."
+    @bash scripts/nixos-diagnostic.sh
+
+# Test shell aliases (cross-shell validation per ADR-002)
+test-aliases *ARGS:
+    @echo "🧪 Testing shell aliases..."
+    @bash scripts/test-shell-aliases.sh {{ ARGS }}
