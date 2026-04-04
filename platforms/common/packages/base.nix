@@ -182,9 +182,6 @@
       docker # Docker CLI tools
       docker-compose # Multi-container Docker applications
 
-      # Dagger - programmable CI/CD engine
-      dagger
-
       # Kubernetes tools
       kubectl # Kubernetes CLI (includes fish/zsh/bash completions!)
       k9s # Kubernetes CLI To Manage Your Clusters In Style
