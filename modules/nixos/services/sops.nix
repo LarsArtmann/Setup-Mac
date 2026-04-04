@@ -19,6 +19,11 @@
           group = "grafana";
           restartUnits = ["grafana.service"];
         };
+        grafana_oauth_client_secret = {
+          owner = "grafana";
+          group = "grafana";
+          restartUnits = ["grafana.service"];
+        };
         gitea_token = {
           owner = "lars";
           group = "users";
