@@ -1,7 +1,7 @@
 # Comprehensive Status Report: SSH Extraction Follow-Up
 
-**Date**: 2026-04-04 05:47  
-**Session Focus**: Fix SSH key path issues, commit cleanup  
+**Date**: 2026-04-04 05:47
+**Session Focus**: Fix SSH key path issues, commit cleanup
 **Status**: ✅ COMPLETE - Critical bug fixed
 
 ---
@@ -121,7 +121,7 @@ outputs = { ... }: {
   # Current modules
   homeManagerModules.ssh = ...;
   nixosModules.ssh = ...;
-  
+
   # New: Direct key export
   sshKeys.lars = builtins.readFile ./ssh-keys/lars.pub;
   sshKeys.lars-ed25519 = builtins.readFile ./ssh-keys/lars-ed25519.pub;
@@ -149,7 +149,7 @@ ssh-config.users = {
 #### Key Rotation Support
 ```nix
 # Support multiple key types with priority
-authorizedKeys.keys = 
+authorizedKeys.keys =
   # Prefer Ed25519 (modern, secure)
   lib.optional ed25519Exists ed25519Key
   # Fallback to RSA (legacy support)
@@ -362,7 +362,7 @@ Statix returned exit code 1 (failure) even for warnings. This is because:
      entry: statix check
      verbose: true
      # Don't use stages, just info
-   
+
    - id: statix-errors
      name: statix errors (blocking)
      entry: statix
@@ -401,5 +401,5 @@ Next priority: Push to GitHub and fix pre-commit configuration.
 
 ---
 
-**Report Generated**: 2026-04-04 05:47  
+**Report Generated**: 2026-04-04 05:47
 **Status**: Ready for GitHub publication phase
