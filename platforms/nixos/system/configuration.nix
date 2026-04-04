@@ -139,6 +139,7 @@
         allowUsers = ["lars"];
         passwordAuthentication = false;
         allowRootLogin = false;
+        authorizedKeys = [ nix-ssh-config.sshKeys.lars ];
       };
 
       # Configure fail2ban for SSH protection

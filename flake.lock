@@ -420,11 +420,11 @@
         "treefmt-full-flake": "treefmt-full-flake"
       },
       "locked": {
-        "lastModified": 1775269238,
-        "narHash": "sha256-fi5aWCJDYpgxWlhehSlSj7ByO2bHgIUfVup4JF5R6Yg=",
+        "lastModified": 1775269268,
+        "narHash": "sha256-zf/hx4LjVQKzZ1xzEemLA0a4SQej+3OhWV64y/N1+6k=",
         "owner": "LarsArtmann",
         "repo": "nix-ssh-config",
-        "rev": "d6686c5e11a009c5204b1ec91ea74c56a04cd877",
+        "rev": "b52e5437274913c4b59e50d63bded99b39384669",
         "type": "github"
       },
       "original": {
