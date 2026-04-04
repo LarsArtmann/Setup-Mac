@@ -297,6 +297,12 @@
           PULL = 600;
         };
 
+        # CI/CD via Gitea Actions
+        actions = {
+          ENABLED = true;
+          DEFAULT_ACTIONS_URL = "github";
+        };
+
         # Cleaner footer
         other = {
           SHOW_FOOTER_VERSION = false;
@@ -432,6 +438,77 @@
           fi
         '';
       in "${tokenGen}";
+    };
+
+    # Runner registration token generation
+    systemd.services.gitea-runner-token = {
+      description = "Generate Gitea Actions runner registration token";
+      after = ["gitea.service"];
+      requires = ["gitea.service"];
+      wantedBy = ["multi-user.target"];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "gitea";
+        Group = "gitea";
+        RemainAfterExit = true;
+      };
+      script = let
+        tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''
+          set -euo pipefail
+
+          TOKEN_FILE="/var/lib/gitea/.runner-token"
+          GITEA=${lib.getExe giteaPkg}
+          export GITEA_WORK_DIR=/var/lib/gitea
+
+          [ -f "$TOKEN_FILE" ] && exit 0
+
+          for i in $(seq 1 30); do
+            if ${pkgs.curl}/bin/curl -s -o /dev/null "http://localhost:3000/"; then
+              break
+            fi
+            sleep 1
+          done
+
+          TOKEN=$($GITEA actions generate-runner-token 2>/dev/null) || TOKEN=""
+
+          if [ -n "$TOKEN" ]; then
+            printf 'TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
+            chmod 644 "$TOKEN_FILE"
+            echo "Runner registration token written to $TOKEN_FILE"
+          else
+            echo "WARNING: Failed to generate runner registration token"
+          fi
+        '';
+      in "${tokenGen}";
+    };
+
+    # Gitea Actions Runner
+    services.gitea-actions-runner = {
+      package = pkgs.gitea-actions-runner;
+      instances.${config.networking.hostName} = {
+        enable = true;
+        name = config.networking.hostName;
+        url = "http://localhost:3000";
+        tokenFile = "/var/lib/gitea/.runner-token";
+        labels = [
+          "ubuntu-latest:docker://node:22-bookworm"
+          "ubuntu-22.04:docker://node:22-bookworm"
+          "native:host"
+        ];
+        settings = {
+          log.level = "info";
+          runner.capacity = 2;
+          container = {
+            network = "host";
+          };
+        };
+      };
+    };
+
+    # Ensure runner starts after token generation
+    systemd.services."gitea-runner-${config.networking.hostName}" = {
+      after = ["gitea-runner-token.service"];
+      requires = ["gitea-runner-token.service"];
     };
 
     # CLI tools
