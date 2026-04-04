@@ -232,17 +232,16 @@
       };
     };
 
-    environment.etc."authelia/users_database.yml".source =
-      pkgs.writeText "users_database.yml" ''
-        users:
-          lars:
-            displayname: "Lars"
-            password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
-            email: "lars@auth.lan"
-            groups:
-              - admin
-              - dev
-      '';
+    environment.etc."authelia/users_database.yml".source = pkgs.writeText "users_database.yml" ''
+      users:
+        lars:
+          displayname: "Lars"
+          password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
+          email: "lars@auth.lan"
+          groups:
+            - admin
+            - dev
+    '';
 
     systemd.tmpfiles.rules = [
       "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
