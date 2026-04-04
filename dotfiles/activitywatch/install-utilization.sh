@@ -13,23 +13,23 @@ echo ""
 
 # Check if ActivityWatch is installed
 if [[ ! -d "/Applications/ActivityWatch.app" ]]; then
-    echo "❌ ActivityWatch not found at /Applications/ActivityWatch.app"
-    echo "   Please install ActivityWatch first: brew install --cask activitywatch"
-    exit 1
+  echo "❌ ActivityWatch not found at /Applications/ActivityWatch.app"
+  echo "   Please install ActivityWatch first: brew install --cask activitywatch"
+  exit 1
 fi
 
 echo "✅ ActivityWatch found"
 
 # Check if already installed
-if [[ -d "$WATCHER_DIR" ]]; then
-    echo "⚠️  aw-watcher-utilization already installed"
-    echo "   To reinstall, remove: rm -rf '$WATCHER_DIR'"
-    read -p "   Reinstall? [y/N] " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 0
-    fi
-    rm -rf "$WATCHER_DIR"
+if [[ -d $WATCHER_DIR ]]; then
+  echo "⚠️  aw-watcher-utilization already installed"
+  echo "   To reinstall, remove: rm -rf '$WATCHER_DIR'"
+  read -p "   Reinstall? [y/N] " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 0
+  fi
+  rm -rf "$WATCHER_DIR"
 fi
 
 # Create temp directory
@@ -41,9 +41,9 @@ echo "📥 Downloading aw-watcher-utilization..."
 
 # Download latest release
 curl -L "https://github.com/Alwinator/aw-watcher-utilization/releases/download/v1.2.2/aw-watcher-utilization" \
-    -o "$TEMP_DIR/aw-watcher-utilization" 2>/dev/null || {
-    echo "❌ Failed to download watcher"
-    exit 1
+  -o "$TEMP_DIR/aw-watcher-utilization" 2>/dev/null || {
+  echo "❌ Failed to download watcher"
+  exit 1
 }
 
 echo "✅ Downloaded successfully"
@@ -64,23 +64,23 @@ mkdir -p "$USER_WATCHER_DIR"
 
 # Download and extract the source
 curl -L "https://github.com/Alwinator/aw-watcher-utilization/archive/refs/tags/v1.2.2.tar.gz" \
-    -o "$TEMP_DIR/source.tar.gz" 2>/dev/null
+  -o "$TEMP_DIR/source.tar.gz" 2>/dev/null
 
 tar -xzf "$TEMP_DIR/source.tar.gz" -C "$TEMP_DIR"
 
 # Install Python package locally
-if command -v pip3 &> /dev/null; then
-    pip3 install --user "$TEMP_DIR/aw-watcher-utilization-1.2.2" --quiet || {
-        echo "⚠️  pip install failed, trying with --break-system-packages..."
-        pip3 install --user "$TEMP_DIR/aw-watcher-utilization-1.2.2" --break-system-packages --quiet || {
-            echo "❌ Failed to install Python package"
-            echo "   Try: pip3 install --user aw-watcher-utilization"
-            exit 1
-        }
+if command -v pip3 &>/dev/null; then
+  pip3 install --user "$TEMP_DIR/aw-watcher-utilization-1.2.2" --quiet || {
+    echo "⚠️  pip install failed, trying with --break-system-packages..."
+    pip3 install --user "$TEMP_DIR/aw-watcher-utilization-1.2.2" --break-system-packages --quiet || {
+      echo "❌ Failed to install Python package"
+      echo "   Try: pip3 install --user aw-watcher-utilization"
+      exit 1
     }
+  }
 else
-    echo "❌ pip3 not found. Please install Python 3 and pip."
-    exit 1
+  echo "❌ pip3 not found. Please install Python 3 and pip."
+  exit 1
 fi
 
 echo "✅ Installed Python package"
@@ -89,7 +89,7 @@ echo "✅ Installed Python package"
 mkdir -p "$USER_WATCHER_DIR"
 
 # Create default config
-cat > "$USER_WATCHER_DIR/aw-watcher-utilization.toml" << 'EOF'
+cat >"$USER_WATCHER_DIR/aw-watcher-utilization.toml" <<'EOF'
 [aw-watcher-utilization]
 poll_time = 5
 EOF
@@ -98,24 +98,24 @@ echo "✅ Created default config"
 
 # Add to aw-qt autostart (if config exists)
 AWQT_CONFIG="$USER_AW_DIR/aw-qt/aw-qt.toml"
-if [[ -f "$AWQT_CONFIG" ]]; then
-    if ! grep -q "aw-watcher-utilization" "$AWQT_CONFIG" 2>/dev/null; then
-        echo ""
-        echo "📝 Adding to aw-qt autostart..."
-        # Backup original
-        cp "$AWQT_CONFIG" "$AWQT_CONFIG.backup"
-        # Add to autostart_modules if it exists
-        if grep -q "autostart_modules" "$AWQT_CONFIG"; then
-            sed -i '' 's/autostart_modules = \[/autostart_modules = ["aw-watcher-utilization", /' "$AWQT_CONFIG"
-        else
-            echo -e "\n[aw-qt]\nautostart_modules = [\"aw-server\", \"aw-watcher-afk\", \"aw-watcher-window\", \"aw-watcher-utilization\"]" >> "$AWQT_CONFIG"
-        fi
-        echo "✅ Added to autostart"
+if [[ -f $AWQT_CONFIG ]]; then
+  if ! grep -q "aw-watcher-utilization" "$AWQT_CONFIG" 2>/dev/null; then
+    echo ""
+    echo "📝 Adding to aw-qt autostart..."
+    # Backup original
+    cp "$AWQT_CONFIG" "$AWQT_CONFIG.backup"
+    # Add to autostart_modules if it exists
+    if grep -q "autostart_modules" "$AWQT_CONFIG"; then
+      sed -i '' 's/autostart_modules = \[/autostart_modules = ["aw-watcher-utilization", /' "$AWQT_CONFIG"
     else
-        echo "ℹ️  Already in autostart"
+      echo -e "\n[aw-qt]\nautostart_modules = [\"aw-server\", \"aw-watcher-afk\", \"aw-watcher-window\", \"aw-watcher-utilization\"]" >>"$AWQT_CONFIG"
     fi
+    echo "✅ Added to autostart"
+  else
+    echo "ℹ️  Already in autostart"
+  fi
 else
-    echo "⚠️  aw-qt.toml not found. You may need to start the watcher manually."
+  echo "⚠️  aw-qt.toml not found. You may need to start the watcher manually."
 fi
 
 echo ""

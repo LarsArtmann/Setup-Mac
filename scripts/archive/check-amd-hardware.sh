@@ -9,9 +9,9 @@ echo ""
 # Check for NPU device nodes
 echo "1. Checking for NPU device nodes:"
 if ls /dev/accel/accel* 2>/dev/null; then
-    echo "   Found NPU devices in /dev/accel/"
+  echo "   Found NPU devices in /dev/accel/"
 else
-    echo "   No NPU devices found in /dev/accel/"
+  echo "   No NPU devices found in /dev/accel/"
 fi
 echo ""
 
@@ -46,9 +46,9 @@ echo ""
 # Check Vulkan devices
 echo "7. Vulkan devices detected:"
 if command -v vulkaninfo >/dev/null 2>&1; then
-    vulkaninfo --summary | grep -A 10 "GPU id" || echo "   Could not read vulkaninfo"
+  vulkaninfo --summary | grep -A 10 "GPU id" || echo "   Could not read vulkaninfo"
 else
-    echo "   vulkaninfo not available"
+  echo "   vulkaninfo not available"
 fi
 echo ""
 

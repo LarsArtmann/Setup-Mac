@@ -1,9 +1,0 @@
-# treefmt configuration - formats Nix code using alejandra
-
-[formatter.nix]
-command = "alejandra"
-includes = ["*.nix"]
-excludes = ["*.backup", "*.lock"]
-
-[settings]
-env.PATH = "/home/lars/.nix-profile/bin:/run/current-system/sw/bin:/usr/local/bin:/usr/bin:/bin"

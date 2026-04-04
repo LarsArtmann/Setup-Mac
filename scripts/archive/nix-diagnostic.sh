@@ -13,15 +13,15 @@ echo "----------------------------"
 
 # Test basic connectivity
 if curl -s --connect-timeout 5 https://cache.nixos.org >/dev/null 2>&1; then
-    echo "✅ cache.nixos.org: reachable"
+  echo "✅ cache.nixos.org: reachable"
 else
-    echo "❌ cache.nixos.org: NOT reachable"
+  echo "❌ cache.nixos.org: NOT reachable"
 fi
 
 if curl -s --connect-timeout 5 https://github.com >/dev/null 2>&1; then
-    echo "✅ github.com: reachable"
+  echo "✅ github.com: reachable"
 else
-    echo "❌ github.com: NOT reachable"
+  echo "❌ github.com: NOT reachable"
 fi
 
 echo ""
@@ -32,18 +32,18 @@ echo "📋 Flake inputs:"
 cd dotfiles/nix 2>/dev/null || echo "❌ Cannot find dotfiles/nix directory"
 
 if [ -f "flake.nix" ]; then
-    echo "✅ flake.nix exists"
-    echo "📦 Nixpkgs version:"
-    grep -A1 "nixpkgs.url" flake.nix | tail -1 | sed 's/.*\///;s/".*//'
+  echo "✅ flake.nix exists"
+  echo "📦 Nixpkgs version:"
+  grep -A1 "nixpkgs.url" flake.nix | tail -1 | sed 's/.*\///;s/".*//'
 else
-    echo "❌ flake.nix missing"
+  echo "❌ flake.nix missing"
 fi
 
 if [ -f "flake.lock" ]; then
-    echo "✅ flake.lock exists"
-    echo "📊 Lock file size: $(du -h flake.lock | cut -f1)"
+  echo "✅ flake.lock exists"
+  echo "📊 Lock file size: $(du -h flake.lock | cut -f1)"
 else
-    echo "❌ flake.lock missing"
+  echo "❌ flake.lock missing"
 fi
 
 echo ""
@@ -58,10 +58,10 @@ echo "--------------------"
 
 # Check for recent error logs
 if [ -d ~/.local/state/nix/logs ]; then
-    echo "📋 Recent Nix logs:"
-    find ~/.local/state/nix/logs -name "*.log" -mtime -1 -exec ls -la {} \; 2>/dev/null | head -3 || echo "No recent logs found"
+  echo "📋 Recent Nix logs:"
+  find ~/.local/state/nix/logs -name "*.log" -mtime -1 -exec ls -la {} \; 2>/dev/null | head -3 || echo "No recent logs found"
 else
-    echo "📋 No Nix log directory found"
+  echo "📋 No Nix log directory found"
 fi
 
 echo ""

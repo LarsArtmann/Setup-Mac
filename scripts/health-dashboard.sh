@@ -31,9 +31,9 @@ fish_path=$(which fish 2>/dev/null)
 echo -e "  • Generation: ${INFO} $current_gen"
 echo -e "  • Profile: ${INFO} $profile_path"
 if [ -n "$fish_path" ]; then
-    echo -e "  • Fish Shell: $OK $fish_path"
+  echo -e "  • Fish Shell: $OK $fish_path"
 else
-    echo -e "  • Fish Shell: $ERROR Not found"
+  echo -e "  • Fish Shell: $ERROR Not found"
 fi
 echo ""
 
@@ -77,26 +77,26 @@ echo ""
 
 # Services Status
 echo -e "${PURPLE}🔍 Services:${NC}"
-netdata_status=$(pgrep netdata > /dev/null && echo "Running" || echo "Stopped")
-ssh_agent_status=$(pgrep ssh-agent > /dev/null && echo "Running" || echo "Stopped")
+netdata_status=$(pgrep netdata >/dev/null && echo "Running" || echo "Stopped")
+ssh_agent_status=$(pgrep ssh-agent >/dev/null && echo "Running" || echo "Stopped")
 fish_config_status=$([ -f ~/.config/fish/config.fish ] && echo "Present" || echo "Missing")
 
 if [ "$netdata_status" = "Running" ]; then
-    echo -e "  • Netdata: $OK $netdata_status"
+  echo -e "  • Netdata: $OK $netdata_status"
 else
-    echo -e "  • Netdata: $WARN $netdata_status"
+  echo -e "  • Netdata: $WARN $netdata_status"
 fi
 
 if [ "$ssh_agent_status" = "Running" ]; then
-    echo -e "  • SSH Agent: $OK $ssh_agent_status"
+  echo -e "  • SSH Agent: $OK $ssh_agent_status"
 else
-    echo -e "  • SSH Agent: $ERROR $ssh_agent_status"
+  echo -e "  • SSH Agent: $ERROR $ssh_agent_status"
 fi
 
 if [ "$fish_config_status" = "Present" ]; then
-    echo -e "  • Fish Config: $OK $fish_config_status"
+  echo -e "  • Fish Config: $OK $fish_config_status"
 else
-    echo -e "  • Fish Config: $ERROR $fish_config_status"
+  echo -e "  • Fish Config: $ERROR $fish_config_status"
 fi
 echo ""
 
@@ -106,9 +106,9 @@ gitleaks_status=$([ -f .pre-commit-config.yaml ] && grep -q gitleaks .pre-commit
 ssh_keys_count=$(ssh-add -l 2>/dev/null | wc -l | tr -d ' ')
 
 if [ "$gitleaks_status" = "Configured" ]; then
-    echo -e "  • Gitleaks: $OK $gitleaks_status"
+  echo -e "  • Gitleaks: $OK $gitleaks_status"
 else
-    echo -e "  • Gitleaks: $WARN $gitleaks_status"
+  echo -e "  • Gitleaks: $WARN $gitleaks_status"
 fi
 
 echo -e "  • SSH Keys: ${INFO} $ssh_keys_count loaded"

@@ -17,15 +17,15 @@ NC='\033[0m' # No Color
 
 # Helper functions
 check() {
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓${NC} $1"
-    else
-        echo -e "${RED}✗${NC} $1"
-    fi
+  if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✓${NC} $1"
+  else
+    echo -e "${RED}✗${NC} $1"
+  fi
 }
 
 warn() {
-    echo -e "${YELLOW}⚠${NC} $1"
+  echo -e "${YELLOW}⚠${NC} $1"
 }
 
 echo "1. SYSTEM FILE DESCRIPTOR LIMITS"
@@ -44,9 +44,9 @@ echo ""
 echo "3. SYSTEMD-RESOLVED STATUS"
 echo "═══════════════════════════════════════════════════════"
 systemctl is-active systemd-resolved 2>/dev/null && check "systemd-resolved is running" || warn "systemd-resolved is not running"
-if command -v resolvectl &> /dev/null; then
-    echo ""
-    resolvectl status 2>/dev/null || warn "resolvectl status failed"
+if command -v resolvectl &>/dev/null; then
+  echo ""
+  resolvectl status 2>/dev/null || warn "resolvectl status failed"
 fi
 echo ""
 
@@ -76,12 +76,12 @@ echo ""
 
 echo "7. DNSSEC VALIDATION TESTS"
 echo "═══════════════════════════════════════════════════════"
-if command -v dig &> /dev/null; then
-    echo "Quad9 with DNSSEC:"
-    dig @9.9.9.10 +dnssec cache.nixos.org | grep -E "flags|AD" || warn "dig command failed"
-    echo ""
+if command -v dig &>/dev/null; then
+  echo "Quad9 with DNSSEC:"
+  dig @9.9.9.10 +dnssec cache.nixos.org | grep -E "flags|AD" || warn "dig command failed"
+  echo ""
 else
-    warn "dig not installed, skipping DNSSEC tests"
+  warn "dig not installed, skipping DNSSEC tests"
 fi
 echo ""
 
@@ -90,11 +90,11 @@ echo "════════════════════════�
 ip link show | grep -E "^\d+:|mtu" | head -20
 echo ""
 echo "Testing path MTU:"
-if command -v ping &> /dev/null; then
-    ping -c 1 -M do -s 1472 cache.nixos.org 2>/dev/null && check "MTU 1472 works" || warn "MTU 1472 failed"
-    ping -c 1 -M do -s 1473 cache.nixos.org 2>/dev/null && warn "MTU 1473 should fail but didn't" || check "MTU 1473 correctly blocked"
+if command -v ping &>/dev/null; then
+  ping -c 1 -M do -s 1472 cache.nixos.org 2>/dev/null && check "MTU 1472 works" || warn "MTU 1472 failed"
+  ping -c 1 -M do -s 1473 cache.nixos.org 2>/dev/null && warn "MTU 1473 should fail but didn't" || check "MTU 1473 correctly blocked"
 else
-    warn "ping not available"
+  warn "ping not available"
 fi
 echo ""
 
@@ -112,13 +112,13 @@ echo ""
 
 echo "11. DOCKER DNS CONFIGURATION"
 echo "═══════════════════════════════════════════════════════"
-if command -v docker &> /dev/null; then
-    docker info 2>/dev/null | grep -i dns || warn "Could not get Docker DNS config"
-    echo ""
-    echo "Testing DNS from Docker container:"
-    timeout 5 docker run --rm alpine sh -c "nslookup cache.nixos.org" 2>&1 | head -10 || warn "Docker DNS test failed"
+if command -v docker &>/dev/null; then
+  docker info 2>/dev/null | grep -i dns || warn "Could not get Docker DNS config"
+  echo ""
+  echo "Testing DNS from Docker container:"
+  timeout 5 docker run --rm alpine sh -c "nslookup cache.nixos.org" 2>&1 | head -10 || warn "Docker DNS test failed"
 else
-    warn "Docker not available"
+  warn "Docker not available"
 fi
 echo ""
 
@@ -130,10 +130,10 @@ echo ""
 echo "13. ISP DNS BLOCKING TEST"
 echo "═══════════════════════════════════════════════════════"
 echo "Testing direct IP access (bypasses DNS):"
-if command -v curl &> /dev/null; then
-    time curl -I -m 5 https://151.101.193.91/ 2>&1 | head -5 && check "Direct IP to cache.nixos.org works" || warn "Direct IP access failed"
+if command -v curl &>/dev/null; then
+  time curl -I -m 5 https://151.101.193.91/ 2>&1 | head -5 && check "Direct IP to cache.nixos.org works" || warn "Direct IP access failed"
 else
-    warn "curl not available"
+  warn "curl not available"
 fi
 echo ""
 
@@ -147,25 +147,25 @@ echo "════════════════════════�
 
 # Check for issues and provide recommendations
 if grep -q "nameserver fe80:" /etc/resolv.conf; then
-    warn "ISSUE: IPv6 link-local DNS present in resolv.conf"
-    echo "  → Recommendation: Add 'networking.networkmanager.ipv6.dns.ipv4-only = true'"
+  warn "ISSUE: IPv6 link-local DNS present in resolv.conf"
+  echo "  → Recommendation: Add 'networking.networkmanager.ipv6.dns.ipv4-only = true'"
 fi
 
 if systemctl is-active systemd-resolved &>/dev/null; then
-    warn "ISSUE: systemd-resolved is running alongside NetworkManager DNS"
-    echo "  → Recommendation: Disable systemd-resolved or configure NetworkManager to use it"
+  warn "ISSUE: systemd-resolved is running alongside NetworkManager DNS"
+  echo "  → Recommendation: Disable systemd-resolved or configure NetworkManager to use it"
 fi
 
 if ! grep -q "9.9.9.10" /etc/resolv.conf; then
-    warn "ISSUE: Quad9 DNS not being used"
-    echo "  → Recommendation: Check NetworkManager DNS override in NixOS config"
+  warn "ISSUE: Quad9 DNS not being used"
+  echo "  → Recommendation: Check NetworkManager DNS override in NixOS config"
 fi
 
 # Check FD limit
 FD_LIMIT=$(ulimit -n)
 if [ "$FD_LIMIT" -lt 4096 ]; then
-    warn "ISSUE: File descriptor limit too low ($FD_LIMIT)"
-    echo "  → Recommendation: Increase with 'systemd.extraConfig' or PAM limits"
+  warn "ISSUE: File descriptor limit too low ($FD_LIMIT)"
+  echo "  → Recommendation: Increase with 'systemd.extraConfig' or PAM limits"
 fi
 
 echo ""

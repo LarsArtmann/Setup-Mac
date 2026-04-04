@@ -42,6 +42,7 @@
     ../desktop/multi-wm.nix
     # Chrome/Chromium policy configuration for extension management
     ../programs/chrome.nix
+    ../programs/steam.nix
   ];
 
   # Define color scheme option

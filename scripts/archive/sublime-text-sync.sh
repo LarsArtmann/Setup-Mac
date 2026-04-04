@@ -21,49 +21,49 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 log() {
-    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
+  echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')] $1${NC}"
 }
 
 warn() {
-    echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}"
+  echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING: $1${NC}"
 }
 
 error() {
-    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}"
-    exit 1
+  echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR: $1${NC}"
+  exit 1
 }
 
 info() {
-    echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')] INFO: $1${NC}"
+  echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')] INFO: $1${NC}"
 }
 
 # Check if SublimeText is installed
 check_sublime_installation() {
-    if ! command -v subl >/dev/null 2>&1; then
-        if [[ ! -d "/Applications/Sublime Text.app" ]]; then
-            error "SublimeText is not installed. Please install it first."
-        else
-            warn "SublimeText CLI not in PATH. Creating symlink..."
-            sudo ln -sf "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl || \
-                warn "Could not create symlink. You may need to install CLI tools manually."
-        fi
+  if ! command -v subl >/dev/null 2>&1; then
+    if [[ ! -d "/Applications/Sublime Text.app" ]]; then
+      error "SublimeText is not installed. Please install it first."
+    else
+      warn "SublimeText CLI not in PATH. Creating symlink..."
+      sudo ln -sf "/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl" /usr/local/bin/subl ||
+        warn "Could not create symlink. You may need to install CLI tools manually."
     fi
+  fi
 }
 
 # Check if SublimeText user directory exists
 check_sublime_user_dir() {
-    if [[ ! -d "$SUBLIME_USER_DIR" ]]; then
-        error "SublimeText user directory not found: $SUBLIME_USER_DIR"
-    fi
+  if [[ ! -d $SUBLIME_USER_DIR ]]; then
+    error "SublimeText user directory not found: $SUBLIME_USER_DIR"
+  fi
 }
 
 # Create sublime-text dotfiles directory structure
 setup_dotfiles_structure() {
-    log "Setting up SublimeText dotfiles structure..."
-    mkdir -p "$SUBLIME_CONFIG_DIR"/{settings,packages,keymaps,snippets,themes}
+  log "Setting up SublimeText dotfiles structure..."
+  mkdir -p "$SUBLIME_CONFIG_DIR"/{settings,packages,keymaps,snippets,themes}
 
-    # Create README for the sublime-text directory
-    cat > "$SUBLIME_CONFIG_DIR/README.md" << 'EOF'
+  # Create README for the sublime-text directory
+  cat >"$SUBLIME_CONFIG_DIR/README.md" <<'EOF'
 # SublimeText Configuration
 
 This directory contains synchronized SublimeText configuration files.
@@ -109,125 +109,125 @@ To manually export current configuration:
 ```
 EOF
 
-    log "SublimeText dotfiles structure created at: $SUBLIME_CONFIG_DIR"
+  log "SublimeText dotfiles structure created at: $SUBLIME_CONFIG_DIR"
 }
 
 # Export current SublimeText configuration to dotfiles
 export_config() {
-    log "Exporting SublimeText configuration to dotfiles..."
+  log "Exporting SublimeText configuration to dotfiles..."
 
-    # Create backup directory with timestamp
-    local backup_dir="$SUBLIME_CONFIG_DIR/backups/$(date +%Y%m%d-%H%M%S)"
-    mkdir -p "$backup_dir"
+  # Create backup directory with timestamp
+  local backup_dir="$SUBLIME_CONFIG_DIR/backups/$(date +%Y%m%d-%H%M%S)"
+  mkdir -p "$backup_dir"
 
-    # Copy existing dotfiles config to backup
-    if [[ -d "$SUBLIME_CONFIG_DIR/settings" ]]; then
-        cp -r "$SUBLIME_CONFIG_DIR/settings"/* "$backup_dir/" 2>/dev/null || true
+  # Copy existing dotfiles config to backup
+  if [[ -d "$SUBLIME_CONFIG_DIR/settings" ]]; then
+    cp -r "$SUBLIME_CONFIG_DIR/settings"/* "$backup_dir/" 2>/dev/null || true
+  fi
+
+  # Export main settings files
+  if [[ -f "$SUBLIME_USER_DIR/Preferences.sublime-settings" ]]; then
+    cp "$SUBLIME_USER_DIR/Preferences.sublime-settings" "$SUBLIME_CONFIG_DIR/settings/"
+    log "✓ Exported Preferences.sublime-settings"
+  fi
+
+  # Export package control settings
+  if [[ -f "$SUBLIME_USER_DIR/Package Control.sublime-settings" ]]; then
+    cp "$SUBLIME_USER_DIR/Package Control.sublime-settings" "$SUBLIME_CONFIG_DIR/settings/"
+    log "✓ Exported Package Control.sublime-settings"
+  fi
+
+  # Export keymaps
+  for keymap in "$SUBLIME_USER_DIR"/*.sublime-keymap; do
+    if [[ -f $keymap ]]; then
+      cp "$keymap" "$SUBLIME_CONFIG_DIR/keymaps/"
+      log "✓ Exported $(basename "$keymap")"
     fi
+  done
 
-    # Export main settings files
-    if [[ -f "$SUBLIME_USER_DIR/Preferences.sublime-settings" ]]; then
-        cp "$SUBLIME_USER_DIR/Preferences.sublime-settings" "$SUBLIME_CONFIG_DIR/settings/"
-        log "✓ Exported Preferences.sublime-settings"
+  # Export snippets
+  for snippet in "$SUBLIME_USER_DIR"/*.sublime-snippet; do
+    if [[ -f $snippet ]]; then
+      cp "$snippet" "$SUBLIME_CONFIG_DIR/snippets/"
+      log "✓ Exported $(basename "$snippet")"
     fi
+  done
 
-    # Export package control settings
-    if [[ -f "$SUBLIME_USER_DIR/Package Control.sublime-settings" ]]; then
-        cp "$SUBLIME_USER_DIR/Package Control.sublime-settings" "$SUBLIME_CONFIG_DIR/settings/"
-        log "✓ Exported Package Control.sublime-settings"
+  # Export themes and color schemes
+  for theme in "$SUBLIME_USER_DIR"/*.{sublime-theme,sublime-color-scheme}; do
+    if [[ -f $theme ]]; then
+      cp "$theme" "$SUBLIME_CONFIG_DIR/themes/"
+      log "✓ Exported $(basename "$theme")"
     fi
+  done
 
-    # Export keymaps
-    for keymap in "$SUBLIME_USER_DIR"/*.sublime-keymap; do
-        if [[ -f "$keymap" ]]; then
-            cp "$keymap" "$SUBLIME_CONFIG_DIR/keymaps/"
-            log "✓ Exported $(basename "$keymap")"
-        fi
-    done
-
-    # Export snippets
-    for snippet in "$SUBLIME_USER_DIR"/*.sublime-snippet; do
-        if [[ -f "$snippet" ]]; then
-            cp "$snippet" "$SUBLIME_CONFIG_DIR/snippets/"
-            log "✓ Exported $(basename "$snippet")"
-        fi
-    done
-
-    # Export themes and color schemes
-    for theme in "$SUBLIME_USER_DIR"/*.{sublime-theme,sublime-color-scheme}; do
-        if [[ -f "$theme" ]]; then
-            cp "$theme" "$SUBLIME_CONFIG_DIR/themes/"
-            log "✓ Exported $(basename "$theme")"
-        fi
-    done
-
-    log "Configuration exported to: $SUBLIME_CONFIG_DIR"
-    info "Backup created at: $backup_dir"
+  log "Configuration exported to: $SUBLIME_CONFIG_DIR"
+  info "Backup created at: $backup_dir"
 }
 
 # Import configuration from dotfiles to SublimeText
 import_config() {
-    log "Importing SublimeText configuration from dotfiles..."
+  log "Importing SublimeText configuration from dotfiles..."
 
-    # Create backup of current user directory
-    local user_backup_dir="$HOME/.sublime-text-backup-$(date +%Y%m%d-%H%M%S)"
-    if [[ -d "$SUBLIME_USER_DIR" ]]; then
-        cp -r "$SUBLIME_USER_DIR" "$user_backup_dir"
-        log "Created backup of current config at: $user_backup_dir"
-    fi
+  # Create backup of current user directory
+  local user_backup_dir="$HOME/.sublime-text-backup-$(date +%Y%m%d-%H%M%S)"
+  if [[ -d $SUBLIME_USER_DIR ]]; then
+    cp -r "$SUBLIME_USER_DIR" "$user_backup_dir"
+    log "Created backup of current config at: $user_backup_dir"
+  fi
 
-    # Ensure user directory exists
-    mkdir -p "$SUBLIME_USER_DIR"
+  # Ensure user directory exists
+  mkdir -p "$SUBLIME_USER_DIR"
 
-    # Import settings files
-    if [[ -d "$SUBLIME_CONFIG_DIR/settings" ]]; then
-        for setting_file in "$SUBLIME_CONFIG_DIR/settings"/*.sublime-settings; do
-            if [[ -f "$setting_file" ]]; then
-                cp "$setting_file" "$SUBLIME_USER_DIR/"
-                log "✓ Imported $(basename "$setting_file")"
-            fi
-        done
-    fi
+  # Import settings files
+  if [[ -d "$SUBLIME_CONFIG_DIR/settings" ]]; then
+    for setting_file in "$SUBLIME_CONFIG_DIR/settings"/*.sublime-settings; do
+      if [[ -f $setting_file ]]; then
+        cp "$setting_file" "$SUBLIME_USER_DIR/"
+        log "✓ Imported $(basename "$setting_file")"
+      fi
+    done
+  fi
 
-    # Import keymaps
-    if [[ -d "$SUBLIME_CONFIG_DIR/keymaps" ]]; then
-        for keymap in "$SUBLIME_CONFIG_DIR/keymaps"/*.sublime-keymap; do
-            if [[ -f "$keymap" ]]; then
-                cp "$keymap" "$SUBLIME_USER_DIR/"
-                log "✓ Imported $(basename "$keymap")"
-            fi
-        done
-    fi
+  # Import keymaps
+  if [[ -d "$SUBLIME_CONFIG_DIR/keymaps" ]]; then
+    for keymap in "$SUBLIME_CONFIG_DIR/keymaps"/*.sublime-keymap; do
+      if [[ -f $keymap ]]; then
+        cp "$keymap" "$SUBLIME_USER_DIR/"
+        log "✓ Imported $(basename "$keymap")"
+      fi
+    done
+  fi
 
-    # Import snippets
-    if [[ -d "$SUBLIME_CONFIG_DIR/snippets" ]]; then
-        for snippet in "$SUBLIME_CONFIG_DIR/snippets"/*.sublime-snippet; do
-            if [[ -f "$snippet" ]]; then
-                cp "$snippet" "$SUBLIME_USER_DIR/"
-                log "✓ Imported $(basename "$snippet")"
-            fi
-        done
-    fi
+  # Import snippets
+  if [[ -d "$SUBLIME_CONFIG_DIR/snippets" ]]; then
+    for snippet in "$SUBLIME_CONFIG_DIR/snippets"/*.sublime-snippet; do
+      if [[ -f $snippet ]]; then
+        cp "$snippet" "$SUBLIME_USER_DIR/"
+        log "✓ Imported $(basename "$snippet")"
+      fi
+    done
+  fi
 
-    # Import themes
-    if [[ -d "$SUBLIME_CONFIG_DIR/themes" ]]; then
-        for theme in "$SUBLIME_CONFIG_DIR/themes"/*.{sublime-theme,sublime-color-scheme}; do
-            if [[ -f "$theme" ]]; then
-                cp "$theme" "$SUBLIME_USER_DIR/"
-                log "✓ Imported $(basename "$theme")"
-            fi
-        done
-    fi
+  # Import themes
+  if [[ -d "$SUBLIME_CONFIG_DIR/themes" ]]; then
+    for theme in "$SUBLIME_CONFIG_DIR/themes"/*.{sublime-theme,sublime-color-scheme}; do
+      if [[ -f $theme ]]; then
+        cp "$theme" "$SUBLIME_USER_DIR/"
+        log "✓ Imported $(basename "$theme")"
+      fi
+    done
+  fi
 
-    log "Configuration imported successfully"
+  log "Configuration imported successfully"
 }
 
 # Create enhanced default configuration files
 create_enhanced_config() {
-    log "Creating enhanced SublimeText configuration..."
+  log "Creating enhanced SublimeText configuration..."
 
-    # Enhanced Preferences
-    cat > "$SUBLIME_CONFIG_DIR/settings/Preferences.sublime-settings" << 'EOF'
+  # Enhanced Preferences
+  cat >"$SUBLIME_CONFIG_DIR/settings/Preferences.sublime-settings" <<'EOF'
 {
     // Font configuration optimized for development
     "font_face": "JetBrains Mono",
@@ -369,8 +369,8 @@ create_enhanced_config() {
 }
 EOF
 
-    # Package Control Settings
-    cat > "$SUBLIME_CONFIG_DIR/settings/Package Control.sublime-settings" << 'EOF'
+  # Package Control Settings
+  cat >"$SUBLIME_CONFIG_DIR/settings/Package Control.sublime-settings" <<'EOF'
 {
     "bootstrapped": true,
     "in_process_packages": [],
@@ -398,8 +398,8 @@ EOF
 }
 EOF
 
-    # Default key bindings for development
-    cat > "$SUBLIME_CONFIG_DIR/keymaps/Default (OSX).sublime-keymap" << 'EOF'
+  # Default key bindings for development
+  cat >"$SUBLIME_CONFIG_DIR/keymaps/Default (OSX).sublime-keymap" <<'EOF'
 [
     // File operations
     { "keys": ["cmd+shift+n"], "command": "new_window" },
@@ -432,15 +432,15 @@ EOF
 ]
 EOF
 
-    log "Enhanced configuration files created"
+  log "Enhanced configuration files created"
 }
 
 # Create launchd service for automatic sync
 create_sync_service() {
-    local plist_file="$HOME/Library/LaunchAgents/com.larsartmann.sublime-sync.plist"
+  local plist_file="$HOME/Library/LaunchAgents/com.larsartmann.sublime-sync.plist"
 
-    log "Creating automatic sync service..."
-    cat > "$plist_file" << EOF
+  log "Creating automatic sync service..."
+  cat >"$plist_file" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -467,52 +467,52 @@ create_sync_service() {
 </plist>
 EOF
 
-    launchctl load "$plist_file" 2>/dev/null || warn "launchd service may already be loaded"
-    log "Automatic sync service created and loaded: $plist_file"
+  launchctl load "$plist_file" 2>/dev/null || warn "launchd service may already be loaded"
+  log "Automatic sync service created and loaded: $plist_file"
 }
 
 # Validate configuration
 validate_config() {
-    log "Validating SublimeText configuration..."
+  log "Validating SublimeText configuration..."
 
-    local issues=0
+  local issues=0
 
-    # Check for valid JSON in settings files (handle SublimeText's relaxed JSON format)
-    for settings_file in "$SUBLIME_CONFIG_DIR/settings"/*.sublime-settings; do
-        if [[ -f "$settings_file" ]]; then
-            # Strip comments and validate JSON (SublimeText supports relaxed JSON format)
-            local temp_json=$(mktemp)
-            # Remove line comments (//) - SublimeText allows this
-            sed 's|//.*||g' "$settings_file" > "$temp_json"
+  # Check for valid JSON in settings files (handle SublimeText's relaxed JSON format)
+  for settings_file in "$SUBLIME_CONFIG_DIR/settings"/*.sublime-settings; do
+    if [[ -f $settings_file ]]; then
+      # Strip comments and validate JSON (SublimeText supports relaxed JSON format)
+      local temp_json=$(mktemp)
+      # Remove line comments (//) - SublimeText allows this
+      sed 's|//.*||g' "$settings_file" >"$temp_json"
 
-            if ! python3 -m json.tool "$temp_json" >/dev/null 2>&1; then
-                warn "JSON syntax issues in: $(basename "$settings_file") - this may be normal for SublimeText format"
-                # Don't count as error since SublimeText handles relaxed JSON
-            else
-                log "✓ Valid JSON: $(basename "$settings_file")"
-            fi
-            rm -f "$temp_json"
-        fi
-    done
-
-    # Check for required directories
-    for dir in settings keymaps snippets themes; do
-        if [[ ! -d "$SUBLIME_CONFIG_DIR/$dir" ]]; then
-            warn "Missing directory: $dir"
-            mkdir -p "$SUBLIME_CONFIG_DIR/$dir"
-        fi
-    done
-
-    if [[ $issues -eq 0 ]]; then
-        log "✅ Configuration validation passed"
-    else
-        error "Configuration validation failed with $issues issues"
+      if ! python3 -m json.tool "$temp_json" >/dev/null 2>&1; then
+        warn "JSON syntax issues in: $(basename "$settings_file") - this may be normal for SublimeText format"
+        # Don't count as error since SublimeText handles relaxed JSON
+      else
+        log "✓ Valid JSON: $(basename "$settings_file")"
+      fi
+      rm -f "$temp_json"
     fi
+  done
+
+  # Check for required directories
+  for dir in settings keymaps snippets themes; do
+    if [[ ! -d "$SUBLIME_CONFIG_DIR/$dir" ]]; then
+      warn "Missing directory: $dir"
+      mkdir -p "$SUBLIME_CONFIG_DIR/$dir"
+    fi
+  done
+
+  if [[ $issues -eq 0 ]]; then
+    log "✅ Configuration validation passed"
+  else
+    error "Configuration validation failed with $issues issues"
+  fi
 }
 
 # Show usage information
 show_usage() {
-    cat << EOF
+  cat <<EOF
 SublimeText Configuration Sync Automation
 
 Usage: $0 [OPTION]
@@ -538,49 +538,49 @@ EOF
 
 # Main execution function
 main() {
-    local action="${1:-export}"
+  local action="${1:-export}"
 
-    case "$action" in
-        --export|export)
-            check_sublime_installation
-            check_sublime_user_dir
-            setup_dotfiles_structure
-            export_config
-            validate_config
-            ;;
-        --import|import)
-            check_sublime_installation
-            import_config
-            validate_config
-            ;;
-        --setup|setup)
-            check_sublime_installation
-            setup_dotfiles_structure
-            create_enhanced_config
-            create_sync_service
-            validate_config
-            ;;
-        --validate|validate)
-            validate_config
-            ;;
-        --help|help|-h)
-            show_usage
-            exit 0
-            ;;
-        *)
-            # Default: export current configuration
-            check_sublime_installation
-            check_sublime_user_dir
-            setup_dotfiles_structure
-            export_config
-            validate_config
-            ;;
-    esac
+  case "$action" in
+  --export | export)
+    check_sublime_installation
+    check_sublime_user_dir
+    setup_dotfiles_structure
+    export_config
+    validate_config
+    ;;
+  --import | import)
+    check_sublime_installation
+    import_config
+    validate_config
+    ;;
+  --setup | setup)
+    check_sublime_installation
+    setup_dotfiles_structure
+    create_enhanced_config
+    create_sync_service
+    validate_config
+    ;;
+  --validate | validate)
+    validate_config
+    ;;
+  --help | help | -h)
+    show_usage
+    exit 0
+    ;;
+  *)
+    # Default: export current configuration
+    check_sublime_installation
+    check_sublime_user_dir
+    setup_dotfiles_structure
+    export_config
+    validate_config
+    ;;
+  esac
 
-    log "✅ SublimeText configuration sync completed successfully!"
-    info "📁 Configuration directory: $SUBLIME_CONFIG_DIR"
-    info "🔄 Auto-sync runs daily at 6 PM"
-    info "📖 See README.md for more information"
+  log "✅ SublimeText configuration sync completed successfully!"
+  info "📁 Configuration directory: $SUBLIME_CONFIG_DIR"
+  info "🔄 Auto-sync runs daily at 6 PM"
+  info "📖 See README.md for more information"
 }
 
 # Run the main function with all arguments

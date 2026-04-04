@@ -14,7 +14,7 @@ NC='\033[0m' # No Color
 
 # Test configuration
 INTERACTIVE=false
-if [[ "${1:-}" == "--interactive" ]]; then
+if [[ ${1:-} == "--interactive" ]]; then
   INTERACTIVE=true
   echo -e "${BLUE}Running in interactive mode${NC}"
 fi
@@ -43,7 +43,7 @@ check_alias_config() {
   local config_file="$2"
   local alias_name="$3"
 
-  if [[ ! -f "$config_file" ]]; then
+  if [[ ! -f $config_file ]]; then
     echo -e "${RED}✖${NC} $shell: $alias_name - Config file not found"
     return 1
   fi
@@ -163,7 +163,7 @@ run_tests() {
   # Test Bash
   echo -e "${BLUE}Testing Bash...${NC}"
   local bash_config="$BASH_CONFIG"
-  if [[ ! -f "$bash_config" ]]; then
+  if [[ ! -f $bash_config ]]; then
     bash_config="$BASH_ALT_CONFIG"
   fi
 

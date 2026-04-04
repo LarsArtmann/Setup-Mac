@@ -133,6 +133,7 @@
     signoz-collector-src,
     nix-ssh-config,
     crush-config,
+    treefmt-full-flake,
     ...
   }: let
     goOverlay = final: prev: {
@@ -202,7 +203,8 @@
           ];
         };
 
-        formatter = pkgs.treefmt;
+        # Use treefmt-full-flake's formatter which includes alejandra in PATH
+        formatter = treefmt-full-flake.formatter.${system};
 
         packages =
           {
