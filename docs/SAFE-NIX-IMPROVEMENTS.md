@@ -914,32 +914,12 @@ version = "0.7.6.1";
 
 ---
 
-### 27. Check Geekbench AI Version
+### 27. (Obsolete) Remove Geekbench AI Custom Package
 
-**Priority:** LOW
-**File:** `pkgs/geekbench-ai/default.nix:5`
+**Priority:** COMPLETED
+**Status:** REMOVED
 
-**Current State:**
-
-```nix
-version = "1.6.0";
-```
-
-**Issue:**
-
-- Benchmark tools should be updated for accuracy
-- May have compatibility issues
-
-**Suggested Fix:**
-
-- Check for updates on Geekbench website
-- Update to latest stable version
-
-**Justification:**
-
-- Benchmark tools should be updated for accurate results
-- Compatibility with latest hardware
-- Bug fixes and improvements
+The custom `pkgs/geekbench-ai/` package has been removed. The project uses `geekbench_6` from nixpkgs which includes AI/ML benchmarking capabilities (Linux-only).
 
 ---
 

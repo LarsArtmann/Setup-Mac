@@ -260,7 +260,7 @@ Patterns for building custom Nix packages:
 
 - **callPackage + fetchpatch Hybrid**: `pkgs/crush-patched/package.nix` demonstrates reproducible patch management from immutable GitHub URLs
 - **Go 1.26 Overlay**: Custom overlay for Go 1.26rc2 via flake-parts
-- **Binary Packaging**: `pkgs/geekbench-ai/default.nix` shows binary packaging pattern
+- **Binary Packaging**: `pkgs/superfile/default.nix` shows binary packaging pattern
 
 ### Code Example
 

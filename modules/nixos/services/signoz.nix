@@ -203,6 +203,28 @@ in {
 
       (lib.mkIf cfg.components.clickhouse {
         services.clickhouse.enable = true;
+        services.clickhouse.package = pkgs.clickhouse.override { enableKeeper = true; };
+        services.clickhouse.extraServerConfig = ''
+          <keeper_server>
+            <tcp_port>9181</tcp_port>
+            <server_id>1</server_id>
+            <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
+            <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
+            <raft_configuration>
+              <server>
+                <id>1</id>
+                <hostname>localhost</hostname>
+                <port>9234</port>
+              </server>
+            </raft_configuration>
+          </keeper_server>
+          <zookeeper>
+            <node>
+              <host>localhost</host>
+              <port>9181</port>
+            </node>
+          </zookeeper>
+        '';
       })
 
       (lib.mkIf cfg.components.queryService {
@@ -230,6 +252,10 @@ in {
           wants = ["signoz.service"];
           wantedBy = ["multi-user.target"];
           preStart = ''
+            ${packages.otelCollector}/bin/signoz-otel-collector migrate bootstrap \
+              --clickhouse-dsn "${cfg.settings.clickhouse.url}" \
+              --clickhouse-cluster "default" \
+              --clickhouse-replication=false || true
             ${packages.otelCollector}/bin/signoz-otel-collector migrate sync up \
               --clickhouse-dsn "${cfg.settings.clickhouse.url}" \
               --clickhouse-cluster "default" \
