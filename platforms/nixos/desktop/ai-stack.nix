@@ -90,10 +90,8 @@ in {
       };
   };
 
-  # Group all systemd service configurations together
-  systemd = {
-    # Ollama permissions fix service
-    services.ollama-permissions = {
+  systemd.services = {
+    ollama-permissions = {
       description = "Fix Ollama data directory permissions";
       after = ["local-fs.target" "ollama.service"];
       before = [];
@@ -111,8 +109,7 @@ in {
       };
     };
 
-    # Unsloth Studio setup service
-    services.unsloth-setup = {
+    unsloth-setup = {
       description = "Unsloth Studio - First-time setup";
       after = ["network-online.target"];
       wants = ["network-online.target"];
@@ -207,8 +204,7 @@ in {
       };
     };
 
-    # Unsloth Studio runtime service
-    services.unsloth-studio = {
+    unsloth-studio = {
       description = "Unsloth Studio - AI Model Training & Inference UI";
       after = ["network.target" "unsloth-setup.service"];
       requires = ["unsloth-setup.service"];
