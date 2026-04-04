@@ -52,7 +52,7 @@ in {
   services.ollama = {
     enable = true;
     package = pkgs.ollama-rocm;
-    home = "/data/ollama";
+    home = "/data/models/ollama";
     host = "127.0.0.1";
     port = 11434;
     environmentVariables = {
@@ -82,13 +82,13 @@ in {
       # UID 61547 is the typical dynamic UID for ollama
       ExecStart = pkgs.writeShellScript "fix-ollama-perms" ''
         # Ensure directory exists and is traversable
-        mkdir -p /data/ollama
-        chmod 755 /data/ollama 2>/dev/null || true
+        mkdir -p /data/models/ollama
+        chmod 755 /data/models/ollama 2>/dev/null || true
         # Try to fix ownership (will work if root, fail silently otherwise)
-        chown -R 61547:61547 /data/ollama 2>/dev/null || \
-          chown -R ollama:ollama /data/ollama 2>/dev/null || true
+        chown -R 61547:61547 /data/models/ollama 2>/dev/null || \
+          chown -R ollama:ollama /data/models/ollama 2>/dev/null || true
         # Ensure read/write for owner
-        chmod -R u+rwX /data/ollama 2>/dev/null || true
+        chmod -R u+rwX /data/models/ollama 2>/dev/null || true
       '';
     };
   };
@@ -261,9 +261,9 @@ in {
 
   systemd.tmpfiles.rules = [
     # Recursively fix ownership/permissions on ollama data dir (handles pre-existing dirs)
-    "R /data/ollama 0755 ollama ollama - -"
+    "R /data/models/ollama 0755 ollama ollama - -"
     # Ensure directory exists with correct ownership (in case it was deleted)
-    "d /data/ollama 0755 ollama ollama -"
+    "d /data/models/ollama 0755 ollama ollama -"
     "d ${unslothDataDir} 0755 lars users -"
     "d ${unslothDataDir}/workspace 0755 lars users -"
     "d ${unslothDataDir}/models 0755 lars users -"
