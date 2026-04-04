@@ -68,21 +68,17 @@ For the **most recent** and **accurate** project status, please refer to:
 
 ## 📝 Maintenance Policy
 
-**Policy**: Historical preservation with selective updates
-
-**Decision Made**: 2026-02-09
+**Policy**: Historical preservation with selective archival
 
 **Guidelines**:
 
 - Path references preserved for historical accuracy
 - New status reports use current paths
 - Only update factual errors, not historical context
-- Maintain chronological ordering for audit trail
+- Reports older than ~30 days are moved to `archive/`
 
 **Exception**: When documenting current state, always use `~/projects/SystemNix`
 
 ---
 
-**Last Updated**: 2026-02-09
-**Policy Established**: Path Reference Cleanup and Status Audit
-**Reason**: Preserve historical context while maintaining documentation accuracy
+**Last Updated**: 2026-04-04

@@ -1,4 +1,4 @@
-# Setup-Mac
+# SystemNix
 
 A comprehensive cross-platform development environment using Nix, supporting both macOS (nix-darwin) and NixOS with declarative configuration management.
 
@@ -7,14 +7,13 @@ A comprehensive cross-platform development environment using Nix, supporting bot
 This repository provides a complete, reproducible development environment for macOS and Linux with:
 
 - **Cross-Platform Nix**: Unified configurations for macOS (nix-darwin) and NixOS
-- **Type Safety System**: Comprehensive validation and assertion framework (Ghost Systems)
 - **Home Manager**: User-specific configurations and dotfiles
 - **Go Development Stack**: Complete Go toolchain with templ, sqlc, and modern tools
 - **Cloud & Kubernetes Tools**: AWS, GCP, kubectl, Helm, Terraform, and more
 - **Homebrew Integration**: Managed through nix-homebrew for GUI applications (macOS)
 - **Security Tools**: Gitleaks, Little Snitch, Lulu, age encryption
 - **Performance Tools**: Hyperfine, htop, ncdu, and comprehensive monitoring
-- **AI Development**: Complete AI/ML stack with GPU acceleration (AMD/NVIDIA)
+- **Niri Window Manager**: Wayland tiling compositor
 
 ## Home Manager Integration
 
@@ -43,7 +42,7 @@ platforms/
 │   │   └── fonts.nix         # Cross-platform fonts
 │   └── core/
 │       ├── nix-settings.nix  # Cross-platform Nix settings
-│       └── UserConfig.nix    # Cross-platform user config
+│       └── nix-settings.nix  # Cross-platform Nix settings
 ├── darwin/                    # macOS (nix-darwin) specific
 │   ├── default.nix            # Darwin system config
 │   └── home.nix              # Darwin Home Manager overrides
@@ -95,7 +94,7 @@ platforms/
 - Fish aliases: `nixup`, `nixbuild`, `nixcheck` (nixos-rebuild)
 - Session variables: Wayland, Qt, NixOS_OZONE_WL
 - Packages: pavucontrol (audio), xdg utils
-- Desktop: Hyprland window manager
+- Desktop: Niri (Wayland tiling) window manager
 
 ### Configuration Workflow
 
