@@ -126,6 +126,7 @@
     signoz-src,
     signoz-collector-src,
     nix-ssh-config,
+    crush-config,
     ...
   }: let
     goOverlay = final: prev: {
@@ -195,7 +196,7 @@
           ];
         };
 
-        formatter = pkgs.alejandra;
+        formatter = pkgs.treefmt;
 
         packages =
           {
