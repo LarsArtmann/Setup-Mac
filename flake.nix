@@ -104,6 +104,12 @@
     crush-config = {
       url = "github:LarsArtmann/crush-config";
     };
+
+    # Treefmt formatter with auto-discovery for nix fmt
+    treefmt-full-flake = {
+      url = "github:LarsArtmann/treefmt-full-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {

@@ -9,12 +9,25 @@
     authHost = "auth.${domain}";
     authPort = 9091;
 
-    forwardAuthSnippet = ''
-      forward_auth localhost:${toString authPort} {
-        uri /api/authz/forward-auth
-        copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
-      }
-    '';
+    mkClient = {
+      client_id,
+      client_name,
+      redirect_uris,
+      ...
+    }: {
+      inherit client_id client_name redirect_uris;
+      client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
+      public = false;
+      authorization_policy = "two_factor";
+      require_pkce = true;
+      pkce_challenge_method = "S256";
+      scopes = ["openid" "profile" "email" "groups"];
+      response_types = ["code"];
+      grant_types = ["authorization_code"];
+      access_token_signed_response_alg = "none";
+      userinfo_signed_response_alg = "none";
+      token_endpoint_auth_method = "client_secret_basic";
+    };
   in {
     services.authelia.instances.main = {
       enable = true;
@@ -48,7 +61,7 @@
         totp = {
           disable = false;
           issuer = "evo-x2";
-          algorithm = "SHA1";
+          algorithm = "SHA256";
           digits = 6;
           period = 30;
           skew = 1;
@@ -94,7 +107,6 @@
 
         session = {
           name = "authelia_session";
-          domain = domain;
           same_site = "lax";
           expiration = "1h";
           inactivity = "5m";
@@ -102,7 +114,7 @@
           cookies = [
             {
               name = "authelia_session";
-              domain = domain;
+              inherit domain;
               authelia_url = "https://${authHost}";
               default_redirection_url = "https://home.${domain}";
               same_site = "lax";
@@ -119,9 +131,7 @@
           ban_time = "5m";
         };
 
-        storage = {
-          local.path = "/var/lib/authelia-main/db.sqlite3";
-        };
+        storage.local.path = "/var/lib/authelia-main/db.sqlite3";
 
         notifier = {
           disable_startup_check = true;
@@ -144,7 +154,6 @@
         };
 
         identity_providers.oidc = {
-          hmac_secret = "";
           lifespans = {
             access_token = "1h";
             authorize_code = "1m";
@@ -162,62 +171,29 @@
             ];
           };
           clients = [
-            {
+            (mkClient {
               client_id = "immich";
               client_name = "Immich";
-              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
-              public = false;
-              authorization_policy = "two_factor";
-              require_pkce = true;
-              pkce_challenge_method = "S256";
               redirect_uris = [
                 "https://immich.${domain}/auth/login"
                 "https://immich.${domain}/user-settings"
                 "app.immich:///oauth-callback"
               ];
-              scopes = ["openid" "profile" "email" "groups"];
-              response_types = ["code"];
-              grant_types = ["authorization_code"];
-              access_token_signed_response_alg = "none";
-              userinfo_signed_response_alg = "none";
-              token_endpoint_auth_method = "client_secret_basic";
-            }
-            {
+            })
+            (mkClient {
               client_id = "grafana";
               client_name = "Grafana";
-              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
-              public = false;
-              authorization_policy = "two_factor";
-              require_pkce = true;
-              pkce_challenge_method = "S256";
               redirect_uris = [
                 "https://grafana.${domain}/login/generic_oauth"
               ];
-              scopes = ["openid" "profile" "email" "groups"];
-              response_types = ["code"];
-              grant_types = ["authorization_code"];
-              access_token_signed_response_alg = "none";
-              userinfo_signed_response_alg = "none";
-              token_endpoint_auth_method = "client_secret_basic";
-            }
-            {
+            })
+            (mkClient {
               client_id = "gitea";
               client_name = "Gitea";
-              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
-              public = false;
-              authorization_policy = "two_factor";
-              require_pkce = true;
-              pkce_challenge_method = "S256";
               redirect_uris = [
                 "https://gitea.${domain}/user/oauth2/authelia/callback"
               ];
-              scopes = ["openid" "profile" "email" "groups"];
-              response_types = ["code"];
-              grant_types = ["authorization_code"];
-              access_token_signed_response_alg = "none";
-              userinfo_signed_response_alg = "none";
-              token_endpoint_auth_method = "client_secret_basic";
-            }
+            })
           ];
         };
       };
@@ -232,16 +208,17 @@
       };
     };
 
-    environment.etc."authelia/users_database.yml".source = pkgs.writeText "users_database.yml" ''
-      users:
-        lars:
-          displayname: "Lars"
-          password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
-          email: "lars@auth.lan"
-          groups:
-            - admin
-            - dev
-    '';
+    environment.etc."authelia/users_database.yml".source =
+      pkgs.writeText "users_database.yml" ''
+        users:
+          lars:
+            displayname: "Lars"
+            password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
+            email: "lars@auth.lan"
+            groups:
+              - admin
+              - dev
+      '';
 
     systemd.tmpfiles.rules = [
       "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
