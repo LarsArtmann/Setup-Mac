@@ -203,7 +203,6 @@ in {
 
       (lib.mkIf cfg.components.clickhouse {
         services.clickhouse.enable = true;
-        services.clickhouse.package = pkgs.clickhouse.override { enableKeeper = true; };
         services.clickhouse.extraServerConfig = ''
           <keeper_server>
             <tcp_port>9181</tcp_port>
