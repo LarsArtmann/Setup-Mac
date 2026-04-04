@@ -38,7 +38,7 @@
     signoz = buildGoModule {
       pname = "signoz";
       inherit version;
-      src = src;
+      inherit src;
       vendorHash = "sha256-z6WdVvDvFsbQ1apEr+jHFPB+mLLZj3jeUUX92atTuUk=";
       subPackages = ["cmd/community"];
       tags = ["timetzdata"];
@@ -79,7 +79,7 @@ in {
     packages = mkPackages pkgs;
   in {
     packages = lib.optionalAttrs pkgs.stdenv.isLinux {
-      signoz = packages.signoz;
+      inherit (packages) signoz;
       signoz-otel-collector = packages.otelCollector;
       signoz-schema-migrator = packages.schemaMigrator;
     };

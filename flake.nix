@@ -254,12 +254,14 @@
           };
           modules = [
             {
-              nixpkgs.hostPlatform = "aarch64-darwin";
-              nixpkgs.config.allowUnfree = true;
-              nixpkgs.overlays = [
-                nur.overlays.default
-                awWatcherOverlay
-              ];
+              nixpkgs = {
+                hostPlatform = "aarch64-darwin";
+                config.allowUnfree = true;
+                overlays = [
+                  nur.overlays.default
+                  awWatcherOverlay
+                ];
+              };
             }
 
             # Import nix-homebrew for declarative Homebrew management
@@ -327,27 +329,25 @@
             inherit nix-ssh-config;
           };
           modules = [
-            # Core system configuration
             {
-              nixpkgs.hostPlatform = "x86_64-linux";
+              nixpkgs = {
+                hostPlatform = "x86_64-linux";
+                config.allowUnfree = true;
+                overlays = [
+                  nur.overlays.default
+                  inputs.niri.overlays.niri
+                  goOverlay
+                  awWatcherOverlay
+                  dnsblockdOverlay
+                  (final: prev: {
+                    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
+                      timm = pyPrev.timm.overridePythonAttrs (old: {doCheck = false;});
+                      xformers = pyPrev.xformers.overridePythonAttrs (old: {doCheck = false;});
+                    });
+                  })
+                ];
+              };
               system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
-              # Allow unfree packages in NixOS
-              nixpkgs.config.allowUnfree = true;
-
-              # Add NUR overlay to make nur.repos available
-              nixpkgs.overlays = [
-                nur.overlays.default
-                inputs.niri.overlays.niri
-                goOverlay
-                awWatcherOverlay
-                dnsblockdOverlay
-                (final: prev: {
-                  python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-                    timm = pyPrev.timm.overridePythonAttrs (old: {doCheck = false;});
-                    xformers = pyPrev.xformers.overridePythonAttrs (old: {doCheck = false;});
-                  });
-                })
-              ];
             }
             home-manager.nixosModules.home-manager
             nur.modules.nixos.default
