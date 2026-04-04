@@ -4,7 +4,7 @@
     pkgs,
     ...
   }: let
-    listenPort = 9091;
+    listenPort = 9090;
   in {
     services.prometheus = {
       enable = true;
