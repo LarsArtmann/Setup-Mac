@@ -33,21 +33,6 @@
         "type": "github"
       }
     },
-    "crush-config": {
-      "locked": {
-        "lastModified": 1775257678,
-        "narHash": "sha256-ImGLtZs/ca0MSqxlTiZpu5jxjFKFF7FeoEnUGPsLYHg=",
-        "ref": "refs/heads/master",
-        "rev": "36752b5cbb14bccd84d1325ad02f8b275662506c",
-        "revCount": 3,
-        "type": "git",
-        "url": "file:///home/lars/.config/crush"
-      },
-      "original": {
-        "type": "git",
-        "url": "file:///home/lars/.config/crush"
-      }
-    },
     "flake-compat": {
       "locked": {
         "lastModified": 1696426674,
@@ -588,7 +573,6 @@
     },
     "root": {
       "inputs": {
-        "crush-config": "crush-config",
         "flake-parts": "flake-parts",
         "helium": "helium",
         "home-manager": "home-manager",

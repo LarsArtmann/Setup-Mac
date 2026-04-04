@@ -101,11 +101,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    # Crush AI Agent Configuration — global AI assistant settings
-    # This ensures AGENTS.md and all references are synced across machines
-    crush-config = {
-      url = "git+file:///home/lars/.config/crush";
-    };
   };
 
   outputs = inputs @ {
@@ -128,7 +123,6 @@
     signoz-src,
     signoz-collector-src,
     nix-ssh-config,
-    crush-config,
     ...
   }: let
     goOverlay = final: prev: {
@@ -298,7 +292,6 @@
                   lib,
                   nix-colors,
                   nix-ssh-config,
-                  crush-config,
                   ...
                 }: {
                   imports = [
@@ -308,7 +301,6 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
-                  inherit crush-config;
                 };
               };
             }
@@ -329,7 +321,6 @@
             inherit niri;
             inherit otel-tui;
             inherit nix-amd-npu;
-            inherit crush-config;
             inherit nix-ssh-config;
           };
           modules = [
@@ -370,7 +361,6 @@
                   lib,
                   nix-colors,
                   nix-ssh-config,
-                  crush-config,
                   ...
                 }: {
                   imports = [
@@ -380,7 +370,6 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
-                  inherit crush-config;
                 };
               };
             }

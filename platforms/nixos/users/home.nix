@@ -2,7 +2,6 @@
   pkgs,
   lib,
   nix-ssh-config,
-  crush-config,
   ...
 }: {
   imports = [
@@ -275,10 +274,6 @@
       package = pkgs.qt6.qtbase;
     };
   };
-
-  # Crush AI Agent Configuration — symlinked from flake input
-  # This ensures AGENTS.md and all references are synced across all machines
-  home.file.".config/crush".source = crush-config;
 
   services.dunst = {
     enable = true;

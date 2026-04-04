@@ -1,7 +1,6 @@
 {
   pkgs,
   nix-ssh-config,
-  crush-config,
   config,
   ...
 }: {
@@ -52,7 +51,4 @@
     # Most packages are in common/packages/base.nix
   ];
 
-  # Crush AI Agent Configuration — symlinked from flake input
-  # This ensures AGENTS.md and all references are synced across all machines
-  home.file.".config/crush".source = crush-config;
 }
