@@ -50,5 +50,4 @@
     # Add Darwin-specific user packages if needed
     # Most packages are in common/packages/base.nix
   ];
-
 }

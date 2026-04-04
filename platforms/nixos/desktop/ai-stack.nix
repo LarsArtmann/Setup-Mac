@@ -1,9 +1,20 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: let
   inherit (pkgs.rocmPackages) rocwmma;
+
+  ollama-rocm-0_20 = pkgs.ollama-rocm.overrideAttrs (old: rec {
+    version = "0.20.0";
+    src = pkgs.fetchFromGitHub {
+      owner = "ollama";
+      repo = "ollama";
+      tag = "v${version}";
+      hash = "sha256-QQKPXdXlsT+uMGGIyqkVZqk6OTa7VHrwDVmgDdgdKOY=";
+    };
+  });
   llama-cpp-rocwmma =
     (pkgs.llama-cpp.override {
       rocmSupport = true;
@@ -51,7 +62,7 @@ in {
 
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-rocm;
+    package = ollama-rocm-0_20;
     home = "/data/models/ollama";
     host = "127.0.0.1";
     port = 11434;
@@ -230,7 +241,7 @@ in {
     after = ["network.target" "unsloth-setup.service"];
     requires = ["unsloth-setup.service"];
     wantedBy = ["multi-user.target"];
-    path = with pkgs; [git python313];
+    path = with pkgs; [git python313 llama-cpp-rocwmma];
     environment = {
       HOME = unslothDataDir;
       LD_LIBRARY_PATH = with pkgs;
