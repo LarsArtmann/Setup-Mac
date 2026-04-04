@@ -232,7 +232,8 @@ in {
           preStart = ''
             ${packages.otelCollector}/bin/signoz-otel-collector migrate sync up \
               --clickhouse-dsn "${cfg.settings.clickhouse.url}" \
-              --clickhouse-cluster "default" || true
+              --clickhouse-cluster "default" \
+              --clickhouse-replication=false || true
           '';
           serviceConfig = {
             Type = "simple";
