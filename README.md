@@ -2,25 +2,28 @@
 
 **Declarative cross-platform system configuration using Nix.**
 
-SystemNix manages both macOS (nix-darwin) and NixOS systems through a single, reproducible Nix flake. All system settings, packages, and user configurations are defined in code and applied consistently across machines.
+SystemNix manages both macOS (nix-darwin) and NixOS systems through a single, reproducible Nix flake. All system settings, packages, services, and user configurations are defined in code and applied consistently across machines.
 
 ## What You Get
 
-| Category | Tools |
-|----------|-------|
-| **Languages** | Go 1.26, Node.js, Bun, Python, Rust, Java, .NET |
-| **Cloud** | AWS CLI, GCP SDK, kubectl, Helm, Terraform |
-| **Development** | Git, GitHub CLI, JetBrains Toolbox, VS Code, tmux, Fish shell |
-| **Security** | Gitleaks, age encryption, Touch ID for sudo |
-| **Monitoring** | ActivityWatch, Netdata, ntopng |
-| **AI/ML** | ROCm support, AMD NPU driver, Python AI stack |
+| Category | Tools & Services |
+|----------|-----------------|
+| **Languages** | Go 1.26, Node.js, Bun, Python 3.13, Rust |
+| **Cloud & Infra** | AWS CLI, GCP SDK, kubectl, Helm, Terraform, Docker |
+| **Development** | Git, GitHub CLI, Git Town, JetBrains Toolbox, VS Code, Fish shell, tmux, Zellij |
+| **Desktop (NixOS)** | Niri (Wayland tiling), Waybar, SDDM, Rofi, Kitty, Dunst, swaylock |
+| **Self-Hosted Services** | Immich (photos), Gitea (Git), Grafana + Prometheus (monitoring), SigNoz (observability), Homepage Dashboard, PhotoMap AI |
+| **AI/ML** | Ollama (ROCm), Unsloth Studio, llama.cpp, AMD NPU (XDNA) driver |
+| **Security** | Gitleaks, sops-nix, AppArmor, Fail2ban, ClamAV, Touch ID for sudo (macOS) |
+| **Monitoring** | ActivityWatch, Prometheus exporters, Netdata, service health checks |
+| **Networking** | Caddy reverse proxy (TLS), Unbound DNS with 2.5M+ blocked domains, DNSSEC |
+| **Storage** | BTRFS with Timeshift snapshots, ZRAM swap, weekly scrub |
 
 ## Quick Start
 
 ### Prerequisites
 
-- macOS (Apple Silicon/Intel) or Linux with Nix installed
-- Xcode Command Line Tools (macOS)
+- macOS (Apple Silicon) or Linux (x86_64) with Nix installed
 - Administrative access
 
 ### Installation
@@ -38,34 +41,82 @@ just switch             # Apply configuration
 
 ### Target Systems
 
-| System | Configuration | Command |
-|--------|--------------|---------|
-| macOS (Lars-MacBook-Air) | `flake.nix#Lars-MacBook-Air` | `sudo darwin-rebuild switch --flake .#Lars-MacBook-Air` |
-| NixOS (evo-x2) | `flake.nix#evo-x2` | `sudo nixos-rebuild switch --flake .#evo-x2` |
+| System | Hardware | Configuration | Command |
+|--------|----------|--------------|---------|
+| macOS (Lars-MacBook-Air) | Apple Silicon | `flake.nix#Lars-MacBook-Air` | `just switch` |
+| NixOS (evo-x2) | AMD Ryzen AI Max+ 395, 128GB | `flake.nix#evo-x2` | `just switch` |
 
 ## Architecture
 
 ```
-platforms/
-├── common/              # Shared across platforms (~80% of config)
-│   ├── home-base.nix    # Home Manager base
-│   ├── programs/        # Fish, tmux, Starship, SSH, Git
-│   ├── packages/        # Cross-platform packages
-│   └── core/            # Type safety & validation
-├── darwin/              # macOS-specific (nix-darwin)
-│   ├── default.nix      # System config
-│   └── home.nix         # User config overrides
-└── nixos/               # NixOS-specific
-    ├── system/          # System configuration
-    └── users/           # User configurations
+SystemNix/
+├── flake.nix                    # Main entry point with flake-parts
+├── justfile                     # Task runner for all operations
+├── modules/nixos/services/      # NixOS service modules (Caddy, Gitea, Immich, ...)
+├── pkgs/                        # Custom Nix packages (dnsblockd, modernize, ...)
+├── platforms/
+│   ├── common/                  # Shared across platforms (~80% of config)
+│   │   ├── home-base.nix        # Home Manager base (14 program modules)
+│   │   ├── programs/            # Fish, Zsh, Bash, Nushell, Starship, Git, tmux, ...
+│   │   ├── packages/            # Cross-platform packages & fonts
+│   │   └── core/                # Nix daemon settings
+│   ├── darwin/                  # macOS-specific (nix-darwin)
+│   │   ├── default.nix          # System config
+│   │   ├── home.nix             # User config
+│   │   ├── services/            # LaunchAgents (ActivityWatch, Crush updates)
+│   │   └── programs/            # Chrome policies, shell aliases
+│   └── nixos/                   # NixOS-specific
+│       ├── system/              # Boot, networking, BTRFS snapshots, DNS blocker
+│       ├── desktop/             # Niri, Waybar, SDDM, AI stack, security hardening
+│       ├── hardware/            # AMD GPU/NPU, Bluetooth, hardware config
+│       ├── programs/            # Rofi, swaylock, wlogout, Yazi, Zellij, Chromium
+│       └── users/               # Home Manager user config
+├── scripts/                     # Operational scripts (30+)
+└── docs/                        # Architecture decisions, status reports, troubleshooting
 ```
 
-### Key Components
+## NixOS Services (evo-x2)
 
-- **flake.nix**: Main entry point defining all outputs
-- **justfile**: Task runner for all operations (use instead of raw Nix commands)
-- **Home Manager**: Unified user configuration for both platforms
-- **Ghost Systems**: Type safety framework for compile-time validation
+All services are defined as flake-parts modules and reverse-proxied through Caddy with TLS:
+
+| Service | Port | URL | Description |
+|---------|------|-----|-------------|
+| **Caddy** | 443 | `*.lan` | Reverse proxy with sops-managed TLS certs |
+| **Immich** | 2283 | `immich.lan` | Self-hosted Google Photos alternative (PostgreSQL + Redis + ML) |
+| **Gitea** | 3000 | `gitea.lan` | Self-hosted Git with GitHub mirror sync |
+| **Grafana** | 3001 | `grafana.lan` | Monitoring dashboards with Prometheus datasource |
+| **Prometheus** | 9091 | — | 30-day retention, Node/Postgres/Caddy/Redis exporters |
+| **Homepage** | 8082 | `home.lan` | Service overview dashboard |
+| **SigNoz** | — | `signoz.lan` | Observability platform (traces, metrics, logs) |
+| **PhotoMap AI** | 8050 | `photomap.lan` | AI-powered photo exploration with UMAP embeddings |
+| **DNS Blocker** | 53, 9090 | — | Unbound + dnsblockd, 25 blocklists, DNS-over-TLS upstream |
+
+### DNS Blocking
+
+- 2.5M+ blocked domains (ads, trackers, malware, telemetry, gambling)
+- Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
+- Local `.lan` DNS records for all services
+- DNSSEC enabled
+
+## NixOS Desktop
+
+- **Niri**: Scrollable-tiling Wayland compositor with 5 named workspaces
+- **Waybar**: Custom status bar with workspaces, media, weather, DNS stats, power menu
+- **SDDM**: Login manager with Catppuccin Mocha theme
+- **Theme**: Catppuccin Mocha across all applications (GTK, Qt, terminal, browser)
+- **Backup WM**: Sway configured as fallback
+
+## NixOS Hardware (evo-x2)
+
+| Component | Configuration |
+|-----------|--------------|
+| **CPU** | AMD Ryzen AI Max+ 395 (Strix Halo), amd_pstate=guided |
+| **GPU** | AMD integrated (amdgpu), Mesa latest, ROCm compute stack |
+| **NPU** | AMD XDNA via nix-amd-npu, XRT runtime |
+| **Memory** | 128GB unified, ZRAM swap (32GB), tuned for AI/ML workloads |
+| **Storage** | BTRFS root (zstd) + `/data` (zstd:3), Timeshift snapshots |
+| **Boot** | systemd-boot (50 generations), latest Linux kernel |
+| **Network** | Realtek 2.5G Ethernet, MediaTek WiFi |
 
 ## Essential Commands
 
@@ -73,81 +124,108 @@ platforms/
 # Core workflow
 just setup              # Initial setup (run once after clone)
 just switch             # Apply configuration changes
-just update             # Update packages
-just test               # Validate without applying
+just update             # Update flake inputs and packages
+just test               # Validate configuration (full build)
+just test-fast          # Syntax-only validation (fast)
 
 # Development
 just dev                # Format, lint, test
-just format             # Format code with treefmt
+just format             # Format code with treefmt + alejandra
 just health             # System health check
+just validate           # Nix flake validation
 
 # Maintenance
-just clean              # Clean caches and old packages
+just clean              # Comprehensive cleanup (caches, old packages)
 just backup             # Backup configuration
 just rollback           # Revert to previous generation
+just check              # Check for outdated packages
+
+# Go development
+just go-dev             # Full Go workflow (format, lint, test, build)
+just go-tools-version   # Show all Go tool versions
+
+# NixOS services
+just dns-diagnostics    # Full DNS diagnostics
+just immich-status       # Check Immich service status
+just immich-backup       # Run database backup
+just gitea-sync-repos    # Sync GitHub repos to Gitea
 ```
 
-## Type Safety
+## Cross-Platform Programs
 
-SystemNix uses Ghost Systems for compile-time validation:
+Shared across macOS and NixOS via `platforms/common/programs/`:
 
-```nix
-# Types.nix defines all configuration types
-# State.nix provides centralized state management
-# Validation.nix enforces constraints at evaluation time
-```
+| Program | Configuration |
+|---------|--------------|
+| **Fish** | Primary shell, shared aliases, carapace completions, 5000 history |
+| **Zsh** | Secondary shell with autosuggestions, syntax highlighting |
+| **Starship** | Prompt with Catppuccin Mocha, performance-optimized |
+| **Git** | GPG signing, SSH insteadOf HTTPS, git-town integration |
+| **tmux** | Catppuccin theme, resurrect plugin, SystemNix dev session |
+| **FZF** | Ripgrep integration, reverse layout |
+| **KeePassXC** | Browser integration (Chromium + Helium) |
+| **Chromium** | Enterprise policies, YouTube Shorts Blocker, HTTPS-only |
 
-Configuration errors are caught during build, not at runtime.
+## Flake Inputs
 
-## Nix-Managed Development Tools
+| Input | Purpose |
+|-------|---------|
+| `nixpkgs` | Package collection (unstable) |
+| `nix-darwin` | macOS system management |
+| `home-manager` | Cross-platform user configuration |
+| `flake-parts` | Modular flake architecture |
+| `niri` | Scrollable-tiling Wayland compositor |
+| `nix-homebrew` | Declarative Homebrew management (macOS) |
+| `sops-nix` | Secrets management with age encryption |
+| `nix-amd-npu` | AMD NPU (XDNA) driver |
+| `nix-ssh-config` | Shared SSH configuration |
+| `crush-config` | AI assistant configuration |
+| `nix-colors` | Declarative color schemes |
+| `silent-sddm` | SDDM theme with Catppuccin support |
 
-All tools are declared in Nix, providing:
+## CI/CD
 
-- **Reproducible**: Same versions everywhere
-- **Atomic updates**: `just update && just switch`
-- **Easy rollback**: Revert to previous tool versions
+GitHub Actions workflow (`.github/workflows/nix-check.yml`):
+- **Flake check**: `nix flake check` on macOS and Ubuntu
+- **Build**: Full Darwin build on macOS runner
+- **Syntax check**: `nix flake check --no-build` on Ubuntu
 
-Go tools (gopls, golangci-lint, buf, delve, etc.) are defined in `platforms/common/packages/base.nix`.
+### Pre-commit Hooks
 
-## Features
-
-- Declarative system configuration
-- Cross-platform (macOS + NixOS)
-- Type-safe configuration validation
-- Home Manager for user settings
-- 100+ pre-configured development tools
-- Comprehensive monitoring stack
-- Security hardening (Gitleaks, Touch ID)
-- GPU/NPU support (ROCm, AMD XDNA)
+8 hooks configured via `.pre-commit-config.yaml`:
+- **gitleaks** — secret detection
+- **alejandra** — Nix formatting
+- **deadnix** — dead code detection
+- **statix** — Nix anti-patterns
+- **trailing-whitespace** — whitespace cleanup
+- **nix-check** — flake validation
+- **flake-lock-validate** — lock file integrity
+- **check-merge-conflicts** — conflict marker detection
 
 ## Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [Setup Guide](./docs/development/setup.md) | Detailed installation instructions |
-| [Troubleshooting](./docs/troubleshooting/README.md) | Common issues and solutions |
-| [AGENTS.md](./AGENTS.md) | AI assistant guide |
+| [AGENTS.md](./AGENTS.md) | AI assistant guide and project conventions |
+| [Architecture Decisions](./docs/architecture/) | ADRs for key design choices |
 | [Project Status](./docs/project-status-summary.md) | Development milestones |
+| [Troubleshooting](./docs/troubleshooting/) | Common issues and solutions |
+| [Architecture Diagrams](./docs/architecture-understanding/) | Mermaid diagram collection |
 
 ## Troubleshooting
 
 ### Build Errors
 
 ```bash
-# Validate configuration
-just test-fast
-
-# Clean and rebuild
-just clean && just switch
+just test-fast          # Quick syntax validation
+just clean && just switch  # Clean and rebuild
 ```
 
 ### GPG Not Working
 
 ```bash
-# Install GPG via Nix
 nix profile add nixpkgs#gnupg
-
-# Path should be: ~/.nix-profile/bin/gpg
+# Path: ~/.nix-profile/bin/gpg
 ```
 
 ### Package Not Found
@@ -156,21 +234,12 @@ nix profile add nixpkgs#gnupg
 nix search nixpkgs <package-name>
 ```
 
-## Repository Structure
+### DNS Issues (NixOS)
 
-```
-SystemNix/
-├── flake.nix              # Main flake entry point
-├── justfile               # Task runner commands
-├── platforms/
-│   ├── common/           # Shared configuration
-│   ├── darwin/           # macOS configuration
-│   └── nixos/            # NixOS configuration
-├── docs/                  # Documentation
-│   ├── development/
-│   ├── troubleshooting/
-│   └── status/
-└── AGENTS.md              # AI assistant guide
+```bash
+just dns-diagnostics    # Full DNS diagnostics
+just dns-restart        # Restart DNS services
+just dns-test           # Test resolution and blocking
 ```
 
 ## Contributing
