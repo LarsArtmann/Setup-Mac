@@ -1,0 +1,252 @@
+{inputs, ...}: {
+  flake.nixosModules.authelia = {
+    config,
+    lib,
+    pkgs,
+    ...
+  }: let
+    domain = "lan";
+    authHost = "auth.${domain}";
+    authPort = 9091;
+
+    forwardAuthSnippet = ''
+      forward_auth localhost:${toString authPort} {
+        uri /api/authz/forward-auth
+        copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+      }
+    '';
+  in {
+    services.authelia.instances.main = {
+      enable = true;
+
+      secrets = {
+        jwtSecretFile = config.sops.secrets.authelia_jwt_secret.path;
+        storageEncryptionKeyFile = config.sops.secrets.authelia_storage_encryption_key.path;
+        oidcHmacSecretFile = config.sops.secrets.authelia_oidc_hmac_secret.path;
+        oidcIssuerPrivateKeyFile = config.sops.secrets.authelia_oidc_issuer_private_key.path;
+      };
+
+      settings = {
+        theme = "dark";
+        default_2fa_method = "totp";
+
+        server = {
+          address = "tcp://127.0.0.1:${toString authPort}/";
+          endpoints.enable = {
+            enable_pprof = false;
+            enable_expvars = false;
+          };
+        };
+
+        log = {
+          level = "info";
+          format = "text";
+        };
+
+        telemetry.metrics.enabled = false;
+
+        totp = {
+          disable = false;
+          issuer = "evo-x2";
+          algorithm = "SHA1";
+          digits = 6;
+          period = 30;
+          skew = 1;
+        };
+
+        webauthn = {
+          disable = false;
+          display_name = "evo-x2";
+          attestation_conveyance_preference = "indirect";
+          user_verification = "preferred";
+        };
+
+        authentication_backend = {
+          password_reset.disable = false;
+          refresh_interval = "5m";
+          file = {
+            path = "/var/lib/authelia-main/users_database.yml";
+            password = {
+              algorithm = "argon2";
+              argon2 = {
+                variant = "argon2id";
+                iterations = 3;
+                memory = 65536;
+                parallelism = 4;
+                key_length = 32;
+                salt_length = 16;
+              };
+            };
+          };
+        };
+
+        password_policy = {
+          standard = {
+            enabled = true;
+            min_length = 8;
+            max_length = 128;
+            require_uppercase = true;
+            require_lowercase = true;
+            require_number = true;
+            require_special = true;
+          };
+        };
+
+        session = {
+          name = "authelia_session";
+          domain = domain;
+          same_site = "lax";
+          expiration = "1h";
+          inactivity = "5m";
+          remember_me = "1M";
+          cookies = [
+            {
+              name = "authelia_session";
+              domain = domain;
+              authelia_url = "https://${authHost}";
+              default_redirection_url = "https://home.${domain}";
+              same_site = "lax";
+              expiration = "1h";
+              inactivity = "5m";
+              remember_me = "1M";
+            }
+          ];
+        };
+
+        regulation = {
+          max_retries = 3;
+          find_time = "2m";
+          ban_time = "5m";
+        };
+
+        storage = {
+          local.path = "/var/lib/authelia-main/db.sqlite3";
+        };
+
+        notifier = {
+          disable_startup_check = true;
+          filesystem.path = "/var/lib/authelia-main/notification.txt";
+        };
+
+        access_control = {
+          default_policy = "deny";
+          rules = [
+            {
+              domain = authHost;
+              policy = "bypass";
+            }
+            {
+              domain = "*.${domain}";
+              policy = "two_factor";
+              subject = ["user:lars"];
+            }
+          ];
+        };
+
+        identity_providers.oidc = {
+          hmac_secret = "";
+          lifespans = {
+            access_token = "1h";
+            authorize_code = "1m";
+            id_token = "1h";
+            refresh_token = "90m";
+          };
+          cors = {
+            allowed_origins = ["https://*.${domain}"];
+            endpoints = [
+              "authorization"
+              "token"
+              "revocation"
+              "introspection"
+              "userinfo"
+            ];
+          };
+          clients = [
+            {
+              client_id = "immich";
+              client_name = "Immich";
+              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
+              public = false;
+              authorization_policy = "two_factor";
+              require_pkce = true;
+              pkce_challenge_method = "S256";
+              redirect_uris = [
+                "https://immich.${domain}/auth/login"
+                "https://immich.${domain}/user-settings"
+                "app.immich:///oauth-callback"
+              ];
+              scopes = ["openid" "profile" "email" "groups"];
+              response_types = ["code"];
+              grant_types = ["authorization_code"];
+              access_token_signed_response_alg = "none";
+              userinfo_signed_response_alg = "none";
+              token_endpoint_auth_method = "client_secret_basic";
+            }
+            {
+              client_id = "grafana";
+              client_name = "Grafana";
+              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
+              public = false;
+              authorization_policy = "two_factor";
+              require_pkce = true;
+              pkce_challenge_method = "S256";
+              redirect_uris = [
+                "https://grafana.${domain}/login/generic_oauth"
+              ];
+              scopes = ["openid" "profile" "email" "groups"];
+              response_types = ["code"];
+              grant_types = ["authorization_code"];
+              access_token_signed_response_alg = "none";
+              userinfo_signed_response_alg = "none";
+              token_endpoint_auth_method = "client_secret_basic";
+            }
+            {
+              client_id = "gitea";
+              client_name = "Gitea";
+              client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
+              public = false;
+              authorization_policy = "two_factor";
+              require_pkce = true;
+              pkce_challenge_method = "S256";
+              redirect_uris = [
+                "https://gitea.${domain}/user/oauth2/authelia/callback"
+              ];
+              scopes = ["openid" "profile" "email" "groups"];
+              response_types = ["code"];
+              grant_types = ["authorization_code"];
+              access_token_signed_response_alg = "none";
+              userinfo_signed_response_alg = "none";
+              token_endpoint_auth_method = "client_secret_basic";
+            }
+          ];
+        };
+      };
+    };
+
+    systemd.services.authelia-main = {
+      after = ["sops-nix.service"];
+      requires = ["sops-nix.service"];
+      serviceConfig = {
+        StateDirectory = "authelia-main";
+        StateDirectoryMode = "0750";
+      };
+    };
+
+    environment.etc."authelia/users_database.yml".source =
+      pkgs.writeText "users_database.yml" ''
+        users:
+          lars:
+            displayname: "Lars"
+            password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
+            email: "lars@auth.lan"
+            groups:
+              - admin
+              - dev
+      '';
+
+    systemd.tmpfiles.rules = [
+      "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
+      "L+ /var/lib/authelia-main/users_database.yml - - - - /etc/authelia/users_database.yml"
+    ];
+  };
+}

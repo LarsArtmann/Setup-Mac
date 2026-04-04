@@ -162,6 +162,7 @@
 
       # Import dendritic modules - each file is a self-contained flake-parts module
       imports = [
+        ./modules/nixos/services/authelia.nix
         ./modules/nixos/services/caddy.nix
         ./modules/nixos/services/default.nix
         ./modules/nixos/services/gitea.nix
@@ -384,6 +385,7 @@
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             inputs.silent-sddm.nixosModules.default
+            inputs.self.nixosModules.authelia
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea

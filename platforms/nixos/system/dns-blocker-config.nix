@@ -239,6 +239,7 @@
   services.unbound.settings.server = {
     local-zone = [''"lan." static''];
     local-data = [
+      ''"auth.lan. IN A 192.168.1.150"''
       ''"immich.lan. IN A 192.168.1.150"''
       ''"gitea.lan. IN A 192.168.1.150"''
       ''"grafana.lan. IN A 192.168.1.150"''

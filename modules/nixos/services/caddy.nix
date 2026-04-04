@@ -6,6 +6,18 @@
   }: let
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
+    autheliaPort = 9091;
+
+    tlsConfig = ''
+      tls ${serverCert} ${serverKey}
+    '';
+
+    forwardAuth = ''
+      forward_auth localhost:${toString autheliaPort} {
+        uri /api/authz/forward-auth
+        copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+      }
+    '';
   in {
     services.caddy = {
       enable = true;
@@ -18,51 +30,65 @@
       '';
 
       virtualHosts = {
+        "auth.lan" = {
+          extraConfig = ''
+            ${tlsConfig}
+            reverse_proxy localhost:${toString autheliaPort}
+          '';
+        };
+
         "immich.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:${toString config.services.immich.port}
           '';
         };
 
         "gitea.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:3000
           '';
         };
 
         "grafana.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:3001
           '';
         };
 
         "home.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:8082
           '';
         };
 
         "photomap.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:8050
           '';
         };
 
         "unsloth.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:8888
           '';
         };
 
         "signoz.lan" = {
           extraConfig = ''
-            tls ${serverCert} ${serverKey}
+            ${tlsConfig}
+            ${forwardAuth}
             reverse_proxy localhost:8080
           '';
         };
