@@ -206,8 +206,8 @@
       after = ["sops-nix.service"];
       requires = ["sops-nix.service"];
       serviceConfig = {
-        StateDirectory = "authelia-main";
-        StateDirectoryMode = "0750";
+        StateDirectory = lib.mkForce "authelia-main";
+        StateDirectoryMode = lib.mkForce "0750";
       };
     };
 
