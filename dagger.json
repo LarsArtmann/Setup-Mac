@@ -1,0 +1,6 @@
+{
+  "name": "systemnix",
+  "sdk": "go",
+  "source": "dagger",
+  "engineVersion": "v0.18.5"
+}
