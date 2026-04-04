@@ -56,7 +56,10 @@
           format = "text";
         };
 
-        telemetry.metrics.enabled = false;
+        telemetry.metrics = {
+          enabled = true;
+          address = "tcp://127.0.0.1:9959";
+        };
 
         totp = {
           disable = false;
