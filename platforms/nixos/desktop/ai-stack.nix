@@ -5,6 +5,23 @@
 }: let
   inherit (pkgs.rocmPackages) rocwmma;
 
+  rocmEnv = {
+    ROCBLAS_USE_HIPBLASLT = "1";
+    HSA_OVERRIDE_GFX_VERSION = "11.5.1";
+    HSA_ENABLE_SDMA = "0";
+  };
+
+  rocmRuntimeLibs = with pkgs; [
+    stdenv.cc.cc.lib
+    zstd
+    rocmPackages.clr
+    rocmPackages.rocminfo
+    rocmPackages.rocrand
+    rocmPackages.rocblas
+    rocmPackages.rocm-runtime
+    rocmPackages.rocm-comgr
+  ];
+
   ollama-rocm-0_20 = pkgs.ollama-rocm.overrideAttrs (old: rec {
     version = "0.20.0";
     src = pkgs.fetchFromGitHub {
