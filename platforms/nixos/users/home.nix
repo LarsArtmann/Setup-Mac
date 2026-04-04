@@ -161,7 +161,7 @@
     # Note: xdg-utils moved to base.nix for cross-platform consistency
 
     # Desktop packages
-    kitty
+    # Note: kitty managed by programs.kitty above — don't add to packages
     dunst
     libnotify
     wlogout

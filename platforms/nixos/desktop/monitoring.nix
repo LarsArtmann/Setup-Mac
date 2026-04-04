@@ -1,9 +1,7 @@
 {pkgs, ...}: {
-  # Performance monitoring
   environment.systemPackages = with pkgs; [
-    # GPU monitoring
-    nvtopPackages.amd
     radeontop # AMD GPU specific monitor (CLI, lightweight)
+    # nvtopPackages.amd moved to hardware/amd-gpu.nix (alongside other GPU tools)
     # amdgpu_top moved to hardware/amd-gpu.nix (available system-wide)
 
     # System monitoring

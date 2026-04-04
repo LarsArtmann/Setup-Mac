@@ -1,7 +1,6 @@
 {
   pkgs,
   config,
-  lib,
   ...
 }: let
   inherit (pkgs.rocmPackages) rocwmma;
@@ -105,9 +104,8 @@ in {
   };
 
   environment.systemPackages = with pkgs; [
-    ollama
     llama-cpp-rocwmma
-    tesseract4
+    tesseract5
     poppler-utils
     jupyter
     python313
@@ -244,6 +242,7 @@ in {
     path = with pkgs; [git python313 llama-cpp-rocwmma];
     environment = {
       HOME = unslothDataDir;
+      LLAMA_SERVER_PATH = "${llama-cpp-rocwmma}/bin/llama-server";
       LD_LIBRARY_PATH = with pkgs;
         lib.makeLibraryPath [
           stdenv.cc.cc.lib

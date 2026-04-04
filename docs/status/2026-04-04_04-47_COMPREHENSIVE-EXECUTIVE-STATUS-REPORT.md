@@ -1,9 +1,9 @@
 # SystemNix — COMPREHENSIVE EXECUTIVE STATUS REPORT
 
-**Date:** 2026-04-04 04:47  
-**Report Type:** Full Comprehensive Audit & Strategic Assessment  
-**Scope:** NixOS (evo-x2) + macOS (Lars-MacBook-Air) + Infrastructure  
-**Author:** Crush AI Agent (Deep System Analysis)  
+**Date:** 2026-04-04 04:47
+**Report Type:** Full Comprehensive Audit & Strategic Assessment
+**Scope:** NixOS (evo-x2) + macOS (Lars-MacBook-Air) + Infrastructure
+**Author:** Crush AI Agent (Deep System Analysis)
 
 ---
 
@@ -157,8 +157,8 @@ These issues are **actively causing harm** or blocking critical functionality.
 
 ### 🔴 CRITICAL: Ollama Running CPU-Only (Wasting Entire GPU)
 
-**Severity:** CRITICAL — Defeats purpose of AI workstation  
-**Location:** `platforms/nixos/desktop/ai-stack.nix:52-78`  
+**Severity:** CRITICAL — Defeats purpose of AI workstation
+**Location:** `platforms/nixos/desktop/ai-stack.nix:52-78`
 **Evidence:** `dev/testing/benchmark_glm_flash_findings.md`
 
 **Symptoms:**
@@ -187,8 +187,8 @@ services.ollama.environmentVariables = {
 
 ### 🟠 HIGH: Unsloth Studio GPU Not Detected
 
-**Severity:** HIGH — Primary AI training tool non-functional  
-**Location:** `platforms/nixos/desktop/ai-stack.nix:239-271`  
+**Severity:** HIGH — Primary AI training tool non-functional
+**Location:** `platforms/nixos/desktop/ai-stack.nix:239-271`
 **Evidence:** `docs/status/2026-04-03_outstanding-issues-ai-stack.md`
 
 **Symptoms:**
@@ -206,32 +206,32 @@ torch.cuda.is_available() = False
 
 ### 🟠 HIGH: `/data` Partition Not Persisted
 
-**Severity:** HIGH — Data loss risk on reboot  
-**Location:** Missing in `hardware-configuration.nix`  
+**Severity:** HIGH — Data loss risk on reboot
+**Location:** Missing in `hardware-configuration.nix`
 **Impact:** 800GB partition with Ollama models, containers, Unsloth data — all manually mounted. **Will not survive reboot.**
 
 ---
 
 ### 🟠 HIGH: Scheduled Tasks Broken Path
 
-**Severity:** HIGH — Cron jobs silently failing  
-**Location:** `platforms/nixos/system/scheduled-tasks.nix:50`  
+**Severity:** HIGH — Cron jobs silently failing
+**Location:** `platforms/nixos/system/scheduled-tasks.nix:50`
 **Issue:** `WorkingDirectory = "/home/lars/Setup-Mac"` — old macOS project name. Should be `/home/lars/projects/SystemNix`.
 
 ---
 
 ### 🟡 MEDIUM: SigNoz Module — 0% Built
 
-**Severity:** MEDIUM — Dead code in repository  
-**Location:** `modules/nixos/services/signoz.nix`  
+**Severity:** MEDIUM — Dead code in repository
+**Location:** `modules/nixos/services/signoz.nix`
 **Issue:** All 10 Go build steps have placeholder vendor hashes. Module imports but nothing builds. Estimated 3-4 hours to iteratively fix.
 
 ---
 
 ### 🟡 MEDIUM: Flake Input Paths Are macOS-Only
 
-**Severity:** MEDIUM — Breaks NixOS evaluation  
-**Location:** `flake.nix` inputs  
+**Severity:** MEDIUM — Breaks NixOS evaluation
+**Location:** `flake.nix` inputs
 **Issue:** `nix-ssh-config` → `/Users/larsartmann/...` and `crush-config` → `/Users/larsartmann/.config/crush`. Works on MacBook, would break pure NixOS evaluation.
 
 ---
@@ -447,6 +447,6 @@ cat /proc/mounts | grep /data
 3. Execute the IMMEDIATE actions (Top 5) to activate GPU acceleration
 4. Schedule SHORT-TERM improvements for this week
 
-**Report Generated:** 2026-04-04 04:47 UTC  
-**Data Sources:** Git history, flake.nix, status documents, configuration files  
+**Report Generated:** 2026-04-04 04:47 UTC
+**Data Sources:** Git history, flake.nix, status documents, configuration files
 **Confidence Level:** High for code analysis, Medium for deployment status (information gap)

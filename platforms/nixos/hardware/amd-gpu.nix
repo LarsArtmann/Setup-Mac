@@ -35,9 +35,9 @@
 
   # KFD/DRM udev rules for GPU compute access + force high performance for AI workloads
   services.udev.extraRules = ''
-    SUBSYSTEM=="kfd", GROUP="render", MODE="0666"
-    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", GROUP="render", MODE="0666"
-    SUBSYSTEM=="drm", KERNEL=="renderD[0-9]*", GROUP="render", MODE="0666"
+    SUBSYSTEM=="kfd", GROUP="render", MODE="0660"
+    SUBSYSTEM=="drm", KERNEL=="card[0-9]*", GROUP="render", MODE="0660"
+    SUBSYSTEM=="drm", KERNEL=="renderD[0-9]*", GROUP="render", MODE="0660"
     # Force GPU to high performance DPM state (fixes 10-15% perf loss from power saving)
     SUBSYSTEM=="drm", KERNEL=="card*", ATTR{device/power_dpm_force_performance_level}="high"
   '';

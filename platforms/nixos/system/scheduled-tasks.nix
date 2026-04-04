@@ -47,7 +47,7 @@
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.writeShellScript "blocklist-hash-updater" (builtins.readFile ../scripts/blocklist-hash-updater)}";
-          WorkingDirectory = "/home/lars/Setup-Mac";
+          WorkingDirectory = "/home/lars/projects/SystemNix";
           User = "lars";
           StandardOutput = "journal";
           StandardError = "journal";
