@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Comprehensive Maintenance Script for Setup-Mac Project
+# Comprehensive Maintenance Script for SystemNix
 # =====================================================
 # Automated maintenance tasks for optimal system performance
 # Includes scheduling, reporting, and safety checks
@@ -489,16 +489,16 @@ setup_schedule() {
     crontab -l 2>/dev/null > "$temp_cron" || true
 
     # Remove existing maintenance jobs
-    grep -v "# Setup-Mac maintenance" "$temp_cron" > "${temp_cron}.new" || true
+    grep -v "# SystemNix maintenance" "$temp_cron" > "${temp_cron}.new" || true
     mv "${temp_cron}.new" "$temp_cron"
 
     # Add new maintenance jobs
     cat >> "$temp_cron" << EOF
-# Setup-Mac maintenance jobs
-0 2 * * * cd $PROJECT_DIR && $0 health-check --level $MAINTENANCE_LEVEL # Setup-Mac maintenance
-0 3 * * 0 cd $PROJECT_DIR && $0 cleanup --level $MAINTENANCE_LEVEL # Setup-Mac maintenance
-0 1 1 * * cd $PROJECT_DIR && $0 optimize --level $MAINTENANCE_LEVEL # Setup-Mac maintenance
-0 4 * * 0 cd $PROJECT_DIR && $0 backup # Setup-Mac maintenance
+# SystemNix maintenance jobs
+0 2 * * * cd $PROJECT_DIR && $0 health-check --level $MAINTENANCE_LEVEL # SystemNix maintenance
+0 3 * * 0 cd $PROJECT_DIR && $0 cleanup --level $MAINTENANCE_LEVEL # SystemNix maintenance
+0 1 1 * * cd $PROJECT_DIR && $0 optimize --level $MAINTENANCE_LEVEL # SystemNix maintenance
+0 4 * * 0 cd $PROJECT_DIR && $0 backup # SystemNix maintenance
 EOF
 
     # Install cron jobs
@@ -513,7 +513,7 @@ EOF
     log_info "  • Weekly backup on Sundays at 4:00 AM"
 
     log_info "To view scheduled jobs: crontab -l"
-    log_info "To remove scheduled jobs: crontab -e (then delete lines ending with '# Setup-Mac maintenance')"
+    log_info "To remove scheduled jobs: crontab -e (then delete lines ending with '# SystemNix maintenance')"
 }
 
 # Get default tasks based on maintenance level

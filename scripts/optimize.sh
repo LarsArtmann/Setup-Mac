@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Automated Performance Optimization Script for Setup-Mac Project
+# Automated Performance Optimization Script for SystemNix
 # ==============================================================
 # Applies various performance optimizations based on system analysis
 # Supports different optimization profiles and safe rollback

@@ -139,7 +139,7 @@
         fi
 
         # Check common locations
-        for dir in "$HOME/Setup-Mac" "$HOME/projects/SystemNix" "$HOME/SystemNix"; do
+        for dir in "$HOME/projects/SystemNix" "$HOME/SystemNix" "$HOME/Setup-Mac"; do
           if [[ -d "$dir/platforms/nixos/secrets" ]]; then
             echo "$dir"
             return 0

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Comprehensive Cleanup Script for Setup-Mac Project
+# Comprehensive Cleanup Script for SystemNix
 # ================================================
 # Removes temporary files, logs, caches, and old backups
 # Supports dry-run mode for safety
@@ -51,7 +51,7 @@ log_verbose() {
 # Help function
 show_help() {
     cat << EOF
-Cleanup Script for Setup-Mac Project
+Cleanup Script for SystemNix
 
 USAGE:
     $0 [OPTIONS]

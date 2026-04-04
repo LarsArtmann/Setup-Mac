@@ -310,7 +310,7 @@
               };
             }
 
-            # Core Darwin configuration with Ghost Systems integration
+            # Core Darwin configuration
             ./platforms/darwin/default.nix
           ];
         };

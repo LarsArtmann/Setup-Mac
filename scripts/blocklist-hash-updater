@@ -3,8 +3,8 @@
 # Runs weekly via systemd timer
 set -euo pipefail
 
-CONFIG="/home/lars/Setup-Mac/platforms/nixos/system/dns-blocker-config.nix"
-FLAKE_DIR="/home/lars/Setup-Mac"
+CONFIG="/home/lars/projects/SystemNix/platforms/nixos/system/dns-blocker-config.nix"
+FLAKE_DIR="/home/lars/projects/SystemNix"
 
 log() { echo "[blocklist-updater] $*"; }
 
