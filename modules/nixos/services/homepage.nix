@@ -56,6 +56,12 @@
 
     environment.etc."homepage/services.yaml".source = pkgs.writeText "homepage-services.yaml" ''
       - Infrastructure:
+          - Authelia:
+              href: https://auth.lan
+              description: SSO & Identity Provider
+              icon: authelia.png
+              statusStyle: dot
+              siteMonitor: https://auth.lan/api/health
           - Caddy:
               href: https://home.lan
               description: Reverse Proxy
@@ -130,7 +136,7 @@
               description: Metrics Collection
               icon: prometheus.png
               statusStyle: dot
-              siteMonitor: http://localhost:9091/-/healthy
+              siteMonitor: http://localhost:9090/-/healthy
           - Node Exporter:
               description: System Metrics Agent
               icon: prometheus.png
