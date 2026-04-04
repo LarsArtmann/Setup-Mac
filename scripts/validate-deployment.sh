@@ -197,50 +197,34 @@ validate_amd_gpu() {
     fi
 }
 
-# Validate Hyprland desktop configuration
-validate_hyprland() {
-    log "Validating Hyprland desktop configuration..."
+# Validate Niri desktop configuration
+validate_niri() {
+    log "Validating Niri desktop configuration..."
 
     local desktop_config_errors=0
 
-    # Check Hyprland system configuration
-    if grep -E "programs\.hyprland\.enable.*true" dotfiles/nixos/configuration.nix > /dev/null; then
-        log "✓ Hyprland enabled at system level"
+    # Check Niri system configuration
+    if grep -rE "programs\.niri\.enable.*=.*true" platforms/nixos/desktop/ > /dev/null 2>&1; then
+        log "✓ Niri enabled at system level"
     else
-        error "✗ Hyprland not enabled at system level"
-        ((desktop_config_errors++))
-    fi
-
-    # Check X11 server configuration
-    if grep -E "services\.xserver\.enable.*true" dotfiles/nixos/configuration.nix > /dev/null; then
-        log "✓ X11 server enabled for Xwayland support"
-    else
-        error "✗ X11 server not enabled (needed for Xwayland)"
+        error "✗ Niri not enabled at system level"
         ((desktop_config_errors++))
     fi
 
     # Check display manager configuration
-    if grep -E "services\.displayManager\.sddm\.enable.*true" dotfiles/nixos/configuration.nix > /dev/null; then
+    if grep -rE "services\.displayManager\.sddm\.enable.*=.*true" platforms/nixos/desktop/ > /dev/null 2>&1; then
         log "✓ SDDM display manager enabled"
     else
         error "✗ SDDM display manager not enabled"
         ((desktop_config_errors++))
     fi
 
-    # Check home manager Hyprland configuration
-    if grep -E "wayland\.windowManager\.hyprland\.enable.*true" platforms/nixos/desktop/hyprland.nix > /dev/null; then
-        log "✓ Hyprland enabled in Home Manager"
-    else
-        error "✗ Hyprland not enabled in Home Manager"
-        ((desktop_config_errors++))
-    fi
-
     if [[ $desktop_config_errors -eq 0 ]]; then
-        success "Hyprland desktop configuration validation passed"
+        success "Niri desktop configuration validation passed"
         track_test "pass"
         return 0
     else
-        error "Hyprland desktop configuration validation failed: $desktop_config_errors errors"
+        error "Niri desktop configuration validation failed: $desktop_config_errors errors"
         track_test "fail"
         return 1
     fi
@@ -474,7 +458,7 @@ EOF
         echo "1. Deploy to evo-x2 hardware" >> "$REPORT_FILE"
         echo "2. Run: sudo nixos-rebuild switch --flake .#evo-x2" >> "$REPORT_FILE"
         echo "3. Verify all services are running" >> "$REPORT_FILE"
-        echo "4. Test Hyprland desktop environment" >> "$REPORT_FILE"
+        echo "4. Test Niri desktop environment" >> "$REPORT_FILE"
         echo "5. Validate AMD GPU performance" >> "$REPORT_FILE"
     else
         echo "❌ CONFIGURATION IS NOT READY FOR DEPLOYMENT" >> "$REPORT_FILE"
@@ -545,7 +529,7 @@ main() {
     validate_nixos_config
     validate_boot_config
     validate_amd_gpu
-    validate_hyprland
+    validate_niri
     validate_ssh_hardening
     validate_user_config
     validate_security_config

@@ -230,6 +230,8 @@
               shellcheck
               just # Task runner
               statix
+              gitleaks
+              jq
             ];
             # Shell hook to provide jscpd command via bunx
             shellHook = ''
