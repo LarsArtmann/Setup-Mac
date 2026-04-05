@@ -242,7 +242,7 @@
 
         server = {
           HTTP_PORT = 3000;
-          ROOT_URL = "http://gitea.home.lan/";
+          ROOT_URL = "https://gitea.home.lan/";
           DOMAIN = "gitea.home.lan";
         };
 
