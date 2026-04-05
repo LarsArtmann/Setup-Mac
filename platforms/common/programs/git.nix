@@ -234,8 +234,11 @@ _: {
       "*_templ.go" ## https://templ.guide/
       "*.sql.go" ## https://sqlc.dev
 
-      # Nix
+      # github.com:LarsArtmann/auto-deduplicate
       ".auto-deduplicate.lock"
+
+      # AI tools
+      ".crush"
     ];
   };
 }
