@@ -232,6 +232,8 @@ in {
     };
 
     systemd = {
+      services.unbound.reloadIfChanged = true;
+
       tmpfiles.rules =
         [
           "d /var/lib/dnsblockd 0755 root root -"
@@ -264,26 +266,41 @@ in {
           delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
             ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
           '';
-          dnsblockdCmd =
-            "${pkgs.dnsblockd}/bin/dnsblockd"
-            + " -addr $(${detectIPScript})"
-            + " -port ${toString cfg.blockPort}"
-            + " -tls-port ${toString cfg.blockTLSPort}"
-            + " -ca-cert ${config.sops.secrets.dnsblockd_ca_cert.path}"
-            + " -ca-key ${config.sops.secrets.dnsblockd_ca_key.path}"
-            + " -stats-addr 127.0.0.1"
-            + " -stats-port ${toString cfg.statsPort}"
-            + " -blocklist-mapping ${processedBlocklist}/mapping.json"
-            + " -unbound-control ${pkgs.unbound}/bin/unbound-control"
-            + " -unbound-socket /run/unbound/unbound.ctl"
-            + " -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf"
-            + (
-              if cfg.categories != {}
-              then " -categories ${categoriesJSON}"
-              else ""
-            );
+          caCert = config.sops.secrets.dnsblockd_ca_cert.path;
+          caKey = config.sops.secrets.dnsblockd_ca_key.path;
           dnsblockdWrapper = pkgs.writeShellScript "dnsblockd-start" ''
-            exec ${dnsblockdCmd}
+            set -euo pipefail
+
+            for i in $(${pkgs.coreutils}/bin/seq 1 60); do
+              if [ -s "${caCert}" ] && [ -s "${caKey}" ]; then
+                break
+              fi
+              if [ "$i" -eq 60 ]; then
+                echo "ERROR: sops secrets not available after 60s" >&2
+                exit 1
+              fi
+              sleep 1
+            done
+
+            IP=$(${detectIPScript})
+            if [ -z "$IP" ]; then
+              echo "ERROR: No IP detected on ${cfg.blockInterface}" >&2
+              exit 1
+            fi
+
+            exec ${pkgs.dnsblockd}/bin/dnsblockd \
+              -addr "$IP" \
+              -port ${toString cfg.blockPort} \
+              -tls-port ${toString cfg.blockTLSPort} \
+              -ca-cert "${caCert}" \
+              -ca-key "${caKey}" \
+              -stats-addr 127.0.0.1 \
+              -stats-port ${toString cfg.statsPort} \
+              -blocklist-mapping ${processedBlocklist}/mapping.json \
+              -unbound-control ${pkgs.unbound}/bin/unbound-control \
+              -unbound-socket /run/unbound/unbound.ctl \
+              -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf \
+              ${lib.optionalString (cfg.categories != {}) "-categories ${categoriesJSON}"}
           '';
         in
           {
