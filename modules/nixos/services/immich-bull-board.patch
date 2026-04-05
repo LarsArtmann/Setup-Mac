@@ -1,0 +1,696 @@
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index ab8ae8f08..931f516b4 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -340,6 +340,15 @@ importers:
+ 
+   server:
+     dependencies:
++      '@bull-board/api':
++        specifier: ^6.20.6
++        version: 6.20.6(@bull-board/ui@6.20.6)
++      '@bull-board/express':
++        specifier: ^6.20.6
++        version: 6.20.6
++      '@bull-board/nestjs':
++        specifier: ^6.20.6
++        version: 6.20.6(@bull-board/api@6.20.6(@bull-board/ui@6.20.6))(@nestjs/bull-shared@11.0.4(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17))(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+       '@extism/extism':
+         specifier: 2.0.0-rc13
+         version: 2.0.0-rc13
+@@ -589,7 +598,7 @@ importers:
+     devDependencies:
+       '@eslint/js':
+         specifier: ^10.0.0
+-        version: 10.0.1(eslint@10.1.0(jiti@2.6.1))
++        version: 10.0.1(eslint@10.1.0(jiti@1.21.7))
+       '@nestjs/cli':
+         specifier: ^11.0.2
+         version: 11.0.16(@swc/core@1.15.18(@swc/helpers@0.5.17))(@types/node@24.12.0)(esbuild@0.27.4)
+@@ -676,19 +685,19 @@ importers:
+         version: 13.15.10
+       '@vitest/coverage-v8':
+         specifier: ^3.0.0
+-        version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
++        version: 3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@1.21.7)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
+       eslint:
+         specifier: ^10.0.0
+-        version: 10.1.0(jiti@2.6.1)
++        version: 10.1.0(jiti@1.21.7)
+       eslint-config-prettier:
+         specifier: ^10.1.8
+-        version: 10.1.8(eslint@10.1.0(jiti@2.6.1))
++        version: 10.1.8(eslint@10.1.0(jiti@1.21.7))
+       eslint-plugin-prettier:
+         specifier: ^5.1.3
+-        version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@2.6.1)))(eslint@10.1.0(jiti@2.6.1))(prettier@3.8.1)
++        version: 5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@1.21.7)))(eslint@10.1.0(jiti@1.21.7))(prettier@3.8.1)
+       eslint-plugin-unicorn:
+         specifier: ^63.0.0
+-        version: 63.0.0(eslint@10.1.0(jiti@2.6.1))
++        version: 63.0.0(eslint@10.1.0(jiti@1.21.7))
+       globals:
+         specifier: ^17.0.0
+         version: 17.4.0
+@@ -724,16 +733,16 @@ importers:
+         version: 5.9.3
+       typescript-eslint:
+         specifier: ^8.28.0
+-        version: 8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)
++        version: 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
+       unplugin-swc:
+         specifier: ^1.4.5
+         version: 1.5.9(@swc/core@1.15.18(@swc/helpers@0.5.17))(rollup@4.55.1)
+       vite-tsconfig-paths:
+         specifier: ^6.0.0
+-        version: 6.1.1(typescript@5.9.3)(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
++        version: 6.1.1(typescript@5.9.3)(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
+       vitest:
+         specifier: ^3.0.0
+-        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@1.21.7)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+ 
+   web:
+     dependencies:
+@@ -1714,6 +1723,27 @@ packages:
+   '@braintree/sanitize-url@7.1.1':
+     resolution: {integrity: sha512-i1L7noDNxtFyL5DmZafWy1wRVhGehQmzZaz1HiN5e7iylJMSZR7ekOV7NsIqa5qBldlLrsKv4HbgFUVlQrz8Mw==}
+ 
++  '@bull-board/api@6.20.6':
++    resolution: {integrity: sha512-B/9OlKWJ/He421Lyuc7htMpKN4R8hcNu5uoIRiyh9y9J0kMOfxfs82GKXdfR9R0595LvAcCOSvjn8EtWHXesTA==}
++    peerDependencies:
++      '@bull-board/ui': 6.20.6
++
++  '@bull-board/express@6.20.6':
++    resolution: {integrity: sha512-QBOjhi3jR4qIJvLCo++DdL0CyG4umiFXBCPJYr74DmRN41m27rDS3NSf7ceHdbQr9Ol8mw3xbVqGLn50x3QdWQ==}
++
++  '@bull-board/nestjs@6.20.6':
++    resolution: {integrity: sha512-jWXvn4cbRwlLlp4/+PIXJniP/blK0Dt8EphmN3k7SPwWG1yQiDGxLVA2ZbynjfwGE/weN73+i4WVR+7IuvK7WA==}
++    peerDependencies:
++      '@bull-board/api': ^6.20.6
++      '@nestjs/bull-shared': ^10.0.0 || ^11.0.0
++      '@nestjs/common': ^9.0.0 || ^10.0.0 || ^11.0.0
++      '@nestjs/core': ^9.0.0 || ^10.0.0 || ^11.0.0
++      reflect-metadata: ^0.1.13 || ^0.2.0
++      rxjs: ^7.8.1
++
++  '@bull-board/ui@6.20.6':
++    resolution: {integrity: sha512-nEXRgMHHd48ssINgvDqT7b4p/+57XRf3CUcTGQ7UIJb4F7n/kRRj8+ZQvQmMFsYGdNmbNU2eNheQ05vXSYiqdQ==}
++
+   '@chevrotain/cst-dts-gen@11.0.3':
+     resolution: {integrity: sha512-BvIKpRLeS/8UbfxXxgC33xOumsacaeCKAjAeLyOn7Pcp95HiRbrpl14S+9vaZLolnbssPIUuiUd8IvgkRyt6NQ==}
+ 
+@@ -6990,6 +7020,11 @@ packages:
+   ee-first@1.1.1:
+     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
+ 
++  ejs@3.1.10:
++    resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
++    engines: {node: '>=0.10.0'}
++    hasBin: true
++
+   electron-to-chromium@1.5.302:
+     resolution: {integrity: sha512-sM6HAN2LyK82IyPBpznDRqlTQAtuSaO+ShzFiWTvoMJLHyZ+Y39r8VMfHzwbU8MVBzQ4Wdn85+wlZl2TLGIlwg==}
+ 
+@@ -7453,6 +7488,9 @@ packages:
+     resolution: {integrity: sha512-DLkUvGwep3poOV2wpzbHCOnSKGk1LzyXTv+aHFgN2VFl96wnp8YA9YjO2qPzg5PuL8q/SW9Pdi6WTkYOIh995w==}
+     engines: {node: '>=20'}
+ 
++  filelist@1.0.6:
++    resolution: {integrity: sha512-5giy2PkLYY1cP39p17Ech+2xlpTRL9HLspOfEgm0L6CwBXBTgsK5ou0JtzYuepxkaQ/tvhCFIJ5uXo0OrM2DxA==}
++
+   fill-range@7.1.1:
+     resolution: {integrity: sha512-YsGpe3WHLK8ZYi4tWDg2Jy3ebRz2rXowDxnld4bkQB00cc/1Zw9AWnC0i9ztDJitivtQvaI9KaLyKrc+hBW0yg==}
+     engines: {node: '>=8'}
+@@ -8331,6 +8369,11 @@ packages:
+     resolution: {integrity: sha512-zptv57P3GpL+O0I7VdMJNBZCu+BPHVQUk55Ft8/QCJjTVxrnJHuVuX/0Bl2A6/+2oyR/ZMEuFKwmzqqZ/U5nPQ==}
+     engines: {node: 20 || >=22}
+ 
++  jake@10.9.4:
++    resolution: {integrity: sha512-wpHYzhxiVQL+IV05BLE2Xn34zW1S223hvjtqk0+gsPrwd/8JNLXJgZZM/iPFsYc1xyphF+6M6EvdE5E9MBGkDA==}
++    engines: {node: '>=10'}
++    hasBin: true
++
+   jest-util@29.7.0:
+     resolution: {integrity: sha512-z6EbKajIpqGKU56y5KBUgy1dt1ihhQJgWzUlZHArA/+X2ad7Cb5iF+AK1EWVL/Bo7Rz9uurpqw6SiBCefUbCGA==}
+     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+@@ -10576,6 +10619,9 @@ packages:
+     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+     engines: {node: '>=4'}
+ 
++  redis-info@3.1.0:
++    resolution: {integrity: sha512-ER4L9Sh/vm63DkIE0bkSjxluQlioBiBgf5w1UuldaW/3vPcecdljVDisZhmnCMvsxHNiARTTDDHGg9cGwTfrKg==}
++
+   redis-parser@3.0.0:
+     resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
+     engines: {node: '>=4'}
+@@ -13438,6 +13484,33 @@ snapshots:
+ 
+   '@braintree/sanitize-url@7.1.1': {}
+ 
++  '@bull-board/api@6.20.6(@bull-board/ui@6.20.6)':
++    dependencies:
++      '@bull-board/ui': 6.20.6
++      redis-info: 3.1.0
++
++  '@bull-board/express@6.20.6':
++    dependencies:
++      '@bull-board/api': 6.20.6(@bull-board/ui@6.20.6)
++      '@bull-board/ui': 6.20.6
++      ejs: 3.1.10
++      express: 5.2.1
++    transitivePeerDependencies:
++      - supports-color
++
++  '@bull-board/nestjs@6.20.6(@bull-board/api@6.20.6(@bull-board/ui@6.20.6))(@nestjs/bull-shared@11.0.4(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17))(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17)(reflect-metadata@0.2.2)(rxjs@7.8.2)':
++    dependencies:
++      '@bull-board/api': 6.20.6(@bull-board/ui@6.20.6)
++      '@nestjs/bull-shared': 11.0.4(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.17)
++      '@nestjs/common': 11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
++      '@nestjs/core': 11.1.17(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.17)(@nestjs/websockets@11.1.17)(reflect-metadata@0.2.2)(rxjs@7.8.2)
++      reflect-metadata: 0.2.2
++      rxjs: 7.8.2
++
++  '@bull-board/ui@6.20.6':
++    dependencies:
++      '@bull-board/api': 6.20.6(@bull-board/ui@6.20.6)
++
+   '@chevrotain/cst-dts-gen@11.0.3':
+     dependencies:
+       '@chevrotain/gast': 11.0.3
+@@ -14857,6 +14930,11 @@ snapshots:
+   '@esbuild/win32-x64@0.27.4':
+     optional: true
+ 
++  '@eslint-community/eslint-utils@4.9.1(eslint@10.1.0(jiti@1.21.7))':
++    dependencies:
++      eslint: 10.1.0(jiti@1.21.7)
++      eslint-visitor-keys: 3.4.3
++
+   '@eslint-community/eslint-utils@4.9.1(eslint@10.1.0(jiti@2.6.1))':
+     dependencies:
+       eslint: 10.1.0(jiti@2.6.1)
+@@ -14880,6 +14958,10 @@ snapshots:
+     dependencies:
+       '@types/json-schema': 7.0.15
+ 
++  '@eslint/js@10.0.1(eslint@10.1.0(jiti@1.21.7))':
++    optionalDependencies:
++      eslint: 10.1.0(jiti@1.21.7)
++
+   '@eslint/js@10.0.1(eslint@10.1.0(jiti@2.6.1))':
+     optionalDependencies:
+       eslint: 10.1.0(jiti@2.6.1)
+@@ -17444,6 +17526,22 @@ snapshots:
+     dependencies:
+       '@types/yargs-parser': 21.0.3
+ 
++  '@typescript-eslint/eslint-plugin@8.57.1(@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)':
++    dependencies:
++      '@eslint-community/regexpp': 4.12.2
++      '@typescript-eslint/parser': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      '@typescript-eslint/scope-manager': 8.57.1
++      '@typescript-eslint/type-utils': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      '@typescript-eslint/utils': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      '@typescript-eslint/visitor-keys': 8.57.1
++      eslint: 10.1.0(jiti@1.21.7)
++      ignore: 7.0.5
++      natural-compare: 1.4.0
++      ts-api-utils: 2.5.0(typescript@5.9.3)
++      typescript: 5.9.3
++    transitivePeerDependencies:
++      - supports-color
++
+   '@typescript-eslint/eslint-plugin@8.57.1(@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3))(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)':
+     dependencies:
+       '@eslint-community/regexpp': 4.12.2
+@@ -17460,6 +17558,18 @@ snapshots:
+     transitivePeerDependencies:
+       - supports-color
+ 
++  '@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)':
++    dependencies:
++      '@typescript-eslint/scope-manager': 8.57.1
++      '@typescript-eslint/types': 8.57.1
++      '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
++      '@typescript-eslint/visitor-keys': 8.57.1
++      debug: 4.4.3
++      eslint: 10.1.0(jiti@1.21.7)
++      typescript: 5.9.3
++    transitivePeerDependencies:
++      - supports-color
++
+   '@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)':
+     dependencies:
+       '@typescript-eslint/scope-manager': 8.57.1
+@@ -17490,6 +17600,18 @@ snapshots:
+     dependencies:
+       typescript: 5.9.3
+ 
++  '@typescript-eslint/type-utils@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)':
++    dependencies:
++      '@typescript-eslint/types': 8.57.1
++      '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
++      '@typescript-eslint/utils': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      debug: 4.4.3
++      eslint: 10.1.0(jiti@1.21.7)
++      ts-api-utils: 2.5.0(typescript@5.9.3)
++      typescript: 5.9.3
++    transitivePeerDependencies:
++      - supports-color
++
+   '@typescript-eslint/type-utils@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)':
+     dependencies:
+       '@typescript-eslint/types': 8.57.1
+@@ -17519,6 +17641,17 @@ snapshots:
+     transitivePeerDependencies:
+       - supports-color
+ 
++  '@typescript-eslint/utils@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)':
++    dependencies:
++      '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0(jiti@1.21.7))
++      '@typescript-eslint/scope-manager': 8.57.1
++      '@typescript-eslint/types': 8.57.1
++      '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
++      eslint: 10.1.0(jiti@1.21.7)
++      typescript: 5.9.3
++    transitivePeerDependencies:
++      - supports-color
++
+   '@typescript-eslint/utils@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)':
+     dependencies:
+       '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0(jiti@2.6.1))
+@@ -17539,7 +17672,7 @@ snapshots:
+ 
+   '@vercel/oidc@3.0.5': {}
+ 
+-  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))':
++  '@vitest/coverage-v8@3.2.4(vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@1.21.7)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))':
+     dependencies:
+       '@ampproject/remapping': 2.3.0
+       '@bcoe/v8-coverage': 1.0.2
+@@ -17554,7 +17687,7 @@ snapshots:
+       std-env: 3.10.0
+       test-exclude: 7.0.2
+       tinyrainbow: 2.0.0
+-      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++      vitest: 3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@1.21.7)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+     transitivePeerDependencies:
+       - supports-color
+ 
+@@ -17603,13 +17736,13 @@ snapshots:
+       chai: 6.2.2
+       tinyrainbow: 3.1.0
+ 
+-  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))':
++  '@vitest/mocker@3.2.4(vite@7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))':
+     dependencies:
+       '@vitest/spy': 3.2.4
+       estree-walker: 3.0.3
+       magic-string: 0.30.21
+     optionalDependencies:
+-      vite: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++      vite: 7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+ 
+   '@vitest/mocker@4.1.0(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))':
+     dependencies:
+@@ -19383,6 +19516,10 @@ snapshots:
+ 
+   ee-first@1.1.1: {}
+ 
++  ejs@3.1.10:
++    dependencies:
++      jake: 10.9.4
++
+   electron-to-chromium@1.5.302: {}
+ 
+   emoji-regex@10.6.0: {}
+@@ -19613,6 +19750,10 @@ snapshots:
+ 
+   escape-string-regexp@5.0.0: {}
+ 
++  eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@1.21.7)):
++    dependencies:
++      eslint: 10.1.0(jiti@1.21.7)
++
+   eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@2.6.1)):
+     dependencies:
+       eslint: 10.1.0(jiti@2.6.1)
+@@ -19628,6 +19769,16 @@ snapshots:
+       lodash.memoize: 4.1.2
+       semver: 7.7.4
+ 
++  eslint-plugin-prettier@5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@1.21.7)))(eslint@10.1.0(jiti@1.21.7))(prettier@3.8.1):
++    dependencies:
++      eslint: 10.1.0(jiti@1.21.7)
++      prettier: 3.8.1
++      prettier-linter-helpers: 1.0.1
++      synckit: 0.11.12
++    optionalDependencies:
++      '@types/eslint': 9.6.1
++      eslint-config-prettier: 10.1.8(eslint@10.1.0(jiti@1.21.7))
++
+   eslint-plugin-prettier@5.5.5(@types/eslint@9.6.1)(eslint-config-prettier@10.1.8(eslint@10.1.0(jiti@2.6.1)))(eslint@10.1.0(jiti@2.6.1))(prettier@3.8.1):
+     dependencies:
+       eslint: 10.1.0(jiti@2.6.1)
+@@ -19656,6 +19807,26 @@ snapshots:
+     transitivePeerDependencies:
+       - ts-node
+ 
++  eslint-plugin-unicorn@63.0.0(eslint@10.1.0(jiti@1.21.7)):
++    dependencies:
++      '@babel/helper-validator-identifier': 7.28.5
++      '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0(jiti@1.21.7))
++      change-case: 5.4.4
++      ci-info: 4.3.1
++      clean-regexp: 1.0.0
++      core-js-compat: 3.47.0
++      eslint: 10.1.0(jiti@1.21.7)
++      find-up-simple: 1.0.1
++      globals: 16.5.0
++      indent-string: 5.0.0
++      is-builtin-module: 5.0.0
++      jsesc: 3.1.0
++      pluralize: 8.0.0
++      regexp-tree: 0.1.27
++      regjsparser: 0.13.0
++      semver: 7.7.4
++      strip-indent: 4.1.1
++
+   eslint-plugin-unicorn@63.0.0(eslint@10.1.0(jiti@2.6.1)):
+     dependencies:
+       '@babel/helper-validator-identifier': 7.28.5
+@@ -19699,6 +19870,43 @@ snapshots:
+ 
+   eslint-visitor-keys@5.0.1: {}
+ 
++  eslint@10.1.0(jiti@1.21.7):
++    dependencies:
++      '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0(jiti@1.21.7))
++      '@eslint-community/regexpp': 4.12.2
++      '@eslint/config-array': 0.23.3
++      '@eslint/config-helpers': 0.5.3
++      '@eslint/core': 1.1.1
++      '@eslint/plugin-kit': 0.6.1
++      '@humanfs/node': 0.16.7
++      '@humanwhocodes/module-importer': 1.0.1
++      '@humanwhocodes/retry': 0.4.3
++      '@types/estree': 1.0.8
++      ajv: 6.14.0
++      cross-spawn: 7.0.6
++      debug: 4.4.3
++      escape-string-regexp: 4.0.0
++      eslint-scope: 9.1.2
++      eslint-visitor-keys: 5.0.1
++      espree: 11.2.0
++      esquery: 1.7.0
++      esutils: 2.0.3
++      fast-deep-equal: 3.1.3
++      file-entry-cache: 8.0.0
++      find-up: 5.0.0
++      glob-parent: 6.0.2
++      ignore: 5.3.2
++      imurmurhash: 0.1.4
++      is-glob: 4.0.3
++      json-stable-stringify-without-jsonify: 1.0.1
++      minimatch: 10.2.4
++      natural-compare: 1.4.0
++      optionator: 0.9.4
++    optionalDependencies:
++      jiti: 1.21.7
++    transitivePeerDependencies:
++      - supports-color
++
+   eslint@10.1.0(jiti@2.6.1):
+     dependencies:
+       '@eslint-community/eslint-utils': 4.9.1(eslint@10.1.0(jiti@2.6.1))
+@@ -20047,6 +20255,10 @@ snapshots:
+     transitivePeerDependencies:
+       - supports-color
+ 
++  filelist@1.0.6:
++    dependencies:
++      minimatch: 5.1.9
++
+   fill-range@7.1.1:
+     dependencies:
+       to-regex-range: 5.0.1
+@@ -21064,6 +21276,12 @@ snapshots:
+     dependencies:
+       '@isaacs/cliui': 8.0.2
+ 
++  jake@10.9.4:
++    dependencies:
++      async: 3.2.6
++      filelist: 1.0.6
++      picocolors: 1.1.1
++
+   jest-util@29.7.0:
+     dependencies:
+       '@jest/types': 29.6.3
+@@ -23725,6 +23943,10 @@ snapshots:
+ 
+   redis-errors@1.2.0: {}
+ 
++  redis-info@3.1.0:
++    dependencies:
++      lodash: 4.18.1
++
+   redis-parser@3.0.0:
+     dependencies:
+       redis-errors: 1.2.0
+@@ -25188,6 +25410,17 @@ snapshots:
+ 
+   typedarray@0.0.6: {}
+ 
++  typescript-eslint@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3):
++    dependencies:
++      '@typescript-eslint/eslint-plugin': 8.57.1(@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3))(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      '@typescript-eslint/parser': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      '@typescript-eslint/typescript-estree': 8.57.1(typescript@5.9.3)
++      '@typescript-eslint/utils': 8.57.1(eslint@10.1.0(jiti@1.21.7))(typescript@5.9.3)
++      eslint: 10.1.0(jiti@1.21.7)
++      typescript: 5.9.3
++    transitivePeerDependencies:
++      - supports-color
++
+   typescript-eslint@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3):
+     dependencies:
+       '@typescript-eslint/eslint-plugin': 8.57.1(@typescript-eslint/parser@8.57.1(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3))(eslint@10.1.0(jiti@2.6.1))(typescript@5.9.3)
+@@ -25465,13 +25698,13 @@ snapshots:
+       - rollup
+       - supports-color
+ 
+-  vite-node@3.2.4(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
++  vite-node@3.2.4(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
+     dependencies:
+       cac: 6.7.14
+       debug: 4.4.3
+       es-module-lexer: 1.7.0
+       pathe: 2.0.3
+-      vite: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++      vite: 7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+     transitivePeerDependencies:
+       - '@types/node'
+       - jiti
+@@ -25486,6 +25719,16 @@ snapshots:
+       - tsx
+       - yaml
+ 
++  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)):
++    dependencies:
++      debug: 4.4.3
++      globrex: 0.1.2
++      tsconfck: 3.1.6(typescript@5.9.3)
++      vite: 8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++    transitivePeerDependencies:
++      - supports-color
++      - typescript
++
+   vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)):
+     dependencies:
+       debug: 4.4.3
+@@ -25496,7 +25739,7 @@ snapshots:
+       - supports-color
+       - typescript
+ 
+-  vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
++  vite@7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
+     dependencies:
+       esbuild: 0.27.4
+       fdir: 6.5.0(picomatch@4.0.4)
+@@ -25507,13 +25750,30 @@ snapshots:
+     optionalDependencies:
+       '@types/node': 24.12.0
+       fsevents: 2.3.3
+-      jiti: 2.6.1
++      jiti: 1.21.7
+       lightningcss: 1.32.0
+       sass: 1.97.1
+       terser: 5.44.1
+       tsx: 4.21.0
+       yaml: 2.8.3
+ 
++  vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
++    dependencies:
++      lightningcss: 1.32.0
++      picomatch: 4.0.4
++      postcss: 8.5.8
++      rolldown: 1.0.0-rc.10
++      tinyglobby: 0.2.15
++    optionalDependencies:
++      '@types/node': 24.12.0
++      esbuild: 0.27.4
++      fsevents: 2.3.3
++      jiti: 1.21.7
++      sass: 1.97.1
++      terser: 5.44.1
++      tsx: 4.21.0
++      yaml: 2.8.3
++
+   vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
+     dependencies:
+       lightningcss: 1.32.0
+@@ -25556,11 +25816,11 @@ snapshots:
+     dependencies:
+       vitest: 4.1.0(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(happy-dom@20.8.9)(jsdom@26.1.0(canvas@2.11.2))(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
+ 
+-  vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@2.6.1)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
++  vitest@3.2.4(@types/debug@4.1.12)(@types/node@24.12.0)(happy-dom@20.8.9)(jiti@1.21.7)(jsdom@26.1.0(canvas@2.11.2))(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3):
+     dependencies:
+       '@types/chai': 5.2.3
+       '@vitest/expect': 3.2.4
+-      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
++      '@vitest/mocker': 3.2.4(vite@7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3))
+       '@vitest/pretty-format': 3.2.4
+       '@vitest/runner': 3.2.4
+       '@vitest/snapshot': 3.2.4
+@@ -25578,8 +25838,8 @@ snapshots:
+       tinyglobby: 0.2.15
+       tinypool: 1.1.1
+       tinyrainbow: 2.0.0
+-      vite: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+-      vite-node: 3.2.4(@types/node@24.12.0)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++      vite: 7.3.1(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
++      vite-node: 3.2.4(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.3)
+       why-is-node-running: 2.3.0
+     optionalDependencies:
+       '@types/debug': 4.1.12
+diff --git a/server/package.json b/server/package.json
+index 1adad9ba8..693b4b4c1 100644
+--- a/server/package.json
++++ b/server/package.json
+@@ -39,6 +39,9 @@
+     "email:dev": "email dev -p 3050 --dir src/emails"
+   },
+   "dependencies": {
++    "@bull-board/api": "^6.20.6",
++    "@bull-board/express": "^6.20.6",
++    "@bull-board/nestjs": "^6.20.6",
+     "@extism/extism": "2.0.0-rc13",
+     "@immich/sql-tools": "^0.3.2",
+     "@nestjs/bullmq": "^11.0.1",
+diff --git a/server/src/app.module.ts b/server/src/app.module.ts
+index f2b6a7e80..9898c9b90 100644
+--- a/server/src/app.module.ts
++++ b/server/src/app.module.ts
+@@ -31,6 +31,7 @@ import { SystemMetadataRepository } from 'src/repositories/system-metadata.repos
+ import { teardownTelemetry, TelemetryRepository } from 'src/repositories/telemetry.repository';
+ import { UserRepository } from 'src/repositories/user.repository';
+ import { WebsocketRepository } from 'src/repositories/websocket.repository';
++import { ImmichBullBoardModule } from 'src/modules/bull-board.module';
+ import { services } from 'src/services';
+ import { AuthService } from 'src/services/auth.service';
+ import { CliService } from 'src/services/cli.service';
+@@ -100,7 +101,7 @@ export class BaseModule implements OnModuleInit, OnModuleDestroy {
+ }
+ 
+ @Module({
+-  imports: [...bullImports, ...commonImports, ScheduleModule.forRoot()],
++  imports: [...bullImports, ...commonImports, ScheduleModule.forRoot(), ImmichBullBoardModule],
+   controllers: [...controllers],
+   providers: [...common, ...apiMiddleware, { provide: IWorker, useValue: ImmichWorker.Api }],
+ })
+diff --git a/server/src/constants.ts b/server/src/constants.ts
+index 4f8d9342c..319dcddcc 100644
+--- a/server/src/constants.ts
++++ b/server/src/constants.ts
+@@ -61,7 +61,7 @@ export const reverseGeocodeMaxDistance = 25_000;
+ export const MOBILE_REDIRECT = 'app.immich:///oauth-callback';
+ export const LOGIN_URL = '/auth/login?autoLaunch=0';
+ 
+-export const excludePaths = ['/.well-known/immich', '/custom.css', '/favicon.ico'];
++export const excludePaths = ['/.well-known/immich', '/custom.css', '/favicon.ico', '/admin/queues'];
+ 
+ export const FACE_THUMBNAIL_SIZE = 250;
+ 
+diff --git a/server/src/middleware/bull-board-auth.middleware.ts b/server/src/middleware/bull-board-auth.middleware.ts
+new file mode 100644
+index 000000000..529bc9269
+--- /dev/null
++++ b/server/src/middleware/bull-board-auth.middleware.ts
+@@ -0,0 +1,32 @@
++import { Injectable, NestMiddleware } from '@nestjs/common';
++import { Request, Response, NextFunction } from 'express';
++import { LOGIN_URL } from 'src/constants';
++import { AuthService } from 'src/services/auth.service';
++
++@Injectable()
++export class BullBoardAuthMiddleware implements NestMiddleware {
++  constructor(private authService: AuthService) {}
++
++  async use(request: Request, response: Response, next: NextFunction) {
++    try {
++      const authDto = await this.authService.authenticate({
++        headers: request.headers,
++        queryParams: request.query as Record<string, string>,
++        metadata: { adminRoute: true, sharedLinkRoute: false, uri: request.path },
++      });
++
++      if (!authDto.user.isAdmin) {
++        response.status(403).send('Forbidden');
++        return;
++      }
++
++      next();
++    } catch {
++      if (request.accepts('html')) {
++        response.redirect(LOGIN_URL);
++        return;
++      }
++      response.status(401).send('Unauthorized');
++    }
++  }
++}
+diff --git a/server/src/modules/bull-board.module.ts b/server/src/modules/bull-board.module.ts
+new file mode 100644
+index 000000000..0a487d50d
+--- /dev/null
++++ b/server/src/modules/bull-board.module.ts
+@@ -0,0 +1,26 @@
++import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
++import { BullBoardModule } from '@bull-board/nestjs';
++import { ExpressAdapter } from '@bull-board/express';
++import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
++import { QueueName } from 'src/enum';
++import { BullBoardAuthMiddleware } from 'src/middleware/bull-board-auth.middleware';
++
++@Module({
++  imports: [
++    BullBoardModule.forRoot({
++      route: '/admin/queues',
++      adapter: ExpressAdapter,
++    }),
++    BullBoardModule.forFeature(
++      ...Object.values(QueueName).map((name) => ({
++        name,
++        adapter: BullMQAdapter,
++      })),
++    ),
++  ],
++})
++export class ImmichBullBoardModule implements NestModule {
++  configure(consumer: MiddlewareConsumer) {
++    consumer.apply(BullBoardAuthMiddleware).forRoutes('/admin/queues');
++  }
++}

@@ -12,26 +12,6 @@ in {
 
     spawn-at-startup = [
       {argv = ["kitty"];}
-      {
-        argv = [
-          "${pkgs.swayidle}/bin/swayidle"
-          "-w"
-          "timeout"
-          "300"
-          "${pkgs.swaylock}/bin/swaylock"
-          "-f"
-          "timeout"
-          "600"
-          "${pkgs.bash}/bin/bash"
-          "-c"
-          "${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true"
-          "before-sleep"
-          "${pkgs.swaylock}/bin/swaylock"
-          "-f"
-        ];
-      }
-      {argv = ["${pkgs.dunst}/bin/dunst"];}
-      {argv = ["${pkgs.wl-clipboard}/bin/wl-paste" "--watch" "${pkgs.cliphist}/bin/cliphist" "store"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
@@ -427,6 +407,32 @@ in {
       Service = {
         Type = "oneshot";
         ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3'";
+      };
+      Install.WantedBy = ["graphical-session.target"];
+    };
+
+    swayidle = {
+      Unit = {
+        Description = "Idle management daemon";
+        After = ["graphical-session.target"];
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock -f timeout 600 ${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true' before-sleep ${pkgs.swaylock}/bin/swaylock -f";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = ["graphical-session.target"];
+    };
+
+    cliphist = {
+      Unit = {
+        Description = "Clipboard history watcher";
+        After = ["graphical-session.target"];
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
+        Restart = "on-failure";
       };
       Install.WantedBy = ["graphical-session.target"];
     };
