@@ -53,14 +53,6 @@
           '';
         };
 
-        "grafana.lan" = {
-          extraConfig = ''
-            ${tlsConfig}
-            ${forwardAuth}
-            reverse_proxy localhost:3001
-          '';
-        };
-
         "home.lan" = {
           extraConfig = ''
             ${tlsConfig}

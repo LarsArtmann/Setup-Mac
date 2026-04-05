@@ -244,7 +244,6 @@
       ''"auth.lan. IN A 192.168.1.150"''
       ''"immich.lan. IN A 192.168.1.150"''
       ''"gitea.lan. IN A 192.168.1.150"''
-      ''"grafana.lan. IN A 192.168.1.150"''
       ''"home.lan. IN A 192.168.1.150"''
       ''"photomap.lan. IN A 192.168.1.150"''
       ''"unsloth.lan. IN A 192.168.1.150"''

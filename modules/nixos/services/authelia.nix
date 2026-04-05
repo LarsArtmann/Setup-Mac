@@ -184,13 +184,6 @@
               ];
             })
             (mkClient {
-              client_id = "grafana";
-              client_name = "Grafana";
-              redirect_uris = [
-                "https://grafana.${domain}/login/generic_oauth"
-              ];
-            })
-            (mkClient {
               client_id = "gitea";
               client_name = "Gitea";
               redirect_uris = [

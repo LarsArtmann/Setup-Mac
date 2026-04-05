@@ -126,12 +126,6 @@
               icon: signoz.png
               statusStyle: dot
               siteMonitor: https://signoz.lan
-          - Grafana:
-              href: https://grafana.lan
-              description: Metrics & Dashboards
-              icon: grafana.png
-              statusStyle: dot
-              siteMonitor: https://grafana.lan/api/health
           - Prometheus:
               description: Metrics Collection
               icon: prometheus.png

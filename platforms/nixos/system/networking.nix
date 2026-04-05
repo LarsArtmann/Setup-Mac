@@ -4,7 +4,7 @@ _: {
     hostName = "evo-x2"; # Machine name
     # Disable NetworkManager - use dhcpcd instead for simpler DNS management
     # networkmanager.enable = true;
-    enableIPv6 = false; # IPv6 is unreachable, disable entirely
+    enableIPv6 = true;
 
     # Firewall - deny by default, only allow needed ports
     firewall = {

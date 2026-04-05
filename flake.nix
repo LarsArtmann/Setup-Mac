@@ -175,7 +175,6 @@
         ./modules/nixos/services/default.nix
         ./modules/nixos/services/gitea.nix
         ./modules/nixos/services/gitea-repos.nix
-        ./modules/nixos/services/grafana.nix
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
         ./modules/nixos/services/monitoring.nix
@@ -394,17 +393,13 @@
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             inputs.silent-sddm.nixosModules.default
-            # Disabled: secrets not configured - authelia_jwt_secret missing from secrets.yaml
-            # inputs.self.nixosModules.authelia
+            inputs.self.nixosModules.authelia
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea
             inputs.self.nixosModules.gitea-repos
-            # Disabled: secrets not configured - grafana_secret_key missing from secrets.yaml
-            # inputs.self.nixosModules.grafana
             inputs.self.nixosModules.homepage
-            # Disabled: immich_oauth_client_secret not in secrets.yaml
-            # inputs.self.nixosModules.immich
+            inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring
             inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
