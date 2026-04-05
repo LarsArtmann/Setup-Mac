@@ -12,6 +12,7 @@ in {
 
     spawn-at-startup = [
       {argv = ["kitty"];}
+      {argv = ["kitty" "-e" "fish" "-c" "sudo btop"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
