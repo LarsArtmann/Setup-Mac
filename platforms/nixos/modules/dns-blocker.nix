@@ -282,14 +282,9 @@ in {
               sleep 1
             done
 
-            IP=""
-            for i in $(${pkgs.coreutils}/bin/seq 1 30); do
+            while true; do
               IP=$(${detectIPScript})
               [ -n "$IP" ] && break
-              if [ "$i" -eq 30 ]; then
-                echo "ERROR: No IP detected on ${cfg.blockInterface} after 30s" >&2
-                exit 1
-              fi
               sleep 1
             done
 
@@ -345,11 +340,7 @@ in {
         path = [pkgs.nss];
         script = ''
           CA_CERT="${config.sops.secrets.dnsblockd_ca_cert.path}"
-          for i in $(${pkgs.coreutils}/bin/seq 1 30); do
-            [ -s "$CA_CERT" ] && break
-            [ "$i" -eq 30 ] && { echo "ERROR: sops CA cert not available after 30s" >&2; exit 1; }
-            sleep 1
-          done
+          while [ ! -s "$CA_CERT" ]; do sleep 1; done
           mkdir -p $HOME/.pki/nssdb
           certutil -d sql:$HOME/.pki/nssdb -N --empty-password 2>/dev/null || true
           certutil -d sql:$HOME/.pki/nssdb -D -n dnsblockd-ca 2>/dev/null || true
