@@ -1,4 +1,4 @@
-_: {
+{config, ...}: {
   # macOS system defaults configuration
   system = {
     # Set system state version for nix-darwin
@@ -14,8 +14,11 @@ _: {
         # Trackpad configuration
         "com.apple.trackpad.scaling" = 1.0;
 
-        # Dark mode preference
-        AppleInterfaceStyle = "Dark";
+        # Dark mode — driven by preferences.appearance.variant
+        AppleInterfaceStyle =
+          if config.preferences.appearance.variant == "dark"
+          then "Dark"
+          else null;
       };
 
       # Finder preferences

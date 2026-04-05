@@ -6,6 +6,8 @@
 }: {
   # Import Darwin-specific system configurations
   imports = [
+    # Cross-platform preferences (dark mode, fonts, themes — single source of truth)
+    ../common/preferences.nix
     ./networking/default.nix
     ./nix/settings.nix
     ./security/pam.nix
@@ -23,7 +25,7 @@
   # Define color scheme option
   options.colorScheme = lib.mkOption {
     type = lib.types.attrs;
-    default = nix-colors.colorSchemes.catppuccin-mocha;
+    default = nix-colors.colorSchemes.${config.preferences.appearance.colorSchemeName};
     description = "Color scheme for system";
   };
 

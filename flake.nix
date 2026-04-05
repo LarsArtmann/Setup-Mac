@@ -403,7 +403,8 @@
             # Disabled: secrets not configured - grafana_secret_key missing from secrets.yaml
             # inputs.self.nixosModules.grafana
             inputs.self.nixosModules.homepage
-            inputs.self.nixosModules.immich
+            # Disabled: immich_oauth_client_secret not in secrets.yaml
+            # inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring
             inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops

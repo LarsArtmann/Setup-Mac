@@ -63,11 +63,11 @@
         #   restartUnits = ["authelia-main.service"];
         # };
 
-        immich_oauth_client_secret = {
-          owner = "immich";
-          group = "immich";
-          restartUnits = ["immich-server.service"];
-        };
+        # immich_oauth_client_secret = {
+        #   owner = "immich";
+        #   group = "immich";
+        #   restartUnits = ["immich-server.service"];
+        # };
 
         dnsblockd_ca_cert = {
           sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;
