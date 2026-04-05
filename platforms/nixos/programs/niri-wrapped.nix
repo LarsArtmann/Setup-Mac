@@ -17,7 +17,7 @@ in {
         argv = [
           "${pkgs.bash}/bin/bash"
           "-c"
-          "sleep 1 && img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3"
+          "while [ ! -S \"${"$"}{XDG_RUNTIME_DIR:-/run/user/${"$"}(id -u)}/${"$"}{WAYLAND_DISPLAY}-awww-daemon.sock\" ]; do ${pkgs.coreutils}/bin/sleep 0.1; done && img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3"
         ];
       }
       {
