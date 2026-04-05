@@ -196,8 +196,6 @@
     };
 
     systemd.services.authelia-main = {
-      after = ["sops-nix.service"];
-      requires = ["sops-nix.service"];
       serviceConfig = {
         StateDirectory = lib.mkForce "authelia-main";
         StateDirectoryMode = lib.mkForce "0750";
