@@ -126,16 +126,6 @@
               icon: signoz.png
               statusStyle: dot
               siteMonitor: https://signoz.lan
-          - Prometheus:
-              description: Metrics Collection
-              icon: prometheus.png
-              statusStyle: dot
-              siteMonitor: http://localhost:9090/-/healthy
-          - Node Exporter:
-              description: System Metrics Agent
-              icon: prometheus.png
-              statusStyle: dot
-              siteMonitor: http://localhost:9100/metrics
           - Homepage:
               description: This Page
               icon: homepage.png

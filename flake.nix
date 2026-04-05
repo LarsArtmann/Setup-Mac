@@ -177,7 +177,6 @@
         ./modules/nixos/services/gitea-repos.nix
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
-        ./modules/nixos/services/monitoring.nix
         ./modules/nixos/services/signoz.nix
         ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
@@ -400,7 +399,6 @@
             inputs.self.nixosModules.gitea-repos
             inputs.self.nixosModules.homepage
             inputs.self.nixosModules.immich
-            inputs.self.nixosModules.monitoring
             inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
             inputs.nix-ssh-config.nixosModules.ssh
