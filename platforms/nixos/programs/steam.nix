@@ -18,9 +18,15 @@
   programs.gamemode = {
     enable = true;
     settings = {
-      Governor = "performance";
-      gputempthreshold = 80;
-      renice = 10;
+      general = {
+        renice = 10;
+      };
+      gpu = {
+        gputempthreshold = 80;
+      };
+      cpu = {
+        Governor = "performance";
+      };
     };
   };
 

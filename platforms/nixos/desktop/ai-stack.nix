@@ -91,20 +91,26 @@ in {
   };
 
   systemd.services = {
+    ollama.serviceConfig = {
+      SupplementaryGroups = ["render" "users"];
+      UMask = pkgs.lib.mkForce "0007";
+    };
+
     ollama-permissions = {
       description = "Fix Ollama data directory permissions";
-      after = ["local-fs.target" "ollama.service"];
-      before = [];
+      after = ["local-fs.target"];
+      before = ["ollama.service"];
       wantedBy = ["multi-user.target"];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
         ExecStart = pkgs.writeShellScript "fix-ollama-perms" ''
-          mkdir -p /data/models/ollama
+          mkdir -p /data/models/ollama/models
           chmod 755 /data/models/ollama 2>/dev/null || true
-          chown -R 61547:61547 /data/models/ollama 2>/dev/null || \
-            chown -R ollama:ollama /data/models/ollama 2>/dev/null || true
-          chmod -R u+rwX /data/models/ollama 2>/dev/null || true
+          chmod 775 /data/models/ollama/models 2>/dev/null || true
+          chown -R 61547:users /data/models/ollama 2>/dev/null || \
+            chown -R ollama:users /data/models/ollama 2>/dev/null || true
+          chmod -R u+rwX,g+rX /data/models/ollama 2>/dev/null || true
         '';
       };
     };
@@ -243,20 +249,19 @@ in {
   ];
 
   systemd.tmpfiles.rules = [
-    # Recursively fix ownership/permissions on ollama data dir (handles pre-existing dirs)
-    "R /data/models/ollama 0755 ollama ollama - -"
-    # Ensure directory exists with correct ownership (in case it was deleted)
-    "d /data/models/ollama 0755 ollama ollama -"
+    "d /data/models/ollama 0755 lars users -"
+    "d /data/models/ollama/models 0775 lars users -"
     "d ${unslothDataDir} 0755 lars users -"
     "d ${unslothDataDir}/workspace 0755 lars users -"
     "d ${unslothDataDir}/models 0755 lars users -"
     "d ${unslothDataDir}/.unsloth 0755 lars users -"
     "d ${unslothDataDir}/.unsloth/studio 0755 lars users -"
-    # Centralized AI models directory
     "d /data/models 0755 lars users -"
   ];
 
   environment.sessionVariables = {
+    OLLAMA_MODELS = "/data/models/ollama/models";
+    OLLAMA_HOST = "127.0.0.1:11434";
     ROCBLAS_USE_HIPBLASLT = "1";
     # HuggingFace cache locations (centralized on /data)
     HF_HOME = "/data/cache/huggingface";

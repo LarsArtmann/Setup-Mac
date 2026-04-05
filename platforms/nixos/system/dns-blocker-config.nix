@@ -12,7 +12,7 @@
   domain = config.networking.domain;
   lanIP =
     builtins.head
-      config.networking.interfaces.eno1.ipv4.addresses;
+    config.networking.interfaces.eno1.ipv4.addresses;
   serverIP = lanIP.address;
 in {
   imports = [
@@ -246,7 +246,8 @@ in {
 
   services.unbound.settings.server = {
     local-zone = [''"${domain}." static''];
-    local-data = map
+    local-data =
+      map
       (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
       ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz"];
   };
