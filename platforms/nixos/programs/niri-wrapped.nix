@@ -58,6 +58,11 @@ in {
       workspace-auto-back-and-forth = true;
     };
 
+    cursor = {
+      theme = "Bibata-Modern-Classic";
+      size = 96;
+    };
+
     layout = {
       gaps = 8;
       center-focused-column = "on-overflow";

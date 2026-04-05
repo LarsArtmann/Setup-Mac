@@ -271,7 +271,7 @@
     cursorTheme = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
-      size = 8;
+      size = 96;
     };
     # Force dark mode preference for all GTK applications
     gtk3.extraConfig = {
