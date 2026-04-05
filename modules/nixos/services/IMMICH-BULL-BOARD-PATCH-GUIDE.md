@@ -74,7 +74,7 @@ Add a `package` override that applies the patch:
       settings = {
         oauth = {
           enabled = true;
-          issuerUrl = "https://auth.lan";
+          issuerUrl = "https://auth.home.lan";
           clientId = "immich";
           clientSecret._secret = config.sops.secrets.immich_oauth_client_secret.path;
           scope = "openid profile email";

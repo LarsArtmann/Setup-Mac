@@ -30,14 +30,14 @@
       '';
 
       virtualHosts = {
-        "auth.lan" = {
+        "auth.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             reverse_proxy localhost:${toString autheliaPort}
           '';
         };
 
-        "immich.lan" = {
+        "immich.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}
@@ -45,7 +45,7 @@
           '';
         };
 
-        "gitea.lan" = {
+        "gitea.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}
@@ -53,7 +53,7 @@
           '';
         };
 
-        "home.lan" = {
+        "dash.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}
@@ -61,7 +61,7 @@
           '';
         };
 
-        "photomap.lan" = {
+        "photomap.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}
@@ -69,7 +69,7 @@
           '';
         };
 
-        "unsloth.lan" = {
+        "unsloth.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}
@@ -77,7 +77,7 @@
           '';
         };
 
-        "signoz.lan" = {
+        "signoz.home.lan" = {
           extraConfig = ''
             ${tlsConfig}
             ${forwardAuth}

@@ -5,7 +5,7 @@
     pkgs,
     ...
   }: let
-    domain = "lan";
+    domain = "home.lan";
     authHost = "auth.${domain}";
     authPort = 9091;
 
@@ -45,7 +45,7 @@
 
         server = {
           address = "tcp://127.0.0.1:${toString authPort}/";
-          endpoints.enable = {
+          endpoints = {
             enable_pprof = false;
             enable_expvars = false;
           };
@@ -74,7 +74,9 @@
           disable = false;
           display_name = "evo-x2";
           attestation_conveyance_preference = "indirect";
-          user_verification = "preferred";
+          selection_criteria = {
+            user_verification = "preferred";
+          };
         };
 
         authentication_backend = {
@@ -138,7 +140,7 @@
 
         notifier = {
           disable_startup_check = true;
-          filesystem.path = "/var/lib/authelia-main/notification.txt";
+          filesystem.filename = "/var/lib/authelia-main/notification.txt";
         };
 
         access_control = {
@@ -207,7 +209,7 @@
         lars:
           displayname: "Lars"
           password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
-          email: "lars@auth.lan"
+          email: "lars@auth.home.lan"
           groups:
             - admin
             - dev

@@ -57,17 +57,17 @@
     environment.etc."homepage/services.yaml".source = pkgs.writeText "homepage-services.yaml" ''
       - Infrastructure:
           - Authelia:
-              href: https://auth.lan
+              href: https://auth.home.lan
               description: SSO & Identity Provider
               icon: authelia.png
               statusStyle: dot
-              siteMonitor: https://auth.lan/api/health
+              siteMonitor: https://auth.home.lan/api/health
           - Caddy:
-              href: https://home.lan
+              href: https://dash.home.lan
               description: Reverse Proxy
               icon: caddy.png
               statusStyle: dot
-              siteMonitor: https://home.lan
+              siteMonitor: https://dash.home.lan
           - Unbound DNS:
               description: DNS Resolver + Blocker
               icon: unbound.png
@@ -82,17 +82,17 @@
 
       - Media:
           - Immich:
-              href: https://immich.lan
+              href: https://immich.home.lan
               description: Photo & Video Management
               icon: immich.png
               statusStyle: dot
-              siteMonitor: https://immich.lan/api/server-info/ping
+              siteMonitor: https://immich.home.lan/api/server-info/ping
           - PhotoMapAI:
-              href: https://photomap.lan
+              href: https://photomap.home.lan
               description: CLIP Embedding Vector Map
               icon: network-map.png
               statusStyle: dot
-              siteMonitor: https://photomap.lan
+              siteMonitor: https://photomap.home.lan
           - DNS Blocker:
               href: https://localhost:8443/stats
               description: DNS Block Stats
@@ -102,35 +102,35 @@
 
       - Development:
           - Gitea:
-              href: https://gitea.lan
+              href: https://gitea.home.lan
               description: Git Mirror (GitHub Sync)
               icon: gitea.png
               statusStyle: dot
-              siteMonitor: https://gitea.lan/api/v1/nodeinfo
+              siteMonitor: https://gitea.home.lan/api/v1/nodeinfo
           - Ollama:
               description: Local AI Inference
               icon: ollama.png
               statusStyle: dot
               siteMonitor: http://localhost:11434/api/tags
           - Unsloth Studio:
-              href: https://unsloth.lan
+              href: https://unsloth.home.lan
               description: AI Model Training & Inference UI
               icon: jupyter.png
               statusStyle: dot
-              siteMonitor: https://unsloth.lan
+              siteMonitor: https://unsloth.home.lan
 
       - Monitoring:
           - SigNoz:
-              href: https://signoz.lan
+              href: https://signoz.home.lan
               description: Observability Platform
               icon: signoz.png
               statusStyle: dot
-              siteMonitor: https://signoz.lan
+              siteMonitor: https://signoz.home.lan
           - Homepage:
               description: This Page
               icon: homepage.png
               statusStyle: dot
-              siteMonitor: https://home.lan
+              siteMonitor: https://dash.home.lan
     '';
 
     systemd.tmpfiles.rules = [

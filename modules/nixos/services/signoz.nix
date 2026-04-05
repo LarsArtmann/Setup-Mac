@@ -204,25 +204,27 @@ in {
       (lib.mkIf cfg.components.clickhouse {
         services.clickhouse.enable = true;
         services.clickhouse.extraServerConfig = ''
-          <keeper_server>
-            <tcp_port>9181</tcp_port>
-            <server_id>1</server_id>
-            <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
-            <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
-            <raft_configuration>
-              <server>
-                <id>1</id>
-                <hostname>localhost</hostname>
-                <port>9234</port>
-              </server>
-            </raft_configuration>
-          </keeper_server>
-          <zookeeper>
-            <node>
-              <host>localhost</host>
-              <port>9181</port>
-            </node>
-          </zookeeper>
+          <clickhouse>
+            <keeper_server>
+              <tcp_port>9181</tcp_port>
+              <server_id>1</server_id>
+              <log_storage_path>/var/lib/clickhouse/coordination/log</log_storage_path>
+              <snapshot_storage_path>/var/lib/clickhouse/coordination/snapshots</snapshot_storage_path>
+              <raft_configuration>
+                <server>
+                  <id>1</id>
+                  <hostname>localhost</hostname>
+                  <port>9234</port>
+                </server>
+              </raft_configuration>
+            </keeper_server>
+            <zookeeper>
+              <node>
+                <host>localhost</host>
+                <port>9181</port>
+              </node>
+            </zookeeper>
+          </clickhouse>
         '';
       })
 

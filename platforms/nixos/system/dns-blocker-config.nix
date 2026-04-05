@@ -239,15 +239,15 @@
   };
 
   services.unbound.settings.server = {
-    local-zone = [''"lan." static''];
+    local-zone = [''"home.lan." static''];
     local-data = [
-      ''"auth.lan. IN A 192.168.1.150"''
-      ''"immich.lan. IN A 192.168.1.150"''
-      ''"gitea.lan. IN A 192.168.1.150"''
-      ''"home.lan. IN A 192.168.1.150"''
-      ''"photomap.lan. IN A 192.168.1.150"''
-      ''"unsloth.lan. IN A 192.168.1.150"''
-      ''"signoz.lan. IN A 192.168.1.150"''
+      ''"auth.home.lan. IN A 192.168.1.150"''
+      ''"immich.home.lan. IN A 192.168.1.150"''
+      ''"gitea.home.lan. IN A 192.168.1.150"''
+      ''"dash.home.lan. IN A 192.168.1.150"''
+      ''"photomap.home.lan. IN A 192.168.1.150"''
+      ''"unsloth.home.lan. IN A 192.168.1.150"''
+      ''"signoz.home.lan. IN A 192.168.1.150"''
     ];
   };
 }

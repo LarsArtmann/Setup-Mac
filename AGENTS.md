@@ -148,7 +148,7 @@ To update: `just update && just switch` (fetches latest crush-config from GitHub
 Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server).
 - 25 blocklists, 2.5M+ domains blocked
 - Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
-- Local `.lan` DNS records for all services
+- Local `.home.lan` DNS records for all services
 - Blocklist source: `platforms/nixos/programs/dnsblockd/`
 
 ## Critical Rules & Gotchas

@@ -81,21 +81,19 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 
 | Service | Port | URL | Description |
 |---------|------|-----|-------------|
-| **Caddy** | 443 | `*.lan` | Reverse proxy with sops-managed TLS certs |
-| **Immich** | 2283 | `immich.lan` | Self-hosted Google Photos alternative (PostgreSQL + Redis + ML) |
-| **Gitea** | 3000 | `gitea.lan` | Self-hosted Git with GitHub mirror sync |
-| **Grafana** | 3001 | `grafana.lan` | Monitoring dashboards with Prometheus datasource |
-| **Prometheus** | 9091 | — | 30-day retention, Node/Postgres/Caddy/Redis exporters |
-| **Homepage** | 8082 | `home.lan` | Service overview dashboard |
-| **SigNoz** | — | `signoz.lan` | Observability platform (traces, metrics, logs) |
-| **PhotoMap AI** | 8050 | `photomap.lan` | AI-powered photo exploration with UMAP embeddings |
+| **Caddy** | 443 | `*.home.lan` | Reverse proxy with sops-managed TLS certs |
+| **Immich** | 2283 | `immich.home.lan` | Self-hosted Google Photos alternative (PostgreSQL + Redis + ML) |
+| **Gitea** | 3000 | `gitea.home.lan` | Self-hosted Git with GitHub mirror sync |
+| **SigNoz** | — | `signoz.home.lan` | Observability platform (traces, metrics, logs) |
+| **Homepage** | 8082 | `dash.home.lan` | Service overview dashboard |
+| **PhotoMap AI** | 8050 | `photomap.home.lan` | AI-powered photo exploration with UMAP embeddings |
 | **DNS Blocker** | 53, 9090 | — | Unbound + dnsblockd, 25 blocklists, DNS-over-TLS upstream |
 
 ### DNS Blocking
 
 - 2.5M+ blocked domains (ads, trackers, malware, telemetry, gambling)
 - Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
-- Local `.lan` DNS records for all services
+- Local `.home.lan` DNS records for all services
 - DNSSEC enabled
 
 ## NixOS Desktop

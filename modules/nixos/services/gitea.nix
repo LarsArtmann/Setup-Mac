@@ -242,8 +242,8 @@
 
         server = {
           HTTP_PORT = 3000;
-          ROOT_URL = "http://gitea.lan/";
-          DOMAIN = "gitea.lan";
+          ROOT_URL = "http://gitea.home.lan/";
+          DOMAIN = "gitea.home.lan";
         };
 
         repository = {

@@ -241,8 +241,8 @@ in {
 
       services.dnsblockd = {
         description = "DNS Block Page Server";
-        after = ["network-online.target"];
-        wants = ["network-online.target"];
+        after = ["network-online.target" "sops-nix.service"];
+        wants = ["network-online.target" "sops-nix.service"];
         wantedBy = ["multi-user.target"];
 
         serviceConfig = let
