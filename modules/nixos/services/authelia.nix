@@ -121,7 +121,7 @@
               name = "authelia_session";
               inherit domain;
               authelia_url = "https://${authHost}";
-              default_redirection_url = "https://home.${domain}";
+              default_redirection_url = "https://dash.${domain}";
               same_site = "lax";
               expiration = "1h";
               inactivity = "5m";
