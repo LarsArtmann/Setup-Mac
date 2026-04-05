@@ -25,33 +25,33 @@
           restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
         };
 
-        authelia_jwt_secret = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          restartUnits = ["authelia-main.service"];
-        };
-        authelia_storage_encryption_key = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          restartUnits = ["authelia-main.service"];
-        };
-        authelia_oidc_hmac_secret = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          restartUnits = ["authelia-main.service"];
-        };
-        authelia_oidc_issuer_private_key = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          mode = "0400";
-          restartUnits = ["authelia-main.service"];
-        };
-
-        immich_oauth_client_secret = {
-          owner = "immich";
-          group = "immich";
-          restartUnits = ["immich-server.service"];
-        };
+        # authelia_jwt_secret = {
+        #   owner = "authelia-main";
+        #   group = "authelia-main";
+        #   restartUnits = ["authelia-main.service"];
+        # };
+        # authelia_storage_encryption_key = {
+        #   owner = "authelia-main";
+        #   group = "authelia-main";
+        #   restartUnits = ["authelia-main.service"];
+        # };
+        # authelia_oidc_hmac_secret = {
+        #   owner = "authelia-main";
+        #   group = "authelia-main";
+        #   restartUnits = ["authelia-main.service"];
+        # };
+        # authelia_oidc_issuer_private_key = {
+        #   owner = "authelia-main";
+        #   group = "authelia-main";
+        #   mode = "0400";
+        #   restartUnits = ["authelia-main.service"];
+        # };
+        #
+        # immich_oauth_client_secret = {
+        #   owner = "immich";
+        #   group = "immich";
+        #   restartUnits = ["immich-server.service"];
+        # };
 
         dnsblockd_ca_cert = {
           sopsFile = ./../../../platforms/nixos/secrets/dnsblockd-certs.yaml;

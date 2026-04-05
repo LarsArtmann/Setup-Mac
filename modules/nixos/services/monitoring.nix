@@ -28,10 +28,10 @@
           job_name = "redis";
           static_configs = [{targets = ["localhost:${toString config.services.prometheus.exporters.redis.port}"];}];
         }
-        {
-          job_name = "authelia";
-          static_configs = [{targets = ["localhost:9959"];}];
-        }
+        # {
+        #   job_name = "authelia";
+        #   static_configs = [{targets = ["localhost:9959"];}];
+        # }
       ];
     };
 

@@ -30,20 +30,20 @@
       '';
 
       virtualHosts = {
-        "auth.lan" = {
-          extraConfig = ''
-            ${tlsConfig}
-            reverse_proxy localhost:${toString autheliaPort}
-          '';
-        };
-
-        "immich.lan" = {
-          extraConfig = ''
-            ${tlsConfig}
-            ${forwardAuth}
-            reverse_proxy localhost:${toString config.services.immich.port}
-          '';
-        };
+        # "auth.lan" = {
+        #   extraConfig = ''
+        #     ${tlsConfig}
+        #     reverse_proxy localhost:${toString autheliaPort}
+        #   '';
+        # };
+        #
+        # "immich.lan" = {
+        #   extraConfig = ''
+        #     ${tlsConfig}
+        #     ${forwardAuth}
+        #     reverse_proxy localhost:${toString config.services.immich.port}
+        #   '';
+        # };
 
         "gitea.lan" = {
           extraConfig = ''

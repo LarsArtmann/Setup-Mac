@@ -170,16 +170,16 @@
 
       # Import dendritic modules - each file is a self-contained flake-parts module
       imports = [
-        ./modules/nixos/services/authelia.nix
+        # ./modules/nixos/services/authelia.nix
         ./modules/nixos/services/caddy.nix
         ./modules/nixos/services/default.nix
         ./modules/nixos/services/gitea.nix
         ./modules/nixos/services/gitea-repos.nix
         ./modules/nixos/services/homepage.nix
-        ./modules/nixos/services/immich.nix
+        # ./modules/nixos/services/immich.nix
         ./modules/nixos/services/monitoring.nix
         ./modules/nixos/services/signoz.nix
-        ./modules/nixos/services/photomap.nix
+        # ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
@@ -393,15 +393,15 @@
             inputs.nix-amd-npu.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             inputs.silent-sddm.nixosModules.default
-            inputs.self.nixosModules.authelia
+            # inputs.self.nixosModules.authelia
             inputs.self.nixosModules.caddy
             inputs.self.nixosModules.default-services
             inputs.self.nixosModules.gitea
             inputs.self.nixosModules.gitea-repos
             inputs.self.nixosModules.homepage
-            inputs.self.nixosModules.immich
+            # inputs.self.nixosModules.immich
             inputs.self.nixosModules.monitoring
-            inputs.self.nixosModules.photomap
+            # inputs.self.nixosModules.photomap
             inputs.self.nixosModules.sops
             inputs.nix-ssh-config.nixosModules.ssh
             inputs.self.nixosModules.signoz
