@@ -23,7 +23,7 @@
       settings = {
         oauth = {
           enabled = true;
-          issuerUrl = "https://auth.home.lan";
+          issuerUrl = "https://auth.${config.networking.domain}";
           clientId = "immich";
           clientSecret._secret = config.sops.secrets.immich_oauth_client_secret.path;
           scope = "openid profile email";

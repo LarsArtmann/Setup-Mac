@@ -8,7 +8,13 @@
 #   Oppo/Realme, Roku, Vivo, Windows/Office, TikTok
 # - DGA/NRD blocking, anti-piracy, NSFW, social, gambling, URL shorteners
 # - Dynamic DNS, badware hosters, safesearch enforcement
-{lib, ...}: {
+{config, ...}: let
+  domain = config.networking.domain;
+  lanIP =
+    builtins.head
+      config.networking.interfaces.eno1.ipv4.addresses;
+  serverIP = lanIP.address;
+in {
   imports = [
     ../modules/dns-blocker.nix
   ];
@@ -16,7 +22,7 @@
   services.dns-blocker = {
     enable = true;
 
-    blockIP = "192.168.1.150";
+    blockIP = serverIP;
     blockPort = 80;
     blockTLSPort = 8443;
     blockInterface = "eno1";
@@ -239,15 +245,9 @@
   };
 
   services.unbound.settings.server = {
-    local-zone = [''"home.lan." static''];
-    local-data = [
-      ''"auth.home.lan. IN A 192.168.1.150"''
-      ''"immich.home.lan. IN A 192.168.1.150"''
-      ''"gitea.home.lan. IN A 192.168.1.150"''
-      ''"dash.home.lan. IN A 192.168.1.150"''
-      ''"photomap.home.lan. IN A 192.168.1.150"''
-      ''"unsloth.home.lan. IN A 192.168.1.150"''
-      ''"signoz.home.lan. IN A 192.168.1.150"''
-    ];
+    local-zone = [''"${domain}." static''];
+    local-data = map
+      (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
+      ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz"];
   };
 }

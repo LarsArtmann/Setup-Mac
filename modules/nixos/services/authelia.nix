@@ -5,7 +5,7 @@
     pkgs,
     ...
   }: let
-    domain = "home.lan";
+    domain = config.networking.domain;
     authHost = "auth.${domain}";
     authPort = 9091;
 

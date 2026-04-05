@@ -2,6 +2,8 @@ _: {
   # Networking configuration
   networking = {
     hostName = "evo-x2"; # Machine name
+    domain = "home.lan"; # Base domain for all local services
+
     # Disable NetworkManager - use dhcpcd instead for simpler DNS management
     # networkmanager.enable = true;
     enableIPv6 = true;

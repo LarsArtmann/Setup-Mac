@@ -4,8 +4,11 @@
     pkgs,
     ...
   }: let
+    domain = config.networking.domain;
     port = 8082;
     stateDir = "/var/lib/homepage-dashboard";
+
+    svcUrl = subdomain: "https://${subdomain}.${domain}";
   in {
     systemd.services.homepage-dashboard = {
       description = "Homepage Dashboard";
@@ -57,17 +60,17 @@
     environment.etc."homepage/services.yaml".source = pkgs.writeText "homepage-services.yaml" ''
       - Infrastructure:
           - Authelia:
-              href: https://auth.home.lan
+              href: ${svcUrl "auth"}
               description: SSO & Identity Provider
               icon: authelia.png
               statusStyle: dot
-              siteMonitor: https://auth.home.lan/api/health
+              siteMonitor: ${svcUrl "auth"}/api/health
           - Caddy:
-              href: https://dash.home.lan
+              href: ${svcUrl "dash"}
               description: Reverse Proxy
               icon: caddy.png
               statusStyle: dot
-              siteMonitor: https://dash.home.lan
+              siteMonitor: ${svcUrl "dash"}
           - Unbound DNS:
               description: DNS Resolver + Blocker
               icon: unbound.png
@@ -82,17 +85,17 @@
 
       - Media:
           - Immich:
-              href: https://immich.home.lan
+              href: ${svcUrl "immich"}
               description: Photo & Video Management
               icon: immich.png
               statusStyle: dot
-              siteMonitor: https://immich.home.lan/api/server-info/ping
+              siteMonitor: ${svcUrl "immich"}/api/server-info/ping
           - PhotoMapAI:
-              href: https://photomap.home.lan
+              href: ${svcUrl "photomap"}
               description: CLIP Embedding Vector Map
               icon: network-map.png
               statusStyle: dot
-              siteMonitor: https://photomap.home.lan
+              siteMonitor: ${svcUrl "photomap"}
           - DNS Blocker:
               href: https://localhost:8443/stats
               description: DNS Block Stats
@@ -102,35 +105,35 @@
 
       - Development:
           - Gitea:
-              href: https://gitea.home.lan
+              href: ${svcUrl "gitea"}
               description: Git Mirror (GitHub Sync)
               icon: gitea.png
               statusStyle: dot
-              siteMonitor: https://gitea.home.lan/api/v1/nodeinfo
+              siteMonitor: ${svcUrl "gitea"}/api/v1/nodeinfo
           - Ollama:
               description: Local AI Inference
               icon: ollama.png
               statusStyle: dot
               siteMonitor: http://localhost:11434/api/tags
           - Unsloth Studio:
-              href: https://unsloth.home.lan
+              href: ${svcUrl "unsloth"}
               description: AI Model Training & Inference UI
               icon: jupyter.png
               statusStyle: dot
-              siteMonitor: https://unsloth.home.lan
+              siteMonitor: ${svcUrl "unsloth"}
 
       - Monitoring:
           - SigNoz:
-              href: https://signoz.home.lan
+              href: ${svcUrl "signoz"}
               description: Observability Platform
               icon: signoz.png
               statusStyle: dot
-              siteMonitor: https://signoz.home.lan
+              siteMonitor: ${svcUrl "signoz"}
           - Homepage:
               description: This Page
               icon: homepage.png
               statusStyle: dot
-              siteMonitor: https://dash.home.lan
+              siteMonitor: ${svcUrl "dash"}
     '';
 
     systemd.tmpfiles.rules = [

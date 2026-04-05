@@ -3,7 +3,7 @@
 **Date:** 2026-04-05 06:08
 **Trigger:** `just switch` on evo-x2 (generation `26.05.20260402.8d8c1fa`)
 **Result:** Activation failed (exit 4) — 3 services crashed, 1 dependency cascaded
-**Status:** Fixed, validated (`just test-fast` passes), pending `just switch`
+**Status:** Fixed, Nixified, validated (`just test-fast` passes), pending `just switch`
 
 ---
 
@@ -29,107 +29,107 @@
 
 Authelia upgraded to **4.39.12** which introduced strict config validation. Five errors + one deprecation warning:
 
-| # | Error | Root Cause | Fix |
-|---|-------|-----------|-----|
-| 1 | `notifier.filesystem.path` unexpected | Renamed in 4.39 | `filesystem.path` → `filesystem.filename` |
-| 2 | `server.endpoints.enable.enable_expvars` unexpected | Nested `enable` key removed | `endpoints.enable.enable_expvars` → `endpoints.enable_expvars` |
-| 3 | `server.endpoints.enable.enable_pprof` unexpected | Same as above | `endpoints.enable.enable_pprof` → `endpoints.enable_pprof` |
-| 4 | `domain 'lan'` not valid cookie domain | Bare TLDs rejected in 4.39 | Domain migration: `lan` → `home.lan` (see below) |
-| 5 | `notifier: filesystem: option 'filename' is required` | Same as #1 | Same as #1 |
-| ⚠ | `webauthn.user_verification` deprecated | Moved in 4.39 | → `webauthn.selection_criteria.user_verification` |
-
-#### Domain Migration: `*.lan` → `*.home.lan`
-
-Authelia 4.39 enforces that session cookie domains must have at least two levels (e.g., `example.com`, not just `com`). The bare TLD `lan` was rejected. This required migrating **all** service domains across the entire codebase.
-
-**Old → New domain map:**
-
-| Service | Old | New |
-|---------|-----|-----|
-| Authelia | `auth.lan` | `auth.home.lan` |
-| Immich | `immich.lan` | `immich.home.lan` |
-| Gitea | `gitea.lan` | `gitea.home.lan` |
-| Homepage | `home.lan` | `dash.home.lan` |
-| PhotoMap | `photomap.lan` | `photomap.home.lan` |
-| Unsloth | `unsloth.lan` | `unsloth.home.lan` |
-| SigNoz | `signoz.lan` | `signoz.home.lan` |
-| Cookie domain | `lan` | `home.lan` |
-
-**Files changed for domain migration (11 total):**
-
-| File | Changes |
-|------|---------|
-| `modules/nixos/services/authelia.nix` | `domain`, session cookies, ACLs, CORS, email |
-| `modules/nixos/services/caddy.nix` | 7 virtual host definitions |
-| `modules/nixos/services/homepage.nix` | 14 URLs + health checks |
-| `modules/nixos/services/immich.nix` | OAuth `issuerUrl` |
-| `modules/nixos/services/gitea.nix` | `ROOT_URL`, `DOMAIN` |
-| `platforms/nixos/system/dns-blocker-config.nix` | `local-zone` + 7 DNS records |
-| `README.md` | Service table, DNS description |
-| `AGENTS.md` | DNS blocker description |
-| `IMMICH-BULL-BOARD-PATCH-GUIDE.md` | Example config |
-
----
+| # | Error | Fix |
+|---|-------|-----|
+| 1 | `notifier.filesystem.path` unexpected | → `filesystem.filename` |
+| 2 | `server.endpoints.enable.enable_expvars` unexpected | → `endpoints.enable_expvars` |
+| 3 | `server.endpoints.enable.enable_pprof` unexpected | → `endpoints.enable_pprof` |
+| 4 | `domain 'lan'` not valid cookie domain | Domain migration (see below) |
+| 5 | `notifier: filesystem: option 'filename' is required` | Same as #1 |
+| ⚠ | `webauthn.user_verification` deprecated | → `selection_criteria.user_verification` |
 
 ### 2. ClickHouse XML Parse Error
 
-**Service:** `clickhouse.service` (cascaded to `signoz.service`)
-**File:** `modules/nixos/services/signoz.nix:206-226`
+**Service:** `clickhouse.service` → cascaded to `signoz.service`
+**File:** `modules/nixos/services/signoz.nix`
 
-**Error:**
-```
-SAXParseException: Junk after document element in '200-nixos-module-extra-config.xml', line 14 column 0
-```
+`extraServerConfig` had two sibling XML elements without a wrapping root. ClickHouse's config merger requires a single root element in standalone XML files.
 
-**Root cause:** `services.clickhouse.extraServerConfig` contained two sibling XML elements (`<keeper_server>` and `<zookeeper>`) without a wrapping root element. ClickHouse's config merger writes this to a standalone XML file, which requires a single root element.
-
-**Fix:** Wrapped both elements in `<clickhouse>` root:
-
-```xml
-<clickhouse>
-  <keeper_server>...</keeper_server>
-  <zookeeper>...</zookeeper>
-</clickhouse>
-```
-
----
+**Fix:** Wrapped in `<clickhouse>` root element.
 
 ### 3. dnsblockd sops Secret Race Condition
 
 **Service:** `dnsblockd.service`
 **File:** `platforms/nixos/modules/dns-blocker.nix`
 
-**Error:**
+dnsblockd started before sops-nix decrypted TLS secrets. Added `sops-nix.service` to `after`/`wants`.
+
+### 4. Gitea `ROOT_URL` Protocol Bug (pre-existing)
+
+`ROOT_URL` was `http://gitea.lan/` but Caddy serves it over TLS. Fixed to `https://`.
+
+---
+
+## Nixification: Domain & IP as Single Source of Truth
+
+Instead of hardcoding `.home.lan` and `192.168.1.150` across 11 files, everything now derives from NixOS config.
+
+### Architecture
+
 ```
--ca-cert and -ca-key are required when -tls-port > 0
+networking.domain = "home.lan"            ← ONE definition in networking.nix
+         │
+         ├── authelia.nix    → config.networking.domain
+         ├── caddy.nix       → config.networking.domain
+         ├── homepage.nix    → config.networking.domain
+         ├── immich.nix      → config.networking.domain
+         ├── gitea.nix       → config.networking.domain
+         └── dns-blocker-config.nix → config.networking.domain
+                                       + config.networking.interfaces.eno1 (IP)
 ```
 
-**Root cause:** dnsblockd started before sops-nix decrypted the TLS CA cert/key secrets. The sops secrets existed on disk but weren't ready at first start. With `Restart = "on-failure"` (3s delay), it would eventually self-heal (restart counter was at 32), but this caused unnecessary startup delay and noise.
+### What was Nixified
 
-**Fix:** Added `sops-nix.service` to `after` and `wants`:
+| Before (hardcoded) | After (derived) | File |
+|--------------------|-----------------|------|
+| `"home.lan"` x7 files | `config.networking.domain` | all service modules |
+| `"192.168.1.150"` | `builtins.head config.networking.interfaces.eno1.ipv4.addresses).address` | `dns-blocker-config.nix` |
+| 7 copy-pasted Caddy vhosts | `protectedVHost` function | `caddy.nix` |
+| 14 hardcoded URLs in homepage | `svcUrl` helper function | `homepage.nix` |
+| 7 hardcoded DNS records | `map` over subdomain list | `dns-blocker-config.nix` |
 
+### DRY Patterns Introduced
+
+**caddy.nix** — `protectedVHost` helper:
 ```nix
-after = ["network-online.target" "sops-nix.service"];
-wants = ["network-online.target" "sops-nix.service"];
+protectedVHost = subdomain: port: {
+  extraConfig = ''
+    ${tlsConfig}
+    ${forwardAuth}
+    reverse_proxy localhost:${toString port}
+  '';
+};
+"signoz.${domain}" = protectedVHost "signoz" 8080;
+```
+
+**homepage.nix** — `svcUrl` helper:
+```nix
+svcUrl = subdomain: "https://${subdomain}.${domain}";
+```
+
+**dns-blocker-config.nix** — mapped DNS records:
+```nix
+local-data = map
+  (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
+  ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz"];
 ```
 
 ---
 
-## Files Changed (11 files, 72 insertions, 70 deletions)
+## Files Changed
 
-```
-AGENTS.md                                          |  2 +-
-README.md                                          | 16 ++++-----
-.../services/IMMICH-BULL-BOARD-PATCH-GUIDE.md      |  2 +-
-modules/nixos/services/authelia.nix                | 12 ++++---
-modules/nixos/services/caddy.nix                   | 14 ++++----
-modules/nixos/services/gitea.nix                   |  4 +--
-modules/nixos/services/homepage.nix                | 30 ++++++++--------
-modules/nixos/services/immich.nix                  |  2 +-
-modules/nixos/services/signoz.nix                  | 40 ++++++++++++----------
-platforms/nixos/modules/dns-blocker.nix            |  4 +--
-platforms/nixos/system/dns-blocker-config.nix      | 16 ++++-----
-```
+| File | Changes |
+|------|---------|
+| `platforms/nixos/system/networking.nix` | Added `networking.domain = "home.lan"` |
+| `modules/nixos/services/authelia.nix` | Domain from config, 4.39 schema fixes, `selection_criteria` |
+| `modules/nixos/services/caddy.nix` | `protectedVHost` helper, all domains from config |
+| `modules/nixos/services/homepage.nix` | `svcUrl` helper, all URLs from config |
+| `modules/nixos/services/immich.nix` | `issuerUrl` from config |
+| `modules/nixos/services/gitea.nix` | `ROOT_URL`/`DOMAIN` from config, http→https fix |
+| `modules/nixos/services/signoz.nix` | ClickHouse XML root element fix |
+| `platforms/nixos/system/dns-blocker-config.nix` | Domain + IP from config, `map` for DNS records |
+| `platforms/nixos/modules/dns-blocker.nix` | `sops-nix.service` dependency |
+| `README.md`, `AGENTS.md`, `IMMICH-BULL-BOARD-PATCH-GUIDE.md` | Domain references |
 
 ## Validation
 
@@ -138,18 +138,8 @@ $ just test-fast
 ✅ Fast configuration test passed
 ```
 
-All NixOS modules evaluated successfully. No remaining stale `.lan` references in `.nix` files (verified via `grep`).
-
 ## Next Steps
 
-1. `just switch` — deploy the fixed configuration
-2. Verify all 3 services start cleanly
-3. Update any bookmarks/browser shortcuts from `*.lan` to `*.home.lan`
-4. Update DNS cache on LAN clients (flush or wait for TTL)
-
-## Unaffected by Domain Migration
-
-These files reference `.lan` but are **not** configuration — no changes needed:
-- `pkgs/dnsblockd-processor/main.go:102` — skips `.lan` domains in blocklist processing (correct behavior, skips local domains)
-- `platforms/nixos/programs/dnsblockd/main.go:451` — `isLANDomain()` helper for block page rendering (correct, matches any `.lan` suffix)
-- Various `docs/status/*.md` — historical reports, not live config
+1. `just switch` — deploy
+2. Verify all services start
+3. Update browser bookmarks (`*.lan` → `*.home.lan`)
