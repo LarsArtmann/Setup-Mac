@@ -12,14 +12,6 @@ in {
 
     spawn-at-startup = [
       {argv = ["kitty"];}
-      {argv = ["${pkgs.awww}/bin/awww-daemon"];}
-      {
-        argv = [
-          "${pkgs.bash}/bin/bash"
-          "-c"
-          "while [ ! -S \"${"$"}{XDG_RUNTIME_DIR:-/run/user/${"$"}(id -u)}/${"$"}{WAYLAND_DISPLAY}-awww-daemon.sock\" ]; do ${pkgs.coreutils}/bin/sleep 0.1; done && img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3"
-        ];
-      }
       {
         argv = [
           "${pkgs.swayidle}/bin/swayidle"
@@ -408,6 +400,35 @@ in {
       NIXOS_OZONE_WL = "1";
       DISPLAY = ":0";
       WAYLAND_DISPLAY = "wayland-1";
+    };
+  };
+
+  systemd.user.services = {
+    awww-daemon = {
+      Unit = {
+        Description = "awww wallpaper daemon";
+        After = ["graphical-session.target"];
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        ExecStart = "${pkgs.awww}/bin/awww-daemon";
+        Restart = "on-failure";
+      };
+      Install.WantedBy = ["graphical-session.target"];
+    };
+
+    awww-wallpaper = {
+      Unit = {
+        Description = "Set random wallpaper";
+        After = ["awww-daemon.service"];
+        Requires = ["awww-daemon.service"];
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3'";
+      };
+      Install.WantedBy = ["graphical-session.target"];
     };
   };
 }

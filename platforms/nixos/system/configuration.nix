@@ -95,9 +95,17 @@
     };
 
     # AccountsService avatar for SDDM login/lock screen
-    environment.etc."AccountsService/users/lars".text = ''
+    system.activationScripts.accountsservice-avatar = ''
+      mkdir -p /var/lib/AccountsService/icons
+      cp --update=none /home/lars/projects/SystemNix/assets/avatar.png /var/lib/AccountsService/icons/lars
+      chown root:root /var/lib/AccountsService/icons/lars
+      chmod 644 /var/lib/AccountsService/icons/lars
+      cat > /var/lib/AccountsService/users/lars <<EOF
       [User]
-      Icon=/home/lars/projects/wallpapers/cyberpunk-chinese-neon-cheongsam-character.jpeg
+      Icon=/var/lib/AccountsService/icons/lars
+      SystemAccount=false
+      EOF
+      chmod 644 /var/lib/AccountsService/users/lars
     '';
 
     # Ensure Home Manager profile directory exists for user lars
