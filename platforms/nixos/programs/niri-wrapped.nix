@@ -382,11 +382,6 @@ in {
       };
     };
 
-    environment = {
-      NIXOS_OZONE_WL = "1";
-      DISPLAY = ":0";
-      WAYLAND_DISPLAY = "wayland-1";
-    };
   };
 
   systemd.user.services = {
