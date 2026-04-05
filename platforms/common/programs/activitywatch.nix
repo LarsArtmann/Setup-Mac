@@ -7,8 +7,8 @@
     enable = pkgs.stdenv.isLinux;
     package = pkgs.activitywatch;
     watchers = {
-      aw-watcher-afk = {
-        package = pkgs.activitywatch;
+      aw-watcher-window-wayland = {
+        package = pkgs.aw-watcher-window-wayland;
       };
       aw-watcher-utilization = {
         package = pkgs.aw-watcher-utilization;
@@ -22,7 +22,6 @@
   };
 
   systemd.user.services = lib.optionalAttrs pkgs.stdenv.isLinux {
-    activitywatch-watcher-aw-watcher-afk.Service.Environment = "DISPLAY=:0";
     activitywatch-theme = {
       Unit = {
         Description = "Set ActivityWatch theme to dark";

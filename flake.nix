@@ -150,6 +150,10 @@
       aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
     };
 
+    openaudibleOverlay = final: prev: {
+      openaudible = prev.callPackage ./pkgs/openaudible.nix {};
+    };
+
     dnsblockdOverlay = final: prev: {
       dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
         src = prev.lib.cleanSourceWith {
@@ -212,6 +216,7 @@
             inherit (pkgs) aw-watcher-utilization;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
+            openaudible = pkgs.callPackage ./pkgs/openaudible.nix {};
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
               src = lib.cleanSourceWith {
                 filter = path: type: baseNameOf path != "package.nix";
@@ -348,6 +353,7 @@
                   inputs.niri.overlays.niri
                   goOverlay
                   awWatcherOverlay
+                  openaudibleOverlay
                   dnsblockdOverlay
                   (final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {

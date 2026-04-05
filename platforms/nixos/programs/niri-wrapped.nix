@@ -419,7 +419,7 @@ in {
         PartOf = ["graphical-session.target"];
       };
       Service = {
-        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock -f timeout 600 ${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true' before-sleep ${pkgs.swaylock}/bin/swaylock -f";
+        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock timeout 600 ${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true' before-sleep ${pkgs.swaylock}/bin/swaylock";
         Restart = "on-failure";
       };
       Install.WantedBy = ["graphical-session.target"];

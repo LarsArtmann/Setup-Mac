@@ -205,9 +205,11 @@
       geekbench_6 # Geekbench 6 includes AI/ML benchmarking capabilities (Linux-only)
     ];
 
-  # Linux-specific utilities
+    # Linux-specific utilities
   linuxUtilities = with pkgs;
     lib.optionals stdenv.isLinux [
+      openaudible
+
       # Media streaming
       fcast-client # FCast Client Terminal, media streaming client
       fcast-receiver # FCast Receiver, media streaming receiver
