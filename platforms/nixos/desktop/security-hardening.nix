@@ -7,10 +7,8 @@
     # Add Swaylock PAM service for screen locking
     pam.services.swaylock = {};
 
-    # Audit daemon disabled due to AppArmor conflicts
-    # NixOS 26.05 (Jan 2026) has bug where audit-rules-nixos.service fails with "No rules"
+    # Audit daemon disabled — NixOS 26.05 bug: audit-rules-nixos.service fails with "No rules"
     # See: https://github.com/NixOS/nixpkgs/issues/483085
-    # Audit logs still work even when service fails - AppArmor may block rule loading
     # TODO: Re-enable after NixOS resolves the audit-rules service bug
     # auditd.enable = true;
     # auditd.settings = {
@@ -18,7 +16,7 @@
     # };
 
     # Audit rules configuration (disabled)
-    # TODO: Re-enable after fixing audit kernel module (AppArmor conflicts)
+    # TODO: Re-enable after fixing audit kernel module
     # audit = {
     #   enable = true;
     #   rules = [
