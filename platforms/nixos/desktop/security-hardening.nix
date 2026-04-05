@@ -37,8 +37,8 @@
     #   ];
     # };
 
-    # AppArmor for mandatory access control
-    apparmor.enable = true;
+    # AppArmor for mandatory access control (disabled)
+    apparmor.enable = false;
   };
 
   # Security services (SSH is configured separately in ../services/ssh.nix)
