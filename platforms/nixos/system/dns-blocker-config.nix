@@ -34,55 +34,55 @@ in {
       {
         name = "StevenBlack-everything";
         url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn-social/hosts";
-        hash = "sha256-CszxDsZ6EsxblTUPE0hDcsdGbZ909UZqUPa1nYv0ieY=";
+        hash = "sha256-su61LEXtsIziTZobmqivh1DA377MoP4blB1Lp/+ax4o=";
       }
       # HaGeZi Ultimate: comprehensive ad/tracker/scam/clickbait blocking (~541K)
       {
         name = "HaGeZi-ultimate";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/ultimate.txt";
-        hash = "sha256-a81XW+myYbAKNW8gU1X4zdbTdDzSup1yFjIk1CDqn6Q=";
+        hash = "sha256-i04/iXVtRvGWNvkxNF3TL0M0eo2Ud602s0ud6WhTXYc=";
       }
       # HaGeZi Tracker Interference: blocks anti-DNS tracking countermeasures (~1M)
       {
         name = "HaGeZi-tif";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt";
-        hash = "sha256-LqkBlTkyRjl/SPN+1Carptdcwe6EAJiOmQ+o3w/QfoU=";
+        hash = "sha256-IaVayb+U4VK8N0uw/QWiL/nEdz/O415dslVM2IW0R10=";
       }
       # HaGeZi DNS-over-HTTPS: prevent bypassing DNS via DoH (~4K)
       {
         name = "HaGeZi-doh";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/doh.txt";
-        hash = "sha256-wBZxKHqrXWGrQYjnbOjDGXJUa1/wgIFks0jKX8Si6mQ=";
+        hash = "sha256-SGroFMhGRgh4ppxROCat27CoFJSHv6AuwIz2a579tmk=";
       }
       # HaGeZi DoH/VPN/TOR/Proxy full bypass prevention (~17K)
       {
         name = "HaGeZi-bypass-full";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/doh-vpn-proxy-bypass.txt";
-        hash = "sha256-a87L6zBzwuHn1Ibs1bUcKk0r6/cGmlPDngeRyD6uG0o=";
+        hash = "sha256-4YnZtL7OClwPefEii/BkCRlAdjJ0g83A3CyL8VR8t+8=";
       }
       # HaGeZi Native telemetry - Apple
       {
         name = "HaGeZi-native-apple";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.apple.txt";
-        hash = "sha256-iDNL4t9MUCCP0HfnbKi1TNu43luErKcJI/KZodzV5jA=";
+        hash = "sha256-Jp02CpVwePxyk9x9WrvjphpJdLg3qCd7YoBF+IX3j5U=";
       }
       # HaGeZi Native telemetry - Amazon
       {
         name = "HaGeZi-native-amazon";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.amazon.txt";
-        hash = "sha256-qmTShV7kjfZ+yDnxjxOJAjxuM3hKU5Qy6AZJEDDFaQ4=";
+        hash = "sha256-BrDHb/iJk5P5bwNbMqkUDFUemNZ5BQXjsTkiTIsmHR8=";
       }
       # HaGeZi Native telemetry - Samsung
       {
         name = "HaGeZi-native-samsung";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.samsung.txt";
-        hash = "sha256-L/ag8CukXGwqmP1Mxz3f5A5o5tRSOKQsqFaXB1mcikM=";
+        hash = "sha256-IS58exeIQsXXf1sdBFBx2qeL3MaWVAnEhheDtvOZdOM=";
       }
       # HaGeZi Native telemetry - Xiaomi
       {
         name = "HaGeZi-native-xiaomi";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.xiaomi.txt";
-        hash = "sha256-ZcwN1KdvE9n5AuMzpJ6ESIlpAq+EkXlBz+F+YFFBF+g=";
+        hash = "sha256-Y9P9vA7baXSn9BHRaXd2XUxxaz3tZss0G9x4zMPbWJ4=";
       }
       # HaGeZi Native telemetry - Huawei
       {
@@ -94,7 +94,7 @@ in {
       {
         name = "HaGeZi-native-lgwebos";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.lgwebos.txt";
-        hash = "sha256-7oxVOVxGKvV3hEv8TsvjpqEDovzpFMOU8m3oJceZ9zw=";
+        hash = "sha256-QCOFH55djcTqQNsf7un7rXHAQ8D3cAAJ3XbGPKP2/EI=";
       }
       # HaGeZi Native telemetry - Oppo/Realme
       {
@@ -118,55 +118,55 @@ in {
       {
         name = "HaGeZi-native-winoffice";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winoffice.txt";
-        hash = "sha256-oYxCzmggNG5biolQLwNNg3wrBIgqKZ3KUEykNUAm13w=";
+        hash = "sha256-3+EnpSPeHhFwk2wqT5hWb6Iqp5cDVeUjoV0BzVVDmvs=";
       }
       # HaGeZi Native - TikTok extended blocking
       {
         name = "HaGeZi-native-tiktok-extended";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.tiktok.extended.txt";
-        hash = "sha256-+9dqc3cJD2FUPpDW4YgfFs++B7HbYBapRdwj+vOnWaI=";
+        hash = "sha256-j72mjZ4pRTycOaAFusE5EEZgxrgp48yWnoeEXqRe94U=";
       }
       # HaGeZi Gambling: blocks gambling content (~209K)
       {
         name = "HaGeZi-gambling";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/gambling.txt";
-        hash = "sha256-8nK8H+wNhhDrlW5+ZfTEkAw6HFX8gHnsKFAO/CVmFJ8=";
+        hash = "sha256-NhrXplqo+G8+hg0aWODnXVouhFi/yM3RtlgO1qPDusQ=";
       }
       # HaGeZi NSFW: blocks adult content (~76K)
       {
         name = "HaGeZi-nsfw";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/nsfw.txt";
-        hash = "sha256-h+D4ScGGivN0ebl0LXYqb0ITjy0kbyU8VoDAAPBdzDE=";
+        hash = "sha256-/1DAmI+3UsLsF3GnhwI7FBZZp4H6oywnfmVE6FVWDAQ=";
       }
       # HaGeZi Social Networks: blocks social media (~900)
       {
         name = "HaGeZi-social";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/social.txt";
-        hash = "sha256-zDGwI1XL4eQHpbWEQ14KpOH88NdJuMp0rhq2tfUJIv4=";
+        hash = "sha256-ps97h0PrTn2KBGjAEykgLgNW9cHVKN/Lr24x3/kIQco=";
       }
       # HaGeZi Anti Piracy: blocks piracy sites (~12K)
       {
         name = "HaGeZi-anti-piracy";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/anti.piracy.txt";
-        hash = "sha256-k2whYDpNlkPAb5Zm/Vbsza75ux0h8yfK3vFE4e2QhaE=";
+        hash = "sha256-XJv85gpGZuYk9S+VtODpdtKEgSK9lhIzGG886N1EyIE=";
       }
       # HaGeZi Dynamic DNS: blocks malicious DynDNS services (~1.5K)
       {
         name = "HaGeZi-dyndns";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/dyndns.txt";
-        hash = "sha256-Xi5SJi9aVY0Rcclzn7wPjcU0zK6RmMjepNCvVqDDEa0=";
+        hash = "sha256-c4XRe2ewuoWtxBLCoX4DUqUjQnXCh2IXgBANcQyd0b8=";
       }
       # HaGeZi Badware Hoster: blocks malicious hosting providers (~1.2K)
       {
         name = "HaGeZi-hoster";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/hoster.txt";
-        hash = "sha256-ZHJnNSVpX6WLk8IRZmjgcxpAQp//io1w4NbAcLjViRA=";
+        hash = "sha256-824WnSAwQnQn1yQPk/Bav6GRUAOHmwElWsiNNdpejBc=";
       }
       # HaGeZi URL Shortener: blocks link shorteners (~10K)
       {
         name = "HaGeZi-urlshortener";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/urlshortener.txt";
-        hash = "sha256-2BcIwrTygvWHI5X72yL9tn3Q0r7PMDwj/Z5sS0ETWtU=";
+        hash = "sha256-S4INweat0ux0sKmIgmVUx2AJbdLKZo14cFLNPyopvTw=";
       }
       # HaGeZi Safesearch: blocks engines without safesearch (~200)
       {
@@ -178,7 +178,7 @@ in {
       {
         name = "HaGeZi-dga7";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/dga7.txt";
-        hash = "sha256-+72mSSDC/fv81cKZoma/wu5ma4u+rGbsOnfQ4T86G3g=";
+        hash = "sha256-prDpjZlIQQtrWHdHEDVtDhk+dU/a3WKEjfDEeFeKUoI=";
       }
     ];
 
