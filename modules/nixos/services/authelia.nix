@@ -208,7 +208,7 @@
       users:
         lars:
           displayname: "Lars"
-          password: "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng"
+          password: "$argon2id$v=19$m=65536,t=3,p=4$N3oIeSh+Z49gAkaswNmmpw$I5Ls1qWDfBpr8KCqlSnoHHvzwY+q224urs9s6dcEM34"
           email: "lars@auth.home.lan"
           groups:
             - admin
