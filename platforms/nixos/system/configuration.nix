@@ -129,6 +129,19 @@
     system.stateVersion = "25.11";
 
     services = {
+      libinput = {
+        enable = true;
+        mouse = {
+          accelProfile = "flat";
+        };
+        touchpad = {
+          tapping = true;
+          naturalScrolling = true;
+          disableWhileTyping = true;
+          clickMethod = "clickfinger";
+        };
+      };
+
       fstrim.enable = true;
 
       signoz = {

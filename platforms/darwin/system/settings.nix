@@ -12,7 +12,7 @@
         InitialKeyRepeat = 15; # Delay before repeat
 
         # Trackpad configuration
-        "com.apple.trackpad.scaling" = 1.0;
+        "com.apple.trackpad.scaling" = 2.0;
 
         # Dark mode — driven by preferences.appearance.variant
         AppleInterfaceStyle =

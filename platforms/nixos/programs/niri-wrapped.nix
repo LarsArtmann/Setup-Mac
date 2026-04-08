@@ -43,6 +43,7 @@ in {
       };
 
       trackball = {
+        accel-profile = "flat";
         scroll-method = "on-button-down";
         scroll-button = 273;
       };
