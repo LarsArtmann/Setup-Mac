@@ -228,6 +228,30 @@ in {
           Value = false;
           Status = "locked";
         };
+        "widget.disable-swipe-tracker" = {
+          Value = true;
+          Status = "locked";
+        };
+        "browser.gesture.swipe.left" = {
+          Value = "";
+          Status = "locked";
+        };
+        "browser.gesture.swipe.right" = {
+          Value = "";
+          Status = "locked";
+        };
+        "browser.gesture.swipe.up" = {
+          Value = "";
+          Status = "locked";
+        };
+        "browser.gesture.swipe.down" = {
+          Value = "";
+          Status = "locked";
+        };
+        "browser.autofocus" = {
+          Value = false;
+          Status = "locked";
+        };
       };
     };
 

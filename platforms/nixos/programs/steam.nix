@@ -4,17 +4,17 @@
   pkgs,
   ...
 }: {
-  # Steam support for Linux gaming
   programs.steam = {
     enable = true;
+    extest.enable = true;
+    localNetworkGameTransfers.openFirewall = true;
+    protontricks.enable = true;
   };
 
-  # Steam hardware support for controllers and VR
   hardware.steam-hardware = {
     enable = true;
   };
 
-  # GameMode - optimize CPU/GPU performance for games
   programs.gamemode = {
     enable = true;
     settings = {
@@ -30,10 +30,15 @@
     };
   };
 
-  # Add Steam, GameMode, and MangoHud to system packages
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
+
   environment.systemPackages = with pkgs; [
     steam
     gamemode
     mangohud
+    gamescope
   ];
 }
