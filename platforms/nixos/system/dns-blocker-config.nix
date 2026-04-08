@@ -193,6 +193,7 @@ in {
       "nominatim.openstreetmap.org"
       "tile.openstreetmap.org"
       "huggingface.co"
+      "hf.co"
       "cdn-lfs.huggingface.co"
       "cdn-lfs-us-1.huggingface.co"
       "discord.gg"
