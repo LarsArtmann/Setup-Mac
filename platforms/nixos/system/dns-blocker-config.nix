@@ -40,13 +40,13 @@ in {
       {
         name = "HaGeZi-ultimate";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/ultimate.txt";
-        hash = "sha256-UyP3HnFPaRx9W/CNSD/03wGH5LXOXYdyCvMuaO9TGhM=";
+        hash = "sha256-QqDZ7MpDauPR6oGwFhvCApVBmrjCeT8FEvSUgaRDnhw=";
       }
       # HaGeZi Tracker Interference: blocks anti-DNS tracking countermeasures (~1M)
       {
         name = "HaGeZi-tif";
         url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt";
-        hash = "sha256-5L3iet6uYsnhBR4wQlKR0wdAwUDkcee3+22Rq+aT2Ro=";
+        hash = "sha256-+PKLd73vuy1GtJdVAnMBHNQSYs5s+qu1Ma3VnyEfbk0=";
       }
       # HaGeZi DNS-over-HTTPS: prevent bypassing DNS via DoH (~4K)
       {
