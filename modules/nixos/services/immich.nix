@@ -20,6 +20,8 @@
       redis.enable = true;
       machine-learning.enable = true;
 
+      environment.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
       settings = {
         oauth = {
           enabled = true;
