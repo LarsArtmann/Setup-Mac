@@ -186,11 +186,16 @@
             if [ "''${#CLIP_CONTENT}" -gt 15 ]; then
               CLIP_TRUNCATED="''${CLIP_TRUNCATED}..."
             fi
-            echo "$CLIP_TRUNCATED" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
+            COUNT=$(${pkgs.cliphist}/bin/cliphist list | wc -l || echo "0")
+            echo "{\"text\": \"$CLIP_TRUNCATED\", \"tooltip\": \"Clipboard ($COUNT items)\\nClick: open history\\nMiddle-click: clear all\"}" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g'
           '';
+          return-type = "json";
           interval = 5;
           on-click = pkgs.writeShellScript "waybar-clipboard-menu" ''
-            ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' -theme-str 'window {width: 50%;}' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
+            ${pkgs.cliphist}/bin/cliphist list | ${pkgs.rofi}/bin/rofi -dmenu -p 'Clipboard:' -kb-delete-entry 'Ctrl+Delete' -theme-str 'window {width: 50%;} listview {columns: 1; lines: 12; scrollbar: true; } element {orientation: horizontal; padding: 8px; spacing: 8px; } element-text {horizontal-align: 0.0; vertical-align: 0.5; } scrollbar {enabled: true; width: 4px; padding: 0; } scrollbar-handle {background-color: #89b4fa; border-radius: 2px; }' | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
+          '';
+          on-middle-click = pkgs.writeShellScript "waybar-clipboard-clear" ''
+            ${pkgs.cliphist}/bin/cliphist wipe
           '';
         };
 

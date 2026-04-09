@@ -201,6 +201,7 @@ in {
       "movieffm.net"
       "www.movieffm.net"
       "deref-mail.com"
+      "wbby.co"
     ];
 
     extraDomains = [

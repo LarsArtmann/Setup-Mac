@@ -166,6 +166,7 @@
 
     # Desktop packages
     # Note: kitty managed by programs.kitty above — don't add to packages
+    # Note: cliphist is installed via common/packages/base.nix (Linux-only)
     dunst
     libnotify
     wlogout
@@ -174,7 +175,6 @@
     playerctl
     brightnessctl
     ddcutil
-    cliphist
     wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste)
     wl-clip-persist # Keeps clipboard content after programs close
     rofi-calc

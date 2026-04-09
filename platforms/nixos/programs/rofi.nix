@@ -18,14 +18,6 @@
           font: "JetBrainsMono Nerd Font 10";
       }
 
-      configuration {
-          modi: "drun";
-          show-icons: true;
-          display-drun: "  ";
-          drun-display-format: "{name}";
-          icon-theme: "Papirus";
-      }
-
       window {
           transparency: "real";
           location: center;
@@ -190,6 +182,7 @@
       show-icons = true;
       icon-theme = "Papirus";
       terminal = "kitty";
+      display-drun = " ";
       drun-display-format = "{name}";
       location = 0;
       disable-history = false;
