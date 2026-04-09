@@ -35,6 +35,8 @@ in {
         natural-scroll = true;
         tap-button-map = "left-middle-right";
         click-method = "clickfinger";
+        drag = true;
+        disabled-on-external-mouse = true;
       };
 
       mouse = {

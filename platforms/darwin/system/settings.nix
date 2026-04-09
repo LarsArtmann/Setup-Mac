@@ -21,6 +21,12 @@
           else null;
       };
 
+      trackpad = {
+        Clicking = true;
+        TrackpadThreeFingerDrag = true;
+        TrackpadRightClick = true;
+      };
+
       # Finder preferences
       finder = {
         FXPreferredViewStyle = "Nlsv"; # List view
