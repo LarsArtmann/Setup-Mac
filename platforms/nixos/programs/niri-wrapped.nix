@@ -384,7 +384,6 @@ in {
         };
       };
     };
-
   };
 
   systemd.user.services = {
