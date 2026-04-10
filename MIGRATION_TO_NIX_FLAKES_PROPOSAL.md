@@ -278,7 +278,7 @@ The justfile's `backup` recipes imperatively copy directories. Nix already provi
 - In scripts: Use `git rev-parse --show-toplevel` or pass paths from Nix
 
 **Steps:**
-1. Audit all consumers of `paths.sh` 
+1. Audit all consumers of `paths.sh`
 2. Refactor each consumer to derive paths independently or receive them as arguments
 3. Delete `scripts/lib/paths.sh`
 4. Verify all scripts still function
@@ -433,7 +433,7 @@ These are inherently runtime concerns and should stay as a packaged script.
 
 **Current:** `maintenance.sh` (681 lines) implements its own cron-like scheduler.
 
-**Migration:** 
+**Migration:**
 
 **NixOS:** Systemd timers
 ```nix
@@ -541,7 +541,7 @@ checks.nixos = nixosTests {
 
 **Current:** justfile `backup`/`restore` recipes copy directories imperatively.
 
-**Migration:** 
+**Migration:**
 
 - **System config:** Already handled by Nix generations. Promote `nix-env --list-generations` and `home-manager generations` as the primary rollback mechanism.
 - **User data:** Consider `services.borgbackup` or `services.restic` on NixOS for declarative backup:
