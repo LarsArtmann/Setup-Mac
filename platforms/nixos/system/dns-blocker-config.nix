@@ -9,7 +9,7 @@
 # - DGA/NRD blocking, anti-piracy, NSFW, social, gambling, URL shorteners
 # - Dynamic DNS, badware hosters, safesearch enforcement
 {config, ...}: let
-  domain = config.networking.domain;
+  inherit (config.networking) domain;
   lanIP =
     builtins.head
     config.networking.interfaces.eno1.ipv4.addresses;

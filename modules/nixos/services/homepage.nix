@@ -4,7 +4,7 @@
     pkgs,
     ...
   }: let
-    domain = config.networking.domain;
+    inherit (config.networking) domain;
     port = 8082;
     stateDir = "/var/lib/homepage-dashboard";
 

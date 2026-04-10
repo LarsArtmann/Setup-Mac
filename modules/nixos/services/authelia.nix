@@ -5,7 +5,7 @@
     pkgs,
     ...
   }: let
-    domain = config.networking.domain;
+    inherit (config.networking) domain;
     authHost = "auth.${domain}";
     authPort = 9091;
 

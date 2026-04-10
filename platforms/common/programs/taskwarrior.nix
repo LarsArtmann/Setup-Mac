@@ -10,25 +10,27 @@
         confirmation = false;
       };
 
-      report.minimal = {
-        filter = "status:pending";
-        columns = "id,project,tags,start.age,description";
-        labels = "ID,Project,Tags,Started,Description";
-        sort = "project+,description+";
-      };
+      report = {
+        minimal = {
+          filter = "status:pending";
+          columns = "id,project,tags,start.age,description";
+          labels = "ID,Project,Tags,Started,Description";
+          sort = "project+,description+";
+        };
 
-      report.next = {
-        filter = "status:pending limit:20";
-        columns = "id,start.age,entry.age,project,tags,recur,wait.remaining,scheduled,urgency,due,description";
-        labels = "ID,Active,Age,Project,Tag,Recur,Wait,Sched,Urg,Due,Description";
-        sort = "urgency-";
-      };
+        next = {
+          filter = "status:pending limit:20";
+          columns = "id,start.age,entry.age,project,tags,recur,wait.remaining,scheduled,urgency,due,description";
+          labels = "ID,Active,Age,Project,Tag,Recur,Wait,Sched,Urg,Due,Description";
+          sort = "urgency-";
+        };
 
-      report.agent = {
-        filter = "status:pending +agent limit:50";
-        columns = "id,source,start.age,description";
-        labels = "ID,Source,Active,Description";
-        sort = "entry+";
+        agent = {
+          filter = "status:pending +agent limit:50";
+          columns = "id,source,start.age,description";
+          labels = "ID,Source,Active,Description";
+          sort = "entry+";
+        };
       };
 
       uda.source.type = "string";

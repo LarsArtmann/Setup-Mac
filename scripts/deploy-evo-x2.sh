@@ -17,8 +17,8 @@ echo "=== Ping 192.168.1.150 ==="
 ping -c 2 -W 2 192.168.1.150 || true
 
 echo ""
-echo "=== IP addresses on enp1s0 ==="
-ip addr show enp1s0 | grep "inet " || true
+echo "=== IP addresses on eno1 ==="
+ip addr show eno1 | grep "inet " || true
 
 echo ""
 echo "=== Failed units ==="

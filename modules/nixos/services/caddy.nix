@@ -4,7 +4,7 @@
     pkgs,
     ...
   }: let
-    domain = config.networking.domain;
+    inherit (config.networking) domain;
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
