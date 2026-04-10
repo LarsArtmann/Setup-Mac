@@ -3,7 +3,7 @@
   sox,
   runCommand,
 }:
-runCommand "notification-tone" { nativeBuildInputs = [ sox ]; } ''
+runCommand "notification-tone" {nativeBuildInputs = [sox];} ''
   mkdir -p $out/share/sounds
 
   # Three ascending pings: A5(880) → E6(1318) → A6(1760)
