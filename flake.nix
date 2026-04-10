@@ -254,6 +254,41 @@
             '';
           };
         };
+
+        apps =
+          {
+            deploy = {
+              type = "app";
+              program = "${pkgs.writeShellScriptBin "deploy" ''
+                set -euo pipefail
+                nh os switch . 2>&1
+              ''}/bin/deploy";
+            };
+            validate = {
+              type = "app";
+              program = "${pkgs.writeShellScriptBin "validate" ''
+                nix --extra-experimental-features "nix-command flakes" flake check --no-build
+              ''}/bin/validate";
+            };
+          }
+          // lib.optionalAttrs pkgs.stdenv.isLinux {
+            dns-diagnostics = {
+              type = "app";
+              program = "${pkgs.writeShellScriptBin "dns-diagnostics" ''
+                echo "=== DNS Services ==="
+                systemctl is-active unbound dnsblockd 2>/dev/null || true
+                echo ""
+                echo "=== DNS Resolution ==="
+                ${pkgs.dig}/bin/dig google.com +short | head -1
+                echo ""
+                echo "=== DNS Blocking ==="
+                ${pkgs.dig}/bin/dig doubleclick.net +short | head -1
+                echo ""
+                echo "=== dnsblockd Stats ==="
+                ${pkgs.curl}/bin/curl -s http://127.0.0.1:9090/stats 2>/dev/null || echo "Stats unavailable"
+              ''}/bin/dns-diagnostics";
+            };
+          };
       };
 
       # System configurations (maintain backward compatibility)
