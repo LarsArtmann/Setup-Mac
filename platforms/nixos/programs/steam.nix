@@ -7,7 +7,7 @@
   programs.steam = {
     enable = true;
     extest.enable = true;
-    localNetworkGameTransfers.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = false;
     protontricks.enable = true;
   };
 

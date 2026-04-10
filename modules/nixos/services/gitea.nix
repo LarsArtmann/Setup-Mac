@@ -431,7 +431,7 @@
 
           if [ -n "$TOKEN" ]; then
             printf 'GITEA_TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
-            chmod 644 "$TOKEN_FILE"
+            chmod 600 "$TOKEN_FILE"
             echo "API token written to $TOKEN_FILE"
           else
             echo "WARNING: Failed to generate API token"
@@ -473,7 +473,7 @@
 
           if [ -n "$TOKEN" ]; then
             printf 'TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
-            chmod 644 "$TOKEN_FILE"
+            chmod 600 "$TOKEN_FILE"
             echo "Runner registration token written to $TOKEN_FILE"
           else
             echo "WARNING: Failed to generate runner registration token"

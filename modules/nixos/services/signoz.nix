@@ -324,12 +324,7 @@ in {
         };
       })
 
-      {
-        networking.firewall.allowedTCPPorts =
-          lib.optionals cfg.components.queryService [cfg.settings.queryService.port]
-          ++ lib.optionals cfg.components.otelCollector [cfg.settings.collector.port cfg.settings.collector.httpPort]
-          ++ lib.optionals cfg.components.clickhouse [9000 8123];
-      }
+      {}
     ]);
   };
 }
