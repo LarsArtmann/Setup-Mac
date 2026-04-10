@@ -52,6 +52,12 @@
         "photomap.${domain}" = protectedVHost "photomap" 8050;
         "unsloth.${domain}" = protectedVHost "unsloth" 8888;
         "signoz.${domain}" = protectedVHost "signoz" 8080;
+        "tasks.${domain}" = {
+          extraConfig = ''
+            ${tlsConfig}
+            reverse_proxy localhost:10222
+          '';
+        };
       };
     };
 

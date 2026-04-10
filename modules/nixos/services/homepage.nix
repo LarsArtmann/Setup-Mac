@@ -52,6 +52,9 @@
         Development:
           style: row
           columns: 4
+        Productivity:
+          style: row
+          columns: 4
         Monitoring:
           style: row
           columns: 4
@@ -129,6 +132,15 @@
               icon: signoz.png
               statusStyle: dot
               siteMonitor: ${svcUrl "signoz"}
+
+      - Productivity:
+          - Taskwarrior:
+              href: ${svcUrl "tasks"}
+              description: Task Sync Server (TaskChampion)
+              icon: taskwarrior.png
+              statusStyle: dot
+              siteMonitor: ${svcUrl "tasks"}
+
           - Homepage:
               description: This Page
               icon: homepage.png

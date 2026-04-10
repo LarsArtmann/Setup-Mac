@@ -18,6 +18,7 @@
     ./programs/pre-commit.nix
     ./programs/ublock-filters.nix
     ./programs/keepassxc.nix
+    ./programs/taskwarrior.nix
 
     # Browser configuration with extension management
     ./programs/chromium.nix
