@@ -34,7 +34,8 @@ SystemNix/
 │   ├── monitoring.nix           # Prometheus + exporters
 │   ├── photomap.nix             # AI photo exploration
 │   ├── signoz.nix               # Observability (traces/metrics/logs)
-│   └── sops.nix                 # Secrets management
+│   ├── sops.nix                 # Secrets management
+│   └── taskchampion.nix         # Taskwarrior sync server
 │
 ├── pkgs/                        # Custom packages
 │   ├── dnsblockd.nix            # DNS block page server (Go)
@@ -44,8 +45,8 @@ SystemNix/
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
-    │   ├── home-base.nix        # Imports 14 program modules
-    │   ├── programs/            # fish, zsh, bash, nushell, starship, git, tmux, fzf, ...
+    │   ├── home-base.nix        # Imports 15 program modules
+    │   ├── programs/            # fish, zsh, bash, nushell, starship, git, tmux, fzf, taskwarrior, ...
     │   ├── packages/base.nix    # All cross-platform packages (70+)
     │   └── core/nix-settings.nix
     ├── darwin/                  # macOS (nix-darwin)
@@ -150,6 +151,21 @@ Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server)
 - Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
 - Local `.home.lan` DNS records for all services
 - Blocklist source: `platforms/nixos/programs/dnsblockd/`
+
+### Taskwarrior + TaskChampion Sync
+
+Task management synced across NixOS, macOS, and Android via TaskChampion sync server.
+- Server: `services.taskchampion-sync-server` on NixOS (port 10222, behind Caddy at `tasks.home.lan`)
+- Client: Taskwarrior 3 via Home Manager (`platforms/common/programs/taskwarrior.nix`)
+- Android: TaskStrider (Play Store, supports TaskChampion sync)
+- Sync URL: `https://tasks.home.lan`
+- No forward auth — TaskChampion uses client ID allowlisting + client-side encryption
+- Per-device setup required: generate client ID (`uuidgen`) and set `sync.server.client_id` + `sync.encryption_secret` in `~/.config/task/taskrc`
+
+AI agent task tracking protocol:
+- Tag `+agent` for AI-created/tracked tasks
+- UDA `source` identifies the originating agent (e.g., `source:crush`)
+- Report: `task report.agent` shows agent tasks
 
 ## Critical Rules & Gotchas
 
