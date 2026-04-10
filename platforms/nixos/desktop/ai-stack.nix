@@ -98,25 +98,6 @@ in {
       UMask = pkgs.lib.mkForce "0007";
     };
 
-    ollama-permissions = {
-      description = "Fix Ollama data directory permissions";
-      after = ["local-fs.target"];
-      before = ["ollama.service"];
-      wantedBy = ["multi-user.target"];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = pkgs.writeShellScript "fix-ollama-perms" ''
-          mkdir -p /data/models/ollama/models
-          chmod 755 /data/models/ollama 2>/dev/null || true
-          chmod 775 /data/models/ollama/models 2>/dev/null || true
-          chown -R 61547:users /data/models/ollama 2>/dev/null || \
-            chown -R ollama:users /data/models/ollama 2>/dev/null || true
-          chmod -R u+rwX,g+rX /data/models/ollama 2>/dev/null || true
-        '';
-      };
-    };
-
     unsloth-setup = {
       description = "Unsloth Studio - First-time setup";
       after = ["network-online.target"];
