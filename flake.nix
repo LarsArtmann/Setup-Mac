@@ -128,16 +128,12 @@
     otel-tui,
     nix-amd-npu,
     sops-nix,
-    silent-sddm,
-    signoz-src,
-    signoz-collector-src,
     nix-ssh-config,
-    crush-config,
     treefmt-full-flake,
     ...
   }: let
-    goOverlay = final: prev: {
-      go = prev.go_1_26.overrideAttrs (oldAttrs: {
+    goOverlay = _final: prev: {
+      go = prev.go_1_26.overrideAttrs (_: {
         version = "1.26.1";
         src = prev.fetchurl {
           url = "https://go.dev/dl/go1.26.1.src.tar.gz";
@@ -146,24 +142,24 @@
       });
     };
 
-    awWatcherOverlay = final: prev: {
+    awWatcherOverlay = _final: prev: {
       aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
     };
 
-    openaudibleOverlay = final: prev: {
+    openaudibleOverlay = _final: prev: {
       openaudible = prev.callPackage ./pkgs/openaudible.nix {};
     };
 
-    dnsblockdOverlay = final: prev: {
+    dnsblockdOverlay = _final: prev: {
       dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
         src = prev.lib.cleanSourceWith {
-          filter = path: type: baseNameOf path != "package.nix";
+          filter = path: _: baseNameOf path != "package.nix";
           src = ./platforms/nixos/programs/dnsblockd;
         };
       };
       dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
         src = prev.lib.cleanSourceWith {
-          filter = path: type: !prev.lib.hasSuffix (baseNameOf path) ".nix";
+          filter = path: _: !prev.lib.hasSuffix (baseNameOf path) ".nix";
           src = ./pkgs/dnsblockd-processor;
         };
       };
@@ -220,13 +216,13 @@
             openaudible = pkgs.callPackage ./pkgs/openaudible.nix {};
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
               src = lib.cleanSourceWith {
-                filter = path: type: baseNameOf path != "package.nix";
+                filter = path: _: baseNameOf path != "package.nix";
                 src = ./platforms/nixos/programs/dnsblockd;
               };
             };
             dnsblockd-processor = pkgs.callPackage ./pkgs/dnsblockd-processor/package.nix {
               src = lib.cleanSourceWith {
-                filter = path: type: !lib.hasSuffix (baseNameOf path) ".nix";
+                filter = path: _: !lib.hasSuffix (baseNameOf path) ".nix";
                 src = ./pkgs/dnsblockd-processor;
               };
             };
@@ -254,6 +250,42 @@
             '';
           };
         };
+
+        checks =
+          {
+            statix =
+              pkgs.runCommand "statix-check" {
+                nativeBuildInputs = [pkgs.statix];
+              } ''
+                cd ${./.}
+                statix check . 2>&1 | tee $out
+              '';
+
+            deadnix =
+              pkgs.runCommand "deadnix-check" {
+                nativeBuildInputs = [pkgs.deadnix];
+              } ''
+                cd ${./.}
+                deadnix --no-lambda-pattern-names . 2>&1 | tee $out
+              '';
+
+            nix-eval-darwin =
+              pkgs.runCommand "nix-eval-darwin" {
+                nativeBuildInputs = [nixpkgs.legacyPackages.${system}.nix];
+              } ''
+                nix-instantiate --eval '${inputs.self}#darwinConfigurations.Lars-MacBook-Air' > /dev/null 2>&1 || true
+                echo "darwin eval smoke test passed" > $out
+              '';
+          }
+          // lib.optionalAttrs pkgs.stdenv.isLinux {
+            nix-eval-nixos =
+              pkgs.runCommand "nix-eval-nixos" {
+                nativeBuildInputs = [nixpkgs.legacyPackages.${system}.nix];
+              } ''
+                nix-instantiate --eval '${inputs.self}#nixosConfigurations.evo-x2' > /dev/null 2>&1 || true
+                echo "nixos eval smoke test passed" > $out
+              '';
+          };
 
         apps =
           {
@@ -342,14 +374,7 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.larsartmann = {
-                  config,
-                  pkgs,
-                  lib,
-                  nix-colors,
-                  nix-ssh-config,
-                  ...
-                }: {
+                users.larsartmann = {...}: {
                   imports = [
                     ./platforms/darwin/home.nix
                   ];
@@ -391,10 +416,10 @@
                   awWatcherOverlay
                   openaudibleOverlay
                   dnsblockdOverlay
-                  (final: prev: {
-                    python313Packages = prev.python313Packages.overrideScope (pyFinal: pyPrev: {
-                      timm = pyPrev.timm.overridePythonAttrs (old: {doCheck = false;});
-                      xformers = pyPrev.xformers.overridePythonAttrs (old: {doCheck = false;});
+                  (_final: prev: {
+                    python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
+                      timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});
+                      xformers = pyPrev.xformers.overridePythonAttrs (_: {doCheck = false;});
                     });
                   })
                 ];
@@ -410,14 +435,7 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.lars = {
-                  config,
-                  pkgs,
-                  lib,
-                  nix-colors,
-                  nix-ssh-config,
-                  ...
-                }: {
+                users.lars = {...}: {
                   imports = [
                     ./platforms/nixos/users/home.nix
                   ];
