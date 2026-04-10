@@ -71,7 +71,7 @@ switch:
         sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./ --print-build-logs; \
     elif [ "$PLATFORM" = "linux" ]; then \
         echo "🔄 Applying NixOS configuration for $HOST..."; \
-        sudo nixos-rebuild switch --flake ./#"$HOST" --print-build-logs; \
+        nh os switch . -- --print-build-logs; \
     else \
         echo "❌ Unknown platform: $PLATFORM"; \
         exit 1; \
@@ -675,7 +675,7 @@ test:
     if [ "$$PLATFORM" = "darwin" ]; then \
         sudo /run/current-system/sw/bin/darwin-rebuild check --flake ./; \
     else \
-        sudo nixos-rebuild test --flake .#evo-x2; \
+        nh os test .; \
     fi
     @echo "✅ Configuration test passed"
 
@@ -694,7 +694,7 @@ deploy:
     if [ "$$PLATFORM" = "darwin" ]; then \
         sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./; \
     else \
-        sudo nixos-rebuild switch --flake .#evo-x2; \
+        nh os switch .; \
     fi
     @echo "✅ Home Manager deployment complete!"
     @echo ""
@@ -716,7 +716,7 @@ rollback:
     if [ "$$PLATFORM" = "darwin" ]; then \
         sudo /run/current-system/sw/bin/darwin-rebuild switch --rollback; \
     else \
-        sudo nixos-rebuild switch --rollback; \
+        nh os switch . -- --rollback; \
     fi
     @echo "✅ Rollback complete!"
     @echo ""
@@ -1433,7 +1433,7 @@ health-dashboard:
 # Tmux configuration and session management
 tmux-setup:
     @echo "🔧 Setting up tmux configuration..."
-    sudo nixos-rebuild switch --flake .#evo-x2 || darwin-rebuild switch --flake .#Lars-MacBook-Air
+    nh os switch . || darwin-rebuild switch --flake .#Lars-MacBook-Air
     @echo "✅ Tmux configuration applied"
 
 tmux-dev:
