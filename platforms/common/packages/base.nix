@@ -71,7 +71,6 @@
 
       # Shells and prompts
       fish
-      starship
       carapace
 
       # File operations and browsing
@@ -122,10 +121,6 @@
 
       # Media tools
       ffmpeg # Complete, cross-platform solution to record, convert and stream audio and video
-
-      # Task management
-      taskwarrior3
-      timewarrior
 
       # Clipboard management (Linux-only, Wayland)
       # cliphist # Not available on Darwin (Linux-only package)
