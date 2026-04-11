@@ -280,6 +280,22 @@ in {
         default-window-height = {proportion = 0.7;};
       }
       {
+        matches = [
+          {app-id = "^steam_app_.*";}
+        ];
+        open-fullscreen = true;
+        opacity = 1.0;
+      }
+      {
+        matches = [
+          {app-id = "^steam_app_.*";}
+          {app-id = "^steam$";}
+          {title = "^Counter-Strike";}
+        ];
+        open-fullscreen = true;
+        opacity = 1.0;
+      }
+      {
         matches = [{app-id = "^xdg-desktop-portal-gtk$";}];
         open-floating = true;
       }

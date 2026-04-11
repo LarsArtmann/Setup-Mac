@@ -27,7 +27,7 @@
     LIBVA_DRIVER_NAME = "radeonsi";
     AMD_VULKAN_ICD = "RADV";
     # Performance optimization
-    MESA_VK_WSI_PRESENT_MODE = "fifo";
+    MESA_VK_WSI_PRESENT_MODE = "immediate";
     # Remove problematic variables that can cause issues with modern Wayland compositors
     # WLR_RENDERER_ALLOW_SOFTWARE = "1";  # Only for debugging
     # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
