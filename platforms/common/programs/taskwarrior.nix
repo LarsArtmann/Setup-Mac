@@ -1,4 +1,22 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}: let
+  machineSeed = "${config.home.username}@${pkgs.stdenv.hostPlatform.system}";
+
+  deriveUuid = seed: let
+    h = builtins.hashString "sha256" "taskchampion-${seed}";
+    p1 = lib.strings.substring 0 8 h;
+    p2 = lib.strings.substring 8 4 h;
+    p3 = lib.strings.substring 12 4 h;
+    p4 = lib.strings.substring 16 4 h;
+    p5 = lib.strings.substring 20 12 h;
+  in "${p1}-${p2}-${p3}-${p4}-${p5}";
+
+  syncEncryptionSecret = builtins.hashString "sha256" "taskchampion-sync-encryption-systemnix";
+in {
   programs.taskwarrior = {
     enable = true;
     package = pkgs.taskwarrior3;
@@ -36,15 +54,16 @@
       uda.source.type = "string";
       uda.source.label = "Source";
 
-      sync.server.url = "https://tasks.home.lan";
+      sync = {
+        server = {
+          url = "https://tasks.home.lan";
+          client_id = deriveUuid machineSeed;
+        };
+        encryption_secret = syncEncryptionSecret;
+      };
     };
 
     extraConfig = ''
-      # TaskChampion sync client ID and encryption secret
-      # Generate per-device: uuidgen
-      # sync.server.client_id = <your-uuid-here>
-      # sync.encryption_secret = <your-secret-here>
-
       # Catppuccin Mocha color theme
       color.title=on color0
       color.header=on color0

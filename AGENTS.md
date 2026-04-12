@@ -160,14 +160,15 @@ Task management synced across NixOS, macOS, and Android via TaskChampion sync se
 - Android: TaskStrider (Play Store, supports TaskChampion sync)
 - Sync URL: `https://tasks.home.lan`
 - No forward auth — TaskChampion uses client ID allowlisting + client-side encryption
-- Per-device setup required: generate client ID (`uuidgen`) and set `sync.server.client_id` + `sync.encryption_secret` in `~/.config/task/taskrc`
+- **Zero manual setup**: client IDs derived deterministically from `username@platform` via SHA-256, encryption secret is a shared deterministic hash. `just switch && task sync` just works.
+- Per-device client ID: `sha256("taskchampion-${username}@${system}")` formatted as UUID
+- Shared encryption secret: `sha256("taskchampion-sync-encryption-systemnix")` (same on all devices)
 
 AI agent task tracking protocol:
 - Tag `+agent` for AI-created/tracked tasks
 - UDA `source` identifies the originating agent (e.g., `source:crush`)
 - Report: `task report.agent` shows agent tasks
 - Quick add: `just task-agent "description"` adds task with `+agent source:crush`
-- Setup: `just task-setup` generates client ID + configures encryption secret
 - Backup: `just task-backup` exports all tasks as JSON to `~/backups/taskwarrior/`
 - Theme: Catppuccin Mocha colors configured in `platforms/common/programs/taskwarrior.nix`
 

@@ -51,19 +51,6 @@
           restartUnits = ["authelia-main.service"];
         };
 
-        authelia_users_database_password = {
-          sopsFile = ./../../../platforms/nixos/secrets/authelia-secrets.yaml;
-          owner = "authelia-main";
-          group = "authelia-main";
-          restartUnits = ["authelia-main.service"];
-        };
-        authelia_oidc_client_secret = {
-          sopsFile = ./../../../platforms/nixos/secrets/authelia-secrets.yaml;
-          owner = "authelia-main";
-          group = "authelia-main";
-          restartUnits = ["authelia-main.service"];
-        };
-
         immich_oauth_client_secret = {
           sopsFile = ./../../../platforms/nixos/secrets/authelia-secrets.yaml;
           owner = "immich";
@@ -95,34 +82,13 @@
         };
       };
 
-      templates = {
-        "gitea-sync.env" = {
-          owner = "lars";
-          group = "users";
-          content = ''
-            GITHUB_TOKEN=${config.sops.placeholder.github_token}
-            GITHUB_USER=${config.sops.placeholder.github_user}
-          '';
-        };
-        "authelia-users_database.yml" = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          content = ''
-            users:
-              lars:
-                displayname: "Lars"
-                password: ${config.sops.placeholder.authelia_users_database_password}
-                email: "lars@auth.home.lan"
-                groups:
-                  - admin
-                  - dev
-          '';
-        };
-        "authelia-oidc-client-secret" = {
-          owner = "authelia-main";
-          group = "authelia-main";
-          content = config.sops.placeholder.authelia_oidc_client_secret;
-        };
+      templates."gitea-sync.env" = {
+        owner = "lars";
+        group = "users";
+        content = ''
+          GITHUB_TOKEN=${config.sops.placeholder.github_token}
+          GITHUB_USER=${config.sops.placeholder.github_user}
+        '';
       };
     };
   };

@@ -1845,28 +1845,17 @@ task-status:
     @task config sync.server.client_id 2>/dev/null || echo "  Client ID: not set"
     @echo ""
 
-# Interactive per-device setup: generate client ID + set encryption secret
+# Show taskwarrior auto-configured per-device credentials
 task-setup:
-    @echo "🔧 Taskwarrior per-device setup"
-    @echo "==============================="
+    @echo "📋 Taskwarrior is auto-configured per device"
+    @echo "   Client ID and encryption secret derived deterministically from hostname"
     @echo ""
-    @echo "This will:"
-    @echo "  1. Generate a new UUID for this device"
-    @echo "  2. Set the client ID in Taskwarrior config"
-    @echo "  3. Prompt for the shared encryption secret"
+    @echo "Current config:"
+    @echo -n "  Client ID: "; task config sync.server.client_id 2>/dev/null || echo "not set"
+    @echo -n "  Sync URL:   "; task config sync.server.url 2>/dev/null || echo "not set"
+    @echo -n "  Encrypted:  "; task config sync.encryption_secret 2>/dev/null && echo "yes" || echo "not set"
     @echo ""
-    CLIENT_ID=$$(uuidgen); \
-    echo "Generated Client ID: $$CLIENT_ID"; \
-    task config sync.server.client_id "$$CLIENT_ID"; \
-    echo ""; \
-    echo "Enter the shared encryption secret (same on all devices):"; \
-    read -r SECRET; \
-    task config sync.encryption_secret "$$SECRET"; \
-    echo ""; \
-    echo "Testing sync..."; \
-    task sync; \
-    echo ""; \
-    echo "✅ Setup complete. Client ID: $$CLIENT_ID"
+    @echo "No manual steps required — just switch and task sync"
 
 # Export all tasks as JSON (for backup)
 task-backup:

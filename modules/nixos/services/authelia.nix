@@ -204,11 +204,20 @@
       };
     };
 
-    environment.etc."authelia/users_database.yml".source = config.sops.templates."authelia-users_database.yml".path;
+    environment.etc."authelia/users_database.yml".source = pkgs.writeText "users_database.yml" ''
+      users:
+        lars:
+          displayname: "Lars"
+          password: "$argon2id$v=19$m=65536,t=3,p=4$N3oIeSh+Z49gAkaswNmmpw$I5Ls1qWDfBpr8KCqlSnoHHvzwY+q224urs9s6dcEM34"
+          email: "lars@auth.home.lan"
+          groups:
+            - admin
+            - dev
+    '';
 
     systemd.tmpfiles.rules = [
       "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
-      "L+ /var/lib/authelia-main/users_database.yml - - - - ${config.sops.templates."authelia-users_database.yml".path}"
+      "L+ /var/lib/authelia-main/users_database.yml - - - - /etc/authelia/users_database.yml"
     ];
   };
 }
