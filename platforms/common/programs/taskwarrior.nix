@@ -44,6 +44,57 @@
       # Generate per-device: uuidgen
       # sync.server.client_id = <your-uuid-here>
       # sync.encryption_secret = <your-secret-here>
+
+      # Catppuccin Mocha color theme
+      color.title=on color0
+      color.header=on color0
+      color.footnote=on color0
+      color.message=on color0
+      color.error=on color0
+      color.debug=on color0
+
+      color.overdue=rgbF38
+      color.due.today=rgbF9E
+      color.due=rgbF9E
+      color.scheduled=rgbA6E
+      color.active=rgbB4B
+      color.recurring=rgbCBA
+      color.blocked=rgbF38
+      color.blocking=rgbFAB
+
+      color.tagged=on rgb313
+      color.tag.none=
+      color.project.none=
+
+      color.uda.priority.H=rgbF38
+      color.uda.priority.M=rgbF9E
+      color.uda.priority.L=rgbA6E
+
+      color.summary.background=on rgb1E1
+      color.summary.bar=on rgb89B
+      color.history.add=rgbA6E
+      color.history.done=rgbA6E
+      color.history.delete=rgbF38
+
+      color.burndown.pending=rgb89B
+      color.burndown.done=rgbA6E
+      color.burndown.started=rgbFAB
+
+      color.sync.added=rgbA6E
+      color.sync.changed=rgbF9E
+      color.sync.rejected=rgbF38
+
+      color.calendar.today=rgb111 on rgbF9E
+      color.calendar.due=rgb111 on rgbF38
+      color.calendar.overdue=rgb111 on rgbF38
+      color.calendar.weekend=rgb6C7
+      color.calendar.holiday=rgbCBA
+
+      color.report.minimal.filter=on rgb454
+      color.report.next.filter=on rgb454
+      color.report.agent.filter=on rgb454
+
+      color.alternate=on rgb313
     '';
   };
 }

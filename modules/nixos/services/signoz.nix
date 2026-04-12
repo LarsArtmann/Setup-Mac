@@ -125,7 +125,7 @@ in {
               };
               host = lib.mkOption {
                 type = lib.types.str;
-                default = "0.0.0.0";
+                default = "127.0.0.1";
               };
               dataDir = lib.mkOption {
                 type = lib.types.path;
@@ -276,8 +276,8 @@ in {
           receivers = {
             otlp = {
               protocols = {
-                grpc = {endpoint = "0.0.0.0:${toString cfg.settings.collector.port}";};
-                http = {endpoint = "0.0.0.0:${toString cfg.settings.collector.httpPort}";};
+                grpc = {endpoint = "127.0.0.1:${toString cfg.settings.collector.port}";};
+                http = {endpoint = "127.0.0.1:${toString cfg.settings.collector.httpPort}";};
               };
             };
           };
