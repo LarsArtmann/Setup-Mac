@@ -166,6 +166,10 @@ AI agent task tracking protocol:
 - Tag `+agent` for AI-created/tracked tasks
 - UDA `source` identifies the originating agent (e.g., `source:crush`)
 - Report: `task report.agent` shows agent tasks
+- Quick add: `just task-agent "description"` adds task with `+agent source:crush`
+- Setup: `just task-setup` generates client ID + configures encryption secret
+- Backup: `just task-backup` exports all tasks as JSON to `~/backups/taskwarrior/`
+- Theme: Catppuccin Mocha colors configured in `platforms/common/programs/taskwarrior.nix`
 
 ## Critical Rules & Gotchas
 
@@ -225,6 +229,15 @@ just dns-diagnostics    # DNS stack diagnostics
 just immich-status       # Immich service status
 just immich-backup       # Database backup
 just gitea-sync-repos    # Sync GitHub → Gitea
+
+# Taskwarrior
+just task-list           # Show pending tasks (next report)
+just task-add <desc>     # Add a new task
+just task-agent <desc>   # Add AI-tracked task (+agent source:crush)
+just task-sync           # Sync with TaskChampion server
+just task-status         # Show task counts + sync config
+just task-setup          # Per-device: generate client ID + set encryption secret
+just task-backup         # Export all tasks as JSON
 
 # Recovery
 just rollback           # Revert to previous generation

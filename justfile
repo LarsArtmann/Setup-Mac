@@ -1808,6 +1808,73 @@ immich-restart:
         sudo systemctl restart immich-server immich-machine-learning && echo "✅ Immich services restarted" || echo "❌ Restart failed"; \
     fi
 
+# ========================================
+# Taskwarrior / TaskChampion Commands
+# ========================================
+
+# List pending tasks (default view)
+task-list:
+    @task next
+
+# Add a new task
+task-add *ARGS:
+    @task add {{ ARGS }}
+
+# Add a task tagged +agent with source metadata
+task-agent *ARGS:
+    @task add {{ ARGS }} +agent source:crush
+
+# Sync tasks with TaskChampion server
+task-sync:
+    @task sync
+
+# Show agent-tracked tasks
+task-agent-list:
+    @task report.agent
+
+# Show task status (sync server + pending count)
+task-status:
+    @echo "📋 Taskwarrior Status"
+    @echo "===================="
+    @echo -n "Pending tasks: "; task count status:pending 2>/dev/null || echo "unavailable"
+    @echo -n "Overdue tasks:  "; task count status:pending +OVERDUE 2>/dev/null || echo "unavailable"
+    @echo -n "Due today:      "; task count status:pending due:today 2>/dev/null || echo "unavailable"
+    @echo ""
+    @echo "Sync configuration:"
+    @task config sync.server.url 2>/dev/null || echo "  Not configured"
+    @task config sync.server.client_id 2>/dev/null || echo "  Client ID: not set"
+    @echo ""
+
+# Interactive per-device setup: generate client ID + set encryption secret
+task-setup:
+    @echo "🔧 Taskwarrior per-device setup"
+    @echo "==============================="
+    @echo ""
+    @echo "This will:"
+    @echo "  1. Generate a new UUID for this device"
+    @echo "  2. Set the client ID in Taskwarrior config"
+    @echo "  3. Prompt for the shared encryption secret"
+    @echo ""
+    CLIENT_ID=$$(uuidgen); \
+    echo "Generated Client ID: $$CLIENT_ID"; \
+    task config sync.server.client_id "$$CLIENT_ID"; \
+    echo ""; \
+    echo "Enter the shared encryption secret (same on all devices):"; \
+    read -r SECRET; \
+    task config sync.encryption_secret "$$SECRET"; \
+    echo ""; \
+    echo "Testing sync..."; \
+    task sync; \
+    echo ""; \
+    echo "✅ Setup complete. Client ID: $$CLIENT_ID"
+
+# Export all tasks as JSON (for backup)
+task-backup:
+    @echo "💾 Exporting all tasks..."
+    @mkdir -p ~/backups/taskwarrior
+    @task export > ~/backups/taskwarrior/tasks-$$(date '+%Y-%m-%d_%H-%M-%S').json
+    @echo "✅ Tasks exported to ~/backups/taskwarrior/"
+
 # Reload Niri compositor config without full rebuild
 reload:
     niri msg action reload-config
