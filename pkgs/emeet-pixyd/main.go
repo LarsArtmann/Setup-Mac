@@ -146,13 +146,7 @@ type Daemon struct {
 func NewDaemon(cfg Config) *Daemon {
 	d := &Daemon{
 		config: cfg,
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
+		state:  DefaultState(),
 	}
 	d.loadState()
 	d.probeDevices()
@@ -316,6 +310,7 @@ func hidSendRecv(hidrawDev string, report []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("open hidraw: %w", err)
 	}
+
 	defer func() { _ = f.Close() }()
 
 	if _, err := f.Write(buf); err != nil {
@@ -409,6 +404,7 @@ type hidMode interface {
 
 func pixyConfig(iface byte, mode hidMode) []byte {
 	var b [9]byte
+
 	b[0] = 0x09
 	b[1] = iface
 	b[2] = 0x01
@@ -418,6 +414,7 @@ func pixyConfig(iface byte, mode hidMode) []byte {
 	b[6] = 0x00
 	b[7] = 0x01
 	b[8] = mode.HIDByte()
+
 	return b[:]
 }
 
@@ -455,11 +452,19 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 }
 
 func (d *Daemon) setTracking(mode CameraState) error {
-	return d.setDeviceState(pixyConfig(0x01, mode), pixyCommit(0x01), func(d *Daemon) { d.state.Camera = mode })
+	return d.setDeviceState(
+		pixyConfig(0x01, mode),
+		pixyCommit(0x01),
+		func(d *Daemon) { d.state.Camera = mode },
+	)
 }
 
 func (d *Daemon) setAudio(mode AudioMode) error {
-	return d.setDeviceState(pixyConfig(0x05, mode), pixyCommit(0x05), func(d *Daemon) { d.state.Audio = mode })
+	return d.setDeviceState(
+		pixyConfig(0x05, mode),
+		pixyCommit(0x05),
+		func(d *Daemon) { d.state.Audio = mode },
+	)
 }
 
 func (d *Daemon) setGesture(enabled bool) error {
@@ -470,6 +475,7 @@ func (d *Daemon) setGesture(enabled bool) error {
 
 	configBytes := []byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x02, 0x00, 0x02, 0x02, modeByte}
 	commitBytes := []byte{0x09, 0x04, 0x02, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02}
+
 	return d.setDeviceState(configBytes, commitBytes, func(d *Daemon) { d.state.Gesture = enabled })
 }
 
@@ -495,48 +501,60 @@ func (d *Daemon) centerCamera() error {
 	return v4l2Set(d.videoDev, "zoom_absolute", "100")
 }
 
-func (d *Daemon) queryTracking() (CameraState, error) {
+func (d *Daemon) queryHIDState(
+	name string,
+	payload []byte,
+	getResult func(hidResponse) any,
+) (any, error) {
 	if d.hidrawDev == "" {
-		return "", errors.New("PIXY HID device not available")
+		return nil, errors.New("PIXY HID device not available")
 	}
 
-	resp, err := hidSendRecv(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x01})
+	resp, err := hidSendRecv(d.hidrawDev, payload)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	if resp == nil {
-		return "", errors.New("no HID response")
+		return nil, errors.New("no HID response")
 	}
 
 	parsed := parseHIDResponse(resp)
 	if !parsed.Got {
-		return "", errors.New("unrecognized HID response")
+		return nil, errors.New("unrecognized HID response")
 	}
 
-	return parsed.Tracking, nil
+	return getResult(parsed), nil
+}
+
+func (d *Daemon) queryTracking() (CameraState, error) {
+	result, err := d.queryHIDState(
+		"tracking",
+		[]byte{0x09, 0x01, 0x01, 0x01},
+		func(p hidResponse) any {
+			return p.Tracking
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return result.(CameraState), nil
 }
 
 func (d *Daemon) queryAudio() (AudioMode, error) {
-	if d.hidrawDev == "" {
-		return "", errors.New("PIXY HID device not available")
-	}
-
-	resp, err := hidSendRecv(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x04})
+	result, err := d.queryHIDState(
+		"audio",
+		[]byte{0x09, 0x05, 0x00, 0x04},
+		func(p hidResponse) any {
+			return p.Audio
+		},
+	)
 	if err != nil {
 		return "", err
 	}
 
-	if resp == nil {
-		return "", errors.New("no HID response")
-	}
-
-	parsed := parseHIDResponse(resp)
-	if !parsed.Got {
-		return "", errors.New("unrecognized HID response")
-	}
-
-	return parsed.Audio, nil
+	return result.(AudioMode), nil
 }
 
 func (d *Daemon) queryGesture() (bool, error) {
@@ -1090,6 +1108,7 @@ func sendCommand(cfg Config, cmd string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	defer func() { _ = conn.Close() }()
 
 	if err := setDeadline(conn, 2*time.Second); err != nil {
@@ -1122,8 +1141,10 @@ func (d *Daemon) Run() {
 	go func() {
 		<-sigs
 		sdNotify("STOPPING=1")
+
 		_ = os.Remove(d.config.SocketPath())
 		_ = os.Remove(d.config.StateFile())
+
 		os.Exit(0)
 	}()
 

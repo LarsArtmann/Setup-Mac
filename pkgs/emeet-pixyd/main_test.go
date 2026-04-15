@@ -15,19 +15,49 @@ func testConfig(dir string) Config {
 	}
 }
 
+func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
+	return &Daemon{
+		state:     State{Camera: camera},
+		videoDev:  videoDev,
+		hidrawDev: hidrawDev,
+	}
+}
+
+func newTestDaemonWithAudio(
+	camera CameraState,
+	audio AudioMode,
+	videoDev, hidrawDev string,
+) *Daemon {
+	return &Daemon{
+		state:     State{Camera: camera, Audio: audio},
+		videoDev:  videoDev,
+		hidrawDev: hidrawDev,
+	}
+}
+
+func assertCameraState(t *testing.T, d *Daemon, expected CameraState) {
+	if d.state.Camera != expected {
+		t.Errorf("expected camera state %s, got %s", expected, d.state.Camera)
+	}
+}
+
+func assertErrorPrefix(t *testing.T, result string) {
+	if !strings.HasPrefix(result, "error:") {
+		t.Errorf("expected error prefix, got: %s", result)
+	}
+}
+
+func assertParsedField(t *testing.T, parsed map[string]string, field string) {
+	if _, ok := parsed[field]; !ok {
+		t.Errorf("waybar output missing '%s' field", field)
+	}
+}
+
 func TestStateDefaults(t *testing.T) {
 	d := &Daemon{
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
+		state: DefaultState(),
 	}
-	if d.state.Camera != StatePrivacy {
-		t.Errorf("expected default camera state to be privacy, got %s", d.state.Camera)
-	}
+	assertCameraState(t, d, StatePrivacy)
 
 	if d.state.Audio != AudioNC {
 		t.Errorf("expected default audio to be nc, got %s", d.state.Audio)
@@ -90,6 +120,7 @@ func TestStateSaveLoad(t *testing.T) {
 
 func TestStateFileCorrupt(t *testing.T) {
 	cfg := testConfig(t.TempDir())
+
 	err := os.WriteFile(cfg.StateFile(), []byte("not json"), 0o644)
 	if err != nil {
 		t.Fatalf("write corrupt file: %v", err)
@@ -114,9 +145,7 @@ func TestStateFileMissing(t *testing.T) {
 	}
 	d.loadState()
 
-	if d.state.Camera != StatePrivacy {
-		t.Errorf("expected state to remain unchanged on missing file, got %s", d.state.Camera)
-	}
+	assertCameraState(t, d, StatePrivacy)
 }
 
 func TestHandleCommandStatus(t *testing.T) {
@@ -136,11 +165,7 @@ func TestHandleCommandStatus(t *testing.T) {
 }
 
 func TestHandleCommandUnknown(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StatePrivacy},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
-	}
+	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
 
 	result := d.handleCommand("foobar")
 	if result != "unknown command: foobar" {
@@ -179,11 +204,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 }
 
 func TestHandleCommandAudioInvalid(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StatePrivacy, Audio: AudioNC},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
-	}
+	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "/dev/video0", "/dev/hidraw0")
 
 	result := d.handleCommand("audio xyz")
 	if result != "usage: audio [nc|live|org]" {
@@ -192,11 +213,7 @@ func TestHandleCommandAudioInvalid(t *testing.T) {
 }
 
 func TestHandleCommandDeviceRequired(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StateOffline},
-		videoDev:  "",
-		hidrawDev: "",
-	}
+	d := newTestDaemon(StateOffline, "", "")
 
 	for _, cmd := range []string{"track", "idle", "privacy", "toggle-privacy", "center", "gesture-on", "gesture-off"} {
 		result := d.handleCommand(cmd)
@@ -235,6 +252,7 @@ func TestWaybarOutput(t *testing.T) {
 		output := d.waybarOutput()
 
 		var parsed map[string]string
+
 		err := json.Unmarshal([]byte(output), &parsed)
 		if err != nil {
 			t.Fatalf("waybar output is not valid JSON: %s, err: %v", output, err)
@@ -244,13 +262,8 @@ func TestWaybarOutput(t *testing.T) {
 			t.Errorf("expected class 'custom-camera %s', got '%s'", tt.expected, parsed["class"])
 		}
 
-		if _, ok := parsed["text"]; !ok {
-			t.Error("waybar output missing 'text' field")
-		}
-
-		if _, ok := parsed["tooltip"]; !ok {
-			t.Error("waybar output missing 'tooltip' field")
-		}
+		assertParsedField(t, parsed, "text")
+		assertParsedField(t, parsed, "tooltip")
 	}
 }
 
@@ -261,11 +274,7 @@ func TestIsCameraInUseEmptyDevice(t *testing.T) {
 }
 
 func TestHandleCommandTogglePrivacy(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StatePrivacy},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
-	}
+	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
 
 	result := d.handleCommand("toggle-privacy")
 	if result == "" {
@@ -274,11 +283,7 @@ func TestHandleCommandTogglePrivacy(t *testing.T) {
 }
 
 func TestHandleCommandProbe(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StateOffline},
-		videoDev:  "",
-		hidrawDev: "",
-	}
+	d := newTestDaemon(StateOffline, "", "")
 
 	result := d.handleCommand("probe")
 	if result != "device not found" {
@@ -364,16 +369,10 @@ func TestTypeValidation(t *testing.T) {
 }
 
 func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StatePrivacy, Audio: AudioNC},
-		videoDev:  "",
-		hidrawDev: "",
-	}
+	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "", "")
 
 	result := d.handleCommand("audio")
-	if !strings.HasPrefix(result, "error:") {
-		t.Errorf("expected error when cycling audio with no device, got: %s", result)
-	}
+	assertErrorPrefix(t, result)
 }
 
 func TestConfigPaths(t *testing.T) {
@@ -401,6 +400,7 @@ func TestParseHIDResponseTracking(t *testing.T) {
 		if !resp.Got {
 			t.Fatal("expected Got=true")
 		}
+
 		if resp.Tracking != tt.expected {
 			t.Errorf("tracking from %x = %s, want %s", tt.data, resp.Tracking, tt.expected)
 		}
@@ -421,6 +421,7 @@ func TestParseHIDResponseAudio(t *testing.T) {
 		if !resp.Got {
 			t.Fatal("expected Got=true")
 		}
+
 		if resp.Audio != tt.expected {
 			t.Errorf("audio from %x = %s, want %s", tt.data, resp.Audio, tt.expected)
 		}
@@ -432,6 +433,7 @@ func TestParseHIDResponseGesture(t *testing.T) {
 	if !on.Got || !on.Gesture {
 		t.Error("expected gesture=true")
 	}
+
 	off := parseHIDResponse([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x00})
 	if !off.Got || off.Gesture {
 		t.Error("expected gesture=false")
@@ -453,15 +455,9 @@ func TestParseHIDResponseNil(t *testing.T) {
 }
 
 func TestHandleCommandSyncNoDevice(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StateOffline},
-		videoDev:  "",
-		hidrawDev: "",
-	}
+	d := newTestDaemon(StateOffline, "", "")
 	result := d.handleCommand("sync")
-	if !strings.HasPrefix(result, "error:") {
-		t.Errorf("expected error for sync with no device, got: %s", result)
-	}
+	assertErrorPrefix(t, result)
 }
 
 func TestHandleCommandSyncWithDevice(t *testing.T) {
@@ -471,6 +467,7 @@ func TestHandleCommandSyncWithDevice(t *testing.T) {
 		videoDev:  "/dev/video0",
 		hidrawDev: "/dev/hidraw0",
 	}
+
 	result := d.handleCommand("sync")
 	if result != "synced (no changes)" && !strings.Contains(result, "error") {
 		t.Errorf("expected sync result, got: %s", result)
