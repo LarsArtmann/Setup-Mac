@@ -39,8 +39,16 @@ Applied Priority 1 hardening from previous session's status report: migrated fro
 - Zero external dependencies — no need for `github.com/coreos/go-systemd/v22/sdnotify`
 - Sends `READY=1` on startup, `WATCHDOG=1` each poll cycle, `STOPPING=1` on graceful shutdown
 
+### Type Model Refactor
+- [x] **`Config` struct** — replaced package-level constants (stateDir, pollInterval, debounceCount) with configurable struct
+- [x] **`Config.StateFile()` / `Config.SocketPath()`** — computed methods instead of string concatenation
+- [x] **`AudioMode.Next()` method** — moved from standalone `nextAudioMode()` function
+- [x] **`AudioMode.HIDByte()` / `CameraState.HIDByte()`** — eliminated duplicated switch statements
+- [x] **`AudioMode.Valid()` / `CameraState.Valid()`** — validation methods for type safety
+- [x] **`NewDaemon(cfg Config)`** — accepts config parameter for testability
+
 ### Tests
-- [x] **16 tests** (was 13) — added `TestNextAudioMode`, `TestHandleCommandAudioCycleNoDevice`, `TestHandleCommandAudioCycleWithDevice`
+- [x] **20 tests** (was 13) — added 7 new tests for type methods, config, validation, audio cycling
 - [x] **Race detector clean** — `go test -race` passes
 - [x] **`go vet` clean**
 
@@ -68,9 +76,9 @@ Applied Priority 1 hardening from previous session's status report: migrated fro
 9. **Config hot-reload** — No progress.
 
 ### Type Model Improvements (Identified This Session)
-10. **`AudioMode.Next()` method** — Currently standalone `nextAudioMode()` function; should be a method
-11. **`AudioMode.HIDByte()` / `CameraState.HIDByte()`** — HID byte mapping duplicated in switch statements
-12. **Config struct** — `pollInterval`, `debounceCount`, paths are constants; should be configurable
+10. ~~**`AudioMode.Next()` method**~~ — DONE (commit 120d9b8)
+11. ~~**`AudioMode.HIDByte()` / `CameraState.HIDByte()`**~~ — DONE (commit 120d9b8)
+12. ~~**Config struct**~~ — DONE (commit 120d9b8)
 13. **Command type** — String parsing in `handleCommand` could use typed commands
 
 ---
@@ -101,9 +109,9 @@ Nothing broken. All builds pass, all tests pass, race detector clean.
 ## F) TOP THINGS TO DO NEXT
 
 ### Priority 1 — Code Quality
-1. **Move `nextAudioMode` to `AudioMode.Next()` method** — idiomatic Go
-2. **Add `AudioMode.HIDByte()` and `CameraState.HIDByte()`** — eliminate switch duplication
-3. **Extract `Config` struct** — testability + configurability
+1. ~~**Move `nextAudioMode` to `AudioMode.Next()` method**~~ — DONE
+2. ~~**Add `AudioMode.HIDByte()` and `CameraState.HIDByte()`**~~ — DONE
+3. ~~**Extract `Config` struct**~~ — DONE
 4. **Separate watchdog goroutine** — prevent blocking autoManage from stopping watchdog
 
 ### Priority 2 — UX
@@ -122,8 +130,8 @@ Nothing broken. All builds pass, all tests pass, race detector clean.
 
 | File | Lines Changed | Purpose |
 |------|--------------|---------|
-| `pkgs/emeet-pixyd/main.go` | ~195 | slog, socket perms, errcheck, notifications, watchdog, audio cycling |
-| `pkgs/emeet-pixyd/main_test.go` | ~59 | 3 new tests, test fixes |
+| `pkgs/emeet-pixyd/main.go` | ~260 | slog, socket perms, errcheck, notifications, watchdog, audio cycling, Config, type methods |
+| `pkgs/emeet-pixyd/main_test.go` | ~80 | 7 new tests (20 total), Config-based test helpers |
 | `pkgs/emeet-pixyd.nix` | ~6 | Version bump, emeet-pixy symlink |
 | `platforms/nixos/hardware/emeet-pixy.nix` | ~3 | WatchdogSec, libnotify in PATH |
 | `justfile` | ~4 | Audio cycling (no arg = cycle) |
@@ -133,5 +141,5 @@ Nothing broken. All builds pass, all tests pass, race detector clean.
 | Check | Result |
 |-------|--------|
 | `go vet ./...` | PASS |
-| `go test -race ./...` | PASS (16 tests, race clean) |
+| `go test -race ./...` | PASS (20 tests, race clean) |
 | `go build` | PASS |
