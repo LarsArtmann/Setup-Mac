@@ -67,7 +67,6 @@ const (
 	gestureConfigMark1 byte = 0x02
 	gestureConfigMark2 byte = 0x01
 	gestureConfigMark3 byte = 0x02
-	hidCommitMarker    byte = 0x01
 	gestureEnabledByte byte = 0x01
 
 	permissionStateDir  = 0o750
@@ -553,7 +552,11 @@ func (d *Daemon) setGesture(enabled bool) error {
 }
 
 func setDeadline(conn net.Conn, timeout time.Duration) error {
-	return fmt.Errorf("setDeadline: %w", conn.SetDeadline(time.Now().Add(timeout)))
+	if err := conn.SetDeadline(time.Now().Add(timeout)); err != nil {
+		return fmt.Errorf("setDeadline: %w", err)
+	}
+
+	return nil
 }
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
@@ -708,7 +711,7 @@ func (d *Daemon) syncState(ctx context.Context) string {
 			d.state.Gesture = gesture
 			changed = true
 		}
-	} else if gestureErr != nil {
+	} else {
 		slog.Debug("gesture query failed", "error", gestureErr)
 	}
 
@@ -798,7 +801,7 @@ func findPixySource(ctx context.Context) (string, error) {
 			strings.Contains(line, "PIXY") {
 			for field := range strings.FieldsSeq(line) {
 				field = strings.TrimSuffix(field, ".")
-					_, parseErr := strconv.Atoi(field)
+				_, parseErr := strconv.Atoi(field)
 				if parseErr == nil {
 					return field, nil
 				}
@@ -846,7 +849,7 @@ func sdNotify(state string) {
 		return
 	}
 
-	writeErr := conn.Write([]byte(state))
+	_, writeErr := conn.Write([]byte(state))
 	if writeErr != nil {
 		slog.Debug("sd_notify write failed", "error", writeErr)
 	}
@@ -898,7 +901,7 @@ func (d *Daemon) autoManage(ctx context.Context) {
 		}
 
 		src, srcErr := findPixySource(ctx)
-	if srcErr == nil {
+		if srcErr == nil {
 			setDefaultSource(ctx, src)
 			slog.Info("set PipeWire default source to PIXY", "id", src)
 		}
