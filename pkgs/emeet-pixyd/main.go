@@ -577,78 +577,57 @@ func (d *Daemon) centerCamera(ctx context.Context) error {
 	return v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
 }
 
-func (d *Daemon) queryHIDState(
+func queryHIDState[T any](
 	ctx context.Context,
+	hidrawDev string,
 	payload []byte,
-	getResult func(hidResponse) any,
-) (any, error) {
-	if d.hidrawDev == "" {
-		return nil, fmt.Errorf("queryHIDState: %w", errHIDDeviceNotAvailable)
+	extract func(hidResponse) T,
+) (T, error) {
+	if hidrawDev == "" {
+		var zero T
+		return zero, fmt.Errorf("queryHIDState: %w", errHIDDeviceNotAvailable)
 	}
 
-	resp, err := hidSendRecv(ctx, d.hidrawDev, payload)
+	resp, err := hidSendRecv(ctx, hidrawDev, payload)
 	if err != nil {
-		return nil, err
+		var zero T
+		return zero, err
 	}
 
 	if resp == nil {
-		return nil, fmt.Errorf("queryHIDState: %w", errNoHIDResponse)
+		var zero T
+		return zero, fmt.Errorf("queryHIDState: %w", errNoHIDResponse)
 	}
 
 	parsed := parseHIDResponse(resp)
 	if !parsed.Got {
-		return nil, fmt.Errorf("queryHIDState: %w", errUnrecognizedHID)
+		var zero T
+		return zero, fmt.Errorf("queryHIDState: %w", errUnrecognizedHID)
 	}
 
-	return getResult(parsed), nil
+	return extract(parsed), nil
 }
 
 func (d *Daemon) queryTracking(_ context.Context) (CameraState, error) {
-	result, err := d.queryHIDState(
+	return queryHIDState(
 		context.Background(),
+		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceTracking, 0x01, 0x01},
-		func(p hidResponse) any {
-			return p.Tracking
-		},
+		func(p hidResponse) CameraState { return p.Tracking },
 	)
-	if err != nil {
-		return "", err
-	}
-
-	resultCamera, ok := result.(CameraState)
-	if !ok {
-		return "", fmt.Errorf("queryTracking type assertion failed: %w", err)
-	}
-
-	return resultCamera, nil
 }
 
 func (d *Daemon) queryAudio(_ context.Context) (AudioMode, error) {
-	result, err := d.queryHIDState(
+	return queryHIDState(
 		context.Background(),
+		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceAudio, audioConfigMarker, 0x04},
-		func(p hidResponse) any {
-			return p.Audio
-		},
+		func(p hidResponse) AudioMode { return p.Audio },
 	)
-	if err != nil {
-		return "", err
-	}
-
-	resultAudio, ok := result.(AudioMode)
-	if !ok {
-		return "", fmt.Errorf("queryAudio type assertion failed: %w", err)
-	}
-
-	return resultAudio, nil
 }
 
 func (d *Daemon) queryGesture(ctx context.Context) (bool, error) {
-	if d.hidrawDev == "" {
-		return false, fmt.Errorf("queryGesture: %w", errHIDDeviceNotAvailable)
-	}
-
-	resp, err := hidSendRecv(
+	return queryHIDState(
 		ctx,
 		d.hidrawDev,
 		[]byte{
@@ -658,21 +637,8 @@ func (d *Daemon) queryGesture(ctx context.Context) (bool, error) {
 			0x00, cameraConfigMarker,
 			gestureConfigMark3,
 		},
+		func(p hidResponse) bool { return p.Gesture },
 	)
-	if err != nil {
-		return false, err
-	}
-
-	if resp == nil {
-		return false, fmt.Errorf("queryGesture: %w", errNoHIDResponse)
-	}
-
-	parsed := parseHIDResponse(resp)
-	if !parsed.Got {
-		return false, fmt.Errorf("queryGesture: %w", errUnrecognizedHID)
-	}
-
-	return parsed.Gesture, nil
 }
 
 func (d *Daemon) syncState(ctx context.Context) string {
