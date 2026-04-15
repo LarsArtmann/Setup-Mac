@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -17,6 +19,7 @@ func testConfig(dir string) Config {
 
 func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
 	return &Daemon{
+		mu:        sync.Mutex{},
 		state:     State{Camera: camera},
 		videoDev:  videoDev,
 		hidrawDev: hidrawDev,
@@ -29,6 +32,7 @@ func newTestDaemonWithAudio(
 	videoDev, hidrawDev string,
 ) *Daemon {
 	return &Daemon{
+		mu:        sync.Mutex{},
 		state:     State{Camera: camera, Audio: audio},
 		videoDev:  videoDev,
 		hidrawDev: hidrawDev,
@@ -36,25 +40,45 @@ func newTestDaemonWithAudio(
 }
 
 func assertCameraState(t *testing.T, d *Daemon, expected CameraState) {
+	t.Helper()
 	if d.state.Camera != expected {
 		t.Errorf("expected camera state %s, got %s", expected, d.state.Camera)
 	}
 }
 
 func assertErrorPrefix(t *testing.T, result string) {
+	t.Helper()
 	if !strings.HasPrefix(result, "error:") {
 		t.Errorf("expected error prefix, got: %s", result)
 	}
 }
 
+func assertAutoMode(t *testing.T, d *Daemon, expected bool) {
+	t.Helper()
+	if d.state.AutoMode != expected {
+		t.Errorf("expected auto mode=%v, got %v", expected, d.state.AutoMode)
+	}
+}
+
+func assertGesture(t *testing.T, resp hidResponse, expected bool) {
+	t.Helper()
+	if !resp.Got || resp.Gesture != expected {
+		t.Errorf("expected gesture=%v, got Got=%v Gesture=%v", expected, resp.Got, resp.Gesture)
+	}
+}
+
 func assertParsedField(t *testing.T, parsed map[string]string, field string) {
+	t.Helper()
 	if _, ok := parsed[field]; !ok {
 		t.Errorf("waybar output missing '%s' field", field)
 	}
 }
 
 func TestStateDefaults(t *testing.T) {
+	t.Parallel()
+
 	d := &Daemon{
+		mu:    sync.Mutex{},
 		state: DefaultState(),
 	}
 	assertCameraState(t, d, StatePrivacy)
@@ -63,9 +87,7 @@ func TestStateDefaults(t *testing.T) {
 		t.Errorf("expected default audio to be nc, got %s", d.state.Audio)
 	}
 
-	if d.state.AutoMode != true {
-		t.Error("expected auto mode to be on by default")
-	}
+	assertAutoMode(t, d, true)
 
 	if d.state.InCall != false {
 		t.Error("expected in_call to be false by default")
@@ -73,9 +95,12 @@ func TestStateDefaults(t *testing.T) {
 }
 
 func TestStateSaveLoad(t *testing.T) {
+	t.Parallel()
+
 	cfg := testConfig(t.TempDir())
 
 	d := &Daemon{
+		mu:     sync.Mutex{},
 		config: cfg,
 		state: State{
 			Camera:   StateTracking,
@@ -86,14 +111,21 @@ func TestStateSaveLoad(t *testing.T) {
 		},
 	}
 
-	err := d.saveState()
-	if err != nil {
-		t.Fatalf("saveState: %v", err)
+	saveErr := d.saveState()
+	if saveErr != nil {
+		t.Fatalf("saveState: %v", saveErr)
 	}
 
 	d2 := &Daemon{
+		mu:     sync.Mutex{},
 		config: cfg,
-		state:  State{},
+		state: State{
+			Camera:   StateIdle,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
 	}
 	d2.loadState()
 
@@ -119,16 +151,25 @@ func TestStateSaveLoad(t *testing.T) {
 }
 
 func TestStateFileCorrupt(t *testing.T) {
+	t.Parallel()
+
 	cfg := testConfig(t.TempDir())
 
-	err := os.WriteFile(cfg.StateFile(), []byte("not json"), 0o644)
+	err := os.WriteFile(cfg.StateFile(), []byte("not json"), permissionStateFile)
 	if err != nil {
 		t.Fatalf("write corrupt file: %v", err)
 	}
 
 	d := &Daemon{
+		mu:     sync.Mutex{},
 		config: cfg,
-		state:  State{Camera: StatePrivacy},
+		state: State{
+			Camera:   StatePrivacy,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
 	}
 	d.loadState()
 
@@ -138,10 +179,19 @@ func TestStateFileCorrupt(t *testing.T) {
 }
 
 func TestStateFileMissing(t *testing.T) {
+	t.Parallel()
+
 	cfg := testConfig("/nonexistent")
 	d := &Daemon{
+		mu:     sync.Mutex{},
 		config: cfg,
-		state:  State{Camera: StatePrivacy, Audio: AudioNC},
+		state: State{
+			Camera:   StatePrivacy,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
 	}
 	d.loadState()
 
@@ -149,42 +199,55 @@ func TestStateFileMissing(t *testing.T) {
 }
 
 func TestHandleCommandStatus(t *testing.T) {
+	t.Parallel()
+
 	d := &Daemon{
+		mu: sync.Mutex{},
 		state: State{
 			Camera:   StatePrivacy,
 			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
 			AutoMode: true,
 		},
 		videoDev: "",
 	}
 
-	result := d.handleCommand("status")
+	result := d.handleCommand(context.Background(), "status")
 	if result != "camera=offline (device not found)" {
 		t.Errorf("expected offline status when no device, got: %s", result)
 	}
 }
 
 func TestHandleCommandUnknown(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
 
-	result := d.handleCommand("foobar")
+	result := d.handleCommand(context.Background(), "foobar")
 	if result != "unknown command: foobar" {
 		t.Errorf("expected unknown command response, got: %s", result)
 	}
 }
 
 func TestHandleCommandAutoToggle(t *testing.T) {
+	t.Parallel()
+
 	d := &Daemon{
+		mu:     sync.Mutex{},
 		config: testConfig(t.TempDir()),
 		state: State{
 			Camera:   StatePrivacy,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
 			AutoMode: true,
 		},
 		videoDev:  "/dev/video0",
 		hidrawDev: "/dev/hidraw0",
 	}
 
-	result := d.handleCommand("auto-off")
+	result := d.handleCommand(context.Background(), "auto-off")
 	if result != "auto mode off" {
 		t.Errorf("expected 'auto mode off', got: %s", result)
 	}
@@ -193,30 +256,32 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 		t.Error("expected auto mode to be false")
 	}
 
-	result = d.handleCommand("auto-on")
+	result = d.handleCommand(context.Background(), "auto-on")
 	if result != "auto mode on" {
 		t.Errorf("expected 'auto mode on', got: %s", result)
 	}
 
-	if d.state.AutoMode != true {
-		t.Error("expected auto mode to be true")
-	}
+	assertAutoMode(t, d, true)
 }
 
 func TestHandleCommandAudioInvalid(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "/dev/video0", "/dev/hidraw0")
 
-	result := d.handleCommand("audio xyz")
+	result := d.handleCommand(context.Background(), "audio xyz")
 	if result != "usage: audio [nc|live|org]" {
 		t.Errorf("expected usage for invalid mode, got: %s", result)
 	}
 }
 
 func TestHandleCommandDeviceRequired(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemon(StateOffline, "", "")
 
 	for _, cmd := range []string{"track", "idle", "privacy", "toggle-privacy", "center", "gesture-on", "gesture-off"} {
-		result := d.handleCommand(cmd)
+		result := d.handleCommand(context.Background(), cmd)
 		if result == "" {
 			t.Errorf("expected error response for '%s' with no device", cmd)
 		}
@@ -228,6 +293,8 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 }
 
 func TestWaybarOutput(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		camera   CameraState
 		inCall   bool
@@ -240,13 +307,15 @@ func TestWaybarOutput(t *testing.T) {
 		{StateTracking, true, "tracking in-call"},
 	}
 
-	for _, tt := range tests {
+	for _, testCase := range tests {
 		d := &Daemon{
+			mu: sync.Mutex{},
 			state: State{
-				Camera:   tt.camera,
+				Camera:   testCase.camera,
 				Audio:    AudioNC,
+				Gesture:  false,
+				InCall:   testCase.inCall,
 				AutoMode: true,
-				InCall:   tt.inCall,
 			},
 		}
 		output := d.waybarOutput()
@@ -258,8 +327,8 @@ func TestWaybarOutput(t *testing.T) {
 			t.Fatalf("waybar output is not valid JSON: %s, err: %v", output, err)
 		}
 
-		if parsed["class"] != "custom-camera "+tt.expected {
-			t.Errorf("expected class 'custom-camera %s', got '%s'", tt.expected, parsed["class"])
+		if parsed["class"] != "custom-camera "+testCase.expected {
+			t.Errorf("expected class 'custom-camera %s', got '%s'", testCase.expected, parsed["class"])
 		}
 
 		assertParsedField(t, parsed, "text")
@@ -268,30 +337,38 @@ func TestWaybarOutput(t *testing.T) {
 }
 
 func TestIsCameraInUseEmptyDevice(t *testing.T) {
+	t.Parallel()
+
 	if isCameraInUse("") {
 		t.Error("expected false for empty video device")
 	}
 }
 
 func TestHandleCommandTogglePrivacy(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
 
-	result := d.handleCommand("toggle-privacy")
+	result := d.handleCommand(context.Background(), "toggle-privacy")
 	if result == "" {
 		t.Error("expected non-empty response")
 	}
 }
 
 func TestHandleCommandProbe(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemon(StateOffline, "", "")
 
-	result := d.handleCommand("probe")
+	result := d.handleCommand(context.Background(), "probe")
 	if result != "device not found" {
 		t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
 	}
 }
 
 func TestAudioModeNext(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		input    AudioMode
 		expected AudioMode
@@ -301,56 +378,62 @@ func TestAudioModeNext(t *testing.T) {
 		{AudioOriginal, AudioNC},
 		{AudioMode("unknown"), AudioNC},
 	}
-	for _, tt := range tests {
-		result := tt.input.Next()
-		if result != tt.expected {
-			t.Errorf("AudioMode(%s).Next() = %s, want %s", tt.input, result, tt.expected)
+	for _, testCase := range tests {
+		result := testCase.input.Next()
+		if result != testCase.expected {
+			t.Errorf("AudioMode(%s).Next() = %s, want %s", testCase.input, result, testCase.expected)
 		}
 	}
 }
 
 func TestAudioModeHIDByte(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		mode     AudioMode
 		expected byte
 	}{
-		{AudioNC, 0x01},
-		{AudioLive, 0x02},
-		{AudioOriginal, 0x03},
-		{AudioMode("unknown"), 0x01},
+		{AudioNC, hidByteNC},
+		{AudioLive, hidByteLive},
+		{AudioOriginal, hidByteOriginal},
+		{AudioMode("unknown"), hidByteNC},
 	}
-	for _, tt := range tests {
-		result := tt.mode.HIDByte()
-		if result != tt.expected {
-			t.Errorf("AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x", tt.mode, result, tt.expected)
+	for _, testCase := range tests {
+		result := testCase.mode.HIDByte()
+		if result != testCase.expected {
+			t.Errorf("AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x", testCase.mode, result, testCase.expected)
 		}
 	}
 }
 
 func TestCameraStateHIDByte(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		state    CameraState
 		expected byte
 	}{
-		{StateTracking, 0x01},
-		{StatePrivacy, 0x02},
-		{StateIdle, 0x00},
-		{CameraState("unknown"), 0x00},
+		{StateTracking, hidByteTracking},
+		{StatePrivacy, hidBytePrivacy},
+		{StateIdle, hidByteIdle},
+		{CameraState("unknown"), hidByteIdle},
 	}
-	for _, tt := range tests {
-		result := tt.state.HIDByte()
-		if result != tt.expected {
+	for _, testCase := range tests {
+		result := testCase.state.HIDByte()
+		if result != testCase.expected {
 			t.Errorf(
 				"CameraState(%s).HIDByte() = 0x%02x, want 0x%02x",
-				tt.state,
+				testCase.state,
 				result,
-				tt.expected,
+				testCase.expected,
 			)
 		}
 	}
 }
 
 func TestTypeValidation(t *testing.T) {
+	t.Parallel()
+
 	if !AudioNC.Valid() {
 		t.Error("AudioNC should be valid")
 	}
@@ -369,14 +452,22 @@ func TestTypeValidation(t *testing.T) {
 }
 
 func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "", "")
 
-	result := d.handleCommand("audio")
+	result := d.handleCommand(context.Background(), "audio")
 	assertErrorPrefix(t, result)
 }
 
 func TestConfigPaths(t *testing.T) {
-	cfg := Config{StateDir: "/tmp/test-pixyd"}
+	t.Parallel()
+
+	cfg := Config{
+		StateDir:      "/tmp/test-pixyd",
+		PollInterval:  defaultPollInterval,
+		DebounceCount: defaultDebounceCount,
+	}
 	if cfg.StateFile() != "/tmp/test-pixyd/state.json" {
 		t.Errorf("unexpected StateFile: %s", cfg.StateFile())
 	}
@@ -387,6 +478,8 @@ func TestConfigPaths(t *testing.T) {
 }
 
 func TestParseHIDResponseTracking(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		data     []byte
 		expected CameraState
@@ -395,19 +488,21 @@ func TestParseHIDResponseTracking(t *testing.T) {
 		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, StatePrivacy},
 		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}, StateIdle},
 	}
-	for _, tt := range tests {
-		resp := parseHIDResponse(tt.data)
+	for _, testCase := range tests {
+		resp := parseHIDResponse(testCase.data)
 		if !resp.Got {
 			t.Fatal("expected Got=true")
 		}
 
-		if resp.Tracking != tt.expected {
-			t.Errorf("tracking from %x = %s, want %s", tt.data, resp.Tracking, tt.expected)
+		if resp.Tracking != testCase.expected {
+			t.Errorf("tracking from %x = %s, want %s", testCase.data, resp.Tracking, testCase.expected)
 		}
 	}
 }
 
 func TestParseHIDResponseAudio(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		data     []byte
 		expected AudioMode
@@ -416,31 +511,36 @@ func TestParseHIDResponseAudio(t *testing.T) {
 		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, AudioLive},
 		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03}, AudioOriginal},
 	}
-	for _, tt := range tests {
-		resp := parseHIDResponse(tt.data)
+	for _, testCase := range tests {
+		resp := parseHIDResponse(testCase.data)
 		if !resp.Got {
 			t.Fatal("expected Got=true")
 		}
 
-		if resp.Audio != tt.expected {
-			t.Errorf("audio from %x = %s, want %s", tt.data, resp.Audio, tt.expected)
+		if resp.Audio != testCase.expected {
+			t.Errorf("audio from %x = %s, want %s", testCase.data, resp.Audio, testCase.expected)
 		}
 	}
 }
 
 func TestParseHIDResponseGesture(t *testing.T) {
-	on := parseHIDResponse([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x01})
-	if !on.Got || !on.Gesture {
-		t.Error("expected gesture=true")
-	}
+	t.Parallel()
 
-	off := parseHIDResponse([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x00})
-	if !off.Got || off.Gesture {
-		t.Error("expected gesture=false")
+	tests := []struct {
+		data     []byte
+		expected bool
+	}{
+		{[]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x01}, true},
+		{[]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x00}, false},
+	}
+	for _, testCase := range tests {
+		assertGesture(t, parseHIDResponse(testCase.data), testCase.expected)
 	}
 }
 
 func TestParseHIDResponseTooShort(t *testing.T) {
+	t.Parallel()
+
 	resp := parseHIDResponse([]byte{0x09, 0x01})
 	if resp.Got {
 		t.Error("expected Got=false for short response")
@@ -448,6 +548,8 @@ func TestParseHIDResponseTooShort(t *testing.T) {
 }
 
 func TestParseHIDResponseNil(t *testing.T) {
+	t.Parallel()
+
 	resp := parseHIDResponse(nil)
 	if resp.Got {
 		t.Error("expected Got=false for nil response")
@@ -455,26 +557,39 @@ func TestParseHIDResponseNil(t *testing.T) {
 }
 
 func TestHandleCommandSyncNoDevice(t *testing.T) {
+	t.Parallel()
+
 	d := newTestDaemon(StateOffline, "", "")
-	result := d.handleCommand("sync")
+	result := d.handleCommand(context.Background(), "sync")
 	assertErrorPrefix(t, result)
 }
 
 func TestHandleCommandSyncWithDevice(t *testing.T) {
+	t.Parallel()
+
 	d := &Daemon{
-		config:    testConfig(t.TempDir()),
-		state:     State{Camera: StatePrivacy, Audio: AudioNC},
+		mu:     sync.Mutex{},
+		config: testConfig(t.TempDir()),
+		state: State{
+			Camera:   StatePrivacy,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
 		videoDev:  "/dev/video0",
 		hidrawDev: "/dev/hidraw0",
 	}
 
-	result := d.handleCommand("sync")
+	result := d.handleCommand(context.Background(), "sync")
 	if result != "synced (no changes)" && !strings.Contains(result, "error") {
 		t.Errorf("expected sync result, got: %s", result)
 	}
 }
 
 func TestDefaultConfig(t *testing.T) {
+	t.Parallel()
+
 	cfg := DefaultConfig()
 	if cfg.StateDir != defaultStateDir {
 		t.Errorf("expected StateDir=%s, got %s", defaultStateDir, cfg.StateDir)
