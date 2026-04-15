@@ -262,11 +262,16 @@ Custom Go daemon for the EMEET PIXY dual-camera AI webcam with auto-activation:
 - Call detection: scans `/proc/*/fd` for any process holding the video device open
 - Auto-actions: face tracking + noise cancellation on call start, privacy mode on call end
 - Auto-switches PipeWire default source to PIXY on call start
-- OBS virtual camera auto-start/stop
+- Desktop notifications via `notify-send` on state changes
+- Systemd watchdog (`WatchdogSec=30`) prevents hung daemon
+- Structured logging via `slog` (leveled: debug/info/warn/error)
 - Waybar click toggles privacy, right-click enables tracking, middle-click centers
 - Device auto-detection by USB vendor/product ID (`328f:00c0`), not hardcoded
 - Hotplug recovery: re-probes on error, recovers when camera reconnected
 - Boot default: privacy mode (camera physically disabled until needed)
+- Configurable via `Config` struct (poll interval, debounce count, state dir)
+- Type-safe HID commands via `CameraState.HIDByte()` / `AudioMode.HIDByte()` methods
+- Socket permissions 0600 (user-only, not world-writable)
 
 ```bash
 # Camera commands
@@ -274,14 +279,16 @@ just cam-status          # Show camera state
 just cam-privacy         # Toggle privacy mode
 just cam-track           # Enable face tracking
 just cam-reset           # Center camera (pan/tilt/zoom)
+just cam-audio           # Cycle audio: nc → live → org → nc
 just cam-audio <mode>    # Set audio: nc, live, org
 just cam-restart         # Restart daemon (user service)
 just cam-logs            # View daemon logs
 
-# Direct daemon commands
-emeet-pixyd status       # Full status
-emeet-pixyd toggle-privacy  # Toggle privacy
-emeet-pixyd probe        # Re-detect device
+# Direct daemon commands (either emeet-pixyd or emeet-pixy works)
+emeet-pixy status           # Full status
+emeet-pixy toggle-privacy   # Toggle privacy
+emeet-pixy probe            # Re-detect device
+emeet-pixy audio            # Cycle audio mode
 ```
 
 ## Flake Inputs
