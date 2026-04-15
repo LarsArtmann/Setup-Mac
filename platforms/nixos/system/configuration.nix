@@ -91,6 +91,7 @@
       ];
       packages = with pkgs; [
         firefox
+        obs-studio
       ];
     };
 
@@ -106,6 +107,11 @@
       mkdir -p /nix/var/nix/profiles/per-user/lars
       chown lars:users /nix/var/nix/profiles/per-user/lars
     '';
+
+    programs.obs-studio = {
+      enable = true;
+      enableVirtualCamera = true;
+    };
 
     # Enable Fish shell system-wide
     programs.fish.enable = true;
