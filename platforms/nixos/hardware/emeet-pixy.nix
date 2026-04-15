@@ -6,6 +6,7 @@
 }:
 with lib; let
   cfg = config.hardware.emeet-pixy;
+  inherit (config.users.users.${cfg.user}) uid;
 in {
   options.hardware.emeet-pixy = {
     enable = mkEnableOption "EMEET PIXY webcam auto-activation daemon";
@@ -47,29 +48,29 @@ in {
       SUBSYSTEM=="video4linux", ATTRS{idVendor}=="328f", ATTRS{idProduct}=="00c0", MODE="0666", TAG+="uaccess"
     '';
 
-    systemd.services.emeet-pixyd = {
+    # State directory
+    systemd.tmpfiles.rules = [
+      "d /run/emeet-pixyd 0755 ${cfg.user} video -"
+    ];
+
+    # User-level systemd service — inherits Wayland/pipewire session environment
+    systemd.user.services.emeet-pixyd = {
       description = "EMEET PIXY Webcam Auto-Activation Daemon";
-      wantedBy = ["multi-user.target"];
-      after = ["multi-user.target"];
+      after = ["pipewire.service" "graphical-session.target"];
       wants = ["pipewire.service"];
+      partOf = ["graphical-session.target"];
+      wantedBy = ["default.target"];
 
       serviceConfig = {
         Type = "simple";
         ExecStart = "${pkgs.emeet-pixyd}/bin/emeet-pixyd";
         Restart = "on-failure";
-        RestartSec = "5";
-        User = cfg.user;
-        Group = "video";
+        RestartSec = "3";
       };
 
       environment = {
-        XDG_RUNTIME_DIR = "/run/user/${toString config.users.users.${cfg.user}.uid}";
+        PATH = "${pkgs.v4l-utils}/bin:${pkgs.wireplumber}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin:$PATH";
       };
     };
-
-    # Ensure state directory exists
-    systemd.tmpfiles.rules = [
-      "d /run/user/emeet-pixyd 0755 ${cfg.user} video -"
-    ];
   };
 }

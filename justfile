@@ -1921,8 +1921,8 @@ cam-gesture-off:
 
 # Restart the EMEET PIXY daemon
 cam-restart:
-    @sudo systemctl restart emeet-pixyd && echo "EMEET PIXY daemon restarted" || echo "Failed to restart"
+    @systemctl --user restart emeet-pixyd && echo "EMEET PIXY daemon restarted" || echo "Failed to restart"
 
 # Show EMEET PIXY daemon logs
 cam-logs:
-    @journalctl -u emeet-pixyd -f --no-pager -n 50
+    @journalctl --user -u emeet-pixyd -f --no-pager -n 50
