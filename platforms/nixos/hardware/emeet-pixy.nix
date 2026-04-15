@@ -68,9 +68,7 @@ in {
         RestartSec = "3";
       };
 
-      environment = {
-        PATH = "${pkgs.v4l-utils}/bin:${pkgs.wireplumber}/bin:${pkgs.coreutils}/bin:/run/wrappers/bin:$PATH";
-      };
+      path = [pkgs.v4l-utils pkgs.wireplumber];
     };
   };
 }
