@@ -164,6 +164,15 @@
         };
       };
     };
+
+    emeetPixyOverlay = _final: prev: {
+      emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
+        src = prev.lib.cleanSourceWith {
+          filter = path: _: baseNameOf path != "package.nix";
+          src = ./pkgs/emeet-pixyd;
+        };
+      };
+    };
   in
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["aarch64-darwin" "x86_64-linux"];
@@ -224,6 +233,12 @@
               src = lib.cleanSourceWith {
                 filter = path: _: !lib.hasSuffix (baseNameOf path) ".nix";
                 src = ./pkgs/dnsblockd-processor;
+              };
+            };
+            emeet-pixyd = pkgs.callPackage ./pkgs/emeet-pixyd.nix {
+              src = lib.cleanSourceWith {
+                filter = path: _: baseNameOf path != "package.nix";
+                src = ./pkgs/emeet-pixyd;
               };
             };
           };
@@ -416,6 +431,7 @@
                   awWatcherOverlay
                   openaudibleOverlay
                   dnsblockdOverlay
+                  emeetPixyOverlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});

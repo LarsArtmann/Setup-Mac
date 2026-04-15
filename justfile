@@ -1882,3 +1882,47 @@ diagnose:
 test-aliases *ARGS:
     @echo "🧪 Testing shell aliases..."
     @bash scripts/test-shell-aliases.sh {{ ARGS }}
+
+# ========================================
+# EMEET PIXY Camera Commands
+# ========================================
+
+# Show camera status (tracking, audio, position)
+cam-status:
+    @emeet-pixyd status 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Toggle camera privacy mode (click waybar icon alternative)
+cam-privacy:
+    @emeet-pixyd toggle-privacy 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Enable face tracking
+cam-track:
+    @emeet-pixyd track 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Disable face tracking
+cam-idle:
+    @emeet-pixyd idle 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Center camera (reset pan/tilt/zoom)
+cam-reset:
+    @emeet-pixyd center 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Set audio mode (nc=noise cancel, live, org=original)
+cam-audio MODE="nc":
+    @emeet-pixyd audio {{ MODE }} 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Enable gesture control
+cam-gesture-on:
+    @emeet-pixyd gesture-on 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Disable gesture control
+cam-gesture-off:
+    @emeet-pixyd gesture-off 2>/dev/null || echo "EMEET PIXY daemon not running"
+
+# Restart the EMEET PIXY daemon
+cam-restart:
+    @sudo systemctl restart emeet-pixyd && echo "EMEET PIXY daemon restarted" || echo "Failed to restart"
+
+# Show EMEET PIXY daemon logs
+cam-logs:
+    @journalctl -u emeet-pixyd -f --no-pager -n 50

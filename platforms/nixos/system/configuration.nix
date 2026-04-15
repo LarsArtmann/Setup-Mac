@@ -30,6 +30,7 @@
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix
+    ../hardware/emeet-pixy.nix
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
     # Desktop modules
@@ -115,6 +116,14 @@
 
     # Enable Fish shell system-wide
     programs.fish.enable = true;
+
+    # EMEET PIXY webcam auto-activation
+    hardware.emeet-pixy = {
+      enable = true;
+      autoTracking = true;
+      autoPrivacy = true;
+      defaultAudio = "nc";
+    };
 
     # AMD GPU Support - imported from hardware module
     #

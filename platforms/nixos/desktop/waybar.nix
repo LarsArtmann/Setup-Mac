@@ -21,6 +21,7 @@
         ];
 
         modules-right = [
+          "custom/camera"
           "custom/dns-stats"
           "custom/weather"
           "pulseaudio"
@@ -56,6 +57,17 @@
             "(.+) — Mozilla Firefox" = " $1";
             "(.+) - Mozilla Firefox" = " $1";
           };
+        };
+
+        "custom/camera" = {
+          exec = pkgs.writeShellScript "waybar-camera" ''
+            ${pkgs.emeet-pixyd}/bin/emeet-pixyd waybar 2>/dev/null || echo '{"text":"📷 ---","tooltip":"EMEET PIXY: daemon not running","class":"custom-camera offline"}'
+          '';
+          return-type = "json";
+          interval = 2;
+          on-click = "${pkgs.emeet-pixyd}/bin/emeet-pixyd toggle-privacy";
+          on-middle-click = "${pkgs.emeet-pixyd}/bin/emeet-pixyd center";
+          on-right-click = "${pkgs.emeet-pixyd}/bin/emeet-pixyd track";
         };
 
         "custom/dns-stats" = {
@@ -276,9 +288,31 @@
       }
 
       #cpu, #memory, #temperature, #network, #pulseaudio,
-      #custom-clipboard, #custom-dns-stats, #tray, #custom-power {
+      #custom-clipboard, #custom-dns-stats, #custom-camera, #tray, #custom-power {
         padding: 0 10px;
         color: #a6adc8;
+      }
+
+      #custom-camera.tracking {
+        color: #a6e3a1;
+      }
+
+      #custom-camera.privacy {
+        color: #f38ba8;
+      }
+
+      #custom-camera.in-call {
+        font-weight: bold;
+      }
+
+      #custom-camera.offline {
+        color: #585b70;
+      }
+
+      #custom-clipboard:hover, #custom-power:hover, #custom-dns-stats:hover,
+      #custom-camera:hover {
+        color: #cdd6f4;
+        background: #313244;
       }
 
       #cpu.high, #memory.high {
@@ -296,11 +330,6 @@
 
       #pulseaudio.muted {
         color: #585b70;
-      }
-
-      #custom-clipboard:hover, #custom-power:hover, #custom-dns-stats:hover {
-        color: #cdd6f4;
-        background: #313244;
       }
 
       #tray {
