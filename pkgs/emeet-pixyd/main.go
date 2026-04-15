@@ -608,18 +608,18 @@ func queryHIDState[T any](
 	return extract(parsed), nil
 }
 
-func (d *Daemon) queryTracking(_ context.Context) (CameraState, error) {
+func (d *Daemon) queryTracking(ctx context.Context) (CameraState, error) {
 	return queryHIDState(
-		context.Background(),
+		ctx,
 		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceTracking, 0x01, 0x01},
 		func(p hidResponse) CameraState { return p.Tracking },
 	)
 }
 
-func (d *Daemon) queryAudio(_ context.Context) (AudioMode, error) {
+func (d *Daemon) queryAudio(ctx context.Context) (AudioMode, error) {
 	return queryHIDState(
-		context.Background(),
+		ctx,
 		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceAudio, audioConfigMarker, 0x04},
 		func(p hidResponse) AudioMode { return p.Audio },
