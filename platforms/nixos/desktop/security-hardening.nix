@@ -7,6 +7,9 @@
     # Add Swaylock PAM service for screen locking
     pam.services.swaylock = {};
 
+    # Auto-unlock GNOME Keyring at login via SDDM (for git-credential-libsecret)
+    pam.services.sddm.enableGnomeKeyring = true;
+
     # Audit daemon disabled — NixOS 26.05 bug: audit-rules-nixos.service fails with "No rules"
     # See: https://github.com/NixOS/nixpkgs/issues/483085
     # TODO: Re-enable after NixOS resolves the audit-rules service bug
