@@ -62,6 +62,11 @@
 
   # Wrap all configuration in config attribute
   config = {
+    # Trust dnsblockd self-signed CA for all *.home.lan TLS endpoints
+    security.pki.certificateFiles = [
+      ./../secrets/dnsblockd-ca.crt
+    ];
+
     # Define color scheme and utilities
     colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
     colorSchemeLib = nix-colors.lib;

@@ -84,7 +84,7 @@ in {
     };
 
     extraConfig = ''
-      # Catppuccin Mocha color theme
+      # Catppuccin Mocha color theme (xterm-256 palette)
       color.title=on color0
       color.header=on color0
       color.footnote=on color0
@@ -92,48 +92,48 @@ in {
       color.error=on color0
       color.debug=on color0
 
-      color.overdue=rgbF38
-      color.due.today=rgbF9E
-      color.due=rgbF9E
-      color.scheduled=rgbA6E
-      color.active=rgbB4B
-      color.recurring=rgbCBA
-      color.blocked=rgbF38
-      color.blocking=rgbFAB
+      color.overdue=color203
+      color.due.today=color222
+      color.due=color222
+      color.scheduled=color115
+      color.active=color147
+      color.recurring=color183
+      color.blocked=color203
+      color.blocking=color216
 
-      color.tagged=on rgb313
+      color.tagged=on color238
       color.tag.none=
       color.project.none=
 
-      color.uda.priority.H=rgbF38
-      color.uda.priority.M=rgbF9E
-      color.uda.priority.L=rgbA6E
+      color.uda.priority.H=color203
+      color.uda.priority.M=color222
+      color.uda.priority.L=color115
 
-      color.summary.background=on rgb1E1
-      color.summary.bar=on rgb89B
-      color.history.add=rgbA6E
-      color.history.done=rgbA6E
-      color.history.delete=rgbF38
+      color.summary.background=on color236
+      color.summary.bar=on color75
+      color.history.add=color115
+      color.history.done=color115
+      color.history.delete=color203
 
-      color.burndown.pending=rgb89B
-      color.burndown.done=rgbA6E
-      color.burndown.started=rgbFAB
+      color.burndown.pending=color75
+      color.burndown.done=color115
+      color.burndown.started=color216
 
-      color.sync.added=rgbA6E
-      color.sync.changed=rgbF9E
-      color.sync.rejected=rgbF38
+      color.sync.added=color115
+      color.sync.changed=color222
+      color.sync.rejected=color203
 
-      color.calendar.today=rgb111 on rgbF9E
-      color.calendar.due=rgb111 on rgbF38
-      color.calendar.overdue=rgb111 on rgbF38
-      color.calendar.weekend=rgb6C7
-      color.calendar.holiday=rgbCBA
+      color.calendar.today=color232 on color222
+      color.calendar.due=color232 on color203
+      color.calendar.overdue=color232 on color203
+      color.calendar.weekend=color244
+      color.calendar.holiday=color183
 
-      color.report.minimal.filter=on rgb454
-      color.report.next.filter=on rgb454
-      color.report.agent.filter=on rgb454
+      color.report.minimal.filter=on color242
+      color.report.next.filter=on color242
+      color.report.agent.filter=on color242
 
-      color.alternate=on rgb313
+      color.alternate=on color238
     '';
   };
 }
