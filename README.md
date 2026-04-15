@@ -10,7 +10,7 @@ SystemNix manages both macOS (nix-darwin) and NixOS systems through a single, re
 |----------|-----------------|
 | **Languages** | Go 1.26, Node.js, Bun, Python 3.13, Rust |
 | **Cloud & Infra** | AWS CLI, GCP SDK, kubectl, Helm, Terraform, Docker |
-| **Development** | Git, GitHub CLI, Git Town, JetBrains Toolbox, VS Code, Fish shell, tmux, Zellij |
+| **Development** | Git, GitHub CLI, Git Town, JetBrains Toolbox, (editor of choice - NOT VS Code), Fish shell, tmux, Zellij |
 | **Desktop (NixOS)** | Niri (Wayland tiling), Waybar, SDDM, Rofi, Kitty, Dunst, swaylock |
 | **Self-Hosted Services** | Immich (photos), Gitea (Git), Grafana + Prometheus (monitoring), SigNoz (observability), Homepage Dashboard, PhotoMap AI |
 | **AI/ML** | Ollama (ROCm), Unsloth Studio, llama.cpp, AMD NPU (XDNA) driver |
