@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -19,7 +20,8 @@ const (
 	stateDir     = "/run/emeet-pixyd"
 	stateFile    = stateDir + "/state.json"
 	socketPath   = stateDir + "/control.sock"
-	pollInterval = 2 * time.Second
+	pollInterval  = 2 * time.Second
+	debounceCount = 3
 
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
@@ -51,10 +53,14 @@ type State struct {
 }
 
 type Daemon struct {
+	mu        sync.Mutex
 	state     State
 	stateFile string
 	videoDev  string
 	hidrawDev string
+
+	debounceInUse int
+	debounceIdle  int
 }
 
 func NewDaemon() *Daemon {
@@ -347,15 +353,12 @@ func setDefaultSource(sourceID string) {
 	exec.Command("wpctl", "set-default", sourceID).Run()
 }
 
-func startOBSVirtualCamera() {
-	exec.Command("obs-cli", "--password", " ", "start-virtual-camera").Run()
-}
 
-func stopOBSVirtualCamera() {
-	exec.Command("obs-cli", "--password", " ", "stop-virtual-camera").Run()
-}
 
 func (d *Daemon) autoManage() {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	if !d.isDevicePresent() {
 		d.probeDevices()
 		if !d.isDevicePresent() {
@@ -367,10 +370,18 @@ func (d *Daemon) autoManage() {
 		return
 	}
 
-	inCall := isCameraInUse(d.videoDev)
+	inUse := isCameraInUse(d.videoDev)
 
-	if inCall && !d.state.InCall {
-		log.Println("Camera in use — activating tracking + noise cancellation")
+	if inUse {
+		d.debounceIdle = 0
+		d.debounceInUse++
+	} else {
+		d.debounceInUse = 0
+		d.debounceIdle++
+	}
+
+	if inUse && !d.state.InCall && d.debounceInUse >= debounceCount {
+		log.Println("Camera in use (confirmed) — activating tracking + noise cancellation")
 		d.state.InCall = true
 		if d.state.Camera == StatePrivacy || d.state.Camera == StateIdle {
 			d.setTracking(StateTracking)
@@ -382,12 +393,10 @@ func (d *Daemon) autoManage() {
 			setDefaultSource(src)
 			log.Printf("Set PipeWire default source to PIXY (id=%s)", src)
 		}
-		startOBSVirtualCamera()
-	} else if !inCall && d.state.InCall {
-		log.Println("Camera released — entering privacy mode")
+	} else if !inUse && d.state.InCall && d.debounceIdle >= debounceCount {
+		log.Println("Camera released (confirmed) — entering privacy mode")
 		d.state.InCall = false
 		d.setTracking(StatePrivacy)
-		stopOBSVirtualCamera()
 	}
 
 	d.saveState()
@@ -429,6 +438,9 @@ func (d *Daemon) getStatus() string {
 }
 
 func (d *Daemon) handleCommand(cmd string) string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	parts := strings.Fields(cmd)
 	if len(parts) == 0 {
 		return d.getStatus()
@@ -640,7 +652,9 @@ func (d *Daemon) Run() {
 	}()
 
 	log.Println("EMEET PIXY daemon started")
+	d.mu.Lock()
 	log.Printf("State: camera=%s audio=%s auto=%v", d.state.Camera, d.state.Audio, d.state.AutoMode)
+	d.mu.Unlock()
 
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()

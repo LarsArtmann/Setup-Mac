@@ -6,7 +6,6 @@
 }:
 with lib; let
   cfg = config.hardware.emeet-pixy;
-  inherit (config.users.users.${cfg.user}) uid;
 in {
   options.hardware.emeet-pixy = {
     enable = mkEnableOption "EMEET PIXY webcam auto-activation daemon";

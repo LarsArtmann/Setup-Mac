@@ -168,7 +168,7 @@
     emeetPixyOverlay = _final: prev: {
       emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
         src = prev.lib.cleanSourceWith {
-          filter = path: _: baseNameOf path != "package.nix";
+          filter = path: type: let b = baseNameOf path; in !(prev.lib.hasSuffix "_test.go" b || b == "package.nix");
           src = ./pkgs/emeet-pixyd;
         };
       };
@@ -237,7 +237,7 @@
             };
             emeet-pixyd = pkgs.callPackage ./pkgs/emeet-pixyd.nix {
               src = lib.cleanSourceWith {
-                filter = path: _: baseNameOf path != "package.nix";
+                filter = path: type: let b = baseNameOf path; in !(lib.hasSuffix "_test.go" b || b == "package.nix");
                 src = ./pkgs/emeet-pixyd;
               };
             };
