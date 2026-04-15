@@ -1907,8 +1907,8 @@ cam-idle:
 cam-reset:
     @emeet-pixyd center 2>/dev/null || echo "EMEET PIXY daemon not running"
 
-# Set audio mode (nc=noise cancel, live, org=original)
-cam-audio MODE="nc":
+# Cycle or set audio mode (no arg cycles: nc→live→org→nc)
+cam-audio MODE="":
     @emeet-pixyd audio {{ MODE }} 2>/dev/null || echo "EMEET PIXY daemon not running"
 
 # Enable gesture control

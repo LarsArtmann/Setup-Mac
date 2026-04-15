@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"net"
 	"os"
 	"os/exec"
@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	stateDir     = "/run/emeet-pixyd"
-	stateFile    = stateDir + "/state.json"
-	socketPath   = stateDir + "/control.sock"
+	stateDir      = "/run/emeet-pixyd"
+	stateFile     = stateDir + "/state.json"
+	socketPath    = stateDir + "/control.sock"
 	pollInterval  = 2 * time.Second
 	debounceCount = 3
 
@@ -129,10 +129,10 @@ func (d *Daemon) probeDevices() {
 		if d.state.Camera == StateOffline {
 			d.state.Camera = StatePrivacy
 		}
-		log.Printf("Found PIXY: video=%s hidraw=%s", d.videoDev, d.hidrawDev)
+		slog.Info("found PIXY device", "video", d.videoDev, "hidraw", d.hidrawDev)
 	} else {
 		d.state.Camera = StateOffline
-		log.Println("PIXY not found — will retry on next probe")
+		slog.Warn("PIXY not found, will retry on next probe")
 	}
 }
 
@@ -141,11 +141,15 @@ func (d *Daemon) loadState() {
 	if err != nil {
 		return
 	}
-	json.Unmarshal(data, &d.state)
+	if err := json.Unmarshal(data, &d.state); err != nil {
+		slog.Warn("failed to parse state file, using defaults", "path", d.stateFile, "error", err)
+	}
 }
 
 func (d *Daemon) saveState() error {
-	os.MkdirAll(stateDir, 0755)
+	if err := os.MkdirAll(stateDir, 0755); err != nil {
+		return fmt.Errorf("create state dir: %w", err)
+	}
 	data, err := json.Marshal(d.state)
 	if err != nil {
 		return err
@@ -157,29 +161,32 @@ func (d *Daemon) isDevicePresent() bool {
 	return d.videoDev != ""
 }
 
-func hidSend(hidrawDev string, report []byte) error {
+func hidSend(hidrawDev string, report []byte) (err error) {
 	if hidrawDev == "" {
 		return fmt.Errorf("PIXY HID device not available")
 	}
 	buf := make([]byte, 32)
 	copy(buf, report)
-	f, err := os.OpenFile(hidrawDev, os.O_WRONLY, 0)
+	var f *os.File
+	f, err = os.OpenFile(hidrawDev, os.O_WRONLY, 0)
 	if err != nil {
 		return fmt.Errorf("open hidraw: %w", err)
 	}
-	defer f.Close()
+	defer func() {
+		if cerr := f.Close(); cerr != nil && err == nil {
+			err = cerr
+		}
+	}()
 	_, err = f.Write(buf)
 	return err
 }
 
 func v4l2Set(dev, ctrl, value string) error {
-	cmd := exec.Command("v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value)
-	return cmd.Run()
+	return exec.Command("v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run()
 }
 
 func v4l2Get(dev, ctrl string) (string, error) {
-	cmd := exec.Command("v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl)
-	out, err := cmd.Output()
+	out, err := exec.Command("v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).Output()
 	if err != nil {
 		return "", err
 	}
@@ -214,7 +221,9 @@ func (d *Daemon) setTracking(mode CameraState) error {
 		return err
 	}
 	d.state.Camera = mode
-	d.saveState()
+	if err := d.saveState(); err != nil {
+		slog.Error("failed to save state", "error", err)
+	}
 	return nil
 }
 
@@ -242,7 +251,9 @@ func (d *Daemon) setAudio(mode AudioMode) error {
 		return err
 	}
 	d.state.Audio = mode
-	d.saveState()
+	if err := d.saveState(); err != nil {
+		slog.Error("failed to save state", "error", err)
+	}
 	return nil
 }
 
@@ -263,7 +274,9 @@ func (d *Daemon) setGesture(enabled bool) error {
 		return err
 	}
 	d.state.Gesture = enabled
-	d.saveState()
+	if err := d.saveState(); err != nil {
+		slog.Error("failed to save state", "error", err)
+	}
 	return nil
 }
 
@@ -329,16 +342,13 @@ func isCameraInUse(videoDev string) bool {
 }
 
 func findPixySource() (string, error) {
-	cmd := exec.Command("wpctl", "status")
-	out, err := cmd.Output()
+	out, err := exec.Command("wpctl", "status").Output()
 	if err != nil {
 		return "", err
 	}
-	lines := strings.Split(string(out), "\n")
-	for _, line := range lines {
+	for _, line := range strings.Split(string(out), "\n") {
 		if strings.Contains(line, "EMEET") || strings.Contains(line, "Pixy") || strings.Contains(line, "PIXY") {
-			fields := strings.Fields(line)
-			for _, f := range fields {
+			for _, f := range strings.Fields(line) {
 				f = strings.TrimSuffix(f, ".")
 				if _, err := strconv.Atoi(f); err == nil {
 					return f, nil
@@ -350,10 +360,46 @@ func findPixySource() (string, error) {
 }
 
 func setDefaultSource(sourceID string) {
-	exec.Command("wpctl", "set-default", sourceID).Run()
+	if err := exec.Command("wpctl", "set-default", sourceID).Run(); err != nil {
+		slog.Error("failed to set default audio source", "id", sourceID, "error", err)
+	}
 }
 
+func notify(title, body string) {
+	if err := exec.Command("notify-send", "-a", "emeet-pixyd", title, body).Run(); err != nil {
+		slog.Debug("notification failed", "error", err)
+	}
+}
 
+func sdNotify(state string) {
+	socket := os.Getenv("NOTIFY_SOCKET")
+	if socket == "" {
+		return
+	}
+	conn, err := net.DialTimeout("unixgram", socket, 1*time.Second)
+	if err != nil {
+		slog.Debug("sd_notify failed", "error", err)
+		return
+	}
+	defer conn.Close()
+	if err := conn.SetDeadline(time.Now().Add(1 * time.Second)); err != nil {
+		return
+	}
+	if _, err := conn.Write([]byte(state)); err != nil {
+		slog.Debug("sd_notify write failed", "error", err)
+	}
+}
+
+func nextAudioMode(current AudioMode) AudioMode {
+	switch current {
+	case AudioNC:
+		return AudioLive
+	case AudioLive:
+		return AudioOriginal
+	default:
+		return AudioNC
+	}
+}
 
 func (d *Daemon) autoManage() {
 	d.mu.Lock()
@@ -381,25 +427,35 @@ func (d *Daemon) autoManage() {
 	}
 
 	if inUse && !d.state.InCall && d.debounceInUse >= debounceCount {
-		log.Println("Camera in use (confirmed) — activating tracking + noise cancellation")
+		slog.Info("camera in use, activating tracking and noise cancellation")
 		d.state.InCall = true
 		if d.state.Camera == StatePrivacy || d.state.Camera == StateIdle {
-			d.setTracking(StateTracking)
+			if err := d.setTracking(StateTracking); err != nil {
+				slog.Error("failed to activate tracking", "error", err)
+			}
 		}
 		if d.state.Audio != AudioNC {
-			d.setAudio(AudioNC)
+			if err := d.setAudio(AudioNC); err != nil {
+				slog.Error("failed to set audio mode", "error", err)
+			}
 		}
 		if src, err := findPixySource(); err == nil {
 			setDefaultSource(src)
-			log.Printf("Set PipeWire default source to PIXY (id=%s)", src)
+			slog.Info("set PipeWire default source to PIXY", "id", src)
 		}
+		notify("EMEET PIXY", "Camera activated — tracking enabled")
 	} else if !inUse && d.state.InCall && d.debounceIdle >= debounceCount {
-		log.Println("Camera released (confirmed) — entering privacy mode")
+		slog.Info("camera released, entering privacy mode")
 		d.state.InCall = false
-		d.setTracking(StatePrivacy)
+		if err := d.setTracking(StatePrivacy); err != nil {
+			slog.Error("failed to enter privacy mode", "error", err)
+		}
+		notify("EMEET PIXY", "Camera privacy mode — physically disabled")
 	}
 
-	d.saveState()
+	if err := d.saveState(); err != nil {
+		slog.Error("failed to save state", "error", err)
+	}
 }
 
 func (d *Daemon) getStatus() string {
@@ -482,19 +538,20 @@ func (d *Daemon) handleCommand(cmd string) string {
 		return "tracking on"
 
 	case "audio":
-		if len(parts) < 2 {
-			return "usage: audio nc|live|org"
-		}
 		var mode AudioMode
-		switch parts[1] {
-		case "nc":
-			mode = AudioNC
-		case "live":
-			mode = AudioLive
-		case "org":
-			mode = AudioOriginal
-		default:
-			return "usage: audio nc|live|org"
+		if len(parts) < 2 {
+			mode = nextAudioMode(d.state.Audio)
+		} else {
+			switch parts[1] {
+			case "nc":
+				mode = AudioNC
+			case "live":
+				mode = AudioLive
+			case "org":
+				mode = AudioOriginal
+			default:
+				return "usage: audio [nc|live|org]"
+			}
 		}
 		if err := d.setAudio(mode); err != nil {
 			return "error: " + err.Error()
@@ -521,12 +578,16 @@ func (d *Daemon) handleCommand(cmd string) string {
 
 	case "auto-on":
 		d.state.AutoMode = true
-		d.saveState()
+		if err := d.saveState(); err != nil {
+			slog.Error("failed to save state", "error", err)
+		}
 		return "auto mode on"
 
 	case "auto-off":
 		d.state.AutoMode = false
-		d.saveState()
+		if err := d.saveState(); err != nil {
+			slog.Error("failed to save state", "error", err)
+		}
 		return "auto mode off"
 
 	case "waybar":
@@ -584,25 +645,33 @@ func (d *Daemon) waybarOutput() string {
 		"tooltip": tooltip,
 		"class":   "custom-camera " + class,
 	}
-	data, _ := json.Marshal(out)
+	data, err := json.Marshal(out)
+	if err != nil {
+		return `{"text":"?","tooltip":"json marshal error","class":"custom-camera offline"}`
+	}
 	return string(data)
 }
 
 func (d *Daemon) listenUnix() error {
 	os.Remove(socketPath)
-	os.MkdirAll(stateDir, 0755)
+	if err := os.MkdirAll(stateDir, 0755); err != nil {
+		return fmt.Errorf("create state dir: %w", err)
+	}
 
 	l, err := net.Listen("unix", socketPath)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
 	defer l.Close()
-	os.Chmod(socketPath, 0666)
+
+	if err := os.Chmod(socketPath, 0600); err != nil {
+		slog.Error("failed to set socket permissions", "error", err)
+	}
 
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			log.Printf("Accept error: %v", err)
+			slog.Error("socket accept error", "error", err)
 			continue
 		}
 		buf := make([]byte, 256)
@@ -610,7 +679,9 @@ func (d *Daemon) listenUnix() error {
 		if err == nil && n > 0 {
 			cmd := strings.TrimSpace(string(buf[:n]))
 			response := d.handleCommand(cmd) + "\n"
-			conn.Write([]byte(response))
+			if _, err := conn.Write([]byte(response)); err != nil {
+				slog.Debug("socket write error", "error", err)
+			}
 		}
 		conn.Close()
 	}
@@ -622,8 +693,12 @@ func sendCommand(cmd string) (string, error) {
 		return "", err
 	}
 	defer conn.Close()
-	conn.SetDeadline(time.Now().Add(2 * time.Second))
-	conn.Write([]byte(cmd))
+	if err := conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
+		return "", err
+	}
+	if _, err := conn.Write([]byte(cmd)); err != nil {
+		return "", err
+	}
 
 	buf := make([]byte, 4096)
 	n, err := conn.Read(buf)
@@ -634,12 +709,15 @@ func sendCommand(cmd string) (string, error) {
 }
 
 func (d *Daemon) Run() {
-	os.MkdirAll(stateDir, 0755)
+	if err := os.MkdirAll(stateDir, 0755); err != nil {
+		slog.Error("failed to create state dir", "error", err)
+	}
 
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigs
+		sdNotify("STOPPING=1")
 		os.Remove(socketPath)
 		os.Remove(stateFile)
 		os.Exit(0)
@@ -647,13 +725,15 @@ func (d *Daemon) Run() {
 
 	go func() {
 		if err := d.listenUnix(); err != nil {
-			log.Fatalf("Unix socket error: %v", err)
+			slog.Error("unix socket error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
-	log.Println("EMEET PIXY daemon started")
+	slog.Info("EMEET PIXY daemon started")
+	sdNotify("READY=1")
 	d.mu.Lock()
-	log.Printf("State: camera=%s audio=%s auto=%v", d.state.Camera, d.state.Audio, d.state.AutoMode)
+	slog.Info("initial state", "camera", d.state.Camera, "audio", d.state.Audio, "auto", d.state.AutoMode)
 	d.mu.Unlock()
 
 	ticker := time.NewTicker(pollInterval)
@@ -661,6 +741,7 @@ func (d *Daemon) Run() {
 
 	for range ticker.C {
 		d.autoManage()
+		sdNotify("WATCHDOG=1")
 	}
 }
 

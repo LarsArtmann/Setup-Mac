@@ -5,13 +5,17 @@
 }:
 buildGoModule rec {
   pname = "emeet-pixyd";
-  version = "0.1.0";
+  version = "0.2.0";
 
   inherit src;
 
   vendorHash = null;
 
   ldflags = ["-s" "-w"];
+
+  postInstall = ''
+    ln -s $out/bin/emeet-pixyd $out/bin/emeet-pixy
+  '';
 
   meta = {
     description = "Auto-activation daemon for EMEET PIXY webcam — face tracking, privacy, noise cancellation";

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -76,7 +77,9 @@ func TestStateSaveLoad(t *testing.T) {
 func TestStateFileCorrupt(t *testing.T) {
 	dir := t.TempDir()
 	statePath := filepath.Join(dir, "state.json")
-	os.WriteFile(statePath, []byte("not json"), 0644)
+	if err := os.WriteFile(statePath, []byte("not json"), 0644); err != nil {
+		t.Fatalf("write corrupt file: %v", err)
+	}
 
 	d := &Daemon{
 		stateFile: statePath,
@@ -155,20 +158,15 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 	}
 }
 
-func TestHandleCommandAudio(t *testing.T) {
+func TestHandleCommandAudioInvalid(t *testing.T) {
 	d := &Daemon{
 		state:     State{Camera: StatePrivacy, Audio: AudioNC},
 		videoDev:  "/dev/video0",
 		hidrawDev: "/dev/hidraw0",
 	}
 
-	result := d.handleCommand("audio")
-	if result != "usage: audio nc|live|org" {
-		t.Errorf("expected usage, got: %s", result)
-	}
-
-	result = d.handleCommand("audio xyz")
-	if result != "usage: audio nc|live|org" {
+	result := d.handleCommand("audio xyz")
+	if result != "usage: audio [nc|live|org]" {
 		t.Errorf("expected usage for invalid mode, got: %s", result)
 	}
 }
@@ -261,5 +259,48 @@ func TestHandleCommandProbe(t *testing.T) {
 	result := d.handleCommand("probe")
 	if result != "device not found" {
 		t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
+	}
+}
+
+func TestNextAudioMode(t *testing.T) {
+	tests := []struct {
+		input    AudioMode
+		expected AudioMode
+	}{
+		{AudioNC, AudioLive},
+		{AudioLive, AudioOriginal},
+		{AudioOriginal, AudioNC},
+		{AudioMode("unknown"), AudioNC},
+	}
+	for _, tt := range tests {
+		result := nextAudioMode(tt.input)
+		if result != tt.expected {
+			t.Errorf("nextAudioMode(%s) = %s, want %s", tt.input, result, tt.expected)
+		}
+	}
+}
+
+func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
+	d := &Daemon{
+		state:     State{Camera: StatePrivacy, Audio: AudioNC},
+		videoDev:  "",
+		hidrawDev: "",
+	}
+	result := d.handleCommand("audio")
+	if !strings.HasPrefix(result, "error:") {
+		t.Errorf("expected error when cycling audio with no device, got: %s", result)
+	}
+}
+
+func TestHandleCommandAudioCycleWithDevice(t *testing.T) {
+	d := &Daemon{
+		state:     State{Camera: StatePrivacy, Audio: AudioNC},
+		videoDev:  "/dev/video0",
+		hidrawDev: "/dev/hidraw0",
+	}
+
+	result := d.handleCommand("audio")
+	if !strings.HasPrefix(result, "error:") {
+		t.Errorf("expected HID error in test environment, got: %s", result)
 	}
 }
