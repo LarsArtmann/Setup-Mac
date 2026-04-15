@@ -17,11 +17,9 @@ import (
 )
 
 const (
-	stateDir      = "/run/emeet-pixyd"
-	stateFile     = stateDir + "/state.json"
-	socketPath    = stateDir + "/control.sock"
-	pollInterval  = 2 * time.Second
-	debounceCount = 3
+	defaultStateDir      = "/run/emeet-pixyd"
+	defaultPollInterval  = 2 * time.Second
+	defaultDebounceCount = 3
 
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
@@ -36,6 +34,26 @@ const (
 	StateOffline  CameraState = "offline"
 )
 
+func (s CameraState) HIDByte() byte {
+	switch s {
+	case StateTracking:
+		return 0x01
+	case StatePrivacy:
+		return 0x02
+	default:
+		return 0x00
+	}
+}
+
+func (s CameraState) Valid() bool {
+	switch s {
+	case StateIdle, StateTracking, StatePrivacy, StateOffline:
+		return true
+	default:
+		return false
+	}
+}
+
 type AudioMode string
 
 const (
@@ -43,6 +61,56 @@ const (
 	AudioLive     AudioMode = "live"
 	AudioOriginal AudioMode = "original"
 )
+
+func (m AudioMode) HIDByte() byte {
+	switch m {
+	case AudioNC:
+		return 0x01
+	case AudioLive:
+		return 0x02
+	case AudioOriginal:
+		return 0x03
+	default:
+		return 0x01
+	}
+}
+
+func (m AudioMode) Valid() bool {
+	switch m {
+	case AudioNC, AudioLive, AudioOriginal:
+		return true
+	default:
+		return false
+	}
+}
+
+func (m AudioMode) Next() AudioMode {
+	switch m {
+	case AudioNC:
+		return AudioLive
+	case AudioLive:
+		return AudioOriginal
+	default:
+		return AudioNC
+	}
+}
+
+type Config struct {
+	StateDir      string
+	PollInterval  time.Duration
+	DebounceCount int
+}
+
+func DefaultConfig() Config {
+	return Config{
+		StateDir:      defaultStateDir,
+		PollInterval:  defaultPollInterval,
+		DebounceCount: defaultDebounceCount,
+	}
+}
+
+func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
+func (c Config) SocketPath() string { return c.StateDir + "/control.sock" }
 
 type State struct {
 	Camera   CameraState `json:"camera"`
@@ -55,7 +123,7 @@ type State struct {
 type Daemon struct {
 	mu        sync.Mutex
 	state     State
-	stateFile string
+	config    Config
 	videoDev  string
 	hidrawDev string
 
@@ -63,9 +131,9 @@ type Daemon struct {
 	debounceIdle  int
 }
 
-func NewDaemon() *Daemon {
+func NewDaemon(cfg Config) *Daemon {
 	d := &Daemon{
-		stateFile: stateFile,
+		config: cfg,
 		state: State{
 			Camera:   StatePrivacy,
 			Audio:    AudioNC,
@@ -137,24 +205,24 @@ func (d *Daemon) probeDevices() {
 }
 
 func (d *Daemon) loadState() {
-	data, err := os.ReadFile(d.stateFile)
+	data, err := os.ReadFile(d.config.StateFile())
 	if err != nil {
 		return
 	}
 	if err := json.Unmarshal(data, &d.state); err != nil {
-		slog.Warn("failed to parse state file, using defaults", "path", d.stateFile, "error", err)
+		slog.Warn("failed to parse state file, using defaults", "path", d.config.StateFile(), "error", err)
 	}
 }
 
 func (d *Daemon) saveState() error {
-	if err := os.MkdirAll(stateDir, 0755); err != nil {
+	if err := os.MkdirAll(d.config.StateDir, 0755); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 	data, err := json.Marshal(d.state)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(d.stateFile, data, 0644)
+	return os.WriteFile(d.config.StateFile(), data, 0644)
 }
 
 func (d *Daemon) isDevicePresent() bool {
@@ -201,18 +269,7 @@ func (d *Daemon) setTracking(mode CameraState) error {
 	if !d.isDevicePresent() {
 		return fmt.Errorf("PIXY not connected")
 	}
-	var modeByte byte
-	switch mode {
-	case StateTracking:
-		modeByte = 0x01
-	case StatePrivacy:
-		modeByte = 0x02
-	case StateIdle:
-		modeByte = 0x00
-	default:
-		modeByte = 0x00
-	}
-	if err := hidSend(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, mode.HIDByte()}); err != nil {
 		d.probeDevices()
 		return err
 	}
@@ -231,18 +288,7 @@ func (d *Daemon) setAudio(mode AudioMode) error {
 	if !d.isDevicePresent() {
 		return fmt.Errorf("PIXY not connected")
 	}
-	var modeByte byte
-	switch mode {
-	case AudioNC:
-		modeByte = 0x01
-	case AudioLive:
-		modeByte = 0x02
-	case AudioOriginal:
-		modeByte = 0x03
-	default:
-		modeByte = 0x01
-	}
-	if err := hidSend(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, mode.HIDByte()}); err != nil {
 		d.probeDevices()
 		return err
 	}
@@ -390,17 +436,6 @@ func sdNotify(state string) {
 	}
 }
 
-func nextAudioMode(current AudioMode) AudioMode {
-	switch current {
-	case AudioNC:
-		return AudioLive
-	case AudioLive:
-		return AudioOriginal
-	default:
-		return AudioNC
-	}
-}
-
 func (d *Daemon) autoManage() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -426,7 +461,7 @@ func (d *Daemon) autoManage() {
 		d.debounceIdle++
 	}
 
-	if inUse && !d.state.InCall && d.debounceInUse >= debounceCount {
+	if inUse && !d.state.InCall && d.debounceInUse >= d.config.DebounceCount {
 		slog.Info("camera in use, activating tracking and noise cancellation")
 		d.state.InCall = true
 		if d.state.Camera == StatePrivacy || d.state.Camera == StateIdle {
@@ -444,7 +479,7 @@ func (d *Daemon) autoManage() {
 			slog.Info("set PipeWire default source to PIXY", "id", src)
 		}
 		notify("EMEET PIXY", "Camera activated — tracking enabled")
-	} else if !inUse && d.state.InCall && d.debounceIdle >= debounceCount {
+	} else if !inUse && d.state.InCall && d.debounceIdle >= d.config.DebounceCount {
 		slog.Info("camera released, entering privacy mode")
 		d.state.InCall = false
 		if err := d.setTracking(StatePrivacy); err != nil {
@@ -540,7 +575,7 @@ func (d *Daemon) handleCommand(cmd string) string {
 	case "audio":
 		var mode AudioMode
 		if len(parts) < 2 {
-			mode = nextAudioMode(d.state.Audio)
+			mode = d.state.Audio.Next()
 		} else {
 			switch parts[1] {
 			case "nc":
@@ -653,8 +688,9 @@ func (d *Daemon) waybarOutput() string {
 }
 
 func (d *Daemon) listenUnix() error {
+	socketPath := d.config.SocketPath()
 	os.Remove(socketPath)
-	if err := os.MkdirAll(stateDir, 0755); err != nil {
+	if err := os.MkdirAll(d.config.StateDir, 0755); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
@@ -687,8 +723,8 @@ func (d *Daemon) listenUnix() error {
 	}
 }
 
-func sendCommand(cmd string) (string, error) {
-	conn, err := net.DialTimeout("unix", socketPath, 2*time.Second)
+func sendCommand(cfg Config, cmd string) (string, error) {
+	conn, err := net.DialTimeout("unix", cfg.SocketPath(), 2*time.Second)
 	if err != nil {
 		return "", err
 	}
@@ -709,7 +745,7 @@ func sendCommand(cmd string) (string, error) {
 }
 
 func (d *Daemon) Run() {
-	if err := os.MkdirAll(stateDir, 0755); err != nil {
+	if err := os.MkdirAll(d.config.StateDir, 0755); err != nil {
 		slog.Error("failed to create state dir", "error", err)
 	}
 
@@ -718,8 +754,8 @@ func (d *Daemon) Run() {
 	go func() {
 		<-sigs
 		sdNotify("STOPPING=1")
-		os.Remove(socketPath)
-		os.Remove(stateFile)
+		os.Remove(d.config.SocketPath())
+		os.Remove(d.config.StateFile())
 		os.Exit(0)
 	}()
 
@@ -736,7 +772,7 @@ func (d *Daemon) Run() {
 	slog.Info("initial state", "camera", d.state.Camera, "audio", d.state.Audio, "auto", d.state.AutoMode)
 	d.mu.Unlock()
 
-	ticker := time.NewTicker(pollInterval)
+	ticker := time.NewTicker(d.config.PollInterval)
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -746,9 +782,10 @@ func (d *Daemon) Run() {
 }
 
 func main() {
+	cfg := DefaultConfig()
 	if len(os.Args) > 1 {
 		cmd := strings.Join(os.Args[1:], " ")
-		resp, err := sendCommand(cmd)
+		resp, err := sendCommand(cfg, cmd)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: %v\nIs emeet-pixyd running?\n", err)
 			os.Exit(1)
@@ -757,6 +794,6 @@ func main() {
 		return
 	}
 
-	d := NewDaemon()
+	d := NewDaemon(cfg)
 	d.Run()
 }

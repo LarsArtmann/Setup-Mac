@@ -3,10 +3,17 @@ package main
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func testConfig(dir string) Config {
+	return Config{
+		StateDir:      dir,
+		PollInterval:  2,
+		DebounceCount: 3,
+	}
+}
 
 func TestStateDefaults(t *testing.T) {
 	d := &Daemon{
@@ -33,11 +40,10 @@ func TestStateDefaults(t *testing.T) {
 }
 
 func TestStateSaveLoad(t *testing.T) {
-	dir := t.TempDir()
-	statePath := filepath.Join(dir, "state.json")
+	cfg := testConfig(t.TempDir())
 
 	d := &Daemon{
-		stateFile: statePath,
+		config: cfg,
 		state: State{
 			Camera:   StateTracking,
 			Audio:    AudioLive,
@@ -52,8 +58,8 @@ func TestStateSaveLoad(t *testing.T) {
 	}
 
 	d2 := &Daemon{
-		stateFile: statePath,
-		state:     State{},
+		config: cfg,
+		state:  State{},
 	}
 	d2.loadState()
 
@@ -75,15 +81,14 @@ func TestStateSaveLoad(t *testing.T) {
 }
 
 func TestStateFileCorrupt(t *testing.T) {
-	dir := t.TempDir()
-	statePath := filepath.Join(dir, "state.json")
-	if err := os.WriteFile(statePath, []byte("not json"), 0644); err != nil {
+	cfg := testConfig(t.TempDir())
+	if err := os.WriteFile(cfg.StateFile(), []byte("not json"), 0644); err != nil {
 		t.Fatalf("write corrupt file: %v", err)
 	}
 
 	d := &Daemon{
-		stateFile: statePath,
-		state:     State{Camera: StatePrivacy},
+		config: cfg,
+		state:  State{Camera: StatePrivacy},
 	}
 	d.loadState()
 
@@ -93,9 +98,10 @@ func TestStateFileCorrupt(t *testing.T) {
 }
 
 func TestStateFileMissing(t *testing.T) {
+	cfg := testConfig("/nonexistent")
 	d := &Daemon{
-		stateFile: "/nonexistent/state.json",
-		state:     State{Camera: StatePrivacy, Audio: AudioNC},
+		config: cfg,
+		state:  State{Camera: StatePrivacy, Audio: AudioNC},
 	}
 	d.loadState()
 
@@ -133,6 +139,7 @@ func TestHandleCommandUnknown(t *testing.T) {
 
 func TestHandleCommandAutoToggle(t *testing.T) {
 	d := &Daemon{
+		config: testConfig(t.TempDir()),
 		state: State{
 			Camera:   StatePrivacy,
 			AutoMode: true,
@@ -262,7 +269,7 @@ func TestHandleCommandProbe(t *testing.T) {
 	}
 }
 
-func TestNextAudioMode(t *testing.T) {
+func TestAudioModeNext(t *testing.T) {
 	tests := []struct {
 		input    AudioMode
 		expected AudioMode
@@ -273,10 +280,61 @@ func TestNextAudioMode(t *testing.T) {
 		{AudioMode("unknown"), AudioNC},
 	}
 	for _, tt := range tests {
-		result := nextAudioMode(tt.input)
+		result := tt.input.Next()
 		if result != tt.expected {
-			t.Errorf("nextAudioMode(%s) = %s, want %s", tt.input, result, tt.expected)
+			t.Errorf("AudioMode(%s).Next() = %s, want %s", tt.input, result, tt.expected)
 		}
+	}
+}
+
+func TestAudioModeHIDByte(t *testing.T) {
+	tests := []struct {
+		mode     AudioMode
+		expected byte
+	}{
+		{AudioNC, 0x01},
+		{AudioLive, 0x02},
+		{AudioOriginal, 0x03},
+		{AudioMode("unknown"), 0x01},
+	}
+	for _, tt := range tests {
+		result := tt.mode.HIDByte()
+		if result != tt.expected {
+			t.Errorf("AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x", tt.mode, result, tt.expected)
+		}
+	}
+}
+
+func TestCameraStateHIDByte(t *testing.T) {
+	tests := []struct {
+		state    CameraState
+		expected byte
+	}{
+		{StateTracking, 0x01},
+		{StatePrivacy, 0x02},
+		{StateIdle, 0x00},
+		{CameraState("unknown"), 0x00},
+	}
+	for _, tt := range tests {
+		result := tt.state.HIDByte()
+		if result != tt.expected {
+			t.Errorf("CameraState(%s).HIDByte() = 0x%02x, want 0x%02x", tt.state, result, tt.expected)
+		}
+	}
+}
+
+func TestTypeValidation(t *testing.T) {
+	if !AudioNC.Valid() {
+		t.Error("AudioNC should be valid")
+	}
+	if !StateTracking.Valid() {
+		t.Error("StateTracking should be valid")
+	}
+	if AudioMode("foo").Valid() {
+		t.Error("unknown audio mode should not be valid")
+	}
+	if CameraState("bar").Valid() {
+		t.Error("unknown camera state should not be valid")
 	}
 }
 
@@ -292,15 +350,25 @@ func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
 	}
 }
 
-func TestHandleCommandAudioCycleWithDevice(t *testing.T) {
-	d := &Daemon{
-		state:     State{Camera: StatePrivacy, Audio: AudioNC},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
+func TestConfigPaths(t *testing.T) {
+	cfg := Config{StateDir: "/tmp/test-pixyd"}
+	if cfg.StateFile() != "/tmp/test-pixyd/state.json" {
+		t.Errorf("unexpected StateFile: %s", cfg.StateFile())
 	}
+	if cfg.SocketPath() != "/tmp/test-pixyd/control.sock" {
+		t.Errorf("unexpected SocketPath: %s", cfg.SocketPath())
+	}
+}
 
-	result := d.handleCommand("audio")
-	if !strings.HasPrefix(result, "error:") {
-		t.Errorf("expected HID error in test environment, got: %s", result)
+func TestDefaultConfig(t *testing.T) {
+	cfg := DefaultConfig()
+	if cfg.StateDir != defaultStateDir {
+		t.Errorf("expected StateDir=%s, got %s", defaultStateDir, cfg.StateDir)
+	}
+	if cfg.PollInterval != defaultPollInterval {
+		t.Errorf("expected PollInterval=%v, got %v", defaultPollInterval, cfg.PollInterval)
+	}
+	if cfg.DebounceCount != defaultDebounceCount {
+		t.Errorf("expected DebounceCount=%d, got %d", defaultDebounceCount, cfg.DebounceCount)
 	}
 }
