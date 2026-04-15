@@ -8,6 +8,7 @@
   inherit (lib) mkEnableOption mkOption types;
 
   caCertFile = ./../secrets/dnsblockd-ca.crt;
+  caCertContent = builtins.readFile caCertFile;
 
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 
@@ -213,7 +214,7 @@ in {
       ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev lo 2>/dev/null || true
     '';
 
-    security.pki.certificateFiles = [caCertFile];
+    security.pki.certificates = [caCertContent];
 
     programs.firefox.policies = {
       DNSOverHTTPS = {

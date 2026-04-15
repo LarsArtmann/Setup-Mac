@@ -40,6 +40,7 @@ SystemNix/
 ├── pkgs/                        # Custom packages
 │   ├── dnsblockd.nix            # DNS block page server (Go)
 │   ├── dnsblockd-processor/     # DNS blocklist processor (Go)
+│   ├── emeet-pixyd/             # EMEET PIXY webcam daemon (Go)
 │   ├── modernize.nix            # Go modernize tool
 │   └── aw-watcher-utilization.nix
 │
@@ -61,7 +62,7 @@ SystemNix/
         ├── system/dns-blocker-config.nix  # Unbound + dnsblockd
         ├── system/snapshots.nix # BTRFS + Timeshift
         ├── desktop/             # Niri, Waybar, SDDM, AI stack, security
-        ├── hardware/            # AMD GPU/NPU, Bluetooth
+        ├── hardware/            # AMD GPU/NPU, Bluetooth, EMEET PIXY
         ├── programs/            # Rofi, swaylock, wlogout, Yazi, Zellij, Chromium
         └── users/home.nix       # HM config (imports common/home-base.nix)
 ```
@@ -243,6 +244,44 @@ just task-backup         # Export all tasks as JSON
 # Recovery
 just rollback           # Revert to previous generation
 just backup / just restore NAME
+```
+
+### EMEET PIXY Webcam (`pkgs/emeet-pixyd/`)
+
+Custom Go daemon for the EMEET PIXY dual-camera AI webcam with auto-activation:
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Daemon | `pkgs/emeet-pixyd/` | Go binary — call detection, HID control, auto-management |
+| Package | `pkgs/emeet-pixyd.nix` | buildGoModule derivation |
+| NixOS module | `platforms/nixos/hardware/emeet-pixy.nix` | udev rules, user systemd service |
+| Waybar | `platforms/nixos/desktop/waybar.nix` | Camera state indicator |
+
+**Architecture:**
+- User-level systemd service (inherits Wayland + pipewire session env)
+- Call detection: scans `/proc/*/fd` for any process holding the video device open
+- Auto-actions: face tracking + noise cancellation on call start, privacy mode on call end
+- Auto-switches PipeWire default source to PIXY on call start
+- OBS virtual camera auto-start/stop
+- Waybar click toggles privacy, right-click enables tracking, middle-click centers
+- Device auto-detection by USB vendor/product ID (`328f:00c0`), not hardcoded
+- Hotplug recovery: re-probes on error, recovers when camera reconnected
+- Boot default: privacy mode (camera physically disabled until needed)
+
+```bash
+# Camera commands
+just cam-status          # Show camera state
+just cam-privacy         # Toggle privacy mode
+just cam-track           # Enable face tracking
+just cam-reset           # Center camera (pan/tilt/zoom)
+just cam-audio <mode>    # Set audio: nc, live, org
+just cam-restart         # Restart daemon (user service)
+just cam-logs            # View daemon logs
+
+# Direct daemon commands
+emeet-pixyd status       # Full status
+emeet-pixyd toggle-privacy  # Toggle privacy
+emeet-pixyd probe        # Re-detect device
 ```
 
 ## Flake Inputs

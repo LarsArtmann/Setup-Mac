@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"syscall"
@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	stateDir    = "/run/user/emeet-pixyd"
-	stateFile   = stateDir + "/state.json"
-	socketPath  = stateDir + "/control.sock"
-	pollInterval = 3 * time.Second
+	stateDir     = "/run/emeet-pixyd"
+	stateFile    = stateDir + "/state.json"
+	socketPath   = stateDir + "/control.sock"
+	pollInterval = 2 * time.Second
 
-	videoDevice = "/dev/video0"
+	pixyVendorID  = "328f"
+	pixyProductID = "00c0"
 )
 
 type CameraState string
@@ -30,6 +31,7 @@ const (
 	StateIdle     CameraState = "idle"
 	StateTracking CameraState = "tracking"
 	StatePrivacy  CameraState = "privacy"
+	StateOffline  CameraState = "offline"
 )
 
 type AudioMode string
@@ -41,23 +43,25 @@ const (
 )
 
 type State struct {
-	Camera    CameraState `json:"camera"`
-	Audio     AudioMode   `json:"audio"`
-	Gesture   bool        `json:"gesture"`
-	InCall    bool        `json:"in_call"`
-	AutoMode  bool        `json:"auto_mode"`
+	Camera   CameraState `json:"camera"`
+	Audio    AudioMode   `json:"audio"`
+	Gesture  bool        `json:"gesture"`
+	InCall   bool        `json:"in_call"`
+	AutoMode bool        `json:"auto_mode"`
 }
 
 type Daemon struct {
 	state     State
 	stateFile string
+	videoDev  string
+	hidrawDev string
 }
 
 func NewDaemon() *Daemon {
 	d := &Daemon{
 		stateFile: stateFile,
 		state: State{
-			Camera:   StateIdle,
+			Camera:   StatePrivacy,
 			Audio:    AudioNC,
 			Gesture:  false,
 			InCall:   false,
@@ -65,7 +69,65 @@ func NewDaemon() *Daemon {
 		},
 	}
 	d.loadState()
+	d.probeDevices()
 	return d
+}
+
+func (d *Daemon) probeDevices() {
+	d.videoDev = ""
+	d.hidrawDev = ""
+
+	entries, err := os.ReadDir("/sys/class/video4linux")
+	if err != nil {
+		return
+	}
+	for _, entry := range entries {
+		indexPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/index")
+		data, err := os.ReadFile(indexPath)
+		if err != nil {
+			continue
+		}
+		if strings.TrimSpace(string(data)) != "0" {
+			continue
+		}
+		modaliasPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/modalias")
+		modalias, err := os.ReadFile(modaliasPath)
+		if err != nil {
+			continue
+		}
+		ms := string(modalias)
+		if strings.Contains(ms, "v"+pixyVendorID) && strings.Contains(ms, "p"+pixyProductID) {
+			d.videoDev = filepath.Join("/dev", entry.Name())
+			break
+		}
+	}
+
+	hidEntries, err := os.ReadDir("/sys/class/hidraw")
+	if err != nil {
+		return
+	}
+	for _, entry := range hidEntries {
+		ueventPath := filepath.Join("/sys/class/hidraw", entry.Name(), "device/uevent")
+		data, err := os.ReadFile(ueventPath)
+		if err != nil {
+			continue
+		}
+		content := string(data)
+		if strings.Contains(content, "EMEET") && strings.Contains(content, "PIXY") {
+			d.hidrawDev = filepath.Join("/dev", entry.Name())
+			break
+		}
+	}
+
+	if d.videoDev != "" {
+		if d.state.Camera == StateOffline {
+			d.state.Camera = StatePrivacy
+		}
+		log.Printf("Found PIXY: video=%s hidraw=%s", d.videoDev, d.hidrawDev)
+	} else {
+		d.state.Camera = StateOffline
+		log.Println("PIXY not found — will retry on next probe")
+	}
 }
 
 func (d *Daemon) loadState() {
@@ -85,33 +147,17 @@ func (d *Daemon) saveState() error {
 	return os.WriteFile(d.stateFile, data, 0644)
 }
 
-func findHIDRaw() (string, error) {
-	entries, err := os.ReadDir("/sys/class/hidraw")
-	if err != nil {
-		return "", fmt.Errorf("no hidraw devices: %w", err)
-	}
-	for _, entry := range entries {
-		ueventPath := filepath.Join("/sys/class/hidraw", entry.Name(), "device/uevent")
-		data, err := os.ReadFile(ueventPath)
-		if err != nil {
-			continue
-		}
-		content := string(data)
-		if strings.Contains(content, "EMEET") && strings.Contains(content, "PIXY") {
-			return filepath.Join("/dev", entry.Name()), nil
-		}
-	}
-	return "", fmt.Errorf("EMEET PIXY HID device not found")
+func (d *Daemon) isDevicePresent() bool {
+	return d.videoDev != ""
 }
 
-func hidSend(report []byte) error {
-	hidraw, err := findHIDRaw()
-	if err != nil {
-		return err
+func hidSend(hidrawDev string, report []byte) error {
+	if hidrawDev == "" {
+		return fmt.Errorf("PIXY HID device not available")
 	}
 	buf := make([]byte, 32)
 	copy(buf, report)
-	f, err := os.OpenFile(hidraw, os.O_WRONLY, 0)
+	f, err := os.OpenFile(hidrawDev, os.O_WRONLY, 0)
 	if err != nil {
 		return fmt.Errorf("open hidraw: %w", err)
 	}
@@ -120,13 +166,13 @@ func hidSend(report []byte) error {
 	return err
 }
 
-func v4l2Set(ctrl, value string) error {
-	cmd := exec.Command("v4l2-ctl", "-d", videoDevice, "--set-ctrl="+ctrl+"="+value)
+func v4l2Set(dev, ctrl, value string) error {
+	cmd := exec.Command("v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value)
 	return cmd.Run()
 }
 
-func v4l2Get(ctrl string) (string, error) {
-	cmd := exec.Command("v4l2-ctl", "-d", videoDevice, "--get-ctrl="+ctrl)
+func v4l2Get(dev, ctrl string) (string, error) {
+	cmd := exec.Command("v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl)
 	out, err := cmd.Output()
 	if err != nil {
 		return "", err
@@ -139,22 +185,26 @@ func v4l2Get(ctrl string) (string, error) {
 }
 
 func (d *Daemon) setTracking(mode CameraState) error {
+	if !d.isDevicePresent() {
+		return fmt.Errorf("PIXY not connected")
+	}
 	var modeByte byte
 	switch mode {
-	case StateIdle:
-		modeByte = 0x00
 	case StateTracking:
 		modeByte = 0x01
 	case StatePrivacy:
 		modeByte = 0x02
+	case StateIdle:
+		modeByte = 0x00
 	default:
 		modeByte = 0x00
 	}
-	if err := hidSend([]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+		d.probeDevices()
 		return err
 	}
 	time.Sleep(200 * time.Millisecond)
-	if err := hidSend([]byte{0x09, 0x01, 0x01, 0x01}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x01}); err != nil {
 		return err
 	}
 	d.state.Camera = mode
@@ -163,6 +213,9 @@ func (d *Daemon) setTracking(mode CameraState) error {
 }
 
 func (d *Daemon) setAudio(mode AudioMode) error {
+	if !d.isDevicePresent() {
+		return fmt.Errorf("PIXY not connected")
+	}
 	var modeByte byte
 	switch mode {
 	case AudioNC:
@@ -174,11 +227,12 @@ func (d *Daemon) setAudio(mode AudioMode) error {
 	default:
 		modeByte = 0x01
 	}
-	if err := hidSend([]byte{0x09, 0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x03, 0x00, 0x01, 0x00, 0x01, modeByte}); err != nil {
+		d.probeDevices()
 		return err
 	}
 	time.Sleep(200 * time.Millisecond)
-	if err := hidSend([]byte{0x09, 0x05, 0x00, 0x04}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x04}); err != nil {
 		return err
 	}
 	d.state.Audio = mode
@@ -187,15 +241,19 @@ func (d *Daemon) setAudio(mode AudioMode) error {
 }
 
 func (d *Daemon) setGesture(enabled bool) error {
+	if !d.isDevicePresent() {
+		return fmt.Errorf("PIXY not connected")
+	}
 	var modeByte byte
 	if enabled {
 		modeByte = 0x01
 	}
-	if err := hidSend([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x02, 0x00, 0x02, 0x02, modeByte}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x02, 0x00, 0x02, 0x02, modeByte}); err != nil {
+		d.probeDevices()
 		return err
 	}
 	time.Sleep(200 * time.Millisecond)
-	if err := hidSend([]byte{0x09, 0x04, 0x02, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02}); err != nil {
+	if err := hidSend(d.hidrawDev, []byte{0x09, 0x04, 0x02, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02}); err != nil {
 		return err
 	}
 	d.state.Gesture = enabled
@@ -204,22 +262,145 @@ func (d *Daemon) setGesture(enabled bool) error {
 }
 
 func (d *Daemon) centerCamera() error {
-	if err := v4l2Set("pan_absolute", "0"); err != nil {
+	if !d.isDevicePresent() {
+		return fmt.Errorf("PIXY not connected")
+	}
+	if err := v4l2Set(d.videoDev, "pan_absolute", "0"); err != nil {
 		return err
 	}
-	if err := v4l2Set("tilt_absolute", "0"); err != nil {
+	if err := v4l2Set(d.videoDev, "tilt_absolute", "0"); err != nil {
 		return err
 	}
-	if err := v4l2Set("zoom_absolute", "100"); err != nil {
-		return err
+	return v4l2Set(d.videoDev, "zoom_absolute", "100")
+}
+
+func isCameraInUse(videoDev string) bool {
+	if videoDev == "" {
+		return false
 	}
-	return nil
+	procEntries, err := os.ReadDir("/proc")
+	if err != nil {
+		return false
+	}
+	for _, proc := range procEntries {
+		if !proc.IsDir() {
+			continue
+		}
+		if _, err := strconv.Atoi(proc.Name()); err != nil {
+			continue
+		}
+		fdPath := filepath.Join("/proc", proc.Name(), "fd")
+		fdEntries, err := os.ReadDir(fdPath)
+		if err != nil {
+			continue
+		}
+		for _, fd := range fdEntries {
+			link, err := os.Readlink(filepath.Join(fdPath, fd.Name()))
+			if err != nil {
+				continue
+			}
+			if link != videoDev {
+				continue
+			}
+			statPath := filepath.Join("/proc", proc.Name(), "stat")
+			statData, err := os.ReadFile(statPath)
+			if err != nil {
+				continue
+			}
+			statStr := string(statData)
+			lastParen := strings.LastIndex(statStr, ")")
+			if lastParen == -1 {
+				continue
+			}
+			comm := statStr[:lastParen+1]
+			if strings.Contains(comm, "emeet-pixyd") {
+				continue
+			}
+			return true
+		}
+	}
+	return false
+}
+
+func findPixySource() (string, error) {
+	cmd := exec.Command("wpctl", "status")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+	lines := strings.Split(string(out), "\n")
+	for _, line := range lines {
+		if strings.Contains(line, "EMEET") || strings.Contains(line, "Pixy") || strings.Contains(line, "PIXY") {
+			fields := strings.Fields(line)
+			for _, f := range fields {
+				f = strings.TrimSuffix(f, ".")
+				if _, err := strconv.Atoi(f); err == nil {
+					return f, nil
+				}
+			}
+		}
+	}
+	return "", fmt.Errorf("PIXY audio source not found")
+}
+
+func setDefaultSource(sourceID string) {
+	exec.Command("wpctl", "set-default", sourceID).Run()
+}
+
+func startOBSVirtualCamera() {
+	exec.Command("obs-cli", "--password", " ", "start-virtual-camera").Run()
+}
+
+func stopOBSVirtualCamera() {
+	exec.Command("obs-cli", "--password", " ", "stop-virtual-camera").Run()
+}
+
+func (d *Daemon) autoManage() {
+	if !d.isDevicePresent() {
+		d.probeDevices()
+		if !d.isDevicePresent() {
+			return
+		}
+	}
+
+	if !d.state.AutoMode {
+		return
+	}
+
+	inCall := isCameraInUse(d.videoDev)
+
+	if inCall && !d.state.InCall {
+		log.Println("Camera in use — activating tracking + noise cancellation")
+		d.state.InCall = true
+		if d.state.Camera == StatePrivacy || d.state.Camera == StateIdle {
+			d.setTracking(StateTracking)
+		}
+		if d.state.Audio != AudioNC {
+			d.setAudio(AudioNC)
+		}
+		if src, err := findPixySource(); err == nil {
+			setDefaultSource(src)
+			log.Printf("Set PipeWire default source to PIXY (id=%s)", src)
+		}
+		startOBSVirtualCamera()
+	} else if !inCall && d.state.InCall {
+		log.Println("Camera released — entering privacy mode")
+		d.state.InCall = false
+		d.setTracking(StatePrivacy)
+		stopOBSVirtualCamera()
+	}
+
+	d.saveState()
 }
 
 func (d *Daemon) getStatus() string {
-	pan, _ := v4l2Get("pan_absolute")
-	tilt, _ := v4l2Get("tilt_absolute")
-	zoom, _ := v4l2Get("zoom_absolute")
+	if !d.isDevicePresent() {
+		return "camera=offline (device not found)"
+	}
+
+	pan, _ := v4l2Get(d.videoDev, "pan_absolute")
+	tilt, _ := v4l2Get(d.videoDev, "tilt_absolute")
+	zoom, _ := v4l2Get(d.videoDev, "zoom_absolute")
 
 	panDeg := 0
 	tiltDeg := 0
@@ -245,84 +426,6 @@ func (d *Daemon) getStatus() string {
 
 	return fmt.Sprintf("camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s",
 		d.state.Camera, d.state.Audio, d.state.Gesture, panDeg, tiltDeg, zoomVal, inCallStr, autoStr)
-}
-
-var callProcessPatterns = []*regexp.Regexp{
-	regexp.MustCompile(`(?i)(zoom|teams|webex|skype|discord|google.meet|hangout|jitsi|slack.call|meet\.google|whereby|gather\.town)`),
-}
-
-var callURLPatterns = []*regexp.Regexp{
-	regexp.MustCompile(`meet\.google\.com`),
-	regexp.MustCompile(`zoom\.us/j/`),
-	regexp.MustCompile(`teams\.microsoft\.com/l/meet`),
-	regexp.MustCompile(`discord\.com/channels`),
-	regexp.MustCompile(`app\.gather\.town`),
-}
-
-func (d *Daemon) detectVideoCall() bool {
-	// Check active window title via niri
-	cmd := exec.Command("niri", "msg", "focused-window")
-	out, err := cmd.Output()
-	if err != nil {
-		return false
-	}
-	title := strings.ToLower(string(out))
-
-	// Check window title for known call apps/URLs
-	for _, p := range callProcessPatterns {
-		if p.MatchString(title) {
-			return true
-		}
-	}
-
-	// Check for browser tabs with video call URLs
-	for _, p := range callURLPatterns {
-		if p.MatchString(title) {
-			return true
-		}
-	}
-
-	// Check pipewire for active video streams from the camera
-	cmd = exec.Command("pw-cli", "dump", "short")
-	out, err = cmd.Output()
-	if err == nil {
-		output := string(out)
-		if strings.Contains(output, "EMEET") || strings.Contains(output, "emeet") {
-			// If there are active links involving the device, a call is likely active
-			if strings.Contains(output, "Video") || strings.Contains(output, "video") {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func (d *Daemon) autoManage() {
-	if !d.state.AutoMode {
-		return
-	}
-
-	inCall := d.detectVideoCall()
-
-	if inCall && !d.state.InCall {
-		log.Println("Video call detected — activating tracking + noise cancellation")
-		d.state.InCall = true
-		if d.state.Camera == StatePrivacy {
-			d.setTracking(StateTracking)
-		} else if d.state.Camera == StateIdle {
-			d.setTracking(StateTracking)
-		}
-		if d.state.Audio != AudioNC {
-			d.setAudio(AudioNC)
-		}
-	} else if !inCall && d.state.InCall {
-		log.Println("Video call ended — entering privacy mode")
-		d.state.InCall = false
-		d.setTracking(StatePrivacy)
-	}
-
-	d.saveState()
 }
 
 func (d *Daemon) handleCommand(cmd string) string {
@@ -417,6 +520,13 @@ func (d *Daemon) handleCommand(cmd string) string {
 	case "waybar":
 		return d.waybarOutput()
 
+	case "probe":
+		d.probeDevices()
+		if d.isDevicePresent() {
+			return "device found: " + d.videoDev
+		}
+		return "device not found"
+
 	default:
 		return "unknown command: " + parts[0]
 	}
@@ -429,17 +539,21 @@ func (d *Daemon) waybarOutput() string {
 
 	switch d.state.Camera {
 	case StateTracking:
-		icon = "\U0001f4f7"
+		icon = "\uf030"
 		class = "tracking"
 		text = "CAM"
 	case StatePrivacy:
-		icon = "\U0001f6ab"
+		icon = "\uf011"
 		class = "privacy"
 		text = "OFF"
 	case StateIdle:
-		icon = "\U0001f4f9"
+		icon = "\uf03d"
 		class = "idle"
 		text = "IDLE"
+	case StateOffline:
+		icon = "\uf00d"
+		class = "offline"
+		text = "---"
 	}
 
 	if d.state.InCall {
@@ -466,50 +580,41 @@ func (d *Daemon) listenUnix() error {
 	os.Remove(socketPath)
 	os.MkdirAll(stateDir, 0755)
 
-	listener, err := syscall.Socket(syscall.AF_UNIX, syscall.SOCK_STREAM, 0)
+	l, err := net.Listen("unix", socketPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("listen: %w", err)
 	}
-	defer syscall.Close(listener)
-
-	addr := &syscall.SockaddrUnix{Name: socketPath}
-	if err := syscall.Bind(listener, addr); err != nil {
-		return err
-	}
+	defer l.Close()
 	os.Chmod(socketPath, 0666)
-	syscall.Listen(listener, 5)
 
-	buf := make([]byte, 256)
 	for {
-		nfd, _, err := syscall.Accept(listener)
+		conn, err := l.Accept()
 		if err != nil {
+			log.Printf("Accept error: %v", err)
 			continue
 		}
-		n, _, err := syscall.Recvfrom(nfd, buf, 0)
+		buf := make([]byte, 256)
+		n, err := conn.Read(buf)
 		if err == nil && n > 0 {
 			cmd := strings.TrimSpace(string(buf[:n]))
 			response := d.handleCommand(cmd) + "\n"
-			syscall.Write(nfd, []byte(response))
+			conn.Write([]byte(response))
 		}
-		syscall.Close(nfd)
+		conn.Close()
 	}
 }
 
 func sendCommand(cmd string) (string, error) {
-	fd, err := syscall.Socket(syscall.AF_UNIX, syscall.SOCK_STREAM, 0)
+	conn, err := net.DialTimeout("unix", socketPath, 2*time.Second)
 	if err != nil {
 		return "", err
 	}
-	defer syscall.Close(fd)
-
-	addr := &syscall.SockaddrUnix{Name: socketPath}
-	if err := syscall.Connect(fd, addr); err != nil {
-		return "", err
-	}
-	syscall.Write(fd, []byte(cmd))
+	defer conn.Close()
+	conn.SetDeadline(time.Now().Add(2 * time.Second))
+	conn.Write([]byte(cmd))
 
 	buf := make([]byte, 4096)
-	n, err := syscall.Read(fd, buf)
+	n, err := conn.Read(buf)
 	if err != nil {
 		return "", err
 	}
@@ -519,7 +624,6 @@ func sendCommand(cmd string) (string, error) {
 func (d *Daemon) Run() {
 	os.MkdirAll(stateDir, 0755)
 
-	// Clean up on exit
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
@@ -529,10 +633,9 @@ func (d *Daemon) Run() {
 		os.Exit(0)
 	}()
 
-	// Start unix socket listener in background
 	go func() {
 		if err := d.listenUnix(); err != nil {
-			log.Printf("Unix socket error: %v", err)
+			log.Fatalf("Unix socket error: %v", err)
 		}
 	}()
 
@@ -549,7 +652,6 @@ func (d *Daemon) Run() {
 
 func main() {
 	if len(os.Args) > 1 {
-		// Client mode: send command to running daemon
 		cmd := strings.Join(os.Args[1:], " ")
 		resp, err := sendCommand(cmd)
 		if err != nil {
@@ -560,7 +662,6 @@ func main() {
 		return
 	}
 
-	// Daemon mode
 	d := NewDaemon()
 	d.Run()
 }
