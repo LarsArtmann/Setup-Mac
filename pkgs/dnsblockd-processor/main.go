@@ -86,7 +86,8 @@ func processHostsFile(
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if line == "" || line[0] == '#' || line[0] == '!' || line[0] == '[' || strings.HasPrefix(line, "@@") {
+		if line == "" || line[0] == '#' || line[0] == '!' || line[0] == '[' ||
+			strings.HasPrefix(line, "@@") {
 			continue
 		}
 

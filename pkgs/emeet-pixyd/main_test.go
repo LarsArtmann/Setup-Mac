@@ -28,12 +28,15 @@ func TestStateDefaults(t *testing.T) {
 	if d.state.Camera != StatePrivacy {
 		t.Errorf("expected default camera state to be privacy, got %s", d.state.Camera)
 	}
+
 	if d.state.Audio != AudioNC {
 		t.Errorf("expected default audio to be nc, got %s", d.state.Audio)
 	}
+
 	if d.state.AutoMode != true {
 		t.Error("expected auto mode to be on by default")
 	}
+
 	if d.state.InCall != false {
 		t.Error("expected in_call to be false by default")
 	}
@@ -53,7 +56,8 @@ func TestStateSaveLoad(t *testing.T) {
 		},
 	}
 
-	if err := d.saveState(); err != nil {
+	err := d.saveState()
+	if err != nil {
 		t.Fatalf("saveState: %v", err)
 	}
 
@@ -66,15 +70,19 @@ func TestStateSaveLoad(t *testing.T) {
 	if d2.state.Camera != StateTracking {
 		t.Errorf("expected camera=tracking, got %s", d2.state.Camera)
 	}
+
 	if d2.state.Audio != AudioLive {
 		t.Errorf("expected audio=live, got %s", d2.state.Audio)
 	}
+
 	if d2.state.Gesture != true {
 		t.Error("expected gesture=true")
 	}
+
 	if d2.state.InCall != true {
 		t.Error("expected in_call=true")
 	}
+
 	if d2.state.AutoMode != false {
 		t.Error("expected auto_mode=false")
 	}
@@ -82,7 +90,8 @@ func TestStateSaveLoad(t *testing.T) {
 
 func TestStateFileCorrupt(t *testing.T) {
 	cfg := testConfig(t.TempDir())
-	if err := os.WriteFile(cfg.StateFile(), []byte("not json"), 0644); err != nil {
+	err := os.WriteFile(cfg.StateFile(), []byte("not json"), 0o644)
+	if err != nil {
 		t.Fatalf("write corrupt file: %v", err)
 	}
 
@@ -119,6 +128,7 @@ func TestHandleCommandStatus(t *testing.T) {
 		},
 		videoDev: "",
 	}
+
 	result := d.handleCommand("status")
 	if result != "camera=offline (device not found)" {
 		t.Errorf("expected offline status when no device, got: %s", result)
@@ -131,6 +141,7 @@ func TestHandleCommandUnknown(t *testing.T) {
 		videoDev:  "/dev/video0",
 		hidrawDev: "/dev/hidraw0",
 	}
+
 	result := d.handleCommand("foobar")
 	if result != "unknown command: foobar" {
 		t.Errorf("expected unknown command response, got: %s", result)
@@ -152,6 +163,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 	if result != "auto mode off" {
 		t.Errorf("expected 'auto mode off', got: %s", result)
 	}
+
 	if d.state.AutoMode != false {
 		t.Error("expected auto mode to be false")
 	}
@@ -160,6 +172,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 	if result != "auto mode on" {
 		t.Errorf("expected 'auto mode on', got: %s", result)
 	}
+
 	if d.state.AutoMode != true {
 		t.Error("expected auto mode to be true")
 	}
@@ -190,6 +203,7 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 		if result == "" {
 			t.Errorf("expected error response for '%s' with no device", cmd)
 		}
+
 		if len(result) < 6 || result[:6] != "error:" {
 			t.Errorf("expected error: prefix for '%s' with no device, got: %s", cmd, result)
 		}
@@ -221,7 +235,8 @@ func TestWaybarOutput(t *testing.T) {
 		output := d.waybarOutput()
 
 		var parsed map[string]string
-		if err := json.Unmarshal([]byte(output), &parsed); err != nil {
+		err := json.Unmarshal([]byte(output), &parsed)
+		if err != nil {
 			t.Fatalf("waybar output is not valid JSON: %s, err: %v", output, err)
 		}
 
@@ -232,6 +247,7 @@ func TestWaybarOutput(t *testing.T) {
 		if _, ok := parsed["text"]; !ok {
 			t.Error("waybar output missing 'text' field")
 		}
+
 		if _, ok := parsed["tooltip"]; !ok {
 			t.Error("waybar output missing 'tooltip' field")
 		}
@@ -263,6 +279,7 @@ func TestHandleCommandProbe(t *testing.T) {
 		videoDev:  "",
 		hidrawDev: "",
 	}
+
 	result := d.handleCommand("probe")
 	if result != "device not found" {
 		t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
@@ -318,7 +335,12 @@ func TestCameraStateHIDByte(t *testing.T) {
 	for _, tt := range tests {
 		result := tt.state.HIDByte()
 		if result != tt.expected {
-			t.Errorf("CameraState(%s).HIDByte() = 0x%02x, want 0x%02x", tt.state, result, tt.expected)
+			t.Errorf(
+				"CameraState(%s).HIDByte() = 0x%02x, want 0x%02x",
+				tt.state,
+				result,
+				tt.expected,
+			)
 		}
 	}
 }
@@ -327,12 +349,15 @@ func TestTypeValidation(t *testing.T) {
 	if !AudioNC.Valid() {
 		t.Error("AudioNC should be valid")
 	}
+
 	if !StateTracking.Valid() {
 		t.Error("StateTracking should be valid")
 	}
+
 	if AudioMode("foo").Valid() {
 		t.Error("unknown audio mode should not be valid")
 	}
+
 	if CameraState("bar").Valid() {
 		t.Error("unknown camera state should not be valid")
 	}
@@ -344,6 +369,7 @@ func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
 		videoDev:  "",
 		hidrawDev: "",
 	}
+
 	result := d.handleCommand("audio")
 	if !strings.HasPrefix(result, "error:") {
 		t.Errorf("expected error when cycling audio with no device, got: %s", result)
@@ -355,6 +381,7 @@ func TestConfigPaths(t *testing.T) {
 	if cfg.StateFile() != "/tmp/test-pixyd/state.json" {
 		t.Errorf("unexpected StateFile: %s", cfg.StateFile())
 	}
+
 	if cfg.SocketPath() != "/tmp/test-pixyd/control.sock" {
 		t.Errorf("unexpected SocketPath: %s", cfg.SocketPath())
 	}
@@ -455,9 +482,11 @@ func TestDefaultConfig(t *testing.T) {
 	if cfg.StateDir != defaultStateDir {
 		t.Errorf("expected StateDir=%s, got %s", defaultStateDir, cfg.StateDir)
 	}
+
 	if cfg.PollInterval != defaultPollInterval {
 		t.Errorf("expected PollInterval=%v, got %v", defaultPollInterval, cfg.PollInterval)
 	}
+
 	if cfg.DebounceCount != defaultDebounceCount {
 		t.Errorf("expected DebounceCount=%d, got %d", defaultDebounceCount, cfg.DebounceCount)
 	}

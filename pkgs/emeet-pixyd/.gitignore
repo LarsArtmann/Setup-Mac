@@ -1,0 +1,8 @@
+# Copy/paste detection report
+/report/jscpd-report.json
+Dependencies
+node_modules/
+Test coverage
+/coverage
+# Build artifacts
+/emeet-pixyd
