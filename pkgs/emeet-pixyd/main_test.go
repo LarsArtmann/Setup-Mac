@@ -360,6 +360,96 @@ func TestConfigPaths(t *testing.T) {
 	}
 }
 
+func TestParseHIDResponseTracking(t *testing.T) {
+	tests := []struct {
+		data     []byte
+		expected CameraState
+	}{
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, StateTracking},
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, StatePrivacy},
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}, StateIdle},
+	}
+	for _, tt := range tests {
+		resp := parseHIDResponse(tt.data)
+		if !resp.Got {
+			t.Fatal("expected Got=true")
+		}
+		if resp.Tracking != tt.expected {
+			t.Errorf("tracking from %x = %s, want %s", tt.data, resp.Tracking, tt.expected)
+		}
+	}
+}
+
+func TestParseHIDResponseAudio(t *testing.T) {
+	tests := []struct {
+		data     []byte
+		expected AudioMode
+	}{
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, AudioNC},
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, AudioLive},
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03}, AudioOriginal},
+	}
+	for _, tt := range tests {
+		resp := parseHIDResponse(tt.data)
+		if !resp.Got {
+			t.Fatal("expected Got=true")
+		}
+		if resp.Audio != tt.expected {
+			t.Errorf("audio from %x = %s, want %s", tt.data, resp.Audio, tt.expected)
+		}
+	}
+}
+
+func TestParseHIDResponseGesture(t *testing.T) {
+	on := parseHIDResponse([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x01})
+	if !on.Got || !on.Gesture {
+		t.Error("expected gesture=true")
+	}
+	off := parseHIDResponse([]byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02, 0x00})
+	if !off.Got || off.Gesture {
+		t.Error("expected gesture=false")
+	}
+}
+
+func TestParseHIDResponseTooShort(t *testing.T) {
+	resp := parseHIDResponse([]byte{0x09, 0x01})
+	if resp.Got {
+		t.Error("expected Got=false for short response")
+	}
+}
+
+func TestParseHIDResponseNil(t *testing.T) {
+	resp := parseHIDResponse(nil)
+	if resp.Got {
+		t.Error("expected Got=false for nil response")
+	}
+}
+
+func TestHandleCommandSyncNoDevice(t *testing.T) {
+	d := &Daemon{
+		state:     State{Camera: StateOffline},
+		videoDev:  "",
+		hidrawDev: "",
+	}
+	result := d.handleCommand("sync")
+	if !strings.HasPrefix(result, "error:") {
+		t.Errorf("expected error for sync with no device, got: %s", result)
+	}
+}
+
+func TestHandleCommandSyncWithDevice(t *testing.T) {
+	d := &Daemon{
+		config:    testConfig(t.TempDir()),
+		state:     State{Camera: StatePrivacy, Audio: AudioNC},
+		videoDev:  "/dev/video0",
+		hidrawDev: "/dev/hidraw0",
+	}
+	result := d.handleCommand("sync")
+	if result != "synced (no changes)" && !strings.Contains(result, "error") {
+		t.Errorf("expected sync result, got: %s", result)
+	}
+}
+
 func TestDefaultConfig(t *testing.T) {
 	cfg := DefaultConfig()
 	if cfg.StateDir != defaultStateDir {

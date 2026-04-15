@@ -1919,6 +1919,10 @@ cam-gesture-on:
 cam-gesture-off:
     @emeet-pixyd gesture-off 2>/dev/null || echo "EMEET PIXY daemon not running"
 
+# Sync daemon state with camera's actual HID state
+cam-sync:
+    @emeet-pixyd sync 2>/dev/null || echo "EMEET PIXY daemon not running"
+
 # Restart the EMEET PIXY daemon
 cam-restart:
     @systemctl --user restart emeet-pixyd && echo "EMEET PIXY daemon restarted" || echo "Failed to restart"

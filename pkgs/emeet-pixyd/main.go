@@ -229,6 +229,8 @@ func (d *Daemon) isDevicePresent() bool {
 	return d.videoDev != ""
 }
 
+const hidResponseTimeout = 500 * time.Millisecond
+
 func hidSend(hidrawDev string, report []byte) (err error) {
 	if hidrawDev == "" {
 		return fmt.Errorf("PIXY HID device not available")
@@ -247,6 +249,79 @@ func hidSend(hidrawDev string, report []byte) (err error) {
 	}()
 	_, err = f.Write(buf)
 	return err
+}
+
+type hidResponse struct {
+	Tracking CameraState
+	Audio    AudioMode
+	Gesture  bool
+	Got      bool
+}
+
+func hidSendRecv(hidrawDev string, report []byte) ([]byte, error) {
+	if hidrawDev == "" {
+		return nil, fmt.Errorf("PIXY HID device not available")
+	}
+	buf := make([]byte, 32)
+	copy(buf, report)
+	f, err := os.OpenFile(hidrawDev, os.O_RDWR, 0)
+	if err != nil {
+		return nil, fmt.Errorf("open hidraw: %w", err)
+	}
+	defer f.Close()
+	if _, err := f.Write(buf); err != nil {
+		return nil, err
+	}
+	type readResult struct {
+		data []byte
+		err  error
+	}
+	ch := make(chan readResult, 1)
+	go func() {
+		resp := make([]byte, 64)
+		n, rerr := f.Read(resp)
+		ch <- readResult{resp[:n], rerr}
+	}()
+	select {
+	case r := <-ch:
+		if r.err != nil {
+			return nil, r.err
+		}
+		return r.data, nil
+	case <-time.After(hidResponseTimeout):
+		return nil, nil
+	}
+}
+
+func parseHIDResponse(data []byte) hidResponse {
+	if len(data) < 9 {
+		return hidResponse{}
+	}
+	resp := hidResponse{Got: true}
+	slog.Debug("HID response", "hex", fmt.Sprintf("%x", data[:min(len(data), 16)]))
+	switch {
+	case data[0] == 0x09 && data[1] == 0x01:
+		switch data[8] {
+		case 0x01:
+			resp.Tracking = StateTracking
+		case 0x02:
+			resp.Tracking = StatePrivacy
+		default:
+			resp.Tracking = StateIdle
+		}
+	case data[0] == 0x09 && data[1] == 0x05:
+		switch data[8] {
+		case 0x02:
+			resp.Audio = AudioLive
+		case 0x03:
+			resp.Audio = AudioOriginal
+		default:
+			resp.Audio = AudioNC
+		}
+	case data[0] == 0x09 && data[1] == 0x04:
+		resp.Gesture = data[len(data)-1] == 0x01
+	}
+	return resp
 }
 
 func v4l2Set(dev, ctrl, value string) error {
@@ -337,6 +412,106 @@ func (d *Daemon) centerCamera() error {
 		return err
 	}
 	return v4l2Set(d.videoDev, "zoom_absolute", "100")
+}
+
+func (d *Daemon) queryTracking() (CameraState, error) {
+	if d.hidrawDev == "" {
+		return "", fmt.Errorf("PIXY HID device not available")
+	}
+	resp, err := hidSendRecv(d.hidrawDev, []byte{0x09, 0x01, 0x01, 0x01})
+	if err != nil {
+		return "", err
+	}
+	if resp == nil {
+		return "", fmt.Errorf("no HID response")
+	}
+	parsed := parseHIDResponse(resp)
+	if !parsed.Got {
+		return "", fmt.Errorf("unrecognized HID response")
+	}
+	return parsed.Tracking, nil
+}
+
+func (d *Daemon) queryAudio() (AudioMode, error) {
+	if d.hidrawDev == "" {
+		return "", fmt.Errorf("PIXY HID device not available")
+	}
+	resp, err := hidSendRecv(d.hidrawDev, []byte{0x09, 0x05, 0x00, 0x04})
+	if err != nil {
+		return "", err
+	}
+	if resp == nil {
+		return "", fmt.Errorf("no HID response")
+	}
+	parsed := parseHIDResponse(resp)
+	if !parsed.Got {
+		return "", fmt.Errorf("unrecognized HID response")
+	}
+	return parsed.Audio, nil
+}
+
+func (d *Daemon) queryGesture() (bool, error) {
+	if d.hidrawDev == "" {
+		return false, fmt.Errorf("PIXY HID device not available")
+	}
+	resp, err := hidSendRecv(d.hidrawDev, []byte{0x09, 0x04, 0x02, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02})
+	if err != nil {
+		return false, err
+	}
+	if resp == nil {
+		return false, fmt.Errorf("no HID response")
+	}
+	parsed := parseHIDResponse(resp)
+	if !parsed.Got {
+		return false, fmt.Errorf("unrecognized HID response")
+	}
+	return parsed.Gesture, nil
+}
+
+func (d *Daemon) syncState() string {
+	if !d.isDevicePresent() {
+		return "error: PIXY not connected"
+	}
+
+	changed := false
+
+	if tracking, err := d.queryTracking(); err == nil && tracking.Valid() && tracking != StateOffline {
+		if d.state.Camera != tracking {
+			slog.Info("state sync: camera changed", "believed", d.state.Camera, "actual", tracking)
+			d.state.Camera = tracking
+			changed = true
+		}
+	} else if err != nil {
+		slog.Debug("tracking query failed", "error", err)
+	}
+
+	if audio, err := d.queryAudio(); err == nil && audio.Valid() {
+		if d.state.Audio != audio {
+			slog.Info("state sync: audio changed", "believed", d.state.Audio, "actual", audio)
+			d.state.Audio = audio
+			changed = true
+		}
+	} else if err != nil {
+		slog.Debug("audio query failed", "error", err)
+	}
+
+	if gesture, err := d.queryGesture(); err == nil {
+		if d.state.Gesture != gesture {
+			slog.Info("state sync: gesture changed", "believed", d.state.Gesture, "actual", gesture)
+			d.state.Gesture = gesture
+			changed = true
+		}
+	} else if err != nil {
+		slog.Debug("gesture query failed", "error", err)
+	}
+
+	if changed {
+		if err := d.saveState(); err != nil {
+			slog.Error("failed to save synced state", "error", err)
+		}
+		return "synced (state updated from camera)"
+	}
+	return "synced (no changes)"
 }
 
 func isCameraInUse(videoDev string) bool {
@@ -628,6 +803,9 @@ func (d *Daemon) handleCommand(cmd string) string {
 	case "waybar":
 		return d.waybarOutput()
 
+	case "sync":
+		return d.syncState()
+
 	case "probe":
 		d.probeDevices()
 		if d.isDevicePresent() {
@@ -770,6 +948,9 @@ func (d *Daemon) Run() {
 	sdNotify("READY=1")
 	d.mu.Lock()
 	slog.Info("initial state", "camera", d.state.Camera, "audio", d.state.Audio, "auto", d.state.AutoMode)
+	if result := d.syncState(); strings.HasPrefix(result, "synced") {
+		slog.Info("startup sync", "result", result)
+	}
 	d.mu.Unlock()
 
 	ticker := time.NewTicker(d.config.PollInterval)

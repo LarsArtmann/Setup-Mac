@@ -272,6 +272,8 @@ Custom Go daemon for the EMEET PIXY dual-camera AI webcam with auto-activation:
 - Configurable via `Config` struct (poll interval, debounce count, state dir)
 - Type-safe HID commands via `CameraState.HIDByte()` / `AudioMode.HIDByte()` methods
 - Socket permissions 0600 (user-only, not world-writable)
+- HID state querying via bidirectional hidraw (reads camera's actual tracking/audio/gesture state)
+- State sync on startup + `sync` command to reconcile believed state with camera reality
 
 ```bash
 # Camera commands
@@ -281,6 +283,7 @@ just cam-track           # Enable face tracking
 just cam-reset           # Center camera (pan/tilt/zoom)
 just cam-audio           # Cycle audio: nc → live → org → nc
 just cam-audio <mode>    # Set audio: nc, live, org
+just cam-sync           # Sync daemon state with camera
 just cam-restart         # Restart daemon (user service)
 just cam-logs            # View daemon logs
 
@@ -288,6 +291,7 @@ just cam-logs            # View daemon logs
 emeet-pixy status           # Full status
 emeet-pixy toggle-privacy   # Toggle privacy
 emeet-pixy probe            # Re-detect device
+emeet-pixy sync             # Sync state from camera
 emeet-pixy audio            # Cycle audio mode
 ```
 
