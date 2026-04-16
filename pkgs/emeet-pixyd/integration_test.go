@@ -121,49 +121,73 @@ func get(t *testing.T, url string) *http.Response {
 	return resp
 }
 
-func assertWebStatus(t *testing.T, status webStatus) {
+// assertWebStatusOffline verifies all fields match offline/no-device state.
+func assertWebStatusOffline(t *testing.T, status webStatus) {
+	assertWebStatusField(t, status, webStatusCheck{
+		Camera:  strPtr("privacy"),
+		Audio:   strPtr("nc"),
+		Gesture: boolPtr(false),
+		Auto:    boolPtr(true),
+		InCall:  boolPtr(false),
+		Online:  boolPtr(false),
+		Device:  strPtr(""),
+		Pan:     intPtr(0), Tilt: intPtr(0), Zoom: intPtr(0),
+	})
+}
+
+type webStatusCheck struct {
+	Camera  *string
+	Audio   *string
+	Gesture *bool
+	Auto    *bool
+	InCall  *bool
+	Online  *bool
+	Device  *string
+	Pan     *int
+	Tilt    *int
+	Zoom    *int
+}
+
+func strPtr(s string) *string { return &s }
+func intPtr(i int) *int         { return &i }
+func boolPtr(b bool) *bool      { return &b }
+
+func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) {
 	t.Helper()
 
-	if status.Camera != "privacy" {
-		t.Errorf("expected camera=privacy, got %s", status.Camera)
+	if check.Camera != nil && status.Camera != *check.Camera {
+		t.Errorf("expected camera=%s, got %s", *check.Camera, status.Camera)
 	}
-
-	if status.Audio != "nc" {
-		t.Errorf("expected audio=nc, got %s", status.Audio)
+	if check.Audio != nil && status.Audio != *check.Audio {
+		t.Errorf("expected audio=%s, got %s", *check.Audio, status.Audio)
 	}
-
-	if status.Gesture {
-		t.Error("expected gesture=false")
+	if check.Gesture != nil && status.Gesture != *check.Gesture {
+		t.Errorf("expected gesture=%v, got %v", *check.Gesture, status.Gesture)
 	}
-
-	if !status.Auto {
-		t.Error("expected auto=true")
+	if check.Auto != nil && status.Auto != *check.Auto {
+		t.Errorf("expected auto=%v, got %v", *check.Auto, status.Auto)
 	}
-
-	if status.InCall {
-		t.Error("expected inCall=false")
+	if check.InCall != nil && status.InCall != *check.InCall {
+		t.Errorf("expected inCall=%v, got %v", *check.InCall, status.InCall)
 	}
-
-	if status.Online {
-		t.Error("expected online=false (no device)")
+	if check.Online != nil && status.Online != *check.Online {
+		t.Errorf("expected online=%v, got %v", *check.Online, status.Online)
 	}
-
-	if status.Device != "" {
-		t.Errorf("expected empty device, got %s", status.Device)
+	if check.Device != nil && status.Device != *check.Device {
+		t.Errorf("expected device=%s, got %s", *check.Device, status.Device)
 	}
-
-	if status.Pan != 0 {
-		t.Errorf("expected pan=0, got %d", status.Pan)
+	if check.Pan != nil && status.Pan != *check.Pan {
+		t.Errorf("expected pan=%d, got %d", *check.Pan, status.Pan)
 	}
-
-	if status.Tilt != 0 {
-		t.Errorf("expected tilt=0, got %d", status.Tilt)
+	if check.Tilt != nil && status.Tilt != *check.Tilt {
+		t.Errorf("expected tilt=%d, got %d", *check.Tilt, status.Tilt)
 	}
-
-	if status.Zoom != 0 {
-		t.Errorf("expected zoom=0, got %d", status.Zoom)
+	if check.Zoom != nil && status.Zoom != *check.Zoom {
+		t.Errorf("expected zoom=%d, got %d", *check.Zoom, status.Zoom)
 	}
 }
+
+func assertWebStatus(t *testing.T, status webStatus) { assertWebStatusOffline(t, status) }
 
 func assertSocketResponseContains(t *testing.T, resp, substr, label string) {
 	t.Helper()
@@ -584,29 +608,16 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	webSrv := &webServer{daemon: daemon}
 	status := webSrv.getWebStatus()
 
-	if !status.Online {
-		t.Error("expected online=true")
-	}
-
-	if status.Device != "/dev/video0" {
-		t.Errorf("expected device=/dev/video0, got %s", status.Device)
-	}
-
-	if status.Camera != "tracking" {
-		t.Errorf("expected camera=tracking, got %s", status.Camera)
-	}
-
-	if status.Audio != "live" {
-		t.Errorf("expected audio=live, got %s", status.Audio)
-	}
-
-	if !status.Gesture {
-		t.Error("expected gesture=true")
-	}
-
-	if !status.InCall {
-		t.Error("expected inCall=true")
-	}
+	assertWebStatusField(t, status, webStatusCheck{
+		Camera:  strPtr("tracking"),
+		Audio:   strPtr("live"),
+		Gesture: boolPtr(true),
+		Auto:    boolPtr(true),
+		InCall:  boolPtr(true),
+		Online:  boolPtr(true),
+		Device:  strPtr("/dev/video0"),
+		Zoom:    intPtr(100),
+	})
 }
 
 func TestWeb_WebStatusAllCameraStates(t *testing.T) {
@@ -661,165 +672,98 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 
 // ---------- parseWebStatus ----------
 
-func TestWeb_ParseWebStatusFull(t *testing.T) {
-	raw := "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0"
-
-	status := parseWebStatus(raw)
-
-	if status.Camera != "tracking" {
-		t.Errorf("expected camera=tracking, got %s", status.Camera)
+func TestWeb_ParseWebStatus(t *testing.T) {
+	tests := []struct {
+		name   string
+		raw    string
+		check  webStatusCheck
+		err    string
+		online *bool
+	}{
+		{
+			name: "full",
+			raw:  "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0",
+			check: webStatusCheck{
+				Camera: strPtr("tracking"), Audio: strPtr("live"), Gesture: boolPtr(true), Auto: boolPtr(true), InCall: boolPtr(true),
+				Device: strPtr("/dev/video0"), Pan: intPtr(5), Tilt: intPtr(-3), Zoom: intPtr(200),
+			},
+			online: ptr(true),
+		},
+		{
+			name:   "offline",
+			raw:    "camera=offline (device not found)",
+			check:  webStatusCheck{Camera: strPtr("offline")},
+			online: ptr(false),
+		},
+		{
+			name:  "error",
+			raw:   "error: PIXY not connected",
+			check: webStatusCheck{Camera: strPtr("offline"), Audio: strPtr("nc"), Zoom: intPtr(100)},
+			err:   "PIXY not connected",
+		},
+		{
+			name:   "empty",
+			check:  webStatusCheck{Camera: strPtr("offline")},
+			online: ptr(false),
+		},
+		{
+			name:   "garbage",
+			raw:   "blah notkeyvalue garbage",
+			check: webStatusCheck{Camera: strPtr("offline")},
+		},
+		{
+			name:  "gestureFalse",
+			raw:  "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
+			check: webStatusCheck{Gesture: boolPtr(false)},
+		},
+		{
+			name:  "autoOff",
+			raw:  "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=off device=/dev/video0",
+			check: webStatusCheck{Auto: boolPtr(false)},
+		},
+		{
+			name:  "inCallNo",
+			raw:  "camera=tracking audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
+			check: webStatusCheck{InCall: boolPtr(false)},
+		},
+		{
+			name:  "defaults",
+			raw:  "camera=tracking",
+			check: webStatusCheck{Zoom: intPtr(100), Audio: strPtr("nc"), Pan: intPtr(0), Tilt: intPtr(0)},
+		},
 	}
 
-	if !status.Online {
-		t.Error("expected online=true for camera=tracking")
-	}
-
-	if status.Audio != "live" {
-		t.Errorf("expected audio=live, got %s", status.Audio)
-	}
-
-	if !status.Gesture {
-		t.Error("expected gesture=true")
-	}
-
-	if status.Pan != 5 {
-		t.Errorf("expected pan=5, got %d", status.Pan)
-	}
-
-	if status.Tilt != -3 {
-		t.Errorf("expected tilt=-3, got %d", status.Tilt)
-	}
-
-	if status.Zoom != 200 {
-		t.Errorf("expected zoom=200, got %d", status.Zoom)
-	}
-
-	if !status.InCall {
-		t.Error("expected inCall=true")
-	}
-
-	if !status.Auto {
-		t.Error("expected auto=true")
-	}
-
-	if status.Device != "/dev/video0" {
-		t.Errorf("expected device=/dev/video0, got %s", status.Device)
-	}
-
-	if status.Error != "" {
-		t.Errorf("expected no error, got %s", status.Error)
-	}
-}
-
-func TestWeb_ParseWebStatusOffline(t *testing.T) {
-	raw := "camera=offline (device not found)"
-
-	status := parseWebStatus(raw)
-
-	if status.Camera != "offline" {
-		t.Errorf("expected camera=offline, got %s", status.Camera)
-	}
-
-	if status.Online {
-		t.Error("expected online=false for offline camera")
-	}
-}
-
-func TestWeb_ParseWebStatusError(t *testing.T) {
-	raw := "error: PIXY not connected"
-
-	status := parseWebStatus(raw)
-
-	if status.Error == "" {
-		t.Error("expected error to be set")
-	}
-
-	if status.Camera != "offline" {
-		t.Errorf("expected camera=offline on error, got %s", status.Camera)
-	}
-
-	if status.Audio != "nc" {
-		t.Errorf("expected default audio=nc on error, got %s", status.Audio)
-	}
-
-	if status.Zoom != 100 {
-		t.Errorf("expected default zoom=100 on error, got %d", status.Zoom)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			status := parseWebStatus(tc.raw)
+			assertWebStatusField(t, status, tc.check)
+			if tc.err != "" {
+				if status.Error == "" {
+					t.Error("expected error to be set")
+				}
+			} else if tc.err == "" && tc.name != "error" {
+				if status.Error != "" {
+					t.Errorf("expected no error, got %s", status.Error)
+				}
+			}
+			if tc.online != nil && status.Online != *tc.online {
+				t.Errorf("expected online=%v, got %v", *tc.online, status.Online)
+			}
+		})
 	}
 }
 
-func TestWeb_ParseWebStatusEmpty(t *testing.T) {
-	status := parseWebStatus("")
+func ptr[T any](v T) *T { return &v }
 
-	if status.Camera != "offline" {
-		t.Errorf("expected camera=offline for empty input, got %s", status.Camera)
-	}
-
-	if status.Online {
-		t.Error("expected online=false for empty input")
-	}
-}
-
-func TestWeb_ParseWebStatusGarbage(t *testing.T) {
-	status := parseWebStatus("blah notkeyvalue garbage")
-
-	if status.Camera != "offline" {
-		t.Errorf("expected camera=offline for garbage, got %s", status.Camera)
-	}
-
-	if status.Error != "" {
-		t.Errorf("expected no error for garbage (no 'error:' prefix), got %s", status.Error)
-	}
-}
-
-func TestWeb_ParseWebStatusGestureFalse(t *testing.T) {
-	raw := "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0"
-
-	status := parseWebStatus(raw)
-
-	if status.Gesture {
-		t.Error("expected gesture=false")
-	}
-}
-
-func TestWeb_ParseWebStatusAutoOff(t *testing.T) {
-	raw := "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=off device=/dev/video0"
-
-	status := parseWebStatus(raw)
-
-	if status.Auto {
-		t.Error("expected auto=false")
-	}
-}
-
-func TestWeb_ParseWebStatusInCallNo(t *testing.T) {
-	raw := "camera=tracking audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0"
-
-	status := parseWebStatus(raw)
-
-	if status.InCall {
-		t.Error("expected inCall=false for in_call=no")
-	}
-}
-
-func TestWeb_ParseWebStatusDefaults(t *testing.T) {
-	status := parseWebStatus("camera=tracking")
-
-	if status.Zoom != 100 {
-		t.Errorf("expected default zoom=100, got %d", status.Zoom)
-	}
-
-	if status.Audio != "nc" {
-		t.Errorf("expected default audio=nc, got %s", status.Audio)
-	}
-
-	if status.Pan != 0 {
-		t.Errorf("expected default pan=0, got %d", status.Pan)
-	}
-
-	if status.Tilt != 0 {
-		t.Errorf("expected default tilt=0, got %d", status.Tilt)
-	}
-}
+func TestWeb_ParseWebStatusFull(t *testing.T)      { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusOffline(t *testing.T)   { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusError(t *testing.T)     { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusEmpty(t *testing.T)     { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusGarbage(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusGestureFalse(t *testing.T) { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusAutoOff(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusInCallNo(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
+func TestWeb_ParseWebStatusDefaults(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
 
 // shortSocketDir creates a temp directory under /tmp with a short path.
 // macOS t.TempDir() produces paths too long for Unix socket addresses.
@@ -972,34 +916,35 @@ func TestSocket_StatusViaCommandReturnsStatus(t *testing.T) {
 	assertSocketResponseContains(t, resp, "camera=", "socket response")
 }
 
-func TestSocket_TrackNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected, track would succeed")
+func TestSocket_CommandsNoDevice(t *testing.T) {
+	tests := []struct {
+		name string
+		cmd  string
+	}{
+		{"track", "track"},
+		{"privacy", "privacy"},
+		{"audio", "audio"},
+		{"gesture", "gesture-on"},
+		{"sync", "sync"},
+		{"center", "center"},
 	}
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "track")
-	if err != nil {
-		t.Fatalf("track: %v", err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			daemon, cfg := startSocketDaemon(t)
+
+			if daemon.videoDev != "" {
+				t.Skip("device connected")
+			}
+
+			resp, err := pixy.SendCommand(cfg.SocketPath(), tc.cmd)
+			if err != nil {
+				t.Fatalf("%s: %v", tc.cmd, err)
+			}
+
+			assertSocketResponsePrefix(t, resp, "error:", "socket response")
+		})
 	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
-}
-
-func TestSocket_PrivacyNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected, privacy would succeed")
-	}
-
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "privacy")
-	if err != nil {
-		t.Fatalf("privacy: %v", err)
-	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_AudioInvalidMode(t *testing.T) {
@@ -1032,66 +977,6 @@ func TestSocket_AudioValidModes(t *testing.T) {
 			assertSocketResponsePrefix(t, resp, "error:", "audio requires device")
 		})
 	}
-}
-
-func TestSocket_AudioCycleNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected")
-	}
-
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "audio")
-	if err != nil {
-		t.Fatalf("audio (cycle): %v", err)
-	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
-}
-
-func TestSocket_GestureNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected")
-	}
-
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "gesture-on")
-	if err != nil {
-		t.Fatalf("gesture-on: %v", err)
-	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
-}
-
-func TestSocket_SyncNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected")
-	}
-
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "sync")
-	if err != nil {
-		t.Fatalf("sync: %v", err)
-	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
-}
-
-func TestSocket_CenterNoDevice(t *testing.T) {
-	daemon, cfg := startSocketDaemon(t)
-
-	if daemon.videoDev != "" {
-		t.Skip("device connected")
-	}
-
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "center")
-	if err != nil {
-		t.Fatalf("center: %v", err)
-	}
-
-	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
