@@ -480,6 +480,20 @@ input[type="range"]:focus-visible {
   100% { width: 0; left: 100%; }
 }
 
+.kbd {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-family: inherit;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-dim);
+  margin-left: 0.35rem;
+  vertical-align: middle;
+  line-height: 1.3;
+}
+
 #status-panel > .card:last-child {
   background: transparent;
   border: 1px dashed var(--border-subtle);
@@ -604,21 +618,21 @@ templ statusPanel(s webStatus) {
 					hx-post="/api/track"
 					hx-target="#status-panel"
 				>
-					Track
+					Track<span class="kbd">T</span>
 				</button>
 				<button
 					class={ "btn", "btn-yellow", templ.KV("btn-active", s.Camera == "idle") }
 					hx-post="/api/idle"
 					hx-target="#status-panel"
 				>
-					Idle
+					Idle<span class="kbd">I</span>
 				</button>
 				<button
 					class={ "btn", "btn-red", templ.KV("btn-active", s.Camera == "privacy") }
 					hx-post="/api/privacy"
 					hx-target="#status-panel"
 				>
-					Privacy
+					Privacy<span class="kbd">P</span>
 				</button>
 			</div>
 		</div>
