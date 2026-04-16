@@ -204,48 +204,25 @@ type webStatusCheck struct {
 	Zoom    *int
 }
 
+func assertOptField[T comparable](t *testing.T, name string, want *T, got T) {
+	t.Helper()
+	if want != nil && got != *want {
+		t.Errorf("expected %s=%v, got %v", name, *want, got)
+	}
+}
+
 func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) {
 	t.Helper()
-
-	if check.Camera != nil && status.Camera != *check.Camera {
-		t.Errorf("expected camera=%s, got %s", *check.Camera, status.Camera)
-	}
-
-	if check.Audio != nil && status.Audio != *check.Audio {
-		t.Errorf("expected audio=%s, got %s", *check.Audio, status.Audio)
-	}
-
-	if check.Gesture != nil && status.Gesture != *check.Gesture {
-		t.Errorf("expected gesture=%v, got %v", *check.Gesture, status.Gesture)
-	}
-
-	if check.Auto != nil && status.Auto != *check.Auto {
-		t.Errorf("expected auto=%v, got %v", *check.Auto, status.Auto)
-	}
-
-	if check.InCall != nil && status.InCall != *check.InCall {
-		t.Errorf("expected inCall=%v, got %v", *check.InCall, status.InCall)
-	}
-
-	if check.Online != nil && status.Online != *check.Online {
-		t.Errorf("expected online=%v, got %v", *check.Online, status.Online)
-	}
-
-	if check.Device != nil && status.Device != *check.Device {
-		t.Errorf("expected device=%s, got %s", *check.Device, status.Device)
-	}
-
-	if check.Pan != nil && status.Pan != *check.Pan {
-		t.Errorf("expected pan=%d, got %d", *check.Pan, status.Pan)
-	}
-
-	if check.Tilt != nil && status.Tilt != *check.Tilt {
-		t.Errorf("expected tilt=%d, got %d", *check.Tilt, status.Tilt)
-	}
-
-	if check.Zoom != nil && status.Zoom != *check.Zoom {
-		t.Errorf("expected zoom=%d, got %d", *check.Zoom, status.Zoom)
-	}
+	assertOptField(t, "camera", check.Camera, status.Camera)
+	assertOptField(t, "audio", check.Audio, status.Audio)
+	assertOptField(t, "gesture", check.Gesture, status.Gesture)
+	assertOptField(t, "auto", check.Auto, status.Auto)
+	assertOptField(t, "inCall", check.InCall, status.InCall)
+	assertOptField(t, "online", check.Online, status.Online)
+	assertOptField(t, "device", check.Device, status.Device)
+	assertOptField(t, "pan", check.Pan, status.Pan)
+	assertOptField(t, "tilt", check.Tilt, status.Tilt)
+	assertOptField(t, "zoom", check.Zoom, status.Zoom)
 }
 
 func assertWebStatus(t *testing.T, status webStatus) {
@@ -693,6 +670,19 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 
 // ---------- parseWebStatus ----------
 
+func assertParseResult(t *testing.T, name string, status webStatus, wantErr string, wantOnline *bool) {
+	t.Helper()
+	assertOptField(t, "online", wantOnline, status.Online)
+
+	if wantErr != "" {
+		if status.Error == "" {
+			t.Error("expected error to be set")
+		}
+	} else if name != "error" && status.Error != "" {
+		t.Errorf("expected no error, got %s", status.Error)
+	}
+}
+
 func TestWeb_ParseWebStatus(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -705,7 +695,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 			name: "full",
 			raw:  "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0",
 			check: webStatusCheck{
-				Camera: ptr(StateTracking),
+				Camera:  ptr(StateTracking),
 				Audio:   ptr(AudioLive),
 				Gesture: new(true),
 				Auto:    new(true),
@@ -765,20 +755,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			status := parseWebStatus(tc.raw)
 			assertWebStatusField(t, status, tc.check)
-
-			if tc.err != "" {
-				if status.Error == "" {
-					t.Error("expected error to be set")
-				}
-			} else if tc.err == "" && tc.name != "error" {
-				if status.Error != "" {
-					t.Errorf("expected no error, got %s", status.Error)
-				}
-			}
-
-			if tc.online != nil && status.Online != *tc.online {
-				t.Errorf("expected online=%v, got %v", *tc.online, status.Online)
-			}
+			assertParseResult(t, tc.name, status, tc.err, tc.online)
 		})
 	}
 }

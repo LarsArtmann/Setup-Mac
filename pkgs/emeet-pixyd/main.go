@@ -26,6 +26,11 @@ import (
 const (
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
+
+	respAutoModeOff = "auto mode off"
+	respAutoModeOn  = "auto mode on"
+	respAudioUsage  = "usage: audio [nc|live|org]"
+	respDeviceNotFound = "device not found"
 )
 
 var (
@@ -1070,22 +1075,17 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		return "centered"
 
-	case "auto-on":
-		d.state.AutoMode = true
+	case "auto-on", "auto-off":
+		mode := parts[0] == "auto-on"
+		d.state.AutoMode = mode
 
 		saveErr := d.saveState()
 		if saveErr != nil {
 			slog.Error("failed to save state", "error", saveErr)
 		}
 
-		return "auto mode on"
-
-	case "auto-off":
-		d.state.AutoMode = false
-
-		saveErr := d.saveState()
-		if saveErr != nil {
-			slog.Error("failed to save state", "error", saveErr)
+		if mode {
+			return "auto mode on"
 		}
 
 		return "auto mode off"

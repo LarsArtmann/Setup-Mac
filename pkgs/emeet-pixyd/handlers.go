@@ -19,17 +19,17 @@ const (
 	zoomDefault     = 100
 	snapshotTimeout = 3 * time.Second
 
-	ptzAxisPan   = "pan"
-	ptzAxisTilt  = "tilt"
-	ptzAxisZoom  = "zoom"
-	inCallYes    = "yes"
+	ptzAxisPan  = "pan"
+	ptzAxisTilt = "tilt"
+	ptzAxisZoom = "zoom"
+	inCallYes   = "yes"
 
-	ptzPanMin   = -170
-	ptzPanMax   = 170
-	ptzTiltMin  = -30
-	ptzTiltMax  = 30
-	ptzZoomMin  = 100
-	ptzZoomMax  = 400
+	ptzPanMin  = -170
+	ptzPanMax  = 170
+	ptzTiltMin = -30
+	ptzTiltMax = 30
+	ptzZoomMin = 100
+	ptzZoomMax = 400
 )
 
 type webServer struct {
