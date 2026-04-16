@@ -284,7 +284,7 @@ func hidSend(hidrawDev string, report []byte) (err error) {
 
 	_, err = hidFile.Write(buf)
 	if err != nil {
-		return fmt.Errorf("hidSend write: %w", err)
+		return fmt.Errorf("hidSend write %s: %w", hidrawDev, err)
 	}
 
 	return nil
@@ -314,7 +314,7 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 
 	written, writeErr := hidFile.Write(buf)
 	if writeErr != nil || written == 0 {
-		return nil, fmt.Errorf("write hidraw: %w", writeErr)
+		return nil, fmt.Errorf("write hidraw %s: %w", hidrawDev, writeErr)
 	}
 
 	type readResult struct {
@@ -534,27 +534,27 @@ func queryHIDState[T any](
 	if hidrawDev == "" {
 		var zero T
 
-		return zero, fmt.Errorf("queryHIDState: %w", pixy.ErrHIDDeviceNotAvailable)
+		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, pixy.ErrHIDDeviceNotAvailable)
 	}
 
 	resp, err := hidSendRecv(ctx, hidrawDev, payload)
 	if err != nil {
 		var zero T
 
-		return zero, err
+		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, err)
 	}
 
 	if resp == nil {
 		var zero T
 
-		return zero, fmt.Errorf("queryHIDState: %w", errNoHIDResponse)
+		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, errNoHIDResponse)
 	}
 
 	parsed := parseHIDResponse(resp)
 	if !parsed.Got {
 		var zero T
 
-		return zero, fmt.Errorf("queryHIDState: %w", errUnrecognizedHID)
+		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, errUnrecognizedHID)
 	}
 
 	return extract(parsed), nil
