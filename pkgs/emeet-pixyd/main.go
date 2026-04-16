@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -176,14 +177,9 @@ func probeHidraw(sysfsPath string) string {
 			id := strings.TrimPrefix(field, "HID_ID=")
 
 			parts := strings.Split(id, ":")
-<<<<<<< Updated upstream
 			if len(parts) == 3 &&
 				strings.Contains(strings.ToLower(parts[1]), pixyVendorID) &&
 				strings.Contains(strings.ToLower(parts[2]), pixyProductID) {
-=======
-			if len(parts) == 3 && strings.EqualFold(parts[1], pixyVendorID) &&
-				strings.EqualFold(parts[2], pixyProductID) {
->>>>>>> Stashed changes
 				return filepath.Join("/dev", entry.Name())
 			}
 		}
@@ -1240,6 +1236,20 @@ func (d *Daemon) Run() {
 			os.Exit(1)
 		}
 	}()
+
+	if d.config.WebAddr != "" {
+		webSrv := &webServer{daemon: d}
+		mux := newWebMux(webSrv)
+
+		go func() {
+			slog.Info("web UI starting", "addr", d.config.WebAddr)
+
+			listenErr := http.ListenAndServe(d.config.WebAddr, mux)
+			if listenErr != nil {
+				slog.Error("web server error", "error", listenErr)
+			}
+		}()
+	}
 
 	slog.Info("EMEET PIXY daemon started")
 	sdNotify("READY=1")
