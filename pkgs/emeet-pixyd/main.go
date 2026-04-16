@@ -459,9 +459,17 @@ func pixyCommit(iface byte) []byte {
 	return []byte{0x09, iface, 0x01, iface}
 }
 
-func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSetter) error {
+func (d *Daemon) requireDevice(context string) error {
 	if !d.isDevicePresent() {
-		return fmt.Errorf("setDeviceState: %w", pixy.ErrPIXYNotConnected)
+		return fmt.Errorf("%s: %w", context, pixy.ErrPIXYNotConnected)
+	}
+
+	return nil
+}
+
+func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSetter) error {
+	if err := d.requireDevice("setDeviceState"); err != nil {
+		return err
 	}
 
 	err := hidSend(d.hidrawDev, configBytes)
@@ -517,8 +525,8 @@ func (d *Daemon) setGesture(enabled bool) error {
 }
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
-	if !d.isDevicePresent() {
-		return fmt.Errorf("centerCamera: %w", pixy.ErrPIXYNotConnected)
+	if err := d.requireDevice("centerCamera"); err != nil {
+		return err
 	}
 
 	err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0")
@@ -666,6 +674,7 @@ func ppidOf(pid int) int {
 	}
 
 	statStr := string(statData)
+
 	lastParen := strings.LastIndex(statStr, ")")
 	if lastParen == -1 {
 		return 0
