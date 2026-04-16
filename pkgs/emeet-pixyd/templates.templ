@@ -468,35 +468,35 @@ input[type="range"]:focus-visible {
 templ page(s webStatus) {
 	<!DOCTYPE html>
 	<html lang="en">
-	<head>
-		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-		<title>EMEET PIXY</title>
-		<script src="https://unpkg.com/htmx.org@2.0.4"></script>
-		<style>{ css }</style>
-	</head>
-	<body>
-		<div class="container">
-			<header>
-				<h1>EMEET PIXY</h1>
-				if s.Online {
-					<span class="header-badge" style="background:rgba(63,185,80,0.15);color:var(--green)">Online</span>
-				} else {
-					<span class="header-badge" style="background:rgba(248,81,73,0.15);color:var(--red)">Offline</span>
-				}
-			</header>
-			<div class="grid">
-				<div>
-					<div class="card">
-						<div class="card-title">Preview</div>
-						<div class="preview-container" id="preview">
-							if s.Online && s.Device != "" {
-								<img src="/api/snapshot" id="preview-img" alt="Camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
-								<div id="preview-fallback" class="preview-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column">
-									<div class="icon">&#x1F4F7;</div>
-									<div>Camera in use or unavailable</div>
-								</div>
-								<script>
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>EMEET PIXY</title>
+			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<style>{ css }</style>
+		</head>
+		<body>
+			<div class="container">
+				<header>
+					<h1>EMEET PIXY</h1>
+					if s.Online {
+						<span class="header-badge" style="background:rgba(63,185,80,0.15);color:var(--green)">Online</span>
+					} else {
+						<span class="header-badge" style="background:rgba(248,81,73,0.15);color:var(--red)">Offline</span>
+					}
+				</header>
+				<div class="grid">
+					<div>
+						<div class="card">
+							<div class="card-title">Preview</div>
+							<div class="preview-container" id="preview">
+								if s.Online && s.Device != "" {
+									<img src="/api/snapshot" id="preview-img" alt="Camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
+									<div id="preview-fallback" class="preview-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column">
+										<div class="icon">&#x1F4F7;</div>
+										<div>Camera in use or unavailable</div>
+									</div>
+									<script>
 									var previewImg = document.getElementById('preview-img');
 									if (previewImg) {
 										setInterval(function() {
@@ -504,30 +504,35 @@ templ page(s webStatus) {
 										}, 1500);
 									}
 								</script>
-							} else {
-								<div class="preview-placeholder">
-									<div class="icon">&#x1F4F7;</div>
-									<div>Camera offline</div>
-								</div>
-							}
+								} else {
+									<div class="preview-placeholder">
+										<div class="icon">&#x1F4F7;</div>
+										<div>Camera offline</div>
+									</div>
+								}
+							</div>
 						</div>
 					</div>
+					@statusPanel(s)
 				</div>
-				@statusPanel(s)
 			</div>
-		</div>
-	</body>
+		</body>
 	</html>
 }
 
 templ ptzSlider(label, axis string, min, max, value int, unit string) {
 	<div class="slider-row">
 		<span class="slider-label">{ label }</span>
-		<input type="range" min={ fmt.Sprintf("%d", min) } max={ fmt.Sprintf("%d", max) }
+		<input
+			type="range"
+			min={ fmt.Sprintf("%d", min) }
+			max={ fmt.Sprintf("%d", max) }
 			value={ fmt.Sprintf("%d", value) }
-			hx-post={ "/api/ptz/" + axis } hx-target="#status-panel"
+			hx-post={ "/api/ptz/" + axis }
+			hx-target="#status-panel"
 			hx-vals="js:{value: this.value}"
-			hx-trigger="change"/>
+			hx-trigger="change"
+		/>
 		<span class="slider-value">{ fmt.Sprintf("%d%s", value, unit) }</span>
 	</div>
 }
@@ -544,20 +549,32 @@ templ statusPanel(s webStatus) {
 				<span>{ s.Camera }</span>
 			</div>
 			<div class="btn-group">
-				<button class={ "btn", "btn-green", templ.KV("btn-active", s.Camera == "tracking") }
-					hx-post="/api/track" hx-target="#status-panel">
+				<button
+					class={ "btn", "btn-green", templ.KV("btn-active", s.Camera == "tracking") }
+					hx-post="/api/track"
+					hx-target="#status-panel"
+				>
 					Track
 				</button>
-				<button class={ "btn", "btn-yellow", templ.KV("btn-active", s.Camera == "idle") }
-					hx-post="/api/idle" hx-target="#status-panel">
+				<button
+					class={ "btn", "btn-yellow", templ.KV("btn-active", s.Camera == "idle") }
+					hx-post="/api/idle"
+					hx-target="#status-panel"
+				>
 					Idle
 				</button>
-				<button class={ "btn", "btn-red", templ.KV("btn-active", s.Camera == "privacy") }
-					hx-post="/api/privacy" hx-target="#status-panel">
+				<button
+					class={ "btn", "btn-red", templ.KV("btn-active", s.Camera == "privacy") }
+					hx-post="/api/privacy"
+					hx-target="#status-panel"
+				>
 					Privacy
 				</button>
-				<button class="btn"
-					hx-post="/api/toggle-privacy" hx-target="#status-panel">
+				<button
+					class="btn"
+					hx-post="/api/toggle-privacy"
+					hx-target="#status-panel"
+				>
 					Toggle
 				</button>
 			</div>
@@ -565,16 +582,28 @@ templ statusPanel(s webStatus) {
 		<div class="card" style="margin-bottom:1rem">
 			<div class="card-title">Audio Mode</div>
 			<div class="btn-group">
-				<button class={ "btn", templ.KV("btn-active", s.Audio == "nc") }
-					hx-post="/api/audio" hx-vals='{"mode":"nc"}' hx-target="#status-panel">
+				<button
+					class={ "btn", templ.KV("btn-active", s.Audio == "nc") }
+					hx-post="/api/audio"
+					hx-vals='{"mode":"nc"}'
+					hx-target="#status-panel"
+				>
 					Noise Cancel
 				</button>
-				<button class={ "btn", templ.KV("btn-active", s.Audio == "live") }
-					hx-post="/api/audio" hx-vals='{"mode":"live"}' hx-target="#status-panel">
+				<button
+					class={ "btn", templ.KV("btn-active", s.Audio == "live") }
+					hx-post="/api/audio"
+					hx-vals='{"mode":"live"}'
+					hx-target="#status-panel"
+				>
 					Live
 				</button>
-				<button class={ "btn", templ.KV("btn-active", s.Audio == "original") }
-					hx-post="/api/audio" hx-vals='{"mode":"org"}' hx-target="#status-panel">
+				<button
+					class={ "btn", templ.KV("btn-active", s.Audio == "original") }
+					hx-post="/api/audio"
+					hx-vals='{"mode":"org"}'
+					hx-target="#status-panel"
+				>
 					Original
 				</button>
 			</div>
@@ -583,15 +612,19 @@ templ statusPanel(s webStatus) {
 			<div class="card-title">Settings</div>
 			<div class="toggle-row">
 				<span class="toggle-label">Gesture Control</span>
-				<button class={ "toggle", templ.KV("on", s.Gesture) }
-					hx-post="/api/gesture" hx-target="#status-panel">
-				</button>
+				<button
+					class={ "toggle", templ.KV("on", s.Gesture) }
+					hx-post="/api/gesture"
+					hx-target="#status-panel"
+				></button>
 			</div>
 			<div class="toggle-row">
 				<span class="toggle-label">Auto Mode</span>
-				<button class={ "toggle", templ.KV("on", s.Auto) }
-					hx-post="/api/auto" hx-target="#status-panel">
-				</button>
+				<button
+					class={ "toggle", templ.KV("on", s.Auto) }
+					hx-post="/api/auto"
+					hx-target="#status-panel"
+				></button>
 			</div>
 			if s.InCall {
 				<div class="meta" style="margin-top:0.5rem">

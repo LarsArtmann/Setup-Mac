@@ -35,11 +35,15 @@ func (s *webServer) getWebStatus() webStatus {
 		Gesture: s.daemon.state.Gesture,
 		Pan:     0,
 		Tilt:    0,
-		Zoom:    zoomDefault,
+		Zoom:    0,
 		InCall:  s.daemon.state.InCall,
 		Auto:    s.daemon.state.AutoMode,
 		Online:  s.daemon.videoDev != "",
 		Device:  s.daemon.videoDev,
+	}
+
+	if status.Online {
+		status.Zoom = zoomDefault
 	}
 
 	return status
@@ -95,6 +99,7 @@ func (s *webServer) action(command string) http.HandlerFunc {
 
 func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *http.Request) {
 	mode := request.FormValue("mode")
+
 	cmd := audioCommand
 	if mode != "" {
 		cmd = audioCommand + " " + mode
@@ -109,6 +114,7 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 
 func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.Request) {
 	axis := request.PathValue("axis")
+
 	val := request.FormValue("value")
 	if axis == "" || val == "" {
 		http.Error(responseWriter, "missing axis or value", http.StatusBadRequest)
@@ -143,11 +149,19 @@ func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *
 	ctx, cancel := context.WithTimeout(request.Context(), snapshotTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "ffmpeg", //nolint:gosec // intentional: controlled v4l2 device path
-		"-f", "v4l2", "-i", status.Device,
-		"-frames:v", "1",
-		"-f", "image2",
-		"-q:v", "2",
+	cmd := exec.CommandContext(
+		ctx,
+		"ffmpeg",
+		"-f",
+		"v4l2",
+		"-i",
+		status.Device,
+		"-frames:v",
+		"1",
+		"-f",
+		"image2",
+		"-q:v",
+		"2",
 		"pipe:1",
 	)
 
@@ -204,12 +218,21 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		default:
 		}
 
-		cmd := exec.CommandContext(ctx, "ffmpeg", //nolint:gosec // intentional: controlled v4l2 device path
-			"-f", "v4l2", "-i", status.Device,
-			"-frames:v", "1",
-			"-f", "image2",
-			"-q:v", "5",
-			"-vf", "scale=640:-1",
+		cmd := exec.CommandContext(
+			ctx,
+			"ffmpeg",
+			"-f",
+			"v4l2",
+			"-i",
+			status.Device,
+			"-frames:v",
+			"1",
+			"-f",
+			"image2",
+			"-q:v",
+			"5",
+			"-vf",
+			"scale=640:-1",
 			"pipe:1",
 		)
 
@@ -287,9 +310,9 @@ func parseWebStatus(raw string) webStatus {
 	status := webStatus{
 		Camera: "offline",
 		Audio:  "nc",
-		Pan:     0,
-		Tilt:    0,
-		Zoom:    zoomDefault,
+		Pan:    0,
+		Tilt:   0,
+		Zoom:   zoomDefault,
 	}
 
 	if strings.HasPrefix(raw, "error") {
@@ -298,7 +321,7 @@ func parseWebStatus(raw string) webStatus {
 		return status
 	}
 
-	for _, field := range strings.Fields(raw) {
+	for field := range strings.FieldsSeq(raw) {
 		key, val, ok := strings.Cut(field, "=")
 		if !ok {
 			continue
@@ -333,7 +356,7 @@ func parseWebStatus(raw string) webStatus {
 func newWebMux(server *webServer) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", server.handleIndex)
+	mux.HandleFunc("GET /{$}", server.handleIndex)
 	mux.HandleFunc("GET /panel", server.handleStatusPanel)
 
 	mux.HandleFunc("POST /api/track", server.action("track"))
@@ -347,6 +370,9 @@ func newWebMux(server *webServer) *http.ServeMux {
 	mux.HandleFunc("POST /api/sync", server.action("sync"))
 	mux.HandleFunc("POST /api/probe", server.action("probe"))
 	mux.HandleFunc("POST /api/ptz/{axis}", server.handlePTZ)
+	mux.HandleFunc("POST /api/ptz/", func(w http.ResponseWriter, _ *http.Request) {
+		http.Error(w, "missing axis", http.StatusBadRequest)
+	})
 	mux.HandleFunc("GET /api/snapshot", server.handleSnapshot)
 	mux.HandleFunc("GET /api/stream", server.handleStream)
 

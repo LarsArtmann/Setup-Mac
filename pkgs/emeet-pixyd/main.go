@@ -413,7 +413,8 @@ func parseHIDResponse(data []byte) hidResponse {
 }
 
 func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
-	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run() //nolint:gosec // intentional: controlled device path
+	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).
+		Run()
 	if err != nil {
 		return fmt.Errorf("v4l2Set %s=%s on %s: %w", ctrl, value, dev, err)
 	}
@@ -422,7 +423,8 @@ func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
 }
 
 func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
-	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).Output() //nolint:gosec // intentional: controlled device path
+	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).
+		Output()
 	if err != nil {
 		return "", fmt.Errorf("v4l2Get: %w", err)
 	}
@@ -864,7 +866,27 @@ func (d *Daemon) autoManage(ctx context.Context) {
 
 func (d *Daemon) getStatus(ctx context.Context) string {
 	if !d.isDevicePresent() {
-		return "camera=offline (device not found)"
+		inCallStr := "no"
+		if d.state.InCall {
+			inCallStr = "yes"
+		}
+
+		autoStr := "on"
+		if !d.state.AutoMode {
+			autoStr = "off"
+		}
+
+		return fmt.Sprintf(
+			"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=",
+			offlineValue,
+			d.state.Audio,
+			d.state.Gesture,
+			0,
+			0,
+			0,
+			inCallStr,
+			autoStr,
+		)
 	}
 
 	pan, _ := v4l2Get(ctx, d.videoDev, "pan_absolute")

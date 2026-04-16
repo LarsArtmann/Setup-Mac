@@ -23,21 +23,7 @@ func testConfig(dir string) Config {
 }
 
 func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
-	return &Daemon{
-		mu: sync.Mutex{},
-		state: State{
-			Camera:   camera,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
-		videoDev:      videoDev,
-		hidrawDev:     hidrawDev,
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	return newTestDaemonWithAudio(camera, AudioNC, videoDev, hidrawDev)
 }
 
 func newTestDaemonWithAudio(
