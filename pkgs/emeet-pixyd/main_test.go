@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
 func testConfig(dir string) Config {
@@ -465,10 +467,10 @@ func TestAudioModeHIDByte(t *testing.T) {
 		{AudioMode("unknown"), hidByteNC},
 	}
 	for _, testCase := range tests {
-		result := testCase.mode.HIDByte()
+		result := audioHIDByte(testCase.mode)
 		if result != testCase.expected {
 			t.Errorf(
-				"AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x",
+				"audioHIDByte(%s) = 0x%02x, want 0x%02x",
 				testCase.mode,
 				result,
 				testCase.expected,
@@ -490,10 +492,10 @@ func TestCameraStateHIDByte(t *testing.T) {
 		{CameraState("unknown"), hidByteIdle},
 	}
 	for _, testCase := range tests {
-		result := testCase.state.HIDByte()
+		result := cameraHIDByte(testCase.state)
 		if result != testCase.expected {
 			t.Errorf(
-				"CameraState(%s).HIDByte() = 0x%02x, want 0x%02x",
+				"cameraHIDByte(%s) = 0x%02x, want 0x%02x",
 				testCase.state,
 				result,
 				testCase.expected,
