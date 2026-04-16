@@ -2,6 +2,20 @@ package main
 
 import "fmt"
 
+type webStatus struct {
+	Camera  string
+	Audio   string
+	Gesture bool
+	Pan     int
+	Tilt    int
+	Zoom    int
+	InCall  bool
+	Auto    bool
+	Online  bool
+	Device  string
+	Error   string
+}
+
 var css = `
 :root {
   --bg: #08090d;
@@ -451,7 +465,7 @@ input[type="range"]:focus-visible {
 }
 `
 
-templ page(s Status) {
+templ page(s webStatus) {
 	<!DOCTYPE html>
 	<html lang="en">
 	<head>
@@ -506,7 +520,7 @@ templ page(s Status) {
 	</html>
 }
 
-templ statusPanel(s Status) {
+templ statusPanel(s webStatus) {
 	<div id="status-panel" hx-swap="outerHTML">
 		if s.Error != "" {
 			<div class="error-banner">{ s.Error }</div>

@@ -425,8 +425,15 @@ func TestHandleCommandProbe(t *testing.T) {
 	d := newTestDaemon(StateOffline, "", "")
 
 	result := d.handleCommand(context.Background(), "probe")
-	if result != "device not found" {
-		t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
+
+	if d.videoDev != "" {
+		if !strings.HasPrefix(result, "device found:") {
+			t.Errorf("expected 'device found: ...' when PIXY connected, got: %s", result)
+		}
+	} else {
+		if result != "device not found" {
+			t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
+		}
 	}
 }
 

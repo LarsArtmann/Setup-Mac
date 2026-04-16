@@ -135,7 +135,7 @@ func probeVideo4linux(sysfsPath string) string {
 			continue
 		}
 
-		ms := string(modalias)
+		ms := strings.ToLower(string(modalias))
 		if !strings.Contains(ms, "v"+pixyVendorID) || !strings.Contains(ms, "p"+pixyProductID) {
 			continue
 		}
@@ -175,7 +175,9 @@ func probeHidraw(sysfsPath string) string {
 
 			id := strings.TrimPrefix(field, "HID_ID=")
 			parts := strings.Split(id, ":")
-			if len(parts) == 3 && strings.EqualFold(parts[1], pixyVendorID) && strings.EqualFold(parts[2], pixyProductID) {
+			if len(parts) == 3 &&
+				strings.Contains(strings.ToLower(parts[1]), pixyVendorID) &&
+				strings.Contains(strings.ToLower(parts[2]), pixyProductID) {
 				return filepath.Join("/dev", entry.Name())
 			}
 		}
