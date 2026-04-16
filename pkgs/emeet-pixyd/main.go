@@ -19,6 +19,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/coreos/go-systemd/v22/daemon"
 	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
@@ -803,33 +804,11 @@ func notify(ctx context.Context, title, body string) {
 }
 
 func sdNotify(state string) {
-	socket := os.Getenv("NOTIFY_SOCKET")
-	if socket == "" {
-		return
-	}
-
-	conn, err := net.DialTimeout("unixgram", socket, 1*time.Second)
+	sent, err := daemon.SdNotify(false, state)
 	if err != nil {
 		slog.Debug("sd_notify failed", "error", err)
-
-		return
-	}
-
-	defer func() {
-		closeErr := conn.Close()
-		if closeErr != nil {
-			slog.Debug("conn close error", "error", closeErr)
-		}
-	}()
-
-	deadlineErr := pixy.SetDeadline(conn, 1*time.Second)
-	if deadlineErr != nil {
-		return
-	}
-
-	_, writeErr := conn.Write([]byte(state))
-	if writeErr != nil {
-		slog.Debug("sd_notify write failed", "error", writeErr)
+	} else if !sent {
+		slog.Debug("sd_notify not sent (no NOTIFY_SOCKET)")
 	}
 }
 
