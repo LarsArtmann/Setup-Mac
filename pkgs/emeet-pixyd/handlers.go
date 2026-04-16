@@ -14,6 +14,13 @@ import (
 	"github.com/a-h/templ"
 )
 
+const (
+	audioCommand    = "audio"
+	offlineValue    = "offline"
+	zoomDefault     = 100
+	snapshotTimeout = 3 * time.Second
+)
+
 type webServer struct {
 	daemon *Daemon
 }
@@ -26,6 +33,9 @@ func (s *webServer) getWebStatus() webStatus {
 		Camera:  string(s.daemon.state.Camera),
 		Audio:   string(s.daemon.state.Audio),
 		Gesture: s.daemon.state.Gesture,
+		Pan:     0,
+		Tilt:    0,
+		Zoom:    zoomDefault,
 		InCall:  s.daemon.state.InCall,
 		Auto:    s.daemon.state.AutoMode,
 		Online:  s.daemon.videoDev != "",
@@ -45,78 +55,92 @@ func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 	tilt, _ := v4l2Get(ctx, s.daemon.videoDev, "tilt_absolute")
 	zoom, _ := v4l2Get(ctx, s.daemon.videoDev, "zoom_absolute")
 
-	if panVal, err := strconv.Atoi(pan); err == nil {
+	panVal, panErr := strconv.Atoi(pan)
+	if panErr == nil {
 		status.Pan = panVal / v4l2DegreesPerUnit
 	}
-	if tiltVal, err := strconv.Atoi(tilt); err == nil {
+
+	tiltVal, tiltErr := strconv.Atoi(tilt)
+	if tiltErr == nil {
 		status.Tilt = tiltVal / v4l2DegreesPerUnit
 	}
-	if zoomVal, err := strconv.Atoi(zoom); err == nil {
+
+	zoomVal, zoomErr := strconv.Atoi(zoom)
+	if zoomErr == nil {
 		status.Zoom = zoomVal
 	}
 
 	return status
 }
 
-func (s *webServer) handleIndex(w http.ResponseWriter, r *http.Request) {
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(page(status)).ServeHTTP(w, r)
+func (s *webServer) handleIndex(responseWriter http.ResponseWriter, request *http.Request) {
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(page(status)).ServeHTTP(responseWriter, request)
 }
 
-func (s *webServer) handleStatusPanel(w http.ResponseWriter, r *http.Request) {
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+func (s *webServer) handleStatusPanel(responseWriter http.ResponseWriter, request *http.Request) {
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
-func (s *webServer) action(cmd string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		resp := s.daemon.handleCommand(r.Context(), cmd)
-		slog.Debug("web action", "cmd", cmd, "response", resp)
+func (s *webServer) action(command string) http.HandlerFunc {
+	return func(responseWriter http.ResponseWriter, request *http.Request) {
+		resp := s.daemon.handleCommand(request.Context(), command)
+		slog.Debug("web action", "cmd", command, "response", resp)
 
-		status := s.getWebStatusWithPTZ(r.Context())
-		templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+		status := s.getWebStatusWithPTZ(request.Context())
+		templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 	}
 }
 
-func (s *webServer) handleAudio(w http.ResponseWriter, r *http.Request) {
-	mode := r.FormValue("mode")
-	cmd := "audio"
+func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *http.Request) {
+	mode := request.FormValue("mode")
+	cmd := audioCommand
 	if mode != "" {
-		cmd = "audio " + mode
+		cmd = audioCommand + " " + mode
 	}
 
-	resp := s.daemon.handleCommand(r.Context(), cmd)
+	resp := s.daemon.handleCommand(request.Context(), cmd)
 	slog.Debug("web audio", "cmd", cmd, "response", resp)
 
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
-func (s *webServer) handlePTZ(w http.ResponseWriter, r *http.Request) {
-	axis := r.PathValue("axis")
-	val := r.FormValue("value")
+func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.Request) {
+	axis := request.PathValue("axis")
+	val := request.FormValue("value")
 	if axis == "" || val == "" {
-		http.Error(w, "missing axis or value", http.StatusBadRequest)
+		http.Error(responseWriter, "missing axis or value", http.StatusBadRequest)
 
 		return
 	}
 
-	resp := s.daemon.handleCommand(r.Context(), axis+" "+val)
+	resp := s.daemon.handleCommand(request.Context(), axis+" "+val)
 	slog.Debug("web ptz", "axis", axis, "val", val, "response", resp)
 
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
-func (s *webServer) handleSnapshot(w http.ResponseWriter, r *http.Request) {
+func (s *webServer) checkDevice(responseWriter http.ResponseWriter) (webStatus, bool) {
 	status := s.getWebStatus()
 	if status.Device == "" {
-		http.Error(w, "no camera device", http.StatusServiceUnavailable)
+		http.Error(responseWriter, "no camera device", http.StatusServiceUnavailable)
 
+		return status, false
+	}
+
+	return status, true
+}
+
+func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *http.Request) {
+	status, ok := s.checkDevice(responseWriter)
+	if !ok {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(request.Context(), snapshotTimeout)
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "ffmpeg",
@@ -127,24 +151,24 @@ func (s *webServer) handleSnapshot(w http.ResponseWriter, r *http.Request) {
 		"pipe:1",
 	)
 
-	stdout, err := cmd.StdoutPipe()
+	stdOut, err := cmd.StdoutPipe()
 	if err != nil {
-		http.Error(w, "ffmpeg pipe error", http.StatusInternalServerError)
+		http.Error(responseWriter, "ffmpeg pipe error", http.StatusInternalServerError)
 
 		return
 	}
 
 	startErr := cmd.Start()
 	if startErr != nil {
-		http.Error(w, "ffmpeg start error", http.StatusInternalServerError)
+		http.Error(responseWriter, "ffmpeg start error", http.StatusInternalServerError)
 
 		return
 	}
 
-	w.Header().Set("Content-Type", "image/jpeg")
-	w.Header().Set("Cache-Control", "no-store")
+	responseWriter.Header().Set("Content-Type", "image/jpeg")
+	responseWriter.Header().Set("Cache-Control", "no-store")
 
-	_, copyErr := io.Copy(w, stdout)
+	_, copyErr := io.Copy(responseWriter, stdOut)
 	if copyErr != nil {
 		slog.Debug("snapshot stream error", "error", copyErr)
 	}
@@ -155,25 +179,23 @@ func (s *webServer) handleSnapshot(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *webServer) handleStream(w http.ResponseWriter, r *http.Request) {
-	status := s.getWebStatus()
-	if status.Device == "" {
-		http.Error(w, "no camera device", http.StatusServiceUnavailable)
-
-		return
-	}
-
-	flusher, ok := w.(http.Flusher)
+func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *http.Request) {
+	status, ok := s.checkDevice(responseWriter)
 	if !ok {
-		http.Error(w, "streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
+	flusher, ok := responseWriter.(http.Flusher)
+	if !ok {
+		http.Error(responseWriter, "streaming not supported", http.StatusInternalServerError)
 
 		return
 	}
 
-	w.Header().Set("Content-Type", "multipart/x-mixed-replace; boundary=frame")
-	w.Header().Set("Cache-Control", "no-store")
+	responseWriter.Header().Set("Content-Type", "multipart/x-mixed-replace; boundary=frame")
+	responseWriter.Header().Set("Cache-Control", "no-store")
 
-	ctx := r.Context()
+	ctx := request.Context()
 
 	for {
 		select {
@@ -198,14 +220,36 @@ func (s *webServer) handleStream(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Fprintf(w, "--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n", len(output))
-		w.Write(output)
-		fmt.Fprint(w, "\r\n")
+		_, fErr := fmt.Fprintf(
+			responseWriter,
+			"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n",
+			len(output),
+		)
+		if fErr != nil {
+			slog.Debug("stream write error", "error", fErr)
+
+			return
+		}
+
+		_, wErr := responseWriter.Write(output)
+		if wErr != nil {
+			slog.Debug("stream write error", "error", wErr)
+
+			return
+		}
+
+		_, pfErr := fmt.Fprint(responseWriter, "\r\n")
+		if pfErr != nil {
+			slog.Debug("stream write error", "error", pfErr)
+
+			return
+		}
+
 		flusher.Flush()
 	}
 }
 
-func (s *webServer) handleGestureToggle(w http.ResponseWriter, r *http.Request) {
+func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	s.daemon.mu.Lock()
 	currentGesture := s.daemon.state.Gesture
 	s.daemon.mu.Unlock()
@@ -215,14 +259,14 @@ func (s *webServer) handleGestureToggle(w http.ResponseWriter, r *http.Request) 
 		cmd = "gesture-on"
 	}
 
-	resp := s.daemon.handleCommand(r.Context(), cmd)
+	resp := s.daemon.handleCommand(request.Context(), cmd)
 	slog.Debug("web gesture toggle", "cmd", cmd, "response", resp)
 
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
-func (s *webServer) handleAutoToggle(w http.ResponseWriter, r *http.Request) {
+func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	s.daemon.mu.Lock()
 	currentAuto := s.daemon.state.AutoMode
 	s.daemon.mu.Unlock()
@@ -232,24 +276,26 @@ func (s *webServer) handleAutoToggle(w http.ResponseWriter, r *http.Request) {
 		cmd = "auto-on"
 	}
 
-	resp := s.daemon.handleCommand(r.Context(), cmd)
+	resp := s.daemon.handleCommand(request.Context(), cmd)
 	slog.Debug("web auto toggle", "cmd", cmd, "response", resp)
 
-	status := s.getWebStatusWithPTZ(r.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(w, r)
+	status := s.getWebStatusWithPTZ(request.Context())
+	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
 func parseWebStatus(raw string) webStatus {
-	s := webStatus{
+	status := webStatus{
 		Camera: "offline",
 		Audio:  "nc",
-		Zoom:   100,
+		Pan:     0,
+		Tilt:    0,
+		Zoom:    zoomDefault,
 	}
 
 	if strings.HasPrefix(raw, "error") {
-		s.Error = raw
+		status.Error = raw
 
-		return s
+		return status
 	}
 
 	for _, field := range strings.Fields(raw) {
@@ -260,49 +306,49 @@ func parseWebStatus(raw string) webStatus {
 
 		switch key {
 		case "camera":
-			s.Camera = val
-			s.Online = val != "offline"
+			status.Camera = val
+			status.Online = val != offlineValue
 		case "audio":
-			s.Audio = val
+			status.Audio = val
 		case "gesture":
-			s.Gesture = val == "true"
+			status.Gesture = val == "true"
 		case "pan":
-			s.Pan, _ = strconv.Atoi(val)
+			status.Pan, _ = strconv.Atoi(val)
 		case "tilt":
-			s.Tilt, _ = strconv.Atoi(val)
+			status.Tilt, _ = strconv.Atoi(val)
 		case "zoom":
-			s.Zoom, _ = strconv.Atoi(val)
+			status.Zoom, _ = strconv.Atoi(val)
 		case "in_call":
-			s.InCall = val == "yes"
+			status.InCall = val == "yes"
 		case "auto":
-			s.Auto = val == "on"
+			status.Auto = val == "on"
 		case "device":
-			s.Device = val
+			status.Device = val
 		}
 	}
 
-	return s
+	return status
 }
 
-func newWebMux(s *webServer) *http.ServeMux {
+func newWebMux(server *webServer) *http.ServeMux {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("GET /", s.handleIndex)
-	mux.HandleFunc("GET /panel", s.handleStatusPanel)
+	mux.HandleFunc("GET /", server.handleIndex)
+	mux.HandleFunc("GET /panel", server.handleStatusPanel)
 
-	mux.HandleFunc("POST /api/track", s.action("track"))
-	mux.HandleFunc("POST /api/idle", s.action("idle"))
-	mux.HandleFunc("POST /api/privacy", s.action("privacy"))
-	mux.HandleFunc("POST /api/toggle-privacy", s.action("toggle-privacy"))
-	mux.HandleFunc("POST /api/audio", s.handleAudio)
-	mux.HandleFunc("POST /api/gesture", s.handleGestureToggle)
-	mux.HandleFunc("POST /api/auto", s.handleAutoToggle)
-	mux.HandleFunc("POST /api/center", s.action("center"))
-	mux.HandleFunc("POST /api/sync", s.action("sync"))
-	mux.HandleFunc("POST /api/probe", s.action("probe"))
-	mux.HandleFunc("POST /api/ptz/{axis}", s.handlePTZ)
-	mux.HandleFunc("GET /api/snapshot", s.handleSnapshot)
-	mux.HandleFunc("GET /api/stream", s.handleStream)
+	mux.HandleFunc("POST /api/track", server.action("track"))
+	mux.HandleFunc("POST /api/idle", server.action("idle"))
+	mux.HandleFunc("POST /api/privacy", server.action("privacy"))
+	mux.HandleFunc("POST /api/toggle-privacy", server.action("toggle-privacy"))
+	mux.HandleFunc("POST /api/audio", server.handleAudio)
+	mux.HandleFunc("POST /api/gesture", server.handleGestureToggle)
+	mux.HandleFunc("POST /api/auto", server.handleAutoToggle)
+	mux.HandleFunc("POST /api/center", server.action("center"))
+	mux.HandleFunc("POST /api/sync", server.action("sync"))
+	mux.HandleFunc("POST /api/probe", server.action("probe"))
+	mux.HandleFunc("POST /api/ptz/{axis}", server.handlePTZ)
+	mux.HandleFunc("GET /api/snapshot", server.handleSnapshot)
+	mux.HandleFunc("GET /api/stream", server.handleStream)
 
 	return mux
 }
