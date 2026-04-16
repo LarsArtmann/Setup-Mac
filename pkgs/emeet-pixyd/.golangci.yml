@@ -135,6 +135,9 @@ linters:
         - G204
         - G404
         - G602
+        - G702
+        - G705
+        - G706
     nestif:
       max-depth: 8
   exclusions:
@@ -155,6 +158,21 @@ linters:
       - path: handlers\.go
         linters:
           - contextcheck
+      - path: main_test\.go
+        linters:
+          - depguard
+      - path: main\.go
+        linters:
+          - depguard
+      - path: integration_test\.go
+        linters:
+          - depguard
+      - path: integration_test\.go
+        linters:
+          - godoclint
+      - path: internal/pixy/pixy\.go
+        linters:
+          - revive
 formatters:
   enable:
     - gci

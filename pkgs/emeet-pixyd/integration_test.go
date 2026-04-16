@@ -146,7 +146,7 @@ func assertSocketCommandsHavePrefix(
 	}
 }
 
-func assertEndpointsReturnNonOK(t *testing.T, serverURL string, method string, endpoints []string) {
+func assertEndpointsReturnNonOK(t *testing.T, serverURL, method string, endpoints []string) {
 	t.Helper()
 
 	for _, ep := range endpoints {

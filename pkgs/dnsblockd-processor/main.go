@@ -213,7 +213,6 @@ func writeMapping(path string, mapping map[string]string) error {
 
 func exitOnError(err error) {
 	if err != nil {
-
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}

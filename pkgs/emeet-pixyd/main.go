@@ -1242,7 +1242,8 @@ func (d *Daemon) Run() {
 
 func exitWithDaemonError(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\nIs emeet-pixyd running?\n", err)
+		_, dieErr := fmt.Fprintf(os.Stderr, "Error: %v\nIs emeet-pixyd running?\n", err)
+		_ = dieErr
 		os.Exit(1)
 	}
 }
@@ -1254,9 +1255,7 @@ func main() {
 		cmd := strings.Join(os.Args[1:], " ")
 
 		resp, err := sendCommand(cfg, cmd)
-		if err != nil {
-			exitWithDaemonError(err)
-		}
+		exitWithDaemonError(err)
 
 		_, printErr := fmt.Fprintln(os.Stdout, resp)
 		if printErr != nil {
