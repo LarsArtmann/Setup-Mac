@@ -891,26 +891,23 @@ func TestProbeVideo4linux_PIXYNoIndexFile(t *testing.T) {
 	})
 }
 
-func TestProbeVideo4linux_NoPIXY(t *testing.T) {
+func TestProbeVideo4linux_NonPIXYSources(t *testing.T) {
 	t.Parallel()
 
-	testV4L2ProbesNothing(t, []fakeVideoDev{
-		{name: "video1", modalias: "platform:v4l2loopback", index: "0"},
-	})
-}
+	tests := []struct {
+		name    string
+		devices []fakeVideoDev
+	}{
+		{"NoPIXY", []fakeVideoDev{{name: "video1", modalias: "platform:v4l2loopback", index: "0"}}},
+		{"WrongVendorProduct", []fakeVideoDev{{name: "video0", modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00", index: "0"}}},
+		{"EmptyDir", nil},
+	}
 
-func TestProbeVideo4linux_WrongVendorProduct(t *testing.T) {
-	t.Parallel()
-
-	testV4L2ProbesNothing(t, []fakeVideoDev{
-		{name: "video0", modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00", index: "0"},
-	})
-}
-
-func TestProbeVideo4linux_EmptyDir(t *testing.T) {
-	t.Parallel()
-
-	testV4L2ProbesNothing(t, nil)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			testV4L2ProbesNothing(t, tc.devices)
+		})
+	}
 }
 
 func TestProbeVideo4linux_NonexistentDir(t *testing.T) {
