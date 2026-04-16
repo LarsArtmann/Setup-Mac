@@ -165,6 +165,19 @@ linters:
               text: assertParseWebStatusField
               linters:
                 - unused
+            - path: handlers\.go
+              linters:
+                - depguard
+                - contextcheck
+            - path: main_test\.go
+              linters:
+                - depguard
+            - path: main\.go
+              linters:
+                - depguard
+            - path: integration_test\.go
+              linters:
+                - depguard
 formatters:
     enable:
         - gci

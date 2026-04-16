@@ -88,7 +88,7 @@ func assertParsedField(t *testing.T, parsed map[string]string, field string) {
 	}
 }
 
-func testDaemonNoDevice(camera CameraState) *Daemon {
+func testDaemonBase(camera CameraState, videoDev, hidrawDev string) *Daemon {
 	return &Daemon{
 		mu: sync.Mutex{},
 		state: State{
@@ -99,29 +99,19 @@ func testDaemonNoDevice(camera CameraState) *Daemon {
 			AutoMode: true,
 		},
 		config:        testConfig("/tmp"),
-		videoDev:      "",
-		hidrawDev:     "",
+		videoDev:      videoDev,
+		hidrawDev:     hidrawDev,
 		debounceInUse: 0,
 		debounceIdle:  0,
 	}
 }
 
+func testDaemonNoDevice(camera CameraState) *Daemon {
+	return testDaemonBase(camera, "", "")
+}
+
 func testDaemonWithDevice(camera CameraState) *Daemon {
-	return &Daemon{
-		mu: sync.Mutex{},
-		state: State{
-			Camera:   camera,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		config:        testConfig("/tmp"),
-		videoDev:      "/dev/video0",
-		hidrawDev:     "/dev/hidraw7",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	return testDaemonBase(camera, "/dev/video0", "/dev/hidraw7")
 }
 
 func TestStateDefaults(t *testing.T) {
@@ -258,6 +248,7 @@ func TestHandleCommandUnknown(t *testing.T) {
 	t.Parallel()
 
 	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
+
 
 	result := d.handleCommand(context.Background(), "foobar")
 	if result != "unknown command: foobar" {
@@ -652,46 +643,50 @@ func TestDefaultConfig(t *testing.T) {
 	}
 }
 
+type parseTestCase[T any] struct {
+	input    string
+	expected T
+	wantErr  bool
+}
+
+func runParseTests[T any](t *testing.T, name string, parse func(string) (T, error), tests []parseTestCase[T]) {
+	for _, tc := range tests {
+		t.Run(tc.input, func(t *testing.T) {
+			got, err := parse(tc.input)
+			if tc.wantErr {
+				if err == nil {
+					t.Errorf("%s(%q): expected error, got nil", name, tc.input)
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("%s(%q): unexpected error: %v", name, tc.input, err)
+				return
+			}
+			if got != tc.expected {
+				t.Errorf("%s(%q) = %v, want %v", name, tc.input, got, tc.expected)
+			}
+		})
+	}
+}
+
 func TestParseAudioMode(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		input    string
-		expected AudioMode
-		wantErr  bool
-	}{
+	tests := []parseTestCase[AudioMode]{
 		{"nc", AudioNC, false},
 		{"live", AudioLive, false},
 		{"org", AudioOriginal, false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	for _, tc := range tests {
-		got, err := ParseAudioMode(tc.input)
-		if tc.wantErr {
-			if err == nil {
-				t.Errorf("ParseAudioMode(%q): expected error, got nil", tc.input)
-			}
-		} else {
-			if err != nil {
-				t.Errorf("ParseAudioMode(%q): unexpected error: %v", tc.input, err)
-			}
-
-			if got != tc.expected {
-				t.Errorf("ParseAudioMode(%q) = %q, want %q", tc.input, got, tc.expected)
-			}
-		}
-	}
+	runParseTests(t, "ParseAudioMode", ParseAudioMode, tests)
 }
 
 func TestParseCameraState(t *testing.T) {
 	t.Parallel()
 
-	tests := []struct {
-		input    string
-		expected CameraState
-		wantErr  bool
-	}{
+	tests := []parseTestCase[CameraState]{
 		{"idle", StateIdle, false},
 		{"tracking", StateTracking, false},
 		{"privacy", StatePrivacy, false},
@@ -699,22 +694,7 @@ func TestParseCameraState(t *testing.T) {
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	for _, tc := range tests {
-		got, err := ParseCameraState(tc.input)
-		if tc.wantErr {
-			if err == nil {
-				t.Errorf("ParseCameraState(%q): expected error, got nil", tc.input)
-			}
-		} else {
-			if err != nil {
-				t.Errorf("ParseCameraState(%q): unexpected error: %v", tc.input, err)
-			}
-
-			if got != tc.expected {
-				t.Errorf("ParseCameraState(%q) = %q, want %q", tc.input, got, tc.expected)
-			}
-		}
-	}
+	runParseTests(t, "ParseCameraState", ParseCameraState, tests)
 }
 
 func TestParseHIDResponseUnknownInterface(t *testing.T) {
