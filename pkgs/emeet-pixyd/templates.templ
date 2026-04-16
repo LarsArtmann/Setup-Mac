@@ -563,7 +563,7 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 }
 
 templ statusPanel(s webStatus) {
-	<div id="status-panel" hx-swap="outerHTML">
+	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s" hx-swap="outerHTML">
 		if s.Error != "" {
 			<div class="error-banner">{ s.Error }</div>
 		}
