@@ -32,7 +32,7 @@ func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
 			InCall:   false,
 			AutoMode: true,
 		},
-		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 		videoDev:      videoDev,
 		hidrawDev:     hidrawDev,
 		debounceInUse: 0,
@@ -54,7 +54,7 @@ func newTestDaemonWithAudio(
 			InCall:   false,
 			AutoMode: true,
 		},
-		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 		videoDev:      videoDev,
 		hidrawDev:     hidrawDev,
 		debounceInUse: 0,
@@ -108,7 +108,7 @@ func TestStateDefaults(t *testing.T) {
 	d := &Daemon{
 		mu:            sync.Mutex{},
 		state:         DefaultState(),
-		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 		videoDev:      "",
 		hidrawDev:     "",
 		debounceInUse: 0,
@@ -252,7 +252,7 @@ func TestHandleCommandStatus(t *testing.T) {
 
 	d := &Daemon{
 		mu:     sync.Mutex{},
-		config: Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 		state: State{
 			Camera:   StatePrivacy,
 			Audio:    AudioNC,
@@ -365,7 +365,7 @@ func TestWaybarOutput(t *testing.T) {
 	for _, testCase := range tests {
 		d := &Daemon{
 			mu:     sync.Mutex{},
-			config: Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+			config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 			state: State{
 				Camera:   testCase.camera,
 				Audio:    AudioNC,

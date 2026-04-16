@@ -27,28 +27,33 @@ func isValidPath(path string) error {
 	return nil
 }
 
-func safeOpenFile(path string) (*os.File, error) {
+func safeFileOperation(path string, op func(string) (*os.File, error)) (*os.File, error) {
 	if err := isValidPath(path); err != nil {
 		return nil, fmt.Errorf("invalid path %q: %w", path, err)
 	}
-	//nolint:gosec // G304: path validated by isValidPath()
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("opening %s: %w", path, err)
-	}
-	return f, nil
+	return op(path)
+}
+
+func safeOpenFile(path string) (*os.File, error) {
+	return safeFileOperation(path, func(p string) (*os.File, error) {
+		//nolint:gosec // G304: path validated by safeFileOperation
+		f, err := os.Open(p)
+		if err != nil {
+			return nil, fmt.Errorf("opening %s: %w", p, err)
+		}
+		return f, nil
+	})
 }
 
 func safeCreateFile(path string) (*os.File, error) {
-	if err := isValidPath(path); err != nil {
-		return nil, fmt.Errorf("invalid path %q: %w", path, err)
-	}
-	//nolint:gosec // G304: path validated by isValidPath()
-	f, err := os.Create(path)
-	if err != nil {
-		return nil, fmt.Errorf("creating %s: %w", path, err)
-	}
-	return f, nil
+	return safeFileOperation(path, func(p string) (*os.File, error) {
+		//nolint:gosec // G304: path validated by safeFileOperation
+		f, err := os.Create(p)
+		if err != nil {
+			return nil, fmt.Errorf("creating %s: %w", p, err)
+		}
+		return f, nil
+	})
 }
 
 func loadWhitelist(path string) map[string]bool {

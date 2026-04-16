@@ -25,7 +25,7 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 			InCall:   false,
 			AutoMode: true,
 		},
-		config:        Config{StateDir: t.TempDir(), PollInterval: 2, DebounceCount: 3},
+		config:        Config{StateDir: t.TempDir(), PollInterval: 2 * time.Second, DebounceCount: 3},
 		videoDev:      "",
 		hidrawDev:     "",
 		debounceInUse: 0,
