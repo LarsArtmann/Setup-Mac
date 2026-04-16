@@ -106,7 +106,7 @@ type State = pixy.State
 var DefaultState = pixy.DefaultState
 
 type Daemon struct {
-	mu        sync.Mutex
+	mu        sync.RWMutex
 	state     State
 	config    Config
 	videoDev  string
@@ -118,7 +118,7 @@ type Daemon struct {
 
 func NewDaemon(cfg Config) *Daemon {
 	d := &Daemon{
-		mu:            sync.Mutex{},
+		mu:            sync.RWMutex{},
 		config:        cfg,
 		state:         DefaultState(),
 		videoDev:      "",

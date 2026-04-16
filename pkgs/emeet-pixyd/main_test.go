@@ -38,7 +38,7 @@ func newTestDaemonWithAudio(
 	videoDev, hidrawDev string,
 ) *Daemon {
 	return &Daemon{
-		mu: sync.Mutex{},
+		mu: sync.RWMutex{},
 		state: State{
 			Camera:   camera,
 			Audio:    audio,
@@ -112,7 +112,7 @@ func assertParsedField(t *testing.T, parsed map[string]string, field string) {
 
 func testDaemonBase(camera CameraState, videoDev, hidrawDev string) *Daemon {
 	return &Daemon{
-		mu: sync.Mutex{},
+		mu: sync.RWMutex{},
 		state: State{
 			Camera:   camera,
 			Audio:    AudioNC,
@@ -159,7 +159,7 @@ func TestStateSaveLoad(t *testing.T) {
 	cfg := testConfig(t.TempDir())
 
 	d := &Daemon{
-		mu:     sync.Mutex{},
+		mu:     sync.RWMutex{},
 		config: cfg,
 		state: State{
 			Camera:   StateTracking,
@@ -180,7 +180,7 @@ func TestStateSaveLoad(t *testing.T) {
 	}
 
 	d2 := &Daemon{
-		mu:     sync.Mutex{},
+		mu:     sync.RWMutex{},
 		config: cfg,
 		state: State{
 			Camera:   StateIdle,
@@ -322,7 +322,7 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 
 func testDaemonWithState(camera CameraState, inCall bool) *Daemon {
 	return &Daemon{
-		mu:     sync.Mutex{},
+		mu:     sync.RWMutex{},
 		config: testConfig("/tmp"),
 		state: State{
 			Camera:   camera,

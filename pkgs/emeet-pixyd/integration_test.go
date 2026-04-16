@@ -20,7 +20,7 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 	t.Helper()
 
 	return &Daemon{
-		mu:    sync.Mutex{},
+		mu:    sync.RWMutex{},
 		state: pixy.DefaultState(),
 		config: Config{
 			StateDir:      t.TempDir(),
@@ -334,9 +334,9 @@ func TestWeb_AutoToggleOff(t *testing.T) {
 
 	assertStatusCode(t, resp, http.StatusOK)
 
-	daemon.mu.Lock()
+	daemon.mu.RLock()
 	isAuto := daemon.state.AutoMode
-	daemon.mu.Unlock()
+	daemon.mu.RUnlock()
 
 	if isAuto {
 		t.Error("expected auto=false after toggle from true")
@@ -353,9 +353,9 @@ func TestWeb_AutoToggleOn(t *testing.T) {
 
 	assertStatusCode(t, resp, http.StatusOK)
 
-	daemon.mu.Lock()
+	daemon.mu.RLock()
 	isAuto := daemon.state.AutoMode
-	daemon.mu.Unlock()
+	daemon.mu.RUnlock()
 
 	if !isAuto {
 		t.Error("expected auto=true after toggle from false")
@@ -368,19 +368,19 @@ func TestWeb_AutoToggleRoundTrip(t *testing.T) {
 
 	postAndClose(t, server.URL+"/api/auto", "", nil)
 
-	daemon.mu.Lock()
+	daemon.mu.RLock()
 	if daemon.state.AutoMode {
 		t.Fatal("first toggle should turn auto off")
 	}
-	daemon.mu.Unlock()
+	daemon.mu.RUnlock()
 
 	postAndClose(t, server.URL+"/api/auto", "", nil)
 
-	daemon.mu.Lock()
+	daemon.mu.RLock()
 	if !daemon.state.AutoMode {
 		t.Fatal("second toggle should turn auto back on")
 	}
-	daemon.mu.Unlock()
+	daemon.mu.RUnlock()
 }
 
 // ---------- Gesture toggle ----------
