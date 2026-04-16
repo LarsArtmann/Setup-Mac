@@ -556,7 +556,7 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 			hx-target={ "#ptz-" + axis }
 			hx-swap="outerHTML"
 			hx-vals="js:{value: this.value}"
-			hx-trigger="input changed delay:400ms"
+			hx-trigger="input changed delay:300ms, change"
 		/>
 		<span class="slider-value" id={ "val-" + axis }>{ fmt.Sprintf("%d%s", value, unit) }</span>
 	</div>

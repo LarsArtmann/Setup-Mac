@@ -626,7 +626,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#status-panel\" hx-vals=\"js:{value: this.value}\" hx-trigger=\"change\"> <span class=\"slider-value\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\" hx-target=\"#status-panel\" hx-vals=\"js:{value: this.value}\" hx-trigger=\"input changed delay:300ms, change\"> <span class=\"slider-value\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
