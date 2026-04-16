@@ -32,6 +32,7 @@ var (
 	errNoHIDResponse       = errors.New("no HID response")
 	errUnrecognizedHID     = errors.New("unrecognized HID response")
 	errAudioSourceNotFound = errors.New("PIXY audio source not found")
+	errInvalidValue        = errors.New("invalid value")
 	errDeadline            = errors.New("deadline error")
 )
 
@@ -293,19 +294,19 @@ func hidSend(hidrawDev string, report []byte) (err error) {
 
 	hidFile, err := os.OpenFile(hidrawDev, os.O_WRONLY, 0)
 	if err != nil {
-		return fmt.Errorf("open hidraw: %w", err)
+		return fmt.Errorf("hidSend open %s: %w", hidrawDev, err)
 	}
 
 	defer func() {
 		cerr := hidFile.Close()
 		if cerr != nil && err == nil {
-			err = cerr
+			err = fmt.Errorf("hidSend close: %w", cerr)
 		}
 	}()
 
 	_, err = hidFile.Write(buf)
 	if err != nil {
-		return fmt.Errorf("write hidraw: %w", err)
+		return fmt.Errorf("hidSend write: %w", err)
 	}
 
 	return nil
@@ -357,7 +358,7 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 		return nil, fmt.Errorf("hidSendRecv context: %w", ctx.Err())
 	case r := <-resultChan:
 		if r.err != nil {
-			return nil, r.err
+			return nil, fmt.Errorf("hidSendRecv read: %w", r.err)
 		}
 
 		return r.data, nil
@@ -412,7 +413,12 @@ func parseHIDResponse(data []byte) hidResponse {
 }
 
 func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
-	return exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run()
+	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run()
+	if err != nil {
+		return fmt.Errorf("v4l2Set %s=%s on %s: %w", ctrl, value, dev, err)
+	}
+
+	return nil
 }
 
 func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
@@ -460,14 +466,14 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 	if err != nil {
 		d.probeDevices()
 
-		return err
+		return fmt.Errorf("setDeviceState send config: %w", err)
 	}
 
 	time.Sleep(hidCommandSleepMs * time.Millisecond)
 
 	err = hidSend(d.hidrawDev, commitBytes)
 	if err != nil {
-		return err
+		return fmt.Errorf("setDeviceState send commit: %w", err)
 	}
 
 	setter(d)
@@ -515,15 +521,20 @@ func (d *Daemon) centerCamera(ctx context.Context) error {
 
 	err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0")
 	if err != nil {
-		return err
+		return fmt.Errorf("centerCamera pan: %w", err)
 	}
 
 	err = v4l2Set(ctx, d.videoDev, "tilt_absolute", "0")
 	if err != nil {
-		return err
+		return fmt.Errorf("centerCamera tilt: %w", err)
 	}
 
-	return v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
+	err = v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
+	if err != nil {
+		return fmt.Errorf("centerCamera zoom: %w", err)
+	}
+
+	return nil
 }
 
 func queryHIDState[T any](
@@ -919,7 +930,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "track":
 		err := d.setTracking(StateTracking)
 		if err != nil {
-			return "error: " + err.Error()
+			return fmt.Sprintf("error: track: %v", err)
 		}
 
 		return "tracking on"
@@ -927,7 +938,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "idle":
 		err := d.setTracking(StateIdle)
 		if err != nil {
-			return "error: " + err.Error()
+			return fmt.Sprintf("error: idle: %v", err)
 		}
 
 		return "tracking off"
@@ -935,7 +946,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "privacy":
 		err := d.setTracking(StatePrivacy)
 		if err != nil {
-			return "error: " + err.Error()
+			return fmt.Sprintf("error: privacy: %v", err)
 		}
 
 		return "privacy on"
@@ -948,7 +959,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		privacyErr := d.setTracking(newState)
 		if privacyErr != nil {
-			return "error: " + privacyErr.Error()
+			return fmt.Sprintf("error: toggle-privacy: %v", privacyErr)
 		}
 
 		if newState == StatePrivacy {
@@ -972,7 +983,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		audioErr := d.setAudio(mode)
 		if audioErr != nil {
-			return "error: " + audioErr.Error()
+			return fmt.Sprintf("error: audio %s: %v", mode, audioErr)
 		}
 
 		return "audio: " + string(mode)
@@ -980,7 +991,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "gesture-on":
 		gestureErr := d.setGesture(true)
 		if gestureErr != nil {
-			return "error: " + gestureErr.Error()
+			return fmt.Sprintf("error: gesture-on: %v", gestureErr)
 		}
 
 		return "gesture on"
@@ -988,7 +999,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "gesture-off":
 		gestureErr := d.setGesture(false)
 		if gestureErr != nil {
-			return "error: " + gestureErr.Error()
+			return fmt.Sprintf("error: gesture-off: %v", gestureErr)
 		}
 
 		return "gesture off"
@@ -996,7 +1007,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "center":
 		centerErr := d.centerCamera(ctx)
 		if centerErr != nil {
-			return "error: " + centerErr.Error()
+			return fmt.Sprintf("error: center: %v", centerErr)
 		}
 
 		return "centered"
@@ -1043,12 +1054,12 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		val, parseErr := strconv.Atoi(parts[1])
 		if parseErr != nil {
-			return "error: invalid value"
+			return fmt.Sprintf("error: pan: %v", errInvalidValue)
 		}
 
 		v4l2Err := v4l2Set(ctx, d.videoDev, "pan_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
 		if v4l2Err != nil {
-			return "error: " + v4l2Err.Error()
+			return fmt.Sprintf("error: pan: %v", v4l2Err)
 		}
 
 		return fmt.Sprintf("pan set to %d", val)
@@ -1060,12 +1071,12 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		val, parseErr := strconv.Atoi(parts[1])
 		if parseErr != nil {
-			return "error: invalid value"
+			return fmt.Sprintf("error: tilt: %v", errInvalidValue)
 		}
 
 		v4l2Err := v4l2Set(ctx, d.videoDev, "tilt_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
 		if v4l2Err != nil {
-			return "error: " + v4l2Err.Error()
+			return fmt.Sprintf("error: tilt: %v", v4l2Err)
 		}
 
 		return fmt.Sprintf("tilt set to %d", val)
@@ -1077,12 +1088,12 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		val, parseErr := strconv.Atoi(parts[1])
 		if parseErr != nil {
-			return "error: invalid value"
+			return fmt.Sprintf("error: zoom: %v", errInvalidValue)
 		}
 
 		v4l2Err := v4l2Set(ctx, d.videoDev, "zoom_absolute", strconv.Itoa(val))
 		if v4l2Err != nil {
-			return "error: " + v4l2Err.Error()
+			return fmt.Sprintf("error: zoom: %v", v4l2Err)
 		}
 
 		return fmt.Sprintf("zoom set to %d", val)
@@ -1207,7 +1218,12 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 }
 
 func sendCommand(cfg Config, cmd string) (string, error) {
-	return pixy.SendCommand(cfg.SocketPath(), cmd)
+	resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
+	if err != nil {
+		return "", fmt.Errorf("sendCommand %q: %w", cmd, err)
+	}
+
+	return resp, nil
 }
 
 func (d *Daemon) Run() {
