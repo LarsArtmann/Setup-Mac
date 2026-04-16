@@ -32,7 +32,11 @@ func safeOpenFile(path string) (*os.File, error) {
 		return nil, fmt.Errorf("invalid path %q: %w", path, err)
 	}
 	//nolint:gosec // G304: path validated by isValidPath()
-	return os.Open(path)
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("opening %s: %w", path, err)
+	}
+	return f, nil
 }
 
 func safeCreateFile(path string) (*os.File, error) {
@@ -40,7 +44,11 @@ func safeCreateFile(path string) (*os.File, error) {
 		return nil, fmt.Errorf("invalid path %q: %w", path, err)
 	}
 	//nolint:gosec // G304: path validated by isValidPath()
-	return os.Create(path)
+	f, err := os.Create(path)
+	if err != nil {
+		return nil, fmt.Errorf("creating %s: %w", path, err)
+	}
+	return f, nil
 }
 
 func loadWhitelist(path string) map[string]bool {
@@ -200,7 +208,7 @@ func writeMapping(path string, mapping map[string]string) error {
 
 func exitOnError(err error) {
 	if err != nil {
-		//nolint:gosec // G705: CLI tool writing to stderr, not HTML
+
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
@@ -208,7 +216,7 @@ func exitOnError(err error) {
 
 func main() {
 	if len(os.Args) < 5 {
-		fmt.Fprintf(
+		fmt.Fprintf( //nolint:gosec // G705: CLI tool writing to stderr, not HTML
 			os.Stderr,
 			"Usage: %s BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [LIST_FILE NAME]...\n",
 			os.Args[0],
