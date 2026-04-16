@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"net"
 	"os"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 func testConfig(dir string) Config {
@@ -603,3 +606,124 @@ func TestDefaultConfig(t *testing.T) {
 		t.Errorf("expected DebounceCount=%d, got %d", defaultDebounceCount, cfg.DebounceCount)
 	}
 }
+
+func TestParseAudioMode(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected AudioMode
+		wantErr  bool
+	}{
+		{"nc", AudioNC, false},
+		{"live", AudioLive, false},
+		{"org", AudioOriginal, false},
+		{"unknown", "", true},
+		{"", "", true},
+	}
+	for _, tc := range tests {
+		got, err := ParseAudioMode(tc.input)
+		if tc.wantErr {
+			if err == nil {
+				t.Errorf("ParseAudioMode(%q): expected error, got nil", tc.input)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("ParseAudioMode(%q): unexpected error: %v", tc.input, err)
+			}
+			if got != tc.expected {
+				t.Errorf("ParseAudioMode(%q) = %q, want %q", tc.input, got, tc.expected)
+			}
+		}
+	}
+}
+
+func TestParseCameraState(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected CameraState
+		wantErr  bool
+	}{
+		{"idle", StateIdle, false},
+		{"tracking", StateTracking, false},
+		{"privacy", StatePrivacy, false},
+		{"offline", StateOffline, false},
+		{"unknown", "", true},
+		{"", "", true},
+	}
+	for _, tc := range tests {
+		got, err := ParseCameraState(tc.input)
+		if tc.wantErr {
+			if err == nil {
+				t.Errorf("ParseCameraState(%q): expected error, got nil", tc.input)
+			}
+		} else {
+			if err != nil {
+				t.Errorf("ParseCameraState(%q): unexpected error: %v", tc.input, err)
+			}
+			if got != tc.expected {
+				t.Errorf("ParseCameraState(%q) = %q, want %q", tc.input, got, tc.expected)
+			}
+		}
+	}
+}
+
+func TestParseHIDResponseUnknownInterface(t *testing.T) {
+	t.Parallel()
+
+	data := []byte{0x09, 0x99, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}
+	resp := parseHIDResponse(data)
+	if !resp.Got {
+		t.Error("expected Got=true for valid-length response with unknown interface")
+	}
+	if resp.Tracking != StateIdle {
+		t.Errorf("expected idle tracking for unknown interface, got %s", resp.Tracking)
+	}
+}
+
+func TestDefaultStateValues(t *testing.T) {
+	t.Parallel()
+
+	s := DefaultState()
+	if s.Camera != StatePrivacy {
+		t.Errorf("expected default camera=privacy, got %s", s.Camera)
+	}
+	if s.Audio != AudioNC {
+		t.Errorf("expected default audio=nc, got %s", s.Audio)
+	}
+	if s.Gesture != false {
+		t.Error("expected default gesture=false")
+	}
+	if s.InCall != false {
+		t.Error("expected default inCall=false")
+	}
+	if s.AutoMode != true {
+		t.Error("expected default autoMode=true")
+	}
+}
+
+func TestSetDeadlineError(t *testing.T) {
+	t.Parallel()
+
+	conn := &mockConn{setDeadlineErr: fmt.Errorf("deadline error")}
+	err := setDeadline(conn, time.Second)
+	if err == nil {
+		t.Error("expected error from setDeadline with failing conn")
+	}
+}
+
+type mockConn struct {
+	setDeadlineErr error
+}
+
+func (m *mockConn) Read(b []byte) (n int, err error)   { return 0, nil }
+func (m *mockConn) Write(b []byte) (n int, err error)  { return 0, nil }
+func (m *mockConn) Close() error                        { return nil }
+func (m *mockConn) LocalAddr() net.Addr                 { return nil }
+func (m *mockConn) RemoteAddr() net.Addr                { return nil }
+func (m *mockConn) SetDeadline(t time.Time) error       { return m.setDeadlineErr }
+func (m *mockConn) SetReadDeadline(t time.Time) error   { return nil }
+func (m *mockConn) SetWriteDeadline(t time.Time) error  { return nil }
+

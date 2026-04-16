@@ -150,6 +150,34 @@ func (m AudioMode) Next() AudioMode {
 	}
 }
 
+func ParseAudioMode(s string) (AudioMode, error) {
+	switch s {
+	case "nc":
+		return AudioNC, nil
+	case "live":
+		return AudioLive, nil
+	case "org":
+		return AudioOriginal, nil
+	default:
+		return "", fmt.Errorf("invalid audio mode: %q", s)
+	}
+}
+
+func ParseCameraState(s string) (CameraState, error) {
+	switch s {
+	case "idle":
+		return StateIdle, nil
+	case "tracking":
+		return StateTracking, nil
+	case "privacy":
+		return StatePrivacy, nil
+	case "offline":
+		return StateOffline, nil
+	default:
+		return "", fmt.Errorf("invalid camera state: %q", s)
+	}
+}
+
 type Config struct {
 	StateDir      string
 	PollInterval  time.Duration
@@ -1005,14 +1033,9 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		if len(parts) < 2 {
 			mode = d.state.Audio.Next()
 		} else {
-			switch parts[1] {
-			case "nc":
-				mode = AudioNC
-			case "live":
-				mode = AudioLive
-			case "org":
-				mode = AudioOriginal
-			default:
+			var parseErr error
+			mode, parseErr = ParseAudioMode(parts[1])
+			if parseErr != nil {
 				return "usage: audio [nc|live|org]"
 			}
 		}
