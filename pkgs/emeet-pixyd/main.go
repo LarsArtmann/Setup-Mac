@@ -123,19 +123,14 @@ func NewDaemon(cfg Config) *Daemon {
 	return d
 }
 
-func (d *Daemon) probeDevices() {
-	d.videoDev = ""
-	d.hidrawDev = ""
-
-	entries, err := os.ReadDir("/sys/class/video4linux")
+func probeVideo4linux(sysfsPath string) string {
+	entries, err := os.ReadDir(sysfsPath)
 	if err != nil {
-		return
+		return ""
 	}
 
 	for _, entry := range entries {
-		modaliasPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/modalias")
-
-		modalias, err := os.ReadFile(modaliasPath)
+		modalias, err := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "device/modalias"))
 		if err != nil {
 			continue
 		}
@@ -145,38 +140,53 @@ func (d *Daemon) probeDevices() {
 			continue
 		}
 
-		ifaceNumPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/bInterfaceNumber")
-		ifaceNum, ifaceErr := os.ReadFile(ifaceNumPath)
-
-		if ifaceErr == nil && strings.TrimSpace(string(ifaceNum)) != "00" {
+		indexData, indexErr := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "index"))
+		if indexErr == nil && strings.TrimSpace(string(indexData)) != "0" {
 			continue
 		}
 
-		d.videoDev = filepath.Join("/dev", entry.Name())
-
-		break
+		return filepath.Join("/dev", entry.Name())
 	}
 
-	hidEntries, err := os.ReadDir("/sys/class/hidraw")
+	return ""
+}
+
+func probeHidraw(sysfsPath string) string {
+	entries, err := os.ReadDir(sysfsPath)
 	if err != nil {
-		return
+		return ""
 	}
 
-	for _, entry := range hidEntries {
-		ueventPath := filepath.Join("/sys/class/hidraw", entry.Name(), "device/uevent")
-
-		data, err := os.ReadFile(ueventPath)
+	for _, entry := range entries {
+		data, err := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "device/uevent"))
 		if err != nil {
 			continue
 		}
 
 		content := string(data)
-		if strings.Contains(content, "EMEET") && strings.Contains(content, "PIXY") {
-			d.hidrawDev = filepath.Join("/dev", entry.Name())
+		if !strings.Contains(content, "HID_ID=") {
+			continue
+		}
 
-			break
+		for field := range strings.FieldsSeq(content) {
+			if !strings.HasPrefix(field, "HID_ID=") {
+				continue
+			}
+
+			id := strings.TrimPrefix(field, "HID_ID=")
+			parts := strings.Split(id, ":")
+			if len(parts) == 3 && strings.EqualFold(parts[1], pixyVendorID) && strings.EqualFold(parts[2], pixyProductID) {
+				return filepath.Join("/dev", entry.Name())
+			}
 		}
 	}
+
+	return ""
+}
+
+func (d *Daemon) probeDevices() {
+	d.videoDev = probeVideo4linux("/sys/class/video4linux")
+	d.hidrawDev = probeHidraw("/sys/class/hidraw")
 
 	if d.videoDev != "" {
 		if d.state.Camera == StateOffline {

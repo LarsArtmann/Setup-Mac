@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
@@ -794,9 +795,9 @@ func TestSetDeadlineError(t *testing.T) {
 
 	conn := &mockConn{setDeadlineErr: errDeadline}
 
-	err := setDeadline(conn, time.Second)
+	err := pixy.SetDeadline(conn, time.Second)
 	if err == nil {
-		t.Error("expected error from setDeadline with failing conn")
+		t.Error("expected error from SetDeadline with failing conn")
 	}
 }
 
@@ -812,3 +813,440 @@ func (m *mockConn) RemoteAddr() net.Addr             { return nil }
 func (m *mockConn) SetDeadline(time.Time) error      { return m.setDeadlineErr }
 func (m *mockConn) SetReadDeadline(time.Time) error  { return nil }
 func (m *mockConn) SetWriteDeadline(time.Time) error { return nil }
+
+func writeFakeFile(t *testing.T, path, content string) {
+	t.Helper()
+
+	dir := filepath.Dir(path)
+
+	dirErr := os.MkdirAll(dir, 0o755)
+	if dirErr != nil {
+		t.Fatalf("mkdir %s: %v", dir, dirErr)
+	}
+
+	writeErr := os.WriteFile(path, []byte(content), 0o644)
+	if writeErr != nil {
+		t.Fatalf("write %s: %v", path, writeErr)
+	}
+}
+
+type fakeVideoDev struct {
+	name     string
+	modalias string
+	index    string
+}
+
+type fakeHidrawDev struct {
+	name    string
+	hidID   string
+	hidName string
+}
+
+func createFakeVideo4linux(t *testing.T, root string, devices []fakeVideoDev) {
+	t.Helper()
+
+	for _, dev := range devices {
+		base := filepath.Join(root, dev.name)
+		writeFakeFile(t, filepath.Join(base, "device/modalias"), dev.modalias)
+		writeFakeFile(t, filepath.Join(base, "name"), "EMEET PIXY: EMEET PIXY")
+
+		if dev.index != "" {
+			writeFakeFile(t, filepath.Join(base, "index"), dev.index)
+		}
+	}
+}
+
+func createFakeHidraw(t *testing.T, root string, devices []fakeHidrawDev) {
+	t.Helper()
+
+	for _, dev := range devices {
+		ueventPath := filepath.Join(root, dev.name, "device/uevent")
+		content := "DRIVER=hid-generic\n"
+		content += "HID_ID=" + dev.hidID + "\n"
+		content += "HID_NAME=" + dev.hidName + "\n"
+
+		writeFakeFile(t, ueventPath, content)
+	}
+}
+
+func TestProbeVideo4linux_PIXYFound(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with a PIXY at index 0 and a metadata node at index 1
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video0",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "0",
+		},
+		{
+			name:     "video2",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "1",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then the primary capture device is found
+	if result != "/dev/video0" {
+		t.Errorf("expected /dev/video0, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_PIXYOnlyCaptureNode(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with only the PIXY capture node (no metadata node)
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video0",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "0",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then it is found
+	if result != "/dev/video0" {
+		t.Errorf("expected /dev/video0, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_PIXYNoIndexFile(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with a PIXY but no index file (some drivers don't expose it)
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video0",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then it still matches (graceful fallback when index is absent)
+	if result != "/dev/video0" {
+		t.Errorf("expected /dev/video0, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_NoPIXY(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with only non-PIXY devices
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video1",
+			modalias: "platform:v4l2loopback",
+			index:    "0",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_WrongVendorProduct(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with a different USB camera
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video0",
+			modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "0",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_EmptyDir(t *testing.T) {
+	t.Parallel()
+
+	// Given an empty sysfs directory
+	root := t.TempDir()
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_NonexistentDir(t *testing.T) {
+	t.Parallel()
+
+	// Given a nonexistent sysfs path
+	result := probeVideo4linux("/nonexistent/path/video4linux")
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_OBSCamIgnored(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with OBS virtual cam (no device/modalias) and a PIXY
+	root := t.TempDir()
+
+	obsDir := filepath.Join(root, "video1")
+	writeFakeFile(t, filepath.Join(obsDir, "name"), "OBS Cam")
+	writeFakeFile(t, filepath.Join(obsDir, "index"), "0")
+
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video0",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "0",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then the PIXY is found, OBS is skipped
+	if result != "/dev/video0" {
+		t.Errorf("expected /dev/video0, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_MetadataNodeSkipped(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree where only the metadata node (index=1) exists
+	root := t.TempDir()
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video2",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "1",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then nothing is found (metadata node rejected)
+	if result != "" {
+		t.Errorf("expected empty for metadata-only node, got %s", result)
+	}
+}
+
+func TestProbeHidraw_PIXYFound(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with a PIXY hidraw device
+	root := t.TempDir()
+	createFakeHidraw(t, root, []fakeHidrawDev{
+		{
+			name:    "hidraw7",
+			hidID:   "0003:0000328F:000000C0",
+			hidName: "EMEET EMEET PIXY",
+		},
+	})
+
+	// When probing
+	result := probeHidraw(root)
+
+	// Then the PIXY hidraw is found
+	if result != "/dev/hidraw7" {
+		t.Errorf("expected /dev/hidraw7, got %s", result)
+	}
+}
+
+func TestProbeHidraw_NoPIXY(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with only non-PIXY hidraw devices
+	root := t.TempDir()
+	createFakeHidraw(t, root, []fakeHidrawDev{
+		{
+			name:    "hidraw0",
+			hidID:   "0003:00003151:0000402D",
+			hidName: "2.4G Wireless Mouse",
+		},
+		{
+			name:    "hidraw3",
+			hidID:   "0003:00001A2C:00004852",
+			hidName: "SEMICO USB Gaming Keyboard",
+		},
+	})
+
+	// When probing
+	result := probeHidraw(root)
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeHidraw_EmptyDir(t *testing.T) {
+	t.Parallel()
+
+	// Given an empty hidraw sysfs directory
+	root := t.TempDir()
+
+	// When probing
+	result := probeHidraw(root)
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeHidraw_NonexistentDir(t *testing.T) {
+	t.Parallel()
+
+	// Given a nonexistent sysfs path
+	result := probeHidraw("/nonexistent/path/hidraw")
+
+	// Then nothing is found
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeHidraw_MixedDevices(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with mouse, keyboard, and PIXY
+	root := t.TempDir()
+	createFakeHidraw(t, root, []fakeHidrawDev{
+		{
+			name:    "hidraw0",
+			hidID:   "0003:00003151:0000402D",
+			hidName: "2.4G Wireless Mouse",
+		},
+		{
+			name:    "hidraw3",
+			hidID:   "0003:00001A2C:00004852",
+			hidName: "SEMICO USB Gaming Keyboard",
+		},
+		{
+			name:    "hidraw7",
+			hidID:   "0003:0000328F:000000C0",
+			hidName: "EMEET EMEET PIXY",
+		},
+		{
+			name:    "hidraw8",
+			hidID:   "0003:0000043E:00009A39",
+			hidName: "LG Electronics Inc. LG Monitor Controls",
+		},
+	})
+
+	// When probing
+	result := probeHidraw(root)
+
+	// Then the PIXY is found
+	if result != "/dev/hidraw7" {
+		t.Errorf("expected /dev/hidraw7, got %s", result)
+	}
+}
+
+func TestProbeHidraw_NoUeventFile(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with a directory but no uevent file
+	root := t.TempDir()
+
+	dirErr := os.MkdirAll(filepath.Join(root, "hidraw0", "device"), 0o755)
+	if dirErr != nil {
+		t.Fatalf("mkdir: %v", dirErr)
+	}
+
+	// When probing
+	result := probeHidraw(root)
+
+	// Then nothing is found (graceful skip)
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeDevices_SetsStateToOfflineWhenNoVideo(t *testing.T) {
+	t.Parallel()
+
+	// Given a daemon with no PIXY video device
+	d := newTestDaemon(StatePrivacy, "", "")
+
+	// When probing (real sysfs — PIXY may or may not be connected)
+	d.probeDevices()
+
+	// Then if no video device is found, state goes offline
+	if d.videoDev == "" && d.state.Camera != StateOffline {
+		t.Errorf("expected offline when no video device, got %s", d.state.Camera)
+	}
+}
+
+func TestProbeDevices_RecoversFromOffline(t *testing.T) {
+	t.Parallel()
+
+	// Given a daemon in offline state
+	d := newTestDaemon(StateOffline, "", "")
+
+	// When probing (may or may not find device)
+	d.probeDevices()
+
+	// Then if a video device is found, state is recovered from offline
+	if d.videoDev != "" && d.state.Camera == StateOffline {
+		t.Error("expected camera state to recover from offline when device found")
+	}
+}
+
+func TestProbeVideo4linux_MultipleCamerasPIXYSecond(t *testing.T) {
+	t.Parallel()
+
+	// Given a sysfs tree with another camera first, then PIXY
+	root := t.TempDir()
+
+	otherDir := filepath.Join(root, "video0")
+	writeFakeFile(t, filepath.Join(otherDir, "device/modalias"), "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00")
+	writeFakeFile(t, filepath.Join(otherDir, "index"), "0")
+	writeFakeFile(t, filepath.Join(otherDir, "name"), "Other Camera")
+
+	createFakeVideo4linux(t, root, []fakeVideoDev{
+		{
+			name:     "video2",
+			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
+			index:    "0",
+		},
+	})
+
+	// When probing
+	result := probeVideo4linux(root)
+
+	// Then the PIXY is found even though it's not the first device
+	if result != "/dev/video2" {
+		t.Errorf("expected /dev/video2, got %s", result)
+	}
+}
