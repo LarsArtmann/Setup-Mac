@@ -88,18 +88,46 @@ func assertParsedField(t *testing.T, parsed map[string]string, field string) {
 	}
 }
 
-func TestStateDefaults(t *testing.T) {
-	t.Parallel()
-
-	d := &Daemon{
-		mu:            sync.Mutex{},
-		state:         DefaultState(),
-		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
+func testDaemonNoDevice(camera CameraState) *Daemon {
+	return &Daemon{
+		mu: sync.Mutex{},
+		state: State{
+			Camera:   camera,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
+		config:        testConfig("/tmp"),
 		videoDev:      "",
 		hidrawDev:     "",
 		debounceInUse: 0,
 		debounceIdle:  0,
 	}
+}
+
+func testDaemonWithDevice(camera CameraState) *Daemon {
+	return &Daemon{
+		mu: sync.Mutex{},
+		state: State{
+			Camera:   camera,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
+		config:        testConfig("/tmp"),
+		videoDev:      "/dev/video0",
+		hidrawDev:     "/dev/hidraw7",
+		debounceInUse: 0,
+		debounceIdle:  0,
+	}
+}
+
+func TestStateDefaults(t *testing.T) {
+	t.Parallel()
+
+	d := testDaemonNoDevice(StatePrivacy)
 	assertCameraState(t, d, StatePrivacy)
 
 	if d.state.Audio != AudioNC {
@@ -187,21 +215,8 @@ func TestStateFileCorrupt(t *testing.T) {
 		t.Fatalf("write corrupt file: %v", err)
 	}
 
-	d := &Daemon{
-		mu:     sync.Mutex{},
-		config: cfg,
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		videoDev:      "",
-		hidrawDev:     "",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	d := testDaemonNoDevice(StatePrivacy)
+	d.config = cfg
 	d.loadState()
 
 	if d.state.Camera != StatePrivacy {
@@ -213,21 +228,8 @@ func TestStateFileMissing(t *testing.T) {
 	t.Parallel()
 
 	cfg := testConfig("/nonexistent")
-	d := &Daemon{
-		mu:     sync.Mutex{},
-		config: cfg,
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		videoDev:      "",
-		hidrawDev:     "",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	d := testDaemonNoDevice(StatePrivacy)
+	d.config = cfg
 	d.loadState()
 
 	assertCameraState(t, d, StatePrivacy)
@@ -236,29 +238,17 @@ func TestStateFileMissing(t *testing.T) {
 func TestHandleCommandStatus(t *testing.T) {
 	t.Parallel()
 
-	d := &Daemon{
-		mu:     sync.Mutex{},
-		config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		videoDev:      "",
-		hidrawDev:     "",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	d := testDaemonNoDevice(StatePrivacy)
 
 	result := d.handleCommand(context.Background(), "status")
 	if !strings.HasPrefix(result, "camera=offline") {
 		t.Errorf("expected offline status when no device, got: %s", result)
 	}
+
 	if !strings.Contains(result, "audio=") {
 		t.Errorf("expected audio= in offline status, got: %s", result)
 	}
+
 	if !strings.Contains(result, "auto=") {
 		t.Errorf("expected auto= in offline status, got: %s", result)
 	}
@@ -278,21 +268,8 @@ func TestHandleCommandUnknown(t *testing.T) {
 func TestHandleCommandAutoToggle(t *testing.T) {
 	t.Parallel()
 
-	d := &Daemon{
-		mu:     sync.Mutex{},
-		config: testConfig(t.TempDir()),
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		videoDev:      "/dev/video0",
-		hidrawDev:     "/dev/hidraw0",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	d := testDaemonWithDevice(StatePrivacy)
+	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "auto-off")
 	if result != "auto mode off" {
@@ -339,6 +316,24 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 	}
 }
 
+func testDaemonWithState(camera CameraState, inCall bool) *Daemon {
+	return &Daemon{
+		mu:     sync.Mutex{},
+		config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
+		state: State{
+			Camera:   camera,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   inCall,
+			AutoMode: true,
+		},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
+	}
+}
+
 func TestWaybarOutput(t *testing.T) {
 	t.Parallel()
 
@@ -355,21 +350,7 @@ func TestWaybarOutput(t *testing.T) {
 	}
 
 	for _, testCase := range tests {
-		d := &Daemon{
-			mu:     sync.Mutex{},
-			config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
-			state: State{
-				Camera:   testCase.camera,
-				Audio:    AudioNC,
-				Gesture:  false,
-				InCall:   testCase.inCall,
-				AutoMode: true,
-			},
-			videoDev:      "",
-			hidrawDev:     "",
-			debounceInUse: 0,
-			debounceIdle:  0,
-		}
+		d := testDaemonWithState(testCase.camera, testCase.inCall)
 		output := d.waybarOutput()
 
 		var parsed map[string]string
@@ -645,21 +626,8 @@ func TestHandleCommandSyncNoDevice(t *testing.T) {
 func TestHandleCommandSyncWithDevice(t *testing.T) {
 	t.Parallel()
 
-	d := &Daemon{
-		mu:     sync.Mutex{},
-		config: testConfig(t.TempDir()),
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
-		videoDev:      "/dev/video0",
-		hidrawDev:     "/dev/hidraw0",
-		debounceInUse: 0,
-		debounceIdle:  0,
-	}
+	d := testDaemonWithDevice(StatePrivacy)
+	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "sync")
 	if result != "synced (no changes)" && !strings.Contains(result, "error") {
@@ -868,143 +836,84 @@ func createFakeHidraw(t *testing.T, root string, devices []fakeHidrawDev) {
 	}
 }
 
-func TestProbeVideo4linux_PIXYFound(t *testing.T) {
-	t.Parallel()
+const pixyModalias = "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00"
 
-	// Given a sysfs tree with a PIXY at index 0 and a metadata node at index 1
+func testV4L2ProbesPIXY(t *testing.T, devices []fakeVideoDev) {
+	t.Helper()
 	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video0",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "0",
-		},
-		{
-			name:     "video2",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "1",
-		},
-	})
+	createFakeVideo4linux(t, root, devices)
 
-	// When probing
 	result := probeVideo4linux(root)
-
-	// Then the primary capture device is found
 	if result != "/dev/video0" {
 		t.Errorf("expected /dev/video0, got %s", result)
 	}
+}
+
+func testV4L2ProbesNothing(t *testing.T, devices []fakeVideoDev) {
+	t.Helper()
+
+	root := t.TempDir()
+	if len(devices) > 0 {
+		createFakeVideo4linux(t, root, devices)
+	}
+
+	result := probeVideo4linux(root)
+	if result != "" {
+		t.Errorf("expected empty, got %s", result)
+	}
+}
+
+func TestProbeVideo4linux_PIXYFound(t *testing.T) {
+	t.Parallel()
+
+	testV4L2ProbesPIXY(t, []fakeVideoDev{
+		{name: "video0", modalias: pixyModalias, index: "0"},
+		{name: "video2", modalias: pixyModalias, index: "1"},
+	})
 }
 
 func TestProbeVideo4linux_PIXYOnlyCaptureNode(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree with only the PIXY capture node (no metadata node)
-	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video0",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "0",
-		},
+	testV4L2ProbesPIXY(t, []fakeVideoDev{
+		{name: "video0", modalias: pixyModalias, index: "0"},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then it is found
-	if result != "/dev/video0" {
-		t.Errorf("expected /dev/video0, got %s", result)
-	}
 }
 
 func TestProbeVideo4linux_PIXYNoIndexFile(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree with a PIXY but no index file (some drivers don't expose it)
-	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video0",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "",
-		},
+	testV4L2ProbesPIXY(t, []fakeVideoDev{
+		{name: "video0", modalias: pixyModalias, index: ""},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then it still matches (graceful fallback when index is absent)
-	if result != "/dev/video0" {
-		t.Errorf("expected /dev/video0, got %s", result)
-	}
 }
 
 func TestProbeVideo4linux_NoPIXY(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree with only non-PIXY devices
-	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video1",
-			modalias: "platform:v4l2loopback",
-			index:    "0",
-		},
+	testV4L2ProbesNothing(t, []fakeVideoDev{
+		{name: "video1", modalias: "platform:v4l2loopback", index: "0"},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then nothing is found
-	if result != "" {
-		t.Errorf("expected empty, got %s", result)
-	}
 }
 
 func TestProbeVideo4linux_WrongVendorProduct(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree with a different USB camera
-	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video0",
-			modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "0",
-		},
+	testV4L2ProbesNothing(t, []fakeVideoDev{
+		{name: "video0", modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00", index: "0"},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then nothing is found
-	if result != "" {
-		t.Errorf("expected empty, got %s", result)
-	}
 }
 
 func TestProbeVideo4linux_EmptyDir(t *testing.T) {
 	t.Parallel()
 
-	// Given an empty sysfs directory
-	root := t.TempDir()
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then nothing is found
-	if result != "" {
-		t.Errorf("expected empty, got %s", result)
-	}
+	testV4L2ProbesNothing(t, nil)
 }
 
 func TestProbeVideo4linux_NonexistentDir(t *testing.T) {
 	t.Parallel()
 
-	// Given a nonexistent sysfs path
 	result := probeVideo4linux("/nonexistent/path/video4linux")
-
-	// Then nothing is found
 	if result != "" {
 		t.Errorf("expected empty, got %s", result)
 	}
@@ -1013,50 +922,22 @@ func TestProbeVideo4linux_NonexistentDir(t *testing.T) {
 func TestProbeVideo4linux_OBSCamIgnored(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree with OBS virtual cam (no device/modalias) and a PIXY
 	root := t.TempDir()
-
 	obsDir := filepath.Join(root, "video1")
 	writeFakeFile(t, filepath.Join(obsDir, "name"), "OBS Cam")
 	writeFakeFile(t, filepath.Join(obsDir, "index"), "0")
 
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video0",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "0",
-		},
+	testV4L2ProbesPIXY(t, []fakeVideoDev{
+		{name: "video0", modalias: pixyModalias, index: "0"},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then the PIXY is found, OBS is skipped
-	if result != "/dev/video0" {
-		t.Errorf("expected /dev/video0, got %s", result)
-	}
 }
 
 func TestProbeVideo4linux_MetadataNodeSkipped(t *testing.T) {
 	t.Parallel()
 
-	// Given a sysfs tree where only the metadata node (index=1) exists
-	root := t.TempDir()
-	createFakeVideo4linux(t, root, []fakeVideoDev{
-		{
-			name:     "video2",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "1",
-		},
+	testV4L2ProbesNothing(t, []fakeVideoDev{
+		{name: "video2", modalias: pixyModalias, index: "1"},
 	})
-
-	// When probing
-	result := probeVideo4linux(root)
-
-	// Then nothing is found (metadata node rejected)
-	if result != "" {
-		t.Errorf("expected empty for metadata-only node, got %s", result)
-	}
 }
 
 func TestProbeHidraw_PIXYFound(t *testing.T) {

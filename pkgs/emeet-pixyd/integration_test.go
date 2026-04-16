@@ -124,14 +124,14 @@ func get(t *testing.T, url string) *http.Response {
 // assertWebStatusOffline verifies all fields match offline/no-device state.
 func assertWebStatusOffline(t *testing.T, status webStatus) {
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  strPtr("privacy"),
-		Audio:   strPtr("nc"),
-		Gesture: boolPtr(false),
-		Auto:    boolPtr(true),
-		InCall:  boolPtr(false),
-		Online:  boolPtr(false),
-		Device:  strPtr(""),
-		Pan:     intPtr(0), Tilt: intPtr(0), Zoom: intPtr(0),
+		Camera:  new("privacy"),
+		Audio:   new("nc"),
+		Gesture: new(false),
+		Auto:    new(true),
+		InCall:  new(false),
+		Online:  new(false),
+		Device:  new(""),
+		Pan:     new(0), Tilt: new(0), Zoom: new(0),
 	})
 }
 
@@ -148,9 +148,14 @@ type webStatusCheck struct {
 	Zoom    *int
 }
 
-func strPtr(s string) *string { return &s }
-func intPtr(i int) *int         { return &i }
-func boolPtr(b bool) *bool      { return &b }
+//go:fix inline
+func strPtr(s string) *string { return new(s) }
+
+//go:fix inline
+func intPtr(i int) *int { return new(i) }
+
+//go:fix inline
+func boolPtr(b bool) *bool { return new(b) }
 
 func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) {
 	t.Helper()
@@ -158,30 +163,39 @@ func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) 
 	if check.Camera != nil && status.Camera != *check.Camera {
 		t.Errorf("expected camera=%s, got %s", *check.Camera, status.Camera)
 	}
+
 	if check.Audio != nil && status.Audio != *check.Audio {
 		t.Errorf("expected audio=%s, got %s", *check.Audio, status.Audio)
 	}
+
 	if check.Gesture != nil && status.Gesture != *check.Gesture {
 		t.Errorf("expected gesture=%v, got %v", *check.Gesture, status.Gesture)
 	}
+
 	if check.Auto != nil && status.Auto != *check.Auto {
 		t.Errorf("expected auto=%v, got %v", *check.Auto, status.Auto)
 	}
+
 	if check.InCall != nil && status.InCall != *check.InCall {
 		t.Errorf("expected inCall=%v, got %v", *check.InCall, status.InCall)
 	}
+
 	if check.Online != nil && status.Online != *check.Online {
 		t.Errorf("expected online=%v, got %v", *check.Online, status.Online)
 	}
+
 	if check.Device != nil && status.Device != *check.Device {
 		t.Errorf("expected device=%s, got %s", *check.Device, status.Device)
 	}
+
 	if check.Pan != nil && status.Pan != *check.Pan {
 		t.Errorf("expected pan=%d, got %d", *check.Pan, status.Pan)
 	}
+
 	if check.Tilt != nil && status.Tilt != *check.Tilt {
 		t.Errorf("expected tilt=%d, got %d", *check.Tilt, status.Tilt)
 	}
+
 	if check.Zoom != nil && status.Zoom != *check.Zoom {
 		t.Errorf("expected zoom=%d, got %d", *check.Zoom, status.Zoom)
 	}
@@ -413,39 +427,26 @@ func TestWeb_AudioNoModeParam(t *testing.T) {
 
 // ---------- PTZ endpoint ----------
 
-func TestWeb_PTZMissingAxis(t *testing.T) {
+func testPTZEndpoint(t *testing.T, path, body string, expectedStatus int) {
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
-	resp := post(t, server.URL+"/api/ptz/", "", nil)
+	resp := post(t, server.URL+path, "application/x-www-form-urlencoded", strings.NewReader(body))
 	defer resp.Body.Close()
 
-	assertStatusCode(t, resp, http.StatusBadRequest)
+	assertStatusCode(t, resp, expectedStatus)
 }
 
+func TestWeb_PTZMissingAxis(
+	t *testing.T,
+) {
+	testPTZEndpoint(t, "/api/ptz/", "", http.StatusBadRequest)
+}
 func TestWeb_PTZMissingValue(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(t, server.URL+"/api/ptz/pan", "", nil)
-	defer resp.Body.Close()
-
-	assertStatusCode(t, resp, http.StatusBadRequest)
+	testPTZEndpoint(t, "/api/ptz/pan", "", http.StatusBadRequest)
 }
-
 func TestWeb_PTZWithAxisAndValue(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(
-		t,
-		server.URL+"/api/ptz/pan",
-		"application/x-www-form-urlencoded",
-		strings.NewReader("value=10"),
-	)
-	defer resp.Body.Close()
-
-	assertStatusCode(t, resp, http.StatusOK)
+	testPTZEndpoint(t, "/api/ptz/pan", "value=10", http.StatusOK)
 }
 
 // ---------- Track/Idle/Privacy ----------
@@ -497,27 +498,19 @@ func TestWeb_SyncEndpointNoDevice(t *testing.T) {
 
 // ---------- Snapshot/Stream (require device) ----------
 
-func TestWeb_SnapshotNoDevice(t *testing.T) {
+func testGETEndpoint503(t *testing.T, path string) {
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
-	resp := get(t, server.URL+"/api/snapshot")
+	resp := get(t, server.URL+path)
 	defer resp.Body.Close()
 
 	assertStatusCode(t, resp, http.StatusServiceUnavailable)
 	assertResponseContains(t, resp, "no camera device", "503 body")
 }
 
-func TestWeb_StreamNoDevice(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := get(t, server.URL+"/api/stream")
-	defer resp.Body.Close()
-
-	assertStatusCode(t, resp, http.StatusServiceUnavailable)
-	assertResponseContains(t, resp, "no camera device", "503 body")
-}
+func TestWeb_SnapshotNoDevice(t *testing.T) { testGETEndpoint503(t, "/api/snapshot") }
+func TestWeb_StreamNoDevice(t *testing.T)   { testGETEndpoint503(t, "/api/stream") }
 
 // ---------- Method enforcement ----------
 
@@ -609,14 +602,14 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	status := webSrv.getWebStatus()
 
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  strPtr("tracking"),
-		Audio:   strPtr("live"),
-		Gesture: boolPtr(true),
-		Auto:    boolPtr(true),
-		InCall:  boolPtr(true),
-		Online:  boolPtr(true),
-		Device:  strPtr("/dev/video0"),
-		Zoom:    intPtr(100),
+		Camera:  new("tracking"),
+		Audio:   new("live"),
+		Gesture: new(true),
+		Auto:    new(true),
+		InCall:  new(true),
+		Online:  new(true),
+		Device:  new("/dev/video0"),
+		Zoom:    new(100),
 	})
 }
 
@@ -684,52 +677,61 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 			name: "full",
 			raw:  "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0",
 			check: webStatusCheck{
-				Camera: strPtr("tracking"), Audio: strPtr("live"), Gesture: boolPtr(true), Auto: boolPtr(true), InCall: boolPtr(true),
-				Device: strPtr("/dev/video0"), Pan: intPtr(5), Tilt: intPtr(-3), Zoom: intPtr(200),
+				Camera: new(
+					"tracking",
+				),
+				Audio:   new("live"),
+				Gesture: new(true),
+				Auto:    new(true),
+				InCall:  new(true),
+				Device:  new("/dev/video0"),
+				Pan:     new(5),
+				Tilt:    new(-3),
+				Zoom:    new(200),
 			},
-			online: ptr(true),
+			online: new(true),
 		},
 		{
 			name:   "offline",
 			raw:    "camera=offline (device not found)",
-			check:  webStatusCheck{Camera: strPtr("offline")},
-			online: ptr(false),
+			check:  webStatusCheck{Camera: new("offline")},
+			online: new(false),
 		},
 		{
 			name:  "error",
 			raw:   "error: PIXY not connected",
-			check: webStatusCheck{Camera: strPtr("offline"), Audio: strPtr("nc"), Zoom: intPtr(100)},
+			check: webStatusCheck{Camera: new("offline"), Audio: new("nc"), Zoom: new(100)},
 			err:   "PIXY not connected",
 		},
 		{
 			name:   "empty",
-			check:  webStatusCheck{Camera: strPtr("offline")},
-			online: ptr(false),
+			check:  webStatusCheck{Camera: new("offline")},
+			online: new(false),
 		},
 		{
-			name:   "garbage",
+			name:  "garbage",
 			raw:   "blah notkeyvalue garbage",
-			check: webStatusCheck{Camera: strPtr("offline")},
+			check: webStatusCheck{Camera: new("offline")},
 		},
 		{
 			name:  "gestureFalse",
-			raw:  "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
-			check: webStatusCheck{Gesture: boolPtr(false)},
+			raw:   "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
+			check: webStatusCheck{Gesture: new(false)},
 		},
 		{
 			name:  "autoOff",
-			raw:  "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=off device=/dev/video0",
-			check: webStatusCheck{Auto: boolPtr(false)},
+			raw:   "camera=privacy audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=off device=/dev/video0",
+			check: webStatusCheck{Auto: new(false)},
 		},
 		{
 			name:  "inCallNo",
-			raw:  "camera=tracking audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
-			check: webStatusCheck{InCall: boolPtr(false)},
+			raw:   "camera=tracking audio=nc gesture=false pan=0 tilt=0 zoom=100 in_call=no auto=on device=/dev/video0",
+			check: webStatusCheck{InCall: new(false)},
 		},
 		{
 			name:  "defaults",
-			raw:  "camera=tracking",
-			check: webStatusCheck{Zoom: intPtr(100), Audio: strPtr("nc"), Pan: intPtr(0), Tilt: intPtr(0)},
+			raw:   "camera=tracking",
+			check: webStatusCheck{Zoom: new(100), Audio: new("nc"), Pan: new(0), Tilt: new(0)},
 		},
 	}
 
@@ -737,6 +739,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			status := parseWebStatus(tc.raw)
 			assertWebStatusField(t, status, tc.check)
+
 			if tc.err != "" {
 				if status.Error == "" {
 					t.Error("expected error to be set")
@@ -746,6 +749,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 					t.Errorf("expected no error, got %s", status.Error)
 				}
 			}
+
 			if tc.online != nil && status.Online != *tc.online {
 				t.Errorf("expected online=%v, got %v", *tc.online, status.Online)
 			}
@@ -753,17 +757,8 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 	}
 }
 
-func ptr[T any](v T) *T { return &v }
-
-func TestWeb_ParseWebStatusFull(t *testing.T)      { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusOffline(t *testing.T)   { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusError(t *testing.T)     { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusEmpty(t *testing.T)     { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusGarbage(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusGestureFalse(t *testing.T) { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusAutoOff(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusInCallNo(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
-func TestWeb_ParseWebStatusDefaults(t *testing.T)  { t.Skip("covered by TestWeb_ParseWebStatus") }
+//go:fix inline
+func ptr[T any](v T) *T { return new(v) }
 
 // shortSocketDir creates a temp directory under /tmp with a short path.
 // macOS t.TempDir() produces paths too long for Unix socket addresses.
@@ -801,7 +796,7 @@ func startSocketDaemon(t *testing.T) (*Daemon, Config) {
 		_ = daemon.listenUnix(ctx)
 	}()
 
-	for i := 0; i < 50; i++ {
+	for range 50 {
 		if _, statErr := os.Stat(cfg.SocketPath()); statErr == nil {
 			break
 		}
