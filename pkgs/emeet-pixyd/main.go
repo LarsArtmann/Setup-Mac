@@ -133,17 +133,6 @@ func (d *Daemon) probeDevices() {
 	}
 
 	for _, entry := range entries {
-		indexPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/index")
-
-		data, err := os.ReadFile(indexPath)
-		if err != nil {
-			continue
-		}
-
-		if strings.TrimSpace(string(data)) != "0" {
-			continue
-		}
-
 		modaliasPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/modalias")
 
 		modalias, err := os.ReadFile(modaliasPath)
@@ -152,11 +141,20 @@ func (d *Daemon) probeDevices() {
 		}
 
 		ms := string(modalias)
-		if strings.Contains(ms, "v"+pixyVendorID) && strings.Contains(ms, "p"+pixyProductID) {
-			d.videoDev = filepath.Join("/dev", entry.Name())
-
-			break
+		if !strings.Contains(ms, "v"+pixyVendorID) || !strings.Contains(ms, "p"+pixyProductID) {
+			continue
 		}
+
+		ifaceNumPath := filepath.Join("/sys/class/video4linux", entry.Name(), "device/bInterfaceNumber")
+		ifaceNum, ifaceErr := os.ReadFile(ifaceNumPath)
+
+		if ifaceErr == nil && strings.TrimSpace(string(ifaceNum)) != "00" {
+			continue
+		}
+
+		d.videoDev = filepath.Join("/dev", entry.Name())
+
+		break
 	}
 
 	hidEntries, err := os.ReadDir("/sys/class/hidraw")
