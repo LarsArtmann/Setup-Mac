@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -652,23 +651,13 @@ func TestDefaultConfig(t *testing.T) {
 	}
 }
 
-// parseErrorTestCase holds test cases for parsing functions that return an error on invalid input.
-type parseErrorTestCase struct {
+type parseTestCase[T comparable] struct {
 	input    string
-	expected string // string representation of expected value
+	expected T
 	wantErr  bool
 }
 
-// testParseErrorCases runs table-driven tests for parse functions.
-// It uses string comparison for flexibility with custom string types.
-func testParseErrorCases[T any](
-	t *testing.T,
-	name string,
-	parse func(string) (T, error),
-	tests []parseErrorTestCase,
-) {
-	t.Helper()
-
+func runParseTests[T comparable](t *testing.T, name string, parse func(string) (T, error), tests []parseTestCase[T]) {
 	for _, tc := range tests {
 		t.Run(tc.input, func(t *testing.T) {
 			got, err := parse(tc.input)
@@ -686,7 +675,7 @@ func testParseErrorCases[T any](
 				return
 			}
 
-			if fmt.Sprintf("%v", got) != tc.expected {
+			if got != tc.expected {
 				t.Errorf("%s(%q) = %v, want %v", name, tc.input, got, tc.expected)
 			}
 		})
@@ -696,10 +685,10 @@ func testParseErrorCases[T any](
 func TestParseAudioMode(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseErrorTestCase{
-		{"nc", "nc", false},
-		{"live", "live", false},
-		{"org", "original", false},
+	tests := []parseTestCase[AudioMode]{
+		{"nc", AudioNC, false},
+		{"live", AudioLive, false},
+		{"org", AudioOriginal, false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
@@ -709,11 +698,11 @@ func TestParseAudioMode(t *testing.T) {
 func TestParseCameraState(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseErrorTestCase{
-		{"idle", "idle", false},
-		{"tracking", "tracking", false},
-		{"privacy", "privacy", false},
-		{"offline", "offline", false},
+	tests := []parseTestCase[CameraState]{
+		{"idle", StateIdle, false},
+		{"tracking", StateTracking, false},
+		{"privacy", StatePrivacy, false},
+		{"offline", StateOffline, false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
