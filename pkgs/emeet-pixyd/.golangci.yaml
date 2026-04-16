@@ -1,0 +1,47 @@
+version: "2"
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - gosec
+    - govet
+    - staticcheck
+    - unused
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  gosec:
+    excludes:
+      - G204  # Subprocess launched - intentional for v4l2-ctl
+      - G304  # File inclusion - intentional for sysfs probing
+      - G404  # Insecure random
+      - G501  # Blacklisted import
+      - G502  # Blacklisted import
+      - G503  # Blacklisted import
+      - G504  # Blacklisted import
+      - G601  # Unsafe reflection
+      - G704  # SSRF - unix socket, not remote
+      - G705  # XSS - intentional HTTP responses
+      - G706  # Log injection - logging own responses
+      - G107  # HTTP request - test httptest.Server
+      - G114  # http.ListenAndServe - internal UI only
+  govet:
+    enable-all: true
+  staticcheck:
+    checks:
+      - "all"
+      - "-SA1019"
+      - "-SA5008"
+      - "-ST1000"
+      - "-ST1003"
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

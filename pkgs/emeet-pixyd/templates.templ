@@ -520,6 +520,18 @@ templ page(s webStatus) {
 	</html>
 }
 
+templ ptzSlider(label, axis string, min, max, value int, unit string) {
+	<div class="slider-row">
+		<span class="slider-label">{ label }</span>
+		<input type="range" min={ fmt.Sprintf("%d", min) } max={ fmt.Sprintf("%d", max) }
+			value={ fmt.Sprintf("%d", value) }
+			hx-post={ "/api/ptz/" + axis } hx-target="#status-panel"
+			hx-vals="js:{value: this.value}"
+			hx-trigger="change"/>
+		<span class="slider-value">{ fmt.Sprintf("%d%s", value, unit) }</span>
+	</div>
+}
+
 templ statusPanel(s webStatus) {
 	<div id="status-panel" hx-swap="outerHTML">
 		if s.Error != "" {
@@ -590,33 +602,9 @@ templ statusPanel(s webStatus) {
 		if s.Online {
 			<div class="card" style="margin-bottom:1rem">
 				<div class="card-title">PTZ</div>
-				<div class="slider-row">
-					<span class="slider-label">Pan</span>
-					<input type="range" min="-170" max="170"
-						value={ fmt.Sprintf("%d", s.Pan) }
-						hx-post="/api/ptz/pan" hx-target="#status-panel"
-						hx-vals="js:{value: this.value}"
-						hx-trigger="change"/>
-					<span class="slider-value">{ fmt.Sprintf("%d&#176;", s.Pan) }</span>
-				</div>
-				<div class="slider-row">
-					<span class="slider-label">Tilt</span>
-					<input type="range" min="-30" max="30"
-						value={ fmt.Sprintf("%d", s.Tilt) }
-						hx-post="/api/ptz/tilt" hx-target="#status-panel"
-						hx-vals="js:{value: this.value}"
-						hx-trigger="change"/>
-					<span class="slider-value">{ fmt.Sprintf("%d&#176;", s.Tilt) }</span>
-				</div>
-				<div class="slider-row">
-					<span class="slider-label">Zoom</span>
-					<input type="range" min="100" max="400"
-						value={ fmt.Sprintf("%d", s.Zoom) }
-						hx-post="/api/ptz/zoom" hx-target="#status-panel"
-						hx-vals="js:{value: this.value}"
-						hx-trigger="change"/>
-					<span class="slider-value">{ fmt.Sprintf("%dx", s.Zoom) }</span>
-				</div>
+				@ptzSlider("Pan", "pan", -170, 170, s.Pan, "&#176;")
+				@ptzSlider("Tilt", "tilt", -30, 30, s.Tilt, "&#176;")
+				@ptzSlider("Zoom", "zoom", 100, 400, s.Zoom, "x")
 				<div class="spacer"></div>
 				<button class="btn" hx-post="/api/center" hx-target="#status-panel">Center</button>
 			</div>

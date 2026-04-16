@@ -1047,56 +1047,27 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		return "device not found"
 
-	case "pan":
+	case "pan", "tilt", "zoom":
 		if len(parts) < 2 {
-			return "usage: pan <degrees>"
+			return fmt.Sprintf("usage: %s <value>", parts[0])
 		}
 
 		val, parseErr := strconv.Atoi(parts[1])
 		if parseErr != nil {
-			return fmt.Sprintf("error: pan: %v", errInvalidValue)
+			return fmt.Sprintf("error: %s: %v", parts[0], errInvalidValue)
 		}
 
-		v4l2Err := v4l2Set(ctx, d.videoDev, "pan_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
+		multiplier := v4l2DegreesPerUnit
+		if parts[0] == "zoom" {
+			multiplier = 1
+		}
+
+		v4l2Err := v4l2Set(ctx, d.videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier))
 		if v4l2Err != nil {
-			return fmt.Sprintf("error: pan: %v", v4l2Err)
+			return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
 		}
 
-		return fmt.Sprintf("pan set to %d", val)
-
-	case "tilt":
-		if len(parts) < 2 {
-			return "usage: tilt <degrees>"
-		}
-
-		val, parseErr := strconv.Atoi(parts[1])
-		if parseErr != nil {
-			return fmt.Sprintf("error: tilt: %v", errInvalidValue)
-		}
-
-		v4l2Err := v4l2Set(ctx, d.videoDev, "tilt_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
-		if v4l2Err != nil {
-			return fmt.Sprintf("error: tilt: %v", v4l2Err)
-		}
-
-		return fmt.Sprintf("tilt set to %d", val)
-
-	case "zoom":
-		if len(parts) < 2 {
-			return "usage: zoom <value>"
-		}
-
-		val, parseErr := strconv.Atoi(parts[1])
-		if parseErr != nil {
-			return fmt.Sprintf("error: zoom: %v", errInvalidValue)
-		}
-
-		v4l2Err := v4l2Set(ctx, d.videoDev, "zoom_absolute", strconv.Itoa(val))
-		if v4l2Err != nil {
-			return fmt.Sprintf("error: zoom: %v", v4l2Err)
-		}
-
-		return fmt.Sprintf("zoom set to %d", val)
+		return fmt.Sprintf("%s set to %d", parts[0], val)
 
 	case "device":
 		if d.videoDev != "" {
