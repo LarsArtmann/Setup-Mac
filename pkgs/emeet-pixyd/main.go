@@ -987,7 +987,7 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 	}
 
 	return fmt.Sprintf(
-		"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s",
+		"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=%s",
 		d.state.Camera,
 		d.state.Audio,
 		d.state.Gesture,
@@ -996,6 +996,7 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 		zoomVal,
 		inCallStr,
 		autoStr,
+		d.videoDev,
 	)
 }
 
@@ -1128,6 +1129,64 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		if d.isDevicePresent() {
 			return "device found: " + d.videoDev
+		}
+
+		return "device not found"
+
+	case "pan":
+		if len(parts) < 2 {
+			return "usage: pan <degrees>"
+		}
+
+		val, parseErr := strconv.Atoi(parts[1])
+		if parseErr != nil {
+			return "error: invalid value"
+		}
+
+		v4l2Err := v4l2Set(ctx, d.videoDev, "pan_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
+		if v4l2Err != nil {
+			return "error: " + v4l2Err.Error()
+		}
+
+		return fmt.Sprintf("pan set to %d", val)
+
+	case "tilt":
+		if len(parts) < 2 {
+			return "usage: tilt <degrees>"
+		}
+
+		val, parseErr := strconv.Atoi(parts[1])
+		if parseErr != nil {
+			return "error: invalid value"
+		}
+
+		v4l2Err := v4l2Set(ctx, d.videoDev, "tilt_absolute", strconv.Itoa(val*v4l2DegreesPerUnit))
+		if v4l2Err != nil {
+			return "error: " + v4l2Err.Error()
+		}
+
+		return fmt.Sprintf("tilt set to %d", val)
+
+	case "zoom":
+		if len(parts) < 2 {
+			return "usage: zoom <value>"
+		}
+
+		val, parseErr := strconv.Atoi(parts[1])
+		if parseErr != nil {
+			return "error: invalid value"
+		}
+
+		v4l2Err := v4l2Set(ctx, d.videoDev, "zoom_absolute", strconv.Itoa(val))
+		if v4l2Err != nil {
+			return "error: " + v4l2Err.Error()
+		}
+
+		return fmt.Sprintf("zoom set to %d", val)
+
+	case "device":
+		if d.videoDev != "" {
+			return d.videoDev
 		}
 
 		return "device not found"
