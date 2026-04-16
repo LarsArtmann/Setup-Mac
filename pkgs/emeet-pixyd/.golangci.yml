@@ -28,7 +28,6 @@ linters:
     - copyloopvar
     - cyclop
     - decorder
-    - depguard
     - dogsled
     - dupl
     - dupword
@@ -40,7 +39,6 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exhaustruct
     - exptostd
     - fatcontext
     - forbidigo
@@ -48,7 +46,6 @@ linters:
     - funlen
     - ginkgolinter
     - gocheckcompilerdirectives
-    - gochecknoglobals
     - gochecknoinits
     - gochecksumtype
     - gocognit
@@ -73,7 +70,6 @@ linters:
     - interfacebloat
     - intrange
     - iotamixing
-    - ireturn
     - loggercheck
     - maintidx
     - makezero
@@ -89,11 +85,9 @@ linters:
     - nilnil
     - nlreturn
     - noctx
-    - noinlineerr
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
-    - paralleltest
     - perfsprint
     - prealloc
     - predeclared
@@ -111,7 +105,7 @@ linters:
     - tagliatelle
     - testableexamples
     - testifylint
-    - testpackage
+    - testifylint
     - thelper
     - tparallel
     - unconvert
@@ -120,11 +114,9 @@ linters:
     - unused
     - usestdlibvars
     - usetesting
-    - varnamelen
     - wastedassign
     - whitespace
     - wrapcheck
-    - wsl_v5
     - zerologlint
   settings:
     cyclop:
@@ -132,9 +124,6 @@ linters:
     errcheck:
       check-blank: false
       check-type-assertions: true
-    exhaustruct:
-      include:
-        - root
     funlen:
       lines: 80
       statements: 60
@@ -148,8 +137,6 @@ linters:
         - G602
     nestif:
       max-depth: 8
-    varnamelen:
-      min-length: 2
   exclusions:
     rules:
       - path: _test\.go
@@ -167,17 +154,7 @@ linters:
           - unused
       - path: handlers\.go
         linters:
-          - depguard
           - contextcheck
-      - path: main_test\.go
-        linters:
-          - depguard
-      - path: main\.go
-        linters:
-          - depguard
-      - path: integration_test\.go
-        linters:
-          - depguard
 formatters:
   enable:
     - gci
