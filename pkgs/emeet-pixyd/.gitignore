@@ -6,3 +6,5 @@ Test coverage
 /coverage
 # Build artifacts
 /emeet-pixyd
+Add pattern for Templ generated files
+*_templ.go

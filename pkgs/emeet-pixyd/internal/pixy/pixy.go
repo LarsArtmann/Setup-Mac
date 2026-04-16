@@ -26,8 +26,8 @@ const (
 )
 
 var (
-	ErrInvalidAudioMode    = errors.New("invalid audio mode")
-	ErrInvalidCameraState  = errors.New("invalid camera state")
+	ErrInvalidAudioMode      = errors.New("invalid audio mode")
+	ErrInvalidCameraState    = errors.New("invalid camera state")
 	ErrHIDDeviceNotAvailable = errors.New("PIXY HID device not available")
 	ErrPIXYNotConnected      = errors.New("PIXY not connected")
 )

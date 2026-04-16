@@ -45,6 +45,7 @@ func (s *server) action(cmd string) http.HandlerFunc {
 
 func (s *server) handleAudio(w http.ResponseWriter, r *http.Request) {
 	mode := r.FormValue("mode")
+
 	cmd := "audio"
 	if mode != "" {
 		cmd = "audio " + mode
@@ -61,6 +62,7 @@ func (s *server) handleAudio(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) handlePTZ(w http.ResponseWriter, r *http.Request) {
 	axis := r.PathValue("axis")
+
 	val := r.FormValue("value")
 	if axis == "" || val == "" {
 		http.Error(w, "missing axis or value", http.StatusBadRequest)
@@ -167,7 +169,11 @@ func (s *server) handleStream(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Fprintf(w, "--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n", len(output))
+		fmt.Fprintf(
+			w,
+			"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n",
+			len(output),
+		)
 		w.Write(output)
 		fmt.Fprint(w, "\r\n")
 		flusher.Flush()
@@ -211,9 +217,9 @@ func (s *server) handleAutoToggle(w http.ResponseWriter, r *http.Request) {
 func ptzRange(axis string, val int) string {
 	switch axis {
 	case "pan":
-		return fmt.Sprintf("%d", val*3600)
+		return strconv.Itoa(val * 3600)
 	case "tilt":
-		return fmt.Sprintf("%d", val*3600)
+		return strconv.Itoa(val * 3600)
 	case "zoom":
 		return strconv.Itoa(val)
 	default:

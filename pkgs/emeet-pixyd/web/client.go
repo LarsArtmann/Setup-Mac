@@ -73,7 +73,7 @@ func parseStatus(raw string) Status {
 		return s
 	}
 
-	for _, field := range strings.Fields(raw) {
+	for field := range strings.FieldsSeq(raw) {
 		key, val, ok := strings.Cut(field, "=")
 		if !ok {
 			continue

@@ -84,7 +84,7 @@ const (
 )
 
 var (
-	ParseAudioMode  = pixy.ParseAudioMode
+	ParseAudioMode   = pixy.ParseAudioMode
 	ParseCameraState = pixy.ParseCameraState
 )
 
@@ -174,10 +174,16 @@ func probeHidraw(sysfsPath string) string {
 			}
 
 			id := strings.TrimPrefix(field, "HID_ID=")
+
 			parts := strings.Split(id, ":")
+<<<<<<< Updated upstream
 			if len(parts) == 3 &&
 				strings.Contains(strings.ToLower(parts[1]), pixyVendorID) &&
 				strings.Contains(strings.ToLower(parts[2]), pixyProductID) {
+=======
+			if len(parts) == 3 && strings.EqualFold(parts[1], pixyVendorID) &&
+				strings.EqualFold(parts[2], pixyProductID) {
+>>>>>>> Stashed changes
 				return filepath.Join("/dev", entry.Name())
 			}
 		}
@@ -429,7 +435,7 @@ func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
 
 type stateSetter func(d *Daemon)
 
-func pixyConfig(iface byte, modeByte byte) []byte {
+func pixyConfig(iface, modeByte byte) []byte {
 	var buf [hidMinLen]byte
 
 	buf[0] = cameraConfigPrefix
@@ -505,8 +511,6 @@ func (d *Daemon) setGesture(enabled bool) error {
 
 	return d.setDeviceState(configBytes, commitBytes, func(d *Daemon) { d.state.Gesture = enabled })
 }
-
-
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
 	if !d.isDevicePresent() {

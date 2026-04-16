@@ -1076,7 +1076,7 @@ func TestProbeHidraw_PIXYFound(t *testing.T) {
 		{
 			name:    "hidraw7",
 			hidID:   "0003:0000328F:000000C0",
-			hidName: "EMEET EMEET PIXY",
+			hidName: "EMEET PIXY",
 		},
 	})
 
@@ -1162,7 +1162,7 @@ func TestProbeHidraw_MixedDevices(t *testing.T) {
 		{
 			name:    "hidraw7",
 			hidID:   "0003:0000328F:000000C0",
-			hidName: "EMEET EMEET PIXY",
+			hidName: "EMEET PIXY",
 		},
 		{
 			name:    "hidraw8",
@@ -1237,7 +1237,11 @@ func TestProbeVideo4linux_MultipleCamerasPIXYSecond(t *testing.T) {
 	root := t.TempDir()
 
 	otherDir := filepath.Join(root, "video0")
-	writeFakeFile(t, filepath.Join(otherDir, "device/modalias"), "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00")
+	writeFakeFile(
+		t,
+		filepath.Join(otherDir, "device/modalias"),
+		"usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00",
+	)
 	writeFakeFile(t, filepath.Join(otherDir, "index"), "0")
 	writeFakeFile(t, filepath.Join(otherDir, "name"), "Other Camera")
 
