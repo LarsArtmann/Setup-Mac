@@ -18,14 +18,8 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 	t.Helper()
 
 	return &Daemon{
-		mu: sync.Mutex{},
-		state: State{
-			Camera:   StatePrivacy,
-			Audio:    AudioNC,
-			Gesture:  false,
-			InCall:   false,
-			AutoMode: true,
-		},
+		mu:    sync.Mutex{},
+		state: pixy.DefaultState(),
 		config: Config{
 			StateDir:      t.TempDir(),
 			PollInterval:  2 * time.Second,
@@ -121,8 +115,56 @@ func get(t *testing.T, url string) *http.Response {
 	return resp
 }
 
+func postAndClose(t *testing.T, url, contentType string, body io.Reader) {
+	t.Helper()
+
+	resp, err := http.Post(url, contentType, body)
+	if err != nil {
+		t.Fatalf("POST %s: %v", url, err)
+	}
+	resp.Body.Close()
+}
+
+func assertSocketCommandsHavePrefix(t *testing.T, socketPath string, commands []string, expectedPrefix string) {
+	t.Helper()
+
+	for _, cmd := range commands {
+		resp, err := pixy.SendCommand(socketPath, cmd)
+		if err != nil {
+			t.Fatalf("%s: %v", cmd, err)
+		}
+		assertSocketResponsePrefix(t, resp, expectedPrefix, "socket response")
+	}
+}
+
+func assertEndpointsReturnNonOK(t *testing.T, serverURL string, method string, endpoints []string) {
+	t.Helper()
+
+	for _, ep := range endpoints {
+		t.Run(ep, func(t *testing.T) {
+			var resp *http.Response
+			var err error
+			if method == "GET" {
+				resp, err = http.Get(serverURL + ep)
+			} else {
+				resp, err = http.Post(serverURL+ep, "", nil)
+			}
+			if err != nil {
+				t.Fatalf("%s %s: %v", method, ep, err)
+			}
+			resp.Body.Close()
+
+			if resp.StatusCode == http.StatusOK {
+				t.Errorf("%s %s should not be 200, got %d", method, ep, resp.StatusCode)
+			}
+		})
+	}
+}
+
 // assertWebStatusOffline verifies all fields match offline/no-device state.
 func assertWebStatusOffline(t *testing.T, status webStatus) {
+	t.Helper()
+
 	assertWebStatusField(t, status, webStatusCheck{
 		Camera:  new("privacy"),
 		Audio:   new("nc"),
@@ -147,15 +189,6 @@ type webStatusCheck struct {
 	Tilt    *int
 	Zoom    *int
 }
-
-//go:fix inline
-func strPtr(s string) *string { return new(s) }
-
-//go:fix inline
-func intPtr(i int) *int { return new(i) }
-
-//go:fix inline
-func boolPtr(b bool) *bool { return new(b) }
 
 func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) {
 	t.Helper()
@@ -201,7 +234,10 @@ func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) 
 	}
 }
 
-func assertWebStatus(t *testing.T, status webStatus) { assertWebStatusOffline(t, status) }
+func assertWebStatus(t *testing.T, status webStatus) {
+	t.Helper()
+	assertWebStatusOffline(t, status)
+}
 
 func assertSocketResponseContains(t *testing.T, resp, substr, label string) {
 	t.Helper()
@@ -339,7 +375,7 @@ func TestWeb_AutoToggleRoundTrip(t *testing.T) {
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
-	post(t, server.URL+"/api/auto", "", nil).Body.Close()
+	postAndClose(t, server.URL+"/api/auto", "", nil)
 
 	daemon.mu.Lock()
 	if daemon.state.AutoMode {
@@ -347,7 +383,7 @@ func TestWeb_AutoToggleRoundTrip(t *testing.T) {
 	}
 	daemon.mu.Unlock()
 
-	post(t, server.URL+"/api/auto", "", nil).Body.Close()
+	postAndClose(t, server.URL+"/api/auto", "", nil)
 
 	daemon.mu.Lock()
 	if !daemon.state.AutoMode {
@@ -428,6 +464,7 @@ func TestWeb_AudioNoModeParam(t *testing.T) {
 // ---------- PTZ endpoint ----------
 
 func testPTZEndpoint(t *testing.T, path, body string, expectedStatus int) {
+	t.Helper()
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
@@ -442,9 +479,11 @@ func TestWeb_PTZMissingAxis(
 ) {
 	testPTZEndpoint(t, "/api/ptz/", "", http.StatusBadRequest)
 }
+
 func TestWeb_PTZMissingValue(t *testing.T) {
 	testPTZEndpoint(t, "/api/ptz/pan", "", http.StatusBadRequest)
 }
+
 func TestWeb_PTZWithAxisAndValue(t *testing.T) {
 	testPTZEndpoint(t, "/api/ptz/pan", "value=10", http.StatusOK)
 }
@@ -499,6 +538,7 @@ func TestWeb_SyncEndpointNoDevice(t *testing.T) {
 // ---------- Snapshot/Stream (require device) ----------
 
 func testGETEndpoint503(t *testing.T, path string) {
+	t.Helper()
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
@@ -757,14 +797,12 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 	}
 }
 
-//go:fix inline
-func ptr[T any](v T) *T { return new(v) }
-
 // shortSocketDir creates a temp directory under /tmp with a short path.
 // macOS t.TempDir() produces paths too long for Unix socket addresses.
 func shortSocketDir(t *testing.T) string {
 	t.Helper()
 
+	//nolint:usetesting // macOS t.TempDir() produces paths too long for Unix socket addresses
 	dir, err := os.MkdirTemp("/tmp", "pxd-")
 	if err != nil {
 		t.Fatalf("create short temp dir: %v", err)
@@ -981,14 +1019,7 @@ func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
 		t.Skip("device connected")
 	}
 
-	for _, cmd := range []string{"pan 10", "tilt -5", "zoom 200"} {
-		resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
-		if err != nil {
-			t.Fatalf("%s: %v", cmd, err)
-		}
-
-		assertSocketResponsePrefix(t, resp, "error:", "socket response")
-	}
+	assertSocketCommandsHavePrefix(t, cfg.SocketPath(), []string{"pan 10", "tilt -5", "zoom 200"}, "error:")
 }
 
 func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
@@ -1009,14 +1040,7 @@ func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
 func TestSocket_PanTiltZoomInvalidValue(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	for _, cmd := range []string{"pan abc", "tilt !", "zoom x"} {
-		resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
-		if err != nil {
-			t.Fatalf("%s: %v", cmd, err)
-		}
-
-		assertSocketResponsePrefix(t, resp, "error:", "socket response")
-	}
+	assertSocketCommandsHavePrefix(t, cfg.SocketPath(), []string{"pan abc", "tilt !", "zoom x"}, "error:")
 }
 
 func TestSocket_TogglePrivacy(t *testing.T) {

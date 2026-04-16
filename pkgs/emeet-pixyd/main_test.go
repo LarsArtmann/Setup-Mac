@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
@@ -61,6 +62,22 @@ func assertErrorPrefix(t *testing.T, result string) {
 
 	if !strings.HasPrefix(result, "error:") {
 		t.Errorf("expected error prefix, got: %s", result)
+	}
+}
+
+func assertStatusContains(t *testing.T, result, substr, msg string) {
+	t.Helper()
+
+	if !strings.Contains(result, substr) {
+		t.Errorf("%s: expected %q in status, got: %s", msg, substr, result)
+	}
+}
+
+func assertStatusPrefix(t *testing.T, result, prefix, msg string) {
+	t.Helper()
+
+	if !strings.HasPrefix(result, prefix) {
+		t.Errorf("%s: expected prefix %q, got: %s", msg, prefix, result)
 	}
 }
 
@@ -231,24 +248,15 @@ func TestHandleCommandStatus(t *testing.T) {
 	d := testDaemonNoDevice(StatePrivacy)
 
 	result := d.handleCommand(context.Background(), "status")
-	if !strings.HasPrefix(result, "camera=offline") {
-		t.Errorf("expected offline status when no device, got: %s", result)
-	}
-
-	if !strings.Contains(result, "audio=") {
-		t.Errorf("expected audio= in offline status, got: %s", result)
-	}
-
-	if !strings.Contains(result, "auto=") {
-		t.Errorf("expected auto= in offline status, got: %s", result)
-	}
+	assertStatusPrefix(t, result, "camera=offline", "offline status")
+	assertStatusContains(t, result, "audio=", "offline status")
+	assertStatusContains(t, result, "auto=", "offline status")
 }
 
 func TestHandleCommandUnknown(t *testing.T) {
 	t.Parallel()
 
 	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
-
 
 	result := d.handleCommand(context.Background(), "foobar")
 	if result != "unknown command: foobar" {
@@ -310,7 +318,7 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 func testDaemonWithState(camera CameraState, inCall bool) *Daemon {
 	return &Daemon{
 		mu:     sync.Mutex{},
-		config: Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
+		config: testConfig("/tmp"),
 		state: State{
 			Camera:   camera,
 			Audio:    AudioNC,
@@ -391,9 +399,7 @@ func TestHandleCommandProbe(t *testing.T) {
 	result := d.handleCommand(context.Background(), "probe")
 
 	if d.videoDev != "" {
-		if !strings.HasPrefix(result, "device found:") {
-			t.Errorf("expected 'device found: ...' when PIXY connected, got: %s", result)
-		}
+		assertStatusPrefix(t, result, "device found:", "PIXY connected")
 	} else {
 		if result != "device not found" {
 			t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
@@ -643,13 +649,23 @@ func TestDefaultConfig(t *testing.T) {
 	}
 }
 
-type parseTestCase[T any] struct {
+// parseErrorTestCase holds test cases for parsing functions that return an error on invalid input.
+type parseErrorTestCase struct {
 	input    string
-	expected T
+	expected string // string representation of expected value
 	wantErr  bool
 }
 
-func runParseTests[T any](t *testing.T, name string, parse func(string) (T, error), tests []parseTestCase[T]) {
+// testParseErrorCases runs table-driven tests for parse functions.
+// It uses string comparison for flexibility with custom string types.
+func testParseErrorCases[T any](
+	t *testing.T,
+	name string,
+	parse func(string) (T, error),
+	tests []parseErrorTestCase,
+) {
+	t.Helper()
+
 	for _, tc := range tests {
 		t.Run(tc.input, func(t *testing.T) {
 			got, err := parse(tc.input)
@@ -657,13 +673,17 @@ func runParseTests[T any](t *testing.T, name string, parse func(string) (T, erro
 				if err == nil {
 					t.Errorf("%s(%q): expected error, got nil", name, tc.input)
 				}
+
 				return
 			}
+
 			if err != nil {
 				t.Errorf("%s(%q): unexpected error: %v", name, tc.input, err)
+
 				return
 			}
-			if got != tc.expected {
+
+			if fmt.Sprintf("%v", got) != tc.expected {
 				t.Errorf("%s(%q) = %v, want %v", name, tc.input, got, tc.expected)
 			}
 		})
@@ -673,28 +693,28 @@ func runParseTests[T any](t *testing.T, name string, parse func(string) (T, erro
 func TestParseAudioMode(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseTestCase[AudioMode]{
-		{"nc", AudioNC, false},
-		{"live", AudioLive, false},
-		{"org", AudioOriginal, false},
+	tests := []parseErrorTestCase{
+		{"nc", "nc", false},
+		{"live", "live", false},
+		{"org", "original", false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	runParseTests(t, "ParseAudioMode", ParseAudioMode, tests)
+	testParseErrorCases(t, "ParseAudioMode", ParseAudioMode, tests)
 }
 
 func TestParseCameraState(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseTestCase[CameraState]{
-		{"idle", StateIdle, false},
-		{"tracking", StateTracking, false},
-		{"privacy", StatePrivacy, false},
-		{"offline", StateOffline, false},
+	tests := []parseErrorTestCase{
+		{"idle", "idle", false},
+		{"tracking", "tracking", false},
+		{"privacy", "privacy", false},
+		{"offline", "offline", false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	runParseTests(t, "ParseCameraState", ParseCameraState, tests)
+	testParseErrorCases(t, "ParseCameraState", ParseCameraState, tests)
 }
 
 func TestParseHIDResponseUnknownInterface(t *testing.T) {
