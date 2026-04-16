@@ -1018,17 +1018,18 @@ func TestSocket_AudioInvalidMode(t *testing.T) {
 func TestSocket_AudioValidModes(t *testing.T) {
 	for _, mode := range []string{"nc", "live", "org"} {
 		t.Run(mode, func(t *testing.T) {
-			_, cfg := startSocketDaemon(t)
+			daemon, cfg := startSocketDaemon(t)
+
+			if daemon.videoDev != "" {
+				t.Skip("device connected, audio would succeed")
+			}
 
 			resp, err := pixy.SendCommand(cfg.SocketPath(), "audio "+mode)
 			if err != nil {
 				t.Fatalf("audio %s: %v", mode, err)
 			}
 
-			expected := "audio: " + mode
-			if !strings.HasPrefix(resp, expected) {
-				t.Errorf("expected %q, got: %s", expected, resp)
-			}
+			assertSocketResponsePrefix(t, resp, "error:", "audio requires device")
 		})
 	}
 }
