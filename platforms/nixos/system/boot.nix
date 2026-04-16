@@ -44,6 +44,9 @@
     "vm.oom_kill_allocating_task" = 1; # Kill the allocating task, not an innocent victim
   };
 
+  # Resolve upstream conflict: earlyoom sets true, smartd sets false
+  services.systembus-notify.enable = lib.mkForce true;
+
   # Userspace OOM protection — kills the largest memory hog before the kernel panics
   # Terminates processes at ~10% free RAM / ~10% free swap, giving the system time to recover
   services.earlyoom = {
