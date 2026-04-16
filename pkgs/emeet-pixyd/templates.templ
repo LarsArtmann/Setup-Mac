@@ -6,20 +6,6 @@ import (
 	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
-type webStatus struct {
-	Camera  pixy.CameraState
-	Audio   pixy.AudioMode
-	Gesture bool
-	Pan     int
-	Tilt    int
-	Zoom    int
-	InCall  bool
-	Auto    bool
-	Online  bool
-	Device  string
-	Error   string
-}
-
 var css = `
 :root {
   --bg: #08090d;

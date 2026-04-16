@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
 const (
@@ -34,6 +35,20 @@ const (
 	ptzZoomMin = 100
 	ptzZoomMax = 400
 )
+
+type webStatus struct {
+	Camera  pixy.CameraState
+	Audio   pixy.AudioMode
+	Gesture bool
+	Pan     int
+	Tilt    int
+	Zoom    int
+	InCall  bool
+	Auto    bool
+	Online  bool
+	Device  string
+	Error   string
+}
 
 type webServer struct {
 	daemon *Daemon
