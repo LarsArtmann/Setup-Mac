@@ -455,6 +455,31 @@ input[type="range"]:focus-visible {
 
 .spacer { height: 0.5rem; }
 
+.htmx-indicator {
+  display: none;
+}
+#status-panel.htmx-request {
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+#status-panel.htmx-request::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  animation: loading-bar 1s ease-in-out infinite;
+  border-radius: var(--radius) var(--radius) 0 0;
+  z-index: 1;
+}
+@keyframes loading-bar {
+  0% { width: 0; left: 0; }
+  50% { width: 60%; left: 20%; }
+  100% { width: 0; left: 100%; }
+}
+
 #status-panel > .card:last-child {
   background: transparent;
   border: 1px dashed var(--border-subtle);
@@ -563,7 +588,7 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 }
 
 templ statusPanel(s webStatus) {
-	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s" hx-swap="outerHTML">
+	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
 		if s.Error != "" {
 			<div class="error-banner">{ s.Error }</div>
 		}
