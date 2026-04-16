@@ -914,7 +914,7 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 
 		return fmt.Sprintf(
 			"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=",
-			offlineValue,
+			StateOffline,
 			d.state.Audio,
 			d.state.Gesture,
 			0,

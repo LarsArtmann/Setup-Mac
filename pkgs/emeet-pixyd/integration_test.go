@@ -14,6 +14,8 @@ import (
 	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
+func ptr[T any](v T) *T { return &v }
+
 func newIntegrationDaemon(t *testing.T) *Daemon {
 	t.Helper()
 
@@ -178,20 +180,20 @@ func assertWebStatusOffline(t *testing.T, status webStatus) {
 	t.Helper()
 
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  new("privacy"),
-		Audio:   new("nc"),
-		Gesture: new(false),
-		Auto:    new(true),
-		InCall:  new(false),
-		Online:  new(false),
-		Device:  new(""),
-		Pan:     new(0), Tilt: new(0), Zoom: new(0),
+		Camera:  ptr(StatePrivacy),
+		Audio:   ptr(AudioNC),
+		Gesture: ptr(false),
+		Auto:    ptr(true),
+		InCall:  ptr(false),
+		Online:  ptr(false),
+		Device:  ptr(""),
+		Pan:     ptr(0), Tilt: ptr(0), Zoom: ptr(0),
 	})
 }
 
 type webStatusCheck struct {
-	Camera  *string
-	Audio   *string
+	Camera  *CameraState
+	Audio   *AudioMode
 	Gesture *bool
 	Auto    *bool
 	InCall  *bool
@@ -628,14 +630,14 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	status := webSrv.getWebStatus()
 
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  new("tracking"),
-		Audio:   new("live"),
-		Gesture: new(true),
-		Auto:    new(true),
-		InCall:  new(true),
-		Online:  new(true),
-		Device:  new("/dev/video0"),
-		Zoom:    new(100),
+		Camera:  ptr(StateTracking),
+		Audio:   ptr(AudioLive),
+		Gesture: ptr(true),
+		Auto:    ptr(true),
+		InCall:  ptr(true),
+		Online:  ptr(true),
+		Device:  ptr("/dev/video0"),
+		Zoom:    ptr(100),
 	})
 }
 
@@ -658,7 +660,7 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 			webSrv := &webServer{daemon: daemon}
 			status := webSrv.getWebStatus()
 
-			if status.Camera != string(tc.camera) {
+			if status.Camera != tc.camera {
 				t.Errorf("expected camera=%s, got %s", tc.camera, status.Camera)
 			}
 		})
@@ -682,7 +684,7 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 			webSrv := &webServer{daemon: daemon}
 			status := webSrv.getWebStatus()
 
-			if status.Audio != string(tc.audio) {
+			if status.Audio != tc.audio {
 				t.Errorf("expected audio=%s, got %s", tc.audio, status.Audio)
 			}
 		})
@@ -703,10 +705,8 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 			name: "full",
 			raw:  "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0",
 			check: webStatusCheck{
-				Camera: new(
-					"tracking",
-				),
-				Audio:   new("live"),
+				Camera: ptr(StateTracking),
+				Audio:   ptr(AudioLive),
 				Gesture: new(true),
 				Auto:    new(true),
 				InCall:  new(true),
@@ -720,24 +720,24 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		{
 			name:   "offline",
 			raw:    "camera=offline (device not found)",
-			check:  webStatusCheck{Camera: new("offline")},
+			check:  webStatusCheck{Camera: ptr(StateOffline)},
 			online: new(false),
 		},
 		{
 			name:  "error",
 			raw:   "error: PIXY not connected",
-			check: webStatusCheck{Camera: new("offline"), Audio: new("nc"), Zoom: new(100)},
+			check: webStatusCheck{Camera: ptr(StateOffline), Audio: ptr(AudioNC), Zoom: new(100)},
 			err:   "PIXY not connected",
 		},
 		{
 			name:   "empty",
-			check:  webStatusCheck{Camera: new("offline")},
+			check:  webStatusCheck{Camera: ptr(StateOffline)},
 			online: new(false),
 		},
 		{
 			name:  "garbage",
 			raw:   "blah notkeyvalue garbage",
-			check: webStatusCheck{Camera: new("offline")},
+			check: webStatusCheck{Camera: ptr(StateOffline)},
 		},
 		{
 			name:  "gestureFalse",
@@ -757,7 +757,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		{
 			name:  "defaults",
 			raw:   "camera=tracking",
-			check: webStatusCheck{Zoom: new(100), Audio: new("nc"), Pan: new(0), Tilt: new(0)},
+			check: webStatusCheck{Zoom: new(100), Audio: ptr(AudioNC), Pan: new(0), Tilt: new(0)},
 		},
 	}
 

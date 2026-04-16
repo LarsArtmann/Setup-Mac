@@ -154,10 +154,10 @@ func SetDeadline(conn net.Conn, timeout time.Duration) error {
 	return nil
 }
 
-func SendCommand(socketPath, cmd string) (string, error) {
+func SendCommand(ctx context.Context, socketPath, cmd string) (string, error) {
 	dialer := net.Dialer{Timeout: DefaultSocketTimeout}
 
-	conn, err := dialer.DialContext(context.Background(), "unix", socketPath)
+	conn, err := dialer.DialContext(ctx, "unix", socketPath)
 	if err != nil {
 		return "", fmt.Errorf("sendCommand dial: %w", err)
 	}

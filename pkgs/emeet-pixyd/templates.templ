@@ -1,10 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
+)
 
 type webStatus struct {
-	Camera  string
-	Audio   string
+	Camera  pixy.CameraState
+	Audio   pixy.AudioMode
 	Gesture bool
 	Pan     int
 	Tilt    int
@@ -567,21 +571,21 @@ templ statusPanel(s webStatus) {
 			</div>
 			<div class="btn-group">
 				<button
-					class={ "btn", "btn-green", templ.KV("btn-active", s.Camera == "tracking") }
+					class={ "btn", "btn-green", templ.KV("btn-active", s.Camera == pixy.StateTracking) }
 					hx-post="/api/track"
 					hx-target="#status-panel"
 				>
 					Track
 				</button>
 				<button
-					class={ "btn", "btn-yellow", templ.KV("btn-active", s.Camera == "idle") }
+					class={ "btn", "btn-yellow", templ.KV("btn-active", s.Camera == pixy.StateIdle) }
 					hx-post="/api/idle"
 					hx-target="#status-panel"
 				>
 					Idle
 				</button>
 				<button
-					class={ "btn", "btn-red", templ.KV("btn-active", s.Camera == "privacy") }
+					class={ "btn", "btn-red", templ.KV("btn-active", s.Camera == pixy.StatePrivacy) }
 					hx-post="/api/privacy"
 					hx-target="#status-panel"
 				>
@@ -600,7 +604,7 @@ templ statusPanel(s webStatus) {
 			<div class="card-title">Audio Mode</div>
 			<div class="btn-group">
 				<button
-					class={ "btn", templ.KV("btn-active", s.Audio == "nc") }
+					class={ "btn", templ.KV("btn-active", s.Audio == pixy.AudioNC) }
 					hx-post="/api/audio"
 					hx-vals='{"mode":"nc"}'
 					hx-target="#status-panel"
@@ -608,7 +612,7 @@ templ statusPanel(s webStatus) {
 					Noise Cancel
 				</button>
 				<button
-					class={ "btn", templ.KV("btn-active", s.Audio == "live") }
+					class={ "btn", templ.KV("btn-active", s.Audio == pixy.AudioLive) }
 					hx-post="/api/audio"
 					hx-vals='{"mode":"live"}'
 					hx-target="#status-panel"
@@ -616,7 +620,7 @@ templ statusPanel(s webStatus) {
 					Live
 				</button>
 				<button
-					class={ "btn", templ.KV("btn-active", s.Audio == "original") }
+					class={ "btn", templ.KV("btn-active", s.Audio == pixy.AudioOriginal) }
 					hx-post="/api/audio"
 					hx-vals='{"mode":"org"}'
 					hx-target="#status-panel"

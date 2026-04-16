@@ -16,7 +16,6 @@ import (
 
 const (
 	audioCommand    = "audio"
-	offlineValue    = "offline"
 	zoomDefault     = 100
 	snapshotTimeout = 3 * time.Second
 
@@ -42,8 +41,8 @@ func (s *webServer) getWebStatus() webStatus {
 	defer s.daemon.mu.Unlock()
 
 	status := webStatus{
-		Camera:  string(s.daemon.state.Camera),
-		Audio:   string(s.daemon.state.Audio),
+		Camera:  s.daemon.state.Camera,
+		Audio:   s.daemon.state.Audio,
 		Gesture: s.daemon.state.Gesture,
 		Pan:     0,
 		Tilt:    0,
@@ -333,8 +332,8 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 
 func parseWebStatus(raw string) webStatus {
 	status := webStatus{
-		Camera: "offline",
-		Audio:  "nc",
+		Camera: StateOffline,
+		Audio:  AudioNC,
 		Pan:    0,
 		Tilt:   0,
 		Zoom:   zoomDefault,
@@ -354,10 +353,14 @@ func parseWebStatus(raw string) webStatus {
 
 		switch key {
 		case "camera":
-			status.Camera = val
-			status.Online = val != offlineValue
+			if cam, camErr := ParseCameraState(val); camErr == nil {
+				status.Camera = cam
+			}
+			status.Online = status.Camera != StateOffline
 		case "audio":
-			status.Audio = val
+			if aud, audErr := ParseAudioMode(val); audErr == nil {
+				status.Audio = aud
+			}
 		case "gesture":
 			status.Gesture = val == "true"
 		case ptzAxisPan:
