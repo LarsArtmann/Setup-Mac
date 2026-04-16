@@ -76,40 +76,10 @@ const (
 	v4l2SplitCount    = 2
 )
 
-type CameraState = pixy.CameraState
-
-const (
-	StateIdle     = pixy.StateIdle
-	StateTracking = pixy.StateTracking
-	StatePrivacy  = pixy.StatePrivacy
-	StateOffline  = pixy.StateOffline
-)
-
-type AudioMode = pixy.AudioMode
-
-const (
-	AudioNC       = pixy.AudioNC
-	AudioLive     = pixy.AudioLive
-	AudioOriginal = pixy.AudioOriginal
-)
-
-var (
-	ParseAudioMode   = pixy.ParseAudioMode
-	ParseCameraState = pixy.ParseCameraState
-)
-
-type Config = pixy.Config
-
-var DefaultConfig = pixy.DefaultConfig
-
-type State = pixy.State
-
-var DefaultState = pixy.DefaultState
-
 type Daemon struct {
 	mu        sync.RWMutex
-	state     State
-	config    Config
+	state     pixy.State
+	config    pixy.Config
 	videoDev  string
 	hidrawDev string
 
@@ -117,11 +87,11 @@ type Daemon struct {
 	debounceIdle  int
 }
 
-func NewDaemon(cfg Config) *Daemon {
+func NewDaemon(cfg pixy.Config) *Daemon {
 	d := &Daemon{
 		mu:            sync.RWMutex{},
 		config:        cfg,
-		state:         DefaultState(),
+		state:         pixy.DefaultState(),
 		videoDev:      "",
 		hidrawDev:     "",
 		debounceInUse: 0,
@@ -202,13 +172,13 @@ func (d *Daemon) probeDevices() {
 	d.hidrawDev = probeHidraw("/sys/class/hidraw")
 
 	if d.videoDev != "" {
-		if d.state.Camera == StateOffline {
-			d.state.Camera = StatePrivacy
+		if d.state.Camera == pixy.StateOffline {
+			d.state.Camera = pixy.StatePrivacy
 		}
 
 		slog.Info("found PIXY device", "video", d.videoDev, "hidraw", d.hidrawDev)
 	} else {
-		d.state.Camera = StateOffline
+		d.state.Camera = pixy.StateOffline
 
 		slog.Warn("PIXY not found, will retry on next probe")
 	}
@@ -258,28 +228,28 @@ func (d *Daemon) saveState() error {
 	return nil
 }
 
-func cameraHIDByte(s CameraState) byte {
+func cameraHIDByte(s pixy.CameraState) byte {
 	switch s {
-	case StateTracking:
+	case pixy.StateTracking:
 		return hidByteTracking
-	case StatePrivacy:
+	case pixy.StatePrivacy:
 		return hidBytePrivacy
-	case StateIdle:
+	case pixy.StateIdle:
 		return hidByteIdle
-	case StateOffline:
+	case pixy.StateOffline:
 		return hidByteIdle
 	default:
 		return hidByteIdle
 	}
 }
 
-func audioHIDByte(m AudioMode) byte {
+func audioHIDByte(m pixy.AudioMode) byte {
 	switch m {
-	case AudioNC:
+	case pixy.AudioNC:
 		return hidByteNC
-	case AudioLive:
+	case pixy.AudioLive:
 		return hidByteLive
-	case AudioOriginal:
+	case pixy.AudioOriginal:
 		return hidByteOriginal
 	default:
 		return hidByteNC
@@ -321,8 +291,8 @@ func hidSend(hidrawDev string, report []byte) (err error) {
 }
 
 type hidResponse struct {
-	Tracking CameraState
-	Audio    AudioMode
+	Tracking pixy.CameraState
+	Audio    pixy.AudioMode
 	Gesture  bool
 	Got      bool
 }
@@ -378,16 +348,16 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 func parseHIDResponse(data []byte) hidResponse {
 	if len(data) < hidMinLen {
 		return hidResponse{
-			Tracking: StateIdle,
-			Audio:    AudioNC,
+			Tracking: pixy.StateIdle,
+			Audio:    pixy.AudioNC,
 			Gesture:  false,
 			Got:      false,
 		}
 	}
 
 	resp := hidResponse{
-		Tracking: StateIdle,
-		Audio:    AudioNC,
+		Tracking: pixy.StateIdle,
+		Audio:    pixy.AudioNC,
 		Gesture:  false,
 		Got:      true,
 	}
@@ -398,20 +368,20 @@ func parseHIDResponse(data []byte) hidResponse {
 	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceTracking:
 		switch data[8] {
 		case hidByteTracking:
-			resp.Tracking = StateTracking
+			resp.Tracking = pixy.StateTracking
 		case hidBytePrivacy:
-			resp.Tracking = StatePrivacy
+			resp.Tracking = pixy.StatePrivacy
 		default:
-			resp.Tracking = StateIdle
+			resp.Tracking = pixy.StateIdle
 		}
 	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceAudio:
 		switch data[8] {
 		case hidByteLive:
-			resp.Audio = AudioLive
+			resp.Audio = pixy.AudioLive
 		case hidByteOriginal:
-			resp.Audio = AudioOriginal
+			resp.Audio = pixy.AudioOriginal
 		default:
-			resp.Audio = AudioNC
+			resp.Audio = pixy.AudioNC
 		}
 	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceGesture:
 		resp.Gesture = data[len(data)-1] == gestureEnabledByte
@@ -504,7 +474,7 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 	return nil
 }
 
-func (d *Daemon) setTracking(mode CameraState) error {
+func (d *Daemon) setTracking(mode pixy.CameraState) error {
 	return d.setDeviceState(
 		pixyConfig(hidInterfaceTracking, cameraHIDByte(mode)),
 		pixyCommit(hidInterfaceTracking),
@@ -512,7 +482,7 @@ func (d *Daemon) setTracking(mode CameraState) error {
 	)
 }
 
-func (d *Daemon) setAudio(mode AudioMode) error {
+func (d *Daemon) setAudio(mode pixy.AudioMode) error {
 	return d.setDeviceState(
 		pixyConfig(hidInterfaceAudio, audioHIDByte(mode)),
 		pixyCommit(hidInterfaceAudio),
@@ -590,21 +560,21 @@ func queryHIDState[T any](
 	return extract(parsed), nil
 }
 
-func (d *Daemon) queryTracking(ctx context.Context) (CameraState, error) {
+func (d *Daemon) queryTracking(ctx context.Context) (pixy.CameraState, error) {
 	return queryHIDState(
 		ctx,
 		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceTracking, 0x01, 0x01},
-		func(p hidResponse) CameraState { return p.Tracking },
+		func(p hidResponse) pixy.CameraState { return p.Tracking },
 	)
 }
 
-func (d *Daemon) queryAudio(ctx context.Context) (AudioMode, error) {
+func (d *Daemon) queryAudio(ctx context.Context) (pixy.AudioMode, error) {
 	return queryHIDState(
 		ctx,
 		d.hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceAudio, audioConfigMarker, 0x04},
-		func(p hidResponse) AudioMode { return p.Audio },
+		func(p hidResponse) pixy.AudioMode { return p.Audio },
 	)
 }
 
@@ -631,7 +601,7 @@ func (d *Daemon) syncState(ctx context.Context) string {
 	changed := false
 
 	tracking, trackingErr := d.queryTracking(ctx)
-	if trackingErr == nil && tracking.Valid() && tracking != StateOffline {
+	if trackingErr == nil && tracking.Valid() && tracking != pixy.StateOffline {
 		if d.state.Camera != tracking {
 			slog.Info("state sync: camera changed", "believed", d.state.Camera, "actual", tracking)
 			d.state.Camera = tracking
@@ -850,15 +820,15 @@ func (d *Daemon) autoManage(ctx context.Context) {
 		slog.Info("camera in use, activating tracking and noise cancellation")
 
 		d.state.InCall = true
-		if d.state.Camera == StatePrivacy || d.state.Camera == StateIdle {
-			trackErr := d.setTracking(StateTracking)
+		if d.state.Camera == pixy.StatePrivacy || d.state.Camera == pixy.StateIdle {
+			trackErr := d.setTracking(pixy.StateTracking)
 			if trackErr != nil {
 				slog.Error("failed to activate tracking", "error", trackErr)
 			}
 		}
 
-		if d.state.Audio != AudioNC {
-			audioErr := d.setAudio(AudioNC)
+		if d.state.Audio != pixy.AudioNC {
+			audioErr := d.setAudio(pixy.AudioNC)
 			if audioErr != nil {
 				slog.Error("failed to set audio mode", "error", audioErr)
 			}
@@ -879,7 +849,7 @@ func (d *Daemon) autoManage(ctx context.Context) {
 
 		d.state.InCall = false
 
-		privacyErr := d.setTracking(StatePrivacy)
+		privacyErr := d.setTracking(pixy.StatePrivacy)
 		if privacyErr != nil {
 			slog.Error("failed to enter privacy mode", "error", privacyErr)
 		}
@@ -897,7 +867,7 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 	if !d.isDevicePresent() {
 		return fmt.Sprintf(
 			"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=",
-			StateOffline,
+			pixy.StateOffline,
 			d.state.Audio,
 			d.state.Gesture,
 			0,
@@ -938,20 +908,20 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.getStatus(ctx)
 
 	case "track":
-		return d.handleTrackingCommand(StateTracking, "track")
+		return d.handleTrackingCommand(pixy.StateTracking, "track")
 
 	case "idle":
-		return d.handleTrackingCommand(StateIdle, "idle")
+		return d.handleTrackingCommand(pixy.StateIdle, "idle")
 
 	case "privacy":
-		return d.handleTrackingCommand(StatePrivacy, "privacy")
+		return d.handleTrackingCommand(pixy.StatePrivacy, "privacy")
 
 	case "toggle-privacy":
-		if d.state.Camera == StatePrivacy {
-			return d.handleTrackingCommand(StateTracking, "toggle-privacy")
+		if d.state.Camera == pixy.StatePrivacy {
+			return d.handleTrackingCommand(pixy.StateTracking, "toggle-privacy")
 		}
 
-		return d.handleTrackingCommand(StatePrivacy, "toggle-privacy")
+		return d.handleTrackingCommand(pixy.StatePrivacy, "toggle-privacy")
 
 	case "audio":
 		return d.handleAudioCommand(parts)
@@ -995,16 +965,16 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	}
 }
 
-func (d *Daemon) handleTrackingCommand(state CameraState, label string) string {
+func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) string {
 	if err := d.setTracking(state); err != nil {
 		return fmt.Sprintf("error: %s: %v", label, err)
 	}
 
-	if state == StateTracking {
+	if state == pixy.StateTracking {
 		return "tracking on"
 	}
 
-	if state == StatePrivacy {
+	if state == pixy.StatePrivacy {
 		return "privacy on"
 	}
 
@@ -1012,13 +982,13 @@ func (d *Daemon) handleTrackingCommand(state CameraState, label string) string {
 }
 
 func (d *Daemon) handleAudioCommand(parts []string) string {
-	var mode AudioMode
+	var mode pixy.AudioMode
 	if len(parts) < 2 {
 		mode = d.state.Audio.Next()
 	} else {
 		var parseErr error
 
-		mode, parseErr = ParseAudioMode(parts[1])
+		mode, parseErr = pixy.ParseAudioMode(parts[1])
 		if parseErr != nil {
 			return respAudioUsage
 		}
@@ -1096,19 +1066,19 @@ func (d *Daemon) waybarOutput() string {
 	text := ""
 
 	switch d.state.Camera {
-	case StateTracking:
+	case pixy.StateTracking:
 		icon = "\uf030"
 		class = "tracking"
 		text = "CAM"
-	case StatePrivacy:
+	case pixy.StatePrivacy:
 		icon = "\uf011"
 		class = "privacy"
 		text = "OFF"
-	case StateIdle:
+	case pixy.StateIdle:
 		icon = "\uf03d"
 		class = "idle"
 		text = "IDLE"
-	case StateOffline:
+	case pixy.StateOffline:
 		icon = "\uf00d"
 		class = "offline"
 		text = "---"
@@ -1197,7 +1167,7 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 	}
 }
 
-func sendCommand(cfg Config, cmd string) (string, error) {
+func sendCommand(cfg pixy.Config, cmd string) (string, error) {
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), cmd)
 	if err != nil {
 		return "", fmt.Errorf("sendCommand %q: %w", cmd, err)
@@ -1276,7 +1246,7 @@ func exitWithDaemonError(err error) {
 }
 
 func main() {
-	cfg := DefaultConfig()
+	cfg := pixy.DefaultConfig()
 
 	if len(os.Args) > 1 {
 		cmd := strings.Join(os.Args[1:], " ")

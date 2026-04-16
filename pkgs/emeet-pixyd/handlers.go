@@ -430,8 +430,8 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 
 func parseWebStatus(raw string) webStatus {
 	status := webStatus{
-		Camera: StateOffline,
-		Audio:  AudioNC,
+		Camera: pixy.StateOffline,
+		Audio:  pixy.AudioNC,
 		Pan:    0,
 		Tilt:   0,
 		Zoom:   zoomDefault,
@@ -451,12 +451,12 @@ func parseWebStatus(raw string) webStatus {
 
 		switch key {
 		case "camera":
-			if cam, camErr := ParseCameraState(val); camErr == nil {
+			if cam, camErr := pixy.ParseCameraState(val); camErr == nil {
 				status.Camera = cam
 			}
-			status.Online = status.Camera != StateOffline
+			status.Online = status.Camera != pixy.StateOffline
 		case "audio":
-			if aud, audErr := ParseAudioMode(val); audErr == nil {
+			if aud, audErr := pixy.ParseAudioMode(val); audErr == nil {
 				status.Audio = aud
 			}
 		case "gesture":

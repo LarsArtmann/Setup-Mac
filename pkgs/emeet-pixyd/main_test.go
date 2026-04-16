@@ -20,33 +20,33 @@ const (
 	testHIDDev   = "/dev/hidraw7"
 )
 
-func testConfig(dir string) Config {
-	return Config{
+func testConfig(dir string) pixy.Config {
+	return pixy.Config{
 		StateDir:      dir,
 		PollInterval:  2 * time.Second,
 		DebounceCount: 3,
 	}
 }
 
-func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
-	return newTestDaemonWithAudio(camera, AudioNC, videoDev, hidrawDev)
+func newTestDaemon(camera pixy.CameraState, videoDev, hidrawDev string) *Daemon {
+	return newTestDaemonWithAudio(camera, pixy.AudioNC, videoDev, hidrawDev)
 }
 
 func newTestDaemonWithAudio(
-	camera CameraState,
-	audio AudioMode,
+	camera pixy.CameraState,
+	audio pixy.AudioMode,
 	videoDev, hidrawDev string,
 ) *Daemon {
 	return &Daemon{
 		mu: sync.RWMutex{},
-		state: State{
+		state: pixy.State{
 			Camera:   camera,
 			Audio:    audio,
 			Gesture:  false,
 			InCall:   false,
 			AutoMode: true,
 		},
-		config:        Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
+		config:        pixy.Config{StateDir: "/tmp", PollInterval: 2 * time.Second, DebounceCount: 3},
 		videoDev:      videoDev,
 		hidrawDev:     hidrawDev,
 		debounceInUse: 0,
@@ -54,7 +54,7 @@ func newTestDaemonWithAudio(
 	}
 }
 
-func assertCameraState(t *testing.T, d *Daemon, expected CameraState) {
+func assertCameraState(t *testing.T, d *Daemon, expected pixy.CameraState) {
 	t.Helper()
 
 	if d.state.Camera != expected {
@@ -110,12 +110,12 @@ func assertParsedField(t *testing.T, parsed map[string]string, field string) {
 	}
 }
 
-func testDaemonBase(camera CameraState, videoDev, hidrawDev string) *Daemon {
+func testDaemonBase(camera pixy.CameraState, videoDev, hidrawDev string) *Daemon {
 	return &Daemon{
 		mu: sync.RWMutex{},
-		state: State{
+		state: pixy.State{
 			Camera:   camera,
-			Audio:    AudioNC,
+			Audio:    pixy.AudioNC,
 			Gesture:  false,
 			InCall:   false,
 			AutoMode: true,
@@ -128,21 +128,21 @@ func testDaemonBase(camera CameraState, videoDev, hidrawDev string) *Daemon {
 	}
 }
 
-func testDaemonNoDevice(camera CameraState) *Daemon {
+func testDaemonNoDevice(camera pixy.CameraState) *Daemon {
 	return testDaemonBase(camera, "", "")
 }
 
-func testDaemonWithDevice(camera CameraState) *Daemon {
+func testDaemonWithDevice(camera pixy.CameraState) *Daemon {
 	return testDaemonBase(camera, testVideoDev, testHIDDev)
 }
 
 func TestStateDefaults(t *testing.T) {
 	t.Parallel()
 
-	d := testDaemonNoDevice(StatePrivacy)
-	assertCameraState(t, d, StatePrivacy)
+	d := testDaemonNoDevice(pixy.StatePrivacy)
+	assertCameraState(t, d, pixy.StatePrivacy)
 
-	if d.state.Audio != AudioNC {
+	if d.state.Audio != pixy.AudioNC {
 		t.Errorf("expected default audio to be nc, got %s", d.state.Audio)
 	}
 
@@ -161,9 +161,9 @@ func TestStateSaveLoad(t *testing.T) {
 	d := &Daemon{
 		mu:     sync.RWMutex{},
 		config: cfg,
-		state: State{
-			Camera:   StateTracking,
-			Audio:    AudioLive,
+		state: pixy.State{
+			Camera:   pixy.StateTracking,
+			Audio:    pixy.AudioLive,
 			Gesture:  true,
 			InCall:   true,
 			AutoMode: false,
@@ -182,9 +182,9 @@ func TestStateSaveLoad(t *testing.T) {
 	d2 := &Daemon{
 		mu:     sync.RWMutex{},
 		config: cfg,
-		state: State{
-			Camera:   StateIdle,
-			Audio:    AudioNC,
+		state: pixy.State{
+			Camera:   pixy.StateIdle,
+			Audio:    pixy.AudioNC,
 			Gesture:  false,
 			InCall:   false,
 			AutoMode: true,
@@ -196,11 +196,11 @@ func TestStateSaveLoad(t *testing.T) {
 	}
 	d2.loadState()
 
-	if d2.state.Camera != StateTracking {
+	if d2.state.Camera != pixy.StateTracking {
 		t.Errorf("expected camera=tracking, got %s", d2.state.Camera)
 	}
 
-	if d2.state.Audio != AudioLive {
+	if d2.state.Audio != pixy.AudioLive {
 		t.Errorf("expected audio=live, got %s", d2.state.Audio)
 	}
 
@@ -227,11 +227,11 @@ func TestStateFileCorrupt(t *testing.T) {
 		t.Fatalf("write corrupt file: %v", err)
 	}
 
-	d := testDaemonNoDevice(StatePrivacy)
+	d := testDaemonNoDevice(pixy.StatePrivacy)
 	d.config = cfg
 	d.loadState()
 
-	if d.state.Camera != StatePrivacy {
+	if d.state.Camera != pixy.StatePrivacy {
 		t.Errorf("expected state to remain unchanged on corrupt file, got %s", d.state.Camera)
 	}
 }
@@ -240,17 +240,17 @@ func TestStateFileMissing(t *testing.T) {
 	t.Parallel()
 
 	cfg := testConfig("/nonexistent")
-	d := testDaemonNoDevice(StatePrivacy)
+	d := testDaemonNoDevice(pixy.StatePrivacy)
 	d.config = cfg
 	d.loadState()
 
-	assertCameraState(t, d, StatePrivacy)
+	assertCameraState(t, d, pixy.StatePrivacy)
 }
 
 func TestHandleCommandStatus(t *testing.T) {
 	t.Parallel()
 
-	d := testDaemonNoDevice(StatePrivacy)
+	d := testDaemonNoDevice(pixy.StatePrivacy)
 
 	result := d.handleCommand(context.Background(), "status")
 	assertStatusPrefix(t, result, "camera=offline", "offline status")
@@ -261,7 +261,7 @@ func TestHandleCommandStatus(t *testing.T) {
 func TestHandleCommandUnknown(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StatePrivacy, testVideoDev, "/dev/hidraw0")
+	d := newTestDaemon(pixy.StatePrivacy, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "foobar")
 	if result != "unknown command: foobar" {
@@ -272,7 +272,7 @@ func TestHandleCommandUnknown(t *testing.T) {
 func TestHandleCommandAutoToggle(t *testing.T) {
 	t.Parallel()
 
-	d := testDaemonWithDevice(StatePrivacy)
+	d := testDaemonWithDevice(pixy.StatePrivacy)
 	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "auto-off")
@@ -295,7 +295,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 func TestHandleCommandAudioInvalid(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, testVideoDev, "/dev/hidraw0")
+	d := newTestDaemonWithAudio(pixy.StatePrivacy, pixy.AudioNC, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "audio xyz")
 	if result != respAudioUsage {
@@ -306,7 +306,7 @@ func TestHandleCommandAudioInvalid(t *testing.T) {
 func TestHandleCommandDeviceRequired(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StateOffline, "", "")
+	d := newTestDaemon(pixy.StateOffline, "", "")
 
 	for _, cmd := range []string{"track", "idle", "privacy", "toggle-privacy", "center", "gesture-on", "gesture-off"} {
 		result := d.handleCommand(context.Background(), cmd)
@@ -320,13 +320,13 @@ func TestHandleCommandDeviceRequired(t *testing.T) {
 	}
 }
 
-func testDaemonWithState(camera CameraState, inCall bool) *Daemon {
+func testDaemonWithState(camera pixy.CameraState, inCall bool) *Daemon {
 	return &Daemon{
 		mu:     sync.RWMutex{},
 		config: testConfig("/tmp"),
-		state: State{
+		state: pixy.State{
 			Camera:   camera,
-			Audio:    AudioNC,
+			Audio:    pixy.AudioNC,
 			Gesture:  false,
 			InCall:   inCall,
 			AutoMode: true,
@@ -342,15 +342,15 @@ func TestWaybarOutput(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		camera   CameraState
+		camera   pixy.CameraState
 		inCall   bool
 		expected string
 	}{
-		{StateTracking, false, "tracking"},
-		{StatePrivacy, false, "privacy"},
-		{StateIdle, false, "idle"},
-		{StateOffline, false, "offline"},
-		{StateTracking, true, "tracking in-call"},
+		{pixy.StateTracking, false, "tracking"},
+		{pixy.StatePrivacy, false, "privacy"},
+		{pixy.StateIdle, false, "idle"},
+		{pixy.StateOffline, false, "offline"},
+		{pixy.StateTracking, true, "tracking in-call"},
 	}
 
 	for _, testCase := range tests {
@@ -388,7 +388,7 @@ func TestIsCameraInUseEmptyDevice(t *testing.T) {
 func TestHandleCommandTogglePrivacy(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StatePrivacy, testVideoDev, "/dev/hidraw0")
+	d := newTestDaemon(pixy.StatePrivacy, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "toggle-privacy")
 	if result == "" {
@@ -399,7 +399,7 @@ func TestHandleCommandTogglePrivacy(t *testing.T) {
 func TestHandleCommandProbe(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StateOffline, "", "")
+	d := newTestDaemon(pixy.StateOffline, "", "")
 
 	result := d.handleCommand(context.Background(), "probe")
 
@@ -414,19 +414,19 @@ func TestAudioModeNext(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		input    AudioMode
-		expected AudioMode
+		input    pixy.AudioMode
+		expected pixy.AudioMode
 	}{
-		{AudioNC, AudioLive},
-		{AudioLive, AudioOriginal},
-		{AudioOriginal, AudioNC},
-		{AudioMode("unknown"), AudioNC},
+		{pixy.AudioNC, pixy.AudioLive},
+		{pixy.AudioLive, pixy.AudioOriginal},
+		{pixy.AudioOriginal, pixy.AudioNC},
+		{pixy.AudioMode("unknown"), pixy.AudioNC},
 	}
 	for _, testCase := range tests {
 		result := testCase.input.Next()
 		if result != testCase.expected {
 			t.Errorf(
-				"AudioMode(%s).Next() = %s, want %s",
+				"pixy.AudioMode(%s).Next() = %s, want %s",
 				testCase.input,
 				result,
 				testCase.expected,
@@ -439,13 +439,13 @@ func TestAudioModeHIDByte(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		mode     AudioMode
+		mode     pixy.AudioMode
 		expected byte
 	}{
-		{AudioNC, hidByteNC},
-		{AudioLive, hidByteLive},
-		{AudioOriginal, hidByteOriginal},
-		{AudioMode("unknown"), hidByteNC},
+		{pixy.AudioNC, hidByteNC},
+		{pixy.AudioLive, hidByteLive},
+		{pixy.AudioOriginal, hidByteOriginal},
+		{pixy.AudioMode("unknown"), hidByteNC},
 	}
 	for _, testCase := range tests {
 		result := audioHIDByte(testCase.mode)
@@ -464,13 +464,13 @@ func TestCameraStateHIDByte(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		state    CameraState
+		state    pixy.CameraState
 		expected byte
 	}{
-		{StateTracking, hidByteTracking},
-		{StatePrivacy, hidBytePrivacy},
-		{StateIdle, hidByteIdle},
-		{CameraState("unknown"), hidByteIdle},
+		{pixy.StateTracking, hidByteTracking},
+		{pixy.StatePrivacy, hidBytePrivacy},
+		{pixy.StateIdle, hidByteIdle},
+		{pixy.CameraState("unknown"), hidByteIdle},
 	}
 	for _, testCase := range tests {
 		result := cameraHIDByte(testCase.state)
@@ -488,19 +488,19 @@ func TestCameraStateHIDByte(t *testing.T) {
 func TestTypeValidation(t *testing.T) {
 	t.Parallel()
 
-	if !AudioNC.Valid() {
-		t.Error("AudioNC should be valid")
+	if !pixy.AudioNC.Valid() {
+		t.Error("pixy.AudioNC should be valid")
 	}
 
-	if !StateTracking.Valid() {
-		t.Error("StateTracking should be valid")
+	if !pixy.StateTracking.Valid() {
+		t.Error("pixy.StateTracking should be valid")
 	}
 
-	if AudioMode("foo").Valid() {
+	if pixy.AudioMode("foo").Valid() {
 		t.Error("unknown audio mode should not be valid")
 	}
 
-	if CameraState("bar").Valid() {
+	if pixy.CameraState("bar").Valid() {
 		t.Error("unknown camera state should not be valid")
 	}
 }
@@ -508,7 +508,7 @@ func TestTypeValidation(t *testing.T) {
 func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "", "")
+	d := newTestDaemonWithAudio(pixy.StatePrivacy, pixy.AudioNC, "", "")
 
 	result := d.handleCommand(context.Background(), "audio")
 	assertErrorPrefix(t, result)
@@ -517,7 +517,7 @@ func TestHandleCommandAudioCycleNoDevice(t *testing.T) {
 func TestConfigPaths(t *testing.T) {
 	t.Parallel()
 
-	cfg := Config{
+	cfg := pixy.Config{
 		StateDir:      "/tmp/test-pixyd",
 		PollInterval:  pixy.DefaultPollInterval,
 		DebounceCount: pixy.DefaultDebounceCount,
@@ -536,11 +536,11 @@ func TestParseHIDResponseTracking(t *testing.T) {
 
 	tests := []struct {
 		data     []byte
-		expected CameraState
+		expected pixy.CameraState
 	}{
-		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, StateTracking},
-		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, StatePrivacy},
-		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}, StateIdle},
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, pixy.StateTracking},
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, pixy.StatePrivacy},
+		{[]byte{0x09, 0x01, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00}, pixy.StateIdle},
 	}
 	for _, testCase := range tests {
 		resp := parseHIDResponse(testCase.data)
@@ -564,11 +564,11 @@ func TestParseHIDResponseAudio(t *testing.T) {
 
 	tests := []struct {
 		data     []byte
-		expected AudioMode
+		expected pixy.AudioMode
 	}{
-		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, AudioNC},
-		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, AudioLive},
-		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03}, AudioOriginal},
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}, pixy.AudioNC},
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x02}, pixy.AudioLive},
+		{[]byte{0x09, 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x03}, pixy.AudioOriginal},
 	}
 	for _, testCase := range tests {
 		resp := parseHIDResponse(testCase.data)
@@ -618,7 +618,7 @@ func TestParseHIDResponseNil(t *testing.T) {
 func TestHandleCommandSyncNoDevice(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StateOffline, "", "")
+	d := newTestDaemon(pixy.StateOffline, "", "")
 	result := d.handleCommand(context.Background(), "sync")
 	assertErrorPrefix(t, result)
 }
@@ -626,7 +626,7 @@ func TestHandleCommandSyncNoDevice(t *testing.T) {
 func TestHandleCommandSyncWithDevice(t *testing.T) {
 	t.Parallel()
 
-	d := testDaemonWithDevice(StatePrivacy)
+	d := testDaemonWithDevice(pixy.StatePrivacy)
 	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "sync")
@@ -638,7 +638,7 @@ func TestHandleCommandSyncWithDevice(t *testing.T) {
 func TestDefaultConfig(t *testing.T) {
 	t.Parallel()
 
-	cfg := DefaultConfig()
+	cfg := pixy.DefaultConfig()
 	if cfg.StateDir != pixy.DefaultStateDir {
 		t.Errorf("expected StateDir=%s, got %s", pixy.DefaultStateDir, cfg.StateDir)
 	}
@@ -703,7 +703,7 @@ func TestParseAudioMode(t *testing.T) {
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	testParseErrorCases(t, "ParseAudioMode", ParseAudioMode, tests)
+	testParseErrorCases(t, "pixy.ParseAudioMode", pixy.ParseAudioMode, tests)
 }
 
 func TestParseCameraState(t *testing.T) {
@@ -717,7 +717,7 @@ func TestParseCameraState(t *testing.T) {
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	testParseErrorCases(t, "ParseCameraState", ParseCameraState, tests)
+	testParseErrorCases(t, "pixy.ParseCameraState", pixy.ParseCameraState, tests)
 }
 
 func TestParseHIDResponseUnknownInterface(t *testing.T) {
@@ -730,7 +730,7 @@ func TestParseHIDResponseUnknownInterface(t *testing.T) {
 		t.Error("expected Got=true for valid-length response with unknown interface")
 	}
 
-	if resp.Tracking != StateIdle {
+	if resp.Tracking != pixy.StateIdle {
 		t.Errorf("expected idle tracking for unknown interface, got %s", resp.Tracking)
 	}
 }
@@ -738,12 +738,12 @@ func TestParseHIDResponseUnknownInterface(t *testing.T) {
 func TestDefaultStateValues(t *testing.T) {
 	t.Parallel()
 
-	s := DefaultState()
-	if s.Camera != StatePrivacy {
+	s := pixy.DefaultState()
+	if s.Camera != pixy.StatePrivacy {
 		t.Errorf("expected default camera=privacy, got %s", s.Camera)
 	}
 
-	if s.Audio != AudioNC {
+	if s.Audio != pixy.AudioNC {
 		t.Errorf("expected default audio=nc, got %s", s.Audio)
 	}
 
@@ -1080,13 +1080,13 @@ func TestProbeDevices_SetsStateToOfflineWhenNoVideo(t *testing.T) {
 	t.Parallel()
 
 	// Given a daemon with no PIXY video device
-	d := newTestDaemon(StatePrivacy, "", "")
+	d := newTestDaemon(pixy.StatePrivacy, "", "")
 
 	// When probing (real sysfs — PIXY may or may not be connected)
 	d.probeDevices()
 
 	// Then if no video device is found, state goes offline
-	if d.videoDev == "" && d.state.Camera != StateOffline {
+	if d.videoDev == "" && d.state.Camera != pixy.StateOffline {
 		t.Errorf("expected offline when no video device, got %s", d.state.Camera)
 	}
 }
@@ -1095,13 +1095,13 @@ func TestProbeDevices_RecoversFromOffline(t *testing.T) {
 	t.Parallel()
 
 	// Given a daemon in offline state
-	d := newTestDaemon(StateOffline, "", "")
+	d := newTestDaemon(pixy.StateOffline, "", "")
 
 	// When probing (may or may not find device)
 	d.probeDevices()
 
 	// Then if a video device is found, state is recovered from offline
-	if d.videoDev != "" && d.state.Camera == StateOffline {
+	if d.videoDev != "" && d.state.Camera == pixy.StateOffline {
 		t.Error("expected camera state to recover from offline when device found")
 	}
 }

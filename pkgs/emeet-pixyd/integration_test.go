@@ -22,7 +22,7 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 	return &Daemon{
 		mu:    sync.RWMutex{},
 		state: pixy.DefaultState(),
-		config: Config{
+		config: pixy.Config{
 			StateDir:      t.TempDir(),
 			PollInterval:  2 * time.Second,
 			DebounceCount: 3,
@@ -180,8 +180,8 @@ func assertWebStatusOffline(t *testing.T, status webStatus) {
 	t.Helper()
 
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  ptr(StatePrivacy),
-		Audio:   ptr(AudioNC),
+		Camera:  ptr(pixy.StatePrivacy),
+		Audio:   ptr(pixy.AudioNC),
 		Gesture: ptr(false),
 		Auto:    ptr(true),
 		InCall:  ptr(false),
@@ -192,8 +192,8 @@ func assertWebStatusOffline(t *testing.T, status webStatus) {
 }
 
 type webStatusCheck struct {
-	Camera  *CameraState
-	Audio   *AudioMode
+	Camera  *pixy.CameraState
+	Audio   *pixy.AudioMode
 	Gesture *bool
 	Auto    *bool
 	InCall  *bool
@@ -598,8 +598,8 @@ func TestWeb_WebStatusOfflineNoDevice(t *testing.T) {
 
 func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	daemon := newDaemonWithDevice(t)
-	daemon.state.Camera = StateTracking
-	daemon.state.Audio = AudioLive
+	daemon.state.Camera = pixy.StateTracking
+	daemon.state.Audio = pixy.AudioLive
 	daemon.state.Gesture = true
 	daemon.state.InCall = true
 
@@ -607,8 +607,8 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	status := webSrv.getWebStatus()
 
 	assertWebStatusField(t, status, webStatusCheck{
-		Camera:  ptr(StateTracking),
-		Audio:   ptr(AudioLive),
+		Camera:  ptr(pixy.StateTracking),
+		Audio:   ptr(pixy.AudioLive),
 		Gesture: ptr(true),
 		Auto:    ptr(true),
 		InCall:  ptr(true),
@@ -620,12 +620,12 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 
 func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 	tests := []struct {
-		camera CameraState
+		camera pixy.CameraState
 	}{
-		{StateTracking},
-		{StatePrivacy},
-		{StateIdle},
-		{StateOffline},
+		{pixy.StateTracking},
+		{pixy.StatePrivacy},
+		{pixy.StateIdle},
+		{pixy.StateOffline},
 	}
 
 	for _, tc := range tests {
@@ -646,11 +646,11 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 
 func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 	tests := []struct {
-		audio AudioMode
+		audio pixy.AudioMode
 	}{
-		{AudioNC},
-		{AudioLive},
-		{AudioOriginal},
+		{pixy.AudioNC},
+		{pixy.AudioLive},
+		{pixy.AudioOriginal},
 	}
 
 	for _, tc := range tests {
@@ -695,8 +695,8 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 			name: "full",
 			raw:  "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0",
 			check: webStatusCheck{
-				Camera:  ptr(StateTracking),
-				Audio:   ptr(AudioLive),
+				Camera:  ptr(pixy.StateTracking),
+				Audio:   ptr(pixy.AudioLive),
 				Gesture: new(true),
 				Auto:    new(true),
 				InCall:  new(true),
@@ -710,24 +710,24 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		{
 			name:   "offline",
 			raw:    "camera=offline (device not found)",
-			check:  webStatusCheck{Camera: ptr(StateOffline)},
+			check:  webStatusCheck{Camera: ptr(pixy.StateOffline)},
 			online: new(false),
 		},
 		{
 			name:  "error",
 			raw:   "error: PIXY not connected",
-			check: webStatusCheck{Camera: ptr(StateOffline), Audio: ptr(AudioNC), Zoom: new(100)},
+			check: webStatusCheck{Camera: ptr(pixy.StateOffline), Audio: ptr(pixy.AudioNC), Zoom: new(100)},
 			err:   "PIXY not connected",
 		},
 		{
 			name:   "empty",
-			check:  webStatusCheck{Camera: ptr(StateOffline)},
+			check:  webStatusCheck{Camera: ptr(pixy.StateOffline)},
 			online: new(false),
 		},
 		{
 			name:  "garbage",
 			raw:   "blah notkeyvalue garbage",
-			check: webStatusCheck{Camera: ptr(StateOffline)},
+			check: webStatusCheck{Camera: ptr(pixy.StateOffline)},
 		},
 		{
 			name:  "gestureFalse",
@@ -747,7 +747,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 		{
 			name:  "defaults",
 			raw:   "camera=tracking",
-			check: webStatusCheck{Zoom: new(100), Audio: ptr(AudioNC), Pan: new(0), Tilt: new(0)},
+			check: webStatusCheck{Zoom: new(100), Audio: ptr(pixy.AudioNC), Pan: new(0), Tilt: new(0)},
 		},
 	}
 
@@ -778,10 +778,10 @@ func shortSocketDir(t *testing.T) string {
 
 // ---------- Daemon unix socket integration ----------
 
-func startSocketDaemon(t *testing.T) (*Daemon, Config) {
+func startSocketDaemon(t *testing.T) (*Daemon, pixy.Config) {
 	t.Helper()
 
-	cfg := Config{
+	cfg := pixy.Config{
 		StateDir:      shortSocketDir(t),
 		PollInterval:  2 * time.Second,
 		DebounceCount: 3,
