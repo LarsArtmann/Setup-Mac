@@ -58,12 +58,19 @@ func getBody(t *testing.T, resp *http.Response) string {
 	t.Helper()
 
 	body, err := io.ReadAll(resp.Body)
-
 	if err != nil {
 		t.Fatalf("read body: %v", err)
 	}
 
 	return string(body)
+}
+
+func assertStatusCode(t *testing.T, resp *http.Response, expected int) {
+	t.Helper()
+
+	if resp.StatusCode != expected {
+		t.Errorf("expected %d, got %d", expected, resp.StatusCode)
+	}
 }
 
 func assertContains(t *testing.T, haystack, needle, label string) {
@@ -80,6 +87,11 @@ func assertNotContains(t *testing.T, haystack, needle, label string) {
 	if strings.Contains(haystack, needle) {
 		t.Errorf("%s: expected body NOT to contain %q", label, needle)
 	}
+}
+
+func assertResponseContains(t *testing.T, resp *http.Response, substr, label string) {
+	t.Helper()
+	assertContains(t, getBody(t, resp), substr, label)
 }
 
 func post(t *testing.T, url, contentType string, body io.Reader) *http.Response {
@@ -104,6 +116,62 @@ func get(t *testing.T, url string) *http.Response {
 	return resp
 }
 
+func assertWebStatus(t *testing.T, status webStatus) {
+	t.Helper()
+
+	if status.Camera != "privacy" {
+		t.Errorf("expected camera=privacy, got %s", status.Camera)
+	}
+	if status.Audio != "nc" {
+		t.Errorf("expected audio=nc, got %s", status.Audio)
+	}
+	if status.Gesture {
+		t.Error("expected gesture=false")
+	}
+	if !status.Auto {
+		t.Error("expected auto=true")
+	}
+	if status.InCall {
+		t.Error("expected inCall=false")
+	}
+	if status.Online {
+		t.Error("expected online=false (no device)")
+	}
+	if status.Device != "" {
+		t.Errorf("expected empty device, got %s", status.Device)
+	}
+	if status.Pan != 0 {
+		t.Errorf("expected pan=0, got %d", status.Pan)
+	}
+	if status.Tilt != 0 {
+		t.Errorf("expected tilt=0, got %d", status.Tilt)
+	}
+	if status.Zoom != 0 {
+		t.Errorf("expected zoom=0, got %d", status.Zoom)
+	}
+}
+
+func assertSocketResponseContains(t *testing.T, resp, substr, label string) {
+	t.Helper()
+	if !strings.Contains(resp, substr) {
+		t.Errorf("%s: expected %q in response, got: %s", label, substr, resp)
+	}
+}
+
+func assertSocketResponsePrefix(t *testing.T, resp, prefix, label string) {
+	t.Helper()
+	if !strings.HasPrefix(resp, prefix) {
+		t.Errorf("%s: expected prefix %q, got: %s", label, prefix, resp)
+	}
+}
+
+func assertSocketResponseHasPrefixes(t *testing.T, resp string, prefixes []string) {
+	t.Helper()
+	for _, p := range prefixes {
+		assertSocketResponseContains(t, resp, p, "socket response")
+	}
+}
+
 // ---------- Index page ----------
 
 func TestWeb_IndexReturnsHTML(t *testing.T) {
@@ -112,13 +180,9 @@ func TestWeb_IndexReturnsHTML(t *testing.T) {
 
 	resp := get(t, server.URL+"/")
 	defer resp.Body.Close()
+	assertStatusCode(t, resp, http.StatusOK)
 
 	body := getBody(t, resp)
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
-
 	assertContains(t, body, "<!DOCTYPE html>", "index page")
 	assertContains(t, body, "EMEET PIXY", "index page title")
 	assertContains(t, body, "status-panel", "index has status panel")
@@ -132,7 +196,6 @@ func TestWeb_IndexShowsOfflineWhenNoDevice(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := getBody(t, resp)
-
 	assertContains(t, body, "Offline", "offline badge")
 	assertContains(t, body, "camera=offline", "status shows offline")
 }
@@ -145,7 +208,6 @@ func TestWeb_IndexShowsOnlineWithDevice(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := getBody(t, resp)
-
 	assertContains(t, body, "Online", "online badge")
 	assertNotContains(t, body, "Offline", "should not show offline")
 }
@@ -160,7 +222,6 @@ func TestWeb_PanelReturnsHTMLFragment(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := getBody(t, resp)
-
 	assertContains(t, body, "status-panel", "panel has status-panel div")
 	assertContains(t, body, "Track", "panel has track button")
 	assertContains(t, body, "Privacy", "panel has privacy button")
@@ -175,7 +236,6 @@ func TestWeb_PanelReflectsDaemonState(t *testing.T) {
 	defer resp.Body.Close()
 
 	body := getBody(t, resp)
-
 	assertContains(t, body, "privacy", "panel shows privacy state")
 	assertContains(t, body, "gesture", "panel has gesture control")
 }
@@ -188,10 +248,7 @@ func TestWeb_AutoToggleOff(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/auto", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 
 	daemon.mu.Lock()
 	isAuto := daemon.state.AutoMode
@@ -209,6 +266,7 @@ func TestWeb_AutoToggleOn(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/auto", "", nil)
 	defer resp.Body.Close()
+	assertStatusCode(t, resp, http.StatusOK)
 
 	daemon.mu.Lock()
 	isAuto := daemon.state.AutoMode
@@ -248,10 +306,7 @@ func TestWeb_GestureToggleEndpoint(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/gesture", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 }
 
 func TestWeb_GestureToggleReturnsPanel(t *testing.T) {
@@ -260,9 +315,7 @@ func TestWeb_GestureToggleReturnsPanel(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/gesture", "", nil)
 	defer resp.Body.Close()
-
-	body := getBody(t, resp)
-	assertContains(t, body, "status-panel", "gesture response is panel fragment")
+	assertResponseContains(t, resp, "status-panel", "gesture response is panel fragment")
 }
 
 // ---------- Audio endpoint ----------
@@ -275,10 +328,7 @@ func TestWeb_AudioWithValidModes(t *testing.T) {
 
 			resp := post(t, server.URL+"/api/audio", "application/x-www-form-urlencoded", strings.NewReader("mode="+mode))
 			defer resp.Body.Close()
-
-			if resp.StatusCode != http.StatusOK {
-				t.Fatalf("expected 200 for mode=%s, got %d", mode, resp.StatusCode)
-			}
+			assertStatusCode(t, resp, http.StatusOK)
 		})
 	}
 }
@@ -289,13 +339,8 @@ func TestWeb_AudioInvalidMode(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/audio", "application/x-www-form-urlencoded", strings.NewReader("mode=blorp"))
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
-
-	body := getBody(t, resp)
-	assertContains(t, body, "status-panel", "still returns panel even on invalid mode")
+	assertStatusCode(t, resp, http.StatusOK)
+	assertResponseContains(t, resp, "status-panel", "still returns panel even on invalid mode")
 }
 
 func TestWeb_AudioNoModeParam(t *testing.T) {
@@ -304,10 +349,7 @@ func TestWeb_AudioNoModeParam(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/audio", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 }
 
 // ---------- PTZ endpoint ----------
@@ -318,10 +360,7 @@ func TestWeb_PTZMissingAxis(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/ptz/", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Errorf("expected 400 for missing axis, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusBadRequest)
 }
 
 func TestWeb_PTZMissingValue(t *testing.T) {
@@ -330,10 +369,7 @@ func TestWeb_PTZMissingValue(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/ptz/pan", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusBadRequest {
-		t.Errorf("expected 400 for missing value, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusBadRequest)
 }
 
 func TestWeb_PTZWithAxisAndValue(t *testing.T) {
@@ -342,73 +378,30 @@ func TestWeb_PTZWithAxisAndValue(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/ptz/pan", "application/x-www-form-urlencoded", strings.NewReader("value=10"))
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 }
 
 // ---------- Track/Idle/Privacy ----------
 
-func TestWeb_TrackEndpointNoDevice(t *testing.T) {
+func testWebEndpointReturnsOK(t *testing.T, endpoint string) {
+	t.Helper()
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 
-	resp := post(t, server.URL+"/api/track", "", nil)
+	resp := post(t, server.URL+endpoint, "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 }
 
-func TestWeb_IdleEndpointNoDevice(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(t, server.URL+"/api/idle", "", nil)
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
-}
-
+func TestWeb_TrackEndpointNoDevice(t *testing.T) { testWebEndpointReturnsOK(t, "/api/track") }
+func TestWeb_IdleEndpointNoDevice(t *testing.T)  { testWebEndpointReturnsOK(t, "/api/idle") }
 func TestWeb_PrivacyEndpointNoDevice(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(t, server.URL+"/api/privacy", "", nil)
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	testWebEndpointReturnsOK(t, "/api/privacy")
 }
-
 func TestWeb_TogglePrivacyEndpointNoDevice(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(t, server.URL+"/api/toggle-privacy", "", nil)
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	testWebEndpointReturnsOK(t, "/api/toggle-privacy")
 }
-
-func TestWeb_CenterEndpointNoDevice(t *testing.T) {
-	daemon := newIntegrationDaemon(t)
-	_, server := newTestWebServer(t, daemon)
-
-	resp := post(t, server.URL+"/api/center", "", nil)
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
-}
+func TestWeb_CenterEndpointNoDevice(t *testing.T) { testWebEndpointReturnsOK(t, "/api/center") }
 
 // ---------- Probe/Sync ----------
 
@@ -418,13 +411,8 @@ func TestWeb_ProbeEndpoint(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/probe", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
-
-	body := getBody(t, resp)
-	assertContains(t, body, "status-panel", "probe returns panel")
+	assertStatusCode(t, resp, http.StatusOK)
+	assertResponseContains(t, resp, "status-panel", "probe returns panel")
 }
 
 func TestWeb_SyncEndpointNoDevice(t *testing.T) {
@@ -433,10 +421,7 @@ func TestWeb_SyncEndpointNoDevice(t *testing.T) {
 
 	resp := post(t, server.URL+"/api/sync", "", nil)
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected 200, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusOK)
 }
 
 // ---------- Snapshot/Stream (require device) ----------
@@ -447,13 +432,8 @@ func TestWeb_SnapshotNoDevice(t *testing.T) {
 
 	resp := get(t, server.URL+"/api/snapshot")
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusServiceUnavailable {
-		t.Errorf("expected 503, got %d", resp.StatusCode)
-	}
-
-	body := getBody(t, resp)
-	assertContains(t, body, "no camera device", "503 body")
+	assertStatusCode(t, resp, http.StatusServiceUnavailable)
+	assertResponseContains(t, resp, "no camera device", "503 body")
 }
 
 func TestWeb_StreamNoDevice(t *testing.T) {
@@ -462,13 +442,8 @@ func TestWeb_StreamNoDevice(t *testing.T) {
 
 	resp := get(t, server.URL+"/api/stream")
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusServiceUnavailable {
-		t.Errorf("expected 503, got %d", resp.StatusCode)
-	}
-
-	body := getBody(t, resp)
-	assertContains(t, body, "no camera device", "503 body")
+	assertStatusCode(t, resp, http.StatusServiceUnavailable)
+	assertResponseContains(t, resp, "no camera device", "503 body")
 }
 
 // ---------- Method enforcement ----------
@@ -536,10 +511,7 @@ func TestWeb_UnknownRouteReturns404(t *testing.T) {
 
 	resp := get(t, server.URL+"/api/nonexistent")
 	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusNotFound {
-		t.Errorf("expected 404 for unknown route, got %d", resp.StatusCode)
-	}
+	assertStatusCode(t, resp, http.StatusNotFound)
 }
 
 // ---------- webStatus mapping ----------
@@ -549,46 +521,7 @@ func TestWeb_WebStatusOfflineNoDevice(t *testing.T) {
 	webSrv := &webServer{daemon: daemon}
 
 	status := webSrv.getWebStatus()
-
-	if status.Camera != "privacy" {
-		t.Errorf("expected camera=privacy, got %s", status.Camera)
-	}
-
-	if status.Audio != "nc" {
-		t.Errorf("expected audio=nc, got %s", status.Audio)
-	}
-
-	if status.Gesture {
-		t.Error("expected gesture=false")
-	}
-
-	if !status.Auto {
-		t.Error("expected auto=true")
-	}
-
-	if status.InCall {
-		t.Error("expected inCall=false")
-	}
-
-	if status.Online {
-		t.Error("expected online=false (no device)")
-	}
-
-	if status.Device != "" {
-		t.Errorf("expected empty device, got %s", status.Device)
-	}
-
-	if status.Pan != 0 {
-		t.Errorf("expected pan=0, got %d", status.Pan)
-	}
-
-	if status.Tilt != 0 {
-		t.Errorf("expected tilt=0, got %d", status.Tilt)
-	}
-
-	if status.Zoom != 0 {
-		t.Errorf("expected zoom=0, got %d", status.Zoom)
-	}
+	assertWebStatus(t, status)
 }
 
 func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
@@ -604,23 +537,18 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	if !status.Online {
 		t.Error("expected online=true")
 	}
-
 	if status.Device != "/dev/video0" {
 		t.Errorf("expected device=/dev/video0, got %s", status.Device)
 	}
-
 	if status.Camera != "tracking" {
 		t.Errorf("expected camera=tracking, got %s", status.Camera)
 	}
-
 	if status.Audio != "live" {
 		t.Errorf("expected audio=live, got %s", status.Audio)
 	}
-
 	if !status.Gesture {
 		t.Error("expected gesture=true")
 	}
-
 	if !status.InCall {
 		t.Error("expected inCall=true")
 	}
@@ -678,6 +606,14 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 
 // ---------- parseWebStatus ----------
 
+func assertParseWebStatusField(t *testing.T, raw, field, expected string) {
+	t.Helper()
+	status := parseWebStatus(raw)
+	if field == "Camera" && status.Camera != expected {
+		t.Errorf("expected camera=%s, got %s", expected, status.Camera)
+	}
+}
+
 func TestWeb_ParseWebStatusFull(t *testing.T) {
 	raw := "camera=tracking audio=live gesture=true pan=5 tilt=-3 zoom=200 in_call=yes auto=on device=/dev/video0"
 
@@ -686,43 +622,33 @@ func TestWeb_ParseWebStatusFull(t *testing.T) {
 	if status.Camera != "tracking" {
 		t.Errorf("expected camera=tracking, got %s", status.Camera)
 	}
-
 	if !status.Online {
 		t.Error("expected online=true for camera=tracking")
 	}
-
 	if status.Audio != "live" {
 		t.Errorf("expected audio=live, got %s", status.Audio)
 	}
-
 	if !status.Gesture {
 		t.Error("expected gesture=true")
 	}
-
 	if status.Pan != 5 {
 		t.Errorf("expected pan=5, got %d", status.Pan)
 	}
-
 	if status.Tilt != -3 {
 		t.Errorf("expected tilt=-3, got %d", status.Tilt)
 	}
-
 	if status.Zoom != 200 {
 		t.Errorf("expected zoom=200, got %d", status.Zoom)
 	}
-
 	if !status.InCall {
 		t.Error("expected inCall=true")
 	}
-
 	if !status.Auto {
 		t.Error("expected auto=true")
 	}
-
 	if status.Device != "/dev/video0" {
 		t.Errorf("expected device=/dev/video0, got %s", status.Device)
 	}
-
 	if status.Error != "" {
 		t.Errorf("expected no error, got %s", status.Error)
 	}
@@ -736,7 +662,6 @@ func TestWeb_ParseWebStatusOffline(t *testing.T) {
 	if status.Camera != "offline" {
 		t.Errorf("expected camera=offline, got %s", status.Camera)
 	}
-
 	if status.Online {
 		t.Error("expected online=false for offline camera")
 	}
@@ -750,15 +675,12 @@ func TestWeb_ParseWebStatusError(t *testing.T) {
 	if status.Error == "" {
 		t.Error("expected error to be set")
 	}
-
 	if status.Camera != "offline" {
 		t.Errorf("expected camera=offline on error, got %s", status.Camera)
 	}
-
 	if status.Audio != "nc" {
 		t.Errorf("expected default audio=nc on error, got %s", status.Audio)
 	}
-
 	if status.Zoom != 100 {
 		t.Errorf("expected default zoom=100 on error, got %d", status.Zoom)
 	}
@@ -770,7 +692,6 @@ func TestWeb_ParseWebStatusEmpty(t *testing.T) {
 	if status.Camera != "offline" {
 		t.Errorf("expected camera=offline for empty input, got %s", status.Camera)
 	}
-
 	if status.Online {
 		t.Error("expected online=false for empty input")
 	}
@@ -782,7 +703,6 @@ func TestWeb_ParseWebStatusGarbage(t *testing.T) {
 	if status.Camera != "offline" {
 		t.Errorf("expected camera=offline for garbage, got %s", status.Camera)
 	}
-
 	if status.Error != "" {
 		t.Errorf("expected no error for garbage (no 'error:' prefix), got %s", status.Error)
 	}
@@ -824,15 +744,12 @@ func TestWeb_ParseWebStatusDefaults(t *testing.T) {
 	if status.Zoom != 100 {
 		t.Errorf("expected default zoom=100, got %d", status.Zoom)
 	}
-
 	if status.Audio != "nc" {
 		t.Errorf("expected default audio=nc, got %s", status.Audio)
 	}
-
 	if status.Pan != 0 {
 		t.Errorf("expected default pan=0, got %d", status.Pan)
 	}
-
 	if status.Tilt != 0 {
 		t.Errorf("expected default tilt=0, got %d", status.Tilt)
 	}
@@ -872,21 +789,7 @@ func TestSocket_StatusCommand(t *testing.T) {
 		t.Fatalf("status: %v", err)
 	}
 
-	if !strings.Contains(resp, "camera=") {
-		t.Errorf("expected camera= in status, got: %s", resp)
-	}
-
-	if !strings.Contains(resp, "audio=") {
-		t.Errorf("expected audio= in status, got: %s", resp)
-	}
-
-	if !strings.Contains(resp, "auto=") {
-		t.Errorf("expected auto= in status, got: %s", resp)
-	}
-
-	if !strings.Contains(resp, "device=") {
-		t.Errorf("expected device= in status, got: %s", resp)
-	}
+	assertSocketResponseHasPrefixes(t, resp, []string{"camera=", "audio=", "auto=", "device="})
 }
 
 func TestSocket_AutoToggleRoundTrip(t *testing.T) {
@@ -896,7 +799,6 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("auto-off: %v", err)
 	}
-
 	if resp != "auto mode off" {
 		t.Errorf("expected 'auto mode off', got: %s", resp)
 	}
@@ -905,7 +807,6 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("auto-on: %v", err)
 	}
-
 	if resp2 != "auto mode on" {
 		t.Errorf("expected 'auto mode on', got: %s", resp2)
 	}
@@ -938,17 +839,7 @@ func TestSocket_WaybarCommand(t *testing.T) {
 		t.Fatalf("waybar: %v", err)
 	}
 
-	if !strings.Contains(resp, `"text"`) {
-		t.Errorf("expected waybar JSON with 'text', got: %s", resp)
-	}
-
-	if !strings.Contains(resp, `"tooltip"`) {
-		t.Errorf("expected waybar JSON with 'tooltip', got: %s", resp)
-	}
-
-	if !strings.Contains(resp, `"class"`) {
-		t.Errorf("expected waybar JSON with 'class', got: %s", resp)
-	}
+	assertSocketResponseHasPrefixes(t, resp, []string{`"text"`, `"tooltip"`, `"class"`})
 }
 
 func TestSocket_DeviceCommand(t *testing.T) {
@@ -978,9 +869,7 @@ func TestSocket_UnknownCommand(t *testing.T) {
 		t.Fatalf("foobar: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "unknown command:") {
-		t.Errorf("expected 'unknown command: ...', got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "unknown command:", "socket response")
 }
 
 func TestSocket_EmptyCommandReturnsStatus(t *testing.T) {
@@ -991,9 +880,7 @@ func TestSocket_EmptyCommandReturnsStatus(t *testing.T) {
 		t.Fatalf("empty command: %v", err)
 	}
 
-	if !strings.Contains(resp, "camera=") {
-		t.Errorf("expected status from empty command, got: %s", resp)
-	}
+	assertSocketResponseContains(t, resp, "camera=", "socket response")
 }
 
 func TestSocket_TrackNoDevice(t *testing.T) {
@@ -1008,9 +895,7 @@ func TestSocket_TrackNoDevice(t *testing.T) {
 		t.Fatalf("track: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_PrivacyNoDevice(t *testing.T) {
@@ -1025,9 +910,7 @@ func TestSocket_PrivacyNoDevice(t *testing.T) {
 		t.Fatalf("privacy: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_AudioInvalidMode(t *testing.T) {
@@ -1073,9 +956,7 @@ func TestSocket_AudioCycleNoDevice(t *testing.T) {
 		t.Fatalf("audio (cycle): %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error cycling audio without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_GestureNoDevice(t *testing.T) {
@@ -1090,9 +971,7 @@ func TestSocket_GestureNoDevice(t *testing.T) {
 		t.Fatalf("gesture-on: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error for gesture-on without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_SyncNoDevice(t *testing.T) {
@@ -1107,9 +986,7 @@ func TestSocket_SyncNoDevice(t *testing.T) {
 		t.Fatalf("sync: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error for sync without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_CenterNoDevice(t *testing.T) {
@@ -1124,9 +1001,7 @@ func TestSocket_CenterNoDevice(t *testing.T) {
 		t.Fatalf("center: %v", err)
 	}
 
-	if !strings.HasPrefix(resp, "error:") {
-		t.Errorf("expected error for center without device, got: %s", resp)
-	}
+	assertSocketResponsePrefix(t, resp, "error:", "socket response")
 }
 
 func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
@@ -1142,9 +1017,7 @@ func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
 			t.Fatalf("%s: %v", cmd, err)
 		}
 
-		if !strings.HasPrefix(resp, "error:") {
-			t.Errorf("expected error for '%s' without device, got: %s", cmd, resp)
-		}
+		assertSocketResponsePrefix(t, resp, "error:", "socket response")
 	}
 }
 
@@ -1172,9 +1045,7 @@ func TestSocket_PanTiltZoomInvalidValue(t *testing.T) {
 			t.Fatalf("%s: %v", cmd, err)
 		}
 
-		if !strings.HasPrefix(resp, "error:") {
-			t.Errorf("expected error for '%s' with invalid value, got: %s", cmd, resp)
-		}
+		assertSocketResponsePrefix(t, resp, "error:", "socket response")
 	}
 }
 

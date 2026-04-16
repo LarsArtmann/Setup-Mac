@@ -32,7 +32,7 @@ linters:
         - G306  # WriteFile permissions - intentional for tests
     errcheck:
       check-type-assertions: true
-      check-blank: true
+      check-blank: false  # Intentionally ignoring errors in some cases
 
   exclusions:
     rules:

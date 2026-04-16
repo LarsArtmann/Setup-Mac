@@ -143,7 +143,7 @@ func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *
 	ctx, cancel := context.WithTimeout(request.Context(), snapshotTimeout)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "ffmpeg",
+	cmd := exec.CommandContext(ctx, "ffmpeg", //nolint:gosec // intentional: controlled v4l2 device path
 		"-f", "v4l2", "-i", status.Device,
 		"-frames:v", "1",
 		"-f", "image2",
@@ -204,7 +204,7 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		default:
 		}
 
-		cmd := exec.CommandContext(ctx, "ffmpeg",
+		cmd := exec.CommandContext(ctx, "ffmpeg", //nolint:gosec // intentional: controlled v4l2 device path
 			"-f", "v4l2", "-i", status.Device,
 			"-frames:v", "1",
 			"-f", "image2",

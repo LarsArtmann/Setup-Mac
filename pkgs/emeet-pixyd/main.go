@@ -413,7 +413,7 @@ func parseHIDResponse(data []byte) hidResponse {
 }
 
 func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
-	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run()
+	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).Run() //nolint:gosec // intentional: controlled device path
 	if err != nil {
 		return fmt.Errorf("v4l2Set %s=%s on %s: %w", ctrl, value, dev, err)
 	}
@@ -422,7 +422,7 @@ func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
 }
 
 func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
-	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).Output()
+	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).Output() //nolint:gosec // intentional: controlled device path
 	if err != nil {
 		return "", fmt.Errorf("v4l2Get: %w", err)
 	}
