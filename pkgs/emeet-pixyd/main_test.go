@@ -899,7 +899,16 @@ func TestProbeVideo4linux_NonPIXYSources(t *testing.T) {
 		devices []fakeVideoDev
 	}{
 		{"NoPIXY", []fakeVideoDev{{name: "video1", modalias: "platform:v4l2loopback", index: "0"}}},
-		{"WrongVendorProduct", []fakeVideoDev{{name: "video0", modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00", index: "0"}}},
+		{
+			"WrongVendorProduct",
+			[]fakeVideoDev{
+				{
+					name:     "video0",
+					modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00",
+					index:    "0",
+				},
+			},
+		},
 		{"EmptyDir", nil},
 	}
 
