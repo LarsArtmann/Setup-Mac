@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
 	"strings"
@@ -22,10 +21,19 @@ func testConfig(dir string) Config {
 
 func newTestDaemon(camera CameraState, videoDev, hidrawDev string) *Daemon {
 	return &Daemon{
-		mu:        sync.Mutex{},
-		state:     State{Camera: camera},
-		videoDev:  videoDev,
-		hidrawDev: hidrawDev,
+		mu: sync.Mutex{},
+		state: State{
+			Camera:   camera,
+			Audio:    AudioNC,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
+		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		videoDev:      videoDev,
+		hidrawDev:     hidrawDev,
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 }
 
@@ -35,15 +43,25 @@ func newTestDaemonWithAudio(
 	videoDev, hidrawDev string,
 ) *Daemon {
 	return &Daemon{
-		mu:        sync.Mutex{},
-		state:     State{Camera: camera, Audio: audio},
-		videoDev:  videoDev,
-		hidrawDev: hidrawDev,
+		mu: sync.Mutex{},
+		state: State{
+			Camera:   camera,
+			Audio:    audio,
+			Gesture:  false,
+			InCall:   false,
+			AutoMode: true,
+		},
+		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		videoDev:      videoDev,
+		hidrawDev:     hidrawDev,
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 }
 
 func assertCameraState(t *testing.T, d *Daemon, expected CameraState) {
 	t.Helper()
+
 	if d.state.Camera != expected {
 		t.Errorf("expected camera state %s, got %s", expected, d.state.Camera)
 	}
@@ -51,6 +69,7 @@ func assertCameraState(t *testing.T, d *Daemon, expected CameraState) {
 
 func assertErrorPrefix(t *testing.T, result string) {
 	t.Helper()
+
 	if !strings.HasPrefix(result, "error:") {
 		t.Errorf("expected error prefix, got: %s", result)
 	}
@@ -58,6 +77,7 @@ func assertErrorPrefix(t *testing.T, result string) {
 
 func assertAutoMode(t *testing.T, d *Daemon, expected bool) {
 	t.Helper()
+
 	if d.state.AutoMode != expected {
 		t.Errorf("expected auto mode=%v, got %v", expected, d.state.AutoMode)
 	}
@@ -65,6 +85,7 @@ func assertAutoMode(t *testing.T, d *Daemon, expected bool) {
 
 func assertGesture(t *testing.T, resp hidResponse, expected bool) {
 	t.Helper()
+
 	if !resp.Got || resp.Gesture != expected {
 		t.Errorf("expected gesture=%v, got Got=%v Gesture=%v", expected, resp.Got, resp.Gesture)
 	}
@@ -72,6 +93,7 @@ func assertGesture(t *testing.T, resp hidResponse, expected bool) {
 
 func assertParsedField(t *testing.T, parsed map[string]string, field string) {
 	t.Helper()
+
 	if _, ok := parsed[field]; !ok {
 		t.Errorf("waybar output missing '%s' field", field)
 	}
@@ -81,8 +103,13 @@ func TestStateDefaults(t *testing.T) {
 	t.Parallel()
 
 	d := &Daemon{
-		mu:    sync.Mutex{},
-		state: DefaultState(),
+		mu:            sync.Mutex{},
+		state:         DefaultState(),
+		config:        Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 	assertCameraState(t, d, StatePrivacy)
 
@@ -112,6 +139,10 @@ func TestStateSaveLoad(t *testing.T) {
 			InCall:   true,
 			AutoMode: false,
 		},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 
 	saveErr := d.saveState()
@@ -129,6 +160,10 @@ func TestStateSaveLoad(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 	d2.loadState()
 
@@ -173,6 +208,10 @@ func TestStateFileCorrupt(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 	d.loadState()
 
@@ -195,6 +234,10 @@ func TestStateFileMissing(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 	d.loadState()
 
@@ -205,7 +248,8 @@ func TestHandleCommandStatus(t *testing.T) {
 	t.Parallel()
 
 	d := &Daemon{
-		mu: sync.Mutex{},
+		mu:     sync.Mutex{},
+		config: Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
 		state: State{
 			Camera:   StatePrivacy,
 			Audio:    AudioNC,
@@ -213,7 +257,10 @@ func TestHandleCommandStatus(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
-		videoDev: "",
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 
 	result := d.handleCommand(context.Background(), "status")
@@ -246,8 +293,10 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
+		videoDev:      "/dev/video0",
+		hidrawDev:     "/dev/hidraw0",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 
 	result := d.handleCommand(context.Background(), "auto-off")
@@ -312,7 +361,8 @@ func TestWaybarOutput(t *testing.T) {
 
 	for _, testCase := range tests {
 		d := &Daemon{
-			mu: sync.Mutex{},
+			mu:     sync.Mutex{},
+			config: Config{StateDir: "/tmp", PollInterval: 2, DebounceCount: 3},
 			state: State{
 				Camera:   testCase.camera,
 				Audio:    AudioNC,
@@ -320,6 +370,10 @@ func TestWaybarOutput(t *testing.T) {
 				InCall:   testCase.inCall,
 				AutoMode: true,
 			},
+			videoDev:      "",
+			hidrawDev:     "",
+			debounceInUse: 0,
+			debounceIdle:  0,
 		}
 		output := d.waybarOutput()
 
@@ -331,7 +385,11 @@ func TestWaybarOutput(t *testing.T) {
 		}
 
 		if parsed["class"] != "custom-camera "+testCase.expected {
-			t.Errorf("expected class 'custom-camera %s', got '%s'", testCase.expected, parsed["class"])
+			t.Errorf(
+				"expected class 'custom-camera %s', got '%s'",
+				testCase.expected,
+				parsed["class"],
+			)
 		}
 
 		assertParsedField(t, parsed, "text")
@@ -384,7 +442,12 @@ func TestAudioModeNext(t *testing.T) {
 	for _, testCase := range tests {
 		result := testCase.input.Next()
 		if result != testCase.expected {
-			t.Errorf("AudioMode(%s).Next() = %s, want %s", testCase.input, result, testCase.expected)
+			t.Errorf(
+				"AudioMode(%s).Next() = %s, want %s",
+				testCase.input,
+				result,
+				testCase.expected,
+			)
 		}
 	}
 }
@@ -404,7 +467,12 @@ func TestAudioModeHIDByte(t *testing.T) {
 	for _, testCase := range tests {
 		result := testCase.mode.HIDByte()
 		if result != testCase.expected {
-			t.Errorf("AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x", testCase.mode, result, testCase.expected)
+			t.Errorf(
+				"AudioMode(%s).HIDByte() = 0x%02x, want 0x%02x",
+				testCase.mode,
+				result,
+				testCase.expected,
+			)
 		}
 	}
 }
@@ -498,7 +566,12 @@ func TestParseHIDResponseTracking(t *testing.T) {
 		}
 
 		if resp.Tracking != testCase.expected {
-			t.Errorf("tracking from %x = %s, want %s", testCase.data, resp.Tracking, testCase.expected)
+			t.Errorf(
+				"tracking from %x = %s, want %s",
+				testCase.data,
+				resp.Tracking,
+				testCase.expected,
+			)
 		}
 	}
 }
@@ -580,8 +653,10 @@ func TestHandleCommandSyncWithDevice(t *testing.T) {
 			InCall:   false,
 			AutoMode: true,
 		},
-		videoDev:  "/dev/video0",
-		hidrawDev: "/dev/hidraw0",
+		videoDev:      "/dev/video0",
+		hidrawDev:     "/dev/hidraw0",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 
 	result := d.handleCommand(context.Background(), "sync")
@@ -631,6 +706,7 @@ func TestParseAudioMode(t *testing.T) {
 			if err != nil {
 				t.Errorf("ParseAudioMode(%q): unexpected error: %v", tc.input, err)
 			}
+
 			if got != tc.expected {
 				t.Errorf("ParseAudioMode(%q) = %q, want %q", tc.input, got, tc.expected)
 			}
@@ -663,6 +739,7 @@ func TestParseCameraState(t *testing.T) {
 			if err != nil {
 				t.Errorf("ParseCameraState(%q): unexpected error: %v", tc.input, err)
 			}
+
 			if got != tc.expected {
 				t.Errorf("ParseCameraState(%q) = %q, want %q", tc.input, got, tc.expected)
 			}
@@ -674,10 +751,12 @@ func TestParseHIDResponseUnknownInterface(t *testing.T) {
 	t.Parallel()
 
 	data := []byte{0x09, 0x99, 0x01, 0x00, 0x00, 0x01, 0x00, 0x01, 0x01}
+
 	resp := parseHIDResponse(data)
 	if !resp.Got {
 		t.Error("expected Got=true for valid-length response with unknown interface")
 	}
+
 	if resp.Tracking != StateIdle {
 		t.Errorf("expected idle tracking for unknown interface, got %s", resp.Tracking)
 	}
@@ -690,15 +769,19 @@ func TestDefaultStateValues(t *testing.T) {
 	if s.Camera != StatePrivacy {
 		t.Errorf("expected default camera=privacy, got %s", s.Camera)
 	}
+
 	if s.Audio != AudioNC {
 		t.Errorf("expected default audio=nc, got %s", s.Audio)
 	}
+
 	if s.Gesture != false {
 		t.Error("expected default gesture=false")
 	}
+
 	if s.InCall != false {
 		t.Error("expected default inCall=false")
 	}
+
 	if s.AutoMode != true {
 		t.Error("expected default autoMode=true")
 	}
@@ -707,7 +790,8 @@ func TestDefaultStateValues(t *testing.T) {
 func TestSetDeadlineError(t *testing.T) {
 	t.Parallel()
 
-	conn := &mockConn{setDeadlineErr: fmt.Errorf("deadline error")}
+	conn := &mockConn{setDeadlineErr: errDeadline}
+
 	err := setDeadline(conn, time.Second)
 	if err == nil {
 		t.Error("expected error from setDeadline with failing conn")
@@ -718,12 +802,11 @@ type mockConn struct {
 	setDeadlineErr error
 }
 
-func (m *mockConn) Read(b []byte) (n int, err error)   { return 0, nil }
-func (m *mockConn) Write(b []byte) (n int, err error)  { return 0, nil }
-func (m *mockConn) Close() error                        { return nil }
-func (m *mockConn) LocalAddr() net.Addr                 { return nil }
-func (m *mockConn) RemoteAddr() net.Addr                { return nil }
-func (m *mockConn) SetDeadline(t time.Time) error       { return m.setDeadlineErr }
-func (m *mockConn) SetReadDeadline(t time.Time) error   { return nil }
-func (m *mockConn) SetWriteDeadline(t time.Time) error  { return nil }
-
+func (m *mockConn) Read([]byte) (int, error)         { return 0, nil }
+func (m *mockConn) Write([]byte) (int, error)        { return 0, nil }
+func (m *mockConn) Close() error                     { return nil }
+func (m *mockConn) LocalAddr() net.Addr              { return nil }
+func (m *mockConn) RemoteAddr() net.Addr             { return nil }
+func (m *mockConn) SetDeadline(time.Time) error      { return m.setDeadlineErr }
+func (m *mockConn) SetReadDeadline(time.Time) error  { return nil }
+func (m *mockConn) SetWriteDeadline(time.Time) error { return nil }

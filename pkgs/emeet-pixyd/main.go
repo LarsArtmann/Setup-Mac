@@ -1,3 +1,4 @@
+// Package main provides the emeet-pixyd daemon for EMEET PIXY camera management.
 package main
 
 import (
@@ -34,6 +35,9 @@ var (
 	errNoHIDResponse         = errors.New("no HID response")
 	errUnrecognizedHID       = errors.New("unrecognized HID response")
 	errAudioSourceNotFound   = errors.New("PIXY audio source not found")
+	ErrInvalidAudioMode      = errors.New("invalid audio mode")
+	ErrInvalidCameraState    = errors.New("invalid camera state")
+	errDeadline              = errors.New("deadline error")
 )
 
 const (
@@ -54,14 +58,14 @@ const (
 	hidInterfaceGesture  = 0x04
 
 	v4l2DegreesPerUnit = 3600
-	hidResponseMs       = 500
+	hidResponseMs      = 500
 
 	defaultSocketTimeout = 2 * time.Second
 	defaultWriteTimeout  = 2 * time.Second
-	socketBufSize       = 256
-	connBufSize         = 4096
+	socketBufSize        = 256
+	connBufSize          = 4096
 
-	cameraConfigPrefix  byte = 0x09
+	cameraConfigPrefix byte = 0x09
 	cameraConfigMarker byte = 0x01
 	audioConfigMarker  byte = 0x00
 	gestureConfigMark1 byte = 0x02
@@ -71,7 +75,10 @@ const (
 
 	permissionStateDir  = 0o750
 	permissionStateFile = 0o600
-	permissionSocket   = 0o600
+	permissionSocket    = 0o600
+
+	hidCommandSleepMs = 200
+	v4l2SplitCount    = 2
 )
 
 type CameraState string
@@ -150,8 +157,8 @@ func (m AudioMode) Next() AudioMode {
 	}
 }
 
-func ParseAudioMode(s string) (AudioMode, error) {
-	switch s {
+func ParseAudioMode(rawInput string) (AudioMode, error) {
+	switch rawInput {
 	case "nc":
 		return AudioNC, nil
 	case "live":
@@ -159,22 +166,22 @@ func ParseAudioMode(s string) (AudioMode, error) {
 	case "org":
 		return AudioOriginal, nil
 	default:
-		return "", fmt.Errorf("invalid audio mode: %q", s)
+		return "", fmt.Errorf("invalid audio mode: %q: %w", rawInput, ErrInvalidAudioMode)
 	}
 }
 
-func ParseCameraState(s string) (CameraState, error) {
-	switch s {
-	case "idle":
+func ParseCameraState(rawInput string) (CameraState, error) {
+	switch rawInput {
+	case string(StateIdle):
 		return StateIdle, nil
-	case "tracking":
+	case string(StateTracking):
 		return StateTracking, nil
-	case "privacy":
+	case string(StatePrivacy):
 		return StatePrivacy, nil
-	case "offline":
+	case string(StateOffline):
 		return StateOffline, nil
 	default:
-		return "", fmt.Errorf("invalid camera state: %q", s)
+		return "", fmt.Errorf("invalid camera state: %q: %w", rawInput, ErrInvalidCameraState)
 	}
 }
 
@@ -226,11 +233,13 @@ type Daemon struct {
 
 func NewDaemon(cfg Config) *Daemon {
 	d := &Daemon{
-		mu:        sync.Mutex{},
-		config:    cfg,
-		state:     DefaultState(),
-		videoDev:  "",
-		hidrawDev: "",
+		mu:            sync.Mutex{},
+		config:        cfg,
+		state:         DefaultState(),
+		videoDev:      "",
+		hidrawDev:     "",
+		debounceInUse: 0,
+		debounceIdle:  0,
 	}
 	d.loadState()
 	d.probeDevices()
@@ -327,12 +336,16 @@ func (d *Daemon) loadState() {
 }
 
 func (d *Daemon) ensureStateDir() error {
-	return os.MkdirAll(d.config.StateDir, permissionStateDir)
+	err := os.MkdirAll(d.config.StateDir, permissionStateDir)
+	if err != nil {
+		return fmt.Errorf("create state dir: %w", err)
+	}
+
+	return nil
 }
 
 func (d *Daemon) saveState() error {
-	err := d.ensureStateDir()
-	if err != nil {
+	if err := d.ensureStateDir(); err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
 
@@ -341,7 +354,11 @@ func (d *Daemon) saveState() error {
 		return fmt.Errorf("marshal state: %w", err)
 	}
 
-	return os.WriteFile(d.config.StateFile(), data, permissionStateFile)
+	if err := os.WriteFile(d.config.StateFile(), data, permissionStateFile); err != nil {
+		return fmt.Errorf("write state file: %w", err)
+	}
+
+	return nil
 }
 
 func (d *Daemon) isDevicePresent() bool {
@@ -489,7 +506,7 @@ func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
 	}
 
 	parts := strings.Split(strings.TrimSpace(string(out)), ":")
-	if len(parts) == 2 {
+	if len(parts) == v4l2SplitCount {
 		return strings.TrimSpace(parts[1]), nil
 	}
 
@@ -534,7 +551,7 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 		return err
 	}
 
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(hidCommandSleepMs * time.Millisecond)
 
 	err = hidSend(d.hidrawDev, commitBytes)
 	if err != nil {
@@ -580,7 +597,8 @@ func (d *Daemon) setGesture(enabled bool) error {
 }
 
 func setDeadline(conn net.Conn, timeout time.Duration) error {
-	if err := conn.SetDeadline(time.Now().Add(timeout)); err != nil {
+	err := conn.SetDeadline(time.Now().Add(timeout))
+	if err != nil {
 		return fmt.Errorf("setDeadline: %w", err)
 	}
 
@@ -613,23 +631,27 @@ func queryHIDState[T any](
 ) (T, error) {
 	if hidrawDev == "" {
 		var zero T
+
 		return zero, fmt.Errorf("queryHIDState: %w", errHIDDeviceNotAvailable)
 	}
 
 	resp, err := hidSendRecv(ctx, hidrawDev, payload)
 	if err != nil {
 		var zero T
+
 		return zero, err
 	}
 
 	if resp == nil {
 		var zero T
+
 		return zero, fmt.Errorf("queryHIDState: %w", errNoHIDResponse)
 	}
 
 	parsed := parseHIDResponse(resp)
 	if !parsed.Got {
 		var zero T
+
 		return zero, fmt.Errorf("queryHIDState: %w", errUnrecognizedHID)
 	}
 
@@ -795,6 +817,7 @@ func findPixySource(ctx context.Context) (string, error) {
 			strings.Contains(line, "PIXY") {
 			for field := range strings.FieldsSeq(line) {
 				field = strings.TrimSuffix(field, ".")
+
 				_, parseErr := strconv.Atoi(field)
 				if parseErr == nil {
 					return field, nil
@@ -832,8 +855,10 @@ func sdNotify(state string) {
 
 		return
 	}
+
 	defer func() {
-		if closeErr := conn.Close(); closeErr != nil {
+		closeErr := conn.Close()
+		if closeErr != nil {
 			slog.Debug("conn close error", "error", closeErr)
 		}
 	}()
@@ -1034,6 +1059,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 			mode = d.state.Audio.Next()
 		} else {
 			var parseErr error
+
 			mode, parseErr = ParseAudioMode(parts[1])
 			if parseErr != nil {
 				return "usage: audio [nc|live|org]"
@@ -1170,24 +1196,29 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 		return fmt.Errorf("create state dir: %w", createErr)
 	}
 
-	listener, err := net.Listen("unix", socketPath)
+	lc := net.ListenConfig{}
+
+	listener, err := lc.Listen(ctx, "unix", socketPath)
 	if err != nil {
 		return fmt.Errorf("listen: %w", err)
 	}
+
 	defer func() {
-		if closeErr := listener.Close(); closeErr != nil {
+		closeErr := listener.Close()
+		if closeErr != nil {
 			slog.Debug("listener close error", "error", closeErr)
 		}
 	}()
 
-	if chmodErr := os.Chmod(socketPath, permissionSocket); chmodErr != nil {
+	chmodErr := os.Chmod(socketPath, permissionSocket)
+	if chmodErr != nil {
 		slog.Error("failed to set socket permissions", "error", chmodErr)
 	}
 
 	for {
-		conn, acceptErr := listener.Accept()
-		if acceptErr != nil {
-			slog.Error("socket accept error", "error", acceptErr)
+		conn, err := listener.Accept()
+		if err != nil {
+			slog.Error("socket accept error", "error", err)
 
 			continue
 		}
@@ -1199,30 +1230,37 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 			cmd := strings.TrimSpace(string(buf[:n]))
 
 			response := d.handleCommand(ctx, cmd) + "\n"
-			if _, writeErr := conn.Write([]byte(response)); writeErr != nil {
+
+			_, writeErr := conn.Write([]byte(response))
+			if writeErr != nil {
 				slog.Debug("socket write error", "error", writeErr)
 			}
 		}
 
-		if closeErr := conn.Close(); closeErr != nil {
+		closeErr := conn.Close()
+		if closeErr != nil {
 			slog.Debug("conn close error", "error", closeErr)
 		}
 	}
 }
 
 func sendCommand(cfg Config, cmd string) (string, error) {
-	conn, err := net.DialTimeout("unix", cfg.SocketPath(), defaultSocketTimeout)
+	dialer := net.Dialer{Timeout: defaultSocketTimeout}
+
+	conn, err := dialer.DialContext(context.Background(), "unix", cfg.SocketPath())
 	if err != nil {
 		return "", fmt.Errorf("sendCommand dial: %w", err)
 	}
 
 	defer func() { _ = conn.Close() }()
 
-	if deadlineErr := setDeadline(conn, defaultWriteTimeout); deadlineErr != nil {
+	deadlineErr := setDeadline(conn, defaultWriteTimeout)
+	if deadlineErr != nil {
 		return "", deadlineErr
 	}
 
-	if _, writeErr := conn.Write([]byte(cmd)); writeErr != nil {
+	_, writeErr := conn.Write([]byte(cmd))
+	if writeErr != nil {
 		return "", fmt.Errorf("sendCommand write: %w", writeErr)
 	}
 
@@ -1298,7 +1336,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Fprintln(os.Stdout, resp)
+		_, printErr := fmt.Fprintln(os.Stdout, resp)
+		if printErr != nil {
+			slog.Debug("failed to print response", "error", printErr)
+		}
 
 		return
 	}
