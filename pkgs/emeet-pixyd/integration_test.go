@@ -17,11 +17,11 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 	t.Helper()
 	return &Daemon{
 
-		mu: sync.Mutex{},
+		mu: sync.RWMutex{},
 
 		state: pixy.DefaultState(),
 
-		config: Config{
+		config: pixy.Config{
 
 			StateDir: t.TempDir(),
 
@@ -134,7 +134,7 @@ func assertSocketCommandsHavePrefix(
 	t.Helper()
 	for _, cmd := range commands {
 
-		resp, err := pixy.SendCommand(socketPath, cmd)
+		resp, err := pixy.SendCommand(context.Background(), socketPath, cmd)
 
 		if err != nil {
 
@@ -194,9 +194,9 @@ func assertWebStatusOffline(t *testing.T, status webStatus) {
 	t.Helper()
 	assertWebStatusField(t, status, webStatusCheck{
 
-		Camera: ptr(string(StatePrivacy)),
+		Camera: ptr(string(pixy.StatePrivacy)),
 
-		Audio: ptr(string(AudioNC)),
+		Audio: ptr(string(pixy.AudioNC)),
 
 		Gesture: new(false),
 
@@ -624,17 +624,17 @@ func TestWeb_WebStatusOfflineNoDevice(t *testing.T) {
 
 func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	daemon := newDaemonWithDevice(t)
-	daemon.state.Camera = StateTracking
-	daemon.state.Audio = AudioLive
+	daemon.state.Camera = pixy.StateTracking
+	daemon.state.Audio = pixy.AudioLive
 	daemon.state.Gesture = true
 	daemon.state.InCall = true
 	webSrv := &webServer{daemon: daemon}
 	status := webSrv.getWebStatus()
 	assertWebStatusField(t, status, webStatusCheck{
 
-		Camera: ptr(string(StateTracking)),
+		Camera: ptr(string(pixy.StateTracking)),
 
-		Audio: ptr(string(AudioLive)),
+		Audio: ptr(string(pixy.AudioLive)),
 
 		Gesture: new(true),
 
@@ -652,16 +652,16 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 
 func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 	tests := []struct {
-		camera CameraState
+		camera pixy.CameraState
 	}{
 
-		{StateTracking},
+		{pixy.StateTracking},
 
-		{StatePrivacy},
+		{pixy.StatePrivacy},
 
-		{StateIdle},
+		{pixy.StateIdle},
 
-		{StateOffline},
+		{pixy.StateOffline},
 	}
 	for _, tc := range tests {
 
@@ -689,14 +689,14 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 
 func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 	tests := []struct {
-		audio AudioMode
+		audio pixy.AudioMode
 	}{
 
-		{AudioNC},
+		{pixy.AudioNC},
 
-		{AudioLive},
+		{pixy.AudioLive},
 
-		{AudioOriginal},
+		{pixy.AudioOriginal},
 	}
 	for _, tc := range tests {
 
@@ -743,9 +743,9 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			check: webStatusCheck{
 
-				Camera: ptr(string(StateTracking)),
+				Camera: ptr(string(pixy.StateTracking)),
 
-				Audio: ptr(string(AudioLive)),
+				Audio: ptr(string(pixy.AudioLive)),
 
 				Gesture: new(true),
 
@@ -771,7 +771,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			raw: "camera=offline (device not found)",
 
-			check: webStatusCheck{Camera: ptr(string(StateOffline))},
+			check: webStatusCheck{Camera: ptr(string(pixy.StateOffline))},
 
 			online: new(false),
 		},
@@ -782,7 +782,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			raw: "error: PIXY not connected",
 
-			check: webStatusCheck{Camera: ptr(string(StateOffline)), Audio: ptr(string(AudioNC)), Zoom: new(100)},
+			check: webStatusCheck{Camera: ptr(string(pixy.StateOffline)), Audio: ptr(string(pixy.AudioNC)), Zoom: new(100)},
 
 			err: "PIXY not connected",
 		},
@@ -791,7 +791,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			name: "empty",
 
-			check: webStatusCheck{Camera: ptr(string(StateOffline))},
+			check: webStatusCheck{Camera: ptr(string(pixy.StateOffline))},
 
 			online: new(false),
 		},
@@ -802,7 +802,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			raw: "blah notkeyvalue garbage",
 
-			check: webStatusCheck{Camera: ptr(string(StateOffline))},
+			check: webStatusCheck{Camera: ptr(string(pixy.StateOffline))},
 		},
 
 		{
@@ -838,7 +838,7 @@ func TestWeb_ParseWebStatus(t *testing.T) {
 
 			raw: "camera=tracking",
 
-			check: webStatusCheck{Zoom: new(100), Audio: ptr(string(AudioNC)), Pan: new(0), Tilt: new(0)},
+			check: webStatusCheck{Zoom: new(100), Audio: ptr(string(pixy.AudioNC)), Pan: new(0), Tilt: new(0)},
 		},
 	}
 	for _, tc := range tests {
@@ -893,9 +893,9 @@ func shortSocketDir(t *testing.T) string {
 
 // ---------- Daemon unix socket integration ----------
 
-func startSocketDaemon(t *testing.T) (*Daemon, Config) {
+func startSocketDaemon(t *testing.T) (*Daemon, pixy.Config) {
 	t.Helper()
-	cfg := Config{
+	cfg := pixy.Config{
 
 		StateDir: shortSocketDir(t),
 
@@ -929,7 +929,7 @@ func startSocketDaemon(t *testing.T) (*Daemon, Config) {
 
 func TestSocket_StatusCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "status")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
 
 		t.Fatalf("status: %v", err)
@@ -939,7 +939,7 @@ func TestSocket_StatusCommand(t *testing.T) {
 
 func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "auto-off")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-off")
 	if err != nil {
 
 		t.Fatalf("auto-off: %v", err)
@@ -948,7 +948,7 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 
 		t.Errorf("expected 'auto mode off', got: %s", resp)
 	}
-	resp2, err := pixy.SendCommand(cfg.SocketPath(), "auto-on")
+	resp2, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-on")
 	if err != nil {
 
 		t.Fatalf("auto-on: %v", err)
@@ -961,7 +961,7 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 
 func TestSocket_ProbeCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "probe")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "probe")
 	if err != nil {
 
 		t.Fatalf("probe: %v", err)
@@ -985,7 +985,7 @@ func TestSocket_ProbeCommand(t *testing.T) {
 
 func TestSocket_WaybarCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "waybar")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "waybar")
 	if err != nil {
 
 		t.Fatalf("waybar: %v", err)
@@ -995,7 +995,7 @@ func TestSocket_WaybarCommand(t *testing.T) {
 
 func TestSocket_DeviceCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "device")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "device")
 	if err != nil {
 
 		t.Fatalf("device: %v", err)
@@ -1019,7 +1019,7 @@ func TestSocket_DeviceCommand(t *testing.T) {
 
 func TestSocket_UnknownCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "foobar")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "foobar")
 	if err != nil {
 
 		t.Fatalf("foobar: %v", err)
@@ -1029,7 +1029,7 @@ func TestSocket_UnknownCommand(t *testing.T) {
 
 func TestSocket_StatusViaCommandReturnsStatus(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "status")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
 
 		t.Fatalf("status command: %v", err)
@@ -1068,7 +1068,7 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 
 			}
 
-			resp, err := pixy.SendCommand(cfg.SocketPath(), tc.cmd)
+			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), tc.cmd)
 
 			if err != nil {
 
@@ -1084,7 +1084,7 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 
 func TestSocket_AudioInvalidMode(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "audio badmode")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio badmode")
 	if err != nil {
 
 		t.Fatalf("audio badmode: %v", err)
@@ -1108,7 +1108,7 @@ func TestSocket_AudioValidModes(t *testing.T) {
 
 			}
 
-			resp, err := pixy.SendCommand(cfg.SocketPath(), "audio "+mode)
+			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio "+mode)
 
 			if err != nil {
 
@@ -1144,7 +1144,7 @@ func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	for _, cmd := range []string{"pan", "tilt", "zoom"} {
 
-		resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
+		resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), cmd)
 
 		if err != nil {
 
@@ -1176,7 +1176,7 @@ func TestSocket_PanTiltZoomInvalidValue(t *testing.T) {
 
 func TestSocket_TogglePrivacy(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "toggle-privacy")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "toggle-privacy")
 	if err != nil {
 
 		t.Fatalf("toggle-privacy: %v", err)

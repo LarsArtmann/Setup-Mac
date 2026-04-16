@@ -685,28 +685,28 @@ func runParseTests[T comparable](t *testing.T, name string, parse func(string) (
 func TestParseAudioMode(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseTestCase[AudioMode]{
-		{"nc", AudioNC, false},
-		{"live", AudioLive, false},
-		{"org", AudioOriginal, false},
+	tests := []parseTestCase[pixy.AudioMode]{
+		{"nc", pixy.AudioNC, false},
+		{"live", pixy.AudioLive, false},
+		{"org", pixy.AudioOriginal, false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	testParseErrorCases(t, "pixy.ParseAudioMode", pixy.ParseAudioMode, tests)
+	runParseTests(t, "pixy.ParseAudioMode", pixy.ParseAudioMode, tests)
 }
 
 func TestParseCameraState(t *testing.T) {
 	t.Parallel()
 
-	tests := []parseTestCase[CameraState]{
-		{"idle", StateIdle, false},
-		{"tracking", StateTracking, false},
-		{"privacy", StatePrivacy, false},
-		{"offline", StateOffline, false},
+	tests := []parseTestCase[pixy.CameraState]{
+		{"idle", pixy.StateIdle, false},
+		{"tracking", pixy.StateTracking, false},
+		{"privacy", pixy.StatePrivacy, false},
+		{"offline", pixy.StateOffline, false},
 		{"unknown", "", true},
 		{"", "", true},
 	}
-	testParseErrorCases(t, "pixy.ParseCameraState", pixy.ParseCameraState, tests)
+	runParseTests(t, "pixy.ParseCameraState", pixy.ParseCameraState, tests)
 }
 
 func TestParseHIDResponseUnknownInterface(t *testing.T) {

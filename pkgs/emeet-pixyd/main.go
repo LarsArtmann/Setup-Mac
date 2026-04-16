@@ -863,6 +863,37 @@ func (d *Daemon) autoManage(ctx context.Context) {
 	}
 }
 
+type ptzValues struct {
+	Pan  int
+	Tilt int
+	Zoom int
+}
+
+func parsePTZValues(ctx context.Context, dev string) ptzValues {
+	pan, _ := v4l2Get(ctx, dev, "pan_absolute")
+	tilt, _ := v4l2Get(ctx, dev, "tilt_absolute")
+	zoom, _ := v4l2Get(ctx, dev, "zoom_absolute")
+
+	var ptz ptzValues
+
+	panVal, panErr := strconv.Atoi(pan)
+	if panErr == nil {
+		ptz.Pan = panVal / v4l2DegreesPerUnit
+	}
+
+	tiltVal, tiltErr := strconv.Atoi(tilt)
+	if tiltErr == nil {
+		ptz.Tilt = tiltVal / v4l2DegreesPerUnit
+	}
+
+	zoomVal, zoomErr := strconv.Atoi(zoom)
+	if zoomErr == nil {
+		ptz.Zoom = zoomVal
+	}
+
+	return ptz
+}
+
 func (d *Daemon) getStatus(ctx context.Context) string {
 	if !d.isDevicePresent() {
 		return fmt.Sprintf(

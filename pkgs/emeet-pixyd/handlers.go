@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/a-h/templ"
 	"io"
 	"log/slog"
 	"net/http"
@@ -12,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/a-h/templ"
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
 const (
@@ -462,9 +464,9 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 func parseWebStatus(raw string) webStatus {
 	status := webStatus{
 
-		Camera: string(StateOffline),
+		Camera: string(pixy.StateOffline),
 
-		Audio: string(AudioNC),
+		Audio: string(pixy.AudioNC),
 
 		Pan: 0,
 
@@ -492,7 +494,7 @@ func parseWebStatus(raw string) webStatus {
 
 		case "camera":
 
-			camera, _ := ParseCameraState(val)
+			camera, _ := pixy.ParseCameraState(val)
 
 			status.Camera = string(camera)
 
@@ -500,7 +502,7 @@ func parseWebStatus(raw string) webStatus {
 
 		case "audio":
 
-			audio, _ := ParseAudioMode(val)
+			audio, _ := pixy.ParseAudioMode(val)
 
 			status.Audio = string(audio)
 
