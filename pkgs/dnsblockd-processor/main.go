@@ -6,15 +6,47 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
+
+func isValidPath(path string) error {
+	if strings.Contains(path, "..") {
+		return errors.New("path traversal not allowed")
+	}
+	absPath, err := filepath.Abs(path)
+	if err != nil {
+		return fmt.Errorf("cannot resolve path: %w", err)
+	}
+	if !filepath.IsAbs(absPath) {
+		return errors.New("relative path not allowed")
+	}
+	return nil
+}
+
+func safeOpenFile(path string) (*os.File, error) {
+	if err := isValidPath(path); err != nil {
+		return nil, fmt.Errorf("invalid path %q: %w", path, err)
+	}
+	//nolint:gosec // G304: path validated by isValidPath()
+	return os.Open(path)
+}
+
+func safeCreateFile(path string) (*os.File, error) {
+	if err := isValidPath(path); err != nil {
+		return nil, fmt.Errorf("invalid path %q: %w", path, err)
+	}
+	//nolint:gosec // G304: path validated by isValidPath()
+	return os.Create(path)
+}
 
 func loadWhitelist(path string) map[string]bool {
 	whitelist := make(map[string]bool)
 
-	f, err := os.Open(path)
+	f, err := safeOpenFile(path)
 	if err != nil {
 		return whitelist
 	}
@@ -63,20 +95,63 @@ func extractDomain(line string) string {
 	return ""
 }
 
+func isCommentOrEmpty(line string) bool {
+	if line == "" {
+		return true
+	}
+	return line[0] == '#' || line[0] == '!' || line[0] == '[' || strings.HasPrefix(line, "@@")
+}
+
+func isLocalhostOrLAN(domain string) bool {
+	return domain == "localhost" || domain == "localhost.localdomain" ||
+		strings.HasSuffix(domain, ".lan")
+}
+
+func shouldSkipDomain(domain string, whitelist, seen map[string]bool) bool {
+	if domain == "" {
+		return true
+	}
+	return whitelist[domain] || seen[domain]
+}
+
+func processLine(
+	line, name, blockIP string,
+	whitelist, seen map[string]bool,
+	unboundEntries *[]string,
+	mapping map[string]string,
+) bool {
+	if isCommentOrEmpty(line) {
+		return false
+	}
+
+	domain := extractDomain(line)
+	if shouldSkipDomain(domain, whitelist, seen) {
+		return false
+	}
+
+	if isLocalhostOrLAN(domain) {
+		return false
+	}
+
+	seen[domain] = true
+	*unboundEntries = append(
+		*unboundEntries,
+		fmt.Sprintf(`local-data: "%s A %s"`, domain, blockIP),
+	)
+	mapping[domain] = name
+	return true
+}
+
 func processHostsFile(
 	path, name, blockIP string,
 	whitelist, seen map[string]bool,
 	unboundEntries *[]string,
 	mapping map[string]string,
 ) {
-	f, err := os.Open(path)
+	f, err := safeOpenFile(path)
 	if err != nil {
-		fmt.Fprintf(
-			os.Stderr,
-			"warning: cannot open %s: %v\n",
-			path,
-			err,
-		)
+		//nolint:gosec // G705: CLI tool writing to stderr, not HTML
+		fmt.Fprintf(os.Stderr, "warning: cannot open %s: %v\n", path, err)
 		return
 	}
 	defer func() { _ = f.Close() }()
@@ -86,39 +161,12 @@ func processHostsFile(
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if line == "" || line[0] == '#' || line[0] == '!' || line[0] == '[' ||
-			strings.HasPrefix(line, "@@") {
-			continue
-		}
-
-		domain := extractDomain(line)
-		if domain == "" {
-			continue
-		}
-
-		if domain == "localhost" || domain == "localhost.localdomain" {
-			continue
-		}
-
-		if strings.HasSuffix(domain, ".lan") {
-			continue
-		}
-
-		if whitelist[domain] || seen[domain] {
-			continue
-		}
-
-		seen[domain] = true
-		*unboundEntries = append(
-			*unboundEntries,
-			fmt.Sprintf(`local-data: "%s A %s"`, domain, blockIP),
-		)
-		mapping[domain] = name
+		processLine(line, name, blockIP, whitelist, seen, unboundEntries, mapping)
 	}
 }
 
 func writeUnbound(path string, entries []string) error {
-	f, err := os.Create(path)
+	f, err := safeCreateFile(path)
 	if err != nil {
 		return fmt.Errorf("creating %s: %w", path, err)
 	}
@@ -134,7 +182,7 @@ func writeUnbound(path string, entries []string) error {
 }
 
 func writeMapping(path string, mapping map[string]string) error {
-	f, err := os.Create(path)
+	f, err := safeCreateFile(path)
 	if err != nil {
 		return fmt.Errorf("creating %s: %w", path, err)
 	}
@@ -150,9 +198,9 @@ func writeMapping(path string, mapping map[string]string) error {
 	return nil
 }
 
-// exitOnError checks err and exits with code 1 if error is not nil.
 func exitOnError(err error) {
 	if err != nil {
+		//nolint:gosec // G705: CLI tool writing to stderr, not HTML
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
 	}
