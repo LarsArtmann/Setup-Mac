@@ -1,0 +1,182 @@
+package pixy
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net"
+	"strings"
+	"time"
+)
+
+const (
+	DefaultStateDir      = "/run/emeet-pixyd"
+	DefaultPollInterval  = 2 * time.Second
+	DefaultDebounceCount = 3
+
+	DefaultSocketTimeout = 2 * time.Second
+	DefaultWriteTimeout  = 2 * time.Second
+	SocketBufSize        = 256
+	ConnBufSize          = 4096
+
+	PermissionStateDir  = 0o750
+	PermissionStateFile = 0o600
+	PermissionSocket    = 0o600
+)
+
+var (
+	ErrInvalidAudioMode    = errors.New("invalid audio mode")
+	ErrInvalidCameraState  = errors.New("invalid camera state")
+	ErrHIDDeviceNotAvailable = errors.New("PIXY HID device not available")
+	ErrPIXYNotConnected      = errors.New("PIXY not connected")
+)
+
+type CameraState string
+
+const (
+	StateIdle     CameraState = "idle"
+	StateTracking CameraState = "tracking"
+	StatePrivacy  CameraState = "privacy"
+	StateOffline  CameraState = "offline"
+)
+
+func (s CameraState) Valid() bool {
+	switch s {
+	case StateIdle, StateTracking, StatePrivacy, StateOffline:
+		return true
+	default:
+		return false
+	}
+}
+
+type AudioMode string
+
+const (
+	AudioNC       AudioMode = "nc"
+	AudioLive     AudioMode = "live"
+	AudioOriginal AudioMode = "original"
+)
+
+func (m AudioMode) Valid() bool {
+	switch m {
+	case AudioNC, AudioLive, AudioOriginal:
+		return true
+	default:
+		return false
+	}
+}
+
+func (m AudioMode) Next() AudioMode {
+	switch m {
+	case AudioNC:
+		return AudioLive
+	case AudioLive:
+		return AudioOriginal
+	case AudioOriginal:
+		return AudioNC
+	default:
+		return AudioNC
+	}
+}
+
+func ParseAudioMode(rawInput string) (AudioMode, error) {
+	switch rawInput {
+	case "nc":
+		return AudioNC, nil
+	case "live":
+		return AudioLive, nil
+	case "org":
+		return AudioOriginal, nil
+	default:
+		return "", fmt.Errorf("invalid audio mode: %q: %w", rawInput, ErrInvalidAudioMode)
+	}
+}
+
+func ParseCameraState(rawInput string) (CameraState, error) {
+	switch rawInput {
+	case string(StateIdle):
+		return StateIdle, nil
+	case string(StateTracking):
+		return StateTracking, nil
+	case string(StatePrivacy):
+		return StatePrivacy, nil
+	case string(StateOffline):
+		return StateOffline, nil
+	default:
+		return "", fmt.Errorf("invalid camera state: %q: %w", rawInput, ErrInvalidCameraState)
+	}
+}
+
+type State struct {
+	Camera   CameraState `json:"camera"`
+	Audio    AudioMode   `json:"audio"`
+	Gesture  bool        `json:"gesture"`
+	InCall   bool        `json:"inCall"`
+	AutoMode bool        `json:"autoMode"`
+}
+
+func DefaultState() State {
+	return State{
+		Camera:   StatePrivacy,
+		Audio:    AudioNC,
+		Gesture:  false,
+		InCall:   false,
+		AutoMode: true,
+	}
+}
+
+type Config struct {
+	StateDir      string
+	PollInterval  time.Duration
+	DebounceCount int
+}
+
+func DefaultConfig() Config {
+	return Config{
+		StateDir:      DefaultStateDir,
+		PollInterval:  DefaultPollInterval,
+		DebounceCount: DefaultDebounceCount,
+	}
+}
+
+func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
+func (c Config) SocketPath() string { return c.StateDir + "/control.sock" }
+
+func SetDeadline(conn net.Conn, timeout time.Duration) error {
+	err := conn.SetDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return fmt.Errorf("setDeadline: %w", err)
+	}
+
+	return nil
+}
+
+func SendCommand(socketPath, cmd string) (string, error) {
+	dialer := net.Dialer{Timeout: DefaultSocketTimeout}
+
+	conn, err := dialer.DialContext(context.Background(), "unix", socketPath)
+	if err != nil {
+		return "", fmt.Errorf("sendCommand dial: %w", err)
+	}
+
+	defer func() { _ = conn.Close() }()
+
+	deadlineErr := SetDeadline(conn, DefaultWriteTimeout)
+	if deadlineErr != nil {
+		return "", deadlineErr
+	}
+
+	_, writeErr := conn.Write([]byte(cmd))
+	if writeErr != nil {
+		return "", fmt.Errorf("sendCommand write: %w", writeErr)
+	}
+
+	buf := make([]byte, ConnBufSize)
+
+	n, readErr := conn.Read(buf)
+	if readErr != nil {
+		return "", fmt.Errorf("sendCommand read: %w", readErr)
+	}
+
+	return strings.TrimSpace(string(buf[:n])), nil
+}

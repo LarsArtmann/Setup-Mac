@@ -18,26 +18,20 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
 const (
-	defaultStateDir      = "/run/emeet-pixyd"
-	defaultPollInterval  = 2 * time.Second
-	defaultDebounceCount = 3
-
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
 )
 
 var (
-	errHIDDeviceNotAvailable = errors.New("PIXY HID device not available")
-	errPIXYNotConnected      = errors.New("PIXY not connected")
-	errNoHIDResponse         = errors.New("no HID response")
-	errUnrecognizedHID       = errors.New("unrecognized HID response")
-	errAudioSourceNotFound   = errors.New("PIXY audio source not found")
-	ErrInvalidAudioMode      = errors.New("invalid audio mode")
-	ErrInvalidCameraState    = errors.New("invalid camera state")
-	errDeadline              = errors.New("deadline error")
+	errNoHIDResponse       = errors.New("no HID response")
+	errUnrecognizedHID     = errors.New("unrecognized HID response")
+	errAudioSourceNotFound = errors.New("PIXY audio source not found")
+	errDeadline            = errors.New("deadline error")
 )
 
 const (
@@ -60,11 +54,6 @@ const (
 	v4l2DegreesPerUnit = 3600
 	hidResponseMs      = 500
 
-	defaultSocketTimeout = 2 * time.Second
-	defaultWriteTimeout  = 2 * time.Second
-	socketBufSize        = 256
-	connBufSize          = 4096
-
 	cameraConfigPrefix byte = 0x09
 	cameraConfigMarker byte = 0x01
 	audioConfigMarker  byte = 0x00
@@ -73,152 +62,39 @@ const (
 	gestureConfigMark3 byte = 0x02
 	gestureEnabledByte byte = 0x01
 
-	permissionStateDir  = 0o750
-	permissionStateFile = 0o600
-	permissionSocket    = 0o600
-
 	hidCommandSleepMs = 200
 	v4l2SplitCount    = 2
 )
 
-type CameraState string
+type CameraState = pixy.CameraState
 
 const (
-	StateIdle     CameraState = "idle"
-	StateTracking CameraState = "tracking"
-	StatePrivacy  CameraState = "privacy"
-	StateOffline  CameraState = "offline"
+	StateIdle     = pixy.StateIdle
+	StateTracking = pixy.StateTracking
+	StatePrivacy  = pixy.StatePrivacy
+	StateOffline  = pixy.StateOffline
 )
 
-func (s CameraState) HIDByte() byte {
-	switch s {
-	case StateTracking:
-		return hidByteTracking
-	case StatePrivacy:
-		return hidBytePrivacy
-	case StateIdle:
-		return hidByteIdle
-	case StateOffline:
-		return hidByteIdle
-	default:
-		return hidByteIdle
-	}
-}
-
-func (s CameraState) Valid() bool {
-	switch s {
-	case StateIdle, StateTracking, StatePrivacy, StateOffline:
-		return true
-	default:
-		return false
-	}
-}
-
-type AudioMode string
+type AudioMode = pixy.AudioMode
 
 const (
-	AudioNC       AudioMode = "nc"
-	AudioLive     AudioMode = "live"
-	AudioOriginal AudioMode = "original"
+	AudioNC       = pixy.AudioNC
+	AudioLive     = pixy.AudioLive
+	AudioOriginal = pixy.AudioOriginal
 )
 
-func (m AudioMode) HIDByte() byte {
-	switch m {
-	case AudioNC:
-		return hidByteNC
-	case AudioLive:
-		return hidByteLive
-	case AudioOriginal:
-		return hidByteOriginal
-	default:
-		return hidByteNC
-	}
-}
+var (
+	ParseAudioMode  = pixy.ParseAudioMode
+	ParseCameraState = pixy.ParseCameraState
+)
 
-func (m AudioMode) Valid() bool {
-	switch m {
-	case AudioNC, AudioLive, AudioOriginal:
-		return true
-	default:
-		return false
-	}
-}
+type Config = pixy.Config
 
-func (m AudioMode) Next() AudioMode {
-	switch m {
-	case AudioNC:
-		return AudioLive
-	case AudioLive:
-		return AudioOriginal
-	case AudioOriginal:
-		return AudioNC
-	default:
-		return AudioNC
-	}
-}
+var DefaultConfig = pixy.DefaultConfig
 
-func ParseAudioMode(rawInput string) (AudioMode, error) {
-	switch rawInput {
-	case "nc":
-		return AudioNC, nil
-	case "live":
-		return AudioLive, nil
-	case "org":
-		return AudioOriginal, nil
-	default:
-		return "", fmt.Errorf("invalid audio mode: %q: %w", rawInput, ErrInvalidAudioMode)
-	}
-}
+type State = pixy.State
 
-func ParseCameraState(rawInput string) (CameraState, error) {
-	switch rawInput {
-	case string(StateIdle):
-		return StateIdle, nil
-	case string(StateTracking):
-		return StateTracking, nil
-	case string(StatePrivacy):
-		return StatePrivacy, nil
-	case string(StateOffline):
-		return StateOffline, nil
-	default:
-		return "", fmt.Errorf("invalid camera state: %q: %w", rawInput, ErrInvalidCameraState)
-	}
-}
-
-type Config struct {
-	StateDir      string
-	PollInterval  time.Duration
-	DebounceCount int
-}
-
-func DefaultConfig() Config {
-	return Config{
-		StateDir:      defaultStateDir,
-		PollInterval:  defaultPollInterval,
-		DebounceCount: defaultDebounceCount,
-	}
-}
-
-func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
-func (c Config) SocketPath() string { return c.StateDir + "/control.sock" }
-
-type State struct {
-	Camera   CameraState `json:"camera"`
-	Audio    AudioMode   `json:"audio"`
-	Gesture  bool        `json:"gesture"`
-	InCall   bool        `json:"inCall"`
-	AutoMode bool        `json:"autoMode"`
-}
-
-func DefaultState() State {
-	return State{
-		Camera:   StatePrivacy,
-		Audio:    AudioNC,
-		Gesture:  false,
-		InCall:   false,
-		AutoMode: true,
-	}
-}
+var DefaultState = pixy.DefaultState
 
 type Daemon struct {
 	mu        sync.Mutex
@@ -336,7 +212,7 @@ func (d *Daemon) loadState() {
 }
 
 func (d *Daemon) ensureStateDir() error {
-	err := os.MkdirAll(d.config.StateDir, permissionStateDir)
+	err := os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
 	if err != nil {
 		return fmt.Errorf("create state dir: %w", err)
 	}
@@ -354,11 +230,39 @@ func (d *Daemon) saveState() error {
 		return fmt.Errorf("marshal state: %w", err)
 	}
 
-	if err := os.WriteFile(d.config.StateFile(), data, permissionStateFile); err != nil {
+	if err := os.WriteFile(d.config.StateFile(), data, pixy.PermissionStateFile); err != nil {
 		return fmt.Errorf("write state file: %w", err)
 	}
 
 	return nil
+}
+
+func cameraHIDByte(s CameraState) byte {
+	switch s {
+	case StateTracking:
+		return hidByteTracking
+	case StatePrivacy:
+		return hidBytePrivacy
+	case StateIdle:
+		return hidByteIdle
+	case StateOffline:
+		return hidByteIdle
+	default:
+		return hidByteIdle
+	}
+}
+
+func audioHIDByte(m AudioMode) byte {
+	switch m {
+	case AudioNC:
+		return hidByteNC
+	case AudioLive:
+		return hidByteLive
+	case AudioOriginal:
+		return hidByteOriginal
+	default:
+		return hidByteNC
+	}
 }
 
 func (d *Daemon) isDevicePresent() bool {
@@ -369,7 +273,7 @@ const hidResponseTimeout = hidResponseMs * time.Millisecond
 
 func hidSend(hidrawDev string, report []byte) (err error) {
 	if hidrawDev == "" {
-		return fmt.Errorf("hidSend: %w", errHIDDeviceNotAvailable)
+		return fmt.Errorf("hidSend: %w", pixy.ErrHIDDeviceNotAvailable)
 	}
 
 	buf := make([]byte, hidBufSize)
@@ -404,7 +308,7 @@ type hidResponse struct {
 
 func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, error) {
 	if hidrawDev == "" {
-		return nil, fmt.Errorf("hidSendRecv: %w", errHIDDeviceNotAvailable)
+		return nil, fmt.Errorf("hidSendRecv: %w", pixy.ErrHIDDeviceNotAvailable)
 	}
 
 	buf := make([]byte, hidBufSize)
@@ -515,11 +419,7 @@ func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
 
 type stateSetter func(d *Daemon)
 
-type hidMode interface {
-	HIDByte() byte
-}
-
-func pixyConfig(iface byte, mode hidMode) []byte {
+func pixyConfig(iface byte, modeByte byte) []byte {
 	var buf [hidMinLen]byte
 
 	buf[0] = cameraConfigPrefix
@@ -530,7 +430,7 @@ func pixyConfig(iface byte, mode hidMode) []byte {
 	buf[5] = cameraConfigMarker
 	buf[6] = 0x00
 	buf[7] = cameraConfigMarker
-	buf[8] = mode.HIDByte()
+	buf[8] = modeByte
 
 	return buf[:]
 }
@@ -541,7 +441,7 @@ func pixyCommit(iface byte) []byte {
 
 func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSetter) error {
 	if !d.isDevicePresent() {
-		return fmt.Errorf("setDeviceState: %w", errPIXYNotConnected)
+		return fmt.Errorf("setDeviceState: %w", pixy.ErrPIXYNotConnected)
 	}
 
 	err := hidSend(d.hidrawDev, configBytes)
@@ -570,7 +470,7 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 
 func (d *Daemon) setTracking(mode CameraState) error {
 	return d.setDeviceState(
-		pixyConfig(hidInterfaceTracking, mode),
+		pixyConfig(hidInterfaceTracking, cameraHIDByte(mode)),
 		pixyCommit(hidInterfaceTracking),
 		func(d *Daemon) { d.state.Camera = mode },
 	)
@@ -578,7 +478,7 @@ func (d *Daemon) setTracking(mode CameraState) error {
 
 func (d *Daemon) setAudio(mode AudioMode) error {
 	return d.setDeviceState(
-		pixyConfig(hidInterfaceAudio, mode),
+		pixyConfig(hidInterfaceAudio, audioHIDByte(mode)),
 		pixyCommit(hidInterfaceAudio),
 		func(d *Daemon) { d.state.Audio = mode },
 	)
@@ -596,18 +496,11 @@ func (d *Daemon) setGesture(enabled bool) error {
 	return d.setDeviceState(configBytes, commitBytes, func(d *Daemon) { d.state.Gesture = enabled })
 }
 
-func setDeadline(conn net.Conn, timeout time.Duration) error {
-	err := conn.SetDeadline(time.Now().Add(timeout))
-	if err != nil {
-		return fmt.Errorf("setDeadline: %w", err)
-	}
 
-	return nil
-}
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
 	if !d.isDevicePresent() {
-		return fmt.Errorf("centerCamera: %w", errPIXYNotConnected)
+		return fmt.Errorf("centerCamera: %w", pixy.ErrPIXYNotConnected)
 	}
 
 	err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0")
@@ -632,7 +525,7 @@ func queryHIDState[T any](
 	if hidrawDev == "" {
 		var zero T
 
-		return zero, fmt.Errorf("queryHIDState: %w", errHIDDeviceNotAvailable)
+		return zero, fmt.Errorf("queryHIDState: %w", pixy.ErrHIDDeviceNotAvailable)
 	}
 
 	resp, err := hidSendRecv(ctx, hidrawDev, payload)
@@ -863,7 +756,7 @@ func sdNotify(state string) {
 		}
 	}()
 
-	deadlineErr := setDeadline(conn, 1*time.Second)
+	deadlineErr := pixy.SetDeadline(conn, 1*time.Second)
 	if deadlineErr != nil {
 		return
 	}
@@ -1250,7 +1143,7 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 	socketPath := d.config.SocketPath()
 	_ = os.Remove(socketPath)
 
-	createErr := os.MkdirAll(d.config.StateDir, permissionStateDir)
+	createErr := os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
 	if createErr != nil {
 		return fmt.Errorf("create state dir: %w", createErr)
 	}
@@ -1269,7 +1162,7 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 		}
 	}()
 
-	chmodErr := os.Chmod(socketPath, permissionSocket)
+	chmodErr := os.Chmod(socketPath, pixy.PermissionSocket)
 	if chmodErr != nil {
 		slog.Error("failed to set socket permissions", "error", chmodErr)
 	}
@@ -1282,7 +1175,7 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 			continue
 		}
 
-		buf := make([]byte, socketBufSize)
+		buf := make([]byte, pixy.SocketBufSize)
 
 		n, readErr := conn.Read(buf)
 		if readErr == nil && n > 0 {
@@ -1304,37 +1197,11 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 }
 
 func sendCommand(cfg Config, cmd string) (string, error) {
-	dialer := net.Dialer{Timeout: defaultSocketTimeout}
-
-	conn, err := dialer.DialContext(context.Background(), "unix", cfg.SocketPath())
-	if err != nil {
-		return "", fmt.Errorf("sendCommand dial: %w", err)
-	}
-
-	defer func() { _ = conn.Close() }()
-
-	deadlineErr := setDeadline(conn, defaultWriteTimeout)
-	if deadlineErr != nil {
-		return "", deadlineErr
-	}
-
-	_, writeErr := conn.Write([]byte(cmd))
-	if writeErr != nil {
-		return "", fmt.Errorf("sendCommand write: %w", writeErr)
-	}
-
-	buf := make([]byte, connBufSize)
-
-	n, readErr := conn.Read(buf)
-	if readErr != nil {
-		return "", fmt.Errorf("sendCommand read: %w", readErr)
-	}
-
-	return strings.TrimSpace(string(buf[:n])), nil
+	return pixy.SendCommand(cfg.SocketPath(), cmd)
 }
 
 func (d *Daemon) Run() {
-	createErr := os.MkdirAll(d.config.StateDir, permissionStateDir)
+	createErr := os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
 	if createErr != nil {
 		slog.Error("failed to create state dir", "error", createErr)
 	}

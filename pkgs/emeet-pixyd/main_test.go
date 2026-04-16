@@ -193,7 +193,7 @@ func TestStateFileCorrupt(t *testing.T) {
 
 	cfg := testConfig(t.TempDir())
 
-	err := os.WriteFile(cfg.StateFile(), []byte("not json"), permissionStateFile)
+	err := os.WriteFile(cfg.StateFile(), []byte("not json"), pixy.PermissionStateFile)
 	if err != nil {
 		t.Fatalf("write corrupt file: %v", err)
 	}
@@ -536,8 +536,8 @@ func TestConfigPaths(t *testing.T) {
 
 	cfg := Config{
 		StateDir:      "/tmp/test-pixyd",
-		PollInterval:  defaultPollInterval,
-		DebounceCount: defaultDebounceCount,
+		PollInterval:  pixy.DefaultPollInterval,
+		DebounceCount: pixy.DefaultDebounceCount,
 	}
 	if cfg.StateFile() != "/tmp/test-pixyd/state.json" {
 		t.Errorf("unexpected StateFile: %s", cfg.StateFile())
@@ -669,16 +669,16 @@ func TestDefaultConfig(t *testing.T) {
 	t.Parallel()
 
 	cfg := DefaultConfig()
-	if cfg.StateDir != defaultStateDir {
-		t.Errorf("expected StateDir=%s, got %s", defaultStateDir, cfg.StateDir)
+	if cfg.StateDir != pixy.DefaultStateDir {
+		t.Errorf("expected StateDir=%s, got %s", pixy.DefaultStateDir, cfg.StateDir)
 	}
 
-	if cfg.PollInterval != defaultPollInterval {
-		t.Errorf("expected PollInterval=%v, got %v", defaultPollInterval, cfg.PollInterval)
+	if cfg.PollInterval != pixy.DefaultPollInterval {
+		t.Errorf("expected PollInterval=%v, got %v", pixy.DefaultPollInterval, cfg.PollInterval)
 	}
 
-	if cfg.DebounceCount != defaultDebounceCount {
-		t.Errorf("expected DebounceCount=%d, got %d", defaultDebounceCount, cfg.DebounceCount)
+	if cfg.DebounceCount != pixy.DefaultDebounceCount {
+		t.Errorf("expected DebounceCount=%d, got %d", pixy.DefaultDebounceCount, cfg.DebounceCount)
 	}
 }
 
