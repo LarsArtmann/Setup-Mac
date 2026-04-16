@@ -803,6 +803,13 @@ func notify(ctx context.Context, title, body string) {
 	}
 }
 
+func boolStr(b bool, ifTrue, ifFalse string) string {
+	if b {
+		return ifTrue
+	}
+	return ifFalse
+}
+
 func sdNotify(state string) {
 	sent, err := daemon.SdNotify(false, state)
 	if err != nil {
@@ -888,16 +895,6 @@ func (d *Daemon) autoManage(ctx context.Context) {
 
 func (d *Daemon) getStatus(ctx context.Context) string {
 	if !d.isDevicePresent() {
-		inCallStr := "no"
-		if d.state.InCall {
-			inCallStr = "yes"
-		}
-
-		autoStr := "on"
-		if !d.state.AutoMode {
-			autoStr = "off"
-		}
-
 		return fmt.Sprintf(
 			"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=",
 			StateOffline,
@@ -906,54 +903,23 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 			0,
 			0,
 			0,
-			inCallStr,
-			autoStr,
+			boolStr(d.state.InCall, "yes", "no"),
+			boolStr(d.state.AutoMode, "on", "off"),
 		)
 	}
 
-	pan, _ := v4l2Get(ctx, d.videoDev, "pan_absolute")
-	tilt, _ := v4l2Get(ctx, d.videoDev, "tilt_absolute")
-	zoom, _ := v4l2Get(ctx, d.videoDev, "zoom_absolute")
-
-	panDeg := 0
-	tiltDeg := 0
-	zoomVal := 100
-
-	panVal, panErr := strconv.Atoi(pan)
-	if panErr == nil {
-		panDeg = panVal / v4l2DegreesPerUnit
-	}
-
-	tiltVal, tiltErr := strconv.Atoi(tilt)
-	if tiltErr == nil {
-		tiltDeg = tiltVal / v4l2DegreesPerUnit
-	}
-
-	zoomValInt, zoomErr := strconv.Atoi(zoom)
-	if zoomErr == nil {
-		zoomVal = zoomValInt
-	}
-
-	inCallStr := "no"
-	if d.state.InCall {
-		inCallStr = "yes"
-	}
-
-	autoStr := "on"
-	if !d.state.AutoMode {
-		autoStr = "off"
-	}
+	ptz := parsePTZValues(ctx, d.videoDev)
 
 	return fmt.Sprintf(
 		"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=%s",
 		d.state.Camera,
 		d.state.Audio,
 		d.state.Gesture,
-		panDeg,
-		tiltDeg,
-		zoomVal,
-		inCallStr,
-		autoStr,
+		ptz.Pan,
+		ptz.Tilt,
+		ptz.Zoom,
+		boolStr(d.state.InCall, "yes", "no"),
+		boolStr(d.state.AutoMode, "on", "off"),
 		d.videoDev,
 	)
 }

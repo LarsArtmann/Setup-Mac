@@ -78,30 +78,40 @@ func (s *webServer) getWebStatus() webStatus {
 	return status
 }
 
+type ptzValues struct {
+	Pan  int
+	Tilt int
+	Zoom int
+}
+
+func parsePTZValues(ctx context.Context, videoDev string) ptzValues {
+	pan, _ := v4l2Get(ctx, videoDev, "pan_absolute")
+	tilt, _ := v4l2Get(ctx, videoDev, "tilt_absolute")
+	zoom, _ := v4l2Get(ctx, videoDev, "zoom_absolute")
+
+	v := ptzValues{Zoom: zoomDefault}
+	if n, err := strconv.Atoi(pan); err == nil {
+		v.Pan = n / v4l2DegreesPerUnit
+	}
+	if n, err := strconv.Atoi(tilt); err == nil {
+		v.Tilt = n / v4l2DegreesPerUnit
+	}
+	if n, err := strconv.Atoi(zoom); err == nil {
+		v.Zoom = n
+	}
+	return v
+}
+
 func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 	status := s.getWebStatus()
 	if !status.Online {
 		return status
 	}
 
-	pan, _ := v4l2Get(ctx, s.daemon.videoDev, "pan_absolute")
-	tilt, _ := v4l2Get(ctx, s.daemon.videoDev, "tilt_absolute")
-	zoom, _ := v4l2Get(ctx, s.daemon.videoDev, "zoom_absolute")
-
-	panVal, panErr := strconv.Atoi(pan)
-	if panErr == nil {
-		status.Pan = panVal / v4l2DegreesPerUnit
-	}
-
-	tiltVal, tiltErr := strconv.Atoi(tilt)
-	if tiltErr == nil {
-		status.Tilt = tiltVal / v4l2DegreesPerUnit
-	}
-
-	zoomVal, zoomErr := strconv.Atoi(zoom)
-	if zoomErr == nil {
-		status.Zoom = zoomVal
-	}
+	ptz := parsePTZValues(ctx, s.daemon.videoDev)
+	status.Pan = ptz.Pan
+	status.Tilt = ptz.Tilt
+	status.Zoom = ptz.Zoom
 
 	return status
 }
