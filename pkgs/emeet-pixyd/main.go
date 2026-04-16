@@ -1247,7 +1247,7 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 }
 
 func sendCommand(cfg Config, cmd string) (string, error) {
-	resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), cmd)
 	if err != nil {
 		return "", fmt.Errorf("sendCommand %q: %w", cmd, err)
 	}

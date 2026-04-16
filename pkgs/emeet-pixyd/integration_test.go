@@ -137,7 +137,7 @@ func assertSocketCommandsHavePrefix(
 	t.Helper()
 
 	for _, cmd := range commands {
-		resp, err := pixy.SendCommand(socketPath, cmd)
+		resp, err := pixy.SendCommand(context.Background(), socketPath, cmd)
 		if err != nil {
 			t.Fatalf("%s: %v", cmd, err)
 		}
@@ -834,7 +834,7 @@ func startSocketDaemon(t *testing.T) (*Daemon, Config) {
 func TestSocket_StatusCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "status")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
 		t.Fatalf("status: %v", err)
 	}
@@ -845,7 +845,7 @@ func TestSocket_StatusCommand(t *testing.T) {
 func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "auto-off")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-off")
 	if err != nil {
 		t.Fatalf("auto-off: %v", err)
 	}
@@ -854,7 +854,7 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 		t.Errorf("expected 'auto mode off', got: %s", resp)
 	}
 
-	resp2, err := pixy.SendCommand(cfg.SocketPath(), "auto-on")
+	resp2, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-on")
 	if err != nil {
 		t.Fatalf("auto-on: %v", err)
 	}
@@ -867,7 +867,7 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 func TestSocket_ProbeCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "probe")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "probe")
 	if err != nil {
 		t.Fatalf("probe: %v", err)
 	}
@@ -886,7 +886,7 @@ func TestSocket_ProbeCommand(t *testing.T) {
 func TestSocket_WaybarCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "waybar")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "waybar")
 	if err != nil {
 		t.Fatalf("waybar: %v", err)
 	}
@@ -897,7 +897,7 @@ func TestSocket_WaybarCommand(t *testing.T) {
 func TestSocket_DeviceCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "device")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "device")
 	if err != nil {
 		t.Fatalf("device: %v", err)
 	}
@@ -916,7 +916,7 @@ func TestSocket_DeviceCommand(t *testing.T) {
 func TestSocket_UnknownCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "foobar")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "foobar")
 	if err != nil {
 		t.Fatalf("foobar: %v", err)
 	}
@@ -927,7 +927,7 @@ func TestSocket_UnknownCommand(t *testing.T) {
 func TestSocket_StatusViaCommandReturnsStatus(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "status")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
 		t.Fatalf("status command: %v", err)
 	}
@@ -956,7 +956,7 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 				t.Skip("device connected")
 			}
 
-			resp, err := pixy.SendCommand(cfg.SocketPath(), tc.cmd)
+			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), tc.cmd)
 			if err != nil {
 				t.Fatalf("%s: %v", tc.cmd, err)
 			}
@@ -969,7 +969,7 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 func TestSocket_AudioInvalidMode(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "audio badmode")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio badmode")
 	if err != nil {
 		t.Fatalf("audio badmode: %v", err)
 	}
@@ -988,7 +988,7 @@ func TestSocket_AudioValidModes(t *testing.T) {
 				t.Skip("device connected, audio would succeed")
 			}
 
-			resp, err := pixy.SendCommand(cfg.SocketPath(), "audio "+mode)
+			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio "+mode)
 			if err != nil {
 				t.Fatalf("audio %s: %v", mode, err)
 			}
@@ -1017,7 +1017,7 @@ func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
 	for _, cmd := range []string{"pan", "tilt", "zoom"} {
-		resp, err := pixy.SendCommand(cfg.SocketPath(), cmd)
+		resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), cmd)
 		if err != nil {
 			t.Fatalf("%s: %v", cmd, err)
 		}
@@ -1042,7 +1042,7 @@ func TestSocket_PanTiltZoomInvalidValue(t *testing.T) {
 func TestSocket_TogglePrivacy(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "toggle-privacy")
+	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "toggle-privacy")
 	if err != nil {
 		t.Fatalf("toggle-privacy: %v", err)
 	}

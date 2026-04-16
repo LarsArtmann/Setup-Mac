@@ -1,6 +1,7 @@
 package pixy
 
 import (
+	"context"
 	"errors"
 	"net"
 	"testing"
@@ -273,7 +274,7 @@ func TestSetDeadline(t *testing.T) {
 func TestSendCommand_DialFailure(t *testing.T) {
 	t.Parallel()
 
-	_, err := SendCommand("/tmp/nonexistent-socket-path-test.sock", "status")
+	_, err := SendCommand(context.Background(), "/tmp/nonexistent-socket-path-test.sock", "status")
 	if err == nil {
 		t.Fatal("SendCommand() expected error for nonexistent socket, got nil")
 	}
@@ -305,7 +306,7 @@ func TestSendCommand_EndToEnd(t *testing.T) {
 		_, _ = conn.Write([]byte("response:" + string(buf[:n])))
 	}()
 
-	got, err := SendCommand(socketPath, "hello")
+	got, err := SendCommand(context.Background(), socketPath, "hello")
 	if err != nil {
 		t.Fatalf("SendCommand() unexpected error: %v", err)
 	}
