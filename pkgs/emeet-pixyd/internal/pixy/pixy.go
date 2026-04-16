@@ -13,6 +13,7 @@ const (
 	DefaultStateDir      = "/run/emeet-pixyd"
 	DefaultPollInterval  = 2 * time.Second
 	DefaultDebounceCount = 3
+	DefaultWebAddr       = "127.0.0.1:8090"
 
 	DefaultSocketTimeout = 2 * time.Second
 	DefaultWriteTimeout  = 2 * time.Second
@@ -129,6 +130,7 @@ type Config struct {
 	StateDir      string
 	PollInterval  time.Duration
 	DebounceCount int
+	WebAddr       string
 }
 
 func DefaultConfig() Config {
@@ -136,6 +138,7 @@ func DefaultConfig() Config {
 		StateDir:      DefaultStateDir,
 		PollInterval:  DefaultPollInterval,
 		DebounceCount: DefaultDebounceCount,
+		WebAddr:       DefaultWebAddr,
 	}
 }
 
