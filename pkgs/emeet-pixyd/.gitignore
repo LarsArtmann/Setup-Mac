@@ -8,3 +8,4 @@ Test coverage
 /emeet-pixyd
 Add pattern for Templ generated files
 *_templ.go
+*.tmp
