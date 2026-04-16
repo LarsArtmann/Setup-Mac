@@ -41,6 +41,8 @@ const (
 	StateOffline  CameraState = "offline"
 )
 
+func (s CameraState) String() string { return string(s) }
+
 func (s CameraState) Valid() bool {
 	switch s {
 	case StateIdle, StateTracking, StatePrivacy, StateOffline:
@@ -57,6 +59,8 @@ const (
 	AudioLive     AudioMode = "live"
 	AudioOriginal AudioMode = "original"
 )
+
+func (m AudioMode) String() string { return string(m) }
 
 func (m AudioMode) Valid() bool {
 	switch m {

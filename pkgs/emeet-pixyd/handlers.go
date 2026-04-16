@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -18,6 +19,8 @@ const (
 	audioCommand    = "audio"
 	zoomDefault     = 100
 	snapshotTimeout = 3 * time.Second
+
+	maxStreamBufferSize = 10 * 1024 * 1024
 
 	ptzAxisPan  = "pan"
 	ptzAxisTilt = "tilt"
@@ -235,6 +238,40 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 	ctx := request.Context()
 
+	cmd := exec.CommandContext(
+		ctx,
+		"ffmpeg",
+		"-f", "v4l2",
+		"-input_format", "mjpeg",
+		"-i", status.Device,
+		"-f", "image2pipe",
+		"-vcodec", "mjpeg",
+		"-q:v", "5",
+		"-vf", "scale=640:-1",
+		"pipe:1",
+	)
+
+	stdOut, pipeErr := cmd.StdoutPipe()
+	if pipeErr != nil {
+		slog.Debug("stream pipe error", "error", pipeErr)
+
+		return
+	}
+
+	startErr := cmd.Start()
+	if startErr != nil {
+		slog.Debug("stream start error", "error", startErr)
+
+		return
+	}
+
+	defer func() {
+		_ = cmd.Process.Kill()
+		_ = cmd.Wait()
+	}()
+
+	var buf bytes.Buffer
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -242,57 +279,93 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		default:
 		}
 
-		cmd := exec.CommandContext(
-			ctx,
-			"ffmpeg",
-			"-f",
-			"v4l2",
-			"-i",
-			status.Device,
-			"-frames:v",
-			"1",
-			"-f",
-			"image2",
-			"-q:v",
-			"5",
-			"-vf",
-			"scale=640:-1",
-			"pipe:1",
-		)
-
-		output, err := cmd.Output()
-		if err != nil {
-			slog.Debug("frame capture error", "error", err)
+		frame, frameErr := extractJPEGFrame(stdOut, &buf)
+		if frameErr != nil {
+			slog.Debug("frame extract error", "error", frameErr)
 
 			return
 		}
 
-		_, fErr := fmt.Fprintf(
+		_, headerErr := fmt.Fprintf(
 			responseWriter,
 			"--frame\r\nContent-Type: image/jpeg\r\nContent-Length: %d\r\n\r\n",
-			len(output),
+			len(frame),
 		)
-		if fErr != nil {
-			slog.Debug("stream write error", "error", fErr)
-
+		if headerErr != nil {
 			return
 		}
 
-		_, wErr := responseWriter.Write(output)
-		if wErr != nil {
-			slog.Debug("stream write error", "error", wErr)
-
+		_, writeErr := responseWriter.Write(frame)
+		if writeErr != nil {
 			return
 		}
 
-		_, pfErr := fmt.Fprint(responseWriter, "\r\n")
-		if pfErr != nil {
-			slog.Debug("stream write error", "error", pfErr)
-
+		_, sepErr := fmt.Fprint(responseWriter, "\r\n")
+		if sepErr != nil {
 			return
 		}
 
 		flusher.Flush()
+	}
+}
+
+func extractJPEGFrame(r io.Reader, buf *bytes.Buffer) ([]byte, error) {
+	var soiFound bool
+
+	for {
+		if buf.Len() > maxStreamBufferSize {
+			buf.Reset()
+		}
+
+		var b [1]byte
+
+		_, err := r.Read(b[:])
+		if err != nil {
+			return nil, fmt.Errorf("read byte: %w", err)
+		}
+
+		if !soiFound {
+			if b[0] == 0xFF {
+				var next [1]byte
+
+				_, nextErr := r.Read(next[:])
+				if nextErr != nil {
+					return nil, fmt.Errorf("read soi next: %w", nextErr)
+				}
+
+				if next[0] == 0xD8 {
+					buf.Reset()
+					buf.Write([]byte{0xFF, 0xD8})
+					soiFound = true
+				} else if next[0] == 0xFF {
+					b[0] = 0xFF
+
+					continue
+				}
+			}
+
+			continue
+		}
+
+		buf.WriteByte(b[0])
+
+		if b[0] == 0xFF {
+			var next [1]byte
+
+			_, nextErr := r.Read(next[:])
+			if nextErr != nil {
+				return nil, fmt.Errorf("read eoi next: %w", nextErr)
+			}
+
+			buf.WriteByte(next[0])
+
+			if next[0] == 0xD9 {
+				frame := make([]byte, buf.Len())
+				copy(frame, buf.Bytes())
+
+				return frame, nil
+			}
+		}
 	}
 }
 
