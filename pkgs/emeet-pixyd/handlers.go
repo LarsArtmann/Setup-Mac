@@ -19,6 +19,18 @@ const (
 	offlineValue    = "offline"
 	zoomDefault     = 100
 	snapshotTimeout = 3 * time.Second
+
+	ptzAxisPan   = "pan"
+	ptzAxisTilt  = "tilt"
+	ptzAxisZoom  = "zoom"
+	inCallYes    = "yes"
+
+	ptzPanMin   = -170
+	ptzPanMax   = 170
+	ptzTiltMin  = -30
+	ptzTiltMax  = 30
+	ptzZoomMin  = 100
+	ptzZoomMax  = 400
 )
 
 type webServer struct {
@@ -128,14 +140,14 @@ func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.
 	status := s.getWebStatusWithPTZ(request.Context())
 
 	switch axis {
-	case "pan":
-		templ.Handler(ptzSlider("Pan", "pan", -170, 170, status.Pan, "\u00b0")).
+	case ptzAxisPan:
+		templ.Handler(ptzSlider("Pan", ptzAxisPan, ptzPanMin, ptzPanMax, status.Pan, "\u00b0")).
 			ServeHTTP(responseWriter, request)
-	case "tilt":
-		templ.Handler(ptzSlider("Tilt", "tilt", -30, 30, status.Tilt, "\u00b0")).
+	case ptzAxisTilt:
+		templ.Handler(ptzSlider("Tilt", ptzAxisTilt, ptzTiltMin, ptzTiltMax, status.Tilt, "\u00b0")).
 			ServeHTTP(responseWriter, request)
-	case "zoom":
-		templ.Handler(ptzSlider("Zoom", "zoom", 100, 400, status.Zoom, "x")).
+	case ptzAxisZoom:
+		templ.Handler(ptzSlider("Zoom", ptzAxisZoom, ptzZoomMin, ptzZoomMax, status.Zoom, "x")).
 			ServeHTTP(responseWriter, request)
 	default:
 		templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
@@ -154,8 +166,8 @@ func (s *webServer) checkDevice(responseWriter http.ResponseWriter) (webStatus, 
 }
 
 func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *http.Request) {
-	status, ok := s.checkDevice(responseWriter)
-	if !ok {
+	status, hasDevice := s.checkDevice(responseWriter)
+	if !hasDevice {
 		return
 	}
 
@@ -207,13 +219,13 @@ func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *
 }
 
 func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *http.Request) {
-	status, ok := s.checkDevice(responseWriter)
-	if !ok {
+	status, hasDevice := s.checkDevice(responseWriter)
+	if !hasDevice {
 		return
 	}
 
-	flusher, ok := responseWriter.(http.Flusher)
-	if !ok {
+	flusher, flushOk := responseWriter.(http.Flusher)
+	if !flushOk {
 		http.Error(responseWriter, "streaming not supported", http.StatusInternalServerError)
 
 		return
@@ -348,14 +360,14 @@ func parseWebStatus(raw string) webStatus {
 			status.Audio = val
 		case "gesture":
 			status.Gesture = val == "true"
-		case "pan":
+		case ptzAxisPan:
 			status.Pan, _ = strconv.Atoi(val)
-		case "tilt":
+		case ptzAxisTilt:
 			status.Tilt, _ = strconv.Atoi(val)
-		case "zoom":
+		case ptzAxisZoom:
 			status.Zoom, _ = strconv.Atoi(val)
 		case "in_call":
-			status.InCall = val == "yes"
+			status.InCall = val == inCallYes
 		case "auto":
 			status.Auto = val == "on"
 		case "device":

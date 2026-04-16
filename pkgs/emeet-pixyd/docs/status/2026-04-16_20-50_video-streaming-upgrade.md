@@ -1,9 +1,9 @@
 # Video Streaming Upgrade Status Report
 
-**Date:** 2026-04-16 20:50  
-**Project:** emeet-pixyd  
-**Branch:** master  
-**Current HEAD:** `38bdc1b fix(emeet-pixyd): restore proper Go formatting and add missing newline after package declaration`  
+**Date:** 2026-04-16 20:50
+**Project:** emeet-pixyd
+**Branch:** master
+**Current HEAD:** `38bdc1b fix(emeet-pixyd): restore proper Go formatting and add missing newline after package declaration`
 **Expected improvement:** ~1 FPS → 15-30 FPS
 
 ---
@@ -106,7 +106,7 @@ The `alejandra` (Nix formatter) hook also fails on an **unrelated file** (`./pla
 
 **What is stripping newlines from `.go` files within seconds of writing them?**
 
-I observed 8+ `golangci-lint-langserver` processes running across multiple shell sessions. The file corruption pattern (all newlines removed, reducing multi-hundred-line files to 0 lines) is not normal behavior for any linter or formatter I know of. The `handlers.go.tmp` file survived because nothing watched it. 
+I observed 8+ `golangci-lint-langserver` processes running across multiple shell sessions. The file corruption pattern (all newlines removed, reducing multi-hundred-line files to 0 lines) is not normal behavior for any linter or formatter I know of. The `handlers.go.tmp` file survived because nothing watched it.
 
 **I need the user to:**
 1. Check if there's a custom file watcher, `entr`, `watchman`, or similar configured for this project
