@@ -23,7 +23,7 @@ const (
 func testConfig(dir string) Config {
 	return Config{
 		StateDir:      dir,
-		PollInterval:  2,
+		PollInterval:  2 * time.Second,
 		DebounceCount: 3,
 	}
 }
