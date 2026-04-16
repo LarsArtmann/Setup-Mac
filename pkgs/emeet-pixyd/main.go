@@ -659,10 +659,54 @@ func (d *Daemon) syncState(ctx context.Context) string {
 	return "synced (no changes)"
 }
 
+func ppidOf(pid int) int {
+	statData, err := os.ReadFile(filepath.Join("/proc", strconv.Itoa(pid), "stat"))
+	if err != nil {
+		return 0
+	}
+
+	statStr := string(statData)
+	lastParen := strings.LastIndex(statStr, ")")
+	if lastParen == -1 {
+		return 0
+	}
+
+	fields := strings.Fields(statStr[lastParen+1:])
+	if len(fields) < 2 {
+		return 0
+	}
+
+	ppid, err := strconv.Atoi(fields[1])
+	if err != nil {
+		return 0
+	}
+
+	return ppid
+}
+
+func isDescendantOf(pid, ancestor int) bool {
+	for range 10 {
+		ppid := ppidOf(pid)
+		if ppid == 0 || ppid == pid {
+			return false
+		}
+
+		if ppid == ancestor {
+			return true
+		}
+
+		pid = ppid
+	}
+
+	return false
+}
+
 func isCameraInUse(videoDev string) bool {
 	if videoDev == "" {
 		return false
 	}
+
+	myPID := os.Getpid()
 
 	procEntries, err := os.ReadDir("/proc")
 	if err != nil {
@@ -674,8 +718,12 @@ func isCameraInUse(videoDev string) bool {
 			continue
 		}
 
-		_, parseErr := strconv.Atoi(proc.Name())
+		pid, parseErr := strconv.Atoi(proc.Name())
 		if parseErr != nil {
+			continue
+		}
+
+		if pid == myPID || isDescendantOf(pid, myPID) {
 			continue
 		}
 
@@ -692,30 +740,9 @@ func isCameraInUse(videoDev string) bool {
 				continue
 			}
 
-			if link != videoDev {
-				continue
+			if link == videoDev {
+				return true
 			}
-
-			statPath := filepath.Join("/proc", proc.Name(), "stat")
-
-			statData, err := os.ReadFile(statPath)
-			if err != nil {
-				continue
-			}
-
-			statStr := string(statData)
-
-			lastParen := strings.LastIndex(statStr, ")")
-			if lastParen == -1 {
-				continue
-			}
-
-			comm := statStr[:lastParen+1]
-			if strings.Contains(comm, "emeet-pixyd") {
-				continue
-			}
-
-			return true
 		}
 	}
 
