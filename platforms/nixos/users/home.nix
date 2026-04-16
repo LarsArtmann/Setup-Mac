@@ -54,6 +54,14 @@
     };
   };
 
+  # D-Bus/GSettings dark mode — read by xdg-desktop-portal-gtk Settings interface,
+  # which Chromium-based browsers (Helium) query for UI chrome theming on Wayland compositors.
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+    };
+  };
+
   # Programs configuration
   programs = {
     # Kitty terminal configuration (TV-friendly font size)

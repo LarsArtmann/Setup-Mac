@@ -13,6 +13,10 @@ in {
     spawn-at-startup = [
       {argv = ["kitty"];}
       {argv = ["kitty" "-e" "fish" "-c" "sudo btop"];}
+      {argv = ["kitty" "-e" "nvtop"];}
+      {argv = ["amdgpu_top"];}
+      {argv = ["helium"];}
+      {argv = ["signal-desktop"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
@@ -336,6 +340,7 @@ in {
           {app-id = "^discord$";}
           {app-id = "^vesktop$";}
           {app-id = "^telegramdesktop$";}
+          {app-id = "^signal$";}
         ];
         open-on-workspace = "chat";
       }
