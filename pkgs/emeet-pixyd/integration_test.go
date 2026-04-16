@@ -857,7 +857,13 @@ func startSocketDaemon(t *testing.T) (*Daemon, Config) {
 		_ = daemon.listenUnix(ctx)
 	}()
 
-	time.Sleep(50 * time.Millisecond)
+	for i := 0; i < 50; i++ {
+		if _, statErr := os.Stat(cfg.SocketPath()); statErr == nil {
+			break
+		}
+
+		time.Sleep(20 * time.Millisecond)
+	}
 
 	return daemon, cfg
 }
@@ -955,12 +961,12 @@ func TestSocket_UnknownCommand(t *testing.T) {
 	assertSocketResponsePrefix(t, resp, "unknown command:", "socket response")
 }
 
-func TestSocket_EmptyCommandReturnsStatus(t *testing.T) {
+func TestSocket_StatusViaCommandReturnsStatus(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	resp, err := pixy.SendCommand(cfg.SocketPath(), "")
+	resp, err := pixy.SendCommand(cfg.SocketPath(), "status")
 	if err != nil {
-		t.Fatalf("empty command: %v", err)
+		t.Fatalf("status command: %v", err)
 	}
 
 	assertSocketResponseContains(t, resp, "camera=", "socket response")

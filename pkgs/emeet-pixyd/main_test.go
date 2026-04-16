@@ -253,8 +253,14 @@ func TestHandleCommandStatus(t *testing.T) {
 	}
 
 	result := d.handleCommand(context.Background(), "status")
-	if result != "camera=offline (device not found)" {
+	if !strings.HasPrefix(result, "camera=offline") {
 		t.Errorf("expected offline status when no device, got: %s", result)
+	}
+	if !strings.Contains(result, "audio=") {
+		t.Errorf("expected audio= in offline status, got: %s", result)
+	}
+	if !strings.Contains(result, "auto=") {
+		t.Errorf("expected auto= in offline status, got: %s", result)
 	}
 }
 
