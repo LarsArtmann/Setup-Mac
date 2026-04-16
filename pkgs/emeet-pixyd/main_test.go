@@ -15,6 +15,11 @@ import (
 	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
+const (
+	testVideoDev = "/dev/video0"
+	testHIDDev   = "/dev/hidraw7"
+)
+
 func testConfig(dir string) Config {
 	return Config{
 		StateDir:      dir,
@@ -128,7 +133,7 @@ func testDaemonNoDevice(camera CameraState) *Daemon {
 }
 
 func testDaemonWithDevice(camera CameraState) *Daemon {
-	return testDaemonBase(camera, "/dev/video0", "/dev/hidraw7")
+	return testDaemonBase(camera, testVideoDev, testHIDDev)
 }
 
 func TestStateDefaults(t *testing.T) {
@@ -256,7 +261,7 @@ func TestHandleCommandStatus(t *testing.T) {
 func TestHandleCommandUnknown(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
+	d := newTestDaemon(StatePrivacy, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "foobar")
 	if result != "unknown command: foobar" {
@@ -271,7 +276,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "auto-off")
-	if result != "auto mode off" {
+	if result != respAutoModeOff {
 		t.Errorf("expected 'auto mode off', got: %s", result)
 	}
 
@@ -280,7 +285,7 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 	}
 
 	result = d.handleCommand(context.Background(), "auto-on")
-	if result != "auto mode on" {
+	if result != respAutoModeOn {
 		t.Errorf("expected 'auto mode on', got: %s", result)
 	}
 
@@ -290,10 +295,10 @@ func TestHandleCommandAutoToggle(t *testing.T) {
 func TestHandleCommandAudioInvalid(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, "/dev/video0", "/dev/hidraw0")
+	d := newTestDaemonWithAudio(StatePrivacy, AudioNC, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "audio xyz")
-	if result != "usage: audio [nc|live|org]" {
+	if result != respAudioUsage {
 		t.Errorf("expected usage for invalid mode, got: %s", result)
 	}
 }
@@ -383,7 +388,7 @@ func TestIsCameraInUseEmptyDevice(t *testing.T) {
 func TestHandleCommandTogglePrivacy(t *testing.T) {
 	t.Parallel()
 
-	d := newTestDaemon(StatePrivacy, "/dev/video0", "/dev/hidraw0")
+	d := newTestDaemon(StatePrivacy, testVideoDev, "/dev/hidraw0")
 
 	result := d.handleCommand(context.Background(), "toggle-privacy")
 	if result == "" {
@@ -400,10 +405,8 @@ func TestHandleCommandProbe(t *testing.T) {
 
 	if d.videoDev != "" {
 		assertStatusPrefix(t, result, "device found:", "PIXY connected")
-	} else {
-		if result != "device not found" {
-			t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
-		}
+	} else if result != respDeviceNotFound {
+		t.Errorf("expected 'device not found' when no PIXY connected, got: %s", result)
 	}
 }
 
@@ -844,7 +847,7 @@ func testV4L2ProbesPIXY(t *testing.T, devices []fakeVideoDev) {
 	createFakeVideo4linux(t, root, devices)
 
 	result := probeVideo4linux(root)
-	if result != "/dev/video0" {
+	if result != testVideoDev {
 		t.Errorf("expected /dev/video0, got %s", result)
 	}
 }
@@ -957,7 +960,7 @@ func TestProbeHidraw_PIXYFound(t *testing.T) {
 	result := probeHidraw(root)
 
 	// Then the PIXY hidraw is found
-	if result != "/dev/hidraw7" {
+	if result != testHIDDev {
 		t.Errorf("expected /dev/hidraw7, got %s", result)
 	}
 }
@@ -1048,7 +1051,7 @@ func TestProbeHidraw_MixedDevices(t *testing.T) {
 	result := probeHidraw(root)
 
 	// Then the PIXY is found
-	if result != "/dev/hidraw7" {
+	if result != testHIDDev {
 		t.Errorf("expected /dev/hidraw7, got %s", result)
 	}
 }

@@ -303,7 +303,7 @@ func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, requ
 
 	cmd := "gesture-off"
 	if !currentGesture {
-		cmd = "gesture-on"
+		cmd = cmdGestureOn
 	}
 
 	resp := s.daemon.handleCommand(request.Context(), cmd)
@@ -320,7 +320,7 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 
 	cmd := "auto-off"
 	if !currentAuto {
-		cmd = "auto-on"
+		cmd = cmdAutoOn
 	}
 
 	resp := s.daemon.handleCommand(request.Context(), cmd)

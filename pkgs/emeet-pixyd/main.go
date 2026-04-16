@@ -1,4 +1,3 @@
-// Package main provides the emeet-pixyd daemon for EMEET PIXY camera management.
 package main
 
 import (
@@ -27,10 +26,13 @@ const (
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
 
-	respAutoModeOff = "auto mode off"
-	respAutoModeOn  = "auto mode on"
-	respAudioUsage  = "usage: audio [nc|live|org]"
+	respAutoModeOff    = "auto mode off"
+	respAutoModeOn     = "auto mode on"
+	respAudioUsage     = "usage: audio [nc|live|org]"
 	respDeviceNotFound = "device not found"
+
+	cmdGestureOn = "gesture-on"
+	cmdAutoOn    = "auto-on"
 )
 
 var (
@@ -991,104 +993,32 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.getStatus(ctx)
 
 	case "track":
-		err := d.setTracking(StateTracking)
-		if err != nil {
-			return fmt.Sprintf("error: track: %v", err)
-		}
-
-		return "tracking on"
+		return d.handleTrackingCommand(StateTracking, "track")
 
 	case "idle":
-		err := d.setTracking(StateIdle)
-		if err != nil {
-			return fmt.Sprintf("error: idle: %v", err)
-		}
-
-		return "tracking off"
+		return d.handleTrackingCommand(StateIdle, "idle")
 
 	case "privacy":
-		err := d.setTracking(StatePrivacy)
-		if err != nil {
-			return fmt.Sprintf("error: privacy: %v", err)
-		}
-
-		return "privacy on"
+		return d.handleTrackingCommand(StatePrivacy, "privacy")
 
 	case "toggle-privacy":
-		newState := StatePrivacy
 		if d.state.Camera == StatePrivacy {
-			newState = StateTracking
+			return d.handleTrackingCommand(StateTracking, "toggle-privacy")
 		}
 
-		privacyErr := d.setTracking(newState)
-		if privacyErr != nil {
-			return fmt.Sprintf("error: toggle-privacy: %v", privacyErr)
-		}
-
-		if newState == StatePrivacy {
-			return "privacy on"
-		}
-
-		return "tracking on"
+		return d.handleTrackingCommand(StatePrivacy, "toggle-privacy")
 
 	case "audio":
-		var mode AudioMode
-		if len(parts) < 2 {
-			mode = d.state.Audio.Next()
-		} else {
-			var parseErr error
+		return d.handleAudioCommand(parts)
 
-			mode, parseErr = ParseAudioMode(parts[1])
-			if parseErr != nil {
-				return "usage: audio [nc|live|org]"
-			}
-		}
-
-		audioErr := d.setAudio(mode)
-		if audioErr != nil {
-			return fmt.Sprintf("error: audio %s: %v", mode, audioErr)
-		}
-
-		return "audio: " + string(mode)
-
-	case "gesture-on":
-		gestureErr := d.setGesture(true)
-		if gestureErr != nil {
-			return fmt.Sprintf("error: gesture-on: %v", gestureErr)
-		}
-
-		return "gesture on"
-
-	case "gesture-off":
-		gestureErr := d.setGesture(false)
-		if gestureErr != nil {
-			return fmt.Sprintf("error: gesture-off: %v", gestureErr)
-		}
-
-		return "gesture off"
+	case cmdGestureOn, "gesture-off":
+		return d.handleGestureCommand(parts[0])
 
 	case "center":
-		centerErr := d.centerCamera(ctx)
-		if centerErr != nil {
-			return fmt.Sprintf("error: center: %v", centerErr)
-		}
+		return d.handleCenterCommand(ctx)
 
-		return "centered"
-
-	case "auto-on", "auto-off":
-		mode := parts[0] == "auto-on"
-		d.state.AutoMode = mode
-
-		saveErr := d.saveState()
-		if saveErr != nil {
-			slog.Error("failed to save state", "error", saveErr)
-		}
-
-		if mode {
-			return "auto mode on"
-		}
-
-		return "auto mode off"
+	case cmdAutoOn, "auto-off":
+		return d.handleAutoCommand(parts[0])
 
 	case "waybar":
 		return d.waybarOutput()
@@ -1103,29 +1033,10 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 			return "device found: " + d.videoDev
 		}
 
-		return "device not found"
+		return respDeviceNotFound
 
 	case "pan", "tilt", "zoom":
-		if len(parts) < 2 {
-			return fmt.Sprintf("usage: %s <value>", parts[0])
-		}
-
-		val, parseErr := strconv.Atoi(parts[1])
-		if parseErr != nil {
-			return fmt.Sprintf("error: %s: %v", parts[0], errInvalidValue)
-		}
-
-		multiplier := v4l2DegreesPerUnit
-		if parts[0] == "zoom" {
-			multiplier = 1
-		}
-
-		v4l2Err := v4l2Set(ctx, d.videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier))
-		if v4l2Err != nil {
-			return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
-		}
-
-		return fmt.Sprintf("%s set to %d", parts[0], val)
+		return d.handlePTZCommand(ctx, parts)
 
 	case "device":
 		if d.videoDev != "" {
@@ -1137,6 +1048,101 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	default:
 		return "unknown command: " + parts[0]
 	}
+}
+
+func (d *Daemon) handleTrackingCommand(state CameraState, label string) string {
+	if err := d.setTracking(state); err != nil {
+		return fmt.Sprintf("error: %s: %v", label, err)
+	}
+
+	if state == StateTracking {
+		return "tracking on"
+	}
+
+	if state == StatePrivacy {
+		return "privacy on"
+	}
+
+	return "tracking off"
+}
+
+func (d *Daemon) handleAudioCommand(parts []string) string {
+	var mode AudioMode
+	if len(parts) < 2 {
+		mode = d.state.Audio.Next()
+	} else {
+		var parseErr error
+
+		mode, parseErr = ParseAudioMode(parts[1])
+		if parseErr != nil {
+			return respAudioUsage
+		}
+	}
+
+	audioErr := d.setAudio(mode)
+	if audioErr != nil {
+		return fmt.Sprintf("error: audio %s: %v", mode, audioErr)
+	}
+
+	return "audio: " + string(mode)
+}
+
+func (d *Daemon) handleGestureCommand(cmd string) string {
+	enable := cmd == cmdGestureOn
+	if err := d.setGesture(enable); err != nil {
+		return fmt.Sprintf("error: %s: %v", cmd, err)
+	}
+
+	if enable {
+		return "gesture on"
+	}
+
+	return "gesture off"
+}
+
+func (d *Daemon) handleCenterCommand(ctx context.Context) string {
+	if err := d.centerCamera(ctx); err != nil {
+		return fmt.Sprintf("error: center: %v", err)
+	}
+
+	return "centered"
+}
+
+func (d *Daemon) handleAutoCommand(cmd string) string {
+	mode := cmd == cmdAutoOn
+	d.state.AutoMode = mode
+
+	if saveErr := d.saveState(); saveErr != nil {
+		slog.Error("failed to save state", "error", saveErr)
+	}
+
+	if mode {
+		return respAutoModeOn
+	}
+
+	return respAutoModeOff
+}
+
+func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
+	if len(parts) < 2 {
+		return fmt.Sprintf("usage: %s <value>", parts[0])
+	}
+
+	val, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return fmt.Sprintf("error: %s: %v", parts[0], errInvalidValue)
+	}
+
+	multiplier := v4l2DegreesPerUnit
+	if parts[0] == "zoom" {
+		multiplier = 1
+	}
+
+	if v4l2Err := v4l2Set(ctx, d.videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
+		return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
+	}
+
+	return fmt.Sprintf("%s set to %d", parts[0], val)
 }
 
 func (d *Daemon) waybarOutput() string {

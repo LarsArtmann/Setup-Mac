@@ -854,7 +854,7 @@ func TestSocket_ProbeCommand(t *testing.T) {
 			t.Errorf("expected 'device found: ...', got: %s", resp)
 		}
 	} else {
-		if resp != "device not found" {
+		if resp != respDeviceNotFound {
 			t.Errorf("expected 'device not found', got: %s", resp)
 		}
 	}
@@ -884,7 +884,7 @@ func TestSocket_DeviceCommand(t *testing.T) {
 			t.Errorf("expected %s, got: %s", daemon.videoDev, resp)
 		}
 	} else {
-		if resp != "device not found" {
+		if resp != respDeviceNotFound {
 			t.Errorf("expected 'device not found', got: %s", resp)
 		}
 	}
