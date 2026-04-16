@@ -361,6 +361,18 @@ input[type="range"]:focus-visible {
   border-radius: 3px;
 }
 
+.ptz-slider {
+  touch-action: none;
+}
+
+.ptz-slider.sending {
+  opacity: 0.7;
+}
+
+.ptz-slider.sending::-webkit-slider-thumb {
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+}
+
 .toggle-row {
   display: flex;
   align-items: center;
@@ -473,6 +485,16 @@ templ page(s webStatus) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>EMEET PIXY</title>
 			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script>
+				document.addEventListener('input', function(e) {
+					if (!e.target.classList.contains('ptz-slider')) return;
+					var axis = e.target.id.replace('slider-', '');
+					var valEl = document.getElementById('val-' + axis);
+					if (!valEl) return;
+					var suffix = axis === 'zoom' ? 'x' : '\u00b0';
+					valEl.textContent = e.target.value + suffix;
+				});
+			</script>
 			<style>{ css }</style>
 		</head>
 		<body>
@@ -521,19 +543,22 @@ templ page(s webStatus) {
 }
 
 templ ptzSlider(label, axis string, min, max, value int, unit string) {
-	<div class="slider-row">
+	<div class="slider-row" id={ "ptz-" + axis }>
 		<span class="slider-label">{ label }</span>
 		<input
 			type="range"
+			class="ptz-slider"
+			id={ "slider-" + axis }
 			min={ fmt.Sprintf("%d", min) }
 			max={ fmt.Sprintf("%d", max) }
 			value={ fmt.Sprintf("%d", value) }
 			hx-post={ "/api/ptz/" + axis }
-			hx-target="#status-panel"
+			hx-target={ "#ptz-" + axis }
+			hx-swap="outerHTML"
 			hx-vals="js:{value: this.value}"
-			hx-trigger="change"
+			hx-trigger="input changed delay:400ms"
 		/>
-		<span class="slider-value">{ fmt.Sprintf("%d%s", value, unit) }</span>
+		<span class="slider-value" id={ "val-" + axis }>{ fmt.Sprintf("%d%s", value, unit) }</span>
 	</div>
 }
 

@@ -126,7 +126,20 @@ func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.
 	slog.Debug("web ptz", "axis", axis, "val", val, "response", resp)
 
 	status := s.getWebStatusWithPTZ(request.Context())
-	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
+
+	switch axis {
+	case "pan":
+		templ.Handler(ptzSlider("Pan", "pan", -170, 170, status.Pan, "\u00b0")).
+			ServeHTTP(responseWriter, request)
+	case "tilt":
+		templ.Handler(ptzSlider("Tilt", "tilt", -30, 30, status.Tilt, "\u00b0")).
+			ServeHTTP(responseWriter, request)
+	case "zoom":
+		templ.Handler(ptzSlider("Zoom", "zoom", 100, 400, status.Zoom, "x")).
+			ServeHTTP(responseWriter, request)
+	default:
+		templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
+	}
 }
 
 func (s *webServer) checkDevice(responseWriter http.ResponseWriter) (webStatus, bool) {
