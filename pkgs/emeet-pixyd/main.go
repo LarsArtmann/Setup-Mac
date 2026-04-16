@@ -329,7 +329,7 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 
 	hidFile, err := os.OpenFile(hidrawDev, os.O_RDWR, 0)
 	if err != nil {
-		return nil, fmt.Errorf("open hidraw: %w", err)
+		return nil, fmt.Errorf("open hidraw %s: %w", hidrawDev, err)
 	}
 
 	defer func() { _ = hidFile.Close() }()
@@ -426,7 +426,7 @@ func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
 	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).
 		Output()
 	if err != nil {
-		return "", fmt.Errorf("v4l2Get: %w", err)
+		return "", fmt.Errorf("v4l2Get %s on %s: %w", ctrl, dev, err)
 	}
 
 	parts := strings.Split(strings.TrimSpace(string(out)), ":")
