@@ -122,10 +122,16 @@ func postAndClose(t *testing.T, url, contentType string, body io.Reader) {
 	if err != nil {
 		t.Fatalf("POST %s: %v", url, err)
 	}
+
 	resp.Body.Close()
 }
 
-func assertSocketCommandsHavePrefix(t *testing.T, socketPath string, commands []string, expectedPrefix string) {
+func assertSocketCommandsHavePrefix(
+	t *testing.T,
+	socketPath string,
+	commands []string,
+	expectedPrefix string,
+) {
 	t.Helper()
 
 	for _, cmd := range commands {
@@ -133,6 +139,7 @@ func assertSocketCommandsHavePrefix(t *testing.T, socketPath string, commands []
 		if err != nil {
 			t.Fatalf("%s: %v", cmd, err)
 		}
+
 		assertSocketResponsePrefix(t, resp, expectedPrefix, "socket response")
 	}
 }
@@ -142,16 +149,21 @@ func assertEndpointsReturnNonOK(t *testing.T, serverURL string, method string, e
 
 	for _, ep := range endpoints {
 		t.Run(ep, func(t *testing.T) {
-			var resp *http.Response
-			var err error
+			var (
+				resp *http.Response
+				err  error
+			)
+
 			if method == "GET" {
 				resp, err = http.Get(serverURL + ep)
 			} else {
 				resp, err = http.Post(serverURL+ep, "", nil)
 			}
+
 			if err != nil {
 				t.Fatalf("%s %s: %v", method, ep, err)
 			}
+
 			resp.Body.Close()
 
 			if resp.StatusCode == http.StatusOK {
@@ -571,20 +583,7 @@ func TestWeb_POSTEndpointsRejectGET(t *testing.T) {
 		"/api/probe",
 	}
 
-	for _, ep := range endpoints {
-		t.Run(ep, func(t *testing.T) {
-			resp, err := http.Get(server.URL + ep)
-			if err != nil {
-				t.Fatalf("GET %s: %v", ep, err)
-			}
-
-			resp.Body.Close()
-
-			if resp.StatusCode == http.StatusOK {
-				t.Errorf("GET %s should not be 200, got %d", ep, resp.StatusCode)
-			}
-		})
-	}
+	assertEndpointsReturnNonOK(t, server.URL, "GET", endpoints)
 }
 
 func TestWeb_GETEndpointsRejectPOST(t *testing.T) {
@@ -593,20 +592,7 @@ func TestWeb_GETEndpointsRejectPOST(t *testing.T) {
 
 	endpoints := []string{"/", "/panel", "/api/snapshot", "/api/stream"}
 
-	for _, ep := range endpoints {
-		t.Run(ep, func(t *testing.T) {
-			resp, err := http.Post(server.URL+ep, "", nil)
-			if err != nil {
-				t.Fatalf("POST %s: %v", ep, err)
-			}
-
-			resp.Body.Close()
-
-			if resp.StatusCode == http.StatusOK {
-				t.Errorf("POST %s should not be 200, got %d", ep, resp.StatusCode)
-			}
-		})
-	}
+	assertEndpointsReturnNonOK(t, server.URL, "POST", endpoints)
 }
 
 // ---------- 404 for unknown routes ----------
@@ -1019,7 +1005,12 @@ func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
 		t.Skip("device connected")
 	}
 
-	assertSocketCommandsHavePrefix(t, cfg.SocketPath(), []string{"pan 10", "tilt -5", "zoom 200"}, "error:")
+	assertSocketCommandsHavePrefix(
+		t,
+		cfg.SocketPath(),
+		[]string{"pan 10", "tilt -5", "zoom 200"},
+		"error:",
+	)
 }
 
 func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
@@ -1040,7 +1031,12 @@ func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
 func TestSocket_PanTiltZoomInvalidValue(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 
-	assertSocketCommandsHavePrefix(t, cfg.SocketPath(), []string{"pan abc", "tilt !", "zoom x"}, "error:")
+	assertSocketCommandsHavePrefix(
+		t,
+		cfg.SocketPath(),
+		[]string{"pan abc", "tilt !", "zoom x"},
+		"error:",
+	)
 }
 
 func TestSocket_TogglePrivacy(t *testing.T) {
