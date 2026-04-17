@@ -141,8 +141,8 @@ in {
             '';
 
             serviceConfig = {
-              ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} up --remove-orphans";
-              ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} down";
+              ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
+              ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
               WorkingDirectory = stateDir;
               Restart = "on-failure";
               RestartSec = "10s";
