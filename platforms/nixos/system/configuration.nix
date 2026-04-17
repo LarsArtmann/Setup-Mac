@@ -165,6 +165,10 @@
         enable = true;
       };
 
+      twenty = {
+        enable = true;
+      };
+
       smartd = {
         enable = true;
         autodetect = true;

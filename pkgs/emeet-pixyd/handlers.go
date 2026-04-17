@@ -3,8 +3,10 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"embed"
 	"fmt"
 	"io"
 	"log/slog"
@@ -24,7 +26,18 @@ const (
 	zoomDefault         = 100
 	snapshotTimeout     = 3 * time.Second
 	maxStreamBufferSize = 10 * 1024 * 1024
+	maxBodyBytes        = 1 << 10
+
+	panMin = -170
+	panMax = 170
+	tiltMin = -30
+	tiltMax = 30
+	zoomMin = 100
+	zoomMax = 400
 )
+
+//go:embed static
+var staticFS embed.FS
 
 func formatLastSynced(t time.Time) string {
 	if t.IsZero() {
@@ -86,24 +99,10 @@ func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 
 		return status
 	}
-	pan, _ := v4l2Get(ctx, s.daemon.videoDev, "pan_absolute")
-	tilt, _ := v4l2Get(ctx, s.daemon.videoDev, "tilt_absolute")
-	zoom, _ := v4l2Get(ctx, s.daemon.videoDev, "zoom_absolute")
-	panVal, panErr := strconv.Atoi(pan)
-	if panErr == nil {
-
-		status.Pan = panVal / v4l2DegreesPerUnit
-	}
-	tiltVal, tiltErr := strconv.Atoi(tilt)
-	if tiltErr == nil {
-
-		status.Tilt = tiltVal / v4l2DegreesPerUnit
-	}
-	zoomVal, zoomErr := strconv.Atoi(zoom)
-	if zoomErr == nil {
-
-		status.Zoom = zoomVal
-	}
+	ptz := parsePTZValues(ctx, s.daemon.videoDev)
+	status.Pan = ptz.Pan
+	status.Tilt = ptz.Tilt
+	status.Zoom = ptz.Zoom
 	return status
 }
 
@@ -119,6 +118,7 @@ func (s *webServer) handleStatusPanel(responseWriter http.ResponseWriter, reques
 
 func (s *webServer) action(command string) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, request *http.Request) {
+		http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 
 		resp := s.daemon.handleCommand(request.Context(), command)
 
@@ -131,6 +131,7 @@ func (s *webServer) action(command string) http.HandlerFunc {
 }
 
 func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *http.Request) {
+	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	mode := request.FormValue("mode")
 	cmd := audioCommand
 	if mode != "" {
@@ -143,7 +144,31 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
+func clampInt(v, lo, hi int) int {
+	if v < lo {
+		return lo
+	}
+	if v > hi {
+		return hi
+	}
+	return v
+}
+
+func ptzLimits(axis string) (int, int) {
+	switch axis {
+	case "pan":
+		return panMin, panMax
+	case "tilt":
+		return tiltMin, tiltMax
+	case "zoom":
+		return zoomMin, zoomMax
+	default:
+		return 0, 0
+	}
+}
+
 func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.Request) {
+	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	axis := request.PathValue("axis")
 	val := request.FormValue("value")
 	if axis == "" || val == "" {
@@ -152,21 +177,28 @@ func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.
 
 		return
 	}
-	resp := s.daemon.handleCommand(request.Context(), axis+" "+val)
-	slog.Debug("web ptz", "axis", axis, "val", val, "response", resp)
+	intVal, err := strconv.Atoi(val)
+	if err != nil {
+		http.Error(responseWriter, "invalid value", http.StatusBadRequest)
+		return
+	}
+	lo, hi := ptzLimits(axis)
+	intVal = clampInt(intVal, lo, hi)
+	resp := s.daemon.handleCommand(request.Context(), axis+" "+strconv.Itoa(intVal))
+	slog.Debug("web ptz", "axis", axis, "val", intVal, "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
 	switch axis {
 	case "pan":
 
-		templ.Handler(ptzSlider("Pan", "pan", -170, 170, status.Pan, "\u00b0")).
+		templ.Handler(ptzSlider("Pan", "pan", panMin, panMax, status.Pan, "\u00b0")).
 			ServeHTTP(responseWriter, request)
 	case "tilt":
 
-		templ.Handler(ptzSlider("Tilt", "tilt", -30, 30, status.Tilt, "\u00b0")).
+		templ.Handler(ptzSlider("Tilt", "tilt", tiltMin, tiltMax, status.Tilt, "\u00b0")).
 			ServeHTTP(responseWriter, request)
 	case "zoom":
 
-		templ.Handler(ptzSlider("Zoom", "zoom", 100, 400, status.Zoom, "x")).
+		templ.Handler(ptzSlider("Zoom", "zoom", zoomMin, zoomMax, status.Zoom, "x")).
 			ServeHTTP(responseWriter, request)
 	default:
 
@@ -366,92 +398,54 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 }
 
 func extractJPEGFrame(r io.Reader, buf *bytes.Buffer) ([]byte, error) {
+	br := bufio.NewReaderSize(r, 64*1024)
 	var soiFound bool
 	for {
-
 		if buf.Len() > maxStreamBufferSize {
-
 			buf.Reset()
-
 		}
 
-		var b [1]byte
-
-		_, err := r.Read(b[:])
-
+		b, err := br.ReadByte()
 		if err != nil {
-
 			return nil, fmt.Errorf("read byte: %w", err)
-
 		}
 
 		if !soiFound {
-
-			if b[0] == 0xFF {
-
-				var next [1]byte
-
-				_, nextErr := r.Read(next[:])
-
+			if b == 0xFF {
+				next, nextErr := br.ReadByte()
 				if nextErr != nil {
-
 					return nil, fmt.Errorf("read soi next: %w", nextErr)
-
 				}
-
-				if next[0] == 0xD8 {
-
+				if next == 0xD8 {
 					buf.Reset()
-
 					buf.Write([]byte{0xFF, 0xD8})
-
 					soiFound = true
-
-				} else if next[0] == 0xFF {
-
-					b[0] = 0xFF
-
-					continue
-
+				} else if next == 0xFF {
+					_ = br.UnreadByte()
 				}
-
 			}
-
 			continue
-
 		}
 
-		buf.WriteByte(b[0])
+		buf.WriteByte(b)
 
-		if b[0] == 0xFF {
-
-			var next [1]byte
-
-			_, nextErr := r.Read(next[:])
-
+		if b == 0xFF {
+			next, nextErr := br.ReadByte()
 			if nextErr != nil {
-
 				return nil, fmt.Errorf("read eoi next: %w", nextErr)
-
 			}
-
-			buf.WriteByte(next[0])
-
-			if next[0] == 0xD9 {
-
+			buf.WriteByte(next)
+			if next == 0xD9 {
 				frame := make([]byte, buf.Len())
-
 				copy(frame, buf.Bytes())
-
 				return frame, nil
-
 			}
-
 		}
 	}
 }
 
 func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, request *http.Request) {
+	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	s.daemon.mu.Lock()
 	currentGesture := s.daemon.state.Gesture
 	s.daemon.mu.Unlock()
@@ -467,6 +461,7 @@ func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, requ
 }
 
 func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request *http.Request) {
+	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	s.daemon.mu.Lock()
 	currentAuto := s.daemon.state.AutoMode
 	s.daemon.mu.Unlock()
@@ -561,6 +556,7 @@ func parseWebStatus(raw string) webStatus {
 
 func newWebMux(server *webServer) *http.ServeMux {
 	mux := http.NewServeMux()
+	mux.Handle("GET /static/", http.FileServer(http.FS(staticFS)))
 	mux.HandleFunc("GET /{$}", server.handleIndex)
 	mux.HandleFunc("GET /panel", server.handleStatusPanel)
 	mux.HandleFunc("POST /api/track", server.action("track"))

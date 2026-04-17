@@ -187,6 +187,7 @@
         ./modules/nixos/services/homepage.nix
         ./modules/nixos/services/immich.nix
         ./modules/nixos/services/signoz.nix
+        ./modules/nixos/services/twenty.nix
         ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
         ./modules/nixos/services/taskchampion.nix
@@ -479,6 +480,7 @@
             inputs.self.nixosModules.sops
             inputs.nix-ssh-config.nixosModules.ssh
             inputs.self.nixosModules.signoz
+            inputs.self.nixosModules.twenty
             inputs.self.nixosModules.taskchampion
             ./platforms/nixos/system/configuration.nix
           ];

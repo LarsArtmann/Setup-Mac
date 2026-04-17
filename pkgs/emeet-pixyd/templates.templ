@@ -25,7 +25,7 @@ templ page(s webStatus) {
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>EMEET PIXY — { s.Camera }</title>
 			<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>"/>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<script src="/static/htmx.min.js"></script>
 			<script>
 				document.addEventListener('input', function(e) {
 					if (!e.target.classList.contains('ptz-slider')) return;
@@ -812,24 +812,24 @@ templ statusPanel(s webStatus) {
 		<div class="card" style="margin-bottom:1rem">
 			<div class="card-title">Settings</div>
 			<div class="toggle-row">
-				<span class="toggle-label">Gesture Control</span>
+				<span class="toggle-label" id="gesture-label">Gesture Control</span>
 				<button
 					class={ "toggle", templ.KV("on", s.Gesture) }
 					hx-post="/api/gesture"
 					hx-target="#status-panel"
-					aria-label="Toggle gesture control"
+					aria-labelledby="gesture-label"
 					role="switch"
 					aria-checked={ fmt.Sprintf("%t", s.Gesture) }
 					if !s.Online { disabled="" }
 				></button>
 			</div>
 			<div class="toggle-row">
-				<span class="toggle-label">Auto Mode</span>
+				<span class="toggle-label" id="auto-label">Auto Mode</span>
 				<button
 					class={ "toggle", templ.KV("on", s.Auto) }
 					hx-post="/api/auto"
 					hx-target="#status-panel"
-					aria-label="Toggle auto mode"
+					aria-labelledby="auto-label"
 					role="switch"
 					aria-checked={ fmt.Sprintf("%t", s.Auto) }
 				></button>

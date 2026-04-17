@@ -251,6 +251,6 @@ in {
     local-data =
       map
       (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
-      ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks"];
+      ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks" "crm"];
   };
 }

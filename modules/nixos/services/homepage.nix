@@ -134,6 +134,12 @@
               siteMonitor: ${svcUrl "signoz"}
 
       - Productivity:
+          - Twenty CRM:
+              href: ${svcUrl "crm"}
+              description: Customer Relationship Management
+              icon: twenty.png
+              statusStyle: dot
+              siteMonitor: ${svcUrl "crm"}/healthz
           - Taskwarrior:
               href: ${svcUrl "tasks"}
               description: Task Sync Server (TaskChampion)

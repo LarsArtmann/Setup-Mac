@@ -52,6 +52,7 @@
         "photomap.${domain}" = protectedVHost "photomap" 8050;
         "unsloth.${domain}" = protectedVHost "unsloth" 8888;
         "signoz.${domain}" = protectedVHost "signoz" 8080;
+        "crm.${domain}" = protectedVHost "crm" 3200;
         "tasks.${domain}" = {
           extraConfig = ''
             ${tlsConfig}
