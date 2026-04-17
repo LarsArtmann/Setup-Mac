@@ -118,47 +118,51 @@ in {
         restartUnits = ["twenty.service"];
       };
 
-      systemd.services.twenty = {
-        description = "Twenty CRM";
-        after = ["docker.service" "sops-nix.service"];
-        requires = ["docker.service"];
-        wants = ["sops-nix.service"];
-        wantedBy = ["multi-user.target"];
-        path = [pkgs.docker pkgs.docker-compose];
+      systemd = {
+        services = {
+          twenty = {
+            description = "Twenty CRM";
+            after = ["docker.service" "sops-nix.service"];
+            requires = ["docker.service"];
+            wants = ["sops-nix.service"];
+            wantedBy = ["multi-user.target"];
+            path = [pkgs.docker pkgs.docker-compose];
 
-        preStart = ''
-          mkdir -p ${stateDir}
-          printf 'PG_DATABASE_PASSWORD=%s\n' "$(cat ${pgPasswordFile} | tr -d '\n')" > ${stateDir}/.env
-          printf 'APP_SECRET=%s\n' "$(cat ${appSecretFile} | tr -d '\n')" >> ${stateDir}/.env
-          chmod 600 ${stateDir}/.env
-        '';
+            preStart = ''
+              mkdir -p ${stateDir}
+              printf 'PG_DATABASE_PASSWORD=%s\n' "$(cat ${pgPasswordFile} | tr -d '\n')" > ${stateDir}/.env
+              printf 'APP_SECRET=%s\n' "$(cat ${appSecretFile} | tr -d '\n')" >> ${stateDir}/.env
+              chmod 600 ${stateDir}/.env
+            '';
 
-        serviceConfig = {
-          ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} up --remove-orphans";
-          ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} down";
-          WorkingDirectory = stateDir;
-          Restart = "on-failure";
-          RestartSec = "10s";
+            serviceConfig = {
+              ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} up --remove-orphans";
+              ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} down";
+              WorkingDirectory = stateDir;
+              Restart = "on-failure";
+              RestartSec = "10s";
+            };
+          };
+
+          twenty-db-backup = {
+            description = "Twenty CRM Database Backup";
+            after = ["twenty.service"];
+            requires = ["docker.service"];
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${pkgs.docker}/bin/docker exec twenty-db-1 pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%Y%m%d_%H%M%S).sql";
+              WorkingDirectory = stateDir;
+            };
+            preStart = "mkdir -p ${stateDir}/backup";
+          };
         };
-      };
 
-      systemd.services.twenty-db-backup = {
-        description = "Twenty CRM Database Backup";
-        after = ["twenty.service"];
-        requires = ["docker.service"];
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStart = "${pkgs.docker}/bin/docker exec twenty-db-1 pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%Y%m%d_%H%M%S).sql";
-          WorkingDirectory = stateDir;
-        };
-        preStart = "mkdir -p ${stateDir}/backup";
-      };
-
-      systemd.timers.twenty-db-backup = {
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
+        timers.twenty-db-backup = {
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnCalendar = "daily";
+            Persistent = true;
+          };
         };
       };
     };
