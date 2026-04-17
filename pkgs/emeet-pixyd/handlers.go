@@ -26,6 +26,22 @@ const (
 	maxStreamBufferSize = 10 * 1024 * 1024
 )
 
+func formatLastSynced(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+
+	elapsed := time.Since(t)
+	if elapsed < time.Minute {
+		return "just now"
+	}
+	if elapsed < time.Hour {
+		return fmt.Sprintf("%dm ago", int(elapsed.Minutes()))
+	}
+
+	return t.Format("15:04")
+}
+
 type webServer struct {
 	daemon *Daemon
 }
@@ -54,6 +70,8 @@ func (s *webServer) getWebStatus() webStatus {
 		Online: s.daemon.videoDev != "",
 
 		Device: s.daemon.videoDev,
+
+		LastSynced: formatLastSynced(s.daemon.lastSyncedAt),
 	}
 	if status.Online {
 

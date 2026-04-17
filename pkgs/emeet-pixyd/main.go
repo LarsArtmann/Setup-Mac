@@ -37,6 +37,7 @@ type Daemon struct {
 
 	debounceInUse int
 	debounceIdle  int
+	lastSyncedAt  time.Time
 }
 
 func NewDaemon(cfg pixy.Config) *Daemon {
@@ -338,8 +339,12 @@ func (d *Daemon) syncState(ctx context.Context) string {
 			slog.Error("failed to save synced state", "error", saveErr)
 		}
 
+		d.lastSyncedAt = time.Now()
+
 		return "synced (state updated from camera)"
 	}
+
+	d.lastSyncedAt = time.Now()
 
 	return "synced (no changes)"
 }
