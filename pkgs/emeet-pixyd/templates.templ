@@ -679,19 +679,11 @@ templ page(s webStatus) {
 							<div class="card-title">Preview</div>
 							<div class="preview-container" id="preview">
 								if s.Online && s.Device != "" {
-									<img src="/api/snapshot" id="preview-img" alt="Camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
+									<img src="/api/stream" id="preview-img" alt="Live camera feed" aria-label="Live camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
 									<div id="preview-fallback" class="preview-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column">
 										<div class="icon">&#x1F4F7;</div>
 										<div>Camera in use or unavailable</div>
 									</div>
-									<script>
-									var previewImg = document.getElementById('preview-img');
-									if (previewImg) {
-										setInterval(function() {
-											previewImg.src = '/api/snapshot?t=' + Date.now();
-										}, 1500);
-									}
-								</script>
 								} else {
 									<div class="preview-placeholder">
 										<div class="icon">&#x1F4F7;</div>
