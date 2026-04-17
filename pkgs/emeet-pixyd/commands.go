@@ -92,7 +92,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 			return d.videoDev
 		}
 
-		return "device not found"
+		return respDeviceNotFound
 
 	default:
 		return "unknown command: " + parts[0]

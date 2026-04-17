@@ -596,32 +596,30 @@ func (d *Daemon) Run() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		<-sigs
-		sdNotify("STOPPING=1")
-
-		_ = os.Remove(d.config.SocketPath())
-		_ = os.Remove(d.config.StateFile())
-
-		os.Exit(0)
-	}()
-
-	go func() {
 		listenErr := d.listenUnix(context.Background())
 		if listenErr != nil {
 			slog.Error("unix socket error", "error", listenErr)
-			os.Exit(1)
 		}
 	}()
 
+	var httpSrv *http.Server
 	if d.config.WebAddr != "" {
 		webSrv := &webServer{daemon: d}
 		mux := newWebMux(webSrv)
+		httpSrv = &http.Server{
+			Addr:              d.config.WebAddr,
+			Handler:           mux,
+			ReadHeaderTimeout: 5 * time.Second,
+			ReadTimeout:       10 * time.Second,
+			WriteTimeout:      30 * time.Second,
+			IdleTimeout:       60 * time.Second,
+			MaxHeaderBytes:    1 << 20,
+		}
 
 		go func() {
 			slog.Info("web UI starting", "addr", d.config.WebAddr)
-
-			listenErr := http.ListenAndServe(d.config.WebAddr, mux)
-			if listenErr != nil {
+			listenErr := httpSrv.ListenAndServe()
+			if listenErr != nil && listenErr != http.ErrServerClosed {
 				slog.Error("web server error", "error", listenErr)
 			}
 		}()
@@ -644,9 +642,27 @@ func (d *Daemon) Run() {
 	ticker := time.NewTicker(d.config.PollInterval)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		d.autoManage(context.Background())
-		sdNotify("WATCHDOG=1")
+	for {
+		select {
+		case <-sigs:
+			sdNotify("STOPPING=1")
+			slog.Info("shutting down")
+			d.mu.Lock()
+			if saveErr := d.saveState(); saveErr != nil {
+				slog.Error("failed to save state on shutdown", "error", saveErr)
+			}
+			d.mu.Unlock()
+			_ = os.Remove(d.config.SocketPath())
+			if httpSrv != nil {
+				shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+				_ = httpSrv.Shutdown(shutdownCtx)
+				cancel()
+			}
+			return
+		case <-ticker.C:
+			d.autoManage(context.Background())
+			sdNotify("WATCHDOG=1")
+		}
 	}
 }
 
