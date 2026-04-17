@@ -32,6 +32,7 @@ var (
 	ErrPIXYNotConnected      = errors.New("PIXY not connected")
 )
 
+// CameraState represents the current operating mode of the PIXY camera.
 type CameraState string
 
 const (
@@ -52,6 +53,7 @@ func (s CameraState) Valid() bool {
 	}
 }
 
+// AudioMode represents the noise cancellation mode of the PIXY camera microphone.
 type AudioMode string
 
 const (
@@ -112,6 +114,7 @@ func ParseCameraState(rawInput string) (CameraState, error) {
 	}
 }
 
+// State holds the current runtime state of the PIXY daemon.
 type State struct {
 	Camera   CameraState `json:"camera"`
 	Audio    AudioMode   `json:"audio"`
@@ -120,6 +123,7 @@ type State struct {
 	AutoMode bool        `json:"autoMode"`
 }
 
+// DefaultState returns the initial daemon state with privacy mode and auto-management enabled.
 func DefaultState() State {
 	return State{
 		Camera:   StatePrivacy,
@@ -130,6 +134,7 @@ func DefaultState() State {
 	}
 }
 
+// Config holds daemon configuration parameters.
 type Config struct {
 	StateDir      string
 	PollInterval  time.Duration
@@ -137,6 +142,7 @@ type Config struct {
 	WebAddr       string
 }
 
+// DefaultConfig returns the standard daemon configuration.
 func DefaultConfig() Config {
 	return Config{
 		StateDir:      DefaultStateDir,
@@ -146,9 +152,13 @@ func DefaultConfig() Config {
 	}
 }
 
+// StateFile returns the path to the JSON state file within the state directory.
 func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
+
+// SocketPath returns the path to the Unix domain control socket within the state directory.
 func (c Config) SocketPath() string { return c.StateDir + "/control.sock" }
 
+// SetDeadline sets a read/write deadline on the connection relative to now.
 func SetDeadline(conn net.Conn, timeout time.Duration) error {
 	err := conn.SetDeadline(time.Now().Add(timeout))
 	if err != nil {
@@ -158,6 +168,7 @@ func SetDeadline(conn net.Conn, timeout time.Duration) error {
 	return nil
 }
 
+// SendCommand sends a command string over a Unix socket and returns the response.
 func SendCommand(ctx context.Context, socketPath, cmd string) (string, error) {
 	dialer := net.Dialer{Timeout: DefaultSocketTimeout}
 

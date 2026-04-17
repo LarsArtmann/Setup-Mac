@@ -1,8 +1,9 @@
+//go:build linux
+
 package main
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,10 +11,7 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
-	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -26,55 +24,9 @@ import (
 const (
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
-
-	respAutoModeOff    = "auto mode off"
-	respAutoModeOn     = "auto mode on"
-	respAudioUsage     = "usage: audio [nc|live|org]"
-	respDeviceNotFound = "device not found"
-
-	cmdGestureOn = "gesture-on"
-	cmdAutoOn    = "auto-on"
 )
 
-var (
-	errNoHIDResponse       = errors.New("no HID response")
-	errUnrecognizedHID     = errors.New("unrecognized HID response")
-	errAudioSourceNotFound = errors.New("PIXY audio source not found")
-	errInvalidValue        = errors.New("invalid value")
-	errDeadline            = errors.New("deadline error")
-)
-
-const (
-	hidByteTracking = 0x01
-	hidBytePrivacy  = 0x02
-	hidByteIdle     = 0x00
-	hidByteNC       = 0x01
-	hidByteLive     = 0x02
-	hidByteOriginal = 0x03
-
-	hidBufSize     = 32
-	hidRespBufSize = 64
-	hidMinLen      = 9
-	hidDebugLen    = 16
-
-	hidInterfaceTracking = 0x01
-	hidInterfaceAudio    = 0x05
-	hidInterfaceGesture  = 0x04
-
-	v4l2DegreesPerUnit = 3600
-	hidResponseMs      = 500
-
-	cameraConfigPrefix byte = 0x09
-	cameraConfigMarker byte = 0x01
-	audioConfigMarker  byte = 0x00
-	gestureConfigMark1 byte = 0x02
-	gestureConfigMark2 byte = 0x01
-	gestureConfigMark3 byte = 0x02
-	gestureEnabledByte byte = 0x01
-
-	hidCommandSleepMs = 200
-	v4l2SplitCount    = 2
-)
+var errDeadline = errors.New("deadline error")
 
 type Daemon struct {
 	mu        sync.RWMutex
@@ -110,22 +62,29 @@ func probeVideo4linux(sysfsPath string) string {
 	}
 
 	for _, entry := range entries {
-		modalias, err := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "device/modalias"))
-		if err != nil {
+		name := entry.Name()
+
+		videoPath := fmt.Sprintf("/dev/%s", name)
+
+		vendorFile := fmt.Sprintf("%s/%s/device/id/vendor", sysfsPath, name)
+		productFile := fmt.Sprintf("%s/%s/device/id/product", sysfsPath, name)
+
+		vendorData, vErr := os.ReadFile(vendorFile)
+		if vErr != nil {
 			continue
 		}
 
-		ms := strings.ToLower(string(modalias))
-		if !strings.Contains(ms, "v"+pixyVendorID) || !strings.Contains(ms, "p"+pixyProductID) {
+		productData, pErr := os.ReadFile(productFile)
+		if pErr != nil {
 			continue
 		}
 
-		indexData, indexErr := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "index"))
-		if indexErr == nil && strings.TrimSpace(string(indexData)) != "0" {
-			continue
-		}
+		vendor := strings.TrimSpace(string(vendorData))
+		product := strings.TrimSpace(string(productData))
 
-		return filepath.Join("/dev", entry.Name())
+		if vendor == pixyVendorID && product == pixyProductID {
+			return videoPath
+		}
 	}
 
 	return ""
@@ -138,28 +97,25 @@ func probeHidraw(sysfsPath string) string {
 	}
 
 	for _, entry := range entries {
-		data, err := os.ReadFile(filepath.Join(sysfsPath, entry.Name(), "device/uevent"))
-		if err != nil {
+		name := entry.Name()
+
+		hidrawPath := fmt.Sprintf("/dev/%s", name)
+
+		ueventFile := fmt.Sprintf("%s/%s/device/uevent", sysfsPath, name)
+
+		ueventData, uErr := os.ReadFile(ueventFile)
+		if uErr != nil {
 			continue
 		}
 
-		content := string(data)
-		if !strings.Contains(content, "HID_ID=") {
-			continue
-		}
+		for line := range strings.SplitSeq(string(ueventData), "\n") {
+			if strings.HasPrefix(line, "HID_NAME=") {
+				hidName := strings.TrimPrefix(line, "HID_NAME=")
 
-		for field := range strings.FieldsSeq(content) {
-			if !strings.HasPrefix(field, "HID_ID=") {
-				continue
-			}
-
-			id := strings.TrimPrefix(field, "HID_ID=")
-
-			parts := strings.Split(id, ":")
-			if len(parts) == 3 &&
-				strings.Contains(strings.ToLower(parts[1]), pixyVendorID) &&
-				strings.Contains(strings.ToLower(parts[2]), pixyProductID) {
-				return filepath.Join("/dev", entry.Name())
+				if strings.Contains(hidName, "EMEET") || strings.Contains(hidName, "Pixy") ||
+					strings.Contains(hidName, "PIXY") {
+					return hidrawPath
+				}
 			}
 		}
 	}
@@ -171,16 +127,8 @@ func (d *Daemon) probeDevices() {
 	d.videoDev = probeVideo4linux("/sys/class/video4linux")
 	d.hidrawDev = probeHidraw("/sys/class/hidraw")
 
-	if d.videoDev != "" {
-		if d.state.Camera == pixy.StateOffline {
-			d.state.Camera = pixy.StatePrivacy
-		}
-
+	if d.videoDev != "" && d.hidrawDev != "" {
 		slog.Info("found PIXY device", "video", d.videoDev, "hidraw", d.hidrawDev)
-	} else {
-		d.state.Camera = pixy.StateOffline
-
-		slog.Warn("PIXY not found, will retry on next probe")
 	}
 }
 
@@ -190,30 +138,24 @@ func (d *Daemon) loadState() {
 		return
 	}
 
-	err = json.Unmarshal(data, &d.state)
-	if err != nil {
-		slog.Warn(
-			"failed to parse state file, using defaults",
-			"path",
-			d.config.StateFile(),
-			"error",
-			err,
-		)
+	var loaded pixy.State
+
+	if jsonErr := json.Unmarshal(data, &loaded); jsonErr != nil {
+		slog.Warn("failed to parse state file, using defaults", "path", d.config.StateFile(), "error", jsonErr)
+
+		return
 	}
+
+	d.state = loaded
 }
 
 func (d *Daemon) ensureStateDir() error {
-	err := os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
-	if err != nil {
-		return fmt.Errorf("create state dir: %w", err)
-	}
-
-	return nil
+	return os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
 }
 
 func (d *Daemon) saveState() error {
 	if err := d.ensureStateDir(); err != nil {
-		return fmt.Errorf("create state dir: %w", err)
+		return err
 	}
 
 	data, err := json.Marshal(d.state)
@@ -221,221 +163,14 @@ func (d *Daemon) saveState() error {
 		return fmt.Errorf("marshal state: %w", err)
 	}
 
-	if err := os.WriteFile(d.config.StateFile(), data, pixy.PermissionStateFile); err != nil {
-		return fmt.Errorf("write state file: %w", err)
-	}
-
-	return nil
-}
-
-func cameraHIDByte(s pixy.CameraState) byte {
-	switch s {
-	case pixy.StateTracking:
-		return hidByteTracking
-	case pixy.StatePrivacy:
-		return hidBytePrivacy
-	case pixy.StateIdle:
-		return hidByteIdle
-	case pixy.StateOffline:
-		return hidByteIdle
-	default:
-		return hidByteIdle
-	}
-}
-
-func audioHIDByte(m pixy.AudioMode) byte {
-	switch m {
-	case pixy.AudioNC:
-		return hidByteNC
-	case pixy.AudioLive:
-		return hidByteLive
-	case pixy.AudioOriginal:
-		return hidByteOriginal
-	default:
-		return hidByteNC
-	}
+	return os.WriteFile(d.config.StateFile(), data, pixy.PermissionStateFile)
 }
 
 func (d *Daemon) isDevicePresent() bool {
 	return d.videoDev != ""
 }
 
-const hidResponseTimeout = hidResponseMs * time.Millisecond
-
-func hidSend(hidrawDev string, report []byte) (err error) {
-	if hidrawDev == "" {
-		return fmt.Errorf("hidSend: %w", pixy.ErrHIDDeviceNotAvailable)
-	}
-
-	buf := make([]byte, hidBufSize)
-	copy(buf, report)
-
-	hidFile, err := os.OpenFile(hidrawDev, os.O_WRONLY, 0)
-	if err != nil {
-		return fmt.Errorf("hidSend open %s: %w", hidrawDev, err)
-	}
-
-	defer func() {
-		cerr := hidFile.Close()
-		if cerr != nil && err == nil {
-			err = fmt.Errorf("hidSend close: %w", cerr)
-		}
-	}()
-
-	_, err = hidFile.Write(buf)
-	if err != nil {
-		return fmt.Errorf("hidSend write %s: %w", hidrawDev, err)
-	}
-
-	return nil
-}
-
-type hidResponse struct {
-	Tracking pixy.CameraState
-	Audio    pixy.AudioMode
-	Gesture  bool
-	Got      bool
-}
-
-func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, error) {
-	if hidrawDev == "" {
-		return nil, fmt.Errorf("hidSendRecv: %w", pixy.ErrHIDDeviceNotAvailable)
-	}
-
-	buf := make([]byte, hidBufSize)
-	copy(buf, report)
-
-	hidFile, err := os.OpenFile(hidrawDev, os.O_RDWR, 0)
-	if err != nil {
-		return nil, fmt.Errorf("open hidraw %s: %w", hidrawDev, err)
-	}
-
-	defer func() { _ = hidFile.Close() }()
-
-	written, writeErr := hidFile.Write(buf)
-	if writeErr != nil || written == 0 {
-		return nil, fmt.Errorf("write hidraw %s: %w", hidrawDev, writeErr)
-	}
-
-	type readResult struct {
-		data []byte
-		err  error
-	}
-
-	resultChan := make(chan readResult, 1)
-
-	go func() {
-		resp := make([]byte, hidRespBufSize)
-
-		n, readErr := hidFile.Read(resp)
-		resultChan <- readResult{resp[:n], readErr}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return nil, fmt.Errorf("hidSendRecv context: %w", ctx.Err())
-	case r := <-resultChan:
-		if r.err != nil {
-			return nil, fmt.Errorf("hidSendRecv read: %w", r.err)
-		}
-
-		return r.data, nil
-	case <-time.After(hidResponseTimeout):
-		return nil, nil
-	}
-}
-
-func parseHIDResponse(data []byte) hidResponse {
-	if len(data) < hidMinLen {
-		return hidResponse{
-			Tracking: pixy.StateIdle,
-			Audio:    pixy.AudioNC,
-			Gesture:  false,
-			Got:      false,
-		}
-	}
-
-	resp := hidResponse{
-		Tracking: pixy.StateIdle,
-		Audio:    pixy.AudioNC,
-		Gesture:  false,
-		Got:      true,
-	}
-
-	slog.Debug("HID response", "hex", hex.EncodeToString(data[:min(len(data), hidDebugLen)]))
-
-	switch {
-	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceTracking:
-		switch data[8] {
-		case hidByteTracking:
-			resp.Tracking = pixy.StateTracking
-		case hidBytePrivacy:
-			resp.Tracking = pixy.StatePrivacy
-		default:
-			resp.Tracking = pixy.StateIdle
-		}
-	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceAudio:
-		switch data[8] {
-		case hidByteLive:
-			resp.Audio = pixy.AudioLive
-		case hidByteOriginal:
-			resp.Audio = pixy.AudioOriginal
-		default:
-			resp.Audio = pixy.AudioNC
-		}
-	case data[0] == cameraConfigPrefix && data[1] == hidInterfaceGesture:
-		resp.Gesture = data[len(data)-1] == gestureEnabledByte
-	}
-
-	return resp
-}
-
-func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
-	err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--set-ctrl="+ctrl+"="+value).
-		Run()
-	if err != nil {
-		return fmt.Errorf("v4l2Set %s=%s on %s: %w", ctrl, value, dev, err)
-	}
-
-	return nil
-}
-
-func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
-	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).
-		Output()
-	if err != nil {
-		return "", fmt.Errorf("v4l2Get %s on %s: %w", ctrl, dev, err)
-	}
-
-	parts := strings.Split(strings.TrimSpace(string(out)), ":")
-	if len(parts) == v4l2SplitCount {
-		return strings.TrimSpace(parts[1]), nil
-	}
-
-	return strings.TrimSpace(string(out)), nil
-}
-
 type stateSetter func(d *Daemon)
-
-func pixyConfig(iface, modeByte byte) []byte {
-	var buf [hidMinLen]byte
-
-	buf[0] = cameraConfigPrefix
-	buf[1] = iface
-	buf[2] = cameraConfigMarker
-	buf[3] = 0x00
-	buf[4] = 0x00
-	buf[5] = cameraConfigMarker
-	buf[6] = 0x00
-	buf[7] = cameraConfigMarker
-	buf[8] = modeByte
-
-	return buf[:]
-}
-
-func pixyCommit(iface byte) []byte {
-	return []byte{0x09, iface, 0x01, iface}
-}
 
 func (d *Daemon) requireDevice(context string) error {
 	if !d.isDevicePresent() {
@@ -491,15 +226,16 @@ func (d *Daemon) setAudio(mode pixy.AudioMode) error {
 }
 
 func (d *Daemon) setGesture(enabled bool) error {
-	var modeByte byte
+	var mark byte = hidByteIdle
 	if enabled {
-		modeByte = 0x01
+		mark = gestureEnabledByte
 	}
 
-	configBytes := []byte{0x09, 0x04, 0x02, 0x00, 0x00, 0x02, 0x00, 0x02, 0x02, modeByte}
-	commitBytes := []byte{0x09, 0x04, 0x02, 0x01, 0x00, 0x01, 0x00, 0x01, 0x02}
-
-	return d.setDeviceState(configBytes, commitBytes, func(d *Daemon) { d.state.Gesture = enabled })
+	return d.setDeviceState(
+		pixyConfig(hidInterfaceGesture, mark),
+		pixyCommit(hidInterfaceGesture),
+		func(d *Daemon) { d.state.Gesture = enabled },
+	)
 }
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
@@ -507,57 +243,20 @@ func (d *Daemon) centerCamera(ctx context.Context) error {
 		return err
 	}
 
-	err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0")
-	if err != nil {
+	if err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0"); err != nil {
 		return fmt.Errorf("centerCamera pan: %w", err)
 	}
 
-	err = v4l2Set(ctx, d.videoDev, "tilt_absolute", "0")
-	if err != nil {
+	if err := v4l2Set(ctx, d.videoDev, "tilt_absolute", "0"); err != nil {
 		return fmt.Errorf("centerCamera tilt: %w", err)
 	}
 
-	err = v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
+	err := v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
 	if err != nil {
 		return fmt.Errorf("centerCamera zoom: %w", err)
 	}
 
 	return nil
-}
-
-func queryHIDState[T any](
-	ctx context.Context,
-	hidrawDev string,
-	payload []byte,
-	extract func(hidResponse) T,
-) (T, error) {
-	if hidrawDev == "" {
-		var zero T
-
-		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, pixy.ErrHIDDeviceNotAvailable)
-	}
-
-	resp, err := hidSendRecv(ctx, hidrawDev, payload)
-	if err != nil {
-		var zero T
-
-		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, err)
-	}
-
-	if resp == nil {
-		var zero T
-
-		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, errNoHIDResponse)
-	}
-
-	parsed := parseHIDResponse(resp)
-	if !parsed.Got {
-		var zero T
-
-		return zero, fmt.Errorf("queryHIDState %s: %w", hidrawDev, errUnrecognizedHID)
-	}
-
-	return extract(parsed), nil
 }
 
 func (d *Daemon) queryTracking(ctx context.Context) (pixy.CameraState, error) {
@@ -643,134 +342,6 @@ func (d *Daemon) syncState(ctx context.Context) string {
 	}
 
 	return "synced (no changes)"
-}
-
-func ppidOf(pid int) int {
-	statData, err := os.ReadFile(filepath.Join("/proc", strconv.Itoa(pid), "stat"))
-	if err != nil {
-		return 0
-	}
-
-	statStr := string(statData)
-
-	lastParen := strings.LastIndex(statStr, ")")
-	if lastParen == -1 {
-		return 0
-	}
-
-	fields := strings.Fields(statStr[lastParen+1:])
-	if len(fields) < 2 {
-		return 0
-	}
-
-	ppid, err := strconv.Atoi(fields[1])
-	if err != nil {
-		return 0
-	}
-
-	return ppid
-}
-
-func isDescendantOf(pid, ancestor int) bool {
-	for range 10 {
-		ppid := ppidOf(pid)
-		if ppid == 0 || ppid == pid {
-			return false
-		}
-
-		if ppid == ancestor {
-			return true
-		}
-
-		pid = ppid
-	}
-
-	return false
-}
-
-func isCameraInUse(videoDev string) bool {
-	if videoDev == "" {
-		return false
-	}
-
-	myPID := os.Getpid()
-
-	procEntries, err := os.ReadDir("/proc")
-	if err != nil {
-		return false
-	}
-
-	for _, proc := range procEntries {
-		if !proc.IsDir() {
-			continue
-		}
-
-		pid, parseErr := strconv.Atoi(proc.Name())
-		if parseErr != nil {
-			continue
-		}
-
-		if pid == myPID || isDescendantOf(pid, myPID) {
-			continue
-		}
-
-		fdPath := filepath.Join("/proc", proc.Name(), "fd")
-
-		fdEntries, err := os.ReadDir(fdPath)
-		if err != nil {
-			continue
-		}
-
-		for _, fd := range fdEntries {
-			link, err := os.Readlink(filepath.Join(fdPath, fd.Name()))
-			if err != nil {
-				continue
-			}
-
-			if link == videoDev {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func findPixySource(ctx context.Context) (string, error) {
-	out, err := exec.CommandContext(ctx, "wpctl", "status").Output()
-	if err != nil {
-		return "", fmt.Errorf("findPixySource: %w", err)
-	}
-
-	for line := range strings.SplitSeq(string(out), "\n") {
-		if strings.Contains(line, "EMEET") || strings.Contains(line, "Pixy") ||
-			strings.Contains(line, "PIXY") {
-			for field := range strings.FieldsSeq(line) {
-				field = strings.TrimSuffix(field, ".")
-
-				_, parseErr := strconv.Atoi(field)
-				if parseErr == nil {
-					return field, nil
-				}
-			}
-		}
-	}
-
-	return "", fmt.Errorf("findPixySource: %w", errAudioSourceNotFound)
-}
-
-func setDefaultSource(ctx context.Context, sourceID string) {
-	err := exec.CommandContext(ctx, "wpctl", "set-default", sourceID).Run()
-	if err != nil {
-		slog.Error("failed to set default audio source", "id", sourceID, "error", err)
-	}
-}
-
-func notify(ctx context.Context, title, body string) {
-	err := exec.CommandContext(ctx, "notify-send", "-a", "emeet-pixyd", title, body).Run()
-	if err != nil {
-		slog.Debug("notification failed", "error", err)
-	}
 }
 
 func boolStr(b bool, ifTrue, ifFalse string) string {
@@ -863,37 +434,6 @@ func (d *Daemon) autoManage(ctx context.Context) {
 	}
 }
 
-type ptzValues struct {
-	Pan  int
-	Tilt int
-	Zoom int
-}
-
-func parsePTZValues(ctx context.Context, dev string) ptzValues {
-	pan, _ := v4l2Get(ctx, dev, "pan_absolute")
-	tilt, _ := v4l2Get(ctx, dev, "tilt_absolute")
-	zoom, _ := v4l2Get(ctx, dev, "zoom_absolute")
-
-	var ptz ptzValues
-
-	panVal, panErr := strconv.Atoi(pan)
-	if panErr == nil {
-		ptz.Pan = panVal / v4l2DegreesPerUnit
-	}
-
-	tiltVal, tiltErr := strconv.Atoi(tilt)
-	if tiltErr == nil {
-		ptz.Tilt = tiltVal / v4l2DegreesPerUnit
-	}
-
-	zoomVal, zoomErr := strconv.Atoi(zoom)
-	if zoomErr == nil {
-		ptz.Zoom = zoomVal
-	}
-
-	return ptz
-}
-
 func (d *Daemon) getStatus(ctx context.Context) string {
 	if !d.isDevicePresent() {
 		return fmt.Sprintf(
@@ -923,172 +463,6 @@ func (d *Daemon) getStatus(ctx context.Context) string {
 		boolStr(d.state.AutoMode, "on", "off"),
 		d.videoDev,
 	)
-}
-
-func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
-	d.mu.Lock()
-	defer d.mu.Unlock()
-
-	parts := strings.Fields(cmd)
-	if len(parts) == 0 {
-		return d.getStatus(ctx)
-	}
-
-	switch parts[0] {
-	case "status":
-		return d.getStatus(ctx)
-
-	case "track":
-		return d.handleTrackingCommand(pixy.StateTracking, "track")
-
-	case "idle":
-		return d.handleTrackingCommand(pixy.StateIdle, "idle")
-
-	case "privacy":
-		return d.handleTrackingCommand(pixy.StatePrivacy, "privacy")
-
-	case "toggle-privacy":
-		if d.state.Camera == pixy.StatePrivacy {
-			return d.handleTrackingCommand(pixy.StateTracking, "toggle-privacy")
-		}
-
-		return d.handleTrackingCommand(pixy.StatePrivacy, "toggle-privacy")
-
-	case "audio":
-		return d.handleAudioCommand(parts)
-
-	case cmdGestureOn, "gesture-off":
-		return d.handleGestureCommand(parts[0])
-
-	case "center":
-		return d.handleCenterCommand(ctx)
-
-	case cmdAutoOn, "auto-off":
-		return d.handleAutoCommand(parts[0])
-
-	case "waybar":
-		return d.waybarOutput()
-
-	case "sync":
-		return d.syncState(ctx)
-
-	case "probe":
-		d.probeDevices()
-
-		if d.isDevicePresent() {
-			return "device found: " + d.videoDev
-		}
-
-		return respDeviceNotFound
-
-	case "pan", "tilt", "zoom":
-		return d.handlePTZCommand(ctx, parts)
-
-	case "device":
-		if d.videoDev != "" {
-			return d.videoDev
-		}
-
-		return "device not found"
-
-	default:
-		return "unknown command: " + parts[0]
-	}
-}
-
-func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) string {
-	if err := d.setTracking(state); err != nil {
-		return fmt.Sprintf("error: %s: %v", label, err)
-	}
-
-	if state == pixy.StateTracking {
-		return "tracking on"
-	}
-
-	if state == pixy.StatePrivacy {
-		return "privacy on"
-	}
-
-	return "tracking off"
-}
-
-func (d *Daemon) handleAudioCommand(parts []string) string {
-	var mode pixy.AudioMode
-	if len(parts) < 2 {
-		mode = d.state.Audio.Next()
-	} else {
-		var parseErr error
-
-		mode, parseErr = pixy.ParseAudioMode(parts[1])
-		if parseErr != nil {
-			return respAudioUsage
-		}
-	}
-
-	audioErr := d.setAudio(mode)
-	if audioErr != nil {
-		return fmt.Sprintf("error: audio %s: %v", mode, audioErr)
-	}
-
-	return "audio: " + string(mode)
-}
-
-func (d *Daemon) handleGestureCommand(cmd string) string {
-	enable := cmd == cmdGestureOn
-	if err := d.setGesture(enable); err != nil {
-		return fmt.Sprintf("error: %s: %v", cmd, err)
-	}
-
-	if enable {
-		return "gesture on"
-	}
-
-	return "gesture off"
-}
-
-func (d *Daemon) handleCenterCommand(ctx context.Context) string {
-	if err := d.centerCamera(ctx); err != nil {
-		return fmt.Sprintf("error: center: %v", err)
-	}
-
-	return "centered"
-}
-
-func (d *Daemon) handleAutoCommand(cmd string) string {
-	mode := cmd == cmdAutoOn
-	d.state.AutoMode = mode
-
-	if saveErr := d.saveState(); saveErr != nil {
-		slog.Error("failed to save state", "error", saveErr)
-	}
-
-	if mode {
-		return respAutoModeOn
-	}
-
-	return respAutoModeOff
-}
-
-func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
-	if len(parts) < 2 {
-		return fmt.Sprintf("usage: %s <value>", parts[0])
-	}
-
-	val, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return fmt.Sprintf("error: %s: %v", parts[0], errInvalidValue)
-	}
-
-	multiplier := v4l2DegreesPerUnit
-	if parts[0] == "zoom" {
-		multiplier = 1
-	}
-
-	if v4l2Err := v4l2Set(ctx, d.videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
-		return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
-	}
-
-	return fmt.Sprintf("%s set to %d", parts[0], val)
 }
 
 func (d *Daemon) waybarOutput() string {

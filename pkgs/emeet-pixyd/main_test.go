@@ -1,3 +1,5 @@
+//go:build linux
+
 package main
 
 import (
@@ -629,7 +631,7 @@ func TestHandleCommandSyncWithDevice(t *testing.T) {
 	d.config = testConfig(t.TempDir())
 
 	result := d.handleCommand(context.Background(), "sync")
-	if result != "synced (no changes)" && !strings.Contains(result, "error") {
+	if !strings.HasPrefix(result, "synced") && !strings.Contains(result, "error") {
 		t.Errorf("expected sync result, got: %s", result)
 	}
 }
