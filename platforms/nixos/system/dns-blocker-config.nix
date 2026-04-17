@@ -197,6 +197,8 @@ in {
       "cdn-lfs.huggingface.co"
       "cdn-lfs-us-1.huggingface.co"
       "discord.gg"
+      "discord.com"
+      "gateway.discord.gg"
       "us.i.posthog.com"
       "movieffm.net"
       "www.movieffm.net"
