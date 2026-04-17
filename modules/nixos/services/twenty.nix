@@ -118,6 +118,11 @@ in {
         restartUnits = ["twenty.service"];
       };
 
+      systemd.tmpfiles.rules = [
+        "d ${stateDir} 0755 root root -"
+        "d ${stateDir}/backup 0755 root root -"
+      ];
+
       systemd = {
         services = {
           twenty = {
