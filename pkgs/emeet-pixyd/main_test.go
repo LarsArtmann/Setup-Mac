@@ -792,9 +792,10 @@ func writeFakeFile(t *testing.T, path, content string) {
 }
 
 type fakeVideoDev struct {
-	name     string
-	modalias string
-	index    string
+	name    string
+	vendor  string
+	product string
+	index   string
 }
 
 type fakeHidrawDev struct {
@@ -808,8 +809,8 @@ func createFakeVideo4linux(t *testing.T, root string, devices []fakeVideoDev) {
 
 	for _, dev := range devices {
 		base := filepath.Join(root, dev.name)
-		writeFakeFile(t, filepath.Join(base, "device/modalias"), dev.modalias)
-		writeFakeFile(t, filepath.Join(base, "name"), "EMEET PIXY: EMEET PIXY")
+		writeFakeFile(t, filepath.Join(base, "device/id/vendor"), dev.vendor)
+		writeFakeFile(t, filepath.Join(base, "device/id/product"), dev.product)
 
 		if dev.index != "" {
 			writeFakeFile(t, filepath.Join(base, "index"), dev.index)
@@ -830,7 +831,10 @@ func createFakeHidraw(t *testing.T, root string, devices []fakeHidrawDev) {
 	}
 }
 
-const pixyModalias = "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00"
+const (
+	pixyVendor  = "328f"
+	pixyProduct = "00c0"
+)
 
 func testV4L2ProbesPIXY(t *testing.T, devices []fakeVideoDev) {
 	t.Helper()
@@ -861,8 +865,8 @@ func TestProbeVideo4linux_PIXYFound(t *testing.T) {
 	t.Parallel()
 
 	testV4L2ProbesPIXY(t, []fakeVideoDev{
-		{name: "video0", modalias: pixyModalias, index: "0"},
-		{name: "video2", modalias: pixyModalias, index: "1"},
+		{name: "video0", vendor: pixyVendor, product: pixyProduct, index: "0"},
+		{name: "video2", vendor: pixyVendor, product: pixyProduct, index: "1"},
 	})
 }
 
@@ -870,7 +874,7 @@ func TestProbeVideo4linux_PIXYOnlyCaptureNode(t *testing.T) {
 	t.Parallel()
 
 	testV4L2ProbesPIXY(t, []fakeVideoDev{
-		{name: "video0", modalias: pixyModalias, index: "0"},
+		{name: "video0", vendor: pixyVendor, product: pixyProduct, index: "0"},
 	})
 }
 
@@ -878,7 +882,7 @@ func TestProbeVideo4linux_PIXYNoIndexFile(t *testing.T) {
 	t.Parallel()
 
 	testV4L2ProbesPIXY(t, []fakeVideoDev{
-		{name: "video0", modalias: pixyModalias, index: ""},
+		{name: "video0", vendor: pixyVendor, product: pixyProduct, index: ""},
 	})
 }
 
@@ -889,14 +893,15 @@ func TestProbeVideo4linux_NonPIXYSources(t *testing.T) {
 		name    string
 		devices []fakeVideoDev
 	}{
-		{"NoPIXY", []fakeVideoDev{{name: "video1", modalias: "platform:v4l2loopback", index: "0"}}},
+		{"NoPIXY", []fakeVideoDev{{name: "video1", vendor: "1511", product: "402d", index: "0"}}},
 		{
 			"WrongVendorProduct",
 			[]fakeVideoDev{
 				{
-					name:     "video0",
-					modalias: "usb:v1234p5678d0100dcEFdsc02dp01ic0Eisc01ip00in00",
-					index:    "0",
+					name:    "video0",
+					vendor:  "1234",
+					product: "5678",
+					index:   "0",
 				},
 			},
 		},
@@ -928,7 +933,7 @@ func TestProbeVideo4linux_OBSCamIgnored(t *testing.T) {
 	writeFakeFile(t, filepath.Join(obsDir, "index"), "0")
 
 	testV4L2ProbesPIXY(t, []fakeVideoDev{
-		{name: "video0", modalias: pixyModalias, index: "0"},
+		{name: "video0", vendor: pixyVendor, product: pixyProduct, index: "0"},
 	})
 }
 
@@ -936,7 +941,7 @@ func TestProbeVideo4linux_MetadataNodeSkipped(t *testing.T) {
 	t.Parallel()
 
 	testV4L2ProbesNothing(t, []fakeVideoDev{
-		{name: "video2", modalias: pixyModalias, index: "1"},
+		{name: "video2", vendor: pixyVendor, product: pixyProduct, index: "1"},
 	})
 }
 
@@ -1120,9 +1125,10 @@ func TestProbeVideo4linux_MultipleCamerasPIXYSecond(t *testing.T) {
 
 	createFakeVideo4linux(t, root, []fakeVideoDev{
 		{
-			name:     "video2",
-			modalias: "usb:v328Fp00C0d2004dcEFdsc02dp01ic0Eisc01ip00in00",
-			index:    "0",
+			name:    "video2",
+			vendor:  pixyVendor,
+			product: pixyProduct,
+			index:   "0",
 		},
 	})
 

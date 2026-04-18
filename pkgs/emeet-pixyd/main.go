@@ -130,6 +130,12 @@ func (d *Daemon) probeDevices() {
 
 	if d.videoDev != "" && d.hidrawDev != "" {
 		slog.Info("found PIXY device", "video", d.videoDev, "hidraw", d.hidrawDev)
+
+		if d.state.Camera == pixy.StateOffline {
+			d.state.Camera = pixy.StatePrivacy
+		}
+	} else {
+		d.state.Camera = pixy.StateOffline
 	}
 }
 
@@ -551,6 +557,11 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+			}
 			slog.Error("socket accept error", "error", err)
 
 			continue
@@ -595,8 +606,9 @@ func (d *Daemon) Run() {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		listenErr := d.listenUnix(context.Background())
+		listenErr := d.listenUnix(ctx)
 		if listenErr != nil {
 			slog.Error("unix socket error", "error", listenErr)
 		}
@@ -652,6 +664,7 @@ func (d *Daemon) Run() {
 				slog.Error("failed to save state on shutdown", "error", saveErr)
 			}
 			d.mu.Unlock()
+			cancel()
 			_ = os.Remove(d.config.SocketPath())
 			if httpSrv != nil {
 				shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

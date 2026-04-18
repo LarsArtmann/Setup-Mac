@@ -99,7 +99,8 @@ func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 
 		return status
 	}
-	ptz := parsePTZValues(ctx, s.daemon.videoDev)
+	dev := status.Device
+	ptz := parsePTZValues(ctx, dev)
 	status.Pan = ptz.Pan
 	status.Tilt = ptz.Tilt
 	status.Zoom = ptz.Zoom
@@ -125,6 +126,9 @@ func (s *webServer) action(command string) http.HandlerFunc {
 		slog.Debug("web action", "cmd", command, "response", resp)
 
 		status := s.getWebStatusWithPTZ(request.Context())
+		if strings.HasPrefix(resp, "error:") {
+			status.Error = resp
+		}
 
 		templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 	}
@@ -141,6 +145,9 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 	resp := s.daemon.handleCommand(request.Context(), cmd)
 	slog.Debug("web audio", "cmd", cmd, "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
+	if strings.HasPrefix(resp, "error:") {
+		status.Error = resp
+	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
