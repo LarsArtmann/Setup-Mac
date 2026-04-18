@@ -1,4 +1,4 @@
-{inputs, ...}: let
+{...}: let
   version = "latest";
 in {
   flake.nixosModules.twenty = {

@@ -132,6 +132,11 @@
     # Font configuration (cross-platform)
     # Note: Font packages are now imported from common/packages/fonts.nix
     # to avoid duplication across platforms
+    # System packages for audio/video codec support
+    environment.systemPackages = with pkgs; [
+      libopus # Opus audio codec for Discord voice support
+    ];
+
     fonts.fontconfig.defaultFonts = {
       monospace = ["JetBrainsMono Nerd Font" "Noto Sans Mono"];
       sansSerif = ["DejaVu Sans" "Noto Sans"];
