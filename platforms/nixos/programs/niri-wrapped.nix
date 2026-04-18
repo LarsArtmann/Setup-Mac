@@ -4,6 +4,160 @@
   ...
 }: let
   wallpaperDir = "/home/lars/projects/wallpapers";
+
+  niri-session-save = pkgs.writeShellApplication {
+    name = "niri-session-save";
+    runtimeInputs = with pkgs; [ niri-unstable jq procps coreutils ];
+    text = ''
+      STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
+      mkdir -p "$STATE_DIR"
+
+      tmp=$(mktemp)
+      if ! niri msg -j windows > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
+        rm -f "$tmp"
+        exit 0
+      fi
+      mv "$tmp" "$STATE_DIR/windows.json"
+
+      tmp=$(mktemp)
+      if ! niri msg -j workspaces > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
+        rm -f "$tmp"
+        exit 0
+      fi
+      mv "$tmp" "$STATE_DIR/workspaces.json"
+
+      kitty_entries=()
+      for pid in $(jq -r '.[] | select(.app_id == "kitty") | .pid' "$STATE_DIR/windows.json" 2>/dev/null || true); do
+        [ -z "$pid" ] && continue
+        [ -d "/proc/$pid" ] || continue
+
+        kitty_args=$(cat "/proc/$pid/cmdline" 2>/dev/null | jq -R -s 'split("\u0000") | map(select(length > 0))' 2>/dev/null || echo '[]')
+        kitty_cwd=$(readlink "/proc/$pid/cwd" 2>/dev/null || echo "$HOME")
+
+        child_cmd=""
+        child_cwd=""
+        current=$pid
+        for _ in $(seq 1 20); do
+          [ -d "/proc/$current" ] || break
+          children=$(pgrep -P "$current" 2>/dev/null || true)
+          [ -z "$children" ] && break
+          current=$(echo "$children" | head -1)
+          proc_name=$(cat "/proc/$current/comm" 2>/dev/null || echo "")
+          if echo "$proc_name" | grep -qxE '(fish|bash|zsh|sh|dash|-fish|-bash|-zsh|-sh|sudo|doas)'; then
+            continue
+          fi
+          child_cmd=$(cat "/proc/$current/cmdline" 2>/dev/null | tr '\0' ' ' | sed 's/ $//' || true)
+          child_cwd=$(readlink "/proc/$current/cwd" 2>/dev/null || echo "$HOME")
+          break
+        done
+
+        kitty_entries+=("$(jq -n \
+          --argjson pid "$pid" \
+          --argjson args "$kitty_args" \
+          --arg cwd "$kitty_cwd" \
+          --arg child_cmd "$child_cmd" \
+          --arg child_cwd "$child_cwd" \
+          '{pid: $pid, args: $args, cwd: $cwd, child_cmd: $child_cmd, child_cwd: $child_cwd}')")
+      done
+
+      if [ ''${#kitty_entries[@]} -gt 0 ]; then
+        printf '[%s]\n' "$(IFS=,; echo "''${kitty_entries[*]}")" > "$STATE_DIR/kitty-state.json"
+      else
+        echo '[]' > "$STATE_DIR/kitty-state.json"
+      fi
+
+      date +%s > "$STATE_DIR/timestamp"
+    '';
+  };
+
+  niri-session-restore = pkgs.writeShellScriptBin "niri-session-restore" ''
+    export PATH="${lib.makeBinPath (with pkgs; [ jq coreutils ])}:$PATH"
+    set -euo pipefail
+
+    STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
+
+    fallback() {
+      kitty &
+      sleep 0.5
+      kitty -e fish -c "sudo btop" &
+      sleep 0.3
+      kitty -e nvtop &
+      sleep 0.3
+      amdgpu_top &
+      sleep 0.3
+      helium &
+      sleep 0.3
+      signal-desktop &
+    }
+
+    if [ ! -f "$STATE_DIR/windows.json" ]; then
+      fallback
+      exit 0
+    fi
+
+    if [ -f "$STATE_DIR/timestamp" ]; then
+      saved=$(cat "$STATE_DIR/timestamp")
+      now=$(date +%s)
+      [ $((now - saved)) -gt 604800 ] && { fallback; exit 0; }
+    fi
+
+    deduped=$(jq '[
+      group_by(.app_id)[]
+      | if .[0].app_id == "kitty" then .[] else .[0] end
+    ]' "$STATE_DIR/windows.json" 2>/dev/null)
+
+    [ -z "$deduped" ] || [ "$deduped" = "[]" ] && { fallback; exit 0; }
+
+    kitty_state=$(cat "$STATE_DIR/kitty-state.json" 2>/dev/null || echo '[]')
+
+    declare -A spawned
+
+    while IFS= read -r win; do
+      [ -z "$win" ] && continue
+      app_id=$(echo "$win" | jq -r '.app_id')
+      pid=$(echo "$win" | jq -r '.pid')
+
+      if [ "$app_id" != "kitty" ] && [ "''${spawned[$app_id]:-}" = "1" ]; then
+        continue
+      fi
+      spawned[$app_id]=1
+
+      case "$app_id" in
+        kitty)
+          entry=$(echo "$kitty_state" | jq -c --argjson pid "$pid" '.[] | select(.pid == $pid)' 2>/dev/null | head -1 || true)
+
+          if [ -n "$entry" ]; then
+            child_cmd=$(echo "$entry" | jq -r '.child_cmd // empty')
+            child_cwd=$(echo "$entry" | jq -r '.child_cwd // empty')
+            has_e=$(echo "$entry" | jq -r '.args | index("-e") // empty')
+
+            if [ -n "$child_cmd" ]; then
+              cwd_arg=""
+              [ -n "$child_cwd" ] && [ "$child_cwd" != "$HOME" ] && cwd_arg="--directory $child_cwd"
+              child_safe=$(echo "$child_cmd" | jq -r -R @sh)
+              kitty $cwd_arg -e sh -c "$child_safe; exec fish" &
+            elif [ -n "$has_e" ]; then
+              e_args=$(echo "$entry" | jq -r '.args[(.args | index("-e")) + 1:] | @sh')
+              eval "kitty -e $e_args &"
+            else
+              kitty &
+            fi
+          else
+            kitty &
+          fi
+          ;;
+        signal)
+          signal-desktop &
+          ;;
+        *)
+          if command -v "$app_id" &>/dev/null; then
+            "$app_id" &
+          fi
+          ;;
+      esac
+      sleep 0.3
+    done < <(echo "$deduped" | jq -c '.[]')
+  '';
 in {
   programs.niri.settings = {
     prefer-no-csd = true;
@@ -11,12 +165,7 @@ in {
     screenshot-path = "~/Pictures/screenshots/%Y-%m-%d %H-%M-%S.png";
 
     spawn-at-startup = [
-      {argv = ["kitty"];}
-      {argv = ["kitty" "-e" "fish" "-c" "sudo btop"];}
-      {argv = ["kitty" "-e" "nvtop"];}
-      {argv = ["amdgpu_top"];}
-      {argv = ["helium"];}
-      {argv = ["signal-desktop"];}
+      {argv = ["${niri-session-restore}/bin/niri-session-restore"];}
     ];
 
     xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
@@ -464,5 +613,25 @@ in {
       };
       Install.WantedBy = ["graphical-session.target"];
     };
+    niri-session-save = {
+      Unit = {
+        Description = "Save niri session state for crash recovery";
+        After = ["graphical-session.target"];
+        PartOf = ["graphical-session.target"];
+      };
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${niri-session-save}/bin/niri-session-save";
+      };
+    };
+  };
+
+  systemd.user.timers.niri-session-save = {
+    Unit.Description = "Periodically save niri session state";
+    Timer = {
+      OnBootSec = "30s";
+      OnUnitActiveSec = "30s";
+    };
+    Install.WantedBy = ["timers.target"];
   };
 }

@@ -40,7 +40,7 @@
           - voice-net
 
       whisper-rocm:
-        image: ghcr.io/beecave-homelab/insanely-fast-whisper-rocm:latest
+        image: beecave/insanely-fast-whisper-rocm:main
         container_name: whisper-asr
         restart: unless-stopped
         ports:
