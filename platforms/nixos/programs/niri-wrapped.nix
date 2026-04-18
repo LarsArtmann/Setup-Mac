@@ -40,7 +40,20 @@
         for _ in $(seq 1 20); do
           [ -d "/proc/$current" ] || break
           children=$(pgrep -P "$current" 2>/dev/null || true)
-          [ -z "$children" ] && break
+          if [ -z "$children" ]; then
+            tpgid_field=$(cat "/proc/$current/stat" 2>/dev/null | cut -d' ' -f8)
+            if [ -n "$tpgid_field" ] && [ "$tpgid_field" -gt 0 ] 2>/dev/null; then
+              fg_pid=$(ps --no-headers -p "$tpgid_field" -o pid= 2>/dev/null | tr -d ' ')
+              if [ -n "$fg_pid" ] && [ "$fg_pid" != "$current" ] && [ -d "/proc/$fg_pid" ]; then
+                fg_comm=$(cat "/proc/$fg_pid/comm" 2>/dev/null || echo "")
+                if [ -n "$fg_comm" ] && ! echo "$fg_comm" | grep -qxE '(fish|bash|zsh|sh|dash|sudo|doas)'; then
+                  child_cmd=$(cat "/proc/$fg_pid/cmdline" 2>/dev/null | tr '\0' ' ' | sed 's/ $//' || true)
+                  child_cwd=$(readlink "/proc/$fg_pid/cwd" 2>/dev/null || echo "$HOME")
+                fi
+              fi
+            fi
+            break
+          fi
           current=$(echo "$children" | head -1)
           proc_name=$(cat "/proc/$current/comm" 2>/dev/null || echo "")
           if echo "$proc_name" | grep -qxE '(fish|bash|zsh|sh|dash|-fish|-bash|-zsh|-sh|sudo|doas)'; then
@@ -60,18 +73,22 @@
           '{pid: $pid, args: $args, cwd: $cwd, child_cmd: $child_cmd, child_cwd: $child_cwd}')")
       done
 
+      tmp=$(mktemp)
       if [ ''${#kitty_entries[@]} -gt 0 ]; then
-        printf '[%s]\n' "$(IFS=,; echo "''${kitty_entries[*]}")" > "$STATE_DIR/kitty-state.json"
+        printf '[%s]\n' "$(IFS=,; echo "''${kitty_entries[*]}")" > "$tmp"
       else
-        echo '[]' > "$STATE_DIR/kitty-state.json"
+        echo '[]' > "$tmp"
       fi
+      mv "$tmp" "$STATE_DIR/kitty-state.json"
 
-      date +%s > "$STATE_DIR/timestamp"
+      tmp=$(mktemp)
+      date +%s > "$tmp"
+      mv "$tmp" "$STATE_DIR/timestamp"
     '';
   };
 
   niri-session-restore = pkgs.writeShellScriptBin "niri-session-restore" ''
-    export PATH="${lib.makeBinPath (with pkgs; [ jq coreutils ])}:$PATH"
+    export PATH="${lib.makeBinPath (with pkgs; [ niri-unstable jq coreutils ])}:$PATH"
     set -euo pipefail
 
     STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
@@ -79,7 +96,7 @@
     fallback() {
       kitty &
       sleep 0.5
-      kitty -e fish -c "sudo btop" &
+      kitty -e btop &
       sleep 0.3
       kitty -e nvtop &
       sleep 0.3
@@ -110,17 +127,35 @@
 
     kitty_state=$(cat "$STATE_DIR/kitty-state.json" 2>/dev/null || echo '[]')
 
+    ws_json=$(cat "$STATE_DIR/workspaces.json" 2>/dev/null || echo '[]')
+    ws_names=$(echo "$ws_json" | jq -r '.[].name // empty' 2>/dev/null || true)
+    for name in $ws_names; do
+      niri msg action focus-workspace "$name" 2>/dev/null || true
+    done
+
     declare -A spawned
+    declare -A ws_windows
 
     while IFS= read -r win; do
       [ -z "$win" ] && continue
       app_id=$(echo "$win" | jq -r '.app_id')
       pid=$(echo "$win" | jq -r '.pid')
+      ws_id=$(echo "$win" | jq -r '.workspace_id')
+
+      ws_ref=""
+      if [ -n "$ws_id" ] && [ "$ws_id" != "null" ]; then
+        ws_ref=$(echo "$ws_json" | jq -r --argjson id "$ws_id" '.[] | select(.id == $id) | .name // (.idx | tostring)' 2>/dev/null || true)
+      fi
 
       if [ "$app_id" != "kitty" ] && [ "''${spawned[$app_id]:-}" = "1" ]; then
         continue
       fi
       spawned[$app_id]=1
+
+      if [ -n "$ws_ref" ]; then
+        niri msg action focus-workspace "$ws_ref" >/dev/null 2>&1 || true
+        sleep 0.1
+      fi
 
       case "$app_id" in
         kitty)
@@ -132,13 +167,18 @@
             has_e=$(echo "$entry" | jq -r '.args | index("-e") // empty')
 
             if [ -n "$child_cmd" ]; then
-              cwd_arg=""
-              [ -n "$child_cwd" ] && [ "$child_cwd" != "$HOME" ] && cwd_arg="--directory $child_cwd"
+              cwd_arg=()
+              [ -n "$child_cwd" ] && [ "$child_cwd" != "$HOME" ] && cwd_arg=(--directory "$child_cwd")
               child_safe=$(echo "$child_cmd" | jq -r -R @sh)
-              kitty $cwd_arg -e sh -c "$child_safe; exec fish" &
+              kitty "''${cwd_arg[@]}" -e sh -c "$child_safe; exec fish" &
             elif [ -n "$has_e" ]; then
-              e_args=$(echo "$entry" | jq -r '.args[(.args | index("-e")) + 1:] | @sh')
-              eval "kitty -e $e_args &"
+              e_args=()
+              idx=$(echo "$entry" | jq -r '.args | index("-e")')
+              rest=$(echo "$entry" | jq -r --argjson idx "$idx" '.args[($idx + 1):][]')
+              while IFS= read -r arg; do
+                e_args+=("$arg")
+              done < <(echo "$rest")
+              kitty -e "''${e_args[@]}" &
             else
               kitty &
             fi
@@ -155,7 +195,7 @@
           fi
           ;;
       esac
-      sleep 0.3
+      sleep 0.5
     done < <(echo "$deduped" | jq -c '.[]')
   '';
 in {
@@ -629,8 +669,8 @@ in {
   systemd.user.timers.niri-session-save = {
     Unit.Description = "Periodically save niri session state";
     Timer = {
-      OnBootSec = "30s";
-      OnUnitActiveSec = "30s";
+      OnBootSec = "60s";
+      OnUnitActiveSec = "60s";
     };
     Install.WantedBy = ["timers.target"];
   };

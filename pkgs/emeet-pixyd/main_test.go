@@ -52,6 +52,7 @@ func newTestDaemonWithAudio(
 		hidrawDev:     hidrawDev,
 		debounceInUse: 0,
 		debounceIdle:  0,
+		streamSema:    make(chan struct{}, 1),
 	}
 }
 

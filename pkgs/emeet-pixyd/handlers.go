@@ -13,7 +13,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -40,11 +39,6 @@ const (
 
 //go:embed static
 var staticFS embed.FS
-
-var lastFrame struct {
-	sync.RWMutex
-	data []byte
-}
 
 func formatLastSynced(t time.Time) string {
 	if t.IsZero() {
@@ -107,10 +101,29 @@ func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 		return status
 	}
 	dev := status.Device
+
+	now := time.Now()
+	s.daemon.ptzCache.mu.RLock()
+	if now.Before(s.daemon.ptzCache.expiresAt) {
+		status.Pan = s.daemon.ptzCache.values.Pan
+		status.Tilt = s.daemon.ptzCache.values.Tilt
+		status.Zoom = s.daemon.ptzCache.values.Zoom
+		s.daemon.ptzCache.mu.RUnlock()
+
+		return status
+	}
+	s.daemon.ptzCache.mu.RUnlock()
+
 	ptz := parsePTZValues(ctx, dev)
+	s.daemon.ptzCache.mu.Lock()
+	s.daemon.ptzCache.values = ptz
+	s.daemon.ptzCache.expiresAt = now.Add(2 * time.Second)
+	s.daemon.ptzCache.mu.Unlock()
+
 	status.Pan = ptz.Pan
 	status.Tilt = ptz.Tilt
 	status.Zoom = ptz.Zoom
+
 	return status
 }
 
@@ -236,9 +249,9 @@ func (s *webServer) checkDevice(responseWriter http.ResponseWriter) (webStatus, 
 }
 
 func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *http.Request) {
-	lastFrame.RLock()
-	frame := lastFrame.data
-	lastFrame.RUnlock()
+	s.daemon.lastFrame.RLock()
+	frame := s.daemon.lastFrame.data
+	s.daemon.lastFrame.RUnlock()
 
 	if len(frame) == 0 {
 		http.Error(responseWriter, "no frame available", http.StatusServiceUnavailable)
@@ -252,8 +265,22 @@ func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *
 }
 
 func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *http.Request) {
+	select {
+	case s.daemon.streamSema <- struct{}{}:
+	default:
+		http.Error(responseWriter, "stream already in use", http.StatusServiceUnavailable)
+
+		return
+	}
+	defer func() { <-s.daemon.streamSema }()
+
 	status, ok := s.checkDevice(responseWriter)
 	if !ok {
+
+		return
+	}
+	if _, lookErr := exec.LookPath("ffmpeg"); lookErr != nil {
+		http.Error(responseWriter, "ffmpeg not available", http.StatusServiceUnavailable)
 
 		return
 	}
@@ -338,9 +365,9 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 		}
 
-		lastFrame.Lock()
-		lastFrame.data = frame
-		lastFrame.Unlock()
+		s.daemon.lastFrame.Lock()
+		s.daemon.lastFrame.data = frame
+		s.daemon.lastFrame.Unlock()
 
 		_, headerErr := fmt.Fprintf(
 
@@ -555,6 +582,9 @@ func ptzAxisValid(axis string) bool {
 func securityMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'")
 		next.ServeHTTP(w, r)
 	})
 }

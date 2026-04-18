@@ -39,17 +39,29 @@ type Daemon struct {
 	debounceInUse int
 	debounceIdle  int
 	lastSyncedAt  time.Time
+
+	lastFrame struct {
+		sync.RWMutex
+		data []byte
+	}
+
+	ptzCache struct {
+		mu        sync.RWMutex
+		values    ptzValues
+		expiresAt time.Time
+	}
+
+	streamSema chan struct{}
 }
 
 func NewDaemon(cfg pixy.Config) *Daemon {
 	d := &Daemon{
-		mu:            sync.RWMutex{},
-		config:        cfg,
-		state:         pixy.DefaultState(),
-		videoDev:      "",
-		hidrawDev:     "",
-		debounceInUse: 0,
-		debounceIdle:  0,
+		mu:          sync.RWMutex{},
+		config:      cfg,
+		state:       pixy.DefaultState(),
+		videoDev:    "",
+		hidrawDev:   "",
+		streamSema:  make(chan struct{}, 1),
 	}
 	d.loadState()
 	d.probeDevices()
@@ -191,7 +203,7 @@ func (d *Daemon) saveState() error {
 
 type stateSetter func(d *Daemon)
 
-func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSetter) error {
+func (d *Daemon) setDeviceState(ctx context.Context, configBytes, commitBytes []byte, setter stateSetter) error {
 	d.mu.RLock()
 	hidrawDev := d.hidrawDev
 	d.mu.RUnlock()
@@ -209,7 +221,11 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 		return fmt.Errorf("setDeviceState send config: %w", err)
 	}
 
-	time.Sleep(hidCommandSleepMs * time.Millisecond)
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("setDeviceState sleep: %w", ctx.Err())
+	case <-time.After(hidCommandSleepMs * time.Millisecond):
+	}
 
 	err = hidSend(hidrawDev, commitBytes)
 	if err != nil {
@@ -227,29 +243,32 @@ func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSet
 	return nil
 }
 
-func (d *Daemon) setTracking(mode pixy.CameraState) error {
+func (d *Daemon) setTracking(ctx context.Context, mode pixy.CameraState) error {
 	return d.setDeviceState(
+		ctx,
 		pixyConfig(hidInterfaceTracking, cameraHIDByte(mode)),
 		pixyCommit(hidInterfaceTracking),
 		func(d *Daemon) { d.state.Camera = mode },
 	)
 }
 
-func (d *Daemon) setAudio(mode pixy.AudioMode) error {
+func (d *Daemon) setAudio(ctx context.Context, mode pixy.AudioMode) error {
 	return d.setDeviceState(
+		ctx,
 		pixyConfig(hidInterfaceAudio, audioHIDByte(mode)),
 		pixyCommit(hidInterfaceAudio),
 		func(d *Daemon) { d.state.Audio = mode },
 	)
 }
 
-func (d *Daemon) setGesture(enabled bool) error {
+func (d *Daemon) setGesture(ctx context.Context, enabled bool) error {
 	var mark byte = hidByteIdle
 	if enabled {
 		mark = gestureEnabledByte
 	}
 
 	return d.setDeviceState(
+		ctx,
 		pixyConfig(hidInterfaceGesture, mark),
 		pixyCommit(hidInterfaceGesture),
 		func(d *Daemon) { d.state.Gesture = enabled },
@@ -407,14 +426,14 @@ func (d *Daemon) handleCallStart(ctx context.Context, camera pixy.CameraState, a
 	d.mu.Unlock()
 
 	if camera == pixy.StatePrivacy || camera == pixy.StateIdle {
-		trackErr := d.setTracking(pixy.StateTracking)
+		trackErr := d.setTracking(ctx, pixy.StateTracking)
 		if trackErr != nil {
 			slog.Error("failed to activate tracking", "error", trackErr)
 		}
 	}
 
 	if audio != pixy.AudioNC {
-		audioErr := d.setAudio(pixy.AudioNC)
+		audioErr := d.setAudio(ctx, pixy.AudioNC)
 		if audioErr != nil {
 			slog.Error("failed to set audio mode", "error", audioErr)
 		}
@@ -434,7 +453,7 @@ func (d *Daemon) handleCallEnd(ctx context.Context) {
 	d.state.InCall = false
 	d.mu.Unlock()
 
-	privacyErr := d.setTracking(pixy.StatePrivacy)
+	privacyErr := d.setTracking(ctx, pixy.StatePrivacy)
 	if privacyErr != nil {
 		slog.Error("failed to enter privacy mode", "error", privacyErr)
 	}
@@ -733,6 +752,9 @@ func (d *Daemon) Run() {
 	ticker := time.NewTicker(d.config.PollInterval)
 	defer ticker.Stop()
 
+	ueventCh := make(chan struct{}, 8)
+	go d.listenUevents(ueventCh)
+
 	for {
 		select {
 		case sig := <-sigs:
@@ -760,6 +782,19 @@ func (d *Daemon) Run() {
 				cancel()
 			}
 			return
+		case <-ueventCh:
+			slog.Info("device event detected, re-probing")
+			d.cmdMu.Lock()
+			d.mu.Lock()
+			oldVideo := d.videoDev
+			d.probeDevices()
+			newVideo := d.videoDev
+			d.mu.Unlock()
+			if oldVideo == "" && newVideo != "" {
+				slog.Info("device appeared, syncing state")
+				_ = d.syncState(ctx)
+			}
+			d.cmdMu.Unlock()
 		case <-ticker.C:
 			d.autoManage(ctx)
 			sdNotify("WATCHDOG=1")

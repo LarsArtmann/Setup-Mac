@@ -44,13 +44,13 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.getStatus(ctx)
 
 	case "track":
-		return d.handleTrackingCommand(pixy.StateTracking, "track")
+		return d.handleTrackingCommand(ctx, pixy.StateTracking, "track")
 
 	case "idle":
-		return d.handleTrackingCommand(pixy.StateIdle, "idle")
+		return d.handleTrackingCommand(ctx, pixy.StateIdle, "idle")
 
 	case cmdPrivacy:
-		return d.handleTrackingCommand(pixy.StatePrivacy, cmdPrivacy)
+		return d.handleTrackingCommand(ctx, pixy.StatePrivacy, cmdPrivacy)
 
 	case "toggle-privacy":
 		d.mu.RLock()
@@ -58,16 +58,16 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		d.mu.RUnlock()
 
 		if camera == pixy.StatePrivacy {
-			return d.handleTrackingCommand(pixy.StateTracking, "toggle-privacy")
+			return d.handleTrackingCommand(ctx, pixy.StateTracking, "toggle-privacy")
 		}
 
-		return d.handleTrackingCommand(pixy.StatePrivacy, "toggle-privacy")
+		return d.handleTrackingCommand(ctx, pixy.StatePrivacy, "toggle-privacy")
 
 	case "audio":
-		return d.handleAudioCommand(parts)
+		return d.handleAudioCommand(ctx, parts)
 
 	case cmdGestureOn, "gesture-off":
-		return d.handleGestureCommand(parts[0])
+		return d.handleGestureCommand(ctx, parts[0])
 
 	case "center":
 		return d.handleCenterCommand(ctx)
@@ -112,8 +112,8 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	}
 }
 
-func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) string {
-	if err := d.setTracking(state); err != nil {
+func (d *Daemon) handleTrackingCommand(ctx context.Context, state pixy.CameraState, label string) string {
+	if err := d.setTracking(ctx, state); err != nil {
 		return fmt.Sprintf("error: %s: %v", label, err)
 	}
 
@@ -128,7 +128,7 @@ func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) str
 	return "tracking off"
 }
 
-func (d *Daemon) handleAudioCommand(parts []string) string {
+func (d *Daemon) handleAudioCommand(ctx context.Context, parts []string) string {
 	var mode pixy.AudioMode
 	if len(parts) < minCmdParts {
 		d.mu.RLock()
@@ -143,7 +143,7 @@ func (d *Daemon) handleAudioCommand(parts []string) string {
 		}
 	}
 
-	audioErr := d.setAudio(mode)
+	audioErr := d.setAudio(ctx, mode)
 	if audioErr != nil {
 		return fmt.Sprintf("error: audio %s: %v", mode, audioErr)
 	}
@@ -151,9 +151,9 @@ func (d *Daemon) handleAudioCommand(parts []string) string {
 	return "audio: " + string(mode)
 }
 
-func (d *Daemon) handleGestureCommand(cmd string) string {
+func (d *Daemon) handleGestureCommand(ctx context.Context, cmd string) string {
 	enable := cmd == cmdGestureOn
-	if err := d.setGesture(enable); err != nil {
+	if err := d.setGesture(ctx, enable); err != nil {
 		return fmt.Sprintf("error: %s: %v", cmd, err)
 	}
 

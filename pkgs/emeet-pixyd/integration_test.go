@@ -39,6 +39,8 @@ func newIntegrationDaemon(t *testing.T) *Daemon {
 		debounceInUse: 0,
 
 		debounceIdle: 0,
+
+		streamSema: make(chan struct{}, 1),
 	}
 }
 
