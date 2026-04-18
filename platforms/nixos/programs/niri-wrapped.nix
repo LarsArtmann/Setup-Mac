@@ -7,7 +7,7 @@
 
   niri-session-save = pkgs.writeShellApplication {
     name = "niri-session-save";
-    runtimeInputs = with pkgs; [ niri-unstable jq procps coreutils ];
+    runtimeInputs = with pkgs; [niri-unstable jq procps coreutils];
     text = ''
       STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
       mkdir -p "$STATE_DIR"
@@ -88,7 +88,7 @@
   };
 
   niri-session-restore = pkgs.writeShellScriptBin "niri-session-restore" ''
-    export PATH="${lib.makeBinPath (with pkgs; [ niri-unstable jq coreutils ])}:$PATH"
+    export PATH="${lib.makeBinPath (with pkgs; [niri-unstable jq coreutils])}:$PATH"
     set -euo pipefail
 
     STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
