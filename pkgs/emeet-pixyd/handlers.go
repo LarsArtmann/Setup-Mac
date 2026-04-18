@@ -8,12 +8,12 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"io"
 	"log/slog"
 	"net/http"
 	"os/exec"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/a-h/templ"
@@ -24,7 +24,6 @@ const (
 	audioCommand        = "audio"
 	offlineValue        = "offline"
 	zoomDefault         = 100
-	snapshotTimeout     = 3 * time.Second
 	maxStreamBufferSize = 10 * 1024 * 1024
 	maxBodyBytes        = 1 << 10
 
@@ -40,6 +39,11 @@ const (
 
 //go:embed static
 var staticFS embed.FS
+
+var lastFrame struct {
+	sync.RWMutex
+	data []byte
+}
 
 func formatLastSynced(t time.Time) string {
 	if t.IsZero() {
@@ -227,67 +231,19 @@ func (s *webServer) checkDevice(responseWriter http.ResponseWriter) (webStatus, 
 }
 
 func (s *webServer) handleSnapshot(responseWriter http.ResponseWriter, request *http.Request) {
-	status, ok := s.checkDevice(responseWriter)
-	if !ok {
+	lastFrame.RLock()
+	frame := lastFrame.data
+	lastFrame.RUnlock()
+
+	if len(frame) == 0 {
+		http.Error(responseWriter, "no frame available", http.StatusServiceUnavailable)
 
 		return
 	}
-	ctx, cancel := context.WithTimeout(request.Context(), snapshotTimeout)
-	defer cancel()
-	cmd := exec.CommandContext(
 
-		ctx,
-
-		"ffmpeg",
-
-		"-f",
-
-		"v4l2",
-
-		"-i",
-
-		status.Device,
-
-		"-frames:v",
-
-		"1",
-
-		"-f",
-
-		"image2",
-
-		"-q:v",
-
-		"2",
-
-		"pipe:1",
-	)
-	stdOut, err := cmd.StdoutPipe()
-	if err != nil {
-
-		http.Error(responseWriter, "ffmpeg pipe error", http.StatusInternalServerError)
-
-		return
-	}
-	startErr := cmd.Start()
-	if startErr != nil {
-
-		http.Error(responseWriter, "ffmpeg start error", http.StatusInternalServerError)
-
-		return
-	}
 	responseWriter.Header().Set("Content-Type", "image/jpeg")
 	responseWriter.Header().Set("Cache-Control", "no-store")
-	_, copyErr := io.Copy(responseWriter, stdOut)
-	if copyErr != nil {
-
-		slog.Debug("snapshot stream error", "error", copyErr)
-	}
-	waitErr := cmd.Wait()
-	if waitErr != nil {
-
-		slog.Debug("ffmpeg wait error", "error", waitErr)
-	}
+	_, _ = responseWriter.Write(frame)
 }
 
 func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *http.Request) {
@@ -348,6 +304,7 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 		_ = cmd.Wait()
 	}()
+	br := bufio.NewReaderSize(stdOut, 64*1024)
 	var buf bytes.Buffer
 	for {
 
@@ -361,7 +318,7 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 		}
 
-		frame, frameErr := extractJPEGFrame(stdOut, &buf)
+		frame, frameErr := extractJPEGFrame(br, &buf)
 
 		if frameErr != nil {
 
@@ -370,6 +327,10 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 			return
 
 		}
+
+		lastFrame.Lock()
+		lastFrame.data = frame
+		lastFrame.Unlock()
 
 		_, headerErr := fmt.Fprintf(
 
@@ -406,8 +367,7 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 	}
 }
 
-func extractJPEGFrame(r io.Reader, buf *bytes.Buffer) ([]byte, error) {
-	br := bufio.NewReaderSize(r, 64*1024)
+func extractJPEGFrame(br *bufio.Reader, buf *bytes.Buffer) ([]byte, error) {
 	var soiFound bool
 	for {
 		if buf.Len() > maxStreamBufferSize {
@@ -576,6 +536,17 @@ func (c cachingFS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func securityMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Referrer-Policy", "no-referrer")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func requestIDMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reqID := r.Header.Get("X-Request-ID")
+		if reqID == "" {
+			reqID = fmt.Sprintf("%08x", time.Now().UnixNano()&0xFFFFFFFF)
+		}
+		w.Header().Set("X-Request-ID", reqID)
 		next.ServeHTTP(w, r)
 	})
 }

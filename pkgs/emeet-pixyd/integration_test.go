@@ -564,7 +564,15 @@ func testGETEndpoint503(t *testing.T, path string) {
 	assertResponseContains(t, resp, "no camera device", "503 body")
 }
 
-func TestWeb_SnapshotNoDevice(t *testing.T) { testGETEndpoint503(t, "/api/snapshot") }
+func TestWeb_SnapshotNoDevice(t *testing.T) {
+	t.Parallel()
+	daemon := newIntegrationDaemon(t)
+	_, server := newTestWebServer(t, daemon)
+	resp := get(t, server.URL+"/api/snapshot")
+	defer resp.Body.Close()
+	assertStatusCode(t, resp, http.StatusServiceUnavailable)
+	assertResponseContains(t, resp, "no frame available", "503 body")
+}
 
 func TestWeb_StreamNoDevice(t *testing.T) { testGETEndpoint503(t, "/api/stream") }
 

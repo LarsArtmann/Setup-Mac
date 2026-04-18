@@ -256,17 +256,13 @@ func (d *Daemon) centerCamera(ctx context.Context) error {
 		return fmt.Errorf("centerCamera: %w", pixy.ErrPIXYNotConnected)
 	}
 
-	if err := v4l2Set(ctx, videoDev, "pan_absolute", "0"); err != nil {
-		return fmt.Errorf("centerCamera pan: %w", err)
-	}
-
-	if err := v4l2Set(ctx, videoDev, "tilt_absolute", "0"); err != nil {
-		return fmt.Errorf("centerCamera tilt: %w", err)
-	}
-
-	err := v4l2Set(ctx, videoDev, "zoom_absolute", "100")
+	err := v4l2SetMultiple(ctx, videoDev, map[string]string{
+		"pan_absolute":  "0",
+		"tilt_absolute": "0",
+		"zoom_absolute": "100",
+	})
 	if err != nil {
-		return fmt.Errorf("centerCamera zoom: %w", err)
+		return fmt.Errorf("centerCamera: %w", err)
 	}
 
 	return nil
@@ -396,6 +392,47 @@ func sdNotify(state string) {
 	}
 }
 
+func (d *Daemon) handleCallStart(ctx context.Context, camera pixy.CameraState, audio pixy.AudioMode) {
+	d.mu.Lock()
+	d.state.InCall = true
+	d.mu.Unlock()
+
+	if camera == pixy.StatePrivacy || camera == pixy.StateIdle {
+		trackErr := d.setTracking(pixy.StateTracking)
+		if trackErr != nil {
+			slog.Error("failed to activate tracking", "error", trackErr)
+		}
+	}
+
+	if audio != pixy.AudioNC {
+		audioErr := d.setAudio(pixy.AudioNC)
+		if audioErr != nil {
+			slog.Error("failed to set audio mode", "error", audioErr)
+		}
+	}
+
+	src, srcErr := findPixySource(ctx)
+	if srcErr == nil {
+		setDefaultSource(ctx, src)
+		slog.Info("set PipeWire default source to PIXY", "id", src)
+	}
+
+	notify(ctx, "EMEET PIXY", "Camera activated — tracking enabled")
+}
+
+func (d *Daemon) handleCallEnd(ctx context.Context) {
+	d.mu.Lock()
+	d.state.InCall = false
+	d.mu.Unlock()
+
+	privacyErr := d.setTracking(pixy.StatePrivacy)
+	if privacyErr != nil {
+		slog.Error("failed to enter privacy mode", "error", privacyErr)
+	}
+
+	notify(ctx, "EMEET PIXY", "Camera privacy mode — physically disabled")
+}
+
 func (d *Daemon) autoManage(ctx context.Context) {
 	d.cmdMu.Lock()
 	defer d.cmdMu.Unlock()
@@ -439,51 +476,14 @@ func (d *Daemon) autoManage(ctx context.Context) {
 	debounceCount := d.config.DebounceCount
 	d.mu.Unlock()
 
-	cameraInUseNotInCall := inUse && !inCall && debounceInUse >= debounceCount
-	if cameraInUseNotInCall {
+	if inUse && !inCall && debounceInUse >= debounceCount {
 		slog.Info("camera in use, activating tracking and noise cancellation")
-
-		d.mu.Lock()
-		d.state.InCall = true
-		d.mu.Unlock()
-
-		if camera == pixy.StatePrivacy || camera == pixy.StateIdle {
-			trackErr := d.setTracking(pixy.StateTracking)
-			if trackErr != nil {
-				slog.Error("failed to activate tracking", "error", trackErr)
-			}
-		}
-
-		if audio != pixy.AudioNC {
-			audioErr := d.setAudio(pixy.AudioNC)
-			if audioErr != nil {
-				slog.Error("failed to set audio mode", "error", audioErr)
-			}
-		}
-
-		src, srcErr := findPixySource(ctx)
-		if srcErr == nil {
-			setDefaultSource(ctx, src)
-			slog.Info("set PipeWire default source to PIXY", "id", src)
-		}
-
-		notify(ctx, "EMEET PIXY", "Camera activated — tracking enabled")
+		d.handleCallStart(ctx, camera, audio)
 	}
 
-	cameraReleasedInCall := !inUse && inCall && debounceIdle >= debounceCount
-	if cameraReleasedInCall {
+	if !inUse && inCall && debounceIdle >= debounceCount {
 		slog.Info("camera released, entering privacy mode")
-
-		d.mu.Lock()
-		d.state.InCall = false
-		d.mu.Unlock()
-
-		privacyErr := d.setTracking(pixy.StatePrivacy)
-		if privacyErr != nil {
-			slog.Error("failed to enter privacy mode", "error", privacyErr)
-		}
-
-		notify(ctx, "EMEET PIXY", "Camera privacy mode — physically disabled")
+		d.handleCallEnd(ctx)
 	}
 
 	d.mu.Lock()
@@ -686,7 +686,7 @@ func (d *Daemon) Run() {
 		mux := newWebMux(webSrv)
 		httpSrv = &http.Server{
 			Addr:              d.config.WebAddr,
-			Handler:           securityMiddleware(mux),
+			Handler:           requestIDMiddleware(securityMiddleware(mux)),
 			ReadHeaderTimeout: 5 * time.Second,
 			ReadTimeout:       10 * time.Second,
 			WriteTimeout:      30 * time.Second,
