@@ -59,7 +59,7 @@ func page(s webStatus) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>\"><link rel=\"stylesheet\" href=\"/static/style.css\"><script src=\"/static/htmx-2.0.8.min.js\"></script><script src=\"/static/app.js\"></script></head><body hx-on::do-action=\"htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})\"><div class=\"container\"><header><h1>EMEET PIXY</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>\"><link rel=\"stylesheet\" href=\"/static/style.css\"><script src=\"/static/htmx-2.0.8.min.js\"></script><script src=\"/static/app.js\"></script></head><body hx-on::do-action=\"htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})\"><main class=\"container\"><header><h1>EMEET PIXY</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -79,7 +79,7 @@ func page(s webStatus) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if s.Online && s.Device != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"preview-live-dot\"></div><img src=\"/api/stream\" id=\"preview-img\" alt=\"Live camera feed\" aria-label=\"Live camera preview\" onerror=\"this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'\"><div id=\"preview-fallback\" class=\"preview-placeholder\" style=\"display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column\"><div class=\"icon\">&#x1F4F7;</div><div>Camera in use or unavailable</div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<div class=\"preview-live-dot\"></div><img src=\"/api/stream\" id=\"preview-img\" alt=\"Live camera feed\" aria-label=\"Live camera preview\"><div id=\"preview-fallback\" class=\"preview-placeholder\" style=\"display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column\"><div class=\"icon\">&#x1F4F7;</div><div>Camera in use or unavailable</div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -97,7 +97,7 @@ func page(s webStatus) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></div><div id=\"toast-container\"></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div></main><div id=\"toast-container\"></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

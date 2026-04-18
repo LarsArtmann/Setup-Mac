@@ -30,7 +30,7 @@ templ page(s webStatus) {
 			<script src="/static/app.js"></script>
 		</head>
 		<body hx-on::do-action="htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})">
-			<div class="container">
+			<main class="container">
 				<header>
 					<h1>EMEET PIXY</h1>
 					if s.Online {
@@ -46,7 +46,7 @@ templ page(s webStatus) {
 							<div class="preview-container" id="preview">
 								if s.Online && s.Device != "" {
 									<div class="preview-live-dot"></div>
-									<img src="/api/stream" id="preview-img" alt="Live camera feed" aria-label="Live camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
+									<img src="/api/stream" id="preview-img" alt="Live camera feed" aria-label="Live camera preview"/>
 									<div id="preview-fallback" class="preview-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column">
 										<div class="icon">&#x1F4F7;</div>
 										<div>Camera in use or unavailable</div>
@@ -62,7 +62,7 @@ templ page(s webStatus) {
 					</div>
 					@statusPanel(s)
 				</div>
-			</div>
+			</main>
 			<div id="toast-container"></div>
 		</body>
 	</html>

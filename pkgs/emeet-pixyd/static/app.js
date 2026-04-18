@@ -2,6 +2,7 @@
 	'use strict';
 
 	var pendingRequests = new Set();
+	var debounceTimer = null;
 
 	document.addEventListener('input', function(e) {
 		if (!e.target.classList.contains('ptz-slider')) return;
@@ -41,6 +42,8 @@
 
 		consecutiveErrors = 0;
 
+		clearErrorBanners();
+
 		var path = e.detail.pathInfo && e.detail.pathInfo.requestPath;
 		if (!path) return;
 		var labels = {
@@ -57,6 +60,11 @@
 		}
 		if (path === '/api/auto') showToast('Auto mode toggled', 'info');
 		if (path.indexOf('/api/audio') === 0) showToast('Audio mode changed', 'info');
+		if (path.indexOf('/api/ptz/') === 0) {
+			var axis = path.split('/').pop();
+			var slider = document.getElementById('slider-' + axis);
+			if (slider) slider.dataset.lastGood = slider.value;
+		}
 	});
 
 	document.addEventListener('htmx:beforeRequest', function(e) {
@@ -76,13 +84,20 @@
 
 	document.addEventListener('htmx:responseError', function(e) {
 		var panel = document.getElementById('status-panel');
-		if (panel) {
-			var banner = document.createElement('div');
-			banner.className = 'error-banner';
-			banner.textContent = 'Connection error — will retry automatically';
-			panel.insertBefore(banner, panel.firstChild);
-		}
+		if (!panel) return;
+		var existing = panel.querySelectorAll('.error-banner');
+		if (existing.length > 0) return;
+		var banner = document.createElement('div');
+		banner.className = 'error-banner';
+		banner.textContent = 'Connection error — will retry automatically';
+		panel.insertBefore(banner, panel.firstChild);
 	});
+
+	function clearErrorBanners() {
+		var panel = document.getElementById('status-panel');
+		if (!panel) return;
+		panel.querySelectorAll('.error-banner').forEach(function(b) { b.remove(); });
+	}
 
 	document.addEventListener('keydown', function(e) {
 		if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
@@ -95,11 +110,21 @@
 	});
 
 	document.addEventListener('visibilitychange', function() {
+		if (debounceTimer) clearTimeout(debounceTimer);
 		if (document.visibilityState === 'visible') {
-			var panel = document.getElementById('status-panel');
-			if (panel) {
-				htmx.trigger(panel, 'refresh');
-			}
+			debounceTimer = setTimeout(function() {
+				var panel = document.getElementById('status-panel');
+				if (panel) htmx.trigger(panel, 'refresh');
+			}, 200);
 		}
 	});
+
+	var previewImg = document.getElementById('preview-img');
+	if (previewImg) {
+		previewImg.addEventListener('error', function() {
+			this.style.display = 'none';
+			var fallback = document.getElementById('preview-fallback');
+			if (fallback) fallback.style.display = 'flex';
+		});
+	}
 })();

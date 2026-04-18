@@ -177,7 +177,16 @@ func (d *Daemon) saveState() error {
 		return fmt.Errorf("marshal state: %w", err)
 	}
 
-	return os.WriteFile(d.config.StateFile(), data, pixy.PermissionStateFile)
+	tmp := d.config.StateFile() + ".tmp"
+	if writeErr := os.WriteFile(tmp, data, pixy.PermissionStateFile); writeErr != nil {
+		return fmt.Errorf("write temp state: %w", writeErr)
+	}
+
+	if renameErr := os.Rename(tmp, d.config.StateFile()); renameErr != nil {
+		return fmt.Errorf("rename state: %w", renameErr)
+	}
+
+	return nil
 }
 
 type stateSetter func(d *Daemon)
@@ -592,6 +601,8 @@ func (d *Daemon) waybarOutput() string {
 	return string(data)
 }
 
+const socketIOTimeout = 5 * time.Second
+
 func (d *Daemon) listenUnix(ctx context.Context) error {
 	socketPath := d.config.SocketPath()
 	_ = os.Remove(socketPath)
@@ -635,12 +646,14 @@ func (d *Daemon) listenUnix(ctx context.Context) error {
 
 		buf := make([]byte, pixy.SocketBufSize)
 
+		_ = conn.SetReadDeadline(time.Now().Add(socketIOTimeout))
 		n, readErr := conn.Read(buf)
 		if readErr == nil && n > 0 {
 			cmd := strings.TrimSpace(string(buf[:n]))
 
 			response := d.handleCommand(ctx, cmd) + "\n"
 
+			_ = conn.SetWriteDeadline(time.Now().Add(socketIOTimeout))
 			_, writeErr := conn.Write([]byte(response))
 			if writeErr != nil {
 				slog.Debug("socket write error", "error", writeErr)
@@ -670,7 +683,7 @@ func (d *Daemon) Run() {
 	}
 
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
@@ -722,7 +735,16 @@ func (d *Daemon) Run() {
 
 	for {
 		select {
-		case <-sigs:
+		case sig := <-sigs:
+			if sig == syscall.SIGHUP {
+				slog.Info("received SIGHUP, saving state")
+				d.mu.Lock()
+				if saveErr := d.saveState(); saveErr != nil {
+					slog.Error("failed to save state on SIGHUP", "error", saveErr)
+				}
+				d.mu.Unlock()
+				continue
+			}
 			sdNotify("STOPPING=1")
 			slog.Info("shutting down")
 			d.mu.Lock()
@@ -739,7 +761,7 @@ func (d *Daemon) Run() {
 			}
 			return
 		case <-ticker.C:
-			d.autoManage(context.Background())
+			d.autoManage(ctx)
 			sdNotify("WATCHDOG=1")
 		}
 	}

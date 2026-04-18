@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/a-h/templ"
@@ -125,7 +126,7 @@ func (s *webServer) handleStatusPanel(responseWriter http.ResponseWriter, reques
 
 func (s *webServer) action(command string) http.HandlerFunc {
 	return func(responseWriter http.ResponseWriter, request *http.Request) {
-		http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
+		request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 
 		resp := s.daemon.handleCommand(request.Context(), command)
 
@@ -141,7 +142,7 @@ func (s *webServer) action(command string) http.HandlerFunc {
 }
 
 func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *http.Request) {
-	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
+	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	mode := request.FormValue("mode")
 	cmd := audioCommand
 	if mode != "" {
@@ -181,13 +182,17 @@ func ptzLimits(axis string) (int, int) {
 }
 
 func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.Request) {
-	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
+	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	axis := request.PathValue("axis")
 	val := request.FormValue("value")
 	if axis == "" || val == "" {
 
 		http.Error(responseWriter, "missing axis or value", http.StatusBadRequest)
 
+		return
+	}
+	if !ptzAxisValid(axis) {
+		http.Error(responseWriter, "invalid axis", http.StatusBadRequest)
 		return
 	}
 	intVal, err := strconv.Atoi(val)
@@ -299,10 +304,15 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		return
 	}
 	defer func() {
-
-		_ = cmd.Process.Kill()
-
-		_ = cmd.Wait()
+		_ = cmd.Process.Signal(syscall.SIGTERM)
+		done := make(chan error, 1)
+		go func() { done <- cmd.Wait() }()
+		select {
+		case <-done:
+		case <-time.After(2 * time.Second):
+			_ = cmd.Process.Kill()
+			_ = cmd.Wait()
+		}
 	}()
 	br := bufio.NewReaderSize(stdOut, 64*1024)
 	var buf bytes.Buffer
@@ -414,7 +424,7 @@ func extractJPEGFrame(br *bufio.Reader, buf *bytes.Buffer) ([]byte, error) {
 }
 
 func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, request *http.Request) {
-	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
+	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	s.daemon.mu.RLock()
 	currentGesture := s.daemon.state.Gesture
 	s.daemon.mu.RUnlock()
@@ -430,7 +440,7 @@ func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, requ
 }
 
 func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request *http.Request) {
-	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
+	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
 	s.daemon.mu.RLock()
 	currentAuto := s.daemon.state.AutoMode
 	s.daemon.mu.RUnlock()
@@ -531,6 +541,15 @@ func (c cachingFS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", int64(staticCacheMaxAge.Seconds())))
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	c.handler.ServeHTTP(w, r)
+}
+
+func ptzAxisValid(axis string) bool {
+	switch axis {
+	case "pan", "tilt", "zoom":
+		return true
+	default:
+		return false
+	}
 }
 
 func securityMiddleware(next http.Handler) http.Handler {

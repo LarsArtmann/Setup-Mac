@@ -193,13 +193,18 @@ func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
 		return fmt.Sprintf("usage: %s <value>", parts[0])
 	}
 
+	axis := parts[0]
+
+	lo, hi := ptzLimits(axis)
 	val, err := strconv.Atoi(parts[1])
 	if err != nil {
-		return fmt.Sprintf("error: %s: %v", parts[0], errInvalidValue)
+		return fmt.Sprintf("error: %s: %v", axis, errInvalidValue)
 	}
 
+	val = clampInt(val, lo, hi)
+
 	multiplier := v4l2DegreesPerUnit
-	if parts[0] == "zoom" {
+	if axis == "zoom" {
 		multiplier = 1
 	}
 
@@ -208,12 +213,12 @@ func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
 	d.mu.RUnlock()
 
 	if videoDev == "" {
-		return fmt.Sprintf("error: %s: device not found", parts[0])
+		return fmt.Sprintf("error: %s: device not found", axis)
 	}
 
-	if v4l2Err := v4l2Set(ctx, videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
-		return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
+	if v4l2Err := v4l2Set(ctx, videoDev, axis+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
+		return fmt.Sprintf("error: %s: %v", axis, v4l2Err)
 	}
 
-	return fmt.Sprintf("%s set to %d", parts[0], val)
+	return fmt.Sprintf("%s set to %d", axis, val)
 }

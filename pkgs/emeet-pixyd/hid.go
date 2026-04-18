@@ -148,6 +148,9 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 		resultChan <- readResult{resp[:n], readErr}
 	}()
 
+	timeout := time.NewTimer(hidResponseTimeout)
+	defer timeout.Stop()
+
 	select {
 	case <-ctx.Done():
 		return nil, fmt.Errorf("hidSendRecv context: %w", ctx.Err())
@@ -157,7 +160,7 @@ func hidSendRecv(ctx context.Context, hidrawDev string, report []byte) ([]byte, 
 		}
 
 		return r.data, nil
-	case <-time.After(hidResponseTimeout):
+	case <-timeout.C:
 		return nil, nil
 	}
 }
