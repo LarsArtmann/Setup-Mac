@@ -34,6 +34,8 @@ const (
 	tiltMax = 30
 	zoomMin = 100
 	zoomMax = 400
+
+	staticCacheMaxAge = 7 * 24 * time.Hour
 )
 
 //go:embed static
@@ -561,9 +563,26 @@ func parseWebStatus(raw string) webStatus {
 	return status
 }
 
+type cachingFS struct {
+	handler http.Handler
+}
+
+func (c cachingFS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", fmt.Sprintf("public, max-age=%d", int64(staticCacheMaxAge.Seconds())))
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	c.handler.ServeHTTP(w, r)
+}
+
+func securityMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Referrer-Policy", "no-referrer")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func newWebMux(server *webServer) *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.Handle("GET /static/", http.FileServer(http.FS(staticFS)))
+	mux.Handle("GET /static/", cachingFS{handler: http.FileServer(http.FS(staticFS))})
 	mux.HandleFunc("GET /{$}", server.handleIndex)
 	mux.HandleFunc("GET /panel", server.handleStatusPanel)
 	mux.HandleFunc("POST /api/track", server.action("track"))

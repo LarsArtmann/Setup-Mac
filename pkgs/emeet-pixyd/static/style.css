@@ -254,6 +254,30 @@ header h1 {
 	transition: opacity 0.3s ease;
 }
 
+.preview-live-dot {
+	position: absolute;
+	top: 0.6rem;
+	right: 0.6rem;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--red);
+	box-shadow: 0 0 6px var(--red-glow);
+	animation: pulse 2s ease-in-out infinite;
+	z-index: 1;
+}
+
+.preview-live-dot::after {
+	content: 'LIVE';
+	position: absolute;
+	left: 14px;
+	top: -2px;
+	font-size: 0.55rem;
+	font-weight: 700;
+	color: var(--red);
+	letter-spacing: 0.08em;
+}
+
 .preview-placeholder {
 	color: var(--text-dim);
 	text-align: center;

@@ -26,7 +26,7 @@ templ page(s webStatus) {
 			<title>EMEET PIXY — { s.Camera }</title>
 			<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>"/>
 			<link rel="stylesheet" href="/static/style.css"/>
-			<script src="/static/htmx.min.js"></script>
+			<script src="/static/htmx-2.0.8.min.js"></script>
 			<script src="/static/app.js"></script>
 		</head>
 		<body hx-on::do-action="htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})">
@@ -45,6 +45,7 @@ templ page(s webStatus) {
 							<div class="card-title">Preview</div>
 							<div class="preview-container" id="preview">
 								if s.Online && s.Device != "" {
+									<div class="preview-live-dot"></div>
 									<img src="/api/stream" id="preview-img" alt="Live camera feed" aria-label="Live camera preview" onerror="this.style.display='none'; document.getElementById('preview-fallback').style.display='flex'"/>
 									<div id="preview-fallback" class="preview-placeholder" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column">
 										<div class="icon">&#x1F4F7;</div>
@@ -88,7 +89,7 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 }
 
 templ statusPanel(s webStatus) {
-	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
+	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s [document.visibilityState === 'visible']" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
 		if s.Error != "" {
 			<div class="error-banner">{ s.Error }</div>
 		}
