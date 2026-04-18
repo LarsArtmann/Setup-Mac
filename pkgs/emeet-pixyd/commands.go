@@ -24,8 +24,10 @@ const (
 	respAudioUsage     = "usage: audio [nc|live|org]"
 	respDeviceNotFound = "device not found"
 
-	cmdGestureOn = "gesture-on"
-	cmdAutoOn    = "auto-on"
+	cmdGestureOn  = "gesture-on"
+	cmdAutoOn     = "auto-on"
+	cmdPrivacy    = string(pixy.StatePrivacy)
+	minCmdParts   = 2
 )
 
 func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
@@ -47,8 +49,8 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "idle":
 		return d.handleTrackingCommand(pixy.StateIdle, "idle")
 
-	case "privacy":
-		return d.handleTrackingCommand(pixy.StatePrivacy, "privacy")
+	case cmdPrivacy:
+		return d.handleTrackingCommand(pixy.StatePrivacy, cmdPrivacy)
 
 	case "toggle-privacy":
 		d.mu.RLock()
@@ -91,7 +93,7 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 
 		return respDeviceNotFound
 
-	case "pan", "tilt", "zoom":
+	case axisPan, axisTilt, axisZoom:
 		return d.handlePTZCommand(ctx, parts)
 
 	case "device":
@@ -128,7 +130,7 @@ func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) str
 
 func (d *Daemon) handleAudioCommand(parts []string) string {
 	var mode pixy.AudioMode
-	if len(parts) < 2 {
+	if len(parts) < minCmdParts {
 		d.mu.RLock()
 		mode = d.state.Audio.Next()
 		d.mu.RUnlock()
@@ -189,7 +191,7 @@ func (d *Daemon) handleAutoCommand(cmd string) string {
 }
 
 func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
-	if len(parts) < 2 {
+	if len(parts) < minCmdParts {
 		return fmt.Sprintf("usage: %s <value>", parts[0])
 	}
 
@@ -204,7 +206,7 @@ func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
 	val = clampInt(val, lo, hi)
 
 	multiplier := v4l2DegreesPerUnit
-	if axis == "zoom" {
+	if axis == axisZoom {
 		multiplier = 1
 	}
 

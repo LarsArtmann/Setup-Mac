@@ -170,11 +170,11 @@ func clampInt(v, lo, hi int) int {
 
 func ptzLimits(axis string) (int, int) {
 	switch axis {
-	case "pan":
+	case axisPan:
 		return panMin, panMax
-	case "tilt":
+	case axisTilt:
 		return tiltMin, tiltMax
-	case "zoom":
+	case axisZoom:
 		return zoomMin, zoomMax
 	default:
 		return 0, 0
@@ -206,17 +206,17 @@ func (s *webServer) handlePTZ(responseWriter http.ResponseWriter, request *http.
 	slog.Debug("web ptz", "axis", axis, "val", intVal, "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
 	switch axis {
-	case "pan":
+	case axisPan:
 
-		templ.Handler(ptzSlider("Pan", "pan", panMin, panMax, status.Pan, "\u00b0")).
+		templ.Handler(ptzSlider("Pan", axisPan, panMin, panMax, status.Pan, "\u00b0")).
 			ServeHTTP(responseWriter, request)
-	case "tilt":
+	case axisTilt:
 
-		templ.Handler(ptzSlider("Tilt", "tilt", tiltMin, tiltMax, status.Tilt, "\u00b0")).
+		templ.Handler(ptzSlider("Tilt", axisTilt, tiltMin, tiltMax, status.Tilt, "\u00b0")).
 			ServeHTTP(responseWriter, request)
-	case "zoom":
+	case axisZoom:
 
-		templ.Handler(ptzSlider("Zoom", "zoom", zoomMin, zoomMax, status.Zoom, "x")).
+		templ.Handler(ptzSlider("Zoom", axisZoom, zoomMin, zoomMax, status.Zoom, "x")).
 			ServeHTTP(responseWriter, request)
 	default:
 
@@ -504,15 +504,15 @@ func parseWebStatus(raw string) webStatus {
 
 			status.Gesture = val == "true"
 
-		case "pan":
+		case axisPan:
 
 			status.Pan, _ = strconv.Atoi(val)
 
-		case "tilt":
+		case axisTilt:
 
 			status.Tilt, _ = strconv.Atoi(val)
 
-		case "zoom":
+		case axisZoom:
 
 			status.Zoom, _ = strconv.Atoi(val)
 
@@ -545,7 +545,7 @@ func (c cachingFS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func ptzAxisValid(axis string) bool {
 	switch axis {
-	case "pan", "tilt", "zoom":
+	case axisPan, axisTilt, axisZoom:
 		return true
 	default:
 		return false
@@ -577,7 +577,7 @@ func newWebMux(server *webServer) *http.ServeMux {
 	mux.HandleFunc("GET /panel", server.handleStatusPanel)
 	mux.HandleFunc("POST /api/track", server.action("track"))
 	mux.HandleFunc("POST /api/idle", server.action("idle"))
-	mux.HandleFunc("POST /api/privacy", server.action("privacy"))
+	mux.HandleFunc("POST /api/privacy", server.action(cmdPrivacy))
 	mux.HandleFunc("POST /api/toggle-privacy", server.action("toggle-privacy"))
 	mux.HandleFunc("POST /api/audio", server.handleAudio)
 	mux.HandleFunc("POST /api/gesture", server.handleGestureToggle)

@@ -563,7 +563,7 @@ func (d *Daemon) waybarOutput() string {
 		text = "CAM"
 	case pixy.StatePrivacy:
 		icon = "\uf011"
-		class = "privacy"
+		class = string(pixy.StatePrivacy)
 		text = "OFF"
 	case pixy.StateIdle:
 		icon = "\uf03d"

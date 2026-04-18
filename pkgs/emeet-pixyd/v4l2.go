@@ -10,7 +10,13 @@ import (
 	"strings"
 )
 
-const v4l2DegreesPerUnit = 3600
+const (
+	v4l2DegreesPerUnit = 3600
+
+	axisPan  = "pan"
+	axisTilt = "tilt"
+	axisZoom = "zoom"
+)
 
 type ptzValues struct {
 	Pan  int
