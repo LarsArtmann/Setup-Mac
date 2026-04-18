@@ -174,6 +174,14 @@
         enable = true;
       };
 
+      # Voice agents (LiveKit + Whisper ASR + Pipecat + MiniMax TTS)
+      voice-agents = {
+        enable = true;
+        openFirewall = false;
+        livekitKey = "voicekey";
+        livekitSecret = "voicesecret";
+      };
+
       smartd = {
         enable = true;
         autodetect = true;

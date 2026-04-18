@@ -482,6 +482,7 @@
             inputs.self.nixosModules.signoz
             inputs.self.nixosModules.twenty
             inputs.self.nixosModules.taskchampion
+            inputs.self.nixosModules.voice-agents
             ./platforms/nixos/system/configuration.nix
           ];
         };
