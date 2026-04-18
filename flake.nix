@@ -191,6 +191,7 @@
         ./modules/nixos/services/photomap.nix
         ./modules/nixos/services/sops.nix
         ./modules/nixos/services/taskchampion.nix
+        ./modules/nixos/services/voice-agents.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 

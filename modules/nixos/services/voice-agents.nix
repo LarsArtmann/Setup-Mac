@@ -1,12 +1,12 @@
-{
-  inputs,
-  config,
-  pkgs,
-  lib,
-  ...
-}: let
-  inherit (config.networking) domain;
-  cfg = config.services.voice-agents;
+{inputs, ...}: {
+  flake.nixosModules.voice-agents = {
+    config,
+    pkgs,
+    lib,
+    ...
+  }: let
+    inherit (config.networking) domain;
+    cfg = config.services.voice-agents;
 
   # Service ports
   livekitPort = 7880;
@@ -28,7 +28,7 @@
         ports:
           - '${toString livekitPort}:${toString livekitPort}/udp'
           - '${toString livekitPort}:${toString livekitPort}/tcp'
-          - '${toString livekitApiPort}:${livekitApiPort}'
+          - '${toString livekitApiPort}:${toString livekitApiPort}'
         environment:
           - LIVEKIT_KEYS=${cfg.livekitKey} ${cfg.livekitSecret}
           - PORT=${toString livekitPort}
@@ -200,5 +200,6 @@ in {
         '';
       };
     };
+  };
   };
 }

@@ -60,8 +60,8 @@ type webServer struct {
 }
 
 func (s *webServer) getWebStatus() webStatus {
-	s.daemon.mu.Lock()
-	defer s.daemon.mu.Unlock()
+	s.daemon.mu.RLock()
+	defer s.daemon.mu.RUnlock()
 	status := webStatus{
 
 		Camera: string(s.daemon.state.Camera),
@@ -453,9 +453,9 @@ func extractJPEGFrame(r io.Reader, buf *bytes.Buffer) ([]byte, error) {
 
 func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
-	s.daemon.mu.Lock()
+	s.daemon.mu.RLock()
 	currentGesture := s.daemon.state.Gesture
-	s.daemon.mu.Unlock()
+	s.daemon.mu.RUnlock()
 	cmd := "gesture-off"
 	if !currentGesture {
 
@@ -469,9 +469,9 @@ func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, requ
 
 func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
-	s.daemon.mu.Lock()
+	s.daemon.mu.RLock()
 	currentAuto := s.daemon.state.AutoMode
-	s.daemon.mu.Unlock()
+	s.daemon.mu.RUnlock()
 	cmd := "auto-off"
 	if !currentAuto {
 

@@ -1064,7 +1064,7 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 
 			daemon, cfg := startSocketDaemon(t)
 
-			if daemon.videoDev != "" {
+			if daemon.videoDev != "" || daemon.hidrawDev != "" {
 
 				t.Skip("device connected")
 
@@ -1104,7 +1104,7 @@ func TestSocket_AudioValidModes(t *testing.T) {
 
 			daemon, cfg := startSocketDaemon(t)
 
-			if daemon.videoDev != "" {
+			if daemon.videoDev != "" || daemon.hidrawDev != "" {
 
 				t.Skip("device connected, audio would succeed")
 

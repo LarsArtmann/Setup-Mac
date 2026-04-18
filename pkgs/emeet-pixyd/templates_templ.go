@@ -59,7 +59,7 @@ func page(s webStatus) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>\"><script src=\"/static/htmx.min.js\"></script><script>\n\t\t\t\tdocument.addEventListener('input', function(e) {\n\t\t\t\t\tif (!e.target.classList.contains('ptz-slider')) return;\n\t\t\t\t\tvar axis = e.target.id.replace('slider-', '');\n\t\t\t\t\tvar valEl = document.getElementById('val-' + axis);\n\t\t\t\t\tif (!valEl) return;\n\t\t\t\t\tvar suffix = axis === 'zoom' ? 'x' : '\\u00b0';\n\t\t\t\t\tvalEl.textContent = e.target.value + suffix;\n\t\t\t\t});\n\n\t\t\t\tfunction showToast(msg, type) {\n\t\t\t\t\ttype = type || 'success';\n\t\t\t\t\tvar container = document.getElementById('toast-container');\n\t\t\t\t\tvar el = document.createElement('div');\n\t\t\t\t\tel.className = 'toast toast-' + type;\n\t\t\t\t\tel.textContent = msg;\n\t\t\t\t\tcontainer.appendChild(el);\n\t\t\t\t\trequestAnimationFrame(function() { el.classList.add('show'); });\n\t\t\t\t\tsetTimeout(function() {\n\t\t\t\t\t\tel.classList.remove('show');\n\t\t\t\t\t\tsetTimeout(function() { el.remove(); }, 300);\n\t\t\t\t\t}, 2500);\n\t\t\t\t}\n\n\t\t\t\tdocument.addEventListener('htmx:afterRequest', function(e) {\n\t\t\t\t\tif (e.detail.failed) {\n\t\t\t\t\t\tshowToast('Request failed', 'error');\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\t\t\t\t\tvar path = e.detail.pathInfo && e.detail.pathInfo.requestPath;\n\t\t\t\t\tif (!path) return;\n\t\t\t\t\tvar labels = {\n\t\t\t\t\t\t'/api/track': 'Tracking enabled',\n\t\t\t\t\t\t'/api/idle': 'Camera idle',\n\t\t\t\t\t\t'/api/privacy': 'Privacy mode on',\n\t\t\t\t\t\t'/api/center': 'Camera centered',\n\t\t\t\t\t\t'/api/sync': 'State synced',\n\t\t\t\t\t\t'/api/probe': 'Probed devices'\n\t\t\t\t\t};\n\t\t\t\t\tif (labels[path]) showToast(labels[path], 'success');\n\t\t\t\t\tif (path === '/api/gesture') {\n\t\t\t\t\t\tvar on = e.detail.xhr && e.detail.xhr.responseURL;\n\t\t\t\t\t\tshowToast('Gesture toggled', 'info');\n\t\t\t\t\t}\n\t\t\t\t\tif (path === '/api/auto') showToast('Auto mode toggled', 'info');\n\t\t\t\t\tif (path.indexOf('/api/audio') === 0) showToast('Audio mode changed', 'info');\n\t\t\t\t});\n\n\t\t\t\tdocument.addEventListener('keydown', function(e) {\n\t\t\t\t\tif (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;\n\t\t\t\t\tvar map = { 't': '/api/track', 'i': '/api/idle', 'p': '/api/privacy', 'c': '/api/center' };\n\t\t\t\t\tvar url = map[e.key.toLowerCase()];\n\t\t\t\t\tif (url) {\n\t\t\t\t\t\te.preventDefault();\n\t\t\t\t\t\thtmx.trigger(document.body, 'doAction', { url: url });\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t</script><style type=\"text/css\">\n\t\t\t\t:root {\n\t\t\t\t\t--bg: #08090d;\n\t\t\t\t\t--bg-grad: linear-gradient(145deg, #08090d 0%, #0d1017 50%, #0a0e14 100%);\n\t\t\t\t\t--surface: rgba(17, 20, 28, 0.85);\n\t\t\t\t\t--surface-hover: rgba(24, 28, 40, 0.9);\n\t\t\t\t\t--surface2: rgba(26, 30, 42, 0.7);\n\t\t\t\t\t--border: rgba(48, 54, 72, 0.5);\n\t\t\t\t\t--border-subtle: rgba(48, 54, 72, 0.25);\n\t\t\t\t\t--text: #e2e8f0;\n\t\t\t\t\t--text-dim: #64748b;\n\t\t\t\t\t--text-bright: #f1f5f9;\n\t\t\t\t\t--accent: #60a5fa;\n\t\t\t\t\t--accent-glow: rgba(96, 165, 250, 0.25);\n\t\t\t\t\t--green: #4ade80;\n\t\t\t\t\t--green-glow: rgba(74, 222, 128, 0.3);\n\t\t\t\t\t--yellow: #fbbf24;\n\t\t\t\t\t--yellow-glow: rgba(251, 191, 36, 0.3);\n\t\t\t\t\t--red: #f87171;\n\t\t\t\t\t--red-glow: rgba(248, 113, 113, 0.3);\n\t\t\t\t\t--radius: 12px;\n\t\t\t\t\t--radius-sm: 8px;\n\t\t\t\t\t--shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);\n\t\t\t\t\t--shadow-lg: 0 4px 20px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);\n\t\t\t\t\t--transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);\n\t\t\t\t}\n\n\t\t\t\t* { box-sizing: border-box; margin: 0; padding: 0; }\n\n\t\t\t\tbody {\n\t\t\t\t\tfont-family: \"Inter\", \"SF Pro Display\", system-ui, -apple-system, sans-serif;\n\t\t\t\t\tbackground: var(--bg-grad);\n\t\t\t\t\tbackground-attachment: fixed;\n\t\t\t\t\tcolor: var(--text);\n\t\t\t\t\tmin-height: 100vh;\n\t\t\t\t\t-webkit-font-smoothing: antialiased;\n\t\t\t\t\t-moz-osx-font-smoothing: grayscale;\n\t\t\t\t\tfont-feature-settings: \"cv02\", \"cv03\", \"cv04\", \"cv11\";\n\t\t\t\t}\n\n\t\t\t\t.container {\n\t\t\t\t\tmax-width: 1020px;\n\t\t\t\t\tmargin: 0 auto;\n\t\t\t\t\tpadding: 2rem 1.5rem;\n\t\t\t\t}\n\n\t\t\t\theader {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tpadding-bottom: 1.75rem;\n\t\t\t\t\tborder-bottom: 1px solid var(--border-subtle);\n\t\t\t\t\tmargin-bottom: 1.75rem;\n\t\t\t\t}\n\n\t\t\t\theader h1 {\n\t\t\t\t\tfont-size: 1.35rem;\n\t\t\t\t\tfont-weight: 700;\n\t\t\t\t\tletter-spacing: -0.03em;\n\t\t\t\t\tcolor: var(--text-bright);\n\t\t\t\t\tbackground: linear-gradient(135deg, var(--text-bright) 0%, var(--accent) 100%);\n\t\t\t\t\t-webkit-background-clip: text;\n\t\t\t\t\t-webkit-text-fill-color: transparent;\n\t\t\t\t\tbackground-clip: text;\n\t\t\t\t}\n\n\t\t\t\t.header-badge {\n\t\t\t\t\tfont-size: 0.65rem;\n\t\t\t\t\tpadding: 0.25rem 0.6rem;\n\t\t\t\t\tborder-radius: 20px;\n\t\t\t\t\tfont-weight: 700;\n\t\t\t\t\ttext-transform: uppercase;\n\t\t\t\t\tletter-spacing: 0.08em;\n\t\t\t\t\tbackdrop-filter: blur(8px);\n\t\t\t\t}\n\n\t\t\t\t.grid {\n\t\t\t\t\tdisplay: grid;\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\t\tgap: 1.25rem;\n\t\t\t\t}\n\n\t\t\t\t@media (max-width: 720px) {\n\t\t\t\t\t.grid { grid-template-columns: 1fr; }\n\t\t\t\t\t.container { padding: 1rem; }\n\t\t\t\t}\n\n\t\t\t\t.card {\n\t\t\t\t\tbackground: var(--surface);\n\t\t\t\t\tborder: 1px solid var(--border-subtle);\n\t\t\t\t\tborder-radius: var(--radius);\n\t\t\t\t\tpadding: 1.25rem;\n\t\t\t\t\tbox-shadow: var(--shadow);\n\t\t\t\t\tbackdrop-filter: blur(12px);\n\t\t\t\t\ttransition: border-color var(--transition), box-shadow var(--transition);\n\t\t\t\t}\n\n\t\t\t\t.card:hover {\n\t\t\t\t\tborder-color: var(--border);\n\t\t\t\t}\n\n\t\t\t\t.card-title {\n\t\t\t\t\tfont-size: 0.65rem;\n\t\t\t\t\ttext-transform: uppercase;\n\t\t\t\t\tletter-spacing: 0.1em;\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\tmargin-bottom: 1rem;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t}\n\n\t\t\t\t.state-indicator {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tgap: 0.6rem;\n\t\t\t\t\tfont-size: 1.4rem;\n\t\t\t\t\tfont-weight: 700;\n\t\t\t\t\tmargin-bottom: 1.1rem;\n\t\t\t\t\tletter-spacing: -0.02em;\n\t\t\t\t}\n\n\t\t\t\t.state-dot {\n\t\t\t\t\twidth: 10px;\n\t\t\t\t\theight: 10px;\n\t\t\t\t\tborder-radius: 50%;\n\t\t\t\t\tanimation: pulse 2.5s ease-in-out infinite;\n\t\t\t\t}\n\n\t\t\t\t@keyframes pulse {\n\t\t\t\t\t0%, 100% { opacity: 1; transform: scale(1); }\n\t\t\t\t\t50% { opacity: 0.6; transform: scale(0.9); }\n\t\t\t\t}\n\n\t\t\t\t.state-tracking .state-dot {\n\t\t\t\t\tbackground: var(--green);\n\t\t\t\t\tbox-shadow: 0 0 8px var(--green-glow), 0 0 20px var(--green-glow);\n\t\t\t\t}\n\t\t\t\t.state-privacy .state-dot {\n\t\t\t\t\tbackground: var(--red);\n\t\t\t\t\tbox-shadow: 0 0 8px var(--red-glow), 0 0 20px var(--red-glow);\n\t\t\t\t}\n\t\t\t\t.state-idle .state-dot {\n\t\t\t\t\tbackground: var(--yellow);\n\t\t\t\t\tbox-shadow: 0 0 8px var(--yellow-glow), 0 0 20px var(--yellow-glow);\n\t\t\t\t}\n\t\t\t\t.state-offline .state-dot {\n\t\t\t\t\tbackground: var(--text-dim);\n\t\t\t\t\tanimation: none;\n\t\t\t\t}\n\n\t\t\t\t.state-tracking { color: var(--green); }\n\t\t\t\t.state-privacy { color: var(--red); }\n\t\t\t\t.state-idle { color: var(--yellow); }\n\t\t\t\t.state-offline { color: var(--text-dim); }\n\n\t\t\t\t.btn-group {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tgap: 0.4rem;\n\t\t\t\t\tflex-wrap: wrap;\n\t\t\t\t}\n\n\t\t\t\t.btn {\n\t\t\t\t\tpadding: 0.45rem 0.85rem;\n\t\t\t\t\tborder: 1px solid var(--border);\n\t\t\t\t\tborder-radius: var(--radius-sm);\n\t\t\t\t\tbackground: var(--surface2);\n\t\t\t\t\tcolor: var(--text);\n\t\t\t\t\tfont-size: 0.78rem;\n\t\t\t\t\tfont-weight: 500;\n\t\t\t\t\tcursor: pointer;\n\t\t\t\t\ttransition: all var(--transition);\n\t\t\t\t\ttext-decoration: none;\n\t\t\t\t\tbackdrop-filter: blur(4px);\n\t\t\t\t\tuser-select: none;\n\t\t\t\t\tline-height: 1.4;\n\t\t\t\t}\n\n\t\t\t\t.btn:hover {\n\t\t\t\t\tbackground: rgba(40, 46, 62, 0.8);\n\t\t\t\t\tborder-color: var(--text-dim);\n\t\t\t\t\ttransform: translateY(-1px);\n\t\t\t\t\tbox-shadow: var(--shadow);\n\t\t\t\t}\n\n\t\t\t\t.btn:active {\n\t\t\t\t\ttransform: translateY(0);\n\t\t\t\t\tbox-shadow: none;\n\t\t\t\t}\n\n\t\t\t\t.btn:focus-visible {\n\t\t\t\t\toutline: 2px solid var(--accent);\n\t\t\t\t\toutline-offset: 2px;\n\t\t\t\t}\n\n\t\t\t\t.btn-active {\n\t\t\t\t\tbackground: var(--accent);\n\t\t\t\t\tborder-color: var(--accent);\n\t\t\t\t\tcolor: #fff;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tbox-shadow: 0 0 12px var(--accent-glow);\n\t\t\t\t}\n\n\t\t\t\t.btn-active:hover {\n\t\t\t\t\tbackground: #4b94f0;\n\t\t\t\t\ttransform: translateY(-1px);\n\t\t\t\t\tbox-shadow: 0 0 16px var(--accent-glow);\n\t\t\t\t}\n\n\t\t\t\t.btn-green.btn-active {\n\t\t\t\t\tbackground: var(--green);\n\t\t\t\t\tborder-color: var(--green);\n\t\t\t\t\tbox-shadow: 0 0 12px var(--green-glow);\n\t\t\t\t}\n\t\t\t\t.btn-green.btn-active:hover {\n\t\t\t\t\tbackground: #3bd674;\n\t\t\t\t\tbox-shadow: 0 0 16px var(--green-glow);\n\t\t\t\t}\n\n\t\t\t\t.btn-red.btn-active {\n\t\t\t\t\tbackground: var(--red);\n\t\t\t\t\tborder-color: var(--red);\n\t\t\t\t\tbox-shadow: 0 0 12px var(--red-glow);\n\t\t\t\t}\n\t\t\t\t.btn-red.btn-active:hover {\n\t\t\t\t\tbackground: #ef5555;\n\t\t\t\t\tbox-shadow: 0 0 16px var(--red-glow);\n\t\t\t\t}\n\n\t\t\t\t.btn-yellow.btn-active {\n\t\t\t\t\tbackground: var(--yellow);\n\t\t\t\t\tborder-color: var(--yellow);\n\t\t\t\t\tcolor: #1a1500;\n\t\t\t\t\tbox-shadow: 0 0 12px var(--yellow-glow);\n\t\t\t\t}\n\t\t\t\t.btn-yellow.btn-active:hover {\n\t\t\t\t\tbackground: #f0ad1e;\n\t\t\t\t\tbox-shadow: 0 0 16px var(--yellow-glow);\n\t\t\t\t}\n\n\t\t\t\t.preview-container {\n\t\t\t\t\tposition: relative;\n\t\t\t\t\tbackground: #050608;\n\t\t\t\t\tborder-radius: var(--radius);\n\t\t\t\t\toverflow: hidden;\n\t\t\t\t\taspect-ratio: 16/9;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tjustify-content: center;\n\t\t\t\t\tborder: 1px solid var(--border-subtle);\n\t\t\t\t}\n\n\t\t\t\t.preview-container img {\n\t\t\t\t\twidth: 100%;\n\t\t\t\t\theight: 100%;\n\t\t\t\t\tobject-fit: cover;\n\t\t\t\t\ttransition: opacity 0.3s ease;\n\t\t\t\t}\n\n\t\t\t\t.preview-placeholder {\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tfont-size: 0.85rem;\n\t\t\t\t}\n\n\t\t\t\t.preview-placeholder .icon {\n\t\t\t\t\tfont-size: 2.5rem;\n\t\t\t\t\tmargin-bottom: 0.6rem;\n\t\t\t\t\topacity: 0.3;\n\t\t\t\t\tfilter: grayscale(0.5);\n\t\t\t\t}\n\n\t\t\t\t.slider-row {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tgap: 0.65rem;\n\t\t\t\t\tmargin-bottom: 0.65rem;\n\t\t\t\t}\n\n\t\t\t\t.slider-label {\n\t\t\t\t\twidth: 38px;\n\t\t\t\t\tfont-size: 0.7rem;\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\ttext-transform: uppercase;\n\t\t\t\t\tletter-spacing: 0.05em;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t}\n\n\t\t\t\t.slider-value {\n\t\t\t\t\twidth: 44px;\n\t\t\t\t\ttext-align: right;\n\t\t\t\t\tfont-size: 0.72rem;\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\tfont-variant-numeric: tabular-nums;\n\t\t\t\t\tfont-weight: 500;\n\t\t\t\t\tfont-feature-settings: \"tnum\";\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"] {\n\t\t\t\t\tflex: 1;\n\t\t\t\t\t-webkit-appearance: none;\n\t\t\t\t\tappearance: none;\n\t\t\t\t\theight: 5px;\n\t\t\t\t\tbackground: rgba(48, 54, 72, 0.6);\n\t\t\t\t\tborder-radius: 3px;\n\t\t\t\t\toutline: none;\n\t\t\t\t\ttransition: background var(--transition);\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"]:hover {\n\t\t\t\t\tbackground: rgba(48, 54, 72, 0.9);\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"]::-webkit-slider-thumb {\n\t\t\t\t\t-webkit-appearance: none;\n\t\t\t\t\tappearance: none;\n\t\t\t\t\twidth: 16px;\n\t\t\t\t\theight: 16px;\n\t\t\t\t\tborder-radius: 50%;\n\t\t\t\t\tbackground: var(--accent);\n\t\t\t\t\tcursor: pointer;\n\t\t\t\t\tborder: 2px solid rgba(255,255,255,0.15);\n\t\t\t\t\tbox-shadow: 0 0 8px var(--accent-glow);\n\t\t\t\t\ttransition: transform var(--transition), box-shadow var(--transition);\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"]::-webkit-slider-thumb:hover {\n\t\t\t\t\ttransform: scale(1.15);\n\t\t\t\t\tbox-shadow: 0 0 14px var(--accent-glow);\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"]::-moz-range-thumb {\n\t\t\t\t\twidth: 16px;\n\t\t\t\t\theight: 16px;\n\t\t\t\t\tborder-radius: 50%;\n\t\t\t\t\tbackground: var(--accent);\n\t\t\t\t\tcursor: pointer;\n\t\t\t\t\tborder: 2px solid rgba(255,255,255,0.15);\n\t\t\t\t\tbox-shadow: 0 0 8px var(--accent-glow);\n\t\t\t\t}\n\n\t\t\t\tinput[type=\"range\"]:focus-visible {\n\t\t\t\t\toutline: 2px solid var(--accent);\n\t\t\t\t\toutline-offset: 3px;\n\t\t\t\t\tborder-radius: 3px;\n\t\t\t\t}\n\n\t\t\t\t.ptz-slider {\n\t\t\t\t\ttouch-action: none;\n\t\t\t\t}\n\n\t\t\t\t.ptz-slider.sending {\n\t\t\t\t\topacity: 0.7;\n\t\t\t\t}\n\n\t\t\t\t.ptz-slider.sending::-webkit-slider-thumb {\n\t\t\t\t\tbox-shadow: 0 0 12px rgba(96, 165, 250, 0.5);\n\t\t\t\t}\n\n\t\t\t\t.toggle-row {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tjustify-content: space-between;\n\t\t\t\t\tpadding: 0.5rem 0;\n\t\t\t\t}\n\n\t\t\t\t.toggle-row + .toggle-row {\n\t\t\t\t\tborder-top: 1px solid var(--border-subtle);\n\t\t\t\t}\n\n\t\t\t\t.toggle-label {\n\t\t\t\t\tfont-size: 0.85rem;\n\t\t\t\t\tfont-weight: 500;\n\t\t\t\t\tcolor: var(--text);\n\t\t\t\t}\n\n\t\t\t\t.toggle {\n\t\t\t\t\tposition: relative;\n\t\t\t\t\twidth: 40px;\n\t\t\t\t\theight: 22px;\n\t\t\t\t\tborder-radius: 11px;\n\t\t\t\t\tbackground: rgba(48, 54, 72, 0.6);\n\t\t\t\t\tborder: 1px solid var(--border-subtle);\n\t\t\t\t\tcursor: pointer;\n\t\t\t\t\ttransition: all var(--transition);\n\t\t\t\t}\n\n\t\t\t\t.toggle:hover {\n\t\t\t\t\tbackground: rgba(48, 54, 72, 0.9);\n\t\t\t\t}\n\n\t\t\t\t.toggle:focus-visible {\n\t\t\t\t\toutline: 2px solid var(--accent);\n\t\t\t\t\toutline-offset: 2px;\n\t\t\t\t}\n\n\t\t\t\t.toggle.on {\n\t\t\t\t\tbackground: var(--green);\n\t\t\t\t\tborder-color: var(--green);\n\t\t\t\t\tbox-shadow: 0 0 10px var(--green-glow);\n\t\t\t\t}\n\n\t\t\t\t.toggle::after {\n\t\t\t\t\tcontent: '';\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 2px;\n\t\t\t\t\tleft: 2px;\n\t\t\t\t\twidth: 16px;\n\t\t\t\t\theight: 16px;\n\t\t\t\t\tborder-radius: 50%;\n\t\t\t\t\tbackground: #fff;\n\t\t\t\t\tbox-shadow: 0 1px 3px rgba(0,0,0,0.3);\n\t\t\t\t\ttransition: transform var(--transition);\n\t\t\t\t}\n\n\t\t\t\t.toggle.on::after {\n\t\t\t\t\ttransform: translateX(18px);\n\t\t\t\t}\n\n\t\t\t\t.error-banner {\n\t\t\t\t\tbackground: rgba(248, 113, 113, 0.08);\n\t\t\t\t\tborder: 1px solid rgba(248, 113, 113, 0.3);\n\t\t\t\t\tborder-radius: var(--radius);\n\t\t\t\t\tpadding: 0.85rem 1rem;\n\t\t\t\t\tmargin-bottom: 1rem;\n\t\t\t\t\tfont-size: 0.8rem;\n\t\t\t\t\tcolor: var(--red);\n\t\t\t\t\tbackdrop-filter: blur(8px);\n\t\t\t\t}\n\n\t\t\t\t.meta {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tgap: 1rem;\n\t\t\t\t\tfont-size: 0.72rem;\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\tmargin-top: 0.5rem;\n\t\t\t\t\tfont-weight: 500;\n\t\t\t\t}\n\n\t\t\t\t.spacer { height: 0.5rem; }\n\n\t\t\t\t.htmx-indicator {\n\t\t\t\t\tdisplay: none;\n\t\t\t\t}\n\t\t\t\t#status-panel.htmx-request {\n\t\t\t\t\topacity: 0.85;\n\t\t\t\t\ttransition: opacity 0.15s ease;\n\t\t\t\t}\n\t\t\t\t#status-panel.htmx-request::before {\n\t\t\t\t\tcontent: '';\n\t\t\t\t\tposition: absolute;\n\t\t\t\t\ttop: 0;\n\t\t\t\t\tleft: 0;\n\t\t\t\t\tright: 0;\n\t\t\t\t\theight: 2px;\n\t\t\t\t\tbackground: var(--accent);\n\t\t\t\t\tanimation: loading-bar 1s ease-in-out infinite;\n\t\t\t\t\tborder-radius: var(--radius) var(--radius) 0 0;\n\t\t\t\t\tz-index: 1;\n\t\t\t\t}\n\t\t\t\t@keyframes loading-bar {\n\t\t\t\t\t0% { width: 0; left: 0; }\n\t\t\t\t\t50% { width: 60%; left: 20%; }\n\t\t\t\t\t100% { width: 0; left: 100%; }\n\t\t\t\t}\n\n\t\t\t\t.kbd {\n\t\t\t\t\tdisplay: inline-block;\n\t\t\t\t\tfont-size: 0.6rem;\n\t\t\t\t\tfont-family: inherit;\n\t\t\t\t\tpadding: 0.1rem 0.3rem;\n\t\t\t\t\tborder-radius: 3px;\n\t\t\t\t\tbackground: rgba(255,255,255,0.06);\n\t\t\t\t\tborder: 1px solid var(--border-subtle);\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\tmargin-left: 0.35rem;\n\t\t\t\t\tvertical-align: middle;\n\t\t\t\t\tline-height: 1.3;\n\t\t\t\t}\n\n\t\t\t\t#toast-container {\n\t\t\t\t\tposition: fixed;\n\t\t\t\t\tbottom: 1.5rem;\n\t\t\t\t\tright: 1.5rem;\n\t\t\t\t\tz-index: 1000;\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\tflex-direction: column;\n\t\t\t\t\tgap: 0.5rem;\n\t\t\t\t\tpointer-events: none;\n\t\t\t\t}\n\n\t\t\t\t.toast {\n\t\t\t\t\tpadding: 0.6rem 1rem;\n\t\t\t\t\tborder-radius: var(--radius-sm);\n\t\t\t\t\tfont-size: 0.78rem;\n\t\t\t\t\tfont-weight: 500;\n\t\t\t\t\tcolor: var(--text-bright);\n\t\t\t\t\tbackground: var(--surface);\n\t\t\t\t\tborder: 1px solid var(--border);\n\t\t\t\t\tbackdrop-filter: blur(16px);\n\t\t\t\t\tbox-shadow: var(--shadow-lg);\n\t\t\t\t\topacity: 0;\n\t\t\t\t\ttransform: translateY(8px) scale(0.96);\n\t\t\t\t\ttransition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);\n\t\t\t\t}\n\n\t\t\t\t.toast.show {\n\t\t\t\t\topacity: 1;\n\t\t\t\t\ttransform: translateY(0) scale(1);\n\t\t\t\t}\n\n\t\t\t\t.toast-success { border-left: 3px solid var(--green); }\n\t\t\t\t.toast-error { border-left: 3px solid var(--red); }\n\t\t\t\t.toast-info { border-left: 3px solid var(--accent); }\n\n\t\t\t\t.audio-indicator {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tgap: 0.6rem;\n\t\t\t\t\tfont-size: 1.05rem;\n\t\t\t\t\tfont-weight: 600;\n\t\t\t\t\tmargin-bottom: 1rem;\n\t\t\t\t\tletter-spacing: -0.01em;\n\t\t\t\t}\n\n\t\t\t\t.audio-dot {\n\t\t\t\t\twidth: 8px;\n\t\t\t\t\theight: 8px;\n\t\t\t\t\tborder-radius: 50%;\n\t\t\t\t\tbackground: var(--accent);\n\t\t\t\t\tbox-shadow: 0 0 6px var(--accent-glow);\n\t\t\t\t\tflex-shrink: 0;\n\t\t\t\t}\n\n\t\t\t\t.audio-nc .audio-dot { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }\n\t\t\t\t.audio-live .audio-dot { background: var(--yellow); box-shadow: 0 0 6px var(--yellow-glow); }\n\t\t\t\t.audio-original .audio-dot { background: var(--text-dim); box-shadow: none; }\n\n\t\t\t\t.btn[disabled] {\n\t\t\t\t\topacity: 0.35;\n\t\t\t\t\tcursor: not-allowed;\n\t\t\t\t\tpointer-events: none;\n\t\t\t\t}\n\n\t\t\t\t.footer-actions {\n\t\t\t\t\tdisplay: grid;\n\t\t\t\t\tgrid-template-columns: 1fr 1fr;\n\t\t\t\t\tgap: 0.5rem;\n\t\t\t\t}\n\n\t\t\t\t.footer-actions .btn {\n\t\t\t\t\tdisplay: flex;\n\t\t\t\t\talign-items: center;\n\t\t\t\t\tjustify-content: center;\n\t\t\t\t\tgap: 0.4rem;\n\t\t\t\t}\n\n\t\t\t\t.last-synced {\n\t\t\t\t\tfont-size: 0.65rem;\n\t\t\t\t\tcolor: var(--text-dim);\n\t\t\t\t\ttext-align: center;\n\t\t\t\t\tmargin-top: 0.5rem;\n\t\t\t\t\topacity: 0.7;\n\t\t\t\t}\n\n\t\t\t\t#status-panel > .card:last-child {\n\t\t\t\t\tbackground: transparent;\n\t\t\t\t\tborder: 1px dashed var(--border-subtle);\n\t\t\t\t\tbox-shadow: none;\n\t\t\t\t\tbackdrop-filter: none;\n\t\t\t\t}\n\n\t\t\t\t@media (prefers-reduced-motion: reduce) {\n\t\t\t\t\t*, *::before, *::after {\n\t\t\t\t\t\tanimation-duration: 0.01ms !important;\n\t\t\t\t\t\tanimation-iteration-count: 1 !important;\n\t\t\t\t\t\ttransition-duration: 0.01ms !important;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t</style></head><body hx-on::do-action=\"htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})\"><div class=\"container\"><header><h1>EMEET PIXY</h1>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"icon\" type=\"image/svg+xml\" href=\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F4F7;</text></svg>\"><link rel=\"stylesheet\" href=\"/static/style.css\"><script src=\"/static/htmx.min.js\"></script><script src=\"/static/app.js\"></script></head><body hx-on::do-action=\"htmx.ajax('POST', event.detail.url, {target: '#status-panel', swap: 'outerHTML'})\"><div class=\"container\"><header><h1>EMEET PIXY</h1>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -133,7 +133,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs("ptz-" + axis)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 705, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 71, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -146,7 +146,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 706, Col: 36}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 72, Col: 36}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -159,7 +159,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs("slider-" + axis)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 710, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 76, Col: 24}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -172,7 +172,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var7 string
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", min))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 711, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 77, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -185,7 +185,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", max))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 712, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 78, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -198,7 +198,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var9 string
 		templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", value))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 713, Col: 35}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 79, Col: 35}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 		if templ_7745c5c3_Err != nil {
@@ -211,7 +211,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs("/api/ptz/" + axis)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 714, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 80, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -224,7 +224,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs("#ptz-" + axis)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 715, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 81, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -237,7 +237,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs("val-" + axis)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 720, Col: 47}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 86, Col: 47}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -250,7 +250,7 @@ func ptzSlider(label, axis string, min, max, value int, unit string) templ.Compo
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d%s", value, unit))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 720, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 86, Col: 84}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -297,7 +297,7 @@ func statusPanel(s webStatus) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(s.Error)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 727, Col: 38}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 93, Col: 38}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func statusPanel(s webStatus) templ.Component {
 		var templ_7745c5c3_Var18 string
 		templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(s.Camera)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 733, Col: 20}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 99, Col: 20}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 		if templ_7745c5c3_Err != nil {
@@ -468,7 +468,7 @@ func statusPanel(s webStatus) templ.Component {
 		var templ_7745c5c3_Var27 string
 		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(s.Audio)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 769, Col: 19}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 135, Col: 19}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -599,7 +599,7 @@ func statusPanel(s webStatus) templ.Component {
 		var templ_7745c5c3_Var36 string
 		templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%t", s.Gesture))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 814, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 180, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 		if templ_7745c5c3_Err != nil {
@@ -644,7 +644,7 @@ func statusPanel(s webStatus) templ.Component {
 		var templ_7745c5c3_Var39 string
 		templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%t", s.Auto))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 826, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 192, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 		if templ_7745c5c3_Err != nil {
@@ -698,7 +698,7 @@ func statusPanel(s webStatus) templ.Component {
 			var templ_7745c5c3_Var40 string
 			templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(s.LastSynced)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 851, Col: 56}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates.templ`, Line: 217, Col: 56}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 			if templ_7745c5c3_Err != nil {

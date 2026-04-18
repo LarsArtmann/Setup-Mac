@@ -12,7 +12,6 @@ import (
 
 const (
 	v4l2DegreesPerUnit = 3600
-	v4l2SplitCount     = 2
 )
 
 type ptzValues struct {
@@ -31,41 +30,36 @@ func v4l2Set(ctx context.Context, dev, ctrl, value string) error {
 	return nil
 }
 
-func v4l2Get(ctx context.Context, dev, ctrl string) (string, error) {
-	out, err := exec.CommandContext(ctx, "v4l2-ctl", "-d", dev, "--get-ctrl="+ctrl).
-		Output()
-	if err != nil {
-		return "", fmt.Errorf("v4l2Get %s on %s: %w", ctrl, dev, err)
-	}
-
-	parts := strings.Split(strings.TrimSpace(string(out)), ":")
-	if len(parts) == v4l2SplitCount {
-		return strings.TrimSpace(parts[1]), nil
-	}
-
-	return strings.TrimSpace(string(out)), nil
-}
-
 func parsePTZValues(ctx context.Context, dev string) ptzValues {
-	pan, _ := v4l2Get(ctx, dev, "pan_absolute")
-	tilt, _ := v4l2Get(ctx, dev, "tilt_absolute")
-	zoom, _ := v4l2Get(ctx, dev, "zoom_absolute")
+	out, err := exec.CommandContext(
+		ctx, "v4l2-ctl", "-d", dev,
+		"--get-ctrl=pan_absolute,tilt_absolute,zoom_absolute",
+	).Output()
+	if err != nil {
+		return ptzValues{}
+	}
 
 	var ptz ptzValues
 
-	panVal, panErr := strconv.Atoi(pan)
-	if panErr == nil {
-		ptz.Pan = panVal / v4l2DegreesPerUnit
-	}
+	for line := range strings.SplitSeq(strings.TrimSpace(string(out)), "\n") {
+		key, val, ok := strings.Cut(line, ":")
+		if !ok {
+			continue
+		}
 
-	tiltVal, tiltErr := strconv.Atoi(tilt)
-	if tiltErr == nil {
-		ptz.Tilt = tiltVal / v4l2DegreesPerUnit
-	}
+		v, parseErr := strconv.Atoi(strings.TrimSpace(val))
+		if parseErr != nil {
+			continue
+		}
 
-	zoomVal, zoomErr := strconv.Atoi(zoom)
-	if zoomErr == nil {
-		ptz.Zoom = zoomVal
+		switch strings.TrimSpace(key) {
+		case "pan_absolute":
+			ptz.Pan = v / v4l2DegreesPerUnit
+		case "tilt_absolute":
+			ptz.Tilt = v / v4l2DegreesPerUnit
+		case "zoom_absolute":
+			ptz.Zoom = v
+		}
 	}
 
 	return ptz

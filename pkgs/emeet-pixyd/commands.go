@@ -29,8 +29,8 @@ const (
 )
 
 func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
-	d.mu.Lock()
-	defer d.mu.Unlock()
+	d.cmdMu.Lock()
+	defer d.cmdMu.Unlock()
 
 	parts := strings.Fields(cmd)
 	if len(parts) == 0 {
@@ -51,7 +51,11 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.handleTrackingCommand(pixy.StatePrivacy, "privacy")
 
 	case "toggle-privacy":
-		if d.state.Camera == pixy.StatePrivacy {
+		d.mu.RLock()
+		camera := d.state.Camera
+		d.mu.RUnlock()
+
+		if camera == pixy.StatePrivacy {
 			return d.handleTrackingCommand(pixy.StateTracking, "toggle-privacy")
 		}
 
@@ -76,10 +80,13 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.syncState(ctx)
 
 	case "probe":
+		d.mu.Lock()
 		d.probeDevices()
+		dev := d.videoDev
+		d.mu.Unlock()
 
-		if d.isDevicePresent() {
-			return "device found: " + d.videoDev
+		if dev != "" {
+			return "device found: " + dev
 		}
 
 		return respDeviceNotFound
@@ -88,8 +95,12 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 		return d.handlePTZCommand(ctx, parts)
 
 	case "device":
-		if d.videoDev != "" {
-			return d.videoDev
+		d.mu.RLock()
+		dev := d.videoDev
+		d.mu.RUnlock()
+
+		if dev != "" {
+			return dev
 		}
 
 		return respDeviceNotFound
@@ -118,7 +129,9 @@ func (d *Daemon) handleTrackingCommand(state pixy.CameraState, label string) str
 func (d *Daemon) handleAudioCommand(parts []string) string {
 	var mode pixy.AudioMode
 	if len(parts) < 2 {
+		d.mu.RLock()
 		mode = d.state.Audio.Next()
+		d.mu.RUnlock()
 	} else {
 		var parseErr error
 
@@ -159,11 +172,14 @@ func (d *Daemon) handleCenterCommand(ctx context.Context) string {
 
 func (d *Daemon) handleAutoCommand(cmd string) string {
 	mode := cmd == cmdAutoOn
+
+	d.mu.Lock()
 	d.state.AutoMode = mode
 
 	if saveErr := d.saveState(); saveErr != nil {
 		slog.Error("failed to save state", "error", saveErr)
 	}
+	d.mu.Unlock()
 
 	if mode {
 		return respAutoModeOn
@@ -187,7 +203,15 @@ func (d *Daemon) handlePTZCommand(ctx context.Context, parts []string) string {
 		multiplier = 1
 	}
 
-	if v4l2Err := v4l2Set(ctx, d.videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
+	d.mu.RLock()
+	videoDev := d.videoDev
+	d.mu.RUnlock()
+
+	if videoDev == "" {
+		return fmt.Sprintf("error: %s: device not found", parts[0])
+	}
+
+	if v4l2Err := v4l2Set(ctx, videoDev, parts[0]+"_absolute", strconv.Itoa(val*multiplier)); v4l2Err != nil {
 		return fmt.Sprintf("error: %s: %v", parts[0], v4l2Err)
 	}
 

@@ -30,6 +30,7 @@ var errDeadline = errors.New("deadline error")
 
 type Daemon struct {
 	mu        sync.RWMutex
+	cmdMu     sync.Mutex
 	state     pixy.State
 	config    pixy.Config
 	videoDev  string
@@ -66,6 +67,12 @@ func probeVideo4linux(sysfsPath string) string {
 		name := entry.Name()
 
 		videoPath := fmt.Sprintf("/dev/%s", name)
+
+		indexFile := fmt.Sprintf("%s/%s/index", sysfsPath, name)
+		indexData, iErr := os.ReadFile(indexFile)
+		if iErr == nil && strings.TrimSpace(string(indexData)) != "0" {
+			continue
+		}
 
 		vendorFile := fmt.Sprintf("%s/%s/device/id/vendor", sysfsPath, name)
 		productFile := fmt.Sprintf("%s/%s/device/id/product", sysfsPath, name)
@@ -173,45 +180,40 @@ func (d *Daemon) saveState() error {
 	return os.WriteFile(d.config.StateFile(), data, pixy.PermissionStateFile)
 }
 
-func (d *Daemon) isDevicePresent() bool {
-	return d.videoDev != ""
-}
-
 type stateSetter func(d *Daemon)
 
-func (d *Daemon) requireDevice(context string) error {
-	if !d.isDevicePresent() {
-		return fmt.Errorf("%s: %w", context, pixy.ErrPIXYNotConnected)
-	}
-
-	return nil
-}
-
 func (d *Daemon) setDeviceState(configBytes, commitBytes []byte, setter stateSetter) error {
-	if err := d.requireDevice("setDeviceState"); err != nil {
-		return err
+	d.mu.RLock()
+	hidrawDev := d.hidrawDev
+	d.mu.RUnlock()
+
+	if hidrawDev == "" {
+		return fmt.Errorf("setDeviceState: %w", pixy.ErrPIXYNotConnected)
 	}
 
-	err := hidSend(d.hidrawDev, configBytes)
+	err := hidSend(hidrawDev, configBytes)
 	if err != nil {
+		d.mu.Lock()
 		d.probeDevices()
+		d.mu.Unlock()
 
 		return fmt.Errorf("setDeviceState send config: %w", err)
 	}
 
 	time.Sleep(hidCommandSleepMs * time.Millisecond)
 
-	err = hidSend(d.hidrawDev, commitBytes)
+	err = hidSend(hidrawDev, commitBytes)
 	if err != nil {
 		return fmt.Errorf("setDeviceState send commit: %w", err)
 	}
 
+	d.mu.Lock()
 	setter(d)
 
-	saveErr := d.saveState()
-	if saveErr != nil {
+	if saveErr := d.saveState(); saveErr != nil {
 		slog.Error("failed to save state", "error", saveErr)
 	}
+	d.mu.Unlock()
 
 	return nil
 }
@@ -246,19 +248,23 @@ func (d *Daemon) setGesture(enabled bool) error {
 }
 
 func (d *Daemon) centerCamera(ctx context.Context) error {
-	if err := d.requireDevice("centerCamera"); err != nil {
-		return err
+	d.mu.RLock()
+	videoDev := d.videoDev
+	d.mu.RUnlock()
+
+	if videoDev == "" {
+		return fmt.Errorf("centerCamera: %w", pixy.ErrPIXYNotConnected)
 	}
 
-	if err := v4l2Set(ctx, d.videoDev, "pan_absolute", "0"); err != nil {
+	if err := v4l2Set(ctx, videoDev, "pan_absolute", "0"); err != nil {
 		return fmt.Errorf("centerCamera pan: %w", err)
 	}
 
-	if err := v4l2Set(ctx, d.videoDev, "tilt_absolute", "0"); err != nil {
+	if err := v4l2Set(ctx, videoDev, "tilt_absolute", "0"); err != nil {
 		return fmt.Errorf("centerCamera tilt: %w", err)
 	}
 
-	err := v4l2Set(ctx, d.videoDev, "zoom_absolute", "100")
+	err := v4l2Set(ctx, videoDev, "zoom_absolute", "100")
 	if err != nil {
 		return fmt.Errorf("centerCamera zoom: %w", err)
 	}
@@ -267,27 +273,39 @@ func (d *Daemon) centerCamera(ctx context.Context) error {
 }
 
 func (d *Daemon) queryTracking(ctx context.Context) (pixy.CameraState, error) {
+	d.mu.RLock()
+	hidrawDev := d.hidrawDev
+	d.mu.RUnlock()
+
 	return queryHIDState(
 		ctx,
-		d.hidrawDev,
+		hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceTracking, 0x01, 0x01},
 		func(p hidResponse) pixy.CameraState { return p.Tracking },
 	)
 }
 
 func (d *Daemon) queryAudio(ctx context.Context) (pixy.AudioMode, error) {
+	d.mu.RLock()
+	hidrawDev := d.hidrawDev
+	d.mu.RUnlock()
+
 	return queryHIDState(
 		ctx,
-		d.hidrawDev,
+		hidrawDev,
 		[]byte{cameraConfigPrefix, hidInterfaceAudio, audioConfigMarker, 0x04},
 		func(p hidResponse) pixy.AudioMode { return p.Audio },
 	)
 }
 
 func (d *Daemon) queryGesture(ctx context.Context) (bool, error) {
+	d.mu.RLock()
+	hidrawDev := d.hidrawDev
+	d.mu.RUnlock()
+
 	return queryHIDState(
 		ctx,
-		d.hidrawDev,
+		hidrawDev,
 		[]byte{
 			cameraConfigPrefix, hidInterfaceGesture,
 			gestureConfigMark1, gestureConfigMark2,
@@ -300,13 +318,21 @@ func (d *Daemon) queryGesture(ctx context.Context) (bool, error) {
 }
 
 func (d *Daemon) syncState(ctx context.Context) string {
-	if !d.isDevicePresent() {
+	d.mu.RLock()
+	videoDev := d.videoDev
+	d.mu.RUnlock()
+
+	if videoDev == "" {
 		return "error: PIXY not connected"
 	}
 
+	tracking, trackingErr := d.queryTracking(ctx)
+	audio, audioErr := d.queryAudio(ctx)
+	gesture, gestureErr := d.queryGesture(ctx)
+
+	d.mu.Lock()
 	changed := false
 
-	tracking, trackingErr := d.queryTracking(ctx)
 	if trackingErr == nil && tracking.Valid() && tracking != pixy.StateOffline {
 		if d.state.Camera != tracking {
 			slog.Info("state sync: camera changed", "believed", d.state.Camera, "actual", tracking)
@@ -317,7 +343,6 @@ func (d *Daemon) syncState(ctx context.Context) string {
 		slog.Debug("tracking query failed", "error", trackingErr)
 	}
 
-	audio, audioErr := d.queryAudio(ctx)
 	if audioErr == nil && audio.Valid() {
 		if d.state.Audio != audio {
 			slog.Info("state sync: audio changed", "believed", d.state.Audio, "actual", audio)
@@ -328,7 +353,6 @@ func (d *Daemon) syncState(ctx context.Context) string {
 		slog.Debug("audio query failed", "error", audioErr)
 	}
 
-	gesture, gestureErr := d.queryGesture(ctx)
 	if gestureErr == nil {
 		if d.state.Gesture != gesture {
 			slog.Info("state sync: gesture changed", "believed", d.state.Gesture, "actual", gesture)
@@ -339,18 +363,19 @@ func (d *Daemon) syncState(ctx context.Context) string {
 		slog.Debug("gesture query failed", "error", gestureErr)
 	}
 
+	d.lastSyncedAt = time.Now()
+
 	if changed {
-		saveErr := d.saveState()
-		if saveErr != nil {
+		if saveErr := d.saveState(); saveErr != nil {
 			slog.Error("failed to save synced state", "error", saveErr)
 		}
 
-		d.lastSyncedAt = time.Now()
+		d.mu.Unlock()
 
 		return "synced (state updated from camera)"
 	}
 
-	d.lastSyncedAt = time.Now()
+	d.mu.Unlock()
 
 	return "synced (no changes)"
 }
@@ -372,23 +397,32 @@ func sdNotify(state string) {
 }
 
 func (d *Daemon) autoManage(ctx context.Context) {
-	d.mu.Lock()
-	defer d.mu.Unlock()
+	d.cmdMu.Lock()
+	defer d.cmdMu.Unlock()
 
-	if !d.isDevicePresent() {
+	d.mu.RLock()
+	videoDev := d.videoDev
+	autoMode := d.state.AutoMode
+	d.mu.RUnlock()
+
+	if videoDev == "" {
+		d.mu.Lock()
 		d.probeDevices()
+		videoDev = d.videoDev
+		d.mu.Unlock()
 
-		if !d.isDevicePresent() {
+		if videoDev == "" {
 			return
 		}
 	}
 
-	if !d.state.AutoMode {
+	if !autoMode {
 		return
 	}
 
-	inUse := isCameraInUse(d.videoDev)
+	inUse := isCameraInUse(videoDev)
 
+	d.mu.Lock()
 	if inUse {
 		d.debounceIdle = 0
 		d.debounceInUse++
@@ -397,19 +431,30 @@ func (d *Daemon) autoManage(ctx context.Context) {
 		d.debounceIdle++
 	}
 
-	cameraInUseNotInCall := inUse && !d.state.InCall && d.debounceInUse >= d.config.DebounceCount
+	debounceInUse := d.debounceInUse
+	debounceIdle := d.debounceIdle
+	inCall := d.state.InCall
+	camera := d.state.Camera
+	audio := d.state.Audio
+	debounceCount := d.config.DebounceCount
+	d.mu.Unlock()
+
+	cameraInUseNotInCall := inUse && !inCall && debounceInUse >= debounceCount
 	if cameraInUseNotInCall {
 		slog.Info("camera in use, activating tracking and noise cancellation")
 
+		d.mu.Lock()
 		d.state.InCall = true
-		if d.state.Camera == pixy.StatePrivacy || d.state.Camera == pixy.StateIdle {
+		d.mu.Unlock()
+
+		if camera == pixy.StatePrivacy || camera == pixy.StateIdle {
 			trackErr := d.setTracking(pixy.StateTracking)
 			if trackErr != nil {
 				slog.Error("failed to activate tracking", "error", trackErr)
 			}
 		}
 
-		if d.state.Audio != pixy.AudioNC {
+		if audio != pixy.AudioNC {
 			audioErr := d.setAudio(pixy.AudioNC)
 			if audioErr != nil {
 				slog.Error("failed to set audio mode", "error", audioErr)
@@ -425,11 +470,13 @@ func (d *Daemon) autoManage(ctx context.Context) {
 		notify(ctx, "EMEET PIXY", "Camera activated — tracking enabled")
 	}
 
-	cameraReleasedInCall := !inUse && d.state.InCall && d.debounceIdle >= d.config.DebounceCount
+	cameraReleasedInCall := !inUse && inCall && debounceIdle >= debounceCount
 	if cameraReleasedInCall {
 		slog.Info("camera released, entering privacy mode")
 
+		d.mu.Lock()
 		d.state.InCall = false
+		d.mu.Unlock()
 
 		privacyErr := d.setTracking(pixy.StatePrivacy)
 		if privacyErr != nil {
@@ -439,49 +486,68 @@ func (d *Daemon) autoManage(ctx context.Context) {
 		notify(ctx, "EMEET PIXY", "Camera privacy mode — physically disabled")
 	}
 
+	d.mu.Lock()
 	saveErr := d.saveState()
+	d.mu.Unlock()
+
 	if saveErr != nil {
 		slog.Error("failed to save state", "error", saveErr)
 	}
 }
 
 func (d *Daemon) getStatus(ctx context.Context) string {
-	if !d.isDevicePresent() {
+	d.mu.RLock()
+	videoDev := d.videoDev
+	camera := d.state.Camera
+	audio := d.state.Audio
+	gesture := d.state.Gesture
+	inCall := d.state.InCall
+	autoMode := d.state.AutoMode
+	d.mu.RUnlock()
+
+	if videoDev == "" {
 		return fmt.Sprintf(
 			"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=",
 			pixy.StateOffline,
-			d.state.Audio,
-			d.state.Gesture,
+			audio,
+			gesture,
 			0,
 			0,
 			0,
-			boolStr(d.state.InCall, "yes", "no"),
-			boolStr(d.state.AutoMode, "on", "off"),
+			boolStr(inCall, "yes", "no"),
+			boolStr(autoMode, "on", "off"),
 		)
 	}
 
-	ptz := parsePTZValues(ctx, d.videoDev)
+	ptz := parsePTZValues(ctx, videoDev)
 
 	return fmt.Sprintf(
 		"camera=%s audio=%s gesture=%v pan=%d tilt=%d zoom=%d in_call=%s auto=%s device=%s",
-		d.state.Camera,
-		d.state.Audio,
-		d.state.Gesture,
+		camera,
+		audio,
+		gesture,
 		ptz.Pan,
 		ptz.Tilt,
 		ptz.Zoom,
-		boolStr(d.state.InCall, "yes", "no"),
-		boolStr(d.state.AutoMode, "on", "off"),
-		d.videoDev,
+		boolStr(inCall, "yes", "no"),
+		boolStr(autoMode, "on", "off"),
+		videoDev,
 	)
 }
 
 func (d *Daemon) waybarOutput() string {
+	d.mu.RLock()
+	camera := d.state.Camera
+	audio := d.state.Audio
+	inCall := d.state.InCall
+	autoMode := d.state.AutoMode
+	d.mu.RUnlock()
+
 	icon := ""
 	class := ""
 	text := ""
 
-	switch d.state.Camera {
+	switch camera {
 	case pixy.StateTracking:
 		icon = "\uf030"
 		class = "tracking"
@@ -500,15 +566,15 @@ func (d *Daemon) waybarOutput() string {
 		text = "---"
 	}
 
-	if d.state.InCall {
+	if inCall {
 		class += " in-call"
 	}
 
-	tooltip := fmt.Sprintf("EMEET PIXY: %s", d.state.Camera)
-	tooltip += fmt.Sprintf("\nAudio: %s", d.state.Audio)
+	tooltip := fmt.Sprintf("EMEET PIXY: %s", camera)
+	tooltip += fmt.Sprintf("\nAudio: %s", audio)
 
-	tooltip += fmt.Sprintf("\nAuto: %t", d.state.AutoMode)
-	if d.state.InCall {
+	tooltip += fmt.Sprintf("\nAuto: %t", autoMode)
+	if inCall {
 		tooltip += "\nIn call: yes"
 	}
 
