@@ -80,6 +80,11 @@
           mode = "0400";
           restartUnits = ["caddy.service"];
         };
+
+        livekit_keys = {
+          sopsFile = ./../../../platforms/nixos/secrets/voice-agents.yaml;
+          restartUnits = ["livekit.service"];
+        };
       };
 
       templates."gitea-sync.env" = {
