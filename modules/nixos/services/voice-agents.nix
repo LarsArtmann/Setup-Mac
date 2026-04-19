@@ -47,17 +47,14 @@
           - '${toString whisperPort}:8000'
         environment:
           - WHISPER_MODEL=${cfg.whisperModel}
+          - HSA_OVERRIDE_GFX_VERSION=11.5.1
         volumes:
           - ${whisperModelsDir}:/root/.cache/huggingface
+        devices:
+          - /dev/dri:/dev/dri
+          - /dev/kfd:/dev/kfd
         networks:
           - voice-net
-        deploy:
-          resources:
-            reservations:
-              devices:
-                - driver: amdgpu
-                  count: 1
-                  capabilities: [gpu]
 
     volumes:
       livekit-data:
