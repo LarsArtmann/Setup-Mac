@@ -201,6 +201,7 @@
   linuxUtilities = with pkgs;
     lib.optionals stdenv.isLinux [
       openaudible
+      prismlauncher # Minecraft launcher (MultiMC fork)
 
       # Media streaming
       fcast-client # FCast Client Terminal, media streaming client
