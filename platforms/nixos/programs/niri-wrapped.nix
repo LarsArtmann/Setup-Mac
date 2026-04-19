@@ -1,9 +1,39 @@
 {
   pkgs,
+  config,
   lib,
   ...
 }: let
-  wallpaperDir = "/home/lars/projects/wallpapers";
+  userHome = config.home.homeDirectory;
+  wallpaperDir = "${userHome}/projects/wallpapers";
+  sessionSaveInterval = "60s";
+  maxSessionAgeDays = 7;
+  fallbackApps = [
+    {
+      app_id = "kitty";
+      args = [];
+    }
+    {
+      app_id = "kitty";
+      args = ["-e" "btop"];
+    }
+    {
+      app_id = "kitty";
+      args = ["-e" "nvtop"];
+    }
+    {
+      app_id = "amdgpu_top";
+      args = [];
+    }
+    {
+      app_id = "helium";
+      args = [];
+    }
+    {
+      app_id = "signal-desktop";
+      args = [];
+    }
+  ];
 
   niri-session-save = pkgs.writeShellApplication {
     name = "niri-session-save";
@@ -17,12 +47,24 @@
         rm -f "$tmp"
         exit 0
       fi
+
+      if ! jq '.' "$tmp" >/dev/null 2>&1; then
+        echo "niri-session-save: windows.json is not valid JSON, discarding" >&2
+        rm -f "$tmp"
+        exit 1
+      fi
       mv "$tmp" "$STATE_DIR/windows.json"
 
       tmp=$(mktemp)
       if ! niri msg -j workspaces > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
         rm -f "$tmp"
         exit 0
+      fi
+
+      if ! jq '.' "$tmp" >/dev/null 2>&1; then
+        echo "niri-session-save: workspaces.json is not valid JSON, discarding" >&2
+        rm -f "$tmp"
+        exit 1
       fi
       mv "$tmp" "$STATE_DIR/workspaces.json"
 
@@ -84,27 +126,29 @@
       tmp=$(mktemp)
       date +%s > "$tmp"
       mv "$tmp" "$STATE_DIR/timestamp"
+
+      win_count=$(jq 'length' "$STATE_DIR/windows.json" 2>/dev/null || echo "?")
+      echo "niri-session-save: saved $win_count windows" >&2
     '';
   };
 
   niri-session-restore = pkgs.writeShellScriptBin "niri-session-restore" ''
-    export PATH="${lib.makeBinPath (with pkgs; [niri-unstable jq coreutils])}:$PATH"
+    export PATH="${lib.makeBinPath (with pkgs; [niri-unstable jq coreutils procps libnotify])}:$PATH"
     set -euo pipefail
 
     STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
 
     fallback() {
-      kitty &
-      sleep 0.5
-      kitty -e btop &
-      sleep 0.3
-      kitty -e nvtop &
-      sleep 0.3
-      amdgpu_top &
-      sleep 0.3
-      helium &
-      sleep 0.3
-      signal-desktop &
+      ${lib.concatStringsSep "\n      " (lib.forEach (lib.range 0 ((lib.length fallbackApps) - 1)) (i: let
+      app = lib.elemAt fallbackApps i;
+      cmd =
+        if app.args == []
+        then app.app_id
+        else "${app.app_id} ${lib.concatStringsSep " " app.args}";
+    in
+      if i == 0
+      then "${cmd} &"
+      else "sleep 0.3\n      ${cmd} &"))}
     }
 
     if [ ! -f "$STATE_DIR/windows.json" ]; then
@@ -112,10 +156,22 @@
       exit 0
     fi
 
+    if ! jq '.' "$STATE_DIR/windows.json" >/dev/null 2>&1; then
+      echo "niri-session-restore: windows.json is corrupt, using fallback" >&2
+      fallback
+      exit 0
+    fi
+
     if [ -f "$STATE_DIR/timestamp" ]; then
       saved=$(cat "$STATE_DIR/timestamp")
       now=$(date +%s)
-      [ $((now - saved)) -gt 604800 ] && { fallback; exit 0; }
+      max_age=$(( ${toString maxSessionAgeDays} * 86400 ))
+      [ $((now - saved)) -gt $max_age ] && { fallback; exit 0; }
+    fi
+
+    if [ -f "$STATE_DIR/workspaces.json" ] && ! jq '.' "$STATE_DIR/workspaces.json" >/dev/null 2>&1; then
+      echo "niri-session-restore: workspaces.json is corrupt, ignoring" >&2
+      echo '[]' > "$STATE_DIR/workspaces.json"
     fi
 
     deduped=$(jq '[
@@ -134,21 +190,34 @@
     done
 
     declare -A spawned
-    declare -A ws_windows
+    spawned_windows=()
+    focused_app=""
+    focused_ws=""
+    highest_ts=0
 
     while IFS= read -r win; do
       [ -z "$win" ] && continue
       app_id=$(echo "$win" | jq -r '.app_id')
       pid=$(echo "$win" | jq -r '.pid')
       ws_id=$(echo "$win" | jq -r '.workspace_id')
+      is_floating=$(echo "$win" | jq -r '.is_floating // false')
+      col_width=$(echo "$win" | jq -r '.layout.tile_size[0] // 0' 2>/dev/null || echo "0")
+      focus_ts=$(echo "$win" | jq -r '.focus_timestamp // 0' 2>/dev/null || echo "0")
 
       ws_ref=""
       if [ -n "$ws_id" ] && [ "$ws_id" != "null" ]; then
         ws_ref=$(echo "$ws_json" | jq -r --argjson id "$ws_id" '.[] | select(.id == $id) | .name // (.idx | tostring)' 2>/dev/null || true)
       fi
 
-      if [ "$app_id" != "kitty" ] && [ "''${spawned[$app_id]:-}" = "1" ]; then
-        continue
+      if [ "$app_id" != "kitty" ]; then
+        if [ "''${spawned[$app_id]:-}" = "1" ]; then
+          continue
+        fi
+        if pgrep -x "$app_id" >/dev/null 2>&1; then
+          echo "niri-session-restore: $app_id already running, skipping" >&2
+          spawned[$app_id]=1
+          continue
+        fi
       fi
       spawned[$app_id]=1
 
@@ -156,6 +225,19 @@
         niri msg action focus-workspace "$ws_ref" >/dev/null 2>&1 || true
         sleep 0.1
       fi
+
+      case "$app_id" in
+        kitty | foot | helium | emacs | firefox | Firefox)
+          skip_width=1 ;;
+        *)
+          skip_width=0 ;;
+      esac
+      case "$app_id" in
+        pavucontrol | com.saivert.pwvucontrol | floating | xdg-desktop-portal-gtk)
+          skip_float=1 ;;
+        *)
+          skip_float=0 ;;
+      esac
 
       case "$app_id" in
         kitty)
@@ -196,7 +278,52 @@
           ;;
       esac
       sleep 0.5
+
+      new_id=$(niri msg -j focused-window 2>/dev/null | jq -r '.id // empty' 2>/dev/null || true)
+
+      if [ -n "$new_id" ] && [ "$is_floating" = "true" ] && [ "$skip_float" = "0" ]; then
+        niri msg action move-window-to-floating 2>/dev/null || true
+        sleep 0.1
+      fi
+
+      if [ -n "$new_id" ] && [ "$col_width" != "0" ] && [ "$is_floating" != "true" ] && [ "$skip_width" = "0" ]; then
+        output_width=$(niri msg -j focused-output 2>/dev/null | jq -r '.logical_width // 0' 2>/dev/null || echo "0")
+        if [ "$output_width" != "0" ] && [ "$output_width" != "null" ]; then
+          pct=$(echo "$col_width $output_width" | awk '{printf "%.0f", ($1 / $2) * 100}')
+          niri msg action set-column-width "''${pct}%" 2>/dev/null || true
+          sleep 0.1
+        fi
+      fi
+
+      if [ -n "$new_id" ]; then
+        spawned_windows+=("$new_id")
+      fi
+
+      if [ "$focus_ts" != "null" ] && [ "$focus_ts" != "0" ]; then
+        ts_int=$(echo "$focus_ts" | awk '{printf "%d", $1}')
+        highest_int=$(echo "$highest_ts" | awk '{printf "%d", $1}')
+        if [ "$ts_int" -gt "$highest_int" ] 2>/dev/null; then
+          highest_ts=$focus_ts
+          if [ -n "$new_id" ]; then
+            focused_id="$new_id"
+          fi
+          focused_ws="$ws_ref"
+        fi
+      fi
     done < <(echo "$deduped" | jq -c '.[]')
+
+    count=''${#spawned_windows[@]}
+    echo "niri-session-restore: restored $count windows" >&2
+
+    if [ -n "$focused_ws" ]; then
+      niri msg action focus-workspace "$focused_ws" >/dev/null 2>&1 || true
+      sleep 0.2
+    fi
+    if [ -n "$focused_id" ]; then
+      niri msg action focus-window --id "$focused_id" >/dev/null 2>&1 || true
+    fi
+
+    notify-send "Session Restored" "Restored $count windows from crash recovery" 2>/dev/null || true
   '';
 in {
   programs.niri.settings = {
@@ -393,9 +520,9 @@ in {
 
       "Mod+W".action.spawn = sh "img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3";
 
-      "Mod+Shift+F11".action.spawn = sh "grim -g \"$(slurp)\" /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
-      "Mod+F11".action.spawn = sh "grim /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
-      "Mod+Ctrl+F11".action.spawn = sh "grim -o $(niri msg focused-output | head -1) /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
+      "Mod+Shift+F11".action.spawn = sh "mkdir -p ~/Pictures/screenshots && grim -g \"$(slurp)\" /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
+      "Mod+F11".action.spawn = sh "mkdir -p ~/Pictures/screenshots && grim /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
+      "Mod+Ctrl+F11".action.spawn = sh "mkdir -p ~/Pictures/screenshots && grim -o $(niri msg focused-output | head -1) /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
 
       "XF86AudioRaiseVolume" = {
         action.spawn = sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.5";
@@ -658,10 +785,18 @@ in {
         Description = "Save niri session state for crash recovery";
         After = ["graphical-session.target"];
         PartOf = ["graphical-session.target"];
+        OnFailure = ["niri-session-save-failure.service"];
       };
       Service = {
         Type = "oneshot";
         ExecStart = "${niri-session-save}/bin/niri-session-save";
+      };
+    };
+    niri-session-save-failure = {
+      Unit.Description = "Notify on niri session save failure";
+      Service = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.libnotify}/bin/notify-send -u critical 'Session Save Failed' 'The niri session save timer failed. Check systemctl --user status niri-session-save'";
       };
     };
   };
@@ -669,8 +804,8 @@ in {
   systemd.user.timers.niri-session-save = {
     Unit.Description = "Periodically save niri session state";
     Timer = {
-      OnBootSec = "60s";
-      OnUnitActiveSec = "60s";
+      OnBootSec = "${sessionSaveInterval}";
+      OnUnitActiveSec = "${sessionSaveInterval}";
     };
     Install.WantedBy = ["timers.target"];
   };

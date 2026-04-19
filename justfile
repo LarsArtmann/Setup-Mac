@@ -1930,3 +1930,36 @@ cam-restart:
 # Show EMEET PIXY daemon logs
 cam-logs:
     @journalctl --user -u emeet-pixyd -f --no-pager -n 50
+
+# Niri Session Commands
+
+# Show niri session save status (last save time, window count, session age)
+session-status:
+    @STATE_DIR="$${XDG_STATE_HOME:-$$HOME/.local/state}/niri-session"; \
+    if [ ! -f "$$STATE_DIR/windows.json" ]; then \
+        echo "No session data found"; \
+    else \
+        echo "Niri Session Status"; \
+        echo "==================="; \
+        if [ -f "$$STATE_DIR/timestamp" ]; then \
+            saved=$$(cat "$$STATE_DIR/timestamp"); \
+            now=$$(date +%s); \
+            age_sec=$$(( now - saved )); \
+            age_min=$$(( age_sec / 60 )); \
+            echo "Last save: $$(date -d @$$saved '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -r $$saved '+%Y-%m-%d %H:%M:%S' 2>/dev/null || echo 'unknown') ($${age_min}m ago)"; \
+        fi; \
+        win_count=$$(jq 'length' "$$STATE_DIR/windows.json" 2>/dev/null || echo "?"); \
+        echo "Windows saved: $$win_count"; \
+        kitty_count=$$(jq '[.[] | select(.app_id == "kitty")] | length' "$$STATE_DIR/windows.json" 2>/dev/null || echo "?"); \
+        echo "Kitty windows: $$kitty_count"; \
+        floating_count=$$(jq '[.[] | select(.is_floating == true)] | length' "$$STATE_DIR/windows.json" 2>/dev/null || echo "?"); \
+        echo "Floating: $$floating_count"; \
+        echo ""; \
+        echo "Timer:"; \
+        systemctl --user list-timers niri-session-save 2>/dev/null || echo "  Timer not active"; \
+    fi
+
+# Manually trigger niri session restore
+session-restore:
+    @echo "Triggering session restore..."
+    @niri-session-restore
