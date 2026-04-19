@@ -105,7 +105,6 @@ linters:
     - tagliatelle
     - testableexamples
     - testifylint
-    - testifylint
     - thelper
     - tparallel
     - unconvert
@@ -158,15 +157,6 @@ linters:
       - path: handlers\.go
         linters:
           - contextcheck
-      - path: main_test\.go
-        linters:
-          - depguard
-      - path: main\.go
-        linters:
-          - depguard
-      - path: integration_test\.go
-        linters:
-          - depguard
       - path: integration_test\.go
         linters:
           - godoclint
