@@ -144,11 +144,44 @@ in {
     users.users.lars.extraGroups = ["docker" "render" "video"];
 
     systemd = {
+      # Image pull services — separate from container start so that
+      # slow downloads never block activation.  These run with no
+      # timeout; docker pull is idempotent (no-op when image is current).
+
+      services.livekit-pull = {
+        description = "Pull LiveKit Docker Image";
+        after = ["docker.service" "network-online.target"];
+        requires = ["docker.service"];
+        wantedBy = ["multi-user.target"];
+        path = [pkgs.docker];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.docker}/bin/docker pull livekit/livekit-server:latest";
+          TimeoutStartSec = 0;
+        };
+      };
+
+      services.whisper-asr-pull = {
+        description = "Pull Whisper ASR Docker Image";
+        after = ["docker.service" "network-online.target"];
+        requires = ["docker.service"];
+        wantedBy = ["multi-user.target"];
+        path = [pkgs.docker];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+          ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:main";
+          TimeoutStartSec = 0;
+        };
+      };
+
       # LiveKit RTC Server
       services.livekit = {
         description = "LiveKit RTC Server";
-        after = ["docker.service" "network-online.target"];
+        after = ["docker.service" "network-online.target" "livekit-pull.service"];
         requires = ["docker.service"];
+        wants = ["livekit-pull.service"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker pkgs.docker-compose];
         serviceConfig = {
@@ -163,8 +196,9 @@ in {
       # Whisper ASR Server (ROCm)
       services.whisper-asr = {
         description = "Whisper ASR Server (ROCm)";
-        after = ["docker.service" "network-online.target"];
+        after = ["docker.service" "network-online.target" "whisper-asr-pull.service"];
         requires = ["docker.service"];
+        wants = ["whisper-asr-pull.service"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker pkgs.docker-compose];
         serviceConfig = {
