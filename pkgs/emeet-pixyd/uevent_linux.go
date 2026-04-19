@@ -3,20 +3,19 @@
 package main
 
 import (
+	"fmt"
+
 	"golang.org/x/sys/unix"
 )
 
-type sockaddrNl struct {
-	Family uint16
-	Pad    uint16
-	Port   uint32
-	Groups uint32
-}
-
 func unixOpenNetlinkKobjectUevent() (int, error) {
-	fd, err := unix.Socket(unix.AF_NETLINK, unix.SOCK_RAW|unix.SOCK_NONBLOCK, unix.NETLINK_KOBJECT_UEVENT)
+	fd, err := unix.Socket(
+		unix.AF_NETLINK,
+		unix.SOCK_RAW|unix.SOCK_NONBLOCK,
+		unix.NETLINK_KOBJECT_UEVENT,
+	)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf("netlink socket: %w", err)
 	}
 
 	sa := &unix.SockaddrNetlink{
@@ -25,7 +24,7 @@ func unixOpenNetlinkKobjectUevent() (int, error) {
 	if bindErr := unix.Bind(fd, sa); bindErr != nil {
 		_ = unix.Close(fd)
 
-		return -1, bindErr
+		return -1, fmt.Errorf("netlink bind: %w", bindErr)
 	}
 
 	return fd, nil
