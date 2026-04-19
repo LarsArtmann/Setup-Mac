@@ -67,6 +67,14 @@
     # Kitty terminal configuration (TV-friendly font size)
     kitty = {
       enable = true;
+      package = pkgs.kitty.overrideAttrs (old: {
+        postInstall =
+          (old.postInstall or "")
+          + ''
+            substituteInPlace $out/lib/kitty/kitty/constants.py \
+              --replace "kitty_run_data.get('bundle_exe_dir')" "None  # Nix: use PATH lookup for GC resilience"
+          '';
+      });
       font = {
         name = "JetBrainsMono Nerd Font";
         size = 16; # TV viewing size (2m distance)

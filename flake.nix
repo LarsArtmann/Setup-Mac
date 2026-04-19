@@ -102,7 +102,7 @@
     # Crush AI Agent Configuration — global AI assistant settings
     # This ensures AGENTS.md and all references are synced across machines
     crush-config = {
-      url = "github:LarsArtmann/crush-config";
+      url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
     };
 
     # Treefmt formatter with auto-discovery for nix fmt
