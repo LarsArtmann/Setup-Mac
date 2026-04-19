@@ -1,4 +1,8 @@
-{pkgs, lib, ...}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   # Bootloader and Kernel Configuration
   boot = {
     # Systemd boot configuration
@@ -55,8 +59,10 @@
     freeSwapThreshold = 10; # Kill when free swap drops below 10%
     enableNotifications = true; # Desktop notification before killing
     extraArgs = [
-      "--avoid" "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
-      "--prefer" "^(llama-server|python3|python|node|java|chrome|chromium)$" # Kill these first
+      "--avoid"
+      "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
+      "--prefer"
+      "^(llama-server|python3|python|node|java|chrome|chromium)$" # Kill these first
     ];
   };
 
