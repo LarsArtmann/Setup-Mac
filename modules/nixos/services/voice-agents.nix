@@ -11,7 +11,7 @@
   # Service ports
   livekitPort = 7880;
   livekitApiPort = 7881;
-  whisperPort = 8000;
+  whisperPort = 7860;
   pipecatPort = 8500;
 
   # Directories
@@ -43,8 +43,9 @@
         image: beecave/insanely-fast-whisper-rocm:main
         container_name: whisper-asr
         restart: unless-stopped
+        command: app.py
         ports:
-          - '${toString whisperPort}:8000'
+          - '${toString whisperPort}:7860'
         environment:
           - WHISPER_MODEL=${cfg.whisperModel}
           - HSA_OVERRIDE_GFX_VERSION=11.5.1
@@ -149,6 +150,7 @@ in {
         description = "Pull LiveKit Docker Image";
         after = ["docker.service" "network-online.target"];
         requires = ["docker.service"];
+        wants = ["network-online.target"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker];
         serviceConfig = {
@@ -163,6 +165,7 @@ in {
         description = "Pull Whisper ASR Docker Image";
         after = ["docker.service" "network-online.target"];
         requires = ["docker.service"];
+        wants = ["network-online.target"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker];
         serviceConfig = {
@@ -178,7 +181,7 @@ in {
         description = "LiveKit RTC Server";
         after = ["docker.service" "network-online.target" "livekit-pull.service"];
         requires = ["docker.service"];
-        wants = ["livekit-pull.service"];
+        wants = ["livekit-pull.service" "network-online.target"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker pkgs.docker-compose];
         serviceConfig = {
@@ -195,7 +198,7 @@ in {
         description = "Whisper ASR Server (ROCm)";
         after = ["docker.service" "network-online.target" "whisper-asr-pull.service"];
         requires = ["docker.service"];
-        wants = ["whisper-asr-pull.service"];
+        wants = ["whisper-asr-pull.service" "network-online.target"];
         wantedBy = ["multi-user.target"];
         path = [pkgs.docker pkgs.docker-compose];
         serviceConfig = {
