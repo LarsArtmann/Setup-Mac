@@ -7,6 +7,26 @@
   }: let
     cfg = config.services.hermes;
     hermesPkg = inputs.hermes-agent.packages.${pkgs.system}.default;
+    sopsEnvPath = config.sops.templates."hermes-env".path;
+
+    mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
+      set -euo pipefail
+      ENV_FILE="${cfg.home}/.env"
+      SOPS_FILE="${sopsEnvPath}"
+
+      if [ ! -f "$ENV_FILE" ]; then
+        touch "$ENV_FILE"
+        chmod 600 "$ENV_FILE"
+      fi
+
+      while IFS='=' read -r key value; do
+        [ -z "$key" ] && continue
+        if grep -q "^''${key}=" "$ENV_FILE" 2>/dev/null; then
+          ${pkgs.gnused}/bin/sed -i "/^''${key}=/d" "$ENV_FILE"
+        fi
+        echo "$key=$value" >> "$ENV_FILE"
+      done < "$SOPS_FILE"
+    '';
   in {
     options.services.hermes = {
       enable = lib.mkEnableOption "Hermes AI Agent Gateway";
@@ -37,13 +57,11 @@
     };
 
     config = lib.mkIf cfg.enable {
-      # Install hermes system-wide (provides hermes, hermes-agent, hermes-acp binaries)
       environment.systemPackages = [
         hermesPkg
         pkgs.libopus
       ];
 
-      # Ensure hermes home directory structure exists + link sops-rendered .env
       systemd.tmpfiles.rules = [
         "d ${cfg.home} 0750 ${cfg.user} users -"
         "d ${cfg.home}/sessions 0750 ${cfg.user} users -"
@@ -52,10 +70,8 @@
         "d ${cfg.home}/cron 0750 ${cfg.user} users -"
         "d ${cfg.home}/cache 0750 ${cfg.user} users -"
         "d ${cfg.home}/logs 0750 ${cfg.user} users -"
-        "L+ ${cfg.home}/.env 0600 ${cfg.user} users - ${config.sops.templates."hermes-env".path}"
       ];
 
-      # Declarative systemd user service managed by Home Manager
       home-manager.users.${cfg.user}.systemd.user.services.hermes-gateway = {
         Unit = {
           Description = "Hermes Agent Gateway - Messaging Platform Integration";
@@ -67,6 +83,7 @@
 
         Service = {
           Type = "simple";
+          ExecStartPre = mergeEnvScript;
           ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
           WorkingDirectory = cfg.home;
           Environment = [
