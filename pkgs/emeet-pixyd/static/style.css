@@ -491,6 +491,21 @@ input[type="range"]:focus-visible {
   backdrop-filter: blur(8px);
 }
 
+.offline-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.offline-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
 .meta {
   display: flex;
   gap: 1rem;
@@ -629,6 +644,11 @@ input[type="range"]:focus-visible {
   opacity: 0.35;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+.btn-loading {
+  opacity: 0.7;
+  cursor: wait;
 }
 
 .footer-actions {
