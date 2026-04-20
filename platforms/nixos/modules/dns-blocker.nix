@@ -357,8 +357,9 @@ in {
 
       user.services.dnsblockd-cert-import = {
         description = "Import dnsblockd CA cert into NSS database";
-        wantedBy = ["default.target"];
-        after = ["sops-nix.service"];
+        wantedBy = ["graphical-session.target"];
+        after = ["sops-nix.service" "graphical-session.target"];
+        partOf = ["graphical-session.target"];
         serviceConfig = {
           Type = "oneshot";
           RemainAfterExit = true;

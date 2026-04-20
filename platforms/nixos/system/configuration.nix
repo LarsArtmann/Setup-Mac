@@ -24,8 +24,7 @@
     # ../services/sops.nix # Secrets management via sops-nix - now loaded via flake module
     # ../services/immich.nix # Self-hosted photo/video management - now loaded via flake module
     # ../services/caddy.nix # Reverse proxy for local domains - now loaded via flake module
-    # ../services/monitoring.nix # Prometheus + exporters - now loaded via flake module
-    # ../services/grafana.nix # Monitoring dashboards - now loaded via flake module
+
     # ../services/homepage.nix # Service overview dashboard - now loaded via flake module
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix

@@ -58,7 +58,7 @@ in {
       after = ["pipewire.service" "graphical-session.target"];
       wants = ["pipewire.service"];
       partOf = ["graphical-session.target"];
-      wantedBy = ["default.target"];
+      wantedBy = ["graphical-session.target"];
 
       serviceConfig = {
         Type = "simple";

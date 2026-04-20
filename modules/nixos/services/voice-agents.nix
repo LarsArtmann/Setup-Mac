@@ -9,10 +9,14 @@
     inherit (config.networking) domain;
     cfg = config.services.voice-agents;
 
-    whisperPort = 7860;
+    whisperApiPort = 8000; # OpenAI-compatible API (FastAPI)
+    whisperUiPort = 7860; # Gradio WebUI
     pipecatPort = 8500;
     whisperModelsDir = "/data/models/whisper";
 
+    # Docker compose for Whisper ASR - API server mode
+    # API: http://localhost:8000/v1/audio/transcriptions (OpenAI-compatible)
+    # Docs: http://localhost:8000/docs
     whisperComposeFile = pkgs.writeText "docker-compose.whisper-asr.yml" ''
       name: voice-agents
 
@@ -21,9 +25,11 @@
           image: beecave/insanely-fast-whisper-rocm:main
           container_name: whisper-asr
           restart: unless-stopped
-          command: app.py
+          # Start API server (OpenAI-compatible) on port 8000
+          command: python -m insanely_fast_whisper_rocm.api --host 0.0.0.0 --port 8000
           ports:
-            - '${toString whisperPort}:7860'
+            - '${toString whisperApiPort}:8000'
+            - '${toString whisperUiPort}:7860'
           environment:
             - WHISPER_MODEL=${cfg.whisperModel}
             - HSA_OVERRIDE_GFX_VERSION=11.5.1
@@ -103,7 +109,7 @@
         };
 
         services.whisper-asr = {
-          description = "Whisper ASR Server (ROCm)";
+          description = "Whisper ASR Server - OpenAI-Compatible API (ROCm)";
           after = ["docker.service" "network-online.target" "whisper-asr-pull.service"];
           requires = ["docker.service"];
           wants = ["whisper-asr-pull.service" "network-online.target"];
@@ -112,9 +118,13 @@
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
+            # Restart container if it crashes
+            ExecStartPre = ["${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans 2>/dev/null || true"];
             ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
             ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down whisper-rocm";
             TimeoutStartSec = 180;
+            Restart = "on-failure";
+            RestartSec = "10";
           };
         };
       };
@@ -122,7 +132,8 @@
       networking.firewall = lib.mkIf cfg.openFirewall {
         allowedTCPPorts = [
           7880
-          whisperPort
+          whisperApiPort
+          whisperUiPort
           pipecatPort
         ];
         allowedUDPPortRanges = [
@@ -141,7 +152,7 @@
         };
         "whisper.${cfg.domain}" = {
           extraConfig = ''
-            reverse_proxy localhost:${toString whisperPort}
+            reverse_proxy localhost:${toString whisperUiPort}
           '';
         };
       };

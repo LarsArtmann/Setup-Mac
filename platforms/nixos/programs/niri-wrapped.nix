@@ -761,7 +761,11 @@ in {
         PartOf = ["graphical-session.target"];
       };
       Service = {
-        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock timeout 600 ${pkgs.bash}/bin/bash -c '${pkgs.coreutils}/bin/nohup ${pkgs.systemd}/bin/systemctl suspend || true' before-sleep ${pkgs.swaylock}/bin/swaylock";
+        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock timeout 600 ${
+          pkgs.writeShellScript "swayidle-suspend" ''
+            ${pkgs.systemd}/bin/systemctl suspend
+          ''
+        } before-sleep ${pkgs.swaylock}/bin/swaylock";
         Restart = "on-failure";
       };
       Install.WantedBy = ["graphical-session.target"];
@@ -777,6 +781,7 @@ in {
         ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
         ExecStartPost = "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular";
         Restart = "on-failure";
+        RestartSec = "3s";
       };
       Install.WantedBy = ["graphical-session.target"];
     };

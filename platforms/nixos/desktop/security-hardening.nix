@@ -76,17 +76,6 @@
           bantime = 3600;
           ignoreip = "127.0.0.1/8 ::1 192.168.1.0/24 10.0.0.0/8 172.16.0.0/12";
         };
-
-        # Grafana login brute force
-        grafana.settings = {
-          enabled = true;
-          filter = "grafana";
-          logpath = "/var/log/grafana/grafana.log";
-          maxretry = 5;
-          findtime = 600;
-          bantime = 3600;
-          ignoreip = "127.0.0.1/8 ::1 192.168.1.0/24 10.0.0.0/8 172.16.0.0/12";
-        };
       };
     };
 

@@ -28,10 +28,8 @@ SystemNix/
 │   ├── default.nix              # Docker
 │   ├── caddy.nix                # Reverse proxy (TLS via sops)
 │   ├── gitea.nix                # Git hosting + GitHub mirror
-│   ├── grafana.nix              # Dashboards
 │   ├── homepage.nix             # Service dashboard
 │   ├── immich.nix               # Photo/video management
-│   ├── monitoring.nix           # Prometheus + exporters
 │   ├── photomap.nix             # AI photo exploration
 │   ├── signoz.nix               # Observability (traces/metrics/logs)
 │   ├── sops.nix                 # Secrets management

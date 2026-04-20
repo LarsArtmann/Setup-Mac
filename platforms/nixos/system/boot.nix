@@ -22,6 +22,9 @@
     kernelParams = [
       "amdgpu.ppfeaturemask=0xfffd7fff"
       "amdgpu.deepfl=1"
+      # Increase ring lockup timeout (default 10s) — prevents false-positive GPU resets
+      # under heavy compute/ML workloads on Strix Halo
+      "amdgpu.lockup_timeout=30000"
       "amd_pstate=guided"
       # TTM: increase page limit for GPU page allocations
       "amdgpu.ttm.pages_limit=15728640"
