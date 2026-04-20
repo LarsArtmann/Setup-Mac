@@ -179,7 +179,15 @@
       "L+ ${stateDir}/services.yaml - - - - /etc/homepage/services.yaml"
       "L+ ${stateDir}/settings.yaml - - - - /etc/homepage/settings.yaml"
       "L+ ${stateDir}/bookmarks.yaml - - - - ${pkgs.writeText "bookmarks.yaml" ""}"
-      "L+ ${stateDir}/widgets.yaml - - - - ${pkgs.writeText "widgets.yaml" ""}"
+      "L+ ${stateDir}/widgets.yaml - - - - ${pkgs.writeText "widgets.yaml" ''
+        - greeting:
+            text: evo-x2 Dashboard
+        - resources:
+            cpu: true
+            memory: true
+            disk: /
+            uptime: true
+      ''}"
       "L+ ${stateDir}/docker.yaml - - - - ${pkgs.writeText "docker.yaml" ""}"
     ];
   };
