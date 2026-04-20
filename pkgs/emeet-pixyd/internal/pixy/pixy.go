@@ -152,6 +152,33 @@ func DefaultConfig() Config {
 	}
 }
 
+var (
+	ErrStateDirEmpty     = errors.New("state directory must not be empty")
+	ErrPollIntervalZero  = errors.New("poll interval must be positive")
+	ErrDebounceCountZero = errors.New("debounce count must be positive")
+	ErrWebAddrEmpty      = errors.New("web address must not be empty")
+)
+
+func (c Config) Validate() error {
+	if c.StateDir == "" {
+		return ErrStateDirEmpty
+	}
+
+	if c.PollInterval <= 0 {
+		return ErrPollIntervalZero
+	}
+
+	if c.DebounceCount <= 0 {
+		return ErrDebounceCountZero
+	}
+
+	if c.WebAddr == "" {
+		return ErrWebAddrEmpty
+	}
+
+	return nil
+}
+
 // StateFile returns the path to the JSON state file within the state directory.
 func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
 

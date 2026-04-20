@@ -315,3 +315,57 @@ func TestSendCommand_EndToEnd(t *testing.T) {
 		t.Errorf("SendCommand() = %q, want %q", got, "response:hello")
 	}
 }
+
+func TestConfigValidate(t *testing.T) {
+	t.Parallel()
+
+	valid := Config{
+		StateDir:      "/tmp/test",
+		PollInterval:  time.Second,
+		DebounceCount: 3,
+		WebAddr:       "127.0.0.1:8090",
+	}
+
+	t.Run("valid default config", func(t *testing.T) {
+		t.Parallel()
+
+		if err := DefaultConfig().Validate(); err != nil {
+			t.Fatalf("DefaultConfig().Validate() = %v", err)
+		}
+	})
+
+	t.Run("valid custom config", func(t *testing.T) {
+		t.Parallel()
+
+		if err := valid.Validate(); err != nil {
+			t.Fatalf("Validate() = %v", err)
+		}
+	})
+
+	tests := []struct {
+		name   string
+		mutate func(*Config)
+		want   error
+	}{
+		{"empty state dir", func(c *Config) { c.StateDir = "" }, ErrStateDirEmpty},
+		{"zero poll interval", func(c *Config) { c.PollInterval = 0 }, ErrPollIntervalZero},
+		{"negative poll interval", func(c *Config) { c.PollInterval = -1 }, ErrPollIntervalZero},
+		{"zero debounce", func(c *Config) { c.DebounceCount = 0 }, ErrDebounceCountZero},
+		{"negative debounce", func(c *Config) { c.DebounceCount = -1 }, ErrDebounceCountZero},
+		{"empty web addr", func(c *Config) { c.WebAddr = "" }, ErrWebAddrEmpty},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			cfg := valid
+			tc.mutate(&cfg)
+
+			err := cfg.Validate()
+			if !errors.Is(err, tc.want) {
+				t.Errorf("Validate() = %v, want %v", err, tc.want)
+			}
+		})
+	}
+}

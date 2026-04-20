@@ -54,7 +54,11 @@ type Daemon struct {
 	streamSema chan struct{}
 }
 
-func NewDaemon(cfg pixy.Config) *Daemon {
+func NewDaemon(cfg pixy.Config) (*Daemon, error) {
+	if err := cfg.Validate(); err != nil {
+		return nil, fmt.Errorf("validate config: %w", err)
+	}
+
 	d := &Daemon{
 		mu:          sync.RWMutex{},
 		config:      cfg,
@@ -66,7 +70,7 @@ func NewDaemon(cfg pixy.Config) *Daemon {
 	d.loadState()
 	d.probeDevices()
 
-	return d
+	return d, nil
 }
 
 func probeVideo4linux(sysfsPath string) string {
@@ -831,6 +835,10 @@ func main() {
 		return
 	}
 
-	d := NewDaemon(cfg)
+	d, err := NewDaemon(cfg)
+	if err != nil {
+		slog.Error("daemon init failed", "error", err)
+		os.Exit(1)
+	}
 	d.Run()
 }
