@@ -20,7 +20,10 @@
 
     # AMD GPU + NPU optimization kernel parameters for Strix Halo (128GB unified memory)
     kernelParams = [
-      "amdgpu.ppfeaturemask=0xfffd7fff"
+      # Disabled 2026-04-20: overdrive was causing GPU hangs → niri SIGABRT → full desktop crash.
+      # The kernel warns: "amdgpu: Overdrive is enabled, please disable it before reporting any bugs"
+      # Re-enable only if you need manual fan/clk control and accept the instability risk.
+      # "amdgpu.ppfeaturemask=0xfffd7fff"
       "amdgpu.deepfl=1"
       # Increase ring lockup timeout (default 10s) — prevents false-positive GPU resets
       # under heavy compute/ML workloads on Strix Halo
