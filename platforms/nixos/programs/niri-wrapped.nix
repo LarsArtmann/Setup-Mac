@@ -727,7 +727,7 @@ in {
     awww-daemon = {
       Unit = {
         Description = "awww wallpaper daemon";
-        After = ["graphical-session.target"];
+        # No After=graphical-session.target — avoids ordering cycle with awww-wallpaper
         PartOf = ["graphical-session.target"];
       };
       Service = {
@@ -779,9 +779,11 @@ in {
       };
       Service = {
         ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
-        ExecStartPost = "${pkgs.wl-clip-persist}/bin/wl-clip-persist --clipboard regular";
         Restart = "on-failure";
         RestartSec = "3s";
+        # Stop retrying after 5 failures in 60s — prevents runaway crash loop
+        StartLimitBurst = 5;
+        StartLimitIntervalSec = 60;
       };
       Install.WantedBy = ["graphical-session.target"];
     };
