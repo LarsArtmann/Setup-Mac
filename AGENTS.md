@@ -44,8 +44,8 @@ SystemNix/
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
-    │   ├── home-base.nix        # Imports 15 program modules
-    │   ├── programs/            # fish, zsh, bash, nushell, starship, git, tmux, fzf, taskwarrior, ...
+    │   ├── home-base.nix        # Imports 14 program modules
+    │   ├── programs/            # fish, zsh, bash, starship, git, tmux, fzf, taskwarrior, ...
     │   ├── packages/base.nix    # All cross-platform packages (70+)
     │   └── core/nix-settings.nix
     ├── darwin/                  # macOS (nix-darwin)

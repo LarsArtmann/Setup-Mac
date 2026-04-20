@@ -6,7 +6,6 @@
     ./programs/fish.nix
     ./programs/zsh.nix
     ./programs/bash.nix
-    ./programs/nushell.nix
 
     # Other program configurations
     # SSH config now loaded from nix-ssh-config flake input
