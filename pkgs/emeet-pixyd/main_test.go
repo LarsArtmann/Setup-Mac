@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net"
 	"os"
 	"path/filepath"
@@ -755,7 +756,7 @@ func TestDefaultStateValues(t *testing.T) {
 func TestSetDeadlineError(t *testing.T) {
 	t.Parallel()
 
-	conn := &mockConn{setDeadlineErr: errDeadline}
+	conn := &mockConn{setDeadlineErr: errors.New("deadline error")}
 
 	err := pixy.SetDeadline(conn, time.Second)
 	if err == nil {

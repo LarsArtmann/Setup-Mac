@@ -66,13 +66,13 @@ func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {
 	case "audio":
 		return d.handleAudioCommand(ctx, parts)
 
-	case cmdGestureOn, "gesture-off":
+	case cmdGestureOn, "gesture-off", "toggle-gesture":
 		return d.handleGestureCommand(ctx, parts[0])
 
 	case "center":
 		return d.handleCenterCommand(ctx)
 
-	case cmdAutoOn, "auto-off":
+	case cmdAutoOn, "auto-off", "toggle-auto":
 		return d.handleAutoCommand(parts[0])
 
 	case "waybar":
@@ -152,7 +152,17 @@ func (d *Daemon) handleAudioCommand(ctx context.Context, parts []string) string 
 }
 
 func (d *Daemon) handleGestureCommand(ctx context.Context, cmd string) string {
-	enable := cmd == cmdGestureOn
+	var enable bool
+	switch cmd {
+	case cmdGestureOn:
+		enable = true
+	case "gesture-off":
+		enable = false
+	case "toggle-gesture":
+		d.mu.RLock()
+		enable = !d.state.Gesture
+		d.mu.RUnlock()
+	}
 	if err := d.setGesture(ctx, enable); err != nil {
 		return fmt.Sprintf("error: %s: %v", cmd, err)
 	}
@@ -173,7 +183,17 @@ func (d *Daemon) handleCenterCommand(ctx context.Context) string {
 }
 
 func (d *Daemon) handleAutoCommand(cmd string) string {
-	mode := cmd == cmdAutoOn
+	var mode bool
+	switch cmd {
+	case cmdAutoOn:
+		mode = true
+	case "auto-off":
+		mode = false
+	case "toggle-auto":
+		d.mu.RLock()
+		mode = !d.state.AutoMode
+		d.mu.RUnlock()
+	}
 
 	d.mu.Lock()
 	d.state.AutoMode = mode

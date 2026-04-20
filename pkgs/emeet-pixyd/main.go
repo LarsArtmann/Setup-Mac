@@ -5,7 +5,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log/slog"
 	"net"
@@ -25,8 +24,6 @@ const (
 	pixyVendorID  = "328f"
 	pixyProductID = "00c0"
 )
-
-var errDeadline = errors.New("deadline error")
 
 type Daemon struct {
 	mu        sync.RWMutex

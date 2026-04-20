@@ -24,7 +24,6 @@ import (
 
 const (
 	audioCommand        = "audio"
-	offlineValue        = "offline"
 	zoomDefault         = 100
 	maxStreamBufferSize = 10 * 1024 * 1024
 	maxBodyBytes        = 1 << 10
@@ -334,8 +333,6 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 		return
 	}
-	responseWriter.Header().Set("Content-Type", "multipart/x-mixed-replace; boundary=frame")
-	responseWriter.Header().Set("Cache-Control", "no-store")
 	ctx := request.Context()
 	cmd := exec.CommandContext(
 
@@ -361,18 +358,18 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 	)
 	stdOut, pipeErr := cmd.StdoutPipe()
 	if pipeErr != nil {
-
-		slog.Debug("stream pipe error", "error", pipeErr)
+		http.Error(responseWriter, "stream pipe error", http.StatusInternalServerError)
 
 		return
 	}
 	startErr := cmd.Start()
 	if startErr != nil {
-
-		slog.Debug("stream start error", "error", startErr)
+		http.Error(responseWriter, "stream start error", http.StatusInternalServerError)
 
 		return
 	}
+	responseWriter.Header().Set("Content-Type", "multipart/x-mixed-replace; boundary=frame")
+	responseWriter.Header().Set("Cache-Control", "no-store")
 	defer func() {
 		_ = cmd.Process.Signal(syscall.SIGTERM)
 		done := make(chan error, 1)
@@ -495,112 +492,18 @@ func extractJPEGFrame(br *bufio.Reader, buf *bytes.Buffer) ([]byte, error) {
 
 func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
-	s.daemon.mu.RLock()
-	currentGesture := s.daemon.state.Gesture
-	s.daemon.mu.RUnlock()
-	cmd := "gesture-off"
-	if !currentGesture {
-
-		cmd = "gesture-on"
-	}
-	resp := s.daemon.handleCommand(request.Context(), cmd)
-	slog.Debug("web gesture toggle", "cmd", cmd, "response", resp)
+	resp := s.daemon.handleCommand(request.Context(), "toggle-gesture")
+	slog.Debug("web gesture toggle", "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
 func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request *http.Request) {
 	request.Body = http.MaxBytesReader(responseWriter, request.Body, maxBodyBytes)
-	s.daemon.mu.RLock()
-	currentAuto := s.daemon.state.AutoMode
-	s.daemon.mu.RUnlock()
-	cmd := "auto-off"
-	if !currentAuto {
-
-		cmd = "auto-on"
-	}
-	resp := s.daemon.handleCommand(request.Context(), cmd)
-	slog.Debug("web auto toggle", "cmd", cmd, "response", resp)
+	resp := s.daemon.handleCommand(request.Context(), "toggle-auto")
+	slog.Debug("web auto toggle", "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
-}
-
-func parseWebStatus(raw string) webStatus {
-	status := webStatus{
-
-		Camera: string(pixy.StateOffline),
-
-		Audio: string(pixy.AudioNC),
-
-		Pan: 0,
-
-		Tilt: 0,
-
-		Zoom: zoomDefault,
-	}
-	if strings.HasPrefix(raw, "error") {
-
-		status.Error = raw
-
-		return status
-	}
-	for field := range strings.FieldsSeq(raw) {
-
-		key, val, ok := strings.Cut(field, "=")
-
-		if !ok {
-
-			continue
-
-		}
-
-		switch key {
-
-		case "camera":
-
-			camera, _ := pixy.ParseCameraState(val)
-
-			status.Camera = string(camera)
-
-			status.Online = val != offlineValue
-
-		case "audio":
-
-			audio, _ := pixy.ParseAudioMode(val)
-
-			status.Audio = string(audio)
-
-		case "gesture":
-
-			status.Gesture = val == "true"
-
-		case axisPan:
-
-			status.Pan, _ = strconv.Atoi(val)
-
-		case axisTilt:
-
-			status.Tilt, _ = strconv.Atoi(val)
-
-		case axisZoom:
-
-			status.Zoom, _ = strconv.Atoi(val)
-
-		case "in_call":
-
-			status.InCall = val == "yes"
-
-		case "auto":
-
-			status.Auto = val == "on"
-
-		case "device":
-
-			status.Device = val
-
-		}
-	}
-	return status
 }
 
 type cachingFS struct {
