@@ -743,7 +743,7 @@ func reportFalsePositiveHandler(w http.ResponseWriter, r *http.Request) {
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100dvw;height:100dvh}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2a 0%%23,#2d1d3a 100%%23,#3a3f4a);color:#e0e0e0;display:flex;align-items:center;justify-content:center}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2a 0%%, #2d1d3a 100%%, #3a3f4a);color:#e0e0e0;display:flex;align-items:center;justify-content:center}
 .container{max-width:min(90dvw,700px);padding:3rem;text-align:center}
 .icon{font-size:clamp(4rem,10dvw,6rem);margin-bottom:1.5rem}
 h1{font-size:clamp(1.5rem,4dvw,2.5rem);font-weight:600;margin-bottom:0.5rem;color:#fbbf24}

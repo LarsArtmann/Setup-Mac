@@ -398,6 +398,87 @@ in {
           };
         });
 
+        environment.etc."signoz/rules/gpu-thermal.json".source = pkgs.writeText "gpu-thermal-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "AMD GPU temperature above 90°C on {{.Labels.card}}";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "node_amdgpu_gpu_temp_celsius";
+                      step = 300;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND";
+                target = 90;
+              };
+              evaluationInterval = "5m";
+              name = "GPU Thermal Throttling (>90°C)";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/rules/dnsblockd-down.json".source = pkgs.writeText "dnsblockd-down-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "dnsblockd metrics endpoint is unreachable";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "up{job=\"dnsblockd\"}";
+                      step = 60;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND_NOT";
+                target = 1;
+              };
+              evaluationInterval = "1m";
+              name = "DNS Blocker Down";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/rules/emeet-pixyd-down.json".source = pkgs.writeText "emeet-pixyd-down-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "emeet-pixyd metrics endpoint is unreachable";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "up{job=\"emeet-pixyd\"}";
+                      step = 60;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND_NOT";
+                target = 1;
+              };
+              evaluationInterval = "1m";
+              name = "EMEET PIXY Daemon Down";
+              source = "RULE";
+            };
+          };
+        });
+
         environment.etc."signoz/dashboards/overview.json".source = "${inputs.self}/modules/nixos/services/dashboards/signoz-overview.json";
       })
 
