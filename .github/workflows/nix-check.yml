@@ -69,3 +69,20 @@ jobs:
 
       - name: Check Syntax (No Build)
         run: nix flake check --no-build
+
+  go-test:
+    name: Go Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: pkgs/emeet-pixyd/go.mod
+
+      - name: Test emeet-pixyd
+        working-directory: pkgs/emeet-pixyd
+        run: go test ./...
