@@ -88,30 +88,35 @@
 
         hermes_discord_bot_token = {
           sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          key = "discord_bot_token";
           owner = "lars";
           group = "users";
           restartUnits = ["hermes-gateway.service"];
         };
         hermes_glm_api_key = {
           sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          key = "glm_api_key";
           owner = "lars";
           group = "users";
           restartUnits = ["hermes-gateway.service"];
         };
         hermes_minimax_api_key = {
           sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          key = "minimax_api_key";
           owner = "lars";
           group = "users";
           restartUnits = ["hermes-gateway.service"];
         };
         hermes_fal_key = {
           sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          key = "fal_key";
           owner = "lars";
           group = "users";
           restartUnits = ["hermes-gateway.service"];
         };
         hermes_firecrawl_api_key = {
           sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          key = "firecrawl_api_key";
           owner = "lars";
           group = "users";
           restartUnits = ["hermes-gateway.service"];
