@@ -147,6 +147,11 @@
               icon: shield.png
               statusStyle: dot
               siteMonitor: http://localhost:9090/metrics
+          - EMEET PIXY:
+              description: Webcam Auto-Management Daemon
+              icon: camera.png
+              statusStyle: dot
+              siteMonitor: http://localhost:8090/metrics
 
       - Productivity:
           - Twenty CRM:

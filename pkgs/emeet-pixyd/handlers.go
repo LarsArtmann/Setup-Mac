@@ -18,6 +18,8 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
@@ -39,6 +41,47 @@ const (
 
 //go:embed static
 var staticFS embed.FS
+
+var (
+	metricInCall = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "emeet_pixyd_in_call",
+		Help: "Whether the camera is currently in a call (1=yes, 0=no)",
+	})
+	metricAutoMode = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "emeet_pixyd_auto_mode",
+		Help: "Whether auto-management mode is enabled (1=yes, 0=no)",
+	})
+	metricCameraState = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "emeet_pixyd_camera_state",
+		Help: "Current camera state as a gauge per state label (1=active)",
+	}, []string{"state"})
+)
+
+func init() {
+	prometheus.MustRegister(metricInCall)
+	prometheus.MustRegister(metricAutoMode)
+	prometheus.MustRegister(metricCameraState)
+}
+
+func updateMetrics(state pixy.State) {
+	if state.InCall {
+		metricInCall.Set(1)
+	} else {
+		metricInCall.Set(0)
+	}
+	if state.AutoMode {
+		metricAutoMode.Set(1)
+	} else {
+		metricAutoMode.Set(0)
+	}
+	for _, s := range []pixy.CameraState{pixy.StatePrivacy, pixy.StateTracking, pixy.StateIdle} {
+		if state.Camera == s {
+			metricCameraState.WithLabelValues(string(s)).Set(1)
+		} else {
+			metricCameraState.WithLabelValues(string(s)).Set(0)
+		}
+	}
+}
 
 func formatLastSynced(t time.Time) string {
 	if t.IsZero() {
@@ -622,5 +665,6 @@ func newWebMux(server *webServer) *http.ServeMux {
 	})
 	mux.HandleFunc("GET /api/snapshot", server.handleSnapshot)
 	mux.HandleFunc("GET /api/stream", server.handleStream)
+	mux.Handle("GET /metrics", promhttp.Handler())
 	return mux
 }

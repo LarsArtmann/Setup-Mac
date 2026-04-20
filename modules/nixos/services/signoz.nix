@@ -489,6 +489,11 @@ in {
                       static_configs = [{targets = ["127.0.0.1:9090"];}];
                       metrics_path = "/metrics";
                     }
+                    {
+                      job_name = "emeet-pixyd";
+                      static_configs = [{targets = ["127.0.0.1:8090"];}];
+                      metrics_path = "/metrics";
+                    }
                   ];
                 };
               };

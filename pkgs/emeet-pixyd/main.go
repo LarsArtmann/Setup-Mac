@@ -521,6 +521,10 @@ func (d *Daemon) autoManage(ctx context.Context) {
 	if saveErr != nil {
 		slog.Error("failed to save state", "error", saveErr)
 	}
+
+	d.mu.RLock()
+	updateMetrics(d.state)
+	d.mu.RUnlock()
 }
 
 func (d *Daemon) getStatus(ctx context.Context) string {
