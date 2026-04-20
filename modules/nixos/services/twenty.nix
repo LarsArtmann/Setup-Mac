@@ -155,7 +155,7 @@ in {
             requires = ["docker.service"];
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${pkgs.docker}/bin/docker exec twenty-db-1 pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%Y%m%d_%H%M%S).sql";
+              ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.docker}/bin/docker exec twenty-db-1 pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%Y%m%d_%H%M%S).sql'";
               WorkingDirectory = stateDir;
             };
             preStart = "mkdir -p ${stateDir}/backup";
