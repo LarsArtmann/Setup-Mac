@@ -85,6 +85,37 @@
           sopsFile = ./../../../platforms/nixos/secrets/voice-agents.yaml;
           restartUnits = ["livekit.service"];
         };
+
+        hermes_discord_bot_token = {
+          sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          owner = "lars";
+          group = "users";
+          restartUnits = ["hermes-gateway.service"];
+        };
+        hermes_glm_api_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          owner = "lars";
+          group = "users";
+          restartUnits = ["hermes-gateway.service"];
+        };
+        hermes_minimax_api_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          owner = "lars";
+          group = "users";
+          restartUnits = ["hermes-gateway.service"];
+        };
+        hermes_fal_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          owner = "lars";
+          group = "users";
+          restartUnits = ["hermes-gateway.service"];
+        };
+        hermes_firecrawl_api_key = {
+          sopsFile = ./../../../platforms/nixos/secrets/hermes.yaml;
+          owner = "lars";
+          group = "users";
+          restartUnits = ["hermes-gateway.service"];
+        };
       };
 
       templates."gitea-sync.env" = {
@@ -93,6 +124,20 @@
         content = ''
           GITHUB_TOKEN=${config.sops.placeholder.github_token}
           GITHUB_USER=${config.sops.placeholder.github_user}
+        '';
+      };
+
+      templates."hermes-env" = {
+        owner = "lars";
+        group = "users";
+        content = ''
+          DISCORD_BOT_TOKEN=${config.sops.placeholder.hermes_discord_bot_token}
+          GLM_API_KEY=${config.sops.placeholder.hermes_glm_api_key}
+          MINIMAX_API_KEY=${config.sops.placeholder.hermes_minimax_api_key}
+          FAL_KEY=${config.sops.placeholder.hermes_fal_key}
+          FIRECRAWL_API_KEY=${config.sops.placeholder.hermes_firecrawl_api_key}
+          OLLAMA_API_KEY=ollama
+          TERMINAL_ENV=local
         '';
       };
     };

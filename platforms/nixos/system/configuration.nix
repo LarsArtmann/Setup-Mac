@@ -178,6 +178,11 @@
         enable = true;
       };
 
+      # Hermes AI Agent Gateway (Discord, cron jobs, messaging)
+      hermes = {
+        enable = true;
+      };
+
       smartd = {
         enable = true;
         autodetect = true;
