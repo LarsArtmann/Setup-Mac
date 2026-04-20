@@ -128,10 +128,20 @@
       - Monitoring:
           - SigNoz:
               href: ${svcUrl "signoz"}
-              description: Observability Platform
+              description: Observability Platform (Traces, Metrics, Logs)
               icon: signoz.png
               statusStyle: dot
               siteMonitor: ${svcUrl "signoz"}
+          - Node Exporter:
+              description: System Metrics (CPU, RAM, Disk, Network)
+              icon: prometheus.png
+              statusStyle: dot
+              siteMonitor: http://localhost:9100/metrics
+          - cAdvisor:
+              description: Container Metrics
+              icon: docker.png
+              statusStyle: dot
+              siteMonitor: http://localhost:9110/metrics
 
       - Productivity:
           - Twenty CRM:

@@ -153,6 +153,8 @@ in {
             queryService = lib.mkEnableOption "query service" // {default = true;};
             otelCollector = lib.mkEnableOption "OTel collector" // {default = true;};
             clickhouse = lib.mkEnableOption "managed ClickHouse" // {default = true;};
+            nodeExporter = lib.mkEnableOption "Prometheus node exporter" // {default = true;};
+            cadvisor = lib.mkEnableOption "cAdvisor container metrics" // {default = true;};
           };
         };
         default = {};
@@ -246,7 +248,32 @@ in {
         };
       })
 
+      (lib.mkIf cfg.components.nodeExporter {
+        services.prometheus.exporters.node = {
+          enable = true;
+          port = 9100;
+          listenAddress = "127.0.0.1";
+          enabledCollectors = ["cpu" "diskstats" "filesystem" "loadavg" "meminfo" "netdev" "stat" "time" "vmstat" "hwmon" "pressure"];
+          extraFlags = ["--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/.+).+$" "--collector.netdev.device-exclude=^(veth.*|br-.*|docker.*).+$"];
+        };
+      })
+
+      (lib.mkIf cfg.components.cadvisor {
+        systemd.services.cadvisor = {
+          description = "cAdvisor — container metrics";
+          wantedBy = ["multi-user.target"];
+          after = ["docker.service"];
+          requires = ["docker.service"];
+          serviceConfig = {
+            ExecStart = "${pkgs.cadvisor}/bin/cadvisor --listen_ip=127.0.0.1 --port=9110 --docker_only=true";
+            Restart = "on-failure";
+            RestartSec = 5;
+          };
+        };
+      })
+
       (lib.mkIf cfg.components.otelCollector {
+        users.groups.systemd-journal-member = lib.mkIf (cfg.components.nodeExporter || cfg.components.cadvisor) {};
         systemd.services.signoz-collector = {
           description = "SigNoz OTel Collector";
           after = ["signoz.service"];
@@ -266,6 +293,7 @@ in {
             Type = "simple";
             User = "signoz";
             Group = "signoz";
+            SupplementaryGroups = lib.optional (cfg.components.nodeExporter || cfg.components.cadvisor) "systemd-journal";
             WorkingDirectory = cfg.settings.queryService.dataDir;
             ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             Restart = "on-failure";
@@ -273,14 +301,47 @@ in {
           };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {
-          receivers = {
-            otlp = {
-              protocols = {
-                grpc = {endpoint = "127.0.0.1:${toString cfg.settings.collector.port}";};
-                http = {endpoint = "127.0.0.1:${toString cfg.settings.collector.httpPort}";};
+          receivers =
+            {
+              otlp = {
+                protocols = {
+                  grpc = {endpoint = "127.0.0.1:${toString cfg.settings.collector.port}";};
+                  http = {endpoint = "127.0.0.1:${toString cfg.settings.collector.httpPort}";};
+                };
+              };
+            }
+            // lib.optionalAttrs cfg.components.nodeExporter {
+              prometheus = {
+                config = {
+                  global = {scrape_interval = "60s";};
+                  scrape_configs = [
+                    {
+                      job_name = "node-exporter";
+                      static_configs = [{targets = ["127.0.0.1:9100"];}];
+                    }
+                    {
+                      job_name = "cadvisor";
+                      static_configs = [{targets = ["127.0.0.1:9110"];}];
+                    }
+                    {
+                      job_name = "caddy";
+                      static_configs = [{targets = ["127.0.0.1:2019"];}];
+                    }
+                    {
+                      job_name = "authelia";
+                      static_configs = [{targets = ["127.0.0.1:9959"];}];
+                    }
+                  ];
+                };
+              };
+            }
+            // lib.optionalAttrs (cfg.components.nodeExporter || cfg.components.cadvisor) {
+              journald = {
+                directory = "/var/log/journal";
+                priority = "info";
+                units = ["signoz.service" "signoz-collector.service" "caddy.service" "immich-server.service" "gitea.service" "docker.service" "postgresql.service" "authelia-main.service"];
               };
             };
-          };
           exporters = {
             clickhousetraces = {
               datasource = "${cfg.settings.clickhouse.url}/${cfg.settings.clickhouse.tracesDatabase}";
@@ -302,9 +363,7 @@ in {
           };
           service = {
             telemetry = {
-              metrics = {
-                level = "none";
-              };
+              metrics = {level = "basic";};
             };
             pipelines = {
               traces = {
@@ -312,11 +371,11 @@ in {
                 exporters = ["clickhousetraces"];
               };
               metrics = {
-                receivers = ["otlp"];
+                receivers = ["otlp"] ++ lib.optional cfg.components.nodeExporter "prometheus";
                 exporters = ["signozclickhousemetrics"];
               };
               logs = {
-                receivers = ["otlp"];
+                receivers = ["otlp"] ++ lib.optional (cfg.components.nodeExporter || cfg.components.cadvisor) "journald";
                 exporters = ["clickhouselogsexporter"];
               };
             };

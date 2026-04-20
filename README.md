@@ -84,7 +84,7 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 | **Caddy** | 443 | `*.home.lan` | Reverse proxy with sops-managed TLS certs |
 | **Immich** | 2283 | `immich.home.lan` | Self-hosted Google Photos alternative (PostgreSQL + Redis + ML) |
 | **Gitea** | 3000 | `gitea.home.lan` | Self-hosted Git with GitHub mirror sync |
-| **SigNoz** | — | `signoz.home.lan` | Observability platform (traces, metrics, logs) |
+| **SigNoz** | 4317, 4318 | `signoz.home.lan` | Observability: traces, metrics, logs + node_exporter + cAdvisor |
 | **Homepage** | 8082 | `dash.home.lan` | Service overview dashboard |
 | **PhotoMap AI** | 8050 | `photomap.home.lan` | AI-powered photo exploration with UMAP embeddings |
 | **DNS Blocker** | 53, 9090 | — | Unbound + dnsblockd, 25 blocklists, DNS-over-TLS upstream |

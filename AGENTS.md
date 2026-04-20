@@ -180,6 +180,36 @@ home.file.".config/crush".source = crush-config;
 
 To update: `just update && just switch` (fetches latest crush-config from GitHub).
 
+### SigNoz Observability Pipeline
+
+SigNoz is the sole observability platform (replaces Prometheus + Grafana). Full stack in `modules/nixos/services/signoz.nix`.
+
+**Data pipeline:**
+- **node_exporter** (port 9100) → system metrics (CPU, RAM, disk, network, pressure)
+- **cAdvisor** (port 9110) → Docker container metrics
+- **Caddy** (port 2019) → HTTP request rates, latencies, errors
+- **Authelia** (port 9959) → SSO health metrics
+- **journald receiver** → service logs from signoz, caddy, immich, gitea, docker, postgresql, authelia
+- **OTLP receiver** → traces/metrics/logs from OTel-instrumented apps (ports 4317/4318)
+
+**SigNoz OTel Collector** scrapes all Prometheus exporters via `prometheus` receiver, collects journald logs, and exports everything to ClickHouse.
+
+**Components (all enabled by default):**
+| Component | Port | Purpose |
+|-----------|------|---------|
+| Query Service | 8080 | Web UI + API (`signoz.home.lan`) |
+| OTel Collector | 4317/4318 | OTLP ingest + Prometheus scraping + journald |
+| ClickHouse | 9000 | Metrics/traces/logs storage |
+| node_exporter | 9100 | System metrics |
+| cAdvisor | 9110 | Container metrics |
+
+**Configurable via `services.signoz.components`:**
+- `queryService` — SigNoz server (default: enabled)
+- `otelCollector` — OTel collector + scrapers (default: enabled)
+- `clickhouse` — managed ClickHouse (default: enabled)
+- `nodeExporter` — node_exporter (default: enabled)
+- `cadvisor` — container metrics (default: enabled)
+
 ### NixOS DNS Blocker
 
 Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server).
