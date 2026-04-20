@@ -407,7 +407,70 @@ in {
           port = 9100;
           listenAddress = "127.0.0.1";
           enabledCollectors = ["cpu" "diskstats" "filesystem" "loadavg" "meminfo" "netdev" "stat" "time" "vmstat" "hwmon" "pressure"];
-          extraFlags = ["--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/.+).+$" "--collector.netdev.device-exclude=^(veth.*|br-.*|docker.*).+$"];
+          extraFlags = ["--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/.+).+$" "--collector.netdev.device-exclude=^(veth.*|br-.*|docker.*).+$" "--collector.textfile.directory=/var/lib/prometheus-node-exporter/textfile_collectors"];
+        };
+
+        systemd.tmpfiles.rules = [
+          "d /var/lib/prometheus-node-exporter/textfile_collectors 0755 nobody nogroup -"
+        ];
+
+        systemd.services.amdgpu-metrics = {
+          description = "AMD GPU metrics collector for node_exporter textfile";
+          path = [pkgs.coreutils pkgs.gnugrep pkgs.gawk pkgs.findutils];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = pkgs.writeShellScript "amdgpu-metrics" ''
+              set -euo pipefail
+              OUT="/var/lib/prometheus-node-exporter/textfile_collectors/amdgpu.prom"
+              TMP="''${OUT}.tmp"
+
+              {
+                for card in /sys/class/drm/card*/device/gpu_busy_percent; do
+                  if [ -f "$card" ]; then
+                    pct=$(cat "$card")
+                    card_name=$(echo "$card" | grep -oP 'card\d+')
+                    echo "node_amdgpu_gpu_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                  fi
+                done
+
+                for mem in /sys/class/drm/card*/device/mem_busy_percent; do
+                  if [ -f "$mem" ]; then
+                    pct=$(cat "$mem")
+                    card_name=$(echo "$mem" | grep -oP 'card\d+')
+                    echo "node_amdgpu_mem_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                  fi
+                done
+
+                for temp in /sys/class/drm/card*/device/gpu_temp; do
+                  if [ -f "$temp" ]; then
+                    millideg=$(cat "$temp")
+                    card_name=$(echo "$temp" | grep -oP 'card\d+')
+                    echo "node_amdgpu_gpu_temp_celsius{card=\"''${card_name}\"} $(awk "BEGIN{printf \"%.1f\", ''${millideg}/1000}")"
+                  fi
+                done
+
+                for vram in /sys/class/drm/card*/device/mem_info_vram_total /sys/class/drm/card*/device/mem_info_vram_used; do
+                  if [ -f "$vram" ]; then
+                    bytes=$(cat "$vram")
+                    card_name=$(echo "$vram" | grep -oP 'card\d+')
+                    metric=$(echo "$vram" | awk -F/ '{print $NF}')
+                    echo "node_amdgpu_''${metric}_bytes{card=\"''${card_name}\"} ''${bytes}"
+                  fi
+                done
+              } > "$TMP"
+
+              mv "$TMP" "$OUT"
+            '';
+          };
+        };
+
+        systemd.timers.amdgpu-metrics = {
+          description = "Collect AMD GPU metrics every 30s";
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnBootSec = "10s";
+            OnUnitActiveSec = "30s";
+          };
         };
       })
 
