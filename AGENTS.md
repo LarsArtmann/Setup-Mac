@@ -364,6 +364,50 @@ emeet-pixy sync             # Sync state from camera
 emeet-pixy audio            # Cycle audio mode
 ```
 
+### Hermes AI Agent Gateway (`modules/nixos/services/hermes.nix`)
+
+Declarative NixOS module for the Hermes AI agent gateway (Discord bot, cron scheduler, messaging).
+
+| Component | Path | Purpose |
+|-----------|------|---------|
+| NixOS module | `modules/nixos/services/hermes.nix` | flake-parts module — service, tmpfiles, HM integration |
+| Secrets | `platforms/nixos/secrets/hermes.yaml` | sops-encrypted API keys |
+| Config | `~/.hermes/config.yaml` | Hermes runtime config (NOT in repo — Hermes writes at runtime) |
+| Env | `~/.hermes/.env` | Merged from sops template at service start (secrets + non-secret env) |
+
+**Architecture:**
+- Installed via flake input `hermes-agent` (pinned in `flake.lock`)
+- Systemd user service managed by Home Manager (`systemd.user.services.hermes-gateway`)
+- Secrets decrypted by sops-nix template → merged into `~/.hermes/.env` via `ExecStartPre` on each start
+- `libopus` installed system-wide for Discord voice support
+- `key_env` references in `config.yaml` read API keys from `.env` instead of inline plaintext
+
+**Module options (`services.hermes`):**
+| Option | Default | Description |
+|--------|---------|-------------|
+| `enable` | false | Enable the gateway |
+| `user` | "lars" | User account |
+| `home` | "/home/lars/.hermes" | Hermes home directory |
+| `restartSec` | "30" | Restart delay after failure |
+| `timeoutStopSec` | "120" | Graceful shutdown timeout |
+
+**Sops secrets (`hermes.yaml`):**
+- `hermes_discord_bot_token` — Discord bot token
+- `hermes_glm_api_key` — Z.AI/GLM API key
+- `hermes_minimax_api_key` — MiniMax API key
+- `hermes_fal_key` — fal.ai image generation key
+- `hermes_firecrawl_api_key` — Firecrawl web scraping key
+
+```bash
+# Hermes commands
+just hermes-status        # Show gateway status
+just hermes-restart       # Restart gateway service
+just hermes-logs          # View gateway logs
+hermes gateway status     # Check gateway state
+hermes model              # Change default model
+hermes cron list          # List cron jobs
+```
+
 ## Flake Inputs
 
 | Input | What | Follows nixpkgs? |
@@ -378,6 +422,7 @@ emeet-pixy audio            # Cycle audio mode
 | `nix-amd-npu` | AMD XDNA NPU driver | Yes |
 | `nix-ssh-config` | SSH configuration | Yes (+ HM) |
 | `crush-config` | AI assistant config | No |
+| `hermes-agent` | AI agent gateway (Discord, cron) | Yes |
 | `nix-colors` | Color schemes | No |
 | `silent-sddm` | SDDM theme | Yes |
 | `nur` | Nix User Repository | Yes |

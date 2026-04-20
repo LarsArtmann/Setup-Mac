@@ -1963,3 +1963,17 @@ session-status:
 session-restore:
     @echo "Triggering session restore..."
     @niri-session-restore
+
+# Hermes Agent Gateway Commands
+
+# Show hermes gateway status (connected platforms, active agents, uptime)
+hermes-status:
+    @echo "Hermes Gateway Status"; echo "===================="; systemctl --user status hermes-gateway --no-pager 2>/dev/null | head -15; echo ""; echo "State:"; cat ~/.hermes/gateway_state.json 2>/dev/null | jq '{pid, gateway_state, active_agents, platforms: .platforms | to_entries | map({(.key): .value.state})}' 2>/dev/null || echo "  No state file"
+
+# Restart hermes gateway service
+hermes-restart:
+    @systemctl --user restart hermes-gateway
+
+# Show hermes gateway logs (follow mode)
+hermes-logs:
+    @journalctl --user -u hermes-gateway -f --no-pager -n 50
