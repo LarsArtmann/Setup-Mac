@@ -5,8 +5,13 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
+	"github.com/prometheus/client_golang/prometheus/testutil"
 )
 
 func TestExtractJPEGFrame_MinimalFrame(t *testing.T) {
@@ -254,5 +259,140 @@ func TestFormatLastSynced(t *testing.T) {
 	result := formatLastSynced(old)
 	if len(result) != 5 {
 		t.Errorf("old time should return HH:MM format, got %q", result)
+	}
+}
+
+func TestSecurityMiddleware(t *testing.T) {
+	t.Parallel()
+
+	called := false
+	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		called = true
+	})
+	handler := securityMiddleware(inner)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if !called {
+		t.Error("inner handler was not called")
+	}
+
+	headers := []struct {
+		key, want string
+	}{
+		{"Referrer-Policy", "no-referrer"},
+		{"X-Content-Type-Options", "nosniff"},
+		{"X-Frame-Options", "DENY"},
+		{"Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'"},
+	}
+	for _, h := range headers {
+		got := rec.Header().Get(h.key)
+		if got != h.want {
+			t.Errorf("%s = %q, want %q", h.key, got, h.want)
+		}
+	}
+}
+
+func TestRequestIDMiddleware_Generated(t *testing.T) {
+	t.Parallel()
+
+	var capturedID string
+	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedID = w.Header().Get("X-Request-ID")
+	})
+	handler := requestIDMiddleware(inner)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if capturedID == "" {
+		t.Error("X-Request-ID should be generated when not provided")
+	}
+	if len(capturedID) != 8 {
+		t.Errorf("generated ID length = %d, want 8", len(capturedID))
+	}
+}
+
+func TestRequestIDMiddleware_Passthrough(t *testing.T) {
+	t.Parallel()
+
+	var capturedID string
+	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		capturedID = w.Header().Get("X-Request-ID")
+	})
+	handler := requestIDMiddleware(inner)
+
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Header.Set("X-Request-ID", "abcd1234")
+	rec := httptest.NewRecorder()
+	handler.ServeHTTP(rec, req)
+
+	if capturedID != "abcd1234" {
+		t.Errorf("X-Request-ID = %q, want %q", capturedID, "abcd1234")
+	}
+}
+
+func TestCachingFS(t *testing.T) {
+	t.Parallel()
+
+	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
+	cfs := cachingFS{handler: inner}
+
+	req := httptest.NewRequest("GET", "/static/test.js", nil)
+	rec := httptest.NewRecorder()
+	cfs.ServeHTTP(rec, req)
+
+	cc := rec.Header().Get("Cache-Control")
+	if cc != "public, max-age=604800" {
+		t.Errorf("Cache-Control = %q, want public max-age 7d", cc)
+	}
+	xcto := rec.Header().Get("X-Content-Type-Options")
+	if xcto != "nosniff" {
+		t.Errorf("X-Content-Type-Options = %q, want nosniff", xcto)
+	}
+}
+
+func TestUpdateMetrics(t *testing.T) {
+	state := pixy.State{
+		Camera:   pixy.StateTracking,
+		Audio:    pixy.AudioNC,
+		InCall:   true,
+		AutoMode: false,
+	}
+
+	updateMetrics(state)
+
+	if v := testutil.ToFloat64(metricInCall); v != 1 {
+		t.Errorf("metricInCall = %v, want 1", v)
+	}
+	if v := testutil.ToFloat64(metricAutoMode); v != 0 {
+		t.Errorf("metricAutoMode = %v, want 0", v)
+	}
+	for _, s := range []pixy.CameraState{pixy.StatePrivacy, pixy.StateTracking, pixy.StateIdle} {
+		want := 0.0
+		if state.Camera == s {
+			want = 1.0
+		}
+		if v := testutil.ToFloat64(metricCameraState.WithLabelValues(string(s))); v != want {
+			t.Errorf("camera_state{state=%q} = %v, want %v", s, v, want)
+		}
+	}
+
+	updateMetrics(pixy.State{
+		Camera:   pixy.StatePrivacy,
+		InCall:   false,
+		AutoMode: true,
+	})
+
+	if v := testutil.ToFloat64(metricInCall); v != 0 {
+		t.Errorf("metricInCall after reset = %v, want 0", v)
+	}
+	if v := testutil.ToFloat64(metricAutoMode); v != 1 {
+		t.Errorf("metricAutoMode after reset = %v, want 1", v)
 	}
 }
