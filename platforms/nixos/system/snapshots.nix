@@ -42,21 +42,68 @@
     }
   '';
 
-  # Create systemd service for Timeshift backup timer
-  systemd.timers.timeshift-backup = {
-    description = "Automatic BTRFS snapshots with Timeshift";
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
+  systemd = {
+    timers.timeshift-backup = {
+      description = "Automatic BTRFS snapshots with Timeshift";
+      timerConfig = {
+        OnCalendar = "daily";
+        Persistent = true;
+      };
+      wantedBy = ["timers.target"];
     };
-    wantedBy = ["timers.target"];
-  };
 
-  systemd.services.timeshift-backup = {
-    description = "Create BTRFS snapshot with Timeshift";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.timeshift}/bin/timeshift --create --scripted";
+    services.timeshift-backup = {
+      description = "Create BTRFS snapshot with Timeshift";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${pkgs.timeshift}/bin/timeshift --create --scripted";
+      };
+    };
+
+    services.timeshift-verify = {
+      description = "Verify Timeshift snapshot freshness";
+      path = [pkgs.timeshift pkgs.coreutils pkgs.gawk];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = pkgs.writeShellScript "timeshift-verify" ''
+          set -euo pipefail
+          MAX_AGE_DAYS=3
+
+          SNAPSHOTS=$(${pkgs.timeshift}/bin/timeshift --list --scripted 2>/dev/null || echo "")
+
+          if echo "$SNAPSHOTS" | grep -q "0 snapshots"; then
+            echo "WARNING: No Timeshift snapshots found!"
+            exit 1
+          fi
+
+          LATEST=$(echo "$SNAPSHOTS" | grep -oP '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}' | tail -1)
+
+          if [ -z "$LATEST" ]; then
+            echo "WARNING: Could not parse latest snapshot date"
+            exit 1
+          fi
+
+          SNAP_EPOCH=$(date -d "''${LATEST//_/-}" +%s 2>/dev/null || date -d "''${LATEST:0:10}" +%s 2>/dev/null || echo 0)
+          NOW_EPOCH=$(date +%s)
+          AGE_DAYS=$(( (NOW_EPOCH - SNAP_EPOCH) / 86400 ))
+
+          if [ "$AGE_DAYS" -gt "$MAX_AGE_DAYS" ]; then
+            echo "WARNING: Latest Timeshift snapshot is $AGE_DAYS days old (threshold: $MAX_AGE_DAYS)"
+            exit 1
+          fi
+
+          echo "OK: Latest Timeshift snapshot is $AGE_DAYS day(s) old"
+        '';
+      };
+    };
+
+    timers.timeshift-verify = {
+      description = "Verify Timeshift snapshot freshness daily";
+      timerConfig = {
+        OnCalendar = "daily";
+        Persistent = true;
+      };
+      wantedBy = ["timers.target"];
     };
   };
 
@@ -67,52 +114,5 @@
       interval = "monthly";
       fileSystems = ["/" "/data"];
     };
-  };
-
-  # Verify backup freshness
-  systemd.services.timeshift-verify = {
-    description = "Verify Timeshift snapshot freshness";
-    path = [pkgs.timeshift pkgs.coreutils pkgs.gawk];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = pkgs.writeShellScript "timeshift-verify" ''
-        set -euo pipefail
-        MAX_AGE_DAYS=3
-
-        SNAPSHOTS=$(${pkgs.timeshift}/bin/timeshift --list --scripted 2>/dev/null || echo "")
-
-        if echo "$SNAPSHOTS" | grep -q "0 snapshots"; then
-          echo "WARNING: No Timeshift snapshots found!"
-          exit 1
-        fi
-
-        LATEST=$(echo "$SNAPSHOTS" | grep -oP '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}' | tail -1)
-
-        if [ -z "$LATEST" ]; then
-          echo "WARNING: Could not parse latest snapshot date"
-          exit 1
-        fi
-
-        SNAP_EPOCH=$(date -d "''${LATEST//_/-}" +%s 2>/dev/null || date -d "''${LATEST:0:10}" +%s 2>/dev/null || echo 0)
-        NOW_EPOCH=$(date +%s)
-        AGE_DAYS=$(( (NOW_EPOCH - SNAP_EPOCH) / 86400 ))
-
-        if [ "$AGE_DAYS" -gt "$MAX_AGE_DAYS" ]; then
-          echo "WARNING: Latest Timeshift snapshot is $AGE_DAYS days old (threshold: $MAX_AGE_DAYS)"
-          exit 1
-        fi
-
-        echo "OK: Latest Timeshift snapshot is $AGE_DAYS day(s) old"
-      '';
-    };
-  };
-
-  systemd.timers.timeshift-verify = {
-    description = "Verify Timeshift snapshot freshness daily";
-    timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-    };
-    wantedBy = ["timers.target"];
   };
 }

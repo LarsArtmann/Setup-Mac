@@ -250,7 +250,8 @@ in {
         systemd.services.signoz-provision = {
           description = "SigNoz Provisioning — deploy alert rules and dashboards";
           after = ["signoz.service"];
-          wants = ["signoz.service"];
+          requires = ["signoz.service"];
+          partOf = ["signoz.service"];
           wantedBy = ["multi-user.target"];
           serviceConfig = {
             Type = "oneshot";
@@ -290,196 +291,198 @@ in {
           '';
         };
 
-        environment.etc."signoz/rules/disk-full.json".source = pkgs.writeText "disk-full-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "Disk usage above 90% on {{.Labels.fstype}} mounted at {{.Labels.mountpoint}}";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "(1 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})) * 100";
-                      step = 300;
-                      statsAggExpr = "last";
-                    }
-                  ];
+        environment.etc = {
+          "signoz/rules/disk-full.json".source = pkgs.writeText "disk-full-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "Disk usage above 90% on {{.Labels.fstype}} mounted at {{.Labels.mountpoint}}";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "(1 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})) * 100";
+                        step = 300;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND";
+                  target = 90;
                 };
-                op = "AND";
-                target = 90;
+                evaluationInterval = "5m";
+                name = "Disk Space Critical (>90%)";
+                source = "RULE";
               };
-              evaluationInterval = "5m";
-              name = "Disk Space Critical (>90%)";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/cpu-sustained.json".source = pkgs.writeText "cpu-sustained-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "CPU usage above 90% for 15 minutes on {{.Labels.instance}}";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
-                      step = 300;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/cpu-sustained.json".source = pkgs.writeText "cpu-sustained-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "CPU usage above 90% for 15 minutes on {{.Labels.instance}}";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+                        step = 300;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND";
+                  target = 90;
                 };
-                op = "AND";
-                target = 90;
+                evaluationInterval = "5m";
+                name = "CPU Sustained High (>90%)";
+                source = "RULE";
               };
-              evaluationInterval = "5m";
-              name = "CPU Sustained High (>90%)";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/memory-critical.json".source = pkgs.writeText "memory-critical-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "Memory usage above 90% on {{.Labels.instance}}";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
-                      step = 300;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/memory-critical.json".source = pkgs.writeText "memory-critical-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "Memory usage above 90% on {{.Labels.instance}}";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
+                        step = 300;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND";
+                  target = 90;
                 };
-                op = "AND";
-                target = 90;
+                evaluationInterval = "5m";
+                name = "Memory Critical (>90%)";
+                source = "RULE";
               };
-              evaluationInterval = "5m";
-              name = "Memory Critical (>90%)";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/service-down.json".source = pkgs.writeText "service-down-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "Systemd service {{.Labels.name}} is in failed state";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "node_systemd_units{state=\"failed\"}";
-                      step = 60;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/service-down.json".source = pkgs.writeText "service-down-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "Systemd service {{.Labels.name}} is in failed state";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "node_systemd_units{state=\"failed\"}";
+                        step = 60;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND";
+                  target = 0;
                 };
-                op = "AND";
-                target = 0;
+                evaluationInterval = "1m";
+                name = "Systemd Service Failed";
+                source = "RULE";
               };
-              evaluationInterval = "1m";
-              name = "Systemd Service Failed";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/gpu-thermal.json".source = pkgs.writeText "gpu-thermal-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "AMD GPU temperature above 90°C on {{.Labels.card}}";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "node_amdgpu_gpu_temp_celsius";
-                      step = 300;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/gpu-thermal.json".source = pkgs.writeText "gpu-thermal-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "AMD GPU temperature above 90°C on {{.Labels.card}}";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "node_amdgpu_gpu_temp_celsius";
+                        step = 300;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND";
+                  target = 90;
                 };
-                op = "AND";
-                target = 90;
+                evaluationInterval = "5m";
+                name = "GPU Thermal Throttling (>90°C)";
+                source = "RULE";
               };
-              evaluationInterval = "5m";
-              name = "GPU Thermal Throttling (>90°C)";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/dnsblockd-down.json".source = pkgs.writeText "dnsblockd-down-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "dnsblockd metrics endpoint is unreachable";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "up{job=\"dnsblockd\"}";
-                      step = 60;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/dnsblockd-down.json".source = pkgs.writeText "dnsblockd-down-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "dnsblockd metrics endpoint is unreachable";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "up{job=\"dnsblockd\"}";
+                        step = 60;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND_NOT";
+                  target = 1;
                 };
-                op = "AND_NOT";
-                target = 1;
+                evaluationInterval = "1m";
+                name = "DNS Blocker Down";
+                source = "RULE";
               };
-              evaluationInterval = "1m";
-              name = "DNS Blocker Down";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/rules/emeet-pixyd-down.json".source = pkgs.writeText "emeet-pixyd-down-rule.json" (builtins.toJSON {
-          data = {
-            rule = {
-              alertType = "METRIC_BASED_ALERT";
-              description = "emeet-pixyd metrics endpoint is unreachable";
-              enabled = true;
-              condition = {
-                compositeMetricQuery = {
-                  promQueries = [
-                    {
-                      name = "A";
-                      query = "up{job=\"emeet-pixyd\"}";
-                      step = 60;
-                      statsAggExpr = "last";
-                    }
-                  ];
+          "signoz/rules/emeet-pixyd-down.json".source = pkgs.writeText "emeet-pixyd-down-rule.json" (builtins.toJSON {
+            data = {
+              rule = {
+                alertType = "METRIC_BASED_ALERT";
+                description = "emeet-pixyd metrics endpoint is unreachable";
+                enabled = true;
+                condition = {
+                  compositeMetricQuery = {
+                    promQueries = [
+                      {
+                        name = "A";
+                        query = "up{job=\"emeet-pixyd\"}";
+                        step = 60;
+                        statsAggExpr = "last";
+                      }
+                    ];
+                  };
+                  op = "AND_NOT";
+                  target = 1;
                 };
-                op = "AND_NOT";
-                target = 1;
+                evaluationInterval = "1m";
+                name = "EMEET PIXY Daemon Down";
+                source = "RULE";
               };
-              evaluationInterval = "1m";
-              name = "EMEET PIXY Daemon Down";
-              source = "RULE";
             };
-          };
-        });
+          });
 
-        environment.etc."signoz/dashboards/overview.json".source = "${inputs.self}/modules/nixos/services/dashboards/signoz-overview.json";
+          "signoz/dashboards/overview.json".source = "${inputs.self}/modules/nixos/services/dashboards/signoz-overview.json";
+        };
       })
 
       (lib.mkIf cfg.components.nodeExporter {
@@ -491,66 +494,68 @@ in {
           extraFlags = ["--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/.+).+$" "--collector.netdev.device-exclude=^(veth.*|br-.*|docker.*).+$" "--collector.textfile.directory=/var/lib/prometheus-node-exporter/textfile_collectors"];
         };
 
-        systemd.tmpfiles.rules = [
-          "d /var/lib/prometheus-node-exporter/textfile_collectors 0755 nobody nogroup -"
-        ];
+        systemd = {
+          tmpfiles.rules = [
+            "d /var/lib/prometheus-node-exporter/textfile_collectors 0755 nobody nogroup -"
+          ];
 
-        systemd.services.amdgpu-metrics = {
-          description = "AMD GPU metrics collector for node_exporter textfile";
-          path = [pkgs.coreutils pkgs.gnugrep pkgs.gawk pkgs.findutils];
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = pkgs.writeShellScript "amdgpu-metrics" ''
-              set -euo pipefail
-              OUT="/var/lib/prometheus-node-exporter/textfile_collectors/amdgpu.prom"
-              TMP="''${OUT}.tmp"
+          services.amdgpu-metrics = {
+            description = "AMD GPU metrics collector for node_exporter textfile";
+            path = [pkgs.coreutils pkgs.gnugrep pkgs.gawk pkgs.findutils];
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = pkgs.writeShellScript "amdgpu-metrics" ''
+                set -euo pipefail
+                OUT="/var/lib/prometheus-node-exporter/textfile_collectors/amdgpu.prom"
+                TMP="''${OUT}.tmp"
 
-              {
-                for card in /sys/class/drm/card*/device/gpu_busy_percent; do
-                  if [ -f "$card" ]; then
-                    pct=$(cat "$card")
-                    card_name=$(echo "$card" | grep -oP 'card\d+')
-                    echo "node_amdgpu_gpu_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
-                  fi
-                done
+                {
+                  for card in /sys/class/drm/card*/device/gpu_busy_percent; do
+                    if [ -f "$card" ]; then
+                      pct=$(cat "$card")
+                      card_name=$(echo "$card" | grep -oP 'card\d+')
+                      echo "node_amdgpu_gpu_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                    fi
+                  done
 
-                for mem in /sys/class/drm/card*/device/mem_busy_percent; do
-                  if [ -f "$mem" ]; then
-                    pct=$(cat "$mem")
-                    card_name=$(echo "$mem" | grep -oP 'card\d+')
-                    echo "node_amdgpu_mem_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
-                  fi
-                done
+                  for mem in /sys/class/drm/card*/device/mem_busy_percent; do
+                    if [ -f "$mem" ]; then
+                      pct=$(cat "$mem")
+                      card_name=$(echo "$mem" | grep -oP 'card\d+')
+                      echo "node_amdgpu_mem_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                    fi
+                  done
 
-                for temp in /sys/class/drm/card*/device/gpu_temp; do
-                  if [ -f "$temp" ]; then
-                    millideg=$(cat "$temp")
-                    card_name=$(echo "$temp" | grep -oP 'card\d+')
-                    echo "node_amdgpu_gpu_temp_celsius{card=\"''${card_name}\"} $(awk "BEGIN{printf \"%.1f\", ''${millideg}/1000}")"
-                  fi
-                done
+                  for temp in /sys/class/drm/card*/device/gpu_temp; do
+                    if [ -f "$temp" ]; then
+                      millideg=$(cat "$temp")
+                      card_name=$(echo "$temp" | grep -oP 'card\d+')
+                      echo "node_amdgpu_gpu_temp_celsius{card=\"''${card_name}\"} $(awk "BEGIN{printf \"%.1f\", ''${millideg}/1000}")"
+                    fi
+                  done
 
-                for vram in /sys/class/drm/card*/device/mem_info_vram_total /sys/class/drm/card*/device/mem_info_vram_used; do
-                  if [ -f "$vram" ]; then
-                    bytes=$(cat "$vram")
-                    card_name=$(echo "$vram" | grep -oP 'card\d+')
-                    metric=$(echo "$vram" | awk -F/ '{print $NF}')
-                    echo "node_amdgpu_''${metric}_bytes{card=\"''${card_name}\"} ''${bytes}"
-                  fi
-                done
-              } > "$TMP"
+                  for vram in /sys/class/drm/card*/device/mem_info_vram_total /sys/class/drm/card*/device/mem_info_vram_used; do
+                    if [ -f "$vram" ]; then
+                      bytes=$(cat "$vram")
+                      card_name=$(echo "$vram" | grep -oP 'card\d+')
+                      metric=$(echo "$vram" | awk -F/ '{print $NF}')
+                      echo "node_amdgpu_''${metric}_bytes{card=\"''${card_name}\"} ''${bytes}"
+                    fi
+                  done
+                } > "$TMP"
 
-              mv "$TMP" "$OUT"
-            '';
+                mv "$TMP" "$OUT"
+              '';
+            };
           };
-        };
 
-        systemd.timers.amdgpu-metrics = {
-          description = "Collect AMD GPU metrics every 30s";
-          wantedBy = ["timers.target"];
-          timerConfig = {
-            OnBootSec = "10s";
-            OnUnitActiveSec = "30s";
+          timers.amdgpu-metrics = {
+            description = "Collect AMD GPU metrics every 30s";
+            wantedBy = ["timers.target"];
+            timerConfig = {
+              OnBootSec = "10s";
+              OnUnitActiveSec = "30s";
+            };
           };
         };
       })
@@ -574,7 +579,8 @@ in {
         systemd.services.signoz-collector = {
           description = "SigNoz OTel Collector";
           after = ["signoz.service"];
-          wants = ["signoz.service"];
+          requires = ["signoz.service"];
+          partOf = ["signoz.service"];
           wantedBy = ["multi-user.target"];
           preStart = ''
             ${packages.otelCollector}/bin/signoz-otel-collector migrate bootstrap \
