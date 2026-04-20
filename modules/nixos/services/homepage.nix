@@ -100,11 +100,11 @@
               statusStyle: dot
               siteMonitor: ${svcUrl "photomap"}
           - DNS Blocker:
-              href: https://localhost:8443/stats
+              href: http://localhost:9090/stats
               description: DNS Block Stats
               icon: shield.png
               statusStyle: dot
-              siteMonitor: https://localhost:8443
+              siteMonitor: http://localhost:9090/health
 
       - Development:
           - Gitea:

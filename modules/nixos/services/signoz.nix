@@ -406,7 +406,7 @@ in {
           enable = true;
           port = 9100;
           listenAddress = "127.0.0.1";
-          enabledCollectors = ["cpu" "diskstats" "filesystem" "loadavg" "meminfo" "netdev" "stat" "time" "vmstat" "hwmon" "pressure"];
+          enabledCollectors = ["cpu" "diskstats" "filesystem" "loadavg" "meminfo" "netdev" "stat" "systemd" "time" "vmstat" "hwmon" "pressure"];
           extraFlags = ["--collector.filesystem.mount-points-exclude=^/(dev|proc|sys|run/k3s/.+).+$" "--collector.netdev.device-exclude=^(veth.*|br-.*|docker.*).+$" "--collector.textfile.directory=/var/lib/prometheus-node-exporter/textfile_collectors"];
         };
 
@@ -529,7 +529,7 @@ in {
             // lib.optionalAttrs cfg.components.nodeExporter {
               prometheus = {
                 config = {
-                  global = {scrape_interval = "60s";};
+                  global = {scrape_interval = "30s";};
                   scrape_configs = [
                     {
                       job_name = "node-exporter";
