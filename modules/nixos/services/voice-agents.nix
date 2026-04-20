@@ -119,7 +119,7 @@
             Type = "oneshot";
             RemainAfterExit = true;
             # Restart container if it crashes
-            ExecStartPre = ["${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans 2>/dev/null || true"];
+            ExecStartPre = ["-${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans"];
             ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
             ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down whisper-rocm";
             TimeoutStartSec = 180;
