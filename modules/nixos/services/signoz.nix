@@ -246,6 +246,159 @@ in {
             RestartSec = 10;
           };
         };
+
+        systemd.services.signoz-provision = {
+          description = "SigNoz Provisioning — deploy alert rules and dashboards";
+          after = ["signoz.service"];
+          wants = ["signoz.service"];
+          wantedBy = ["multi-user.target"];
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          preStart = ''
+            ${pkgs.coreutils}/bin/timeout 120 ${pkgs.bash}/bin/bash -c 'until ${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version > /dev/null 2>&1; do sleep 2; done'
+          '';
+          script = ''
+            SIGNOZ_URL="http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}"
+
+            # Deploy alert rules
+            ${pkgs.coreutils}/bin/echo "Deploying alert rules..."
+            for rule_file in /etc/signoz/rules/*.json; do
+              if [ -f "$rule_file" ]; then
+                ${pkgs.coreutils}/bin/echo "  Applying: $(basename $rule_file)"
+                ${pkgs.curl}/bin/curl -sf -X POST \
+                  -H "Content-Type: application/json" \
+                  -d @"$rule_file" \
+                  "$SIGNOZ_URL/api/v1/rules" 2>/dev/null || true
+              fi
+            done
+
+            # Deploy dashboards
+            ${pkgs.coreutils}/bin/echo "Deploying dashboards..."
+            for dash_file in /etc/signoz/dashboards/*.json; do
+              if [ -f "$dash_file" ]; then
+                ${pkgs.coreutils}/bin/echo "  Applying: $(basename $dash_file)"
+                ${pkgs.curl}/bin/curl -sf -X POST \
+                  -H "Content-Type: application/json" \
+                  -d @"$dash_file" \
+                  "$SIGNOZ_URL/api/v1/dashboards" 2>/dev/null || true
+              fi
+            done
+
+            ${pkgs.coreutils}/bin/echo "Provisioning complete."
+          '';
+        };
+
+        environment.etc."signoz/rules/disk-full.json".source = pkgs.writeText "disk-full-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "Disk usage above 90% on {{.Labels.fstype}} mounted at {{.Labels.mountpoint}}";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "(1 - (node_filesystem_avail_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})) * 100";
+                      step = 300;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND";
+                target = 90;
+              };
+              evaluationInterval = "5m";
+              name = "Disk Space Critical (>90%)";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/rules/cpu-sustained.json".source = pkgs.writeText "cpu-sustained-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "CPU usage above 90% for 15 minutes on {{.Labels.instance}}";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)";
+                      step = 300;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND";
+                target = 90;
+              };
+              evaluationInterval = "5m";
+              name = "CPU Sustained High (>90%)";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/rules/memory-critical.json".source = pkgs.writeText "memory-critical-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "Memory usage above 90% on {{.Labels.instance}}";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100";
+                      step = 300;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND";
+                target = 90;
+              };
+              evaluationInterval = "5m";
+              name = "Memory Critical (>90%)";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/rules/service-down.json".source = pkgs.writeText "service-down-rule.json" (builtins.toJSON {
+          data = {
+            rule = {
+              alertType = "METRIC_BASED_ALERT";
+              description = "Systemd service {{.Labels.name}} is in failed state";
+              enabled = true;
+              condition = {
+                compositeMetricQuery = {
+                  promQueries = [
+                    {
+                      name = "A";
+                      query = "node_systemd_units{state=\"failed\"}";
+                      step = 60;
+                      statsAggExpr = "last";
+                    }
+                  ];
+                };
+                op = "AND";
+                target = 0;
+              };
+              evaluationInterval = "1m";
+              name = "Systemd Service Failed";
+              source = "RULE";
+            };
+          };
+        });
+
+        environment.etc."signoz/dashboards/overview.json".source = "${inputs.self}/modules/nixos/services/dashboards/signoz-overview.json";
       })
 
       (lib.mkIf cfg.components.nodeExporter {

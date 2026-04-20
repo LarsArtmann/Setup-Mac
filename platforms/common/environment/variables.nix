@@ -31,6 +31,9 @@
     LESS = "-R"; # Enable color output in less
     CLICOLOR = "1"; # Enable color output in ls
     LSCOLORS = "ExGxBxDxCxEgEdxbxgxcxd"; # Custom ls colors
+
+    # Crush AI assistant
+    CRUSH_SHORT_TOOL_DESCRIPTIONS = "1";
   };
 in {
   # Shell configuration (platform-agnostic)
