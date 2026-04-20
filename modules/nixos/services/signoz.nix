@@ -484,6 +484,11 @@ in {
                       job_name = "authelia";
                       static_configs = [{targets = ["127.0.0.1:9959"];}];
                     }
+                    {
+                      job_name = "dnsblockd";
+                      static_configs = [{targets = ["127.0.0.1:9090"];}];
+                      metrics_path = "/metrics";
+                    }
                   ];
                 };
               };

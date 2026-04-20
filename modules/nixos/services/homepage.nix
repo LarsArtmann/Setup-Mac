@@ -142,6 +142,11 @@
               icon: docker.png
               statusStyle: dot
               siteMonitor: http://localhost:9110/metrics
+          - dnsblockd:
+              description: DNS Block Page Server
+              icon: shield.png
+              statusStyle: dot
+              siteMonitor: http://localhost:9090/metrics
 
       - Productivity:
           - Twenty CRM:

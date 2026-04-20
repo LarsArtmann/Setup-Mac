@@ -105,6 +105,12 @@
       url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
     };
 
+    # Hermes AI Agent — Discord/gateway agent platform
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Treefmt formatter with auto-discovery for nix fmt
     treefmt-full-flake = {
       url = "github:LarsArtmann/treefmt-full-flake";
@@ -128,6 +134,7 @@
     otel-tui,
     nix-amd-npu,
     sops-nix,
+    hermes-agent,
     nix-ssh-config,
     treefmt-full-flake,
     ...
@@ -152,10 +159,7 @@
 
     dnsblockdOverlay = _final: prev: {
       dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
-        src = prev.lib.cleanSourceWith {
-          filter = path: _: baseNameOf path != "package.nix";
-          src = ./platforms/nixos/programs/dnsblockd;
-        };
+        src = builtins.filterSource (path: _type: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd") ./platforms/nixos/programs/dnsblockd;
       };
       dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
         src = prev.lib.cleanSourceWith {
@@ -192,6 +196,7 @@
         ./modules/nixos/services/sops.nix
         ./modules/nixos/services/taskchampion.nix
         ./modules/nixos/services/voice-agents.nix
+        ./modules/nixos/services/hermes.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -226,10 +231,7 @@
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             openaudible = pkgs.callPackage ./pkgs/openaudible.nix {};
             dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
-              src = lib.cleanSourceWith {
-                filter = path: _: baseNameOf path != "package.nix";
-                src = ./platforms/nixos/programs/dnsblockd;
-              };
+              src = builtins.filterSource (path: _type: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd") ./platforms/nixos/programs/dnsblockd;
             };
             dnsblockd-processor = pkgs.callPackage ./pkgs/dnsblockd-processor/package.nix {
               src = lib.cleanSourceWith {
@@ -484,6 +486,7 @@
             inputs.self.nixosModules.twenty
             inputs.self.nixosModules.taskchampion
             inputs.self.nixosModules.voice-agents
+            inputs.self.nixosModules.hermes
             ./platforms/nixos/system/configuration.nix
           ];
         };

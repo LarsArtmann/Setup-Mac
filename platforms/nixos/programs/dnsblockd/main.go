@@ -22,6 +22,9 @@ import (
 	"sync/atomic"
 	"text/template"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type Config struct {
@@ -109,6 +112,19 @@ var (
 	domainHits     sync.Map
 	fallbackDomain string
 	version        = "dev"
+
+	blockedTotal = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "dnsblockd_blocked_total",
+		Help: "Total number of blocked requests",
+	})
+	tempAllowsGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "dnsblockd_active_temp_allows",
+		Help: "Number of currently active temporary allowlist entries",
+	})
+	falsePositiveGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+		Name: "dnsblockd_false_positive_reports",
+		Help: "Number of logged false positive reports",
+	})
 )
 
 const blockPageHTML = `<!DOCTYPE html>
@@ -190,6 +206,10 @@ func init() {
 	}
 	stats.Start = time.Now()
 	certCache.certs = make(map[string]*tls.Certificate)
+
+	prometheus.MustRegister(blockedTotal)
+	prometheus.MustRegister(tempAllowsGauge)
+	prometheus.MustRegister(falsePositiveGauge)
 }
 
 func addTempAllow(domain string, duration time.Duration, unboundControl, unboundSocket, allowlistConf string) {
@@ -200,6 +220,7 @@ func addTempAllow(domain string, duration time.Duration, unboundControl, unbound
 		ExpiresAt: expiresAt,
 	}
 	tempAllowlistMu.Unlock()
+	tempAllowsGauge.Set(float64(len(tempAllowlist)))
 
 	if unboundControl != "" && allowlistConf != "" {
 		go writeAllowlistConfAndReload(allowlistConf, unboundControl, unboundSocket)
@@ -228,6 +249,7 @@ func cleanupExpiredTempAllows(unboundControl, unboundSocket, allowlistConf strin
 		}
 	}
 	tempAllowlistMu.Unlock()
+	tempAllowsGauge.Set(float64(len(tempAllowlist)))
 
 	if hadExpired && unboundControl != "" && allowlistConf != "" {
 		go writeAllowlistConfAndReload(allowlistConf, unboundControl, unboundSocket)
@@ -423,6 +445,7 @@ func categorize(domain string, categories map[string]string) string {
 }
 
 func recordBlock(domain, category string) {
+	blockedTotal.Inc()
 	stats.TotalBlocked.Add(1)
 
 	if val, ok := domainHits.Load(domain); ok {
@@ -696,6 +719,7 @@ func reportFalsePositiveHandler(w http.ResponseWriter, r *http.Request) {
 		falsePositiveReports = falsePositiveReports[len(falsePositiveReports)-100:]
 	}
 	falsePositiveMu.Unlock()
+	falsePositiveGauge.Set(float64(len(falsePositiveReports)))
 
 	log.Printf("false positive reported: domain=%s category=%s source=%s", domain, report.Category, report.Source)
 
@@ -853,6 +877,7 @@ func main() {
 	mux.HandleFunc("/api/report", handler(reportFalsePositiveHandler))
 
 	statsMux := http.NewServeMux()
+	statsMux.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 	statsMux.HandleFunc("/stats", statsHandler)
 	statsMux.HandleFunc("/health", healthHandler)
 	statsMux.HandleFunc("/api/temp-allowlist", tempAllowlistHandler)
