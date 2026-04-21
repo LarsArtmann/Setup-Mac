@@ -9,10 +9,26 @@
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
 
+    waitOnlineScript = pkgs.writeShellScript "hermes-wait-online" ''
+      timeout 60 bash -c 'until ${pkgs.iputils}/bin/ping -c 1 -W 2 9.9.9.9 >/dev/null 2>&1; do sleep 2; done'
+    '';
+
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
       ENV_FILE="${cfg.home}/.env"
       SOPS_FILE="${sopsEnvPath}"
+
+      if [ ! -f "$SOPS_FILE" ]; then
+        echo "hermes-merge-env: sops template not found at $SOPS_FILE, waiting..." >&2
+        for i in $(seq 1 30); do
+          [ -f "$SOPS_FILE" ] && break
+          sleep 1
+        done
+        if [ ! -f "$SOPS_FILE" ]; then
+          echo "hermes-merge-env: sops template still missing after 30s, aborting" >&2
+          exit 1
+        fi
+      fi
 
       if [ ! -f "$ENV_FILE" ]; then
         touch "$ENV_FILE"
@@ -75,15 +91,17 @@
       home-manager.users.${cfg.user}.systemd.user.services.hermes-gateway = {
         Unit = {
           Description = "Hermes Agent Gateway - Messaging Platform Integration";
-          After = ["network.target" "network-online.target"];
-          Wants = ["network-online.target"];
+          After = ["network.target"];
           StartLimitIntervalSec = 600;
           StartLimitBurst = 5;
         };
 
         Service = {
           Type = "simple";
-          ExecStartPre = mergeEnvScript;
+          ExecStartPre = [
+            waitOnlineScript
+            mergeEnvScript
+          ];
           ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
           WorkingDirectory = cfg.home;
           Environment = [

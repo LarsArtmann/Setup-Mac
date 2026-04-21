@@ -31,8 +31,10 @@
       "amd_pstate=guided"
       # TTM: increase page limit for GPU page allocations
       "amdgpu.ttm.pages_limit=15728640"
-      # Disable IOMMU for ~6% memory read improvement on Strix Halo
-      "amd_iommu=off"
+      # IOMMU enabled — required for full 128GB memory mapping on Strix Halo.
+      # Previously set to "off" for ~6% memory read improvement, but this prevented
+      # the kernel from seeing the upper 64GB of RAM (only 64GB of 128GB visible).
+      "amd_iommu=on"
     ];
   };
 
