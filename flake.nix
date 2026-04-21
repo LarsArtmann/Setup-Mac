@@ -111,6 +111,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Monitor365 device monitoring agent source (Rust)
+    monitor365-src = {
+      url = "git+ssh://git@github.com/LarsArtmann/monitor365?ref=master";
+      flake = false;
+    };
+
     # Treefmt formatter with auto-discovery for nix fmt
     treefmt-full-flake = {
       url = "github:LarsArtmann/treefmt-full-flake";
@@ -136,6 +142,7 @@
     sops-nix,
     hermes-agent,
     nix-ssh-config,
+    monitor365-src,
     treefmt-full-flake,
     ...
   }: let
@@ -172,7 +179,21 @@
 
     monitor365Overlay = _final: prev: {
       monitor365 = prev.callPackage ./pkgs/monitor365.nix {
-        src = /home/lars/projects/Monitor365;
+        src = prev.lib.cleanSourceWith {
+          filter = path: type: let
+            b = baseNameOf path;
+          in !(
+            b == "target" ||
+            b == "vendor" ||
+            b == ".git" ||
+            b == "docs" ||
+            b == "report" ||
+            b == ".crush" ||
+            b == "examples" ||
+            prev.lib.hasSuffix ".svg" b
+          );
+          src = monitor365-src;
+        };
       };
     };
   emeetPixyOverlay = _final: prev: {
@@ -248,9 +269,7 @@
               };
             };
             monitor365 = pkgs.callPackage ./pkgs/monitor365.nix {
-              src = builtins.path {
-                name = "monitor365-source";
-                path = /home/lars/projects/Monitor365;
+              src = lib.cleanSourceWith {
                 filter = path: type: let
                   b = baseNameOf path;
                 in !(
@@ -263,6 +282,7 @@
                   b == "examples" ||
                   lib.hasSuffix ".svg" b
                 );
+                src = monitor365-src;
               };
             };
             emeet-pixyd = pkgs.callPackage ./pkgs/emeet-pixyd.nix {
