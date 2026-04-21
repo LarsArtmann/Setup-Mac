@@ -39,7 +39,12 @@
 in {
   programs.taskwarrior = {
     enable = true;
-    package = pkgs.taskwarrior3;
+    package = pkgs.taskwarrior3.overrideAttrs {
+      cmakeFlags = [
+        (pkgs.lib.cmakeBool "SYSTEM_CORROSION" true)
+        (pkgs.lib.cmakeBool "ENABLE_TLS_NATIVE_ROOTS" true)
+      ];
+    };
 
     config = {
       confirmation = false;

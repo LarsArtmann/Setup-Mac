@@ -3,15 +3,8 @@
     enable = true;
     package = pkgs.swaylock-effects;
     settings = {
-      # Blur effect
-      effect-blur = "20x10";
-      effect-vignette = "0.5:0.5";
-
       # Background
       color = "1e1e2e";
-      # Optional: use a wallpaper
-      # image = "/path/to/wallpaper.png";
-      # scaling = "fill";
 
       # Indicator (the ring you type into)
       indicator = true;
@@ -52,16 +45,8 @@
       font = "JetBrainsMono Nerd Font";
       font-size = 24;
 
-      # Clock (optional)
-      clock = true;
-      timestr = "%H:%M";
-      datestr = "%a, %b %d";
-
       # Grace period (seconds where no password needed after waking)
       grace = 0;
-
-      # Don't show idle indicator
-      fade-in = 0.2;
     };
   };
 }
