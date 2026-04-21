@@ -53,35 +53,27 @@ in {
             restartUnits = ["immich-server.service"];
           };
         }
-        // mkSecrets "dnsblockd-certs.yaml" {
-          restartUnits = ["dnsblockd.service"];
-        } ["dnsblockd_ca_cert"]
+        // mkSecrets "dnsblockd-certs.yaml" {} ["dnsblockd_ca_cert"]
         // {
           dnsblockd_ca_key = {
             sopsFile = secretsDir + "/dnsblockd-certs.yaml";
             mode = "0400";
-            restartUnits = ["dnsblockd.service"];
           };
           dnsblockd_server_cert = {
             sopsFile = secretsDir + "/dnsblockd-certs.yaml";
             owner = "caddy";
             group = "caddy";
-            restartUnits = ["caddy.service"];
           };
           dnsblockd_server_key = {
             sopsFile = secretsDir + "/dnsblockd-certs.yaml";
             owner = "caddy";
             group = "caddy";
             mode = "0400";
-            restartUnits = ["caddy.service"];
           };
         }
-        // {
-          livekit_keys = {
-            sopsFile = secretsDir + "/voice-agents.yaml";
-            restartUnits = ["livekit.service"];
-          };
-        }
+        // mkSecrets "voice-agents.yaml" {
+          restartUnits = ["livekit.service"];
+        } ["livekit_keys"]
         // mkKeyedSecrets "hermes.yaml" {
           owner = "lars";
           group = "users";

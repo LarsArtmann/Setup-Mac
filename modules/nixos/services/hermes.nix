@@ -99,7 +99,6 @@
           ExecReload = "/bin/kill -USR1 $MAINPID";
           StandardOutput = "journal";
           StandardError = "journal";
-          WatchdogSec = 60;
           MemoryMax = "4G";
           PrivateTmp = true;
           NoNewPrivileges = true;

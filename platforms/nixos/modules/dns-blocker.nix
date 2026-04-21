@@ -290,7 +290,13 @@ in {
             ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
           '';
           delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
-            ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+            # Only delete the IP if it's a secondary address (not the primary/static one)
+            # Count how many addresses match — if more than one exists, we can safely delete
+            # If this is the only address, skip deletion to avoid dropping the primary IP
+            count=$(${pkgs.iproute2}/bin/ip -4 addr show dev ${cfg.blockInterface} | ${pkgs.gnugrep}/bin/grep -c "inet ${cfg.blockIP}/" || true)
+            if [ "$count" -gt 1 ]; then
+              ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
+            fi
           '';
           caCert = config.sops.secrets.dnsblockd_ca_cert.path;
           caKey = config.sops.secrets.dnsblockd_ca_key.path;
