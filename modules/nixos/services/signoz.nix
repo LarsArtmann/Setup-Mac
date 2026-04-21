@@ -579,8 +579,7 @@ in {
         systemd.services.signoz-collector = {
           description = "SigNoz OTel Collector";
           after = ["signoz.service"];
-          requires = ["signoz.service"];
-          partOf = ["signoz.service"];
+          wants = ["signoz.service"];
           wantedBy = ["multi-user.target"];
           preStart = ''
             ${packages.otelCollector}/bin/signoz-otel-collector migrate bootstrap \

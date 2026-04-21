@@ -85,7 +85,6 @@ in {
         // mkKeyedSecrets "hermes.yaml" {
           owner = "lars";
           group = "users";
-          restartUnits = ["hermes-gateway.service"];
         } {
           hermes_discord_bot_token = "discord_bot_token";
           hermes_glm_api_key = "glm_api_key";
