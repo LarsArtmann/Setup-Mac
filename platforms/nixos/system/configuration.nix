@@ -183,6 +183,9 @@
         enable = true;
       };
 
+      # Minecraft server (local network only, whitelisted)
+      minecraft = true;
+
       smartd = {
         enable = true;
         autodetect = true;

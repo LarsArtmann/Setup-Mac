@@ -197,6 +197,7 @@
         ./modules/nixos/services/taskchampion.nix
         ./modules/nixos/services/voice-agents.nix
         ./modules/nixos/services/hermes.nix
+        ./modules/nixos/services/minecraft.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -487,6 +488,7 @@
             inputs.self.nixosModules.taskchampion
             inputs.self.nixosModules.voice-agents
             inputs.self.nixosModules.hermes
+            inputs.self.nixosModules.minecraft
             ./platforms/nixos/system/configuration.nix
           ];
         };
