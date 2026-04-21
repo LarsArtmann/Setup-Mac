@@ -51,7 +51,7 @@
         "-X github.com/SigNoz/signoz/pkg/version.hash=nix"
         "-X github.com/SigNoz/signoz/pkg/version.time=1970-01-01T00:00:00Z"
         "-X github.com/SigNoz/signoz/pkg/version.branch=nix"
-        "-X github.com/SigNoz/signoz/pkg/query-service/constants.HTTPHostPort=0.0.0.0:8081"
+        "-X github.com/SigNoz/signoz/pkg/query-service/constants.HTTPHostPort=0.0.0.0:8080"
       ];
 
       postInstall = ''
@@ -122,7 +122,7 @@ in {
             queryService = {
               port = lib.mkOption {
                 type = lib.types.port;
-                default = 8081;
+                default = 8080;
               };
               host = lib.mkOption {
                 type = lib.types.str;
