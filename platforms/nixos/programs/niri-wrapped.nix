@@ -761,7 +761,7 @@ in {
         PartOf = ["graphical-session.target"];
       };
       Service = {
-        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 300 ${pkgs.swaylock}/bin/swaylock timeout 600 ${
+        ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 43200 ${
           pkgs.writeShellScript "swayidle-suspend" ''
             ${pkgs.systemd}/bin/systemctl suspend
           ''
