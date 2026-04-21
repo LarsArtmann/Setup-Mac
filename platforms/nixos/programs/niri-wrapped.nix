@@ -767,6 +767,10 @@ in {
           ''
         } before-sleep ${pkgs.swaylock}/bin/swaylock";
         Restart = "on-failure";
+        RestartSec = "5s";
+        TimeoutStartSec = "10s";
+        StartLimitBurst = 3;
+        StartLimitIntervalSec = 120;
       };
       Install.WantedBy = ["graphical-session.target"];
     };
@@ -780,10 +784,10 @@ in {
       Service = {
         ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
         Restart = "on-failure";
-        RestartSec = "3s";
-        # Stop retrying after 5 failures in 60s — prevents runaway crash loop
-        StartLimitBurst = 5;
-        StartLimitIntervalSec = 60;
+        RestartSec = "5s";
+        TimeoutStartSec = "10s";
+        StartLimitBurst = 3;
+        StartLimitIntervalSec = 120;
       };
       Install.WantedBy = ["graphical-session.target"];
     };
