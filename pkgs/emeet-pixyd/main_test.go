@@ -473,6 +473,7 @@ func TestCameraStateHIDByte(t *testing.T) {
 		{pixy.StateTracking, hidByteTracking},
 		{pixy.StatePrivacy, hidBytePrivacy},
 		{pixy.StateIdle, hidByteIdle},
+		{pixy.StateOffline, hidByteIdle},
 		{pixy.CameraState("unknown"), hidByteIdle},
 	}
 	for _, testCase := range tests {

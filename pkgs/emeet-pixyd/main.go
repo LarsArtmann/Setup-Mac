@@ -177,7 +177,11 @@ func (d *Daemon) loadState() {
 }
 
 func (d *Daemon) ensureStateDir() error {
-	return os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir)
+	if err := os.MkdirAll(d.config.StateDir, pixy.PermissionStateDir); err != nil {
+		return fmt.Errorf("ensure state dir %s: %w", d.config.StateDir, err)
+	}
+
+	return nil
 }
 
 func (d *Daemon) saveState() error {

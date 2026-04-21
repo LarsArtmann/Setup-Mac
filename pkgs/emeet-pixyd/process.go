@@ -39,8 +39,10 @@ func ppidOf(pid int) int {
 	return ppid
 }
 
+const maxDescendantDepth = 32
+
 func isDescendantOf(pid, ancestor int) bool {
-	for range 10 {
+	for range maxDescendantDepth {
 		ppid := ppidOf(pid)
 		if ppid == 0 || ppid == pid {
 			return false

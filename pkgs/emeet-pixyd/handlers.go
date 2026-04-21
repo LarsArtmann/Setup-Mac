@@ -35,7 +35,9 @@ const (
 	zoomMin = 100
 	zoomMax = 400
 
-	staticCacheMaxAge = 7 * 24 * time.Hour
+	staticCacheMaxAge  = 7 * 24 * time.Hour
+	ffmpegShutdownSecs = 2 * time.Second
+	streamBufSize      = 64 * 1024
 )
 
 //go:embed static
@@ -376,12 +378,12 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		go func() { done <- cmd.Wait() }()
 		select {
 		case <-done:
-		case <-time.After(2 * time.Second):
+		case <-time.After(ffmpegShutdownSecs):
 			_ = cmd.Process.Kill()
 			_ = cmd.Wait()
 		}
 	}()
-	br := bufio.NewReaderSize(stdOut, 64*1024)
+	br := bufio.NewReaderSize(stdOut, streamBufSize)
 	var buf bytes.Buffer
 	for {
 
