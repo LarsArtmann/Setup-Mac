@@ -35,7 +35,9 @@
         chmod 600 "$ENV_FILE"
       fi
 
-      while IFS='=' read -r key value; do
+      while IFS= read -r line || [ -n "$line" ]; do
+        key="''${line%%=*}"
+        value="''${line#*=}"
         [ -z "$key" ] && continue
         if grep -q "^''${key}=" "$ENV_FILE" 2>/dev/null; then
           ${pkgs.gnused}/bin/sed -i "/^''${key}=/d" "$ENV_FILE"

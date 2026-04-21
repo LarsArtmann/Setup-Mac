@@ -203,21 +203,14 @@
     gawk # Text processing
   ];
 
-  # Override Helium's .desktop file to unset QT_STYLE_OVERRIDE
-  # Helium is Chromium-based and bundles Qt shims that conflict with the
-  # global kvantum style override, breaking xdg-desktop-portal registration.
-  xdg.dataFile."applications/helium.desktop".text = ''
-    [Desktop Entry]
-    Categories=Network;WebBrowser
-    Exec=env -u QT_STYLE_OVERRIDE helium %U
-    GenericName=Web Browser
-    Icon=helium
-    MimeType=text/html;text/xml;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https
-    Name=Helium
-    Terminal=false
-    Type=Application
-    Version=1.5
-  '';
+  xdg.desktopEntries.helium = {
+    name = "Helium";
+    genericName = "Web Browser";
+    exec = "env -u QT_STYLE_OVERRIDE helium %U";
+    terminal = false;
+    categories = ["Network" "WebBrowser"];
+    mimeType = ["text/html" "text/xml" "application/xhtml+xml" "x-scheme-handler/http" "x-scheme-handler/https"];
+  };
 
   # XDG configuration (Linux specific)
   xdg = {

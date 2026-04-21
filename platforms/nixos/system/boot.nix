@@ -29,8 +29,12 @@
       # under heavy compute/ML workloads on Strix Halo
       "amdgpu.lockup_timeout=30000"
       "amd_pstate=guided"
-      # TTM: increase page limit for GPU page allocations
-      "amdgpu.ttm.pages_limit=15728640"
+      # GTT: allocate ~128GB for GPU compute memory via Graphics Translation Table
+      # Without this, kernel defaults to ~31GB GTT, crippling AI workloads on unified memory.
+      # Removed in crash fix but root cause was overdrive (now disabled), not GTT sizing.
+      "amdgpu.gttsize=131072"
+      # TTM: increase page limit to ~120GB for GPU page allocations
+      "amdgpu.ttm.pages_limit=31457280"
       # IOMMU enabled — required for full 128GB memory mapping on Strix Halo.
       # Previously set to "off" for ~6% memory read improvement, but this prevented
       # the kernel from seeing the upper 64GB of RAM (only 64GB of 128GB visible).
@@ -38,10 +42,11 @@
     ];
   };
 
-  # TTM memory pool configuration for GPU workloads
+  # TTM memory pool configuration for GPU workloads (128GB unified memory)
   boot.extraModprobeConfig = ''
-    options ttm pages_limit=15728640
-    options ttm page_pool_size=15728640
+    options amdgpu gttsize=131072
+    options ttm pages_limit=31457280
+    options ttm page_pool_size=31457280
   '';
 
   # VM sysctl tuning for AI/ML workloads (128GB unified memory)
@@ -70,7 +75,7 @@
       "--avoid"
       "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
       "--prefer"
-      "^(llama-server|python3|python|node|java|chrome|chromium)$" # Kill these first
+      "^(llama-server|ollama|python3|python|node|java|chrome|chromium)$" # Kill these first
     ];
   };
 
