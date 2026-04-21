@@ -39,6 +39,16 @@ _: {
   # networking.networkmanager.enable = true;
   # networking.networkmanager.wifi.backend = "iwd";
 
+  # Prevent dbus-broker and polkit from restarting on every rebuild.
+  # These services have X-Restart-Triggers tied to the system-path hash,
+  # which changes whenever any package changes — causing a full D-Bus restart
+  # that drops network connections (SSH, etc). Reload is sufficient for
+  # picking up new D-Bus service files.
+  systemd.services = {
+    dbus-broker.restartIfChanged = false;
+    polkit.restartIfChanged = false;
+  };
+
   # Disable systemd-resolved to prevent DNS conflicts
   services.resolved.enable = false;
 
