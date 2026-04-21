@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.minecraft = {
     config,
     pkgs,

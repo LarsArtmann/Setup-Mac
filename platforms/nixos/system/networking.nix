@@ -39,32 +39,32 @@ _: {
   # networking.networkmanager.enable = true;
   # networking.networkmanager.wifi.backend = "iwd";
 
-  # Prevent dbus-broker and polkit from restarting on every rebuild.
-  # These services have X-Restart-Triggers tied to the system-path hash,
-  # which changes whenever any package changes — causing a full D-Bus restart
-  # that drops network connections (SSH, etc). Reload is sufficient for
-  # picking up new D-Bus service files.
-  systemd.services = {
-    dbus-broker.restartIfChanged = false;
-    polkit.restartIfChanged = false;
+  systemd = {
+    # Prevent dbus-broker and polkit from restarting on every rebuild.
+    # These services have X-Restart-Triggers tied to the system-path hash,
+    # which changes whenever any package changes — causing a full D-Bus restart
+    # that drops network connections (SSH, etc). Reload is sufficient for
+    # picking up new D-Bus service files.
+    services = {
+      dbus-broker.restartIfChanged = false;
+      polkit.restartIfChanged = false;
+
+      # Reload Nix daemon after config changes to apply settings
+      nix-daemon = {
+        restartIfChanged = true;
+        serviceConfig.LimitNOFILE = 65536;
+      };
+    };
+
+    # Increase file descriptor limits to prevent "Too many open files" errors
+    settings.Manager = {
+      DefaultLimitNOFILE = 65536;
+      DefaultLimitNPROC = 4096;
+    };
   };
 
   # Disable systemd-resolved to prevent DNS conflicts
   services.resolved.enable = false;
-
-  # Increase file descriptor limits to prevent "Too many open files" errors
-  systemd.settings.Manager = {
-    DefaultLimitNOFILE = 65536;
-    DefaultLimitNPROC = 4096;
-  };
-
-  # Reload Nix daemon after config changes to apply settings
-  systemd.services.nix-daemon = {
-    restartIfChanged = true;
-    serviceConfig = {
-      LimitNOFILE = 65536;
-    };
-  };
 
   # Set your time zone.
   time.timeZone = "Europe/Berlin"; # Adjust as needed

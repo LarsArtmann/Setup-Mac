@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.monitor365 = {
     config,
     pkgs,

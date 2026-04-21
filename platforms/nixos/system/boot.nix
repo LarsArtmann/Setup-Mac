@@ -75,7 +75,7 @@
       "--avoid"
       "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
       "--prefer"
-      "^(llama-server|ollama|python3|python|node|java|chrome|chromium)$" # Kill these first
+      "^(ollama|llama-server|python3|python|node|java|chrome|chromium)$" # Kill these first
     ];
   };
 
