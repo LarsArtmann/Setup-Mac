@@ -186,6 +186,12 @@
       # Minecraft server (local network only, whitelisted)
       minecraft = true;
 
+      # Monitor365 device monitoring agent
+      monitor365 = {
+        enable = true;
+      };
+
+
       smartd = {
         enable = true;
         autodetect = true;

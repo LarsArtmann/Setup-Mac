@@ -169,7 +169,13 @@
       };
     };
 
-    emeetPixyOverlay = _final: prev: {
+
+    monitor365Overlay = _final: prev: {
+      monitor365 = prev.callPackage ./pkgs/monitor365.nix {
+        src = /home/lars/projects/Monitor365;
+      };
+    };
+  emeetPixyOverlay = _final: prev: {
       emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
         src = prev.lib.cleanSourceWith {
           filter = path: _type: let b = baseNameOf path; in !(prev.lib.hasSuffix "_test.go" b || b == "package.nix");
@@ -198,6 +204,7 @@
         ./modules/nixos/services/voice-agents.nix
         ./modules/nixos/services/hermes.nix
         ./modules/nixos/services/minecraft.nix
+        ./modules/nixos/services/monitor365.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -238,6 +245,24 @@
               src = lib.cleanSourceWith {
                 filter = path: _: !lib.hasSuffix (baseNameOf path) ".nix";
                 src = ./pkgs/dnsblockd-processor;
+              };
+            };
+            monitor365 = pkgs.callPackage ./pkgs/monitor365.nix {
+              src = builtins.path {
+                name = "monitor365-source";
+                path = /home/lars/projects/Monitor365;
+                filter = path: type: let
+                  b = baseNameOf path;
+                in !(
+                  b == "target" ||
+                  b == "vendor" ||
+                  b == ".git" ||
+                  b == "docs" ||
+                  b == "report" ||
+                  b == ".crush" ||
+                  b == "examples" ||
+                  lib.hasSuffix ".svg" b
+                );
               };
             };
             emeet-pixyd = pkgs.callPackage ./pkgs/emeet-pixyd.nix {
@@ -437,6 +462,7 @@
                   openaudibleOverlay
                   dnsblockdOverlay
                   emeetPixyOverlay
+                  monitor365Overlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});
@@ -489,6 +515,7 @@
             inputs.self.nixosModules.voice-agents
             inputs.self.nixosModules.hermes
             inputs.self.nixosModules.minecraft
+            inputs.self.nixosModules.monitor365
             ./platforms/nixos/system/configuration.nix
           ];
         };
