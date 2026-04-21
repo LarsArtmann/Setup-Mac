@@ -30,7 +30,7 @@
 
       package = lib.mkOption {
         type = lib.types.package;
-        default = inputs.self.packages.${pkgs.system}.monitor365;
+        default = pkgs.monitor365;
         description = "Monitor365 package to use";
       };
 
