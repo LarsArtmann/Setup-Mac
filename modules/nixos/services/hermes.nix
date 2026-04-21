@@ -6,7 +6,7 @@
     ...
   }: let
     cfg = config.services.hermes;
-    hermesPkg = inputs.hermes-agent.packages.${pkgs.system}.default;
+    hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
