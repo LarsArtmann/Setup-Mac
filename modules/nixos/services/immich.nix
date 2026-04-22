@@ -20,7 +20,7 @@
       redis.enable = true;
       machine-learning.enable = true;
 
-      environment.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+      environment.NODE_EXTRA_CA_CERTS = config.security.pki.certificates;
 
       settings = {
         oauth = {

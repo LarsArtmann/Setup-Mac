@@ -35,7 +35,7 @@ in {
           owner = "authelia-main";
           group = "authelia-main";
           restartUnits = ["authelia-main.service"];
-        } ["authelia_jwt_secret" "authelia_storage_encryption_key" "authelia_oidc_hmac_secret"]
+        } ["authelia_jwt_secret" "authelia_storage_encryption_key" "authelia_oidc_hmac_secret" "authelia_user_password_hash"]
         // {
           authelia_oidc_issuer_private_key = {
             sopsFile = secretsDir + "/authelia-secrets.yaml";

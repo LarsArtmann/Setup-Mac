@@ -22,7 +22,7 @@
 
       services:
         whisper-rocm:
-          image: beecave/insanely-fast-whisper-rocm:main
+          image: beecave/insanely-fast-whisper-rocm:latest
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000
@@ -103,7 +103,7 @@
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:main";
+            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:latest";
             TimeoutStartSec = 0;
           };
         };

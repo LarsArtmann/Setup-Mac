@@ -1,5 +1,5 @@
 {_, ...}: let
-  version = "latest";
+  version = "0.16.2";
 in {
   flake.nixosModules.twenty = {
     config,
