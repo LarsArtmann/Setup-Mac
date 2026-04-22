@@ -8,7 +8,7 @@
     cfg = config.services.hermes;
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
-    oldStateDir = "/home/lars/.hermes";
+    oldStateDir = "/home/${cfg.user}/.hermes";
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail

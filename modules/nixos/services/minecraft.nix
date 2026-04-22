@@ -89,7 +89,7 @@ _: {
       };
 
       networking.firewall.extraCommands = ''
-        iptables -A nixos-fw -p tcp --dport 25565 -s 192.168.1.0/24 -j nixos-fw-accept
+        iptables -A nixos-fw -p tcp --dport 25565 -s ${config.networking.local.subnet} -j nixos-fw-accept
         iptables -A nixos-fw -p tcp --dport 25565 -s 127.0.0.1 -j nixos-fw-accept
       '';
     };

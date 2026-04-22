@@ -170,7 +170,7 @@ in {
           access-control = [
             "127.0.0.0/8 allow"
             "::1/128 allow"
-            "192.168.1.0/24 allow"
+            "${config.networking.local.subnet} allow"
           ];
 
           num-threads = 2;

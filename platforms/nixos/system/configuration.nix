@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   nix-colors,
   nix-ssh-config,
@@ -14,6 +15,7 @@
     # ESSENTIAL MODULES FOR FUNCTIONAL DESKTOP
     ./boot.nix
     ./networking.nix
+    ./local-network.nix
     ./dns-blocker-config.nix # DNS blocker with unbound + block page (replaces Technitium)
     ./snapshots.nix # BTRFS snapshots with Timeshift
     ./scheduled-tasks.nix # Daily scheduled tasks (crush update-providers, etc.)
@@ -216,7 +218,7 @@
             findtime = 600;
             maxretry = 3;
             backend = "systemd";
-            ignoreip = "127.0.0.1/8 ::1 192.168.1.0/24 10.0.0.0/8 172.16.0.0/12";
+            ignoreip = "127.0.0.1/8 ::1 ${config.networking.local.subnet} 10.0.0.0/8 172.16.0.0/12";
           };
         };
         jails = {
@@ -228,7 +230,7 @@
               logpath = "/var/log/auth.log";
               maxretry = 3;
               bantime = 3600;
-              ignoreip = "127.0.0.1/8 ::1 192.168.1.0/24 10.0.0.0/8 172.16.0.0/12";
+              ignoreip = "127.0.0.1/8 ::1 ${config.networking.local.subnet} 10.0.0.0/8 172.16.0.0/12";
             };
           };
         };

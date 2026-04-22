@@ -4,6 +4,9 @@
   lib,
   ...
 }: let
+  primaryUser = "lars";
+  primaryGroup = "users";
+
   inherit (pkgs.rocmPackages) rocwmma;
 
   rocmEnv = {
@@ -230,8 +233,8 @@ in {
               date -Iseconds > ${setupDone}
               echo "Studio setup complete."
             '';
-            User = "lars";
-            Group = "users";
+            User = primaryUser;
+            Group = primaryGroup;
             TimeoutStartSec = "3600";
           };
         };
@@ -256,7 +259,7 @@ in {
             Type = "simple";
             ExecStartPre = "${venvPip} install --no-cache-dir structlog";
             ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
-            User = "lars";
+            User = primaryUser;
             Group = "video";
             WorkingDirectory = "${unslothDataDir}/workspace";
             Restart = "on-failure";
@@ -268,11 +271,11 @@ in {
       };
 
       systemd.tmpfiles.rules = [
-        "d ${unslothDataDir} 0755 lars users -"
-        "d ${unslothDataDir}/workspace 0755 lars users -"
-        "d ${unslothDataDir}/models 0755 lars users -"
-        "d ${unslothDataDir}/.unsloth 0755 lars users -"
-        "d ${unslothDataDir}/.unsloth/studio 0755 lars users -"
+        "d ${unslothDataDir} 0755 ${primaryUser} ${primaryGroup} -"
+        "d ${unslothDataDir}/workspace 0755 ${primaryUser} ${primaryGroup} -"
+        "d ${unslothDataDir}/models 0755 ${primaryUser} ${primaryGroup} -"
+        "d ${unslothDataDir}/.unsloth 0755 ${primaryUser} ${primaryGroup} -"
+        "d ${unslothDataDir}/.unsloth/studio 0755 ${primaryUser} ${primaryGroup} -"
       ];
     })
   ];

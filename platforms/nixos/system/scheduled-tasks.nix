@@ -1,3 +1,6 @@
+let
+  primaryUser = "lars";
+in
 # Scheduled tasks for NixOS using systemd timers
 {pkgs, ...}: {
   systemd = {
@@ -47,8 +50,8 @@
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.writeShellScript "blocklist-hash-updater" (builtins.readFile ../scripts/blocklist-hash-updater)}";
-          WorkingDirectory = "/home/lars/projects/SystemNix";
-          User = "lars";
+          WorkingDirectory = "/home/${primaryUser}/projects/SystemNix";
+          User = primaryUser;
           StandardOutput = "journal";
           StandardError = "journal";
         };
@@ -60,7 +63,7 @@
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.writeShellScript "service-health-check" (builtins.readFile ../scripts/service-health-check)}";
-          User = "lars";
+          User = primaryUser;
           Environment = [
             "DISPLAY=:0"
             "WAYLAND_DISPLAY=wayland-1"

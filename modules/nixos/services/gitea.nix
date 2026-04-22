@@ -5,6 +5,7 @@
     config,
     ...
   }: let
+    primaryUser = "lars";
     giteaPkg = config.services.gitea.package;
 
     # Script to mirror all user repos from GitHub
@@ -322,7 +323,7 @@
         path = [pkgs.curl pkgs.jq pkgs.gh];
         serviceConfig = {
           Type = "oneshot";
-          User = "lars";
+          User = primaryUser;
           EnvironmentFile = [
             config.sops.templates."gitea-sync.env".path
             "-/var/lib/gitea/.admin-token.env"
@@ -355,8 +356,8 @@
         adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
           set -euo pipefail
 
-          ADMIN_USER="lars"
-          ADMIN_EMAIL="lars@local"
+          ADMIN_USER="${primaryUser}"
+          ADMIN_EMAIL="${primaryUser}@local"
           PASS_FILE="/var/lib/gitea/.admin-password"
           GITEA=${lib.getExe giteaPkg}
 
@@ -408,7 +409,7 @@
         tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
           set -euo pipefail
 
-          ADMIN_USER="lars"
+          ADMIN_USER="${primaryUser}"
           TOKEN_FILE="/var/lib/gitea/.admin-token.env"
           GITEA=${lib.getExe giteaPkg}
           export GITEA_WORK_DIR=/var/lib/gitea

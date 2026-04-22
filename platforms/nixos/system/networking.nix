@@ -1,4 +1,4 @@
-_: {
+{config, ...}: {
   # Networking configuration
   networking = {
     hostName = "evo-x2"; # Machine name
@@ -15,18 +15,18 @@ _: {
       allowedUDPPorts = [53];
     };
 
-    # Static IP configuration (192.168.1.150/24)
+    # Static IP configuration
     useDHCP = false;
     interfaces.eno1 = {
       useDHCP = false;
       ipv4.addresses = [
         {
-          address = "192.168.1.150";
+          address = config.networking.local.lanIP;
           prefixLength = 24;
         }
       ];
     };
-    defaultGateway = "192.168.1.1";
+    defaultGateway = config.networking.local.gateway;
 
     # dhcpcd disabled - using static IP
     dhcpcd.enable = false;

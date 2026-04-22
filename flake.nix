@@ -166,7 +166,10 @@
 
     dnsblockdOverlay = _final: prev: {
       dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
-        src = builtins.filterSource (path: _type: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd") ./platforms/nixos/programs/dnsblockd;
+        src = prev.lib.cleanSourceWith {
+          filter = path: _: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd";
+          src = ./platforms/nixos/programs/dnsblockd;
+        };
       };
       dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
         src = prev.lib.cleanSourceWith {
@@ -244,6 +247,11 @@
           overlays = [
             goOverlay
             awWatcherOverlay
+          ] ++ lib.optionals (system == "x86_64-linux") [
+            openaudibleOverlay
+            dnsblockdOverlay
+            emeetPixyOverlay
+            monitor365Overlay
           ];
         };
 
@@ -258,39 +266,7 @@
             inherit (pkgs) aw-watcher-utilization;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            openaudible = pkgs.callPackage ./pkgs/openaudible.nix {};
-            dnsblockd = pkgs.callPackage ./pkgs/dnsblockd.nix {
-              src = builtins.filterSource (path: _type: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd") ./platforms/nixos/programs/dnsblockd;
-            };
-            dnsblockd-processor = pkgs.callPackage ./pkgs/dnsblockd-processor/package.nix {
-              src = lib.cleanSourceWith {
-                filter = path: _: !lib.hasSuffix (baseNameOf path) ".nix";
-                src = ./pkgs/dnsblockd-processor;
-              };
-            };
-            monitor365 = pkgs.callPackage ./pkgs/monitor365.nix {
-              src = lib.cleanSourceWith {
-                filter = path: type: let
-                  b = baseNameOf path;
-                in !(
-                  b == "target" ||
-                  b == "vendor" ||
-                  b == ".git" ||
-                  b == "docs" ||
-                  b == "report" ||
-                  b == ".crush" ||
-                  b == "examples" ||
-                  lib.hasSuffix ".svg" b
-                );
-                src = monitor365-src;
-              };
-            };
-            emeet-pixyd = pkgs.callPackage ./pkgs/emeet-pixyd.nix {
-              src = lib.cleanSourceWith {
-                filter = path: _type: let b = baseNameOf path; in !(lib.hasSuffix "_test.go" b || b == "package.nix");
-                src = ./pkgs/emeet-pixyd;
-              };
-            };
+            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 emeet-pixyd;
           };
 
         # Development shells for different program categories
@@ -407,6 +383,7 @@
                 config.allowUnfree = true;
                 overlays = [
                   nur.overlays.default
+                  goOverlay
                   awWatcherOverlay
                 ];
               };

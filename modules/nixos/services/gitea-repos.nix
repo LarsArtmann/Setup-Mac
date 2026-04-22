@@ -219,6 +219,12 @@
     options.services.gitea-repos = {
       enable = lib.mkEnableOption "Declarative Gitea repository mirroring";
 
+      user = lib.mkOption {
+        type = lib.types.str;
+        default = "lars";
+        description = "User account for running sync services (needs gh CLI access)";
+      };
+
       repos = lib.mkOption {
         type = lib.types.listOf lib.types.str;
         default = [];
@@ -252,7 +258,7 @@
         path = [pkgs.curl pkgs.jq pkgs.gh pkgs.sops pkgs.bash];
         serviceConfig = {
           Type = "oneshot";
-          User = "lars";
+          User = cfg.user;
           EnvironmentFile = config.sops.templates."gitea-sync.env".path;
           # Wait for Gitea to be ready before running
           ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
