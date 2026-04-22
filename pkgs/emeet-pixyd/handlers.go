@@ -192,9 +192,34 @@ func (s *webServer) action(command string) http.HandlerFunc {
 		status := s.getWebStatusWithPTZ(request.Context())
 		if strings.HasPrefix(resp, "error:") {
 			status.Error = resp
+		} else {
+			status.Toast, status.ToastType = actionToast(command)
 		}
 
 		templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
+	}
+}
+
+func actionToast(command string) (string, string) {
+	switch command {
+	case "track":
+		return "Tracking enabled", "success"
+	case "idle":
+		return "Camera idle", "success"
+	case cmdPrivacy:
+		return "Privacy mode on", "success"
+	case "center":
+		return "Camera centered", "success"
+	case "sync":
+		return "State synced", "success"
+	case "probe":
+		return "Probed devices", "success"
+	case "toggle-gesture":
+		return "Gesture toggled", "info"
+	case "toggle-auto":
+		return "Auto mode toggled", "info"
+	default:
+		return "", ""
 	}
 }
 
@@ -211,6 +236,9 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 	status := s.getWebStatusWithPTZ(request.Context())
 	if strings.HasPrefix(resp, "error:") {
 		status.Error = resp
+	} else {
+		status.Toast = "Audio mode changed"
+		status.ToastType = "info"
 	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
@@ -497,6 +525,12 @@ func (s *webServer) handleGestureToggle(responseWriter http.ResponseWriter, requ
 	resp := s.daemon.handleCommand(request.Context(), "toggle-gesture")
 	slog.Debug("web gesture toggle", "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
+	if strings.HasPrefix(resp, "error:") {
+		status.Error = resp
+	} else {
+		status.Toast = "Gesture toggled"
+		status.ToastType = "info"
+	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 
@@ -505,6 +539,12 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 	resp := s.daemon.handleCommand(request.Context(), "toggle-auto")
 	slog.Debug("web auto toggle", "response", resp)
 	status := s.getWebStatusWithPTZ(request.Context())
+	if strings.HasPrefix(resp, "error:") {
+		status.Error = resp
+	} else {
+		status.Toast = "Auto mode toggled"
+		status.ToastType = "info"
+	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
 

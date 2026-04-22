@@ -8,7 +8,6 @@
   var consecutiveErrors = 0;
   var streamRetryDelay = 3000;
   var maxStreamRetryDelay = 30000;
-  var maxToasts = 3;
 
   document.body.addEventListener("doAction", function (e) {
     htmx.ajax("POST", e.detail.url, {
@@ -39,21 +38,15 @@
   function showToast(msg, type) {
     type = type || "success";
     var container = document.getElementById("toast-container");
-    while (container.children.length >= maxToasts) {
-      container.removeChild(container.firstChild);
-    }
-    var el = document.createElement("div");
-    el.className = "toast toast-" + type;
-    el.textContent = msg;
-    container.appendChild(el);
-    requestAnimationFrame(function () {
-      el.classList.add("show");
-    });
+    container.innerHTML = '<div class="toast toast-' + type + ' show">' + msg + "</div>";
     setTimeout(function () {
-      el.classList.remove("show");
-      setTimeout(function () {
-        el.remove();
-      }, 300);
+      var el = container.querySelector(".toast");
+      if (el) {
+        el.classList.remove("show");
+        setTimeout(function () {
+          el.remove();
+        }, 300);
+      }
     }, 2500);
   }
 
@@ -65,21 +58,6 @@
     banner.innerHTML =
       '<span class="offline-dot"></span> Daemon unreachable \u2014 reconnecting\u2026';
     panel.insertBefore(banner, panel.firstChild);
-  }
-
-  function hideOfflineBanner() {
-    var banner = document.querySelector(".offline-banner");
-    if (banner) banner.remove();
-  }
-
-  function clearErrorBanners() {
-    var panel = document.getElementById("status-panel");
-    if (!panel) return;
-    panel
-      .querySelectorAll(".error-banner:not(.offline-banner)")
-      .forEach(function (b) {
-        b.remove();
-      });
   }
 
   document.addEventListener("htmx:beforeRequest", function (e) {
@@ -139,26 +117,10 @@
     }
 
     consecutiveErrors = 0;
-    hideOfflineBanner();
-    clearErrorBanners();
+    var offlineBanner = document.querySelector(".offline-banner");
+    if (offlineBanner) offlineBanner.remove();
 
-    if (!path) return;
-
-    var labels = {
-      "/api/track": "Tracking enabled",
-      "/api/idle": "Camera idle",
-      "/api/privacy": "Privacy mode on",
-      "/api/center": "Camera centered",
-      "/api/sync": "State synced",
-      "/api/probe": "Probed devices",
-    };
-    if (labels[path]) showToast(labels[path], "success");
-    if (path === "/api/gesture") showToast("Gesture toggled", "info");
-    if (path === "/api/auto") showToast("Auto mode toggled", "info");
-    if (path.indexOf("/api/audio") === 0)
-      showToast("Audio mode changed", "info");
-
-    if (path.indexOf("/api/ptz/") === 0) {
+    if (path && path.indexOf("/api/ptz/") === 0) {
       var okAxis = path.split("/").pop();
       var okSlider = document.getElementById("slider-" + okAxis);
       if (okSlider) okSlider.dataset.lastGood = okSlider.value;

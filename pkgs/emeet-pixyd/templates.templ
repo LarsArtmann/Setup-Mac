@@ -89,6 +89,14 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 	</div>
 }
 
+templ toastOOB(msg, toastType string) {
+	<div id="toast-container" hx-swap-oob="innerHTML">
+		if msg != "" {
+			<div class={ "toast toast-" + toastType + " show" }>{ msg }</div>
+		}
+	</div>
+}
+
 templ statusPanel(s webStatus) {
 	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s, refresh from:body, load" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
 		if s.Error != "" {
@@ -220,4 +228,5 @@ templ statusPanel(s webStatus) {
 			}
 		</div>
 	</div>
+	@toastOOB(s.Toast, s.ToastType)
 }
