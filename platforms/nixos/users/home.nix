@@ -266,6 +266,19 @@
         "text/markdown" = ["kitty.desktop"];
         "application/json" = ["kitty.desktop"];
         "application/x-yaml" = ["kitty.desktop"];
+
+        # Images
+        "image/bmp" = ["helium.desktop"];
+        "image/gif" = ["helium.desktop"];
+        "image/jpeg" = ["helium.desktop"];
+        "image/png" = ["helium.desktop"];
+        "image/svg+xml" = ["helium.desktop"];
+        "image/webp" = ["helium.desktop"];
+
+        # Videos
+        "video/mp4" = ["helium.desktop"];
+        "video/webm" = ["helium.desktop"];
+        "video/x-matroska" = ["helium.desktop"];
       };
     };
   };
