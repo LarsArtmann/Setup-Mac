@@ -7,8 +7,25 @@ _: {
   }: let
     cfg = config.services.monitor365;
 
-    # Generate TOML config matching Monitor365's exact expected format.
-    # All required fields must be present — the binary validates strictly.
+    runtimeDeps = with pkgs;
+      [
+        xdotool
+        xprintidle
+        scrot
+        networkmanager
+        lm_sensors
+        bluez
+        util-linux
+        coreutils
+        procps
+      ]
+      ++ lib.optionals (!config.wayland.windowManager.niri.enable) [
+        xorg.xwininfo
+        xorg.xprop
+      ];
+
+    runtimePath = lib.makeBinPath runtimeDeps;
+
     monitor365Config = pkgs.writeText "monitor365-config.toml" ''
       [device]
       id = "${config.networking.hostName}"
@@ -91,8 +108,12 @@ _: {
       format = "pretty"
 
       [metrics]
-      enabled = false
-      bind_address = "127.0.0.1:9090"
+      enabled = ${lib.boolToString cfg.metrics.enable}
+      bind_address = "${cfg.metrics.bindAddress}"
+
+      [realtime]
+      enabled = ${lib.boolToString cfg.realtime.enable}
+      bind_address = "${cfg.realtime.bindAddress}"
     '';
   in {
     options.services.monitor365 = {
@@ -164,6 +185,34 @@ _: {
         description = "ActivityWatch integration settings";
       };
 
+      metrics = lib.mkOption {
+        type = lib.types.submodule {
+          options = {
+            enable = lib.mkEnableOption "Prometheus metrics endpoint" // {default = false;};
+            bindAddress = lib.mkOption {
+              type = lib.types.str;
+              default = "127.0.0.1:9190";
+            };
+          };
+        };
+        default = {};
+        description = "Metrics configuration";
+      };
+
+      realtime = lib.mkOption {
+        type = lib.types.submodule {
+          options = {
+            enable = lib.mkEnableOption "realtime API server" // {default = false;};
+            bindAddress = lib.mkOption {
+              type = lib.types.str;
+              default = "127.0.0.1:8180";
+            };
+          };
+        };
+        default = {};
+        description = "Realtime event API configuration";
+      };
+
       retentionDays = lib.mkOption {
         type = lib.types.int;
         default = 90;
@@ -172,53 +221,61 @@ _: {
     };
 
     config = lib.mkIf cfg.enable {
-      # Install the binary system-wide
       environment.systemPackages = [cfg.package];
 
-      # Data directory
       systemd.tmpfiles.rules = [
         "d ${cfg.home} 0750 ${cfg.user} users -"
       ];
 
-      # Generated config (or custom path)
       environment.etc."monitor365/config.toml".source =
         if cfg.configPath != null
         then cfg.configPath
         else monitor365Config;
 
-      # Systemd user service — needs display/input access
-      home-manager.users.${cfg.user}.systemd.user.services.monitor365 = {
-        Unit = {
-          Description = "Monitor365 Device Monitoring Agent";
-          After = ["network.target" "graphical-session.target"];
-          Wants = ["network.target"];
-          PartOf = ["graphical-session.target"];
-          StartLimitIntervalSec = 600;
-          StartLimitBurst = 5;
-        };
+      home-manager.users.${cfg.user} = {
+        xdg.configFile."monitor365/config.toml".source =
+          if cfg.configPath != null
+          then cfg.configPath
+          else monitor365Config;
 
-        Service = {
-          Type = "simple";
-          ExecStart = "${cfg.package}/bin/monitor365 --config /etc/monitor365/config.toml run";
-          WorkingDirectory = cfg.home;
-          Restart = "on-failure";
-          RestartSec = "10";
-          KillMode = "mixed";
-          TimeoutStopSec = "30";
-          StandardOutput = "journal";
-          StandardError = "journal";
+        systemd.user.services.monitor365 = {
+          Unit = {
+            Description = "Monitor365 Device Monitoring Agent";
+            After = ["network.target" "graphical-session.target"];
+            Wants = ["network.target"];
+            PartOf = ["graphical-session.target"];
+            StartLimitIntervalSec = 600;
+            StartLimitBurst = 5;
+          };
 
-          MemoryMax = "1G";
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          ProtectClock = true;
-          ProtectHostname = true;
-          RestrictNamespaces = true;
-          LockPersonality = true;
-        };
+          Service = {
+            Type = "simple";
+            ExecStart = "${cfg.package}/bin/monitor365 --config /etc/monitor365/config.toml run";
+            WorkingDirectory = cfg.home;
+            Restart = "on-failure";
+            RestartSec = "10";
+            KillMode = "mixed";
+            TimeoutStopSec = "30";
+            StandardOutput = "journal";
+            StandardError = "journal";
 
-        Install = {
-          WantedBy = ["graphical-session.target"];
+            Environment = [
+              "PATH=${runtimePath}:/run/wrappers/bin:%h/.nix-profile/bin:/run/current-system/sw/bin"
+              "DISPLAY=:0"
+            ];
+
+            MemoryMax = "1G";
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            ProtectClock = true;
+            ProtectHostname = true;
+            RestrictNamespaces = true;
+            LockPersonality = true;
+          };
+
+          Install = {
+            WantedBy = ["graphical-session.target"];
+          };
         };
       };
     };
