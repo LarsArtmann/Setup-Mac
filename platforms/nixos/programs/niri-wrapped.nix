@@ -98,7 +98,7 @@
           fi
           current=$(echo "$children" | head -1)
           proc_name=$(cat "/proc/$current/comm" 2>/dev/null || echo "")
-          if echo "$proc_name" | grep -qxE '(fish|bash|zsh|sh|dash|-fish|-bash|-zsh|-sh|sudo|doas)'; then
+          if echo "$proc_name" | grep -qxE '(fish|bash|zsh|sh|dash|kitten|-fish|-bash|-zsh|-sh|sudo|doas)'; then
             continue
           fi
           child_cmd=$(cat "/proc/$current/cmdline" 2>/dev/null | tr '\0' ' ' | sed 's/ $//' || true)
@@ -247,6 +247,11 @@
             child_cmd=$(echo "$entry" | jq -r '.child_cmd // empty')
             child_cwd=$(echo "$entry" | jq -r '.child_cwd // empty')
             has_e=$(echo "$entry" | jq -r '.args | index("-e") // empty')
+
+            if [ -n "$child_cmd" ] && echo "$child_cmd" | grep -q '__atexit__'; then
+              child_cmd=""
+              child_cwd=""
+            fi
 
             if [ -n "$child_cmd" ]; then
               cwd_arg=()
