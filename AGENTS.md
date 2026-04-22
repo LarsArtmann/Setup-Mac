@@ -370,25 +370,27 @@ Declarative NixOS module for the Hermes AI agent gateway (Discord bot, cron sche
 
 | Component | Path | Purpose |
 |-----------|------|---------|
-| NixOS module | `modules/nixos/services/hermes.nix` | flake-parts module — service, tmpfiles, HM integration |
+| NixOS module | `modules/nixos/services/hermes.nix` | flake-parts module — system service, tmpfiles, user/group |
 | Secrets | `platforms/nixos/secrets/hermes.yaml` | sops-encrypted API keys |
-| Config | `~/.hermes/config.yaml` | Hermes runtime config (NOT in repo — Hermes writes at runtime) |
-| Env | `~/.hermes/.env` | Merged from sops template at service start (secrets + non-secret env) |
+| Config | `/var/lib/hermes/config.yaml` | Hermes runtime config (NOT in repo — Hermes writes at runtime) |
+| Env | `/var/lib/hermes/.env` | Merged from sops template at service start (secrets + non-secret env) |
 
 **Architecture:**
 - Installed via flake input `hermes-agent` (pinned in `flake.lock`)
-- Systemd user service managed by Home Manager (`systemd.user.services.hermes-gateway`)
-- Secrets decrypted by sops-nix template → merged into `~/.hermes/.env` via `ExecStartPre` on each start
-- `libopus` installed system-wide for Discord voice support
+- System-level systemd service (`systemd.services.hermes`) targeting `multi-user.target` — starts at boot without login
+- Dedicated system user/group (`hermes`/`hermes`) with state at `/var/lib/hermes`
+- Secrets decrypted by sops-nix template → loaded via `EnvironmentFile` and merged into `.env` via `ExecStartPre`
+- `libopus` installed system-wide for Discord voice support (in `configuration.nix`)
 - `key_env` references in `config.yaml` read API keys from `.env` instead of inline plaintext
 
 **Module options (`services.hermes`):**
 | Option | Default | Description |
 |--------|---------|-------------|
 | `enable` | false | Enable the gateway |
-| `user` | "lars" | User account |
-| `home` | "/home/lars/.hermes" | Hermes home directory |
-| `restartSec` | "30" | Restart delay after failure |
+| `user` | "hermes" | System user |
+| `group` | "hermes" | System group |
+| `stateDir` | "/var/lib/hermes" | State directory |
+| `restartSec` | "5" | Restart delay after failure |
 | `timeoutStopSec` | "120" | Graceful shutdown timeout |
 
 **Sops secrets (`hermes.yaml`):**

@@ -75,8 +75,9 @@ in {
           restartUnits = ["livekit.service"];
         } ["livekit_keys"]
         // mkKeyedSecrets "hermes.yaml" {
-          owner = "lars";
-          group = "users";
+          owner = "hermes";
+          group = "hermes";
+          restartUnits = ["hermes.service"];
         } {
           hermes_discord_bot_token = "discord_bot_token";
           hermes_glm_api_key = "glm_api_key";
@@ -95,8 +96,10 @@ in {
       };
 
       templates."hermes-env" = {
-        owner = "lars";
-        group = "users";
+        owner = "hermes";
+        group = "hermes";
+        mode = "0400";
+        restartUnits = ["hermes.service"];
         content = ''
           DISCORD_BOT_TOKEN=${config.sops.placeholder.hermes_discord_bot_token}
           GLM_API_KEY=${config.sops.placeholder.hermes_glm_api_key}

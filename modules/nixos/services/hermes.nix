@@ -8,14 +8,11 @@
     cfg = config.services.hermes;
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
-
-    waitOnlineScript = pkgs.writeShellScript "hermes-wait-online" ''
-      timeout 60 bash -c 'until ${pkgs.iputils}/bin/ping -c 1 -W 2 9.9.9.9 >/dev/null 2>&1; do sleep 2; done'
-    '';
+    oldStateDir = "/home/lars/.hermes";
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
-      ENV_FILE="${cfg.home}/.env"
+      ENV_FILE="${cfg.stateDir}/.env"
       SOPS_FILE="${sopsEnvPath}"
 
       if [ ! -f "$SOPS_FILE" ]; then
@@ -45,25 +42,51 @@
         echo "$key=$value" >> "$ENV_FILE"
       done < "$SOPS_FILE"
     '';
+
+    migrateScript = pkgs.writeShellScript "hermes-migrate-state" ''
+      set -euo pipefail
+      OLD="${oldStateDir}"
+      NEW="${cfg.stateDir}"
+
+      if [ ! -d "$OLD" ]; then
+        echo "hermes-migrate: no old state at $OLD, skipping migration"
+        exit 0
+      fi
+
+      if [ -d "$NEW" ] && [ "$(ls -A "$NEW" 2>/dev/null)" ]; then
+        echo "hermes-migrate: $NEW already populated, skipping migration"
+        exit 0
+      fi
+
+      echo "hermes-migrate: migrating state from $OLD to $NEW"
+      ${pkgs.rsync}/bin/rsync -a --chown=${cfg.user}:${cfg.group} "$OLD/" "$NEW/"
+      echo "hermes-migrate: migration complete"
+    '';
   in {
     options.services.hermes = {
       enable = lib.mkEnableOption "Hermes AI Agent Gateway";
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
-        description = "User account for the gateway service";
+        default = "hermes";
+        description = "System user for the gateway service";
       };
 
-      home = lib.mkOption {
+      group = lib.mkOption {
         type = lib.types.str;
-        default = "/home/lars/.hermes";
-        description = "Hermes home directory (config, sessions, skills)";
+        default = "hermes";
+        description = "System group for the gateway service";
+      };
+
+      stateDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/hermes";
+        description = "State directory for Hermes (config, sessions, skills, memories)";
       };
 
       restartSec = lib.mkOption {
         type = lib.types.str;
-        default = "30";
+        default = "5";
         description = "Seconds to wait before restarting after failure";
       };
 
@@ -75,42 +98,59 @@
     };
 
     config = lib.mkIf cfg.enable {
-      environment.systemPackages = [
-        hermesPkg
-        pkgs.libopus
-      ];
+      users.groups.${cfg.group} = {};
+
+      users.users.${cfg.user} = {
+        isSystemUser = true;
+        group = cfg.group;
+        home = cfg.stateDir;
+        createHome = false;
+        description = "Hermes AI Agent Gateway service user";
+      };
+
+      environment.systemPackages = [hermesPkg];
 
       systemd.tmpfiles.rules = [
-        "d ${cfg.home} 0750 ${cfg.user} users -"
-        "d ${cfg.home}/sessions 0750 ${cfg.user} users -"
-        "d ${cfg.home}/skills 0750 ${cfg.user} users -"
-        "d ${cfg.home}/memories 0750 ${cfg.user} users -"
-        "d ${cfg.home}/cron 0750 ${cfg.user} users -"
-        "d ${cfg.home}/cache 0750 ${cfg.user} users -"
-        "d ${cfg.home}/logs 0750 ${cfg.user} users -"
+        "d ${cfg.stateDir} 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/sessions 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/skills 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/memories 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/cron 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/cache 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/logs 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/workspace 0750 ${cfg.user} ${cfg.group} -"
       ];
 
-      home-manager.users.${cfg.user}.systemd.user.services.hermes-gateway = {
-        Unit = {
-          Description = "Hermes Agent Gateway - Messaging Platform Integration";
-          After = ["network.target"];
-          StartLimitIntervalSec = 600;
-          StartLimitBurst = 5;
-        };
+      systemd.services.hermes = {
+        description = "Hermes Agent Gateway - Messaging Platform Integration";
+        wantedBy = ["multi-user.target"];
+        after = ["network-online.target"];
+        wants = ["network-online.target"];
+        startLimitIntervalSec = 600;
+        startLimitBurst = 5;
 
-        Service = {
+        path = [
+          hermesPkg
+          pkgs.bash
+          pkgs.coreutils
+          pkgs.git
+        ];
+
+        serviceConfig = {
           Type = "simple";
-          ExecStartPre = [
-            waitOnlineScript
-            mergeEnvScript
-          ];
+          User = cfg.user;
+          Group = cfg.group;
+          ExecStartPre = ["+${migrateScript}" mergeEnvScript];
           ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
-          WorkingDirectory = cfg.home;
+          WorkingDirectory = cfg.stateDir;
           Environment = [
-            "HERMES_HOME=${cfg.home}"
-            "LD_LIBRARY_PATH=/run/current-system/sw/lib"
+            "HOME=${cfg.stateDir}"
+            "HERMES_HOME=${cfg.stateDir}"
+            "HERMES_MANAGED=true"
+            "MESSAGING_CWD=${cfg.stateDir}/workspace"
           ];
-          Restart = "on-failure";
+          EnvironmentFile = sopsEnvPath;
+          Restart = "always";
           RestartSec = cfg.restartSec;
           RestartForceExitStatus = 75;
           KillMode = "mixed";
@@ -119,18 +159,22 @@
           ExecReload = "/bin/kill -USR1 $MAINPID";
           StandardOutput = "journal";
           StandardError = "journal";
+          UMask = "0007";
+          WatchdogSec = "60";
+
           MemoryMax = "4G";
           PrivateTmp = true;
           NoNewPrivileges = true;
+          CapabilityBoundingSet = "";
           ProtectClock = true;
           ProtectHostname = true;
           ProtectKernelLogs = true;
           RestrictNamespaces = true;
+          RestrictSUIDSGID = true;
           LockPersonality = true;
-        };
-
-        Install = {
-          WantedBy = ["default.target"];
+          ProtectSystem = "strict";
+          ProtectHome = true;
+          ReadWritePaths = [cfg.stateDir oldStateDir];
         };
       };
     };
