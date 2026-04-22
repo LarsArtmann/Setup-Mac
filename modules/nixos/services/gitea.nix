@@ -386,8 +386,8 @@
     systemd.services.gitea-generate-token = {
       description = "Generate Gitea API token";
       after = ["gitea.service"];
-      requires = ["gitea.service"];
-      wantedBy = ["multi-user.target"];
+      wants = ["gitea.service"];
+      wantedBy = ["gitea.service"];
       serviceConfig = {
         Type = "oneshot";
         User = "gitea";
@@ -444,8 +444,8 @@
     systemd.services.gitea-runner-token = {
       description = "Generate Gitea Actions runner registration token";
       after = ["gitea.service"];
-      requires = ["gitea.service"];
-      wantedBy = ["multi-user.target"];
+      wants = ["gitea.service"];
+      wantedBy = ["gitea.service"];
       serviceConfig = {
         Type = "oneshot";
         User = "gitea";

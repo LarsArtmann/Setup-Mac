@@ -99,10 +99,10 @@ in {
     };
 
     unsloth-setup = {
-      description = "Unsloth Studio - First-time setup";
+      description = "Unsloth Studio - First-time setup (non-blocking)";
       after = ["network-online.target"];
       wants = ["network-online.target"];
-      wantedBy = ["multi-user.target"];
+      wantedBy = ["unsloth-studio.service"];
       path = with pkgs; [
         python313
         git

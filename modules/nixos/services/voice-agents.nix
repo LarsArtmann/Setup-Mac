@@ -98,7 +98,7 @@
           after = ["docker.service" "network-online.target"];
           requires = ["docker.service"];
           wants = ["network-online.target"];
-          wantedBy = ["multi-user.target"];
+          wantedBy = ["whisper-asr.service"];
           path = [pkgs.docker];
           serviceConfig = {
             Type = "oneshot";

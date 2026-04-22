@@ -251,9 +251,8 @@ in {
         systemd.services.signoz-provision = {
           description = "SigNoz Provisioning — deploy alert rules and dashboards";
           after = ["signoz.service"];
-          requires = ["signoz.service"];
-          partOf = ["signoz.service"];
-          wantedBy = ["multi-user.target"];
+          wants = ["signoz.service"];
+          wantedBy = ["signoz.service"];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
