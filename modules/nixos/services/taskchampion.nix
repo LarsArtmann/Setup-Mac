@@ -14,5 +14,15 @@
         days = 14;
       };
     };
+
+    systemd.services.taskchampion-sync-server.serviceConfig = {
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+      ProtectClock = true;
+      ProtectHostname = true;
+      RestrictNamespaces = true;
+      LockPersonality = true;
+      WatchdogSec = "30";
+    };
   };
 }

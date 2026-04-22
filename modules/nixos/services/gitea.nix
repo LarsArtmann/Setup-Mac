@@ -316,7 +316,7 @@
       # GitHub sync service
       services.gitea-github-sync = {
         description = "Sync all GitHub repos to Gitea";
-        after = ["gitea.service" "network-online.target"];
+        after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
         wants = ["network-online.target"];
         requires = ["gitea.service"];
         path = [pkgs.curl pkgs.jq pkgs.gh];
@@ -328,6 +328,11 @@
             "-/var/lib/gitea/.admin-token.env"
           ];
           ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
+          PrivateTmp = true;
+          ProtectClock = true;
+          ProtectHostname = true;
+          RestrictNamespaces = true;
+          LockPersonality = true;
         };
       };
 
@@ -393,6 +398,11 @@
         User = "gitea";
         Group = "gitea";
         RemainAfterExit = true;
+        PrivateTmp = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
       };
       script = let
         tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
@@ -451,6 +461,11 @@
         User = "gitea";
         Group = "gitea";
         RemainAfterExit = true;
+        PrivateTmp = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
       };
       script = let
         tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''

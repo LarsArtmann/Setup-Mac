@@ -118,6 +118,13 @@ in {
         restartUnits = ["twenty.service"];
       };
 
+      sops.templates."twenty-env" = {
+        content = ''
+          PG_DATABASE_PASSWORD=${config.sops.placeholder.twenty_db_password}
+          APP_SECRET=${config.sops.placeholder.twenty_app_secret}
+        '';
+      };
+
       systemd.tmpfiles.rules = [
         "d ${stateDir} 0755 root root -"
         "d ${stateDir}/backup 0755 root root -"
@@ -135,8 +142,7 @@ in {
 
             preStart = ''
               mkdir -p ${stateDir}
-              printf 'PG_DATABASE_PASSWORD=%s\n' "$(cat ${pgPasswordFile} | tr -d '\n')" > ${stateDir}/.env
-              printf 'APP_SECRET=%s\n' "$(cat ${appSecretFile} | tr -d '\n')" >> ${stateDir}/.env
+              cp ${config.sops.templates."twenty-env".path} ${stateDir}/.env
               chmod 600 ${stateDir}/.env
             '';
 
@@ -146,6 +152,11 @@ in {
               WorkingDirectory = stateDir;
               Restart = "on-failure";
               RestartSec = "10s";
+              PrivateTmp = true;
+              ProtectClock = true;
+              ProtectHostname = true;
+              RestrictNamespaces = true;
+              LockPersonality = true;
             };
           };
 

@@ -54,10 +54,24 @@
         immich-server.serviceConfig = {
           Restart = lib.mkForce "on-failure";
           RestartSec = lib.mkForce "5s";
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          ProtectClock = true;
+          ProtectHostname = true;
+          RestrictNamespaces = true;
+          LockPersonality = true;
+          WatchdogSec = "30";
         };
         immich-machine-learning.serviceConfig = {
           Restart = lib.mkForce "on-failure";
           RestartSec = lib.mkForce "10s";
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          ProtectClock = true;
+          ProtectHostname = true;
+          RestrictNamespaces = true;
+          LockPersonality = true;
+          WatchdogSec = "30";
         };
         immich-db-backup = {
           description = "Immich PostgreSQL database backup";

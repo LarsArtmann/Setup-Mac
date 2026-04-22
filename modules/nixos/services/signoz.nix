@@ -243,8 +243,17 @@ in {
             Group = "signoz";
             WorkingDirectory = cfg.settings.queryService.dataDir;
             ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
+            ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
             Restart = "on-failure";
             RestartSec = 10;
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            ProtectClock = true;
+            ProtectHostname = true;
+            ProtectKernelLogs = true;
+            RestrictNamespaces = true;
+            LockPersonality = true;
+            WatchdogSec = "30";
           };
         };
 
@@ -570,6 +579,13 @@ in {
             ExecStart = "${pkgs.cadvisor}/bin/cadvisor --listen_ip=127.0.0.1 --port=9110 --docker_only=true";
             Restart = "on-failure";
             RestartSec = 5;
+            PrivateTmp = true;
+            NoNewPrivileges = lib.mkForce false;
+            ProtectClock = true;
+            ProtectHostname = true;
+            RestrictNamespaces = true;
+            LockPersonality = true;
+            WatchdogSec = "30";
           };
         };
       })
@@ -578,8 +594,8 @@ in {
         users.groups.systemd-journal-member = lib.mkIf (cfg.components.nodeExporter || cfg.components.cadvisor) {};
         systemd.services.signoz-collector = {
           description = "SigNoz OTel Collector";
-          after = ["signoz.service"];
-          wants = ["signoz.service"];
+          after = ["signoz.service"] ++ lib.optional cfg.components.clickhouse "clickhouse.service";
+          wants = ["signoz.service"] ++ lib.optional cfg.components.clickhouse "clickhouse.service";
           wantedBy = ["multi-user.target"];
           preStart = ''
             ${packages.otelCollector}/bin/signoz-otel-collector migrate bootstrap \
@@ -600,6 +616,14 @@ in {
             ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             Restart = "on-failure";
             RestartSec = 10;
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            ProtectClock = true;
+            ProtectHostname = true;
+            ProtectKernelLogs = true;
+            RestrictNamespaces = true;
+            LockPersonality = true;
+            WatchdogSec = "30";
           };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {

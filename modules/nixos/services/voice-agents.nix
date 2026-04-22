@@ -116,8 +116,9 @@
           wantedBy = ["multi-user.target"];
           path = [pkgs.docker pkgs.docker-compose];
           serviceConfig = {
-            Type = "oneshot";
+            Type = "forking";
             RemainAfterExit = true;
+            PIDFile = "/run/whisper-asr.pid";
             # Restart container if it crashes
             ExecStartPre = ["-${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans"];
             ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
@@ -125,6 +126,11 @@
             TimeoutStartSec = 180;
             Restart = "on-failure";
             RestartSec = "10";
+            PrivateTmp = true;
+            ProtectClock = true;
+            ProtectHostname = true;
+            RestrictNamespaces = true;
+            LockPersonality = true;
           };
         };
       };

@@ -57,6 +57,12 @@
       serviceConfig = {
         Restart = "on-failure";
         RestartSec = "10s";
+        PrivateTmp = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
+        WatchdogSec = "30";
       };
     };
 

@@ -246,7 +246,7 @@
       # Systemd service to ensure repos exist
       systemd.services.gitea-ensure-repos = lib.mkIf cfg.autoSync {
         description = "Ensure GitHub repos are mirrored to Gitea";
-        after = ["gitea.service" "network-online.target"];
+        after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
         wants = ["network-online.target"];
         requires = ["gitea.service"];
         path = [pkgs.curl pkgs.jq pkgs.gh pkgs.sops pkgs.bash];

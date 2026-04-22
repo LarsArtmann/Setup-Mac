@@ -26,6 +26,14 @@
         StateDirectory = "homepage-dashboard";
         Restart = "on-failure";
         RestartSec = "5s";
+        PrivateTmp = true;
+        NoNewPrivileges = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        ProtectKernelLogs = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
+        WatchdogSec = "30";
       };
     };
 

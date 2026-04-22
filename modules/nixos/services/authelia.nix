@@ -201,6 +201,15 @@
       serviceConfig = {
         StateDirectory = lib.mkForce "authelia-main";
         StateDirectoryMode = lib.mkForce "0750";
+        PrivateTmp = true;
+        NoNewPrivileges = true;
+        ProtectClock = true;
+        ProtectHostname = true;
+        ProtectKernelLogs = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
+        WatchdogSec = "30";
+        ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
       };
     };
 

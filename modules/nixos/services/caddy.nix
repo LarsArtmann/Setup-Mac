@@ -2,6 +2,7 @@
   flake.nixosModules.caddy = {
     config,
     pkgs,
+    lib,
     ...
   }: let
     inherit (config.networking) domain;
@@ -63,5 +64,19 @@
     };
 
     networking.firewall.allowedTCPPorts = [80 443];
+
+    systemd.services.caddy = {
+      after = ["authelia-main.service"];
+      wants = ["authelia-main.service"];
+      serviceConfig = {
+        PrivateTmp = true;
+        NoNewPrivileges = lib.mkForce false;
+        ProtectClock = true;
+        ProtectHostname = true;
+        RestrictNamespaces = true;
+        LockPersonality = true;
+        WatchdogSec = "30";
+      };
+    };
   };
 }

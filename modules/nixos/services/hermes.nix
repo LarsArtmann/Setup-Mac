@@ -13,34 +13,22 @@
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
       ENV_FILE="${cfg.stateDir}/.env"
-      SOPS_FILE="${sopsEnvPath}"
-
-      if [ ! -f "$SOPS_FILE" ]; then
-        echo "hermes-merge-env: sops template not found at $SOPS_FILE, waiting..." >&2
-        for i in $(seq 1 30); do
-          [ -f "$SOPS_FILE" ] && break
-          sleep 1
-        done
-        if [ ! -f "$SOPS_FILE" ]; then
-          echo "hermes-merge-env: sops template still missing after 30s, aborting" >&2
-          exit 1
-        fi
-      fi
 
       if [ ! -f "$ENV_FILE" ]; then
         touch "$ENV_FILE"
         chmod 600 "$ENV_FILE"
       fi
 
-      while IFS= read -r line || [ -n "$line" ]; do
-        key="''${line%%=*}"
-        value="''${line#*=}"
+      # Write non-secret env vars only (secrets come from sops via EnvironmentFile)
+      for pair in "OLLAMA_API_KEY=ollama" "TERMINAL_ENV=local"; do
+        key="''${pair%%=*}"
+        value="''${pair#*=}"
         [ -z "$key" ] && continue
         if grep -q "^''${key}=" "$ENV_FILE" 2>/dev/null; then
           ${pkgs.gnused}/bin/sed -i "/^''${key}=/d" "$ENV_FILE"
         fi
         echo "$key=$value" >> "$ENV_FILE"
-      done < "$SOPS_FILE"
+      done
     '';
 
     migrateScript = pkgs.writeShellScript "hermes-migrate-state" ''
@@ -166,6 +154,7 @@
             "HERMES_MANAGED=true"
             "MESSAGING_CWD=${cfg.stateDir}/workspace"
           ];
+          EnvironmentFile = [sopsEnvPath];
           Restart = "always";
           RestartSec = cfg.restartSec;
           RestartForceExitStatus = 75;
