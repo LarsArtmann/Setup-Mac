@@ -336,12 +336,14 @@
                 set -euo pipefail
                 nh os switch . 2>&1
               ''}/bin/deploy";
+              meta.description = "Deploy NixOS config to evo-x2 via nh";
             };
             validate = {
               type = "app";
               program = "${pkgs.writeShellScriptBin "validate" ''
                 nix --extra-experimental-features "nix-command flakes" flake check --no-build
               ''}/bin/validate";
+              meta.description = "Validate flake without building";
             };
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
@@ -360,6 +362,7 @@
                 echo "=== dnsblockd Stats ==="
                 ${pkgs.curl}/bin/curl -s http://127.0.0.1:9090/stats 2>/dev/null || echo "Stats unavailable"
               ''}/bin/dns-diagnostics";
+              meta.description = "Run DNS stack diagnostics (resolution, blocking, stats)";
             };
           };
       };

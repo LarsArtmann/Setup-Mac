@@ -14,6 +14,9 @@
       # Secrets managed via sops-nix (see platforms/nixos/services/sops.nix)
       set -euo pipefail
 
+      REPOS_FILE=$(mktemp)
+      trap 'rm -f "$REPOS_FILE"' EXIT
+
       GITEA_URL="http://localhost:3000"
       GITEA_TOKEN="''${GITEA_TOKEN:-}"
       GITHUB_TOKEN="''${GITHUB_TOKEN:-}"
@@ -45,7 +48,7 @@
       while true; do
         response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/users/$GITHUB_USER/repos?per_page=100&page=$page&type=all")
-        echo "$response" | jq -r '.[] | "\(.name)|\(.clone_url)|\(.private)|\(.description // "")"' >> /tmp/gitea-repos-$$.txt
+        echo "$response" | jq -r '.[] | "\(.name)|\(.clone_url)|\(.private)|\(.description // "")"' >> "$REPOS_FILE"
         [[ $(echo "$response" | jq 'length') -lt 100 ]] && break
         page=$((page + 1))
       done
@@ -89,9 +92,8 @@
               milestones: true,
               service: "git"
             }')"
-      done < /tmp/gitea-repos-$$.txt
-      count=$(wc -l < /tmp/gitea-repos-$$.txt)
-      rm -f /tmp/gitea-repos-$$.txt
+      done < "$REPOS_FILE"
+      count=$(wc -l < "$REPOS_FILE")
 
       echo "✓ Done! $count repos processed"
     '';
@@ -100,6 +102,9 @@
     mirrorStarredScript = pkgs.writeShellScriptBin "gitea-mirror-starred" ''
       # Mirror all starred repos from GitHub to Gitea
       set -euo pipefail
+
+      STARRED_FILE=$(mktemp)
+      trap 'rm -f "$STARRED_FILE"' EXIT
 
       GITEA_URL="http://localhost:3000"
       GITEA_TOKEN="''${GITEA_TOKEN:-}"
@@ -136,7 +141,7 @@
       while true; do
         response=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
           "https://api.github.com/users/$GITHUB_USER/starred?per_page=100&page=$page")
-        echo "$response" | jq -r '.[] | "\(.full_name)|\(.clone_url)|\(.description // "")"' >> /tmp/gitea-starred-$$.txt
+        echo "$response" | jq -r '.[] | "\(.full_name)|\(.clone_url)|\(.description // "")"' >> "$STARRED_FILE"
         [[ $(echo "$response" | jq 'length') -lt 100 ]] && break
         page=$((page + 1))
       done
@@ -180,8 +185,7 @@
               milestones: true,
               service: "git"
             }')"
-      done < /tmp/gitea-starred-$$.txt
-      rm -f /tmp/gitea-starred-$$.txt
+      done < "$STARRED_FILE"
 
       echo "✓ Done!"
     '';

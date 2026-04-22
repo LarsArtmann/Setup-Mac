@@ -88,7 +88,7 @@ _: {
       [storage]
       path = "${cfg.home}"
       retention_days = ${toString cfg.retentionDays}
-      encryption = false
+      encryption = true
       compression_level = 3
 
       ${lib.optionalString cfg.activityWatch.enable ''

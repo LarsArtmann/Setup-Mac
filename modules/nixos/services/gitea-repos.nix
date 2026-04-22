@@ -16,10 +16,10 @@
       GITEA_URL="http://localhost:3000"
       REPOS=(${lib.concatStringsSep " " (map (r: "\"${r}\"") cfg.repos)})
 
-      # Get tokens from sops secrets
-      GITEA_TOKEN=$(cat /run/secrets/gitea_token)
-      GITHUB_TOKEN=$(gh auth token)
-      GITHUB_USER=$(cat /run/secrets/github_user)
+      # Get tokens from environment (provided via sops template EnvironmentFile)
+      GITEA_TOKEN="''${GITEA_TOKEN:-}"
+      GITHUB_TOKEN="''${GITHUB_TOKEN:-$(gh auth token)}"
+      GITHUB_USER="''${GITHUB_USER:-}"
 
       if [[ -z "$GITEA_TOKEN" ]]; then
         echo "Error: GITEA_TOKEN not set in sops secrets"

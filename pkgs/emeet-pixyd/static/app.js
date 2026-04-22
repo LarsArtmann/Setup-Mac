@@ -2,6 +2,7 @@
   "use strict";
 
   htmx.config.timeout = 10000;
+  htmx.config.allowEval = false;
 
   var pendingRequests = new Set();
   var consecutiveErrors = 0;

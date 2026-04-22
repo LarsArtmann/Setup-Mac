@@ -108,23 +108,6 @@ activitywatch-stop:
     @sleep 2
     @pgrep -f ActivityWatch > /dev/null && echo "❌ ActivityWatch still running" || echo "✅ ActivityWatch stopped"
 
-# Fix ActivityWatch permissions (macOS Accessibility)
-activitywatch-fix-permissions:
-    @echo "🔧 Fixing ActivityWatch permissions..."
-    @echo ""
-    @echo "This will reset and re-grant Accessibility permissions for URL tracking."
-    @echo ""
-    @bash dotfiles/activitywatch/fix-permissions.sh
-
-# Install aw-watcher-utilization on macOS (manual install for Homebrew ActivityWatch)
-activitywatch-install-utilization:
-    @echo "📊 Installing aw-watcher-utilization..."
-    @echo ""
-    @echo "This installs the utilization watcher for ActivityWatch."
-    @echo "Monitors: CPU, RAM, disk, network, and hardware sensors"
-    @echo ""
-    @bash dotfiles/activitywatch/install-utilization.sh
-
 # Gitea repository management (NixOS only)
 gitea-update-token:
     @PLATFORM=$(just _detect_platform); \
