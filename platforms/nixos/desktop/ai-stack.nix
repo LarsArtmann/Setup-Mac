@@ -1,6 +1,7 @@
 {
   pkgs,
   config,
+  lib,
   ...
 }: let
   inherit (pkgs.rocmPackages) rocwmma;
@@ -60,201 +61,219 @@
   studioFrontend = "${sitePkgs}/studio/frontend";
   studioReq = "${studioBackend}/requirements";
   setupDone = "${unslothDataDir}/.studio-setup-done";
+
+  cfg = config.services.unslothStudio;
 in {
-  security.pam.loginLimits = [
-    {
-      domain = "*";
-      type = "hard";
-      item = "memlock";
-      value = "unlimited";
-    }
-    {
-      domain = "*";
-      type = "soft";
-      item = "memlock";
-      value = "unlimited";
-    }
-  ];
-
-  services.ollama = {
-    enable = true;
-    package = ollama-rocm-0_20;
-    home = "/data/models/ollama";
-    host = "127.0.0.1";
-    port = 11434;
-    environmentVariables =
-      rocmEnv
-      // {
-        OLLAMA_FLASH_ATTENTION = "1";
-        OLLAMA_NUM_PARALLEL = "4";
-        OLLAMA_KV_CACHE_TYPE = "q8_0";
-        OLLAMA_KEEP_ALIVE = "24h";
-      };
+  options = {
+    services.unslothStudio.enable = lib.mkEnableOption "Unsloth Studio - AI Model Training & Inference UI" // {
+      default = false;
+    };
   };
 
-  systemd.services = {
-    ollama.serviceConfig = {
-      SupplementaryGroups = ["render" "users"];
-      UMask = pkgs.lib.mkForce "0007";
-    };
-
-    unsloth-setup = {
-      description = "Unsloth Studio - First-time setup (non-blocking)";
-      after = ["network-online.target"];
-      wants = ["network-online.target"];
-      wantedBy = ["unsloth-studio.service"];
-      path = with pkgs; [
-        python313
-        git
-        gcc
-        gnumake
-        cmake
-        ninja
-        cacert
-        nodejs_22
-        coreutils
-        bash
+  config = lib.mkMerge [
+    # Always-on config
+    {
+      security.pam.loginLimits = [
+        {
+          domain = "*";
+          type = "hard";
+          item = "memlock";
+          value = "unlimited";
+        }
+        {
+          domain = "*";
+          type = "soft";
+          item = "memlock";
+          value = "unlimited";
+        }
       ];
-      environment = {
-        HOME = unslothDataDir;
-        PYTHONDONTWRITEBYTECODE = "1";
+
+      services.ollama = {
+        enable = true;
+        package = ollama-rocm-0_20;
+        home = "/data/models/ollama";
+        host = "127.0.0.1";
+        port = 11434;
+        environmentVariables =
+          rocmEnv
+          // {
+            OLLAMA_FLASH_ATTENTION = "1";
+            OLLAMA_NUM_PARALLEL = "4";
+            OLLAMA_KV_CACHE_TYPE = "q8_0";
+            OLLAMA_KEEP_ALIVE = "24h";
+          };
       };
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = pkgs.writeShellScript "unsloth-setup" ''
-          set -euo pipefail
 
-          if [ ! -f ${venvPython} ]; then
-            echo "Creating Python venv..."
-            ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
-            ${venvPip} install --no-cache-dir --upgrade pip setuptools wheel
-            echo "Installing PyTorch ROCm 6.3 (~4.9GB)..."
-            ${venvPip} install --no-cache-dir \
-              torch torchvision torchaudio \
-              --index-url https://download.pytorch.org/whl/rocm6.3
-            echo "Installing unsloth[amd]..."
-            ${venvPip} install --no-cache-dir \
-              "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
-            echo "CLI install complete."
-          fi
-
-          if [ -f ${setupDone} ]; then
-            echo "Studio setup already complete, skipping."
-            exit 0
-          fi
-
-          echo "Installing studio Python dependencies..."
-          ${venvPip} install --no-cache-dir structlog
-          ${venvPip} install --no-cache-dir -r ${studioReq}/base.txt
-          ${venvPip} install --no-cache-dir -r ${studioReq}/extras.txt
-          ${venvPip} install --no-deps --no-cache-dir -r ${studioReq}/extras-no-deps.txt
-          ${venvPip} install --force-reinstall --no-cache-dir -r ${studioReq}/overrides.txt
-
-          if [ -f ${studioReq}/triton-kernels.txt ]; then
-            ${venvPip} install --no-deps --no-cache-dir -r ${studioReq}/triton-kernels.txt
-          fi
-
-          ${venvPip} install --no-cache-dir -r ${studioReq}/studio.txt
-
-          if [ -f ${studioReq}/single-env/data-designer-deps.txt ]; then
-            ${venvPip} install --no-cache-dir \
-              -c ${studioReq}/single-env/constraints.txt \
-              -r ${studioReq}/single-env/data-designer-deps.txt
-            ${venvPip} install --no-deps --no-cache-dir \
-              -c ${studioReq}/single-env/constraints.txt \
-              -r ${studioReq}/single-env/data-designer.txt
-          fi
-
-          echo "Building frontend..."
-          tmpdir=$(mktemp -d)
-          cp -r ${studioFrontend}/* "$tmpdir"/
-          cd "$tmpdir"
-          ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
-          ${pkgs.nodejs_22}/bin/npm run build
-          mkdir -p ${studioFrontend}/dist
-          cp -r dist/* ${studioFrontend}/dist/
-          rm -rf "$tmpdir"
-
-          if [ -f ${studioBackend}/core/data_recipe/oxc-validator/package.json ]; then
-            tmpdir=$(mktemp -d)
-            cp -r ${studioBackend}/core/data_recipe/oxc-validator/* "$tmpdir"/
-            cd "$tmpdir"
-            ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
-            cp -r node_modules ${studioBackend}/core/data_recipe/oxc-validator/
-            rm -rf "$tmpdir"
-          fi
-
-          date -Iseconds > ${setupDone}
-          echo "Studio setup complete."
-        '';
-        User = "lars";
-        Group = "users";
-        TimeoutStartSec = "3600";
-      };
-    };
-
-    unsloth-studio = {
-      description = "Unsloth Studio - AI Model Training & Inference UI";
-      after = ["network.target" "unsloth-setup.service"];
-      requires = ["unsloth-setup.service"];
-      wantedBy = ["multi-user.target"];
-      path = with pkgs; [git python313 llama-cpp-rocwmma];
-      environment =
-        rocmEnv
-        // {
-          HOME = unslothDataDir;
-          LLAMA_SERVER_PATH = "${llama-cpp-rocwmma}/bin/llama-server";
-          LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath rocmRuntimeLibs;
+      systemd.services = {
+        ollama.serviceConfig = {
+          SupplementaryGroups = ["render" "users"];
+          UMask = pkgs.lib.mkForce "0007";
         };
-      unitConfig = {
-        ConditionPathExists = setupDone;
       };
-      serviceConfig = {
-        Type = "simple";
-        ExecStartPre = "${venvPip} install --no-cache-dir structlog";
-        ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
-        User = "lars";
-        Group = "video";
-        WorkingDirectory = "${unslothDataDir}/workspace";
-        Restart = "on-failure";
-        RestartSec = "10s";
-        SupplementaryGroups = ["render"];
-        TimeoutStartSec = "60";
+
+      environment.systemPackages = with pkgs; [
+        llama-cpp-rocwmma
+        tesseract5
+        poppler-utils
+        jupyter
+        python313
+      ];
+
+      systemd.tmpfiles.rules = [
+        "d /data/models/ollama 0755 lars users -"
+        "d /data/models/ollama/models 0775 lars users -"
+        "d /data/models 0755 lars users -"
+      ];
+
+      environment.sessionVariables = {
+        OLLAMA_MODELS = "/data/models/ollama/models";
+        OLLAMA_HOST = "127.0.0.1:11434";
+        ROCBLAS_USE_HIPBLASLT = "1";
+        HF_HOME = "/data/cache/huggingface";
+        HUGGINGFACE_HUB_CACHE = "/data/cache/huggingface/hub";
+        TRANSFORMERS_CACHE = "/data/cache/huggingface/transformers";
+        UNSLOTH_MODELS = "/data/models";
+        LLAMA_MODEL_PATH = "/data/models";
       };
-    };
-  };
+    }
 
-  environment.systemPackages = with pkgs; [
-    llama-cpp-rocwmma
-    tesseract5
-    poppler-utils
-    jupyter
-    python313
+    # Conditional: Unsloth Studio
+    (lib.mkIf cfg.enable {
+      systemd.services = {
+        unsloth-setup = {
+          description = "Unsloth Studio - First-time setup (non-blocking)";
+          after = ["network-online.target"];
+          wants = ["network-online.target"];
+          wantedBy = ["unsloth-studio.service"];
+          path = with pkgs; [
+            python313
+            git
+            gcc
+            gnumake
+            cmake
+            ninja
+            cacert
+            nodejs_22
+            coreutils
+            bash
+          ];
+          environment = {
+            HOME = unslothDataDir;
+            PYTHONDONTWRITEBYTECODE = "1";
+          };
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+            ExecStart = pkgs.writeShellScript "unsloth-setup" ''
+              set -euo pipefail
+
+              if [ ! -f ${venvPython} ]; then
+                echo "Creating Python venv..."
+                ${pkgs.python313}/bin/python -m venv ${unslothDataDir}/venv
+                ${venvPip} install --no-cache-dir --upgrade pip setuptools wheel
+                echo "Installing PyTorch ROCm 6.3 (~4.9GB)..."
+                ${venvPip} install --no-cache-dir \
+                  torch torchvision torchaudio \
+                  --index-url https://download.pytorch.org/whl/rocm6.3
+                echo "Installing unsloth[amd]..."
+                ${venvPip} install --no-cache-dir \
+                  "unsloth[amd] @ git+https://github.com/unslothai/unsloth"
+                echo "CLI install complete."
+              fi
+
+              if [ -f ${setupDone} ]; then
+                echo "Studio setup already complete, skipping."
+                exit 0
+              fi
+
+              echo "Installing studio Python dependencies..."
+              ${venvPip} install --no-cache-dir structlog
+              ${venvPip} install --no-cache-dir -r ${studioReq}/base.txt
+              ${venvPip} install --no-cache-dir -r ${studioReq}/extras.txt
+              ${venvPip} install --no-deps --no-cache-dir -r ${studioReq}/extras-no-deps.txt
+              ${venvPip} install --force-reinstall --no-cache-dir -r ${studioReq}/overrides.txt
+
+              if [ -f ${studioReq}/triton-kernels.txt ]; then
+                ${venvPip} install --no-deps --no-cache-dir -r ${studioReq}/triton-kernels.txt
+              fi
+
+              ${venvPip} install --no-cache-dir -r ${studioReq}/studio.txt
+
+              if [ -f ${studioReq}/single-env/data-designer-deps.txt ]; then
+                ${venvPip} install --no-cache-dir \
+                  -c ${studioReq}/single-env/constraints.txt \
+                  -r ${studioReq}/single-env/data-designer-deps.txt
+                ${venvPip} install --no-deps --no-cache-dir \
+                  -c ${studioReq}/single-env/constraints.txt \
+                  -r ${studioReq}/single-env/data-designer.txt
+              fi
+
+              echo "Building frontend..."
+              tmpdir=$(mktemp -d)
+              cp -r ${studioFrontend}/* "$tmpdir"/
+              cd "$tmpdir"
+              ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
+              ${pkgs.nodejs_22}/bin/npm run build
+              mkdir -p ${studioFrontend}/dist
+              cp -r dist/* ${studioFrontend}/dist/
+              rm -rf "$tmpdir"
+
+              if [ -f ${studioBackend}/core/data_recipe/oxc-validator/package.json ]; then
+                tmpdir=$(mktemp -d)
+                cp -r ${studioBackend}/core/data_recipe/oxc-validator/* "$tmpdir"/
+                cd "$tmpdir"
+                ${pkgs.nodejs_22}/bin/npm install --no-fund --no-audit --loglevel=error
+                cp -r node_modules ${studioBackend}/core/data_recipe/oxc-validator/
+                rm -rf "$tmpdir"
+              fi
+
+              date -Iseconds > ${setupDone}
+              echo "Studio setup complete."
+            '';
+            User = "lars";
+            Group = "users";
+            TimeoutStartSec = "3600";
+          };
+        };
+
+        unsloth-studio = {
+          description = "Unsloth Studio - AI Model Training & Inference UI";
+          after = ["network.target" "unsloth-setup.service"];
+          requires = ["unsloth-setup.service"];
+          wantedBy = ["multi-user.target"];
+          path = with pkgs; [git python313 llama-cpp-rocwmma];
+          environment =
+            rocmEnv
+            // {
+              HOME = unslothDataDir;
+              LLAMA_SERVER_PATH = "${llama-cpp-rocwmma}/bin/llama-server";
+              LD_LIBRARY_PATH = with pkgs; lib.makeLibraryPath rocmRuntimeLibs;
+            };
+          unitConfig = {
+            ConditionPathExists = setupDone;
+          };
+          serviceConfig = {
+            Type = "simple";
+            ExecStartPre = "${venvPip} install --no-cache-dir structlog";
+            ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
+            User = "lars";
+            Group = "video";
+            WorkingDirectory = "${unslothDataDir}/workspace";
+            Restart = "on-failure";
+            RestartSec = "10s";
+            SupplementaryGroups = ["render"];
+            TimeoutStartSec = "60";
+          };
+        };
+      };
+
+      systemd.tmpfiles.rules = [
+        "d ${unslothDataDir} 0755 lars users -"
+        "d ${unslothDataDir}/workspace 0755 lars users -"
+        "d ${unslothDataDir}/models 0755 lars users -"
+        "d ${unslothDataDir}/.unsloth 0755 lars users -"
+        "d ${unslothDataDir}/.unsloth/studio 0755 lars users -"
+      ];
+    })
   ];
-
-  systemd.tmpfiles.rules = [
-    "d /data/models/ollama 0755 lars users -"
-    "d /data/models/ollama/models 0775 lars users -"
-    "d ${unslothDataDir} 0755 lars users -"
-    "d ${unslothDataDir}/workspace 0755 lars users -"
-    "d ${unslothDataDir}/models 0755 lars users -"
-    "d ${unslothDataDir}/.unsloth 0755 lars users -"
-    "d ${unslothDataDir}/.unsloth/studio 0755 lars users -"
-    "d /data/models 0755 lars users -"
-  ];
-
-  environment.sessionVariables = {
-    OLLAMA_MODELS = "/data/models/ollama/models";
-    OLLAMA_HOST = "127.0.0.1:11434";
-    ROCBLAS_USE_HIPBLASLT = "1";
-    # HuggingFace cache locations (centralized on /data)
-    HF_HOME = "/data/cache/huggingface";
-    HUGGINGFACE_HUB_CACHE = "/data/cache/huggingface/hub";
-    TRANSFORMERS_CACHE = "/data/cache/huggingface/transformers";
-    # Unsloth model location
-    UNSLOTH_MODELS = "/data/models";
-    # Llama.cpp model location
-    LLAMA_MODEL_PATH = "/data/models";
-  };
 }
