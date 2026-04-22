@@ -145,6 +145,7 @@ in {
           fi
 
           echo "Installing studio Python dependencies..."
+          ${venvPip} install --no-cache-dir structlog
           ${venvPip} install --no-cache-dir -r ${studioReq}/base.txt
           ${venvPip} install --no-cache-dir -r ${studioReq}/extras.txt
           ${venvPip} install --no-deps --no-cache-dir -r ${studioReq}/extras-no-deps.txt
@@ -211,6 +212,7 @@ in {
       };
       serviceConfig = {
         Type = "simple";
+        ExecStartPre = "${venvPip} install --no-cache-dir structlog";
         ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
         User = "lars";
         Group = "video";
