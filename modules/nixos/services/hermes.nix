@@ -111,15 +111,32 @@
       environment.systemPackages = [hermesPkg];
 
       systemd.tmpfiles.rules = [
-        "d ${cfg.stateDir} 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/sessions 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/skills 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/memories 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/cron 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/cache 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/logs 0750 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/workspace 0750 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}           2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/sessions  2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/skills    2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/memories  2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/cron      2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/cache     2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/logs      2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/workspace 2770 ${cfg.user} ${cfg.group} -"
       ];
+
+      system.activationScripts."hermes-setup" =
+        lib.stringAfter (["users"] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
+          mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+          chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
+          chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+
+          find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
+            -exec chmod g+rw {} + 2>/dev/null || true
+          for _subdir in sessions skills memories cron cache logs; do
+            find "${cfg.stateDir}/$_subdir" -type f -exec chmod g+rw {} + 2>/dev/null || true
+          done
+
+          touch ${cfg.stateDir}/.managed
+          chown ${cfg.user}:${cfg.group} ${cfg.stateDir}/.managed
+          chmod 0644 ${cfg.stateDir}/.managed
+        '';
 
       systemd.services.hermes = {
         description = "Hermes Agent Gateway - Messaging Platform Integration";
@@ -149,7 +166,6 @@
             "HERMES_MANAGED=true"
             "MESSAGING_CWD=${cfg.stateDir}/workspace"
           ];
-          EnvironmentFile = sopsEnvPath;
           Restart = "always";
           RestartSec = cfg.restartSec;
           RestartForceExitStatus = 75;
@@ -160,7 +176,6 @@
           StandardOutput = "journal";
           StandardError = "journal";
           UMask = "0007";
-          WatchdogSec = "60";
 
           MemoryMax = "4G";
           PrivateTmp = true;
@@ -174,7 +189,7 @@
           LockPersonality = true;
           ProtectSystem = "strict";
           ProtectHome = true;
-          ReadWritePaths = [cfg.stateDir oldStateDir];
+          ReadWritePaths = [cfg.stateDir];
         };
       };
     };
