@@ -9,7 +9,6 @@
   var streamRetryDelay = 3000;
   var maxStreamRetryDelay = 30000;
   var maxToasts = 3;
-  var pollInterval = null;
 
   document.body.addEventListener("doAction", function (e) {
     htmx.ajax("POST", e.detail.url, {
@@ -25,33 +24,6 @@
       if (elt && elt.classList.contains("ptz-slider")) {
         e.detail.parameters.value = elt.value;
       }
-    }
-  });
-
-  function startPolling() {
-    if (pollInterval) return;
-    pollInterval = setInterval(function () {
-      if (document.visibilityState !== "visible") return;
-      var panel = document.getElementById("status-panel");
-      if (panel) htmx.trigger(panel, "refresh");
-    }, 3000);
-  }
-
-  function stopPolling() {
-    if (pollInterval) {
-      clearInterval(pollInterval);
-      pollInterval = null;
-    }
-  }
-
-  startPolling();
-
-  document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") {
-      startPolling();
-      streamRetryDelay = 3000;
-    } else {
-      stopPolling();
     }
   });
 
@@ -112,18 +84,16 @@
 
   document.addEventListener("htmx:beforeRequest", function (e) {
     var path = e.detail.pathInfo && e.detail.pathInfo.requestPath;
-    if (!path) return;
-    if (pendingRequests.has(path)) {
+    if (path === "/panel" && document.visibilityState !== "visible") {
       e.detail.xhr.abort();
       return;
     }
-    pendingRequests.add(path);
-    var elt = e.detail.elt;
-    if (elt && elt.tagName === "BUTTON") {
-      elt.disabled = true;
-      elt.classList.add("btn-loading");
+    if (path && pendingRequests.has(path)) {
+      e.detail.xhr.abort();
+      return;
     }
-    if (path.indexOf("/api/ptz/") === 0) {
+    if (path) pendingRequests.add(path);
+    if (path && path.indexOf("/api/ptz/") === 0) {
       var axis = path.split("/").pop();
       var slider = document.getElementById("slider-" + axis);
       if (slider) slider.classList.add("sending");
@@ -140,12 +110,6 @@
         var slider = document.getElementById("slider-" + axis);
         if (slider) slider.classList.remove("sending");
       }
-    }
-
-    var elt = e.detail.elt;
-    if (elt && elt.tagName === "BUTTON") {
-      elt.disabled = false;
-      elt.classList.remove("btn-loading");
     }
 
     if (e.detail.failed) {
@@ -213,6 +177,12 @@
 
   document.addEventListener("htmx:timeout", function () {
     showToast("Request timed out", "error");
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") {
+      streamRetryDelay = 3000;
+    }
   });
 
   document.addEventListener("keydown", function (e) {

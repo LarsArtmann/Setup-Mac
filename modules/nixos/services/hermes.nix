@@ -90,7 +90,7 @@
 
       users.users.${cfg.user} = {
         isSystemUser = true;
-        group = cfg.group;
+        inherit (cfg) group;
         home = cfg.stateDir;
         createHome = false;
         description = "Hermes AI Agent Gateway service user";

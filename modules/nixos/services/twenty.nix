@@ -107,22 +107,23 @@ in {
     };
 
     config = lib.mkIf cfg.enable {
-      sops.secrets.twenty_app_secret = {
-        owner = "root";
-        group = "root";
-        restartUnits = ["twenty.service"];
-      };
-      sops.secrets.twenty_db_password = {
-        owner = "root";
-        group = "root";
-        restartUnits = ["twenty.service"];
-      };
-
-      sops.templates."twenty-env" = {
-        content = ''
-          PG_DATABASE_PASSWORD=${config.sops.placeholder.twenty_db_password}
-          APP_SECRET=${config.sops.placeholder.twenty_app_secret}
-        '';
+      sops = {
+        secrets.twenty_app_secret = {
+          owner = "root";
+          group = "root";
+          restartUnits = ["twenty.service"];
+        };
+        secrets.twenty_db_password = {
+          owner = "root";
+          group = "root";
+          restartUnits = ["twenty.service"];
+        };
+        templates."twenty-env" = {
+          content = ''
+            PG_DATABASE_PASSWORD=${config.sops.placeholder.twenty_db_password}
+            APP_SECRET=${config.sops.placeholder.twenty_app_secret}
+          '';
+        };
       };
 
       systemd.tmpfiles.rules = [

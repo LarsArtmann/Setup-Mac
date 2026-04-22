@@ -646,9 +646,11 @@ input[type="range"]:focus-visible {
   pointer-events: none;
 }
 
-.btn-loading {
+.btn-loading,
+button.htmx-request {
   opacity: 0.7;
   cursor: wait;
+  pointer-events: none;
 }
 
 .footer-actions {

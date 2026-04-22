@@ -15,6 +15,8 @@ type webStatus struct {
 	Device     string
 	Error      string
 	LastSynced string
+	Toast      string
+	ToastType  string
 }
 
 templ page(s webStatus) {
@@ -88,7 +90,7 @@ templ ptzSlider(label, axis string, min, max, value int, unit string) {
 }
 
 templ statusPanel(s webStatus) {
-	<div id="status-panel" hx-get="/panel" hx-trigger="refresh from:body, load" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
+	<div id="status-panel" hx-get="/panel" hx-trigger="every 3s, refresh from:body, load" hx-swap="outerHTML" hx-indicator="#status-panel" style="position:relative">
 		if s.Error != "" {
 			<div class="error-banner">{ s.Error }</div>
 		}

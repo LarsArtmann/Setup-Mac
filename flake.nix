@@ -113,7 +113,7 @@
 
     # Monitor365 device monitoring agent source (Rust)
     monitor365-src = {
-      url = "path:/home/lars/projects/Monitor365";
+      url = "git+ssh://git@github.com/LarsArtmann/monitor365";
       flake = false;
     };
 
