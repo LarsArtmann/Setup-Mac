@@ -269,8 +269,7 @@ in {
       services.dnsblockd = {
         description = "DNS Block Page Server";
         after = ["network-online.target" "unbound.service" "sops-nix.service"];
-        wants = ["network-online.target" "sops-nix.service"];
-        requires = ["unbound.service"];
+        wants = ["network-online.target" "sops-nix.service" "unbound.service"];
         wantedBy = ["multi-user.target"];
 
         serviceConfig = let
@@ -347,6 +346,8 @@ in {
             StateDirectory = "dnsblockd";
             Restart = "on-failure";
             RestartSec = "3s";
+            StartLimitBurst = 5;
+            StartLimitIntervalSec = 60;
 
             SupplementaryGroups = ["unbound"];
             ProtectSystem = "strict";
