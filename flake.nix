@@ -199,6 +199,9 @@
         };
       };
     };
+  jscpdOverlay = _final: prev: {
+    jscpd = prev.callPackage ./pkgs/jscpd.nix {};
+  };
   emeetPixyOverlay = _final: prev: {
       emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
         src = prev.lib.cleanSourceWith {
@@ -247,6 +250,7 @@
           overlays = [
             goOverlay
             awWatcherOverlay
+            jscpdOverlay
           ] ++ lib.optionals (system == "x86_64-linux") [
             openaudibleOverlay
             dnsblockdOverlay
@@ -263,7 +267,7 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            inherit (pkgs) aw-watcher-utilization;
+            inherit (pkgs) aw-watcher-utilization jscpd;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 emeet-pixyd;
@@ -283,12 +287,8 @@
               statix
               gitleaks
               jq
+              jscpd
             ];
-            # Shell hook to provide jscpd command via bunx
-            shellHook = ''
-              # jscpd - code duplication detector
-              alias jscpd="bunx jscpd"
-            '';
           };
         };
 

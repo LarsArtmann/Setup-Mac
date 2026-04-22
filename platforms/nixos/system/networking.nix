@@ -59,7 +59,7 @@
     # Increase file descriptor limits to prevent "Too many open files" errors
     settings.Manager = {
       DefaultLimitNOFILE = 65536;
-      DefaultLimitNPROC = 4096;
+      DefaultLimitNPROC = 65536;
     };
   };
 
