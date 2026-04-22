@@ -7,22 +7,17 @@ _: {
   }: let
     cfg = config.services.monitor365;
 
-    runtimeDeps = with pkgs;
-      [
-        xdotool
-        xprintidle
-        scrot
-        networkmanager
-        lm_sensors
-        bluez
-        util-linux
-        coreutils
-        procps
-      ]
-      ++ lib.optionals (!config.wayland.windowManager.niri.enable) [
-        xorg.xwininfo
-        xorg.xprop
-      ];
+    runtimeDeps = with pkgs; [
+      xdotool
+      xprintidle
+      scrot
+      networkmanager
+      lm_sensors
+      bluez
+      util-linux
+      coreutils
+      procps
+    ];
 
     runtimePath = lib.makeBinPath runtimeDeps;
 
@@ -110,10 +105,6 @@ _: {
       [metrics]
       enabled = ${lib.boolToString cfg.metrics.enable}
       bind_address = "${cfg.metrics.bindAddress}"
-
-      [realtime]
-      enabled = ${lib.boolToString cfg.realtime.enable}
-      bind_address = "${cfg.realtime.bindAddress}"
     '';
   in {
     options.services.monitor365 = {
@@ -197,20 +188,6 @@ _: {
         };
         default = {};
         description = "Metrics configuration";
-      };
-
-      realtime = lib.mkOption {
-        type = lib.types.submodule {
-          options = {
-            enable = lib.mkEnableOption "realtime API server" // {default = false;};
-            bindAddress = lib.mkOption {
-              type = lib.types.str;
-              default = "127.0.0.1:8180";
-            };
-          };
-        };
-        default = {};
-        description = "Realtime event API configuration";
       };
 
       retentionDays = lib.mkOption {

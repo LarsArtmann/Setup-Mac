@@ -344,18 +344,14 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1776739561,
-        "narHash": "sha256-KQKcS1jGRAJ/roMaxOislBLBCtJRQf90xpEKzUzrZ20=",
-        "ref": "master",
-        "rev": "6dc21eb68283141071b28338e916279209fffc0a",
-        "revCount": 360,
-        "type": "git",
-        "url": "ssh://git@github.com/LarsArtmann/monitor365"
+        "lastModified": 1776822384,
+        "narHash": "sha256-lJkaijl0AdOHv0xoCtxCjD3x0Ge6KuriNdSDBuYg5Y0=",
+        "path": "/home/lars/projects/Monitor365",
+        "type": "path"
       },
       "original": {
-        "ref": "master",
-        "type": "git",
-        "url": "ssh://git@github.com/LarsArtmann/monitor365"
+        "path": "/home/lars/projects/Monitor365",
+        "type": "path"
       }
     },
     "niri": {
