@@ -165,10 +165,12 @@ _: {
             host = lib.mkOption {
               type = lib.types.str;
               default = "localhost";
+              description = "ActivityWatch API hostname";
             };
             port = lib.mkOption {
               type = lib.types.int;
               default = 5600;
+              description = "ActivityWatch API port";
             };
           };
         };
@@ -183,6 +185,7 @@ _: {
             bindAddress = lib.mkOption {
               type = lib.types.str;
               default = "127.0.0.1:9190";
+              description = "Address to bind the Prometheus metrics endpoint";
             };
           };
         };

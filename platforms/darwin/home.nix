@@ -11,26 +11,7 @@
     nix-ssh-config.homeManagerModules.ssh
   ];
 
-  # SSH client configuration
-  ssh-config = {
-    enable = true;
-    user = "lars";
-    hosts = {
-      onprem = {
-        hostname = "192.168.1.100";
-        user = "root";
-      };
-      "evo-x2" = {
-        hostname = "192.168.1.150";
-        user = "lars";
-        serverAliveInterval = 60;
-        serverAliveCountMax = 3;
-        extraOptions = {
-          TCPKeepAlive = "yes";
-        };
-      };
-    };
-  };
+  # SSH hosts defined in common/programs/ssh-config.nix
 
   # Darwin-specific Home Manager overrides
   home.sessionVariables = {

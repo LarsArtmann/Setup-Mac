@@ -105,47 +105,57 @@ in {
               url = lib.mkOption {
                 type = lib.types.str;
                 default = "tcp://127.0.0.1:9000";
+                description = "ClickHouse connection URL";
               };
               database = lib.mkOption {
                 type = lib.types.str;
                 default = "signoz_metrics";
+                description = "ClickHouse database for metrics";
               };
               tracesDatabase = lib.mkOption {
                 type = lib.types.str;
                 default = "signoz_traces";
+                description = "ClickHouse database for traces";
               };
               logsDatabase = lib.mkOption {
                 type = lib.types.str;
                 default = "signoz_logs";
+                description = "ClickHouse database for logs";
               };
             };
             queryService = {
               port = lib.mkOption {
                 type = lib.types.port;
                 default = 8080;
+                description = "Port for the SigNoz query service web UI and API";
               };
               host = lib.mkOption {
                 type = lib.types.str;
                 default = "127.0.0.1";
+                description = "Bind address for the query service";
               };
               dataDir = lib.mkOption {
                 type = lib.types.path;
                 default = "/var/lib/signoz";
+                description = "Data directory for the query service";
               };
             };
             collector = {
               port = lib.mkOption {
                 type = lib.types.port;
                 default = 4317;
+                description = "OTLP gRPC receiver port";
               };
               httpPort = lib.mkOption {
                 type = lib.types.port;
                 default = 4318;
+                description = "OTLP HTTP receiver port";
               };
             };
           };
         };
         default = {};
+        description = "SigNoz service settings (ClickHouse, query service, collector)";
       };
 
       components = lib.mkOption {
@@ -159,6 +169,7 @@ in {
           };
         };
         default = {};
+        description = "Toggle individual SigNoz stack components";
       };
     };
 

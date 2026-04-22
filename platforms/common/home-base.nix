@@ -8,7 +8,8 @@
     ./programs/bash.nix
 
     # Other program configurations
-    # SSH config now loaded from nix-ssh-config flake input
+    # SSH hosts shared across platforms (key auth via nix-ssh-config flake input)
+    ./programs/ssh-config.nix
     ./programs/starship.nix
     ./programs/activitywatch.nix
     ./programs/tmux.nix

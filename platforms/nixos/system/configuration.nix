@@ -190,7 +190,7 @@
 
       # Monitor365 device monitoring agent
       monitor365 = {
-        enable = true;
+        enable = false;
       };
 
 

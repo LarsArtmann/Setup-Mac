@@ -17,42 +17,7 @@
     ../desktop/waybar.nix # Status bar for niri
   ];
 
-  # SSH client configuration (Linux-specific hosts)
-  ssh-config = {
-    enable = true;
-    user = "lars";
-    hosts = {
-      onprem = {
-        hostname = "192.168.1.100";
-        user = "root";
-      };
-      "evo-x2" = {
-        hostname = "192.168.1.150";
-        user = "lars";
-        serverAliveInterval = 60;
-        serverAliveCountMax = 3;
-        extraOptions = {
-          TCPKeepAlive = "yes";
-        };
-      };
-      "private-cloud-hetzner-0" = {
-        hostname = "37.27.217.205";
-        user = "root";
-      };
-      "private-cloud-hetzner-1" = {
-        hostname = "37.27.195.171";
-        user = "root";
-      };
-      "private-cloud-hetzner-2" = {
-        hostname = "37.27.24.111";
-        user = "root";
-      };
-      "private-cloud-hetzner-3" = {
-        hostname = "138.201.155.93";
-        user = "root";
-      };
-    };
-  };
+  # SSH hosts defined in common/programs/ssh-config.nix
 
   # D-Bus/GSettings dark mode — read by xdg-desktop-portal-gtk Settings interface,
   # which Chromium-based browsers (Helium) query for UI chrome theming on Wayland compositors.
@@ -268,17 +233,24 @@
         "application/x-yaml" = ["kitty.desktop"];
 
         # Images
+        "image/avif" = ["helium.desktop"];
         "image/bmp" = ["helium.desktop"];
         "image/gif" = ["helium.desktop"];
+        "image/heif" = ["helium.desktop"];
         "image/jpeg" = ["helium.desktop"];
         "image/png" = ["helium.desktop"];
         "image/svg+xml" = ["helium.desktop"];
+        "image/tiff" = ["helium.desktop"];
         "image/webp" = ["helium.desktop"];
+        "image/x-icon" = ["helium.desktop"];
 
         # Videos
         "video/mp4" = ["helium.desktop"];
+        "video/ogg" = ["helium.desktop"];
+        "video/quicktime" = ["helium.desktop"];
         "video/webm" = ["helium.desktop"];
         "video/x-matroska" = ["helium.desktop"];
+        "video/x-msvideo" = ["helium.desktop"];
       };
     };
   };
