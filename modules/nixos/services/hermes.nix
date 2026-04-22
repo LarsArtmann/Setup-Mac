@@ -178,7 +178,7 @@
           LockPersonality = true;
           ProtectSystem = "strict";
           ProtectHome = true;
-          ReadWritePaths = [cfg.stateDir];
+          ReadWritePaths = [cfg.stateDir oldStateDir];
         };
       };
     };

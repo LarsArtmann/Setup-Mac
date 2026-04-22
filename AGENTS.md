@@ -379,7 +379,7 @@ Declarative NixOS module for the Hermes AI agent gateway (Discord bot, cron sche
 - Installed via flake input `hermes-agent` (pinned in `flake.lock`)
 - System-level systemd service (`systemd.services.hermes`) targeting `multi-user.target` — starts at boot without login
 - Dedicated system user/group (`hermes`/`hermes`) with state at `/var/lib/hermes`
-- Secrets decrypted by sops-nix template → loaded via `EnvironmentFile` and merged into `.env` via `ExecStartPre`
+- Secrets decrypted by sops-nix template → merged into `.env` by `mergeEnvScript` (ExecStartPre) → Hermes reads `.env` at runtime via `load_hermes_dotenv`
 - `libopus` installed system-wide for Discord voice support (in `configuration.nix`)
 - `key_env` references in `config.yaml` read API keys from `.env` instead of inline plaintext
 
