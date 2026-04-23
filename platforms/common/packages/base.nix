@@ -200,6 +200,7 @@
   # Linux-specific utilities
   linuxUtilities = with pkgs;
     lib.optionals stdenv.isLinux [
+      jetbrains.idea
       openaudible
       prismlauncher # Minecraft launcher (MultiMC fork)
 

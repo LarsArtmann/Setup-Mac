@@ -78,7 +78,8 @@
           "vault" # 'bsl11' licence
           "terraform" # 'bsl11' licence
           "cursor" # 'unfree'
-          "idea-ultimate" # 'unfree' licence
+          "idea" # 'unfree' licence (jetbrains.idea)
+          "idea-ultimate" # 'unfree' licence (legacy alias)
           "webstorm" # 'unfree' licence
           "goland" # 'unfree' licence
           "rider" # 'unfree' licence
