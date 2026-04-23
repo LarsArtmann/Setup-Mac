@@ -2,7 +2,9 @@ let
   primaryUser = "lars";
 in
   # Scheduled tasks for NixOS using systemd timers
-  {pkgs, ...}: {
+  {pkgs, config, ...}: let
+    uid = builtins.toString config.users.users.${primaryUser}.uid;
+  in {
     systemd = {
       timers = {
         crush-update-providers = {
@@ -67,7 +69,7 @@ in
             Environment = [
               "DISPLAY=:0"
               "WAYLAND_DISPLAY=wayland-1"
-              "XDG_RUNTIME_DIR=/run/user/1000"
+              "XDG_RUNTIME_DIR=/run/user/${uid}"
             ];
             StandardOutput = "journal";
             StandardError = "journal";
