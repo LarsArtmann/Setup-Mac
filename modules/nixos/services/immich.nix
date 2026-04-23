@@ -20,7 +20,7 @@
       redis.enable = true;
       machine-learning.enable = true;
 
-      environment.NODE_EXTRA_CA_CERTS = config.security.pki.certificates;
+      environment.NODE_EXTRA_CA_CERTS = "/etc/ssl/certs/ca-certificates.crt";
 
       settings = {
         oauth = {
