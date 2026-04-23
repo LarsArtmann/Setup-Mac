@@ -189,6 +189,7 @@ in {
       "github-releases.githubusercontent.com"
       "objects.githubusercontent.com"
       "linkedin.com"
+      "licdn.com"
       "linktr.ee"
       "nominatim.openstreetmap.org"
       "tile.openstreetmap.org"
