@@ -42,8 +42,8 @@
     ../desktop/ai-stack.nix
     ../desktop/monitoring.nix
     ../desktop/multi-wm.nix
-    # Chrome/Chromium policy configuration for extension management
-    ../programs/chrome.nix
+    # Chromium enterprise policies (extensions, security) — applies to Helium
+    ../programs/chromium-policies.nix
     ../programs/steam.nix
   ];
 

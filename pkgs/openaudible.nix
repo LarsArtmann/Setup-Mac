@@ -8,7 +8,7 @@ appimageTools.wrapType2 rec {
   version = "4.7.4";
 
   src = fetchurl {
-    url = "https://openaudible.org/latest/linux_AppImage";
+    url = "https://github.com/openaudible/openaudible/releases/download/v${version}/OpenAudible_${version}_x86_64.AppImage";
     hash = "sha256-uPDsFxAET5hZ4ntBvMuH5G9DogcZuP5kZaLNjLypF70=";
   };
 

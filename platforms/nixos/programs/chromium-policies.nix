@@ -9,6 +9,10 @@
   # Open source: https://github.com/umutseven92/shorts-blocker
   ytShortsBlockerId = "ckagfhpboagdopichicnebandlofghbc";
 
+  # OneTab - tab memory saver
+  # https://chromewebstore.google.com/detail/onetab/chphlpgkkbolifaimnlloiipkdnihall
+  oneTabId = "chphlpgkkbolifaimnlloiipkdnihall";
+
   # Chrome Web Store update URL
   chromeWebStoreUpdateUrl = "https://clients2.google.com/service/update2/crx";
 in {
@@ -19,6 +23,7 @@ in {
     # Force-install extensions via ExtensionInstallForcelist policy
     extensions = [
       "${ytShortsBlockerId};${chromeWebStoreUpdateUrl}"
+      "${oneTabId};${chromeWebStoreUpdateUrl}"
       # Format: "extension_id;update_url"
       # If update URL is omitted, defaults to Chrome Web Store
     ];
@@ -34,6 +39,12 @@ in {
         };
         # Allow and pin YouTube Shorts Blocker
         "${ytShortsBlockerId}" = {
+          installation_mode = "force_installed";
+          toolbar_pin = "force_pinned";
+          update_url = chromeWebStoreUpdateUrl;
+        };
+        # Allow and pin OneTab
+        "${oneTabId}" = {
           installation_mode = "force_installed";
           toolbar_pin = "force_pinned";
           update_url = chromeWebStoreUpdateUrl;
