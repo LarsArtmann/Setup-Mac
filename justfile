@@ -1853,8 +1853,7 @@ reload:
 
 # Deploy NixOS config to evo-x2 via nh
 deploy-evo:
-    @echo "🚀 Deploying to evo-x2..."
-    @bash scripts/deploy-evo-x2.sh
+    @nix run .#deploy
 
 # Run NixOS diagnostic
 diagnose:
