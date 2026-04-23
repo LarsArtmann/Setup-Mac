@@ -111,21 +111,21 @@ _: {
 
         inherit (cfg) jvmOpts;
 
-        serverProperties = {
-          server-port = cfg.port;
-          difficulty = cfg.difficulty;
-          gamemode = "survival";
-          max-players = cfg.maxPlayers;
-          motd = cfg.motd;
-          white-list = cfg.whitelist != {};
-          enforce-whitelist = cfg.whitelist != {};
-          view-distance = cfg.viewDistance;
-          simulation-distance = cfg.simulationDistance;
-          sync-chunk-writes = true;
-          enable-status = true;
-        };
+        serverProperties =
+          {
+            server-port = cfg.port;
+            gamemode = "survival";
+            max-players = cfg.maxPlayers;
+            white-list = cfg.whitelist != {};
+            enforce-whitelist = cfg.whitelist != {};
+            view-distance = cfg.viewDistance;
+            simulation-distance = cfg.simulationDistance;
+            sync-chunk-writes = true;
+            enable-status = true;
+          }
+          // lib.getAttrs ["difficulty" "motd"] cfg;
 
-        whitelist = cfg.whitelist;
+        inherit (cfg) whitelist;
       };
 
       systemd.services.minecraft-server.serviceConfig = {
