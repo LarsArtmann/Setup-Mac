@@ -1,4 +1,6 @@
-# NixOS Chrome/Chromium policy configuration for extension management
+# NixOS Chromium enterprise policies for Helium browser extension management
+# Helium proxies all extension downloads through services.helium.imput.net
+# No explicit update_url = Helium uses its own proxied default
 {
   config,
   pkgs,
@@ -12,72 +14,46 @@
   # OneTab - tab memory saver
   # https://chromewebstore.google.com/detail/onetab/chphlpgkkbolifaimnlloiipkdnihall
   oneTabId = "chphlpgkkbolifaimnlloiipkdnihall";
-
-  # Chrome Web Store update URL
-  chromeWebStoreUpdateUrl = "https://clients2.google.com/service/update2/crx";
 in {
-  # NixOS programs.chromium module provides enterprise policy management
   programs.chromium = {
     enable = true;
 
-    # Force-install extensions via ExtensionInstallForcelist policy
     extensions = [
-      "${ytShortsBlockerId};${chromeWebStoreUpdateUrl}"
-      "${oneTabId};${chromeWebStoreUpdateUrl}"
-      # Format: "extension_id;update_url"
-      # If update URL is omitted, defaults to Chrome Web Store
+      ytShortsBlockerId
+      oneTabId
     ];
 
-    # Additional policies via extraOpts
     extraOpts = {
-      # Extension management
       ExtensionSettings = {
-        # Default: block all extensions (restrictive approach)
         "*" = {
           installation_mode = "allowed";
-          blocked_install_message = "Contact system administrator to request extension approval";
         };
-        # Allow and pin YouTube Shorts Blocker
         "${ytShortsBlockerId}" = {
           installation_mode = "force_installed";
           toolbar_pin = "force_pinned";
-          update_url = chromeWebStoreUpdateUrl;
         };
-        # Allow and pin OneTab
         "${oneTabId}" = {
           installation_mode = "force_installed";
           toolbar_pin = "force_pinned";
-          update_url = chromeWebStoreUpdateUrl;
         };
       };
 
-      # Security policies
       BrowserSignin = 0;
       SyncDisabled = true;
       PasswordManagerEnabled = false;
-      SafeBrowsingEnabled = true;
       HttpsOnlyMode = "force_enabled";
 
-      # UI/UX policies
-      RestoreOnStartup = 1; # Restore last session
+      RestoreOnStartup = 1;
       BookmarkBarEnabled = true;
       DefaultBrowserSettingEnabled = false;
 
-      # Keep Manifest V2 extensions working
       ExtensionManifestV2Availability = 2;
     };
 
-    # Initial preferences (user can change these)
     initialPrefs = {
       "first_run_tabs" = [
         "https://nixos.org/"
       ];
     };
-
-    # Enable Plasma browser integration if using KDE
-    # enablePlasmaBrowserIntegration = true;
   };
-
-  # Note: This applies to Chromium, Google Chrome, and Brave system-wide
-  # Users can still override some settings, but forced extensions cannot be removed
 }
