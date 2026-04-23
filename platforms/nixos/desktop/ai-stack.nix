@@ -68,9 +68,11 @@
   cfg = config.services.unslothStudio;
 in {
   options = {
-    services.unslothStudio.enable = lib.mkEnableOption "Unsloth Studio - AI Model Training & Inference UI" // {
-      default = false;
-    };
+    services.unslothStudio.enable =
+      lib.mkEnableOption "Unsloth Studio - AI Model Training & Inference UI"
+      // {
+        default = false;
+      };
   };
 
   config = lib.mkMerge [

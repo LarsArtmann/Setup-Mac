@@ -179,30 +179,47 @@
       };
     };
 
-
     monitor365Overlay = _final: prev: {
       monitor365 = prev.callPackage ./pkgs/monitor365.nix {
         src = prev.lib.cleanSourceWith {
           filter = path: type: let
             b = baseNameOf path;
-          in !(
-            b == "target" ||
-            b == "vendor" ||
-            b == ".git" ||
-            b == "docs" ||
-            b == "report" ||
-            b == ".crush" ||
-            b == "examples" ||
-            prev.lib.hasSuffix ".svg" b
-          );
+          in
+            !(
+              b
+              == "target"
+              || b == "vendor"
+              || b == ".git"
+              || b == "docs"
+              || b == "report"
+              || b == ".crush"
+              || b == "examples"
+              || prev.lib.hasSuffix ".svg" b
+            );
           src = monitor365-src;
         };
       };
     };
-  jscpdOverlay = _final: prev: {
-    jscpd = prev.callPackage ./pkgs/jscpd.nix {};
-  };
-  emeetPixyOverlay = _final: prev: {
+    jscpdOverlay = _final: prev: {
+      jscpd = prev.callPackage ./pkgs/jscpd.nix {};
+    };
+    unboundDoQOverlay = _final: prev: {
+      unbound = prev.unbound.overrideAttrs (o: {
+        buildInputs =
+          (o.buildInputs or [])
+          ++ [
+            prev.ngtcp2
+            prev.nghttp3
+          ];
+        configureFlags =
+          (o.configureFlags or [])
+          ++ [
+            "--with-libngtcp2=${prev.ngtcp2.dev}"
+            "--with-libnghttp3=${prev.nghttp3.dev}"
+          ];
+      });
+    };
+    emeetPixyOverlay = _final: prev: {
       emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
         src = prev.lib.cleanSourceWith {
           filter = path: _type: let b = baseNameOf path; in !(prev.lib.hasSuffix "_test.go" b || b == "package.nix");
@@ -247,16 +264,19 @@
           inherit system;
           config.allowUnfree = true;
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
-          overlays = [
-            goOverlay
-            awWatcherOverlay
-            jscpdOverlay
-          ] ++ lib.optionals (system == "x86_64-linux") [
-            openaudibleOverlay
-            dnsblockdOverlay
-            emeetPixyOverlay
-            monitor365Overlay
-          ];
+          overlays =
+            [
+              goOverlay
+              awWatcherOverlay
+              jscpdOverlay
+            ]
+            ++ lib.optionals (system == "x86_64-linux") [
+              openaudibleOverlay
+              dnsblockdOverlay
+              emeetPixyOverlay
+              monitor365Overlay
+              unboundDoQOverlay
+            ];
         };
 
         # Use treefmt-full-flake's formatter which includes alejandra in PATH
@@ -463,6 +483,7 @@
                   dnsblockdOverlay
                   emeetPixyOverlay
                   monitor365Overlay
+                  unboundDoQOverlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});

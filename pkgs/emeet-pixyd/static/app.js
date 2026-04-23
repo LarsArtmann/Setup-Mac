@@ -38,7 +38,8 @@
   function showToast(msg, type) {
     type = type || "success";
     var container = document.getElementById("toast-container");
-    container.innerHTML = '<div class="toast toast-' + type + ' show">' + msg + "</div>";
+    container.innerHTML =
+      '<div class="toast toast-' + type + ' show">' + msg + "</div>";
     setTimeout(function () {
       var el = container.querySelector(".toast");
       if (el) {
@@ -111,7 +112,7 @@
         consecutiveErrors >= 3
           ? "Connection lost \u2014 retrying"
           : "Request failed",
-        "error"
+        "error",
       );
       return;
     }
@@ -191,10 +192,7 @@
         img.style.display = "";
         if (fallback) fallback.style.display = "none";
       }, delay);
-      streamRetryDelay = Math.min(
-        streamRetryDelay * 2,
-        maxStreamRetryDelay
-      );
+      streamRetryDelay = Math.min(streamRetryDelay * 2, maxStreamRetryDelay);
     });
   })();
 })();

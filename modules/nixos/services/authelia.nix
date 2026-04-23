@@ -10,11 +10,11 @@
     authPort = 9091;
 
     mkClient = {
-    client_id,
-    client_name,
-    redirect_uris,
-    ...
-  }: {
+      client_id,
+      client_name,
+      redirect_uris,
+      ...
+    }: {
       inherit client_id client_name redirect_uris;
       client_secret = "$pbkdf2-sha512$310000$c8p78n7pUMln0jzvd4aK4Q$JNRBzwAo0ek5qKn50cFzzvE9RXV88h1wJn5KGiHrD0YKtZaR/nCb2CJPOsKaPK0hjf.9yHxzQGZziziccp6Yng";
       public = false;

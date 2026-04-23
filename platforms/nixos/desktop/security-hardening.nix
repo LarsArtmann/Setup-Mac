@@ -1,4 +1,8 @@
-{config, pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   # Enable comprehensive security monitoring
   security = {
     # Enable polkit for authentication

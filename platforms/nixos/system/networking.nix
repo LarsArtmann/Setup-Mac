@@ -12,7 +12,7 @@
     firewall = {
       enable = true;
       allowedTCPPorts = [22 53 80 443];
-      allowedUDPPorts = [53];
+      allowedUDPPorts = [53 853]; # 53=plain DNS + DoQ, 853=DoQ-over-QUIC
     };
 
     # Static IP configuration

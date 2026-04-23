@@ -11,7 +11,6 @@
   lm_sensors,
   src,
 }:
-
 rustPlatform.buildRustPackage rec {
   pname = "monitor365";
   version = "0.1.0";
@@ -26,14 +25,16 @@ rustPlatform.buildRustPackage rec {
     rustPlatform.bindgenHook
   ];
 
-  buildInputs = [
-    libclang.lib
-    llvmPackages.libcxxClang
-    sqlite
-  ] ++ lib.optionals stdenv.isLinux [
-    dbus
-    lm_sensors
-  ];
+  buildInputs =
+    [
+      libclang.lib
+      llvmPackages.libcxxClang
+      sqlite
+    ]
+    ++ lib.optionals stdenv.isLinux [
+      dbus
+      lm_sensors
+    ];
 
   LIBCLANG_PATH = "${libclang.lib}/lib";
 

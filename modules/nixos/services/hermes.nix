@@ -109,22 +109,21 @@
         "d ${cfg.stateDir}/workspace 2770 ${cfg.user} ${cfg.group} -"
       ];
 
-      system.activationScripts."hermes-setup" =
-        lib.stringAfter (["users"] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
-          mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
-          chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
-          chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+      system.activationScripts."hermes-setup" = lib.stringAfter (["users"] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
+        mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+        chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
+        chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
 
-          find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
-            -exec chmod g+rw {} + 2>/dev/null || true
-          for _subdir in sessions skills memories cron cache logs; do
-            find "${cfg.stateDir}/$_subdir" -type f -exec chmod g+rw {} + 2>/dev/null || true
-          done
+        find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
+          -exec chmod g+rw {} + 2>/dev/null || true
+        for _subdir in sessions skills memories cron cache logs; do
+          find "${cfg.stateDir}/$_subdir" -type f -exec chmod g+rw {} + 2>/dev/null || true
+        done
 
-          touch ${cfg.stateDir}/.managed
-          chown ${cfg.user}:${cfg.group} ${cfg.stateDir}/.managed
-          chmod 0644 ${cfg.stateDir}/.managed
-        '';
+        touch ${cfg.stateDir}/.managed
+        chown ${cfg.user}:${cfg.group} ${cfg.stateDir}/.managed
+        chmod 0644 ${cfg.stateDir}/.managed
+      '';
 
       systemd.services.hermes = {
         description = "Hermes Agent Gateway - Messaging Platform Integration";

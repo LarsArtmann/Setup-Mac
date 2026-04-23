@@ -3,9 +3,10 @@
 
   mkSecrets = file: defaults: names:
     builtins.listToAttrs (map (name: {
-      inherit name;
-      value = defaults // {sopsFile = secretsDir + "/${file}";};
-    }) names);
+        inherit name;
+        value = defaults // {sopsFile = secretsDir + "/${file}";};
+      })
+      names);
 
   mkKeyedSecrets = file: defaults: keyMap:
     builtins.mapAttrs (name: key:
@@ -16,10 +17,7 @@
       })
     keyMap;
 in {
-  flake.nixosModules.sops = {
-    config,
-    ...
-  }: {
+  flake.nixosModules.sops = {config, ...}: {
     sops = {
       defaultSopsFile = secretsDir + "/secrets.yaml";
       age.sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];

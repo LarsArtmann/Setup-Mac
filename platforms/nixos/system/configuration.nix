@@ -193,7 +193,6 @@
         enable = false;
       };
 
-
       smartd = {
         enable = true;
         autodetect = true;

@@ -220,6 +220,10 @@ in {
 
     enableDNSSEC = true;
 
+    # DoQ (DNS-over-QUIC) port — RFC 9250, uses QUIC transport encryption
+    # No TLS certificates needed — QUIC handles encryption natively
+    doqPort = 853;
+
     # Temporarily allow all DNS queries (disable blocking)
     # Set to true to bypass all DNS blocking
     tempAllowAll = false;

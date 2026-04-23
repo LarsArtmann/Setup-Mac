@@ -156,6 +156,12 @@ in {
       default = false;
       description = "Temporarily allow all DNS queries (disable blocking). Write 'local-zone: \".\" transparent' to temp-allowlist.conf";
     };
+
+    doqPort = mkOption {
+      type = types.port;
+      default = 853;
+      description = "Port for DNS-over-QUIC (DoQ) server. QUIC transport handles encryption natively — no TLS certificates needed.";
+    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -189,6 +195,10 @@ in {
           harden-referral-path = true;
 
           include = toString unboundIncludeFile;
+
+          # DNS-over-QUIC (DoQ) — RFC 9250
+          # QUIC transport handles encryption natively, no certificates needed
+          quic-port = cfg.doqPort;
 
           local-zone =
             map (d: ''"${d}" transparent'') cfg.whitelist
