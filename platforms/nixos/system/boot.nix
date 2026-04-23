@@ -61,15 +61,15 @@
     "vm.oom_kill_allocating_task" = 0; # Let kernel pick the biggest memory hog (not the allocating process)
   };
 
-# Protect critical services from OOM killer
+  # Protect critical services from OOM killer
   # sshd: -1000 (maximum protection — remote access is the last resort)
   # NixOS sets -1000 by default for sshd, but be explicit to prevent overrides
   # niri: -900 (compositor death = entire desktop gone, but SSH should outlive it)
   # caddy: -500 (reverse proxy loss means all services unreachable)
-  # journald: -250 (logs are important but not as critical as access)
+  # journald: -500 (lost journald = lost crash diagnostics — saw this in the real OOM event)
   systemd.services = {
     "sshd".serviceConfig.OOMScoreAdjust = -1000;
-    "systemd-journald".serviceConfig.OOMScoreAdjust = -250;
+    "systemd-journald".serviceConfig.OOMScoreAdjust = -500;
   };
 
   systemd.user.services = {
