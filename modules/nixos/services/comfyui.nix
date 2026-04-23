@@ -74,7 +74,6 @@
           // {
             HOME = "/home/${cfg.user}";
             LD_LIBRARY_PATH = lib.makeLibraryPath rocmRuntimeLibs;
-            PYTHONPATH = "";
             HF_HOME = "/data/cache/huggingface";
           };
 
@@ -88,7 +87,7 @@
           User = cfg.user;
           Group = "users";
           WorkingDirectory = toString cfg.package;
-          ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --force-fp16";
+          ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
           Restart = "on-failure";
           RestartSec = "10";
           OOMScoreAdjust = -100;

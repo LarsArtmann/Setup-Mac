@@ -61,16 +61,21 @@
     "vm.oom_kill_allocating_task" = 0; # Let kernel pick the biggest memory hog (not the allocating process)
   };
 
-  # Protect critical services from OOM killer
-  # These must survive memory pressure — killing them makes the system unusable
+# Protect critical services from OOM killer
+  # sshd: -1000 (maximum protection — remote access is the last resort)
+  # NixOS sets -1000 by default for sshd, but be explicit to prevent overrides
+  # niri: -900 (compositor death = entire desktop gone, but SSH should outlive it)
+  # caddy: -500 (reverse proxy loss means all services unreachable)
+  # journald: -250 (logs are important but not as critical as access)
   systemd.services = {
-    "sshd".serviceConfig.OOMScoreAdjust = -500;
+    "sshd".serviceConfig.OOMScoreAdjust = -1000;
     "systemd-journald".serviceConfig.OOMScoreAdjust = -250;
   };
 
-  # Protect niri (user service) from OOM — without it the entire desktop dies
   systemd.user.services = {
-    "niri".serviceConfig.OOMScoreAdjust = -500;
+    "niri".serviceConfig.OOMScoreAdjust = -900;
+    "waybar".serviceConfig.OOMScoreAdjust = -500;
+    "pipewire".serviceConfig.OOMScoreAdjust = -500;
   };
 
   # Resolve upstream conflict: earlyoom sets true, smartd sets false
@@ -87,7 +92,7 @@
       "--avoid"
       "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
       "--prefer"
-      "^(ollama|llama-server|python3|python|node|java|chrome|chromium)$" # Kill these first
+      "^(ollama|llama-server|python3|python|node|java|chrome|chromium|generate_happy_girl)$" # Kill these first
     ];
   };
 
