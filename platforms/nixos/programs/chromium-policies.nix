@@ -1,6 +1,5 @@
-# NixOS Chromium enterprise policies for Helium browser extension management
-# Helium proxies all extension downloads through services.helium.imput.net
-# No explicit update_url = Helium uses its own proxied default
+# Force-install extensions via Helium's proxied update URL
+# No explicit update_url → Helium routes through services.helium.imput.net
 {
   config,
   pkgs,
@@ -25,9 +24,6 @@ in {
 
     extraOpts = {
       ExtensionSettings = {
-        "*" = {
-          installation_mode = "allowed";
-        };
         "${ytShortsBlockerId}" = {
           installation_mode = "force_installed";
           toolbar_pin = "force_pinned";
@@ -37,23 +33,6 @@ in {
           toolbar_pin = "force_pinned";
         };
       };
-
-      BrowserSignin = 0;
-      SyncDisabled = true;
-      PasswordManagerEnabled = false;
-      HttpsOnlyMode = "force_enabled";
-
-      RestoreOnStartup = 1;
-      BookmarkBarEnabled = true;
-      DefaultBrowserSettingEnabled = false;
-
-      ExtensionManifestV2Availability = 2;
-    };
-
-    initialPrefs = {
-      "first_run_tabs" = [
-        "https://nixos.org/"
-      ];
     };
   };
 }
