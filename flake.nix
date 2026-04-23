@@ -249,6 +249,7 @@
         ./modules/nixos/services/hermes.nix
         ./modules/nixos/services/minecraft.nix
         ./modules/nixos/services/monitor365.nix
+        ./modules/nixos/services/comfyui.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -551,6 +552,7 @@
             inputs.self.nixosModules.hermes
             inputs.self.nixosModules.minecraft
             inputs.self.nixosModules.monitor365
+            inputs.self.nixosModules.comfyui
             ./platforms/nixos/system/configuration.nix
           ];
         };

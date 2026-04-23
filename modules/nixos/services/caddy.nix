@@ -60,6 +60,12 @@
             reverse_proxy localhost:10222
           '';
         };
+        "comfyui.${domain}" = {
+          extraConfig = ''
+            ${tlsConfig}
+            reverse_proxy localhost:8188
+          '';
+        };
       };
     };
 
@@ -69,6 +75,7 @@
       after = ["authelia-main.service"];
       wants = ["authelia-main.service"];
       serviceConfig = {
+        OOMScoreAdjust = -500;
         PrivateTmp = true;
         NoNewPrivileges = lib.mkForce false;
         ProtectClock = true;

@@ -58,7 +58,19 @@
     "vm.min_free_kbytes" = 2097152; # Keep 2GB free for kernel/GPU allocations
     "vm.max_map_count" = 2147483642; # Maximum for large model memory maps
     "vm.compaction_proactiveness" = 20; # Proactive compaction for hugepages
-    "vm.oom_kill_allocating_task" = 1; # Kill the allocating task, not an innocent victim
+    "vm.oom_kill_allocating_task" = 0; # Let kernel pick the biggest memory hog (not the allocating process)
+  };
+
+  # Protect critical services from OOM killer
+  # These must survive memory pressure — killing them makes the system unusable
+  systemd.services = {
+    "sshd".serviceConfig.OOMScoreAdjust = -500;
+    "systemd-journald".serviceConfig.OOMScoreAdjust = -250;
+  };
+
+  # Protect niri (user service) from OOM — without it the entire desktop dies
+  systemd.user.services = {
+    "niri".serviceConfig.OOMScoreAdjust = -500;
   };
 
   # Resolve upstream conflict: earlyoom sets true, smartd sets false
