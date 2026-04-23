@@ -2,7 +2,11 @@ let
   primaryUser = "lars";
 in
   # Scheduled tasks for NixOS using systemd timers
-  {pkgs, config, ...}: let
+  {
+    pkgs,
+    config,
+    ...
+  }: let
     uid = builtins.toString config.users.users.${primaryUser}.uid;
   in {
     systemd = {
