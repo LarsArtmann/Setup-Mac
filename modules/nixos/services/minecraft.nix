@@ -45,10 +45,62 @@ _: {
         mainProgram = "minecraft-server";
       };
     };
+    cfg = config.services.minecraft;
   in {
-    options.services.minecraft = lib.mkEnableOption "Minecraft server";
+    options.services.minecraft = {
+      enable = lib.mkEnableOption "Minecraft server";
 
-    config = lib.mkIf config.services.minecraft {
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 25565;
+        description = "Server port";
+      };
+
+      jvmOpts = lib.mkOption {
+        type = lib.types.str;
+        default = "-Xms2G -Xmx4G -XX:+UseCompactObjectHeaders -XX:+AlwaysPreTouch -XX:+UseStringDeduplication -XX:+UseZGC";
+        description = "JVM arguments for the server";
+      };
+
+      difficulty = lib.mkOption {
+        type = lib.types.enum ["peaceful" "easy" "normal" "hard"];
+        default = "normal";
+        description = "Game difficulty";
+      };
+
+      maxPlayers = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 20;
+        description = "Maximum number of players";
+      };
+
+      motd = lib.mkOption {
+        type = lib.types.str;
+        default = "§bHome §rMinecraft";
+        description = "Message of the day shown in the server list";
+      };
+
+      viewDistance = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 16;
+        description = "View distance in chunks";
+      };
+
+      simulationDistance = lib.mkOption {
+        type = lib.types.ints.positive;
+        default = 12;
+        description = "Simulation distance in chunks";
+      };
+
+      whitelist = lib.mkOption {
+        type = lib.types.attrsOf lib.types.str;
+        default = {};
+        description = "Whitelist entries (username → UUID)";
+        example = {"Player" = "uuid-here";};
+      };
+    };
+
+    config = lib.mkIf cfg.enable {
       services.minecraft-server = {
         enable = true;
         eula = true;
@@ -57,25 +109,23 @@ _: {
 
         package = minecraft-server-26;
 
-        jvmOpts = "-Xms2G -Xmx4G -XX:+UseCompactObjectHeaders -XX:+AlwaysPreTouch -XX:+UseStringDeduplication -XX:+UseZGC";
+        inherit (cfg) jvmOpts;
 
         serverProperties = {
-          server-port = 25565;
-          difficulty = "normal";
+          server-port = cfg.port;
+          difficulty = cfg.difficulty;
           gamemode = "survival";
-          max-players = 20;
-          motd = "§bHome §rMinecraft";
-          white-list = true;
-          enforce-whitelist = true;
-          view-distance = 16;
-          simulation-distance = 12;
+          max-players = cfg.maxPlayers;
+          motd = cfg.motd;
+          white-list = cfg.whitelist != {};
+          enforce-whitelist = cfg.whitelist != {};
+          view-distance = cfg.viewDistance;
+          simulation-distance = cfg.simulationDistance;
           sync-chunk-writes = true;
           enable-status = true;
         };
 
-        whitelist = {
-          LartyHD = "8c9ec1ab-f64f-4003-9110-f98a1f0d7f47";
-        };
+        whitelist = cfg.whitelist;
       };
 
       systemd.services.minecraft-server.serviceConfig = {
@@ -89,8 +139,8 @@ _: {
       };
 
       networking.firewall.extraCommands = ''
-        iptables -A nixos-fw -p tcp --dport 25565 -s ${config.networking.local.subnet} -j nixos-fw-accept
-        iptables -A nixos-fw -p tcp --dport 25565 -s 127.0.0.1 -j nixos-fw-accept
+        iptables -A nixos-fw -p tcp --dport ${toString cfg.port} -s ${config.networking.local.subnet} -j nixos-fw-accept
+        iptables -A nixos-fw -p tcp --dport ${toString cfg.port} -s 127.0.0.1 -j nixos-fw-accept
       '';
     };
   };

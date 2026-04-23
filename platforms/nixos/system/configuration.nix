@@ -186,7 +186,12 @@
       };
 
       # Minecraft server (local network only, whitelisted)
-      minecraft = true;
+      minecraft = {
+        enable = true;
+        whitelist = {
+          LartyHD = "8c9ec1ab-f64f-4003-9110-f98a1f0d7f47";
+        };
+      };
 
       # Monitor365 device monitoring agent
       monitor365 = {
