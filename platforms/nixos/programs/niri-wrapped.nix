@@ -2,10 +2,11 @@
   pkgs,
   config,
   lib,
+  wallpapers,
   ...
 }: let
   userHome = config.home.homeDirectory;
-  wallpaperDir = "${userHome}/projects/wallpapers";
+  wallpaperDir = wallpapers;
   sessionSaveInterval = "60s";
   maxSessionAgeDays = 7;
   fallbackApps = [

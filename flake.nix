@@ -105,6 +105,11 @@
       url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
     };
 
+    wallpapers = {
+      url = "git+ssh://git@github.com/LarsArtmann/wallpapers?ref=master";
+      flake = false;
+    };
+
     # Hermes AI Agent — Discord/gateway agent platform
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
@@ -551,6 +556,7 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
+                  wallpapers = inputs.wallpapers;
                 };
               };
             }

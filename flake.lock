@@ -276,11 +276,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1776783600,
-        "narHash": "sha256-+7gc+1xCDtSyrdRVq5dmhru/zYu5lb9VPGRAnoTaEK8=",
+        "lastModified": 1777053732,
+        "narHash": "sha256-GxicLGZEWI4mCK5r/5urPvJah5rArxWeY7ZkfRZrVcU=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "c9e8d82ef42970b31d683b9c3e8319b2d54d8b08",
+        "rev": "6f1eed3968318dc1d6ca3fb3ded2de6fc8e50308",
         "type": "github"
       },
       "original": {
@@ -296,11 +296,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776777932,
-        "narHash": "sha256-0R3Yow/NzSeVGUke5tL7CCkqmss4Vmi6BbV6idHzq/8=",
+        "lastModified": 1777054018,
+        "narHash": "sha256-tTNS7V6xN/LX1KZ0TrdOnj375ZrsUlLoce4qxZwDN9U=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "5d5640599a0050b994330328b9fd45709c909720",
+        "rev": "ffbd94a1c9d7d3e1258e51c084ab2109da04f2b1",
         "type": "github"
       },
       "original": {
@@ -328,11 +328,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1776783123,
-        "narHash": "sha256-vzBcoZLB7ZRAhO4qWl85OxBixgbLKcktKEI3Z0vHPak=",
+        "lastModified": 1777054219,
+        "narHash": "sha256-1Px5k4AmDRrX3+flERUhQ8/t6qefob2h8JIiRl2OsiA=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "473f91bac1b51bbeda102183777b188ecc517528",
+        "rev": "c306c4f861eacf3a4a32526205cb4e05fd823489",
         "type": "github"
       },
       "original": {
@@ -344,11 +344,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1776896570,
-        "narHash": "sha256-Ems/4FB5VaHEMvuVNZMdq9/YP19GP2FodnC/VmCTmgw=",
+        "lastModified": 1776920319,
+        "narHash": "sha256-RLTpcwVxPcALCJPo3F3I5PoJOtes0xaWqx11kHcgOWM=",
         "ref": "refs/heads/master",
-        "rev": "bf627ef9e372164a810cf5e0c02b4a0fd77d2b4a",
-        "revCount": 361,
+        "rev": "451bb4649deed4b820b166e612edf657de882e57",
+        "revCount": 364,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
@@ -369,11 +369,11 @@
         "xwayland-satellite-unstable": "xwayland-satellite-unstable"
       },
       "locked": {
-        "lastModified": 1776714033,
-        "narHash": "sha256-O+34yexfSxigXyb5usuzqac7vRHy6gYv7BtNtzDhQNo=",
+        "lastModified": 1777051231,
+        "narHash": "sha256-eQRCg6eyxFutVcPhmdGwZoSSDQoGvGQR9CwaRPvRIpM=",
         "owner": "sodiboo",
         "repo": "niri-flake",
-        "rev": "32bed686f4fd8274a5e4a58d071687a74e19821e",
+        "rev": "d5d46338abb43cd7a16ddedb757df0996bff85a4",
         "type": "github"
       },
       "original": {
@@ -402,11 +402,11 @@
     "niri-unstable": {
       "flake": false,
       "locked": {
-        "lastModified": 1776706941,
-        "narHash": "sha256-nnv27JD0FOOqs1Hh67kydXFzZoEu8e0QyMf0R9AXaIw=",
+        "lastModified": 1777045529,
+        "narHash": "sha256-EeAwmrvONsovL2qPwKGXF2xGhbo7MySesY3fW2pNLpM=",
         "owner": "YaLTeR",
         "repo": "niri",
-        "rev": "e9c182a13c1d12762351ec01ce0ec711d41b0337",
+        "rev": "9438f59e2b9d8deb6fcec5922f8aca18162b673c",
         "type": "github"
       },
       "original": {
@@ -635,11 +635,11 @@
     },
     "nixpkgs-stable": {
       "locked": {
-        "lastModified": 1776434932,
-        "narHash": "sha256-gyqXNMgk3sh+ogY5svd2eNLJ6oEwzbAeaoBrrxD0lKk=",
+        "lastModified": 1776734388,
+        "narHash": "sha256-vl3dkhlE5gzsItuHoEMVe+DlonsK+0836LIRDnm6MXQ=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "c7f47036d3df2add644c46d712d14262b7d86c0c",
+        "rev": "10e7ad5bbcb421fe07e3a4ad53a634b0cd57ffac",
         "type": "github"
       },
       "original": {
@@ -710,11 +710,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1776781134,
-        "narHash": "sha256-eAerZyLqfgivKfCwbI6phGqRXiaBn/xFinalnlWnKCQ=",
+        "lastModified": 1777054150,
+        "narHash": "sha256-/Ri3iBC8nFIzjq47Bw13ARanGdINL+pr7jEPKzDtHL8=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "6e7c03862a2d6fec058b9bfabc8cf8fcc299d1c9",
+        "rev": "6a4b81cf8e0dafa8003fb6154b979c433c6f1e05",
         "type": "github"
       },
       "original": {
@@ -856,7 +856,8 @@
         "signoz-src": "signoz-src",
         "silent-sddm": "silent-sddm",
         "sops-nix": "sops-nix",
-        "treefmt-full-flake": "treefmt-full-flake_2"
+        "treefmt-full-flake": "treefmt-full-flake_2",
+        "wallpapers": "wallpapers"
       }
     },
     "signoz-collector-src": {
@@ -1113,6 +1114,23 @@
         "owner": "pyproject-nix",
         "repo": "uv2nix",
         "type": "github"
+      }
+    },
+    "wallpapers": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775140744,
+        "narHash": "sha256-Bc2W40BEI/dmW4E43kFFP2BA7EnFQRssYBNqKa2Ymqk=",
+        "ref": "master",
+        "rev": "89aa99c5eaa46d681e0e47b38dd41cfe5d71c50e",
+        "revCount": 35,
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/wallpapers"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/wallpapers"
       }
     },
     "xwayland-satellite-stable": {
