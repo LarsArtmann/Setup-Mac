@@ -197,7 +197,7 @@
         };
       };
 
-      # Monitor365 device monitoring agent
+      # Monitor365 device monitoring agent (disabled: high RAM usage)
       monitor365 = {
         enable = false;
       };
