@@ -53,7 +53,7 @@ SystemNix/
 ├── flake.nix                    # Main entry point with flake-parts
 ├── justfile                     # Task runner for all operations
 ├── modules/nixos/services/      # NixOS service modules (Caddy, Gitea, Immich, ...)
-├── pkgs/                        # Custom Nix packages (dnsblockd, modernize, ...)
+├── pkgs/                        # Custom Nix packages (dnsblockd, emeet-pixyd, modernize, jscpd, monitor365, ...)
 ├── platforms/
 │   ├── common/                  # Shared across platforms (~80% of config)
 │   │   ├── home-base.nix        # Home Manager base (14 program modules)

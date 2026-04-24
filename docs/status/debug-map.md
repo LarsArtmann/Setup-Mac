@@ -1,5 +1,8 @@
 # SystemNix: Debug Map
 
+**Date:** ~2026-04-04 (sops/authelia cascade session)
+**Status:** Resolved — all fixes applied
+
 ## The ONE Root Cause
 
 ```

@@ -36,11 +36,14 @@ SystemNix/
 │   └── taskchampion.nix         # Taskwarrior sync server
 │
 ├── pkgs/                        # Custom packages
+│   ├── aw-watcher-utilization.nix # ActivityWatch system utilization watcher (Python)
 │   ├── dnsblockd.nix            # DNS block page server (Go)
 │   ├── dnsblockd-processor/     # DNS blocklist processor (Go)
 │   ├── emeet-pixyd/             # EMEET PIXY webcam daemon (Go)
+│   ├── jscpd.nix                # Copy/paste detector (Node.js)
 │   ├── modernize.nix            # Go modernize tool
-│   └── aw-watcher-utilization.nix
+│   ├── monitor365.nix           # Device monitoring agent (Rust)
+│   └── openaudible.nix          # Audible audiobook manager (AppImage)
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
@@ -101,15 +104,20 @@ imports = [ ../../common/home-base.nix ];
 
 ### Custom Overlays
 
-Three overlays are defined in `flake.nix`:
+Eight overlays are defined in `flake.nix`:
 
 | Overlay | Purpose |
 |---------|---------|
 | `goOverlay` | Pins Go to 1.26.1 (overrides default) |
 | `awWatcherOverlay` | Builds `aw-watcher-utilization` from local nix pkg |
+| `jscpdOverlay` | Builds `jscpd` copy/paste detector from npm (all platforms) |
 | `dnsblockdOverlay` | Builds `dnsblockd` + `dnsblockd-processor` from local source (Linux only) |
+| `emeetPixyOverlay` | Builds `emeet-pixyd` from local source (Linux only) |
+| `openaudibleOverlay` | Wraps OpenAudible AppImage (Linux only) |
+| `monitor365Overlay` | Builds `monitor365` CLI agent from flake input source (Linux only) |
+| `unboundDoQOverlay` | Patches unbound for DNS-over-QUIC support (Linux only) |
 
-Go overlay is applied on both platforms. dnsblockd overlay is Linux-only (applied in NixOS config).
+Go, aw-watcher-utilization, and jscpd overlays are applied on both platforms. The remaining overlays are Linux-only (applied in NixOS config).
 
 ### Wrapped Packages (Vimjoyer Pattern)
 

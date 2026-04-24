@@ -14,15 +14,15 @@
 **Problem diagnosed**: dnsblockd stats showed `total_blocked: 0` despite Unbound correctly resolving blocked domains to `192.168.1.150`. Root cause: all modern browser traffic is HTTPS (port 443), which was Caddy — not dnsblockd. dnsblockd only listened on `192.168.1.150:80` (HTTP) and `192.168.1.150:8443` (HTTPS), neither of which browsers ever hit. Blocked domains resolved correctly but the HTTPS request landed in Caddy (no matching vhost → generic error), dnsblockd's `blockHandler` was never called, `recordBlock()` never fired.
 
 **Fix applied** (commit `a00834f`, authored by prior MiniMax session):
-- dnsblockd gets its own IP: `192.168.1.2` — a secondary address on `eno1`
-- dnsblockd binds `192.168.1.2:80` (HTTP) + `192.168.1.2:443` (HTTPS with dynamic per-domain TLS certs)
+- dnsblockd gets its own IP: `192.168.1.200` — a secondary address on `eno1`
+- dnsblockd binds `192.168.1.200:80` (HTTP) + `192.168.1.200:443` (HTTPS with dynamic per-domain TLS certs)
 - Caddy binds only to `192.168.1.150:443` (via `servers { bind }` in global config)
 - Removed runtime IP detection scripts (`detectIPScript`, `addIPScript`, `delIPScript`)
-- dnsblockd uses static `-addr 192.168.1.2` instead of runtime-detected `$IP`
+- dnsblockd uses static `-addr 192.168.1.200` instead of runtime-detected `$IP`
 - Reverted Caddy `:443` catch-all reverse proxy (no longer needed)
 
 **Files changed**:
-- `platforms/nixos/system/dns-blocker-config.nix` — `blockIP = "192.168.1.2"`, `blockTLSPort = 443`
+- `platforms/nixos/system/dns-blocker-config.nix` — `blockIP = "192.168.1.200"`, `blockTLSPort = 443`
 - `platforms/nixos/modules/dns-blocker.nix` — simplified: no runtime detection, static IP, unconditional `/32` on interface
 - `modules/nixos/services/caddy.nix` — `caddyBind` binds to server IP only, removed catch-all
 - `platforms/nixos/programs/dnsblockd/main.go` — initialized `RecentBlocks` as `make([]BlockEntry, 0)` (was nil → `null` in JSON)
@@ -63,7 +63,7 @@
 - All changes committed and build-tested
 - `just switch` NOT run — dnsblockd still running with OLD config (`192.168.1.150:80+8443`)
 - Caddy still listening on `*:443` (should be `192.168.1.150:443` after deploy)
-- Blocked domains still resolve to `192.168.1.150` (not `192.168.1.2` yet)
+- Blocked domains still resolve to `192.168.1.150` (not `192.168.1.200` yet)
 
 ### 2. dnsblockd Stats Validation
 
@@ -151,7 +151,7 @@ All orphaned since pre-niri migration. Likely useless.
 
 ### High Priority
 
-1. **Validate `192.168.1.2` doesn't conflict** — ping/arp scan before deploy
+1. **Validate `192.168.1.200` doesn't conflict** — ping/arp scan before deploy
 2. **`just switch` + verify dnsblockd** — the entire IP architecture change is theoretical until deployed
 3. **Archive 39 status docs** — move to `docs/status/archive/`, keep only 5-7 recent
 4. **`git stash clear`** — drop 3 orphaned stashes
@@ -180,13 +180,13 @@ All orphaned since pre-niri migration. Likely useless.
 | # | Task | Est. | Impact |
 |---|------|------|--------|
 | 1 | `just switch` — deploy all committed changes | 45m | Everything depends on this |
-| 2 | Verify dnsblockd serves block pages on `192.168.1.2:443` | 3m | Confirms the entire fix |
+| 2 | Verify dnsblockd serves block pages on `192.168.1.200:443` | 3m | Confirms the entire fix |
 | 3 | Verify Ollama works after rebuild (`ollama list` + test inference) | 5m | ROCm-dependent, was broken |
 | 4 | Verify Steam + ComfyUI work after rebuild | 10m | ROCm-dependent |
 | 5 | `git push` — push all local commits | 1m | Unpushed work at risk |
 | 6 | `git stash clear` — drop 3 orphaned stashes | 1m | Hygiene |
 | 7 | Delete 17 remote `copilot/fix-*` branches | 2m | Hygiene |
-| 8 | Ping `192.168.1.2` to confirm no IP conflict | 1m | Pre-deploy validation |
+| 8 | Ping `192.168.1.200` to confirm no IP conflict | 1m | Pre-deploy validation |
 | 9 | Archive 39 redundant status docs to `archive/` | 5m | Doc rot |
 | 10 | Move Taskwarrior encryption secret to sops-nix | 10m | Security |
 | 11 | Pin Docker image digests (Voice Agents + PhotoMap) | 10m | Security |
@@ -209,9 +209,9 @@ All orphaned since pre-niri migration. Likely useless.
 
 ## g) My Top #1 Question
 
-**Does `192.168.1.2` conflict with anything on your LAN?**
+**Does `192.168.1.200` conflict with anything on your LAN?**
 
-The dnsblockd dedicated IP is hardcoded as `192.168.1.2`. This is a common gateway/router address on many networks. If your router or any other device uses `.2`, the secondary IP will cause an ARP conflict and break both dnsblockd AND the conflicting device. Please confirm this IP is free before `just switch`.
+The dnsblockd dedicated IP is hardcoded as `192.168.1.200`. This is a common gateway/router address on many networks. If your router or any other device uses `.2`, the secondary IP will cause an ARP conflict and break both dnsblockd AND the conflicting device. Please confirm this IP is free before `just switch`.
 
 ---
 
@@ -227,10 +227,10 @@ Blocked:   doubleclick.net → 192.168.1.150 (correct resolution, wrong handler)
 ## Expected State After `just switch`
 
 ```
-dnsblockd: 192.168.1.2:80 + 192.168.1.2:443 (NEW — own IP, dynamic TLS)
+dnsblockd: 192.168.1.200:80 + 192.168.1.200:443 (NEW — own IP, dynamic TLS)
 Caddy:     192.168.1.150:443 (NEW — bound to server IP only)
 Unbound:   0.0.0.0:53 (unchanged)
-Blocked:   *.blocked-domain → 192.168.1.2 (NEW — goes directly to dnsblockd)
+Blocked:   *.blocked-domain → 192.168.1.200 (NEW — goes directly to dnsblockd)
 ```
 
 ---

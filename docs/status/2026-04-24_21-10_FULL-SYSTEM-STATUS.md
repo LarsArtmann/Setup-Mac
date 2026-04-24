@@ -17,7 +17,7 @@
 | Commit | Description |
 |--------|-------------|
 | `7f3ee14` | DNS cluster: Keepalived VRRP HA (evo-x2 MASTER, Pi 3 BACKUP, VIP 192.168.1.53) |
-| `7896f1f` | 10 service modules migrated to flake-parts (29 total) |
+| `7896f1f` | 10 service modules migrated to flake-parts (27 total) |
 | `fc74ddf` | Wallpapers as private flake input |
 | `ec5f2ce` | Status report + statix lint fixes (`{...}:` → `_:` on 9 modules) |
 | `4d62f96` | Status report + hipblaslt fix + rpi3 restructuring + dns-blocker restructure |
@@ -47,7 +47,7 @@
 - dnsblockd: fixed nil slice initialization (`stats.RecentBlocks = make([]BlockEntry, 0)`)
 - **Status:** ✅ Code complete, not yet deployed.
 
-#### 4. Flake-Parts Module Migration (10 new → 29 total)
+#### 4. Flake-Parts Module Migration (10 new → 27 total)
 Converted: `display-manager`, `audio`, `niri-config`, `security-hardening`, `ai-stack`, `monitoring`, `multi-wm`, `chromium-policies`, `steam`, `dns-failover`
 
 #### 5. Wallpapers as Flake Input
@@ -62,7 +62,7 @@ Converted: `display-manager`, `audio`, `niri-config`, `security-hardening`, `ai-
 - Taskwarrior + TaskChampion sync
 - SigNoz observability pipeline
 - Hermes AI gateway
-- 29 flake-parts service modules
+- 27 flake-parts service modules
 - Catppuccin Mocha everywhere
 - BTRFS + Timeshift
 - AMD GPU/NPU (ROCm 7.2.2, XDNA)
@@ -86,7 +86,7 @@ Converted: `display-manager`, `audio`, `niri-config`, `security-hardening`, `ai-
   - Test failover
 
 ### 3. Flake-Parts Migration — ~60%
-**Converted (29):** All service modules in `modules/nixos/services/`
+**Converted (27):** All service modules in `modules/nixos/services/`
 
 **Still inline — HM configs (can't be `nixosModules`):**
 waybar, niri-wrapped, rofi, swaylock, wlogout, zellij, yazi, shells, home.nix
@@ -227,7 +227,7 @@ Alternative: push now, switch later. But Ollama and Steam remain broken until sw
 | Metric | Value |
 |--------|-------|
 | Commits ahead of origin | 6 (NOT PUSHED) |
-| Total flake-parts modules | 29 |
+| Total flake-parts modules | 27 |
 | Total service modules | 28 |
 | Total flake inputs | 24 |
 | DNS blocked domains | 2.5M+ |

@@ -39,7 +39,7 @@
   - Unified `ExecStartPre` to always use `"+-${initScript}"`
 
 - `platforms/nixos/system/dns-blocker-config.nix` — updated to match simplified interface:
-  - `blockIP` changed from `serverIP` (192.168.1.150) to `192.168.1.2` (secondary IP on eno1)
+  - `blockIP` changed from `serverIP` (192.168.1.150) to `192.168.1.200` (secondary IP on eno1)
   - `blockTLSPort` changed from 8443 to 443 (standard HTTPS)
 
 #### 3. Cleaned Up Caddy Config
@@ -149,7 +149,7 @@ emeet-pixyd build fails during parallel test but succeeds alone.
 ### 6. Pi 3 `linux-rpi` Deprecation
 `linux-rpi series will be removed in a future release. Please change to use nixos-hardware.`
 
-### 7. DNS Blocker blockIP = 192.168.1.2
+### 7. DNS Blocker blockIP = 192.168.1.200
 Hardcoded secondary IP — not validated on the actual network. Could conflict if something else uses .2 on the LAN.
 
 ---
@@ -163,7 +163,7 @@ Hardcoded secondary IP — not validated on the actual network. Could conflict i
 - **Clean remote branches** (18 `copilot/fix-*`)
 
 ### Architecture
-- **Validate DNS blocker IP** — `192.168.1.2` is hardcoded, should be verified not conflicting
+- **Validate DNS blocker IP** — `192.168.1.200` is hardcoded, should be verified not conflicting
 - **NixOS module options** for niri session restore (not `let` blocks)
 - **`homeModules` pattern** for HM configs via flake-parts
 - **sops-nix for VRRP auth** (currently plaintext `auth_pass`)
@@ -184,7 +184,7 @@ Hardcoded secondary IP — not validated on the actual network. Could conflict i
 | 6 | **Build Pi 3 SD image** | High | Low |
 | 7 | **Flash SD + boot Pi 3** | High | Low |
 | 8 | **Test DNS failover** | High | Low |
-| 9 | **Validate `192.168.1.2`** doesn't conflict on LAN | High | 0 |
+| 9 | **Validate `192.168.1.200`** doesn't conflict on LAN | High | 0 |
 | 10 | **Check Authelia** SSO status | High | Low |
 | 11 | **Archive 30+ stale status docs** | Medium | Low |
 | 12 | **Delete untracked REVIEW_DOCS.md** or act on it | Low | 0 |
@@ -206,9 +206,9 @@ Hardcoded secondary IP — not validated on the actual network. Could conflict i
 
 ## G) TOP #1 QUESTION I CANNOT ANSWER
 
-**Does `192.168.1.2` conflict with anything on your LAN?**
+**Does `192.168.1.200` conflict with anything on your LAN?**
 
-The DNS blocker config now uses `blockIP = "192.168.1.2"` as a secondary address on `eno1`. This IP is added via `ip addr add` at boot. If another device (router, AP, server) already uses `.2`, it'll cause an IP conflict. I don't know your LAN topology — is `.2` safe to use?
+The DNS blocker config now uses `blockIP = "192.168.1.200"` as a secondary address on `eno1`. This IP is added via `ip addr add` at boot. If another device (router, AP, server) already uses `.2`, it'll cause an IP conflict. I don't know your LAN topology — is `.2` safe to use?
 
 ---
 
@@ -229,4 +229,4 @@ The DNS blocker config now uses `blockIP = "192.168.1.2"` as a secondary address
 | nixpkgs | `01fbdeef22b7` (Apr 23) |
 | Compositor | niri (Wayland) |
 | Theme | Catppuccin Mocha |
-| DNS blocker | 192.168.1.2:80/443 on eno1 |
+| DNS blocker | 192.168.1.200:80/443 on eno1 |

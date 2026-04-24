@@ -26,7 +26,7 @@ in {
     dns-blocker = {
       enable = true;
 
-      blockIP = "192.168.1.2";
+      blockIP = "192.168.1.200";
       blockPort = 80;
       blockTLSPort = 443;
       blockInterface = "eno1";

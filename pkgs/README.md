@@ -1,91 +1,90 @@
-# Crush-Patched
+# Custom Packages
 
-## Overview
+Custom Nix package definitions used across SystemNix. All packages are built via overlays in `flake.nix` and exposed as flake outputs.
 
-Custom build of Crush (terminal AI assistant) with critical patches applied from upstream PRs.
+## Packages
 
-**Current Version:** v0.41.0
-**Last Updated:** February 10, 2026
+| Package | Language | Platform | Description |
+|---------|----------|----------|-------------|
+| [dnsblockd](#dnsblockd) | Go | Linux | DNS block page HTTP server |
+| [dnsblockd-processor](#dnsblockd-processor) | Go | Linux | Blocklist processor for dnsblockd |
+| [emeet-pixyd](#emeet-pixyd) | Go | Linux | EMEET PIXY webcam auto-activation daemon |
+| [modernize](#modernize) | Go | All | Go code modernize linter |
+| [jscpd](#jscpd) | Node.js | All | Copy/paste detector for source code |
+| [aw-watcher-utilization](#aw-watcher-utilization) | Python | All | ActivityWatch system utilization watcher |
+| [monitor365](#monitor365) | Rust | Linux | Personal device monitoring agent |
+| [openaudible](#openaudible) | AppImage | Linux | Audible audiobook manager |
 
-## Applied Patches
+---
 
-The following critical patches are applied to fix bugs and improve stability:
+### dnsblockd
 
-### 1. PR #2181 - SQLite Busy Timeout Fix (Fixes #2129)
-- **Issue:** SQLite deadlocks under high concurrency with 5s timeout
-- **Fix:** Increase timeout from 5s to 30s, consolidate pragma configuration
-- **Impact:** Multi-instance usage no longer causes database lockups
-- **Files Modified:**
-  - `internal/db/connect.go`
-  - `internal/db/connect_modernc.go`
-  - `internal/db/connect_ncruces.go`
+Lightweight HTTP server that serves block pages for DNS-filtered domains. Paired with Unbound DNS resolver to provide visual feedback when a blocked domain is accessed.
 
-### 2. PR #2180 - LSP Files Outside CWD Fix (Fixes #1401)
-- **Issue:** LSP client couldn't handle files outside working directory
-- **Fix:** Make LSP client receive working directory explicitly instead of calling `os.Getwd()` internally
-- **Impact:** Improved IDE/editor integration reliability
-- **Files Modified:**
-  - `internal/lsp/client.go`
-  - `internal/lsp/client_test.go`
-  - `internal/lsp/manager.go`
+- **Source:** `dnsblockd.nix` (derivation) + inline Go source in flake
+- **Platform:** Linux only
+- **Config:** `platforms/nixos/system/dns-blocker-config.nix`
 
-### 3. PR #2161 - Regex Cache Memory Leak Fix
-- **Issue:** Regex caches grow unbounded across sessions, causing memory leaks
-- **Fix:** Clear regex caches at session boundaries
-- **Impact:** Prevents unbounded memory growth during long sessions
-- **Files Modified:**
-  - `internal/agent/tools/grep.go`
-  - `internal/ui/model/ui.go`
+### dnsblockd-processor
 
-## Update to New Version
+CLI tool that converts DNS blocklists (hosts, domains, dnsmasq, adblock formats) into Unbound `local-data` entries and a domain-to-list mapping JSON file. Run during NixOS activation to regenerate the block list.
 
-1. Edit `pkgs/crush-patched.nix`
-2. Update `version` and source `sha256`
+- **Source:** `dnsblockd-processor/` (standalone Go module, no dependencies)
+- **Platform:** Linux only
+- **Usage:** `dnsblockd-processor BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [LIST_FILE NAME]...`
 
-```bash
-# Get new version's hash
-nix-prefetch-url --type sha256 \
-  https://github.com/charmbracelet/crush/archive/refs/tags/v0.41.0.tar.gz
-```
+### emeet-pixyd
 
-3. Set `vendorHash = "sha256:0000000000000000000000000000000000000000000000000000000000000000";` (fake hash to force error)
-4. Build and copy the correct hash from error message:
+Auto-activation daemon for the EMEET PIXY dual-camera AI webcam. Detects video call usage via `/proc` scanning and automatically enables face tracking + noise cancellation on call start, privacy mode on call end. Includes a web UI and Waybar integration.
 
-```bash
-nix build .#crush-patched
-```
+- **Source:** `emeet-pixyd/` (Go module)
+- **Platform:** Linux only
+- **Config:** `platforms/nixos/hardware/emeet-pixy.nix` (NixOS module, udev rules)
+- **Binary alias:** `emeet-pixyd` and `emeet-pixy` both work
 
-Output shows:
-```
-got:    sha256-<correct-hash-here>
-```
+### modernize
 
-5. Paste the hash into `vendorHash = "sha256:<correct-hash-here>";`
-6. Build again: `nix build .#crush-patched`
-7. Install: `just switch`
+Builds the `modernize` analysis pass from `golang.org/x/tools` with Go 1.26. Detects Go code that can use newer language features.
 
-## Patch Management
+- **Source:** `modernize.nix` (fetches from `golang/tools` repo)
+- **Platform:** All platforms
+- **Install:** Available as `nix build .#modernize`
 
-Patches are fetched using `pkgs.fetchpatch` from GitHub commit URLs. To add/remove patches:
+### jscpd
 
-1. Add/remove patch entries in `patches = [...]` list in `pkgs/crush-patched.nix`
-2. Use `nix-prefetch-url` to get patch hashes:
+Copy/paste detector for programming source code — finds duplicated code across 150+ languages. Used in the project devShell.
 
-```bash
-nix-prefetch-url --type sha256 \
-  https://github.com/charmbracelet/crush/commit/<commit-hash>.patch
-```
+- **Source:** `jscpd.nix` (npm package, vendored lockfile in `jscpd-package-lock.json`)
+- **Platform:** All platforms
+- **Install:** Available in devShell via `nix develop`
 
-3. Rebuild with `nix build .#crush-patched`
+### aw-watcher-utilization
 
-## Verification
+Monitors CPU, RAM, disk, network, and sensor usage, reporting to ActivityWatch. Fork build from [Alwinator/aw-watcher-utilization](https://github.com/Alwinator/aw-watcher-utilization) with modernized poetry build.
 
-To verify patches are applied:
+- **Source:** `aw-watcher-utilization.nix` (Python, fetched from GitHub)
+- **Platform:** All platforms
+- **Config:** `platforms/darwin/services/launchagents.nix` (macOS LaunchAgent)
 
-```bash
-# Check build log for patch applications
-nix log /nix/store/<derivation-hash>-crush-patched-v0.41.0.drv | grep "applying patch"
+### monitor365
 
-# Verify binary version
-result/bin/crush --version
-```
+Cross-platform personal device monitoring system agent. Rust CLI that collects system metrics via a plugin architecture. NixOS module available at `modules/nixos/services/monitor365.nix` (currently disabled).
+
+- **Source:** `monitor365.nix` (Rust, source from `monitor365-src` flake input)
+- **Platform:** Linux only
+- **Builds:** Only the CLI agent binary (`--package monitor365-cli`)
+
+### openaudible
+
+Desktop application for managing Audible audiobooks. Wrapped AppImage.
+
+- **Source:** `openaudible.nix` (AppImage, unfree)
+- **Platform:** Linux only (x86_64)
+- **Install:** Included in `platforms/common/packages/base.nix` for Linux
+
+## Adding a New Package
+
+1. Create `pkgs/<name>.nix` (or `pkgs/<name>/` directory with `package.nix`)
+2. Add an overlay in `flake.nix` (follow existing patterns)
+3. Add to the `packages` attrset in the `perSystem` block
+4. Add to the appropriate overlay list (shared or Linux-only)
