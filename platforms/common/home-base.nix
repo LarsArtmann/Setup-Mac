@@ -16,7 +16,6 @@
     ./programs/git.nix
     ./programs/fzf.nix
     ./programs/pre-commit.nix
-    ./programs/ublock-filters.nix
     ./programs/keepassxc.nix
     ./programs/taskwarrior.nix
 
@@ -38,13 +37,6 @@
       enable = true;
       # Note: env variables are set via home.sessionVariables below
       # This ensures GOPATH is available in all shells, not just Go commands
-    };
-
-    # uBlock Origin filter management
-    ublock-filters = {
-      enable = false; # Temporarily disabled due to time parsing issues
-      enableAutoUpdate = true;
-      updateInterval = "09:00";
     };
   };
 
