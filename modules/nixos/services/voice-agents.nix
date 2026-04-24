@@ -3,7 +3,7 @@
     config,
     pkgs,
     lib,
-    utils,
+    _,
     ...
   }: let
     inherit (config.networking) domain;
@@ -22,7 +22,8 @@
 
       services:
         whisper-rocm:
-          image: beecave/insanely-fast-whisper-rocm:latest
+          image: beecave/insanely-fast-whisper-rocm:1.0.0
+          # TODO: pin to sha256 digest: docker pull beecave/insanely-fast-whisper-rocm:1.0.0 && docker inspect --format='{{.RepoDigests}}'
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000
@@ -103,8 +104,8 @@
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:latest";
-            TimeoutStartSec = 0;
+            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:1.0.0";
+            TimeoutStartSec = 600;
           };
         };
 
@@ -118,7 +119,6 @@
           serviceConfig = {
             Type = "forking";
             RemainAfterExit = true;
-            PIDFile = "/run/whisper-asr.pid";
             # Restart container if it crashes
             ExecStartPre = ["-${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans"];
             ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";

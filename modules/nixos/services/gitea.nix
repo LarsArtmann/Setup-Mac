@@ -318,6 +318,15 @@
 
     # Systemd configuration
     systemd = {
+      # Harden the main Gitea service (managed by services.gitea)
+      services.gitea = {
+        serviceConfig = {
+          WatchdogSec = "30";
+          Restart = "on-failure";
+          RestartSec = "5";
+        };
+      };
+
       # GitHub sync service
       services.gitea-github-sync = {
         description = "Sync all GitHub repos to Gitea";

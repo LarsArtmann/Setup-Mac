@@ -38,6 +38,12 @@ _: {
         default = 24;
         description = "Subnet prefix length for the virtual IP";
       };
+
+      authPassword = mkOption {
+        type = types.str;
+        default = "DNSClusterVRRP";
+        description = "VRRP authentication password (override with sops for production)";
+      };
     };
 
     config = lib.mkIf cfg.enable {
@@ -66,6 +72,13 @@ _: {
           ];
 
           trackScripts = ["chk_unbound"];
+
+          extraConfig = ''
+            authentication {
+              auth_type PASS
+              auth_pass ${cfg.authPassword}
+            }
+          '';
         };
 
         extraGlobalDefs = ''

@@ -1,5 +1,5 @@
 {pkgs}: let
-  inherit (pkgs) lib python3Packages fetchFromGitHub poetry;
+  inherit (pkgs) lib python3Packages fetchFromGitHub;
   inherit (python3Packages) buildPythonApplication;
 in
   buildPythonApplication rec {

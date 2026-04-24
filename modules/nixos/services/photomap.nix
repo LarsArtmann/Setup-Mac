@@ -25,7 +25,8 @@
   in {
     virtualisation.oci-containers.containers.photomap = {
       autoStart = true;
-      image = "lstein/photomapai:latest";
+      image = "lstein/photomapai:1.0.0";
+      # TODO: pin to sha256 digest: docker pull lstein/photomapai:1.0.0 && docker inspect --format='{{.RepoDigests}}'
       ports = ["127.0.0.1:8050:8050"];
       volumes = [
         "${immichUploadDir}:/Pictures/upload:ro"

@@ -16,9 +16,6 @@ in {
     pgUser = "postgres";
     pgDb = "twenty";
 
-    appSecretFile = config.sops.secrets.twenty_app_secret.path;
-    pgPasswordFile = config.sops.secrets.twenty_db_password.path;
-
     serverUrl = "https://crm.${domain}";
 
     composeFile =

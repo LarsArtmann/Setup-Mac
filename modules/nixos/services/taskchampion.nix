@@ -23,6 +23,8 @@
       RestrictNamespaces = true;
       LockPersonality = true;
       WatchdogSec = "30";
+      Restart = "on-failure";
+      RestartSec = "5";
     };
   };
 }

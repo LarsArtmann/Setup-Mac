@@ -72,12 +72,11 @@
   # Common nixpkgs configuration (platform-agnostic except for hostPlatform)
   nixpkgs = {
     config = {
-      allowUnsupportedSystem = true;
+      allowUnsupportedSystem = false;
       allowUnfreePredicate = pkg:
         builtins.elem (lib.getName pkg) [
           "vault" # 'bsl11' licence
           "terraform" # 'bsl11' licence
-          "cursor" # 'unfree'
           "idea" # 'unfree' licence (jetbrains.idea)
           "idea-ultimate" # 'unfree' licence (legacy alias)
           "webstorm" # 'unfree' licence
@@ -85,7 +84,6 @@
           "rider" # 'unfree' licence
           "google-chrome" # 'unfree' licence
           "signal-desktop-bin" # 'agpl3Only free unfree'
-          "castlabs-electron" # needed for tidal-hifi
           "grayjay" # 'sfl' licence - Cross-platform application to stream and download content
         ];
     };

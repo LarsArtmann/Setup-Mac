@@ -23,7 +23,6 @@
         compression = 9;
         packedGitLimit = "512m";
         packedGitWindowSize = "512m";
-        pager = "cat";
         quotePath = false;
         editor = "code --wait";
       };
@@ -53,7 +52,10 @@
 
       gpg = {
         format = "openpgp";
-        program = "/run/current-system/sw/bin/gpg";
+        program =
+          if pkgs.stdenv.isDarwin
+          then "gpg"
+          else "/run/current-system/sw/bin/gpg";
       };
 
       filter = {
@@ -168,7 +170,6 @@
       "__pycache__/"
       "*.py[cod]"
       "*$py.class"
-      "*.so"
       ".Python"
       "env/"
       "venv/"
@@ -180,14 +181,11 @@
       "*.exe"
       "*.exe~"
       "*.dll"
-      "*.so"
       "*.dylib"
       "*.test"
-      "*.out"
       "go.work"
 
       # Rust
-      "target/"
       "Cargo.lock"
 
       # Java
@@ -195,16 +193,11 @@
       "*.jar"
       "*.war"
       "*.ear"
-      "*.zip"
-      "*.tar.gz"
-      "*.rar"
       "hs_err_pid*"
 
       # C/C++
       "*.o"
       "*.a"
-      "*.so"
-      "*.out"
 
       # Environment and secrets
       ".env"
@@ -218,7 +211,6 @@
       # Backup files
       "*.bak"
       "*.backup"
-      "*~"
 
       # Compressed files
       "*.7z"
@@ -227,11 +219,12 @@
       "*.iso"
       "*.rar"
       "*.tar"
+      "*.tar.gz"
       "*.zip"
 
-      # Logs
-      "logs/"
-      "*.log"
+      # Shared libraries (consolidated)
+      "*.so"
+      "*.out"
 
       # Generated files
       "*_templ.go" ## https://templ.guide/

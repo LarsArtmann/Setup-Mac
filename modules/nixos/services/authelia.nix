@@ -209,6 +209,8 @@
         RestrictNamespaces = true;
         LockPersonality = true;
         WatchdogSec = "30";
+        Restart = "on-failure";
+        RestartSec = "5";
         ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
       };
     };

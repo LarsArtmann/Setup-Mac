@@ -5,7 +5,6 @@
   wallpapers,
   ...
 }: let
-  userHome = config.home.homeDirectory;
   wallpaperDir = wallpapers;
   sessionSaveInterval = "60s";
   maxSessionAgeDays = 7;

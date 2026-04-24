@@ -260,6 +260,19 @@
           Type = "oneshot";
           User = cfg.user;
           EnvironmentFile = config.sops.templates."gitea-sync.env".path;
+          PrivateTmp = true;
+          NoNewPrivileges = true;
+          ProtectHome = "read-only";
+          ProtectSystem = "strict";
+          ProtectClock = true;
+          ProtectHostname = true;
+          RestrictNamespaces = true;
+          LockPersonality = true;
+          MemoryMax = "512M";
+          Restart = "on-failure";
+          RestartSec = "5";
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 300;
           # Wait for Gitea to be ready before running
           ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
             echo "Waiting for Gitea to be ready..."
@@ -275,8 +288,6 @@
             exit 1
           '';
           ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
-          Restart = "on-failure";
-          RestartSec = "30s";
         };
       };
 

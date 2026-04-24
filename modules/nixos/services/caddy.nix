@@ -14,7 +14,10 @@
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
       then let
         addrs = config.networking.interfaces.${config.services.dns-blocker.blockInterface}.ipv4.addresses;
-      in if addrs != [] then "bind ${(builtins.head addrs).address}" else ""
+      in
+        if addrs != []
+        then "bind ${(builtins.head addrs).address}"
+        else ""
       else "";
 
     tlsConfig = ''
@@ -28,7 +31,7 @@
       }
     '';
 
-    protectedVHost = subdomain: port: {
+    protectedVHost = _: port: {
       extraConfig = ''
         ${tlsConfig}
         ${forwardAuth}

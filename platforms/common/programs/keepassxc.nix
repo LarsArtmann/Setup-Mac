@@ -4,7 +4,6 @@
   lib,
   ...
 }: let
-  cfg = config.programs.keepassxc;
   keepassxcPkg = pkgs.keepassxc;
 
   # Chromium manifest as a separate file to avoid eval-time cycles

@@ -321,25 +321,24 @@ in {
               -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf \
               ${lib.optionalString (cfg.categories != {}) "-categories ${categoriesJSON}"}
           '';
-        in
-          {
-            Type = "simple";
-            ExecStartPre = "+-${initScript}";
-            ExecStart = "${dnsblockdWrapper}";
-            StateDirectory = "dnsblockd";
-            Restart = "on-failure";
-            RestartSec = "3s";
-            StartLimitBurst = 5;
-            StartLimitIntervalSec = 60;
+        in {
+          Type = "simple";
+          ExecStartPre = "+-${initScript}";
+          ExecStart = "${dnsblockdWrapper}";
+          StateDirectory = "dnsblockd";
+          Restart = "on-failure";
+          RestartSec = "3s";
+          StartLimitBurst = 5;
+          StartLimitIntervalSec = 60;
 
-            SupplementaryGroups = ["unbound"];
-            ProtectSystem = "strict";
-            ProtectHome = true;
-            PrivateTmp = true;
-            RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_NETLINK"];
-            AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
-            CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
-          };
+          SupplementaryGroups = ["unbound"];
+          ProtectSystem = "strict";
+          ProtectHome = true;
+          PrivateTmp = true;
+          RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_NETLINK"];
+          AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
+          CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
+        };
       };
 
       user.services.dnsblockd-cert-import = {
