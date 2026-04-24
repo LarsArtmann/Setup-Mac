@@ -66,6 +66,15 @@
             reverse_proxy localhost:8188
           '';
         };
+      } // lib.optionalAttrs config.services.dns-blocker.enable {
+        ":443" = {
+          extraConfig = ''
+            tls ${serverCert} ${serverKey}
+            reverse_proxy ${config.services.dns-blocker.blockIP}:${toString config.services.dns-blocker.blockPort} {
+              header_up Host {host}
+            }
+          '';
+        };
       };
     };
 

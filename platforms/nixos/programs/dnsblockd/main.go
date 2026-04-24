@@ -206,6 +206,7 @@ func init() {
 		log.Fatalf("failed to parse template: %v", err)
 	}
 	stats.Start = time.Now()
+	stats.RecentBlocks = make([]BlockEntry, 0)
 	certCache.certs = make(map[string]*tls.Certificate)
 
 	prometheus.MustRegister(blockedTotal)
