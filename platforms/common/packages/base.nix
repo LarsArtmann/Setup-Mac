@@ -105,6 +105,10 @@
       btop
       htop
 
+      # Archive tools
+      unzip
+      zip
+
       # File utilities
       sd # Modern find and replace
       dust # Modern du
