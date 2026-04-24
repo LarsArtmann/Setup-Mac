@@ -34,17 +34,16 @@
     ../hardware/emeet-pixy.nix
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
-    # Desktop modules
-    ../desktop/display-manager.nix
-    ../desktop/audio.nix
-    ../desktop/niri-config.nix
-    ../desktop/security-hardening.nix
-    ../desktop/ai-stack.nix
-    ../desktop/monitoring.nix
-    ../desktop/multi-wm.nix
-    # Chromium enterprise policies (extensions, security) — applies to Helium
-    ../programs/chromium-policies.nix
-    ../programs/steam.nix
+    # Desktop modules — now loaded via flake modules
+    # ../desktop/display-manager.nix
+    # ../desktop/audio.nix
+    # ../desktop/niri-config.nix
+    # ../desktop/security-hardening.nix
+    # ../desktop/ai-stack.nix
+    # ../desktop/monitoring.nix
+    # ../desktop/multi-wm.nix
+    # ../programs/chromium-policies.nix
+    # ../programs/steam.nix
   ];
 
   # Define color scheme option

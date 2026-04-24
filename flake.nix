@@ -203,6 +203,18 @@
     jscpdOverlay = _final: prev: {
       jscpd = prev.callPackage ./pkgs/jscpd.nix {};
     };
+    hipblasltFixOverlay = _final: prev: {
+      rocmPackages = prev.rocmPackages.overrideScope (_rfinal: rprev: {
+        hipblaslt = rprev.hipblaslt.overrideAttrs (old: {
+          postPatch =
+            (old.postPatch or "")
+            + ''
+              sed -i 's/raise Exception("!! Warning: Any rejection/print("!! Warning: Rejection/' tensilelite/Tensile/SolutionStructs/Utilities.py
+            '';
+        });
+      });
+    };
+
     unboundDoQOverlay = _final: prev: let
       unboundNoSlim = prev.unbound.override {withSlimLib = false;};
     in {
@@ -253,6 +265,15 @@
         ./modules/nixos/services/monitor365.nix
         ./modules/nixos/services/comfyui.nix
         ./modules/nixos/services/dns-failover.nix
+        ./modules/nixos/services/display-manager.nix
+        ./modules/nixos/services/audio.nix
+        ./modules/nixos/services/niri-config.nix
+        ./modules/nixos/services/security-hardening.nix
+        ./modules/nixos/services/ai-stack.nix
+        ./modules/nixos/services/monitoring.nix
+        ./modules/nixos/services/multi-wm.nix
+        ./modules/nixos/services/chromium-policies.nix
+        ./modules/nixos/services/steam.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -502,6 +523,7 @@
                   emeetPixyOverlay
                   monitor365Overlay
                   unboundDoQOverlay
+                  hipblasltFixOverlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});
@@ -557,6 +579,15 @@
             inputs.self.nixosModules.monitor365
             inputs.self.nixosModules.comfyui
             inputs.self.nixosModules.dns-failover
+            inputs.self.nixosModules.display-manager
+            inputs.self.nixosModules.audio
+            inputs.self.nixosModules.niri-config
+            inputs.self.nixosModules.security-hardening
+            inputs.self.nixosModules.ai-stack
+            inputs.self.nixosModules.monitoring
+            inputs.self.nixosModules.multi-wm
+            inputs.self.nixosModules.chromium-policies
+            inputs.self.nixosModules.steam
             ./platforms/nixos/system/configuration.nix
           ];
         };
