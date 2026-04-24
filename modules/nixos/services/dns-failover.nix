@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.dns-failover = {
     config,
     lib,

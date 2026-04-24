@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.multi-wm = {pkgs, ...}: {
     # Backup window manager alongside Niri
     # This allows switching between different WMs at SDDM login screen

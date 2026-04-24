@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.audio = _: {
     # Enable sound with pipewire
     services.pipewire = {

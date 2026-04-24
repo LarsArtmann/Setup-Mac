@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.chromium-policies =
     # Force-install extensions via Helium's proxied update URL
     # No explicit update_url → Helium routes through services.helium.imput.net

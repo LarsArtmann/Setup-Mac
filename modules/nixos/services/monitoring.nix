@@ -1,4 +1,4 @@
-{...}: {
+_: {
   flake.nixosModules.monitoring = {pkgs, ...}: {
     environment.systemPackages = with pkgs; [
       radeontop # AMD GPU specific monitor (CLI, lightweight)
