@@ -8,9 +8,9 @@ import (
 
 func TestParseUevent(t *testing.T) {
 	tests := []struct {
-		name   string
-		input  string
-		want   uevent
+		name  string
+		input string
+		want  uevent
 	}{
 		{
 			name:  "video add",

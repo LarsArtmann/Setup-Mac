@@ -28,8 +28,8 @@ const (
 	maxStreamBufferSize = 10 * 1024 * 1024
 	maxBodyBytes        = 1 << 10
 
-	panMin = -170
-	panMax = 170
+	panMin  = -170
+	panMax  = 170
 	tiltMin = -30
 	tiltMax = 30
 	zoomMin = 100
@@ -38,6 +38,11 @@ const (
 	staticCacheMaxAge  = 7 * 24 * time.Hour
 	ffmpegShutdownSecs = 2 * time.Second
 	streamBufSize      = 64 * 1024
+
+	toastTypeSuccess = "success"
+	toastTypeInfo    = "info"
+
+	ptzCacheTTL = 2 * time.Second
 )
 
 //go:embed static
@@ -108,40 +113,28 @@ func (s *webServer) getWebStatus() webStatus {
 	s.daemon.mu.RLock()
 	defer s.daemon.mu.RUnlock()
 	status := webStatus{
-
-		Camera: string(s.daemon.state.Camera),
-
-		Audio: string(s.daemon.state.Audio),
-
-		Gesture: s.daemon.state.Gesture,
-
-		Pan: 0,
-
-		Tilt: 0,
-
-		Zoom: 0,
-
-		InCall: s.daemon.state.InCall,
-
-		Auto: s.daemon.state.AutoMode,
-
-		Online: s.daemon.videoDev != "",
-
-		Device: s.daemon.videoDev,
-
+		Camera:     string(s.daemon.state.Camera),
+		Audio:      string(s.daemon.state.Audio),
+		Gesture:    s.daemon.state.Gesture,
+		Pan:        0,
+		Tilt:       0,
+		Zoom:       0,
+		InCall:     s.daemon.state.InCall,
+		Auto:       s.daemon.state.AutoMode,
+		Online:     s.daemon.videoDev != "",
+		Device:     s.daemon.videoDev,
 		LastSynced: formatLastSynced(s.daemon.lastSyncedAt),
 	}
 	if status.Online {
-
 		status.Zoom = zoomDefault
 	}
+
 	return status
 }
 
 func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 	status := s.getWebStatus()
 	if !status.Online {
-
 		return status
 	}
 	dev := status.Device
@@ -161,7 +154,7 @@ func (s *webServer) getWebStatusWithPTZ(ctx context.Context) webStatus {
 	ptz := parsePTZValues(ctx, dev)
 	s.daemon.ptzCache.mu.Lock()
 	s.daemon.ptzCache.values = ptz
-	s.daemon.ptzCache.expiresAt = now.Add(2 * time.Second)
+	s.daemon.ptzCache.expiresAt = now.Add(ptzCacheTTL)
 	s.daemon.ptzCache.mu.Unlock()
 
 	status.Pan = ptz.Pan
@@ -203,21 +196,21 @@ func (s *webServer) action(command string) http.HandlerFunc {
 func actionToast(command string) (string, string) {
 	switch command {
 	case "track":
-		return "Tracking enabled", "success"
+		return "Tracking enabled", toastTypeSuccess
 	case "idle":
-		return "Camera idle", "success"
+		return "Camera idle", toastTypeSuccess
 	case cmdPrivacy:
-		return "Privacy mode on", "success"
+		return "Privacy mode on", toastTypeSuccess
 	case "center":
-		return "Camera centered", "success"
+		return "Camera centered", toastTypeSuccess
 	case "sync":
-		return "State synced", "success"
+		return "State synced", toastTypeSuccess
 	case "probe":
-		return "Probed devices", "success"
+		return "Probed devices", toastTypeSuccess
 	case "toggle-gesture":
-		return "Gesture toggled", "info"
+		return "Gesture toggled", toastTypeInfo
 	case "toggle-auto":
-		return "Auto mode toggled", "info"
+		return "Auto mode toggled", toastTypeInfo
 	default:
 		return "", ""
 	}
@@ -228,7 +221,6 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 	mode := request.FormValue("mode")
 	cmd := audioCommand
 	if mode != "" {
-
 		cmd = audioCommand + " " + mode
 	}
 	resp := s.daemon.handleCommand(request.Context(), cmd)
@@ -238,7 +230,7 @@ func (s *webServer) handleAudio(responseWriter http.ResponseWriter, request *htt
 		status.Error = resp
 	} else {
 		status.Toast = "Audio mode changed"
-		status.ToastType = "info"
+		status.ToastType = toastTypeInfo
 	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
@@ -348,7 +340,6 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 
 	status, ok := s.checkDevice(responseWriter)
 	if !ok {
-
 		return
 	}
 	if _, lookErr := exec.LookPath("ffmpeg"); lookErr != nil {
@@ -449,25 +440,19 @@ func (s *webServer) handleStream(responseWriter http.ResponseWriter, request *ht
 		)
 
 		if headerErr != nil {
-
 			return
-
 		}
 
 		_, writeErr := responseWriter.Write(frame)
 
 		if writeErr != nil {
-
 			return
-
 		}
 
 		_, sepErr := fmt.Fprint(responseWriter, "\r\n")
 
 		if sepErr != nil {
-
 			return
-
 		}
 
 		flusher.Flush()
@@ -543,7 +528,7 @@ func (s *webServer) handleAutoToggle(responseWriter http.ResponseWriter, request
 		status.Error = resp
 	} else {
 		status.Toast = "Auto mode toggled"
-		status.ToastType = "info"
+		status.ToastType = toastTypeInfo
 	}
 	templ.Handler(statusPanel(status)).ServeHTTP(responseWriter, request)
 }
@@ -605,7 +590,6 @@ func newWebMux(server *webServer) *http.ServeMux {
 	mux.HandleFunc("POST /api/probe", server.action("probe"))
 	mux.HandleFunc("POST /api/ptz/{axis}", server.handlePTZ)
 	mux.HandleFunc("POST /api/ptz/", func(w http.ResponseWriter, _ *http.Request) {
-
 		http.Error(w, "missing axis", http.StatusBadRequest)
 	})
 	mux.HandleFunc("GET /api/snapshot", server.handleSnapshot)

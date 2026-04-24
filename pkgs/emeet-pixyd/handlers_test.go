@@ -5,6 +5,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -266,12 +267,12 @@ func TestSecurityMiddleware(t *testing.T) {
 	t.Parallel()
 
 	called := false
-	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	inner := http.HandlerFunc(func(_ http.ResponseWriter, _ *http.Request) {
 		called = true
 	})
 	handler := securityMiddleware(inner)
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/", nil)
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
@@ -299,12 +300,12 @@ func TestRequestIDMiddleware_Generated(t *testing.T) {
 	t.Parallel()
 
 	var capturedID string
-	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	inner := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		capturedID = w.Header().Get("X-Request-ID")
 	})
 	handler := requestIDMiddleware(inner)
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/", nil)
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
 
@@ -320,12 +321,12 @@ func TestRequestIDMiddleware_Passthrough(t *testing.T) {
 	t.Parallel()
 
 	var capturedID string
-	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	inner := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		capturedID = w.Header().Get("X-Request-ID")
 	})
 	handler := requestIDMiddleware(inner)
 
-	req := httptest.NewRequest("GET", "/", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/", nil)
 	req.Header.Set("X-Request-ID", "abcd1234")
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, req)
@@ -338,12 +339,12 @@ func TestRequestIDMiddleware_Passthrough(t *testing.T) {
 func TestCachingFS(t *testing.T) {
 	t.Parallel()
 
-	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	inner := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.Write([]byte("ok"))
 	})
 	cfs := cachingFS{handler: inner}
 
-	req := httptest.NewRequest("GET", "/static/test.js", nil)
+	req := httptest.NewRequestWithContext(context.Background(), "GET", "/static/test.js", nil)
 	rec := httptest.NewRecorder()
 	cfs.ServeHTTP(rec, req)
 

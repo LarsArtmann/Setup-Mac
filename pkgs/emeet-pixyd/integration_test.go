@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,18 +12,18 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/larsartmann/systemnix/emeet-pixyd/internal/pixy"
 )
 
 func newIntegrationDaemon(t *testing.T) *Daemon {
 	t.Helper()
 	return &Daemon{
-
 		mu: sync.RWMutex{},
 
 		state: pixy.DefaultState(),
 
 		config: pixy.Config{
-
 			StateDir: t.TempDir(),
 
 			PollInterval: 2 * time.Second,
@@ -65,7 +64,6 @@ func getBody(t *testing.T, resp *http.Response) string {
 	t.Helper()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-
 		t.Fatalf("read body: %v", err)
 	}
 	return string(body)
@@ -74,7 +72,6 @@ func getBody(t *testing.T, resp *http.Response) string {
 func assertStatusCode(t *testing.T, resp *http.Response, expected int) {
 	t.Helper()
 	if resp.StatusCode != expected {
-
 		t.Errorf("expected %d, got %d", expected, resp.StatusCode)
 	}
 }
@@ -82,7 +79,6 @@ func assertStatusCode(t *testing.T, resp *http.Response, expected int) {
 func assertContains(t *testing.T, haystack, needle, label string) {
 	t.Helper()
 	if !strings.Contains(haystack, needle) {
-
 		t.Errorf("%s: expected body to contain %q", label, needle)
 	}
 }
@@ -90,7 +86,6 @@ func assertContains(t *testing.T, haystack, needle, label string) {
 func assertNotContains(t *testing.T, haystack, needle, label string) {
 	t.Helper()
 	if strings.Contains(haystack, needle) {
-
 		t.Errorf("%s: expected body NOT to contain %q", label, needle)
 	}
 }
@@ -104,7 +99,6 @@ func post(t *testing.T, url, contentType string, body io.Reader) *http.Response 
 	t.Helper()
 	resp, err := http.Post(url, contentType, body)
 	if err != nil {
-
 		t.Fatalf("POST %s: %v", url, err)
 	}
 	return resp
@@ -114,7 +108,6 @@ func get(t *testing.T, url string) *http.Response {
 	t.Helper()
 	resp, err := http.Get(url)
 	if err != nil {
-
 		t.Fatalf("GET %s: %v", url, err)
 	}
 	return resp
@@ -124,7 +117,6 @@ func postAndClose(t *testing.T, url, contentType string, body io.Reader) {
 	t.Helper()
 	resp, err := http.Post(url, contentType, body)
 	if err != nil {
-
 		t.Fatalf("POST %s: %v", url, err)
 	}
 	resp.Body.Close()
@@ -134,16 +126,14 @@ func assertSocketCommandsHavePrefix(
 	t *testing.T,
 	socketPath string,
 	commands []string,
-	expectedPrefix string) {
+	expectedPrefix string,
+) {
 	t.Helper()
 	for _, cmd := range commands {
 
 		resp, err := pixy.SendCommand(context.Background(), socketPath, cmd)
-
 		if err != nil {
-
 			t.Fatalf("%s: %v", cmd, err)
-
 		}
 
 		assertSocketResponsePrefix(t, resp, expectedPrefix, "socket response")
@@ -153,9 +143,7 @@ func assertSocketCommandsHavePrefix(
 func assertEndpointsReturnNonOK(t *testing.T, serverURL, method string, endpoints []string) {
 	t.Helper()
 	for _, ep := range endpoints {
-
 		t.Run(ep, func(t *testing.T) {
-
 			var (
 				resp *http.Response
 
@@ -163,29 +151,20 @@ func assertEndpointsReturnNonOK(t *testing.T, serverURL, method string, endpoint
 			)
 
 			if method == "GET" {
-
 				resp, err = http.Get(serverURL + ep)
-
 			} else {
-
 				resp, err = http.Post(serverURL+ep, "", nil)
-
 			}
 
 			if err != nil {
-
 				t.Fatalf("%s %s: %v", method, ep, err)
-
 			}
 
 			resp.Body.Close()
 
 			if resp.StatusCode == http.StatusOK {
-
 				t.Errorf("%s %s should not be 200, got %d", method, ep, resp.StatusCode)
-
 			}
-
 		})
 	}
 }
@@ -197,7 +176,6 @@ func ptr[T any](v T) *T { return &v }
 func assertWebStatusOffline(t *testing.T, status webStatus) {
 	t.Helper()
 	assertWebStatusField(t, status, webStatusCheck{
-
 		Camera: ptr(string(pixy.StatePrivacy)),
 
 		Audio: ptr(string(pixy.AudioNC)),
@@ -232,43 +210,33 @@ type webStatusCheck struct {
 func assertWebStatusField(t *testing.T, status webStatus, check webStatusCheck) {
 	t.Helper()
 	if check.Camera != nil && status.Camera != *check.Camera {
-
 		t.Errorf("expected camera=%s, got %s", *check.Camera, status.Camera)
 	}
 	if check.Audio != nil && status.Audio != *check.Audio {
-
 		t.Errorf("expected audio=%s, got %s", *check.Audio, status.Audio)
 	}
 	if check.Gesture != nil && status.Gesture != *check.Gesture {
-
 		t.Errorf("expected gesture=%v, got %v", *check.Gesture, status.Gesture)
 	}
 	if check.Auto != nil && status.Auto != *check.Auto {
-
 		t.Errorf("expected auto=%v, got %v", *check.Auto, status.Auto)
 	}
 	if check.InCall != nil && status.InCall != *check.InCall {
-
 		t.Errorf("expected inCall=%v, got %v", *check.InCall, status.InCall)
 	}
 	if check.Online != nil && status.Online != *check.Online {
-
 		t.Errorf("expected online=%v, got %v", *check.Online, status.Online)
 	}
 	if check.Device != nil && status.Device != *check.Device {
-
 		t.Errorf("expected device=%s, got %s", *check.Device, status.Device)
 	}
 	if check.Pan != nil && status.Pan != *check.Pan {
-
 		t.Errorf("expected pan=%d, got %d", *check.Pan, status.Pan)
 	}
 	if check.Tilt != nil && status.Tilt != *check.Tilt {
-
 		t.Errorf("expected tilt=%d, got %d", *check.Tilt, status.Tilt)
 	}
 	if check.Zoom != nil && status.Zoom != *check.Zoom {
-
 		t.Errorf("expected zoom=%d, got %d", *check.Zoom, status.Zoom)
 	}
 }
@@ -281,7 +249,6 @@ func assertWebStatus(t *testing.T, status webStatus) {
 func assertSocketResponseContains(t *testing.T, resp, substr, label string) {
 	t.Helper()
 	if !strings.Contains(resp, substr) {
-
 		t.Errorf("%s: expected %q in response, got: %s", label, substr, resp)
 	}
 }
@@ -289,7 +256,6 @@ func assertSocketResponseContains(t *testing.T, resp, substr, label string) {
 func assertSocketResponsePrefix(t *testing.T, resp, prefix, label string) {
 	t.Helper()
 	if !strings.HasPrefix(resp, prefix) {
-
 		t.Errorf("%s: expected prefix %q, got: %s", label, prefix, resp)
 	}
 }
@@ -297,7 +263,6 @@ func assertSocketResponsePrefix(t *testing.T, resp, prefix, label string) {
 func assertSocketResponseHasPrefixes(t *testing.T, resp string, prefixes []string) {
 	t.Helper()
 	for _, p := range prefixes {
-
 		assertSocketResponseContains(t, resp, p, "socket response")
 	}
 }
@@ -372,7 +337,6 @@ func TestWeb_AutoToggleOff(t *testing.T) {
 	isAuto := daemon.state.AutoMode
 	daemon.mu.Unlock()
 	if isAuto {
-
 		t.Error("expected auto=false after toggle from true")
 	}
 }
@@ -388,7 +352,6 @@ func TestWeb_AutoToggleOn(t *testing.T) {
 	isAuto := daemon.state.AutoMode
 	daemon.mu.Unlock()
 	if !isAuto {
-
 		t.Error("expected auto=true after toggle from false")
 	}
 }
@@ -399,14 +362,12 @@ func TestWeb_AutoToggleRoundTrip(t *testing.T) {
 	postAndClose(t, server.URL+"/api/auto", "", nil)
 	daemon.mu.Lock()
 	if daemon.state.AutoMode {
-
 		t.Fatal("first toggle should turn auto off")
 	}
 	daemon.mu.Unlock()
 	postAndClose(t, server.URL+"/api/auto", "", nil)
 	daemon.mu.Lock()
 	if !daemon.state.AutoMode {
-
 		t.Fatal("second toggle should turn auto back on")
 	}
 	daemon.mu.Unlock()
@@ -434,9 +395,7 @@ func TestWeb_GestureToggleReturnsPanel(t *testing.T) {
 
 func TestWeb_AudioWithValidModes(t *testing.T) {
 	for _, mode := range []string{"nc", "live", "org"} {
-
 		t.Run(mode, func(t *testing.T) {
-
 			daemon := newIntegrationDaemon(t)
 
 			_, server := newTestWebServer(t, daemon)
@@ -455,7 +414,6 @@ func TestWeb_AudioWithValidModes(t *testing.T) {
 			defer resp.Body.Close()
 
 			assertStatusCode(t, resp, http.StatusOK)
-
 		})
 	}
 }
@@ -498,7 +456,8 @@ func testPTZEndpoint(t *testing.T, path, body string, expectedStatus int) {
 }
 
 func TestWeb_PTZMissingAxis(
-	t *testing.T) {
+	t *testing.T,
+) {
 	testPTZEndpoint(t, "/api/ptz/", "", http.StatusBadRequest)
 }
 
@@ -584,7 +543,6 @@ func TestWeb_POSTEndpointsRejectGET(t *testing.T) {
 	daemon := newIntegrationDaemon(t)
 	_, server := newTestWebServer(t, daemon)
 	endpoints := []string{
-
 		"/api/track",
 
 		"/api/idle",
@@ -643,7 +601,6 @@ func TestWeb_WebStatusOnlineWithDevice(t *testing.T) {
 	webSrv := &webServer{daemon: daemon}
 	status := webSrv.getWebStatus()
 	assertWebStatusField(t, status, webStatusCheck{
-
 		Camera: ptr(string(pixy.StateTracking)),
 
 		Audio: ptr(string(pixy.AudioLive)),
@@ -666,7 +623,6 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 	tests := []struct {
 		camera pixy.CameraState
 	}{
-
 		{pixy.StateTracking},
 
 		{pixy.StatePrivacy},
@@ -676,9 +632,7 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 		{pixy.StateOffline},
 	}
 	for _, tc := range tests {
-
 		t.Run(string(tc.camera), func(t *testing.T) {
-
 			daemon := newIntegrationDaemon(t)
 
 			daemon.videoDev = "/dev/video0"
@@ -690,11 +644,8 @@ func TestWeb_WebStatusAllCameraStates(t *testing.T) {
 			status := webSrv.getWebStatus()
 
 			if status.Camera != string(tc.camera) {
-
 				t.Errorf("expected camera=%s, got %s", tc.camera, status.Camera)
-
 			}
-
 		})
 	}
 }
@@ -703,7 +654,6 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 	tests := []struct {
 		audio pixy.AudioMode
 	}{
-
 		{pixy.AudioNC},
 
 		{pixy.AudioLive},
@@ -711,9 +661,7 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 		{pixy.AudioOriginal},
 	}
 	for _, tc := range tests {
-
 		t.Run(string(tc.audio), func(t *testing.T) {
-
 			daemon := newIntegrationDaemon(t)
 
 			daemon.state.Audio = tc.audio
@@ -723,11 +671,8 @@ func TestWeb_WebStatusAllAudioModes(t *testing.T) {
 			status := webSrv.getWebStatus()
 
 			if status.Audio != string(tc.audio) {
-
 				t.Errorf("expected audio=%s, got %s", tc.audio, status.Audio)
-
 			}
-
 		})
 	}
 }
@@ -737,7 +682,6 @@ func shortSocketDir(t *testing.T) string {
 	//nolint:usetesting // macOS t.TempDir() produces paths too long for Unix socket addresses
 	dir, err := os.MkdirTemp("/tmp", "pxd-")
 	if err != nil {
-
 		t.Fatalf("create short temp dir: %v", err)
 	}
 	t.Cleanup(func() { os.RemoveAll(dir) })
@@ -749,7 +693,6 @@ func shortSocketDir(t *testing.T) string {
 func startSocketDaemon(t *testing.T) (*Daemon, pixy.Config) {
 	t.Helper()
 	cfg := pixy.Config{
-
 		StateDir: shortSocketDir(t),
 
 		PollInterval: 2 * time.Second,
@@ -763,7 +706,6 @@ func startSocketDaemon(t *testing.T) (*Daemon, pixy.Config) {
 		t.Fatalf("NewDaemon: %v", daemonErr)
 	}
 	go func() {
-
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
 		defer cancel()
@@ -773,9 +715,7 @@ func startSocketDaemon(t *testing.T) (*Daemon, pixy.Config) {
 	for range 50 {
 
 		if _, statErr := os.Stat(cfg.SocketPath()); statErr == nil {
-
 			break
-
 		}
 
 		time.Sleep(20 * time.Millisecond)
@@ -787,7 +727,6 @@ func TestSocket_StatusCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
-
 		t.Fatalf("status: %v", err)
 	}
 	assertSocketResponseHasPrefixes(t, resp, []string{"camera=", "audio=", "auto=", "device="})
@@ -797,20 +736,16 @@ func TestSocket_AutoToggleRoundTrip(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-off")
 	if err != nil {
-
 		t.Fatalf("auto-off: %v", err)
 	}
 	if resp != "auto mode off" {
-
 		t.Errorf("expected 'auto mode off', got: %s", resp)
 	}
 	resp2, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "auto-on")
 	if err != nil {
-
 		t.Fatalf("auto-on: %v", err)
 	}
 	if resp2 != "auto mode on" {
-
 		t.Errorf("expected 'auto mode on', got: %s", resp2)
 	}
 }
@@ -819,22 +754,15 @@ func TestSocket_ProbeCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "probe")
 	if err != nil {
-
 		t.Fatalf("probe: %v", err)
 	}
 	if daemon.videoDev != "" {
-
 		if !strings.HasPrefix(resp, "device found:") {
-
 			t.Errorf("expected 'device found: ...', got: %s", resp)
-
 		}
 	} else {
-
 		if resp != "device not found" {
-
 			t.Errorf("expected 'device not found', got: %s", resp)
-
 		}
 	}
 }
@@ -843,7 +771,6 @@ func TestSocket_WaybarCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "waybar")
 	if err != nil {
-
 		t.Fatalf("waybar: %v", err)
 	}
 	assertSocketResponseHasPrefixes(t, resp, []string{`"text"`, `"tooltip"`, `"class"`})
@@ -853,22 +780,15 @@ func TestSocket_DeviceCommand(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "device")
 	if err != nil {
-
 		t.Fatalf("device: %v", err)
 	}
 	if daemon.videoDev != "" {
-
 		if resp != daemon.videoDev {
-
 			t.Errorf("expected %s, got: %s", daemon.videoDev, resp)
-
 		}
 	} else {
-
 		if resp != "device not found" {
-
 			t.Errorf("expected 'device not found', got: %s", resp)
-
 		}
 	}
 }
@@ -877,7 +797,6 @@ func TestSocket_UnknownCommand(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "foobar")
 	if err != nil {
-
 		t.Fatalf("foobar: %v", err)
 	}
 	assertSocketResponsePrefix(t, resp, "unknown command:", "socket response")
@@ -887,7 +806,6 @@ func TestSocket_StatusViaCommandReturnsStatus(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "status")
 	if err != nil {
-
 		t.Fatalf("status command: %v", err)
 	}
 	assertSocketResponseContains(t, resp, "camera=", "socket response")
@@ -899,7 +817,6 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 
 		cmd string
 	}{
-
 		{"track", "track"},
 
 		{"privacy", "privacy"},
@@ -913,27 +830,19 @@ func TestSocket_CommandsNoDevice(t *testing.T) {
 		{"center", "center"},
 	}
 	for _, tc := range tests {
-
 		t.Run(tc.name, func(t *testing.T) {
-
 			daemon, cfg := startSocketDaemon(t)
 
 			if daemon.videoDev != "" || daemon.hidrawDev != "" {
-
 				t.Skip("device connected")
-
 			}
 
 			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), tc.cmd)
-
 			if err != nil {
-
 				t.Fatalf("%s: %v", tc.cmd, err)
-
 			}
 
 			assertSocketResponsePrefix(t, resp, "error:", "socket response")
-
 		})
 	}
 }
@@ -942,38 +851,28 @@ func TestSocket_AudioInvalidMode(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio badmode")
 	if err != nil {
-
 		t.Fatalf("audio badmode: %v", err)
 	}
 	if resp != "usage: audio [nc|live|org]" {
-
 		t.Errorf("expected usage message, got: %s", resp)
 	}
 }
 
 func TestSocket_AudioValidModes(t *testing.T) {
 	for _, mode := range []string{"nc", "live", "org"} {
-
 		t.Run(mode, func(t *testing.T) {
-
 			daemon, cfg := startSocketDaemon(t)
 
 			if daemon.videoDev != "" || daemon.hidrawDev != "" {
-
 				t.Skip("device connected, audio would succeed")
-
 			}
 
 			resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "audio "+mode)
-
 			if err != nil {
-
 				t.Fatalf("audio %s: %v", mode, err)
-
 			}
 
 			assertSocketResponsePrefix(t, resp, "error:", "audio requires device")
-
 		})
 	}
 }
@@ -981,7 +880,6 @@ func TestSocket_AudioValidModes(t *testing.T) {
 func TestSocket_PanTiltZoomNoDevice(t *testing.T) {
 	daemon, cfg := startSocketDaemon(t)
 	if daemon.videoDev != "" {
-
 		t.Skip("device connected")
 	}
 	assertSocketCommandsHavePrefix(
@@ -1001,17 +899,12 @@ func TestSocket_PanTiltZoomMissingValue(t *testing.T) {
 	for _, cmd := range []string{"pan", "tilt", "zoom"} {
 
 		resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), cmd)
-
 		if err != nil {
-
 			t.Fatalf("%s: %v", cmd, err)
-
 		}
 
 		if !strings.HasPrefix(resp, "usage:") {
-
 			t.Errorf("expected usage for '%s' without value, got: %s", cmd, resp)
-
 		}
 	}
 }
@@ -1034,11 +927,9 @@ func TestSocket_TogglePrivacy(t *testing.T) {
 	_, cfg := startSocketDaemon(t)
 	resp, err := pixy.SendCommand(context.Background(), cfg.SocketPath(), "toggle-privacy")
 	if err != nil {
-
 		t.Fatalf("toggle-privacy: %v", err)
 	}
 	if !strings.Contains(resp, "privacy") && !strings.Contains(resp, "tracking") {
-
 		t.Errorf("expected privacy/tracking response, got: %s", resp)
 	}
 }

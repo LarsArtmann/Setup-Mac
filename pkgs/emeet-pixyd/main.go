@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -57,12 +58,12 @@ func NewDaemon(cfg pixy.Config) (*Daemon, error) {
 	}
 
 	d := &Daemon{
-		mu:          sync.RWMutex{},
-		config:      cfg,
-		state:       pixy.DefaultState(),
-		videoDev:    "",
-		hidrawDev:   "",
-		streamSema:  make(chan struct{}, 1),
+		mu:         sync.RWMutex{},
+		config:     cfg,
+		state:      pixy.DefaultState(),
+		videoDev:   "",
+		hidrawDev:  "",
+		streamSema: make(chan struct{}, 1),
 	}
 	d.loadState()
 	d.probeDevices()
@@ -111,6 +112,30 @@ func probeVideo4linux(sysfsPath string) string {
 	return ""
 }
 
+func hasPixyVendorProduct(ueventData []byte) bool {
+	for line := range strings.SplitSeq(string(ueventData), "\n") {
+		hidID, ok := strings.CutPrefix(line, "HID_ID=")
+		if !ok {
+			continue
+		}
+
+		parts := strings.Split(hidID, ":")
+		if len(parts) != 3 {
+			return false
+		}
+
+		vendor, vErr := strconv.ParseInt(parts[1], 16, 0)
+		product, pErr := strconv.ParseInt(parts[2], 16, 0)
+		expectedVendor, evErr := strconv.ParseInt(pixyVendorID, 16, 0)
+		expectedProduct, epErr := strconv.ParseInt(pixyProductID, 16, 0)
+
+		return vErr == nil && pErr == nil && evErr == nil && epErr == nil &&
+			vendor == expectedVendor && product == expectedProduct
+	}
+
+	return false
+}
+
 func probeHidraw(sysfsPath string) string {
 	entries, err := os.ReadDir(sysfsPath)
 	if err != nil {
@@ -130,11 +155,9 @@ func probeHidraw(sysfsPath string) string {
 		}
 
 		for line := range strings.SplitSeq(string(ueventData), "\n") {
-			if strings.HasPrefix(line, "HID_NAME=") {
-				hidName := strings.TrimPrefix(line, "HID_NAME=")
-
-				if strings.Contains(hidName, "EMEET") || strings.Contains(hidName, "Pixy") ||
-					strings.Contains(hidName, "PIXY") {
+			if hidName, ok := strings.CutPrefix(line, "HID_NAME="); ok {
+				if (strings.Contains(hidName, "EMEET") || strings.Contains(hidName, "Pixy") ||
+					strings.Contains(hidName, "PIXY")) && hasPixyVendorProduct(ueventData) {
 					return hidrawPath
 				}
 			}

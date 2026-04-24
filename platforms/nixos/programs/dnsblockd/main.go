@@ -70,7 +70,7 @@ type StatsResponse struct {
 
 type DomainHit struct {
 	Domain string `json:"domain"`
-	Count int64 `json:"count"`
+	Count  int64  `json:"count"`
 }
 
 type BlockEntryMixin struct {

@@ -24,10 +24,10 @@ const (
 	respAudioUsage     = "usage: audio [nc|live|org]"
 	respDeviceNotFound = "device not found"
 
-	cmdGestureOn  = "gesture-on"
-	cmdAutoOn     = "auto-on"
-	cmdPrivacy    = string(pixy.StatePrivacy)
-	minCmdParts   = 2
+	cmdGestureOn = "gesture-on"
+	cmdAutoOn    = "auto-on"
+	cmdPrivacy   = string(pixy.StatePrivacy)
+	minCmdParts  = 2
 )
 
 func (d *Daemon) handleCommand(ctx context.Context, cmd string) string {

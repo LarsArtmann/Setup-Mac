@@ -180,7 +180,7 @@ func (c Config) Validate() error {
 }
 
 // StateFile returns the path to the JSON state file within the state directory.
-func (c Config) StateFile() string  { return c.StateDir + "/state.json" }
+func (c Config) StateFile() string { return c.StateDir + "/state.json" }
 
 // SocketPath returns the path to the Unix domain control socket within the state directory.
 func (c Config) SocketPath() string { return c.StateDir + "/control.sock" }

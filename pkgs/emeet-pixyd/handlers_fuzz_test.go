@@ -23,7 +23,6 @@ func FuzzExtractJPEGFrame(f *testing.F) {
 		buf := &bytes.Buffer{}
 
 		frame, err := extractJPEGFrame(br, buf)
-
 		if err != nil {
 			if frame != nil {
 				t.Error("frame should be nil on error")
