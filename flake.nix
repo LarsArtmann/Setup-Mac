@@ -203,8 +203,10 @@
     jscpdOverlay = _final: prev: {
       jscpd = prev.callPackage ./pkgs/jscpd.nix {};
     };
-    unboundDoQOverlay = _final: prev: {
-      unbound = prev.unbound.overrideAttrs (o: {
+    unboundDoQOverlay = _final: prev: let
+      unboundNoSlim = prev.unbound.override { withSlimLib = false; };
+    in {
+      unbound = unboundNoSlim.overrideAttrs (o: {
         buildInputs =
           (o.buildInputs or [])
           ++ [
