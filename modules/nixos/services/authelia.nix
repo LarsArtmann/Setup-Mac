@@ -222,7 +222,7 @@
         users:
           lars:
             displayname: "Lars"
-            password: "${config.sops.placeholder.authelia_user_password_hash}"
+            password: "$2y$12$OvBQyrn36dhLr0CdMYaUkurQvO0PSB9GuSJHx0TjIkI/jm/4Bczpq"
             email: "lars@auth.home.lan"
             groups:
               - admin
