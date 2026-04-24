@@ -40,6 +40,8 @@
       # the kernel from seeing the upper 64GB of RAM (only 64GB of 128GB visible).
       "amd_iommu=on"
     ];
+
+    binfmt.emulatedSystems = ["aarch64-linux"];
   };
 
   # TTM memory pool configuration for GPU workloads (128GB unified memory)

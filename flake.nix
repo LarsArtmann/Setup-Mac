@@ -204,7 +204,7 @@
       jscpd = prev.callPackage ./pkgs/jscpd.nix {};
     };
     unboundDoQOverlay = _final: prev: let
-      unboundNoSlim = prev.unbound.override { withSlimLib = false; };
+      unboundNoSlim = prev.unbound.override {withSlimLib = false;};
     in {
       unbound = unboundNoSlim.overrideAttrs (o: {
         buildInputs =
@@ -252,6 +252,7 @@
         ./modules/nixos/services/minecraft.nix
         ./modules/nixos/services/monitor365.nix
         ./modules/nixos/services/comfyui.nix
+        ./modules/nixos/services/dns-failover.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -555,7 +556,54 @@
             inputs.self.nixosModules.minecraft
             inputs.self.nixosModules.monitor365
             inputs.self.nixosModules.comfyui
+            inputs.self.nixosModules.dns-failover
             ./platforms/nixos/system/configuration.nix
+          ];
+        };
+
+        # Raspberry Pi 3 — DNS cluster backup node
+        nixosConfigurations."rpi3-dns" = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          specialArgs = {
+            inherit (inputs.self) inputs;
+            inherit nix-ssh-config;
+          };
+          modules = [
+            {
+              nixpkgs = {
+                hostPlatform = "aarch64-linux";
+                config.allowUnfree = true;
+                overlays = [
+                  nur.overlays.default
+                  goOverlay
+                  dnsblockdOverlay
+                ];
+              };
+            }
+            home-manager.nixosModules.home-manager
+            nur.modules.nixos.default
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                backupFileExtension = "backup";
+                overwriteBackup = true;
+                users.root = {...}: {
+                  programs.home-manager.enable = true;
+                  home = {
+                    stateVersion = "25.11";
+                    file.".config/crush".source = inputs.crush-config;
+                  };
+                };
+                extraSpecialArgs = {
+                  inherit nix-colors;
+                  inherit nix-ssh-config;
+                };
+              };
+            }
+            inputs.self.nixosModules.dns-failover
+            "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            ./platforms/nixos/rpi3/default.nix
           ];
         };
       };
