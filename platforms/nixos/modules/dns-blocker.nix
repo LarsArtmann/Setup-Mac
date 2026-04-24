@@ -220,8 +220,8 @@ in {
       };
     };
 
-    networking.localCommands = lib.mkIf (cfg.blockInterface == "lo") ''
-      ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev lo 2>/dev/null || true
+    networking.localCommands = ''
+      ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/32 dev ${cfg.blockInterface} 2>/dev/null || true
     '';
 
     security.pki.certificates = [caCertContent];
@@ -291,22 +291,6 @@ in {
               else "[ -f /var/lib/dnsblockd/temp-allowlist.conf ] || printf '# dnsblockd temp allowlist\\n' > /var/lib/dnsblockd/temp-allowlist.conf"
             }
           '';
-          # Detect the actual primary IP at runtime instead of using hardcoded blockIP
-          detectIPScript = pkgs.writeShellScript "dnsblockd-detect-ip" ''
-            ${pkgs.iproute2}/bin/ip -4 addr show dev ${cfg.blockInterface} | ${pkgs.gnugrep}/bin/grep inet | ${pkgs.gnused}/bin/sed -n 's/.*inet \([0-9.]*\).*/\1/p' | ${pkgs.coreutils}/bin/head -1
-          '';
-          addIPScript = pkgs.writeShellScript "dnsblockd-add-ip" ''
-            ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
-          '';
-          delIPScript = pkgs.writeShellScript "dnsblockd-del-ip" ''
-            # Only delete the IP if it's a secondary address (not the primary/static one)
-            # Count how many addresses match — if more than one exists, we can safely delete
-            # If this is the only address, skip deletion to avoid dropping the primary IP
-            count=$(${pkgs.iproute2}/bin/ip -4 addr show dev ${cfg.blockInterface} | ${pkgs.gnugrep}/bin/grep -c "inet ${cfg.blockIP}/" || true)
-            if [ "$count" -gt 1 ]; then
-              ${pkgs.iproute2}/bin/ip addr del ${cfg.blockIP}/${toString cfg.blockIPPrefix} dev ${cfg.blockInterface} 2>/dev/null || true
-            fi
-          '';
           caCert = config.sops.secrets.dnsblockd_ca_cert.path;
           caKey = config.sops.secrets.dnsblockd_ca_key.path;
           dnsblockdWrapper = pkgs.writeShellScript "dnsblockd-start" ''
@@ -323,14 +307,8 @@ in {
               sleep 1
             done
 
-            while true; do
-              IP=$(${detectIPScript})
-              [ -n "$IP" ] && break
-              sleep 1
-            done
-
             exec ${pkgs.dnsblockd}/bin/dnsblockd \
-              -addr "$IP" \
+              -addr ${cfg.blockIP} \
               -port ${toString cfg.blockPort} \
               -tls-port ${toString cfg.blockTLSPort} \
               -ca-cert "${caCert}" \
@@ -346,12 +324,7 @@ in {
         in
           {
             Type = "simple";
-            ExecStartPre =
-              if cfg.blockInterface == "lo"
-              then "+${initScript}"
-              else [
-                "+-${initScript}"
-              ];
+            ExecStartPre = "+-${initScript}";
             ExecStart = "${dnsblockdWrapper}";
             StateDirectory = "dnsblockd";
             Restart = "on-failure";
@@ -366,9 +339,6 @@ in {
             RestrictAddressFamilies = ["AF_INET" "AF_INET6" "AF_NETLINK"];
             AmbientCapabilities = ["CAP_NET_BIND_SERVICE"];
             CapabilityBoundingSet = ["CAP_NET_BIND_SERVICE"];
-          }
-          // lib.optionalAttrs (cfg.blockInterface != "lo") {
-            ExecStopPost = "+-${delIPScript}";
           };
       };
 

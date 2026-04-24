@@ -20,7 +20,6 @@
     ];
 
     rocmEnv = {
-      ROCBLAS_USE_HIPBLASLT = "1";
       HSA_OVERRIDE_GFX_VERSION = "11.5.1";
       HSA_ENABLE_SDMA = "0";
       PYTORCH_HIP_ALLOC_CONF = "garbage_collection_threshold:0.6,max_split_size_mb:128";

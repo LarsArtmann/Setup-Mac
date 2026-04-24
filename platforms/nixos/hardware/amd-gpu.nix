@@ -12,9 +12,9 @@
     extraPackages = with pkgs; [
       rocmPackages.clr.icd # OpenCL support
       rocmPackages.rocblas # BLAS operations for AI/ML
-      rocmPackages.hipblaslt # Batched GEMM - enables ROCBLAS_USE_HIPBLASLT=1
       rocmPackages.rocminfo # GPU detection and topology
       # amdvlk removed - RADV is now the default AMD Vulkan driver
+      # hipblaslt removed - optional rocblas optimization, fails to build from source
       libva # Video acceleration API
       libvdpau-va-gl # VDPAU backend for video acceleration
     ];

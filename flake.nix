@@ -208,18 +208,6 @@
     jscpdOverlay = _final: prev: {
       jscpd = prev.callPackage ./pkgs/jscpd.nix {};
     };
-    hipblasltFixOverlay = _final: prev: {
-      rocmPackages = prev.rocmPackages.overrideScope (_rfinal: rprev: {
-        hipblaslt = rprev.hipblaslt.overrideAttrs (old: {
-          postPatch =
-            (old.postPatch or "")
-            + ''
-              sed -i 's/raise Exception("!! Warning: Any rejection/print("!! Warning: Rejection/' tensilelite/Tensile/SolutionStructs/Utilities.py
-            '';
-        });
-      });
-    };
-
     unboundDoQOverlay = _final: prev: let
       unboundNoSlim = prev.unbound.override {withSlimLib = false;};
     in {
@@ -528,7 +516,6 @@
                   emeetPixyOverlay
                   monitor365Overlay
                   unboundDoQOverlay
-                  hipblasltFixOverlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});

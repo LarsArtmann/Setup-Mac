@@ -26,9 +26,9 @@ in {
     dns-blocker = {
       enable = true;
 
-      blockIP = serverIP;
+      blockIP = "192.168.1.2";
       blockPort = 80;
-      blockTLSPort = 8443;
+      blockTLSPort = 443;
       blockInterface = "eno1";
       blockIPPrefix = 24;
       statsPort = 9090;

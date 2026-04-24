@@ -10,6 +10,13 @@
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
 
+    caddyBind =
+      if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
+      then let
+        addrs = config.networking.interfaces.${config.services.dns-blocker.blockInterface}.ipv4.addresses;
+      in if addrs != [] then "bind ${(builtins.head addrs).address}" else ""
+      else "";
+
     tlsConfig = ''
       tls ${serverCert} ${serverKey}
     '';
@@ -35,6 +42,7 @@
       globalConfig = ''
         auto_https off
         servers {
+          ${caddyBind}
           metrics
         }
       '';
@@ -64,15 +72,6 @@
           extraConfig = ''
             ${tlsConfig}
             reverse_proxy localhost:8188
-          '';
-        };
-      } // lib.optionalAttrs config.services.dns-blocker.enable {
-        ":443" = {
-          extraConfig = ''
-            tls ${serverCert} ${serverKey}
-            reverse_proxy ${config.services.dns-blocker.blockIP}:${toString config.services.dns-blocker.blockPort} {
-              header_up Host {host}
-            }
           '';
         };
       };
