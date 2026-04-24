@@ -57,9 +57,8 @@ _: {
             if cfg.priority >= 100
             then "MASTER"
             else "BACKUP";
-          interface = cfg.interface;
+          inherit (cfg) interface priority;
           virtualRouterId = cfg.routerID;
-          priority = cfg.priority;
           noPreempt = cfg.priority < 100;
 
           virtualIps = [

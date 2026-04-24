@@ -548,7 +548,7 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.lars = {...}: {
+                users.lars = _: {
                   imports = [
                     ./platforms/nixos/users/home.nix
                   ];
@@ -556,7 +556,7 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
-                  wallpapers = inputs.wallpapers;
+                  inherit (inputs) wallpapers;
                 };
               };
             }
@@ -625,7 +625,7 @@
                 useUserPackages = true;
                 backupFileExtension = "backup";
                 overwriteBackup = true;
-                users.root = {...}: {
+                users.root = _: {
                   programs.home-manager.enable = true;
                   home = {
                     stateVersion = "25.11";

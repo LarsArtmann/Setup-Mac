@@ -59,9 +59,11 @@ in {
   system.stateVersion = "25.11";
 
   boot = {
-    loader.grub.enable = false;
-    loader.generic-extlinux-compatible.enable = true;
-    loader.timeout = 3;
+    loader = {
+      grub.enable = false;
+      generic-extlinux-compatible.enable = true;
+      timeout = 3;
+    };
     kernelPackages = pkgs.linuxKernel.packages.linux_rpi3;
     tmp.cleanOnBoot = true;
     initrd.availableKernelModules = ["usbhid" "usb_storage" "vc4"];
@@ -72,7 +74,7 @@ in {
 
   networking = {
     hostName = "rpi3-dns";
-    domain = domain;
+    inherit domain;
     useDHCP = false;
     enableIPv6 = true;
     interfaces.eth0 = {
@@ -95,7 +97,81 @@ in {
 
   time.timeZone = "Europe/Berlin";
   i18n.defaultLocale = "en_US.UTF-8";
-  services.resolved.enable = false;
+  services = {
+    resolved.enable = false;
+
+    openssh = {
+      enable = true;
+      settings = {
+        PermitRootLogin = "prohibit-password";
+        PasswordAuthentication = false;
+      };
+    };
+
+    unbound = {
+      enable = true;
+      resolveLocalQueries = true;
+      enableRootTrustAnchor = true;
+
+      settings = {
+        server = {
+          interface = ["0.0.0.0" "::0"];
+          access-control = [
+            "127.0.0.0/8 allow"
+            "::1/128 allow"
+            "192.168.1.0/24 allow"
+          ];
+
+          num-threads = 2;
+          msg-cache-size = "32m";
+          rrset-cache-size = "64m";
+          prefetch = true;
+          prefetch-key = true;
+
+          qname-minimisation = true;
+          hide-identity = true;
+          hide-version = true;
+
+          harden-glue = true;
+          harden-dnssec-stripped = true;
+          harden-below-nxdomain = true;
+          harden-referral-path = true;
+
+          include = toString unboundIncludeFile;
+
+          local-zone =
+            map (d: ''"${d}" transparent'') blocklists.whitelist
+            ++ map (d: ''"${d}" always_nxdomain'') blocklists.extraDomains
+            ++ [''"${domain}." static''];
+          local-data =
+            map
+            (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
+            ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks" "crm"];
+        };
+
+        remote-control = {
+          control-enable = true;
+          control-interface = "/run/unbound/unbound.ctl";
+        };
+
+        forward-zone = [
+          {
+            name = ".";
+            forward-addr = blocklists.upstreamDNS;
+            forward-tls-upstream = true;
+          }
+        ];
+      };
+    };
+
+    dns-failover = {
+      enable = true;
+      inherit virtualIP interface;
+      priority = 50;
+      routerID = 53;
+      subnetPrefix = 24;
+    };
+  };
 
   users = {
     mutableUsers = false;
@@ -105,80 +181,6 @@ in {
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKm9qk4syNtsGJgWTMNRLdGyP3UtAfAKx7XnJxZxq7dF lars@evo-x2"
       ];
     };
-  };
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "prohibit-password";
-      PasswordAuthentication = false;
-    };
-  };
-
-  services.unbound = {
-    enable = true;
-    resolveLocalQueries = true;
-    enableRootTrustAnchor = true;
-
-    settings = {
-      server = {
-        interface = ["0.0.0.0" "::0"];
-        access-control = [
-          "127.0.0.0/8 allow"
-          "::1/128 allow"
-          "192.168.1.0/24 allow"
-        ];
-
-        num-threads = 2;
-        msg-cache-size = "32m";
-        rrset-cache-size = "64m";
-        prefetch = true;
-        prefetch-key = true;
-
-        qname-minimisation = true;
-        hide-identity = true;
-        hide-version = true;
-
-        harden-glue = true;
-        harden-dnssec-stripped = true;
-        harden-below-nxdomain = true;
-        harden-referral-path = true;
-
-        include = toString unboundIncludeFile;
-
-        local-zone =
-          map (d: ''"${d}" transparent'') blocklists.whitelist
-          ++ map (d: ''"${d}" always_nxdomain'') blocklists.extraDomains
-          ++ [''"${domain}." static''];
-        local-data =
-          map
-          (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
-          ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks" "crm"];
-      };
-
-      remote-control = {
-        control-enable = true;
-        control-interface = "/run/unbound/unbound.ctl";
-      };
-
-      forward-zone = [
-        {
-          name = ".";
-          forward-addr = blocklists.upstreamDNS;
-          forward-tls-upstream = true;
-        }
-      ];
-    };
-  };
-
-  systemd.services.unbound.reloadIfChanged = true;
-
-  services.dns-failover = {
-    enable = true;
-    inherit virtualIP interface;
-    priority = 50;
-    routerID = 53;
-    subnetPrefix = 24;
   };
 
   environment.systemPackages = with pkgs; [
@@ -196,13 +198,16 @@ in {
       };
       wantedBy = ["timers.target"];
     };
-    services.crush-update-providers = {
-      description = "Update Crush AI providers";
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "${pkgs.nur.repos.charmbracelet.crush}/bin/crush update-providers";
-        StandardOutput = "journal";
-        StandardError = "journal";
+    services = {
+      unbound.reloadIfChanged = true;
+      crush-update-providers = {
+        description = "Update Crush AI providers";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.nur.repos.charmbracelet.crush}/bin/crush update-providers";
+          StandardOutput = "journal";
+          StandardError = "journal";
+        };
       };
     };
   };
