@@ -322,10 +322,10 @@
       # Harden the main Gitea service (managed by services.gitea)
       services.gitea = {
         serviceConfig = {
-          Restart = "on-failure";
-          RestartSec = "5";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 300;
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5";
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
         };
       };
 
@@ -367,7 +367,7 @@
 
     # Declarative admin user setup (runs in Gitea's preStart)
     systemd.services.gitea = {
-      serviceConfig.WatchdogSec = "30";
+      serviceConfig.WatchdogSec = lib.mkForce "30";
       preStart = let
         adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
           set -euo pipefail

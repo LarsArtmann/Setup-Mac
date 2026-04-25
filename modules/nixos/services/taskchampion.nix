@@ -17,15 +17,15 @@
     };
 
     systemd.services.taskchampion-sync-server.serviceConfig = {
-      Restart = "on-failure";
-      RestartSec = "5";
-      PrivateTmp = true;
-      NoNewPrivileges = true;
-      ProtectClock = true;
-      ProtectHostname = true;
-      RestrictNamespaces = true;
-      LockPersonality = true;
-      WatchdogSec = "30";
+      Restart = lib.mkForce "on-failure";
+      RestartSec = lib.mkForce "5";
+      PrivateTmp = lib.mkForce true;
+      NoNewPrivileges = lib.mkForce true;
+      ProtectClock = lib.mkForce true;
+      ProtectHostname = lib.mkForce true;
+      RestrictNamespaces = lib.mkForce true;
+      LockPersonality = lib.mkForce true;
+      WatchdogSec = lib.mkForce "30";
     };
   };
 }

@@ -157,8 +157,8 @@ in {
               "MESSAGING_CWD=${cfg.stateDir}/workspace"
             ];
             EnvironmentFile = [sopsEnvPath];
-            Restart = "always";
-            RestartSec = cfg.restartSec;
+            Restart = lib.mkForce "always";
+            RestartSec = lib.mkForce cfg.restartSec;
             RestartForceExitStatus = 75;
             KillMode = "mixed";
             KillSignal = "SIGTERM";

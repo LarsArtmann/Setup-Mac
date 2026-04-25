@@ -258,13 +258,13 @@ in {
               ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
               ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
             }
-            // harden {MemoryMax = "1G";}
+            // harden {MemoryMax = lib.mkForce "1G";}
             // {
-              Restart = "on-failure";
-              RestartSec = "10";
-              StartLimitBurst = 3;
-              StartLimitIntervalSec = 300;
-              WatchdogSec = "30";
+              Restart = lib.mkForce "on-failure";
+              RestartSec = lib.mkForce "10";
+              StartLimitBurst = lib.mkForce 3;
+              StartLimitIntervalSec = lib.mkForce 300;
+              WatchdogSec = lib.mkForce "30";
             };
         };
 
@@ -604,11 +604,11 @@ in {
             }
             // harden {}
             // {
-              Restart = "on-failure";
-              RestartSec = "5";
-              StartLimitBurst = 3;
-              StartLimitIntervalSec = 300;
-              WatchdogSec = "30";
+              Restart = lib.mkForce "on-failure";
+              RestartSec = lib.mkForce "5";
+              StartLimitBurst = lib.mkForce 3;
+              StartLimitIntervalSec = lib.mkForce 300;
+              WatchdogSec = lib.mkForce "30";
             };
         };
       })
@@ -639,13 +639,13 @@ in {
               WorkingDirectory = cfg.settings.queryService.dataDir;
               ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             }
-            // harden {MemoryMax = "1G";}
+            // harden {MemoryMax = lib.mkForce "1G";}
             // {
-              Restart = "on-failure";
-              RestartSec = "10";
-              StartLimitBurst = 3;
-              StartLimitIntervalSec = 300;
-              WatchdogSec = "30";
+              Restart = lib.mkForce "on-failure";
+              RestartSec = lib.mkForce "10";
+              StartLimitBurst = lib.mkForce 3;
+              StartLimitIntervalSec = lib.mkForce 300;
+              WatchdogSec = lib.mkForce "30";
             };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {

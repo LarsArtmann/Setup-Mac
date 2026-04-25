@@ -86,16 +86,16 @@
       after = ["authelia-main.service"];
       wants = ["authelia-main.service"];
       serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = "5";
-        OOMScoreAdjust = -500;
-        PrivateTmp = true;
+        Restart = lib.mkForce "on-failure";
+        RestartSec = lib.mkForce "5";
+        OOMScoreAdjust = lib.mkForce (-500);
+        PrivateTmp = lib.mkForce true;
         NoNewPrivileges = lib.mkForce false;
-        ProtectClock = true;
-        ProtectHostname = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
+        ProtectClock = lib.mkForce true;
+        ProtectHostname = lib.mkForce true;
+        RestrictNamespaces = lib.mkForce true;
+        LockPersonality = lib.mkForce true;
+        WatchdogSec = lib.mkForce "30";
       };
     };
   };

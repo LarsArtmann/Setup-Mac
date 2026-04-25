@@ -55,28 +55,28 @@
         immich-server.serviceConfig =
           harden {
             MemoryMax = "2G";
-            ProtectHome = false;
-            ProtectSystem = false;
+            ProtectHome = lib.mkForce false;
+            ProtectSystem = lib.mkForce false;
           }
           // {
             Restart = lib.mkForce "on-failure";
             RestartSec = lib.mkForce "5s";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
-            WatchdogSec = "30";
+            StartLimitBurst = lib.mkForce 3;
+            StartLimitIntervalSec = lib.mkForce 300;
+            WatchdogSec = lib.mkForce "30";
           };
         immich-machine-learning.serviceConfig =
           harden {
             MemoryMax = "4G";
-            ProtectHome = false;
-            ProtectSystem = false;
+            ProtectHome = lib.mkForce false;
+            ProtectSystem = lib.mkForce false;
           }
           // {
             Restart = lib.mkForce "on-failure";
             RestartSec = lib.mkForce "10s";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
-            WatchdogSec = "30";
+            StartLimitBurst = lib.mkForce 3;
+            StartLimitIntervalSec = lib.mkForce 300;
+            WatchdogSec = lib.mkForce "30";
           };
         immich-db-backup = {
           description = "Immich PostgreSQL database backup";

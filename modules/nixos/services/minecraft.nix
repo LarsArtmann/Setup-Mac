@@ -131,16 +131,16 @@ _: {
 
       systemd.services.minecraft-server.serviceConfig =
         harden {
-          ProtectHome = false;
-          ProtectSystem = false;
-          MemoryMax = "4G";
+          ProtectHome = lib.mkForce false;
+          ProtectSystem = lib.mkForce false;
+          MemoryMax = lib.mkForce "4G";
         }
         // {
-          Restart = "on-failure";
-          RestartSec = "5";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 300;
-          WatchdogSec = "60";
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5";
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
+          WatchdogSec = lib.mkForce "60";
         };
 
       networking.firewall.extraCommands = ''

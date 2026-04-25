@@ -30,11 +30,11 @@
         }
         // harden {}
         // {
-          Restart = "on-failure";
-          RestartSec = "5s";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 300;
-          WatchdogSec = "30";
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5s";
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
+          WatchdogSec = lib.mkForce "30";
         };
     };
 

@@ -199,18 +199,18 @@
 
     systemd.services.authelia-main = {
       serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = "5";
+        Restart = lib.mkForce "on-failure";
+        RestartSec = lib.mkForce "5";
         StateDirectory = lib.mkForce "authelia-main";
         StateDirectoryMode = lib.mkForce "0750";
-        PrivateTmp = true;
-        NoNewPrivileges = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        ProtectKernelLogs = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
+        PrivateTmp = lib.mkForce true;
+        NoNewPrivileges = lib.mkForce true;
+        ProtectClock = lib.mkForce true;
+        ProtectHostname = lib.mkForce true;
+        ProtectKernelLogs = lib.mkForce true;
+        RestrictNamespaces = lib.mkForce true;
+        LockPersonality = lib.mkForce true;
+        WatchdogSec = lib.mkForce "30";
         ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
       };
     };
