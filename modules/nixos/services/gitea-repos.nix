@@ -6,6 +6,7 @@
     ...
   }: let
     cfg = config.services.gitea-repos;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkOneshotHardenedConfig mkServiceRestartConfig;
 
     # Script to ensure specific GitHub repos are mirrored to Gitea
     ensureReposScript = pkgs.writeShellScriptBin "gitea-ensure-repos" ''
@@ -256,39 +257,29 @@
         wants = ["network-online.target"];
         requires = ["gitea.service"];
         path = [pkgs.curl pkgs.jq pkgs.gh pkgs.sops pkgs.bash];
-        serviceConfig = {
-          Type = "oneshot";
-          User = cfg.user;
-          EnvironmentFile = config.sops.templates."gitea-sync.env".path;
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          ProtectHome = "read-only";
-          ProtectSystem = "strict";
-          ProtectClock = true;
-          ProtectHostname = true;
-          RestrictNamespaces = true;
-          LockPersonality = true;
-          MemoryMax = "512M";
-          Restart = "on-failure";
-          RestartSec = "5";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 300;
-          # Wait for Gitea to be ready before running
-          ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
-            echo "Waiting for Gitea to be ready..."
-            for i in {1..30}; do
-              if curl -s http://localhost:3000/api/v1/version &>/dev/null; then
-                echo "Gitea is ready!"
-                exit 0
-              fi
-              echo "Gitea not ready yet, attempt $i/30..."
-              sleep 2
-            done
-            echo "Gitea failed to become ready after 60 seconds"
-            exit 1
-          '';
-          ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
-        };
+        serviceConfig =
+          {
+            Type = "oneshot";
+            User = cfg.user;
+            EnvironmentFile = config.sops.templates."gitea-sync.env".path;
+            # Wait for Gitea to be ready before running
+            ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
+              echo "Waiting for Gitea to be ready..."
+              for i in {1..30}; do
+                if curl -s http://localhost:3000/api/v1/version &>/dev/null; then
+                  echo "Gitea is ready!"
+                  exit 0
+                fi
+                echo "Gitea not ready yet, attempt $i/30..."
+                sleep 2
+              done
+              echo "Gitea failed to become ready after 60 seconds"
+              exit 1
+            '';
+            ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
+          }
+          // mkOneshotHardenedConfig {memoryMax = "512M";}
+          // mkServiceRestartConfig {};
       };
 
       # Trigger on rebuild if autoSync is enabled

@@ -9,6 +9,7 @@ in {
   }: let
     cfg = config.services.twenty;
     inherit (config.networking) domain;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
 
     stateDir = "/var/lib/twenty";
     serverPort = 3200;
@@ -144,18 +145,17 @@ in {
               chmod 600 ${stateDir}/.env
             '';
 
-            serviceConfig = {
-              ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
-              ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
-              WorkingDirectory = stateDir;
-              Restart = "on-failure";
-              RestartSec = "10s";
-              PrivateTmp = true;
-              ProtectClock = true;
-              ProtectHostname = true;
-              RestrictNamespaces = true;
-              LockPersonality = true;
-            };
+            serviceConfig =
+              {
+                ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
+                ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
+                WorkingDirectory = stateDir;
+              }
+              // mkHardenedServiceConfig {
+                memoryMax = "2G";
+                readWritePaths = [stateDir];
+              }
+              // mkServiceRestartConfig {restartSec = "10s";};
           };
 
           twenty-db-backup = {

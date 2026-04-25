@@ -5,6 +5,7 @@
     lib,
     ...
   }: let
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";
     immichLibraryDir = "${immichMediaDir}/library";
@@ -55,16 +56,12 @@
           chmod 644 ${photomapDataDir}/config/config.yaml
         fi
       '';
-      serviceConfig = {
-        Restart = "on-failure";
-        RestartSec = "10s";
-        PrivateTmp = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
-      };
+      serviceConfig =
+        mkHardenedServiceConfig {memoryMax = "512M";}
+        // mkServiceRestartConfig {
+          watchdogSec = "30";
+          restartSec = "10s";
+        };
     };
 
     systemd.tmpfiles.rules = [
