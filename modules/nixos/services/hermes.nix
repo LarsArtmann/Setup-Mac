@@ -1,4 +1,6 @@
-{inputs, ...}: {
+{inputs, ...}: let
+  harden = import ../../lib/systemd.nix;
+in {
   flake.nixosModules.hermes = {
     config,
     pkgs,
@@ -9,7 +11,6 @@
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
     oldStateDir = "/home/${cfg.user}/.hermes";
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig;
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
@@ -165,11 +166,12 @@
             ExecReload = "/bin/kill -USR1 $MAINPID";
             StandardOutput = "journal";
             StandardError = "journal";
+            WatchdogSec = "30";
             UMask = "0007";
           }
-          // mkHardenedServiceConfig {
-            memoryMax = "4G";
-            readWritePaths = [cfg.stateDir oldStateDir];
+          // harden {
+            MemoryMax = "4G";
+            ReadWritePaths = [cfg.stateDir oldStateDir];
           };
       };
     };

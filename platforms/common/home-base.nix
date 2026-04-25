@@ -44,6 +44,9 @@
   home = {
     # Session variables (available to all shells and applications)
     sessionVariables = {
+      MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+      VISUAL = "code --wait";
+
       # Go development
       GOPATH = "${config.home.homeDirectory}/go";
 

@@ -54,7 +54,7 @@
         format = "openpgp";
         program =
           if pkgs.stdenv.isDarwin
-          then "gpg"
+          then "/opt/homebrew/bin/gpg"
           else "/run/current-system/sw/bin/gpg";
       };
 

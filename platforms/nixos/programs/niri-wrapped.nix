@@ -6,34 +6,7 @@
   ...
 }: let
   wallpaperDir = wallpapers;
-  sessionSaveInterval = "60s";
-  maxSessionAgeDays = 7;
-  fallbackApps = [
-    {
-      app_id = "kitty";
-      args = [];
-    }
-    {
-      app_id = "kitty";
-      args = ["-e" "btop"];
-    }
-    {
-      app_id = "kitty";
-      args = ["-e" "nvtop"];
-    }
-    {
-      app_id = "amdgpu_top";
-      args = [];
-    }
-    {
-      app_id = "helium";
-      args = [];
-    }
-    {
-      app_id = "signal-desktop";
-      args = [];
-    }
-  ];
+  cfg = config.services.niri-session;
 
   niri-session-save = pkgs.writeShellApplication {
     name = "niri-session-save";
@@ -139,8 +112,8 @@
     STATE_DIR="''${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
 
     fallback() {
-      ${lib.concatStringsSep "\n      " (lib.forEach (lib.range 0 ((lib.length fallbackApps) - 1)) (i: let
-      app = lib.elemAt fallbackApps i;
+      ${lib.concatStringsSep "\n      " (lib.forEach (lib.range 0 ((lib.length cfg.fallbackApps) - 1)) (i: let
+      app = lib.elemAt cfg.fallbackApps i;
       cmd =
         if app.args == []
         then app.app_id
@@ -165,7 +138,7 @@
     if [ -f "$STATE_DIR/timestamp" ]; then
       saved=$(cat "$STATE_DIR/timestamp")
       now=$(date +%s)
-      max_age=$(( ${toString maxSessionAgeDays} * 86400 ))
+      max_age=$(( ${toString cfg.maxSessionAgeDays} * 86400 ))
       [ $((now - saved)) -gt $max_age ] && { fallback; exit 0; }
     fi
 
@@ -331,6 +304,63 @@
     notify-send "Session Restored" "Restored $count windows from crash recovery" 2>/dev/null || true
   '';
 in {
+  options.services.niri-session = {
+    sessionSaveInterval = lib.mkOption {
+      type = lib.types.str;
+      default = "60s";
+      description = "Systemd timer interval for saving niri session state";
+    };
+
+    maxSessionAgeDays = lib.mkOption {
+      type = lib.types.int;
+      default = 7;
+      description = "Maximum age in days before session snapshot is discarded";
+    };
+
+    fallbackApps = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          app_id = lib.mkOption {
+            type = lib.types.str;
+            description = "Application ID to spawn";
+          };
+          args = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [];
+            description = "Arguments to pass to the application";
+          };
+        };
+      });
+      default = [
+        {
+          app_id = "kitty";
+          args = [];
+        }
+        {
+          app_id = "kitty";
+          args = ["-e" "btop"];
+        }
+        {
+          app_id = "kitty";
+          args = ["-e" "nvtop"];
+        }
+        {
+          app_id = "amdgpu_top";
+          args = [];
+        }
+        {
+          app_id = "helium";
+          args = [];
+        }
+        {
+          app_id = "signal-desktop";
+          args = [];
+        }
+      ];
+      description = "Fallback applications to spawn when no valid session exists";
+    };
+  };
+
   programs.niri.settings = {
     prefer-no-csd = true;
 
@@ -820,8 +850,8 @@ in {
   systemd.user.timers.niri-session-save = {
     Unit.Description = "Periodically save niri session state";
     Timer = {
-      OnBootSec = "${sessionSaveInterval}";
-      OnUnitActiveSec = "${sessionSaveInterval}";
+      OnBootSec = cfg.sessionSaveInterval;
+      OnUnitActiveSec = cfg.sessionSaveInterval;
     };
     Install.WantedBy = ["timers.target"];
   };
