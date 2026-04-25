@@ -94,6 +94,7 @@ in {
   }: let
     cfg = config.services.signoz;
     packages = mkPackages pkgs;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
   in {
     options.services.signoz = {
       enable = lib.mkEnableOption "SigNoz observability platform";
@@ -248,24 +249,20 @@ in {
           after = lib.optional cfg.components.clickhouse "clickhouse.service";
           requires = lib.optional cfg.components.clickhouse "clickhouse.service";
           wantedBy = ["multi-user.target"];
-          serviceConfig = {
-            Type = "simple";
-            User = "signoz";
-            Group = "signoz";
-            WorkingDirectory = cfg.settings.queryService.dataDir;
-            ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
-            ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
-            Restart = "on-failure";
-            RestartSec = 10;
-            PrivateTmp = true;
-            NoNewPrivileges = true;
-            ProtectClock = true;
-            ProtectHostname = true;
-            ProtectKernelLogs = true;
-            RestrictNamespaces = true;
-            LockPersonality = true;
-            WatchdogSec = "30";
-          };
+          serviceConfig =
+            {
+              Type = "simple";
+              User = "signoz";
+              Group = "signoz";
+              WorkingDirectory = cfg.settings.queryService.dataDir;
+              ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
+              ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
+            }
+            // mkHardenedServiceConfig {memoryMax = "1G";}
+            // mkServiceRestartConfig {
+              restartSec = "10";
+              watchdogSec = "30";
+            };
         };
 
         systemd.services.signoz-provision = {
@@ -586,18 +583,13 @@ in {
           wantedBy = ["multi-user.target"];
           after = ["docker.service"];
           requires = ["docker.service"];
-          serviceConfig = {
-            ExecStart = "${pkgs.cadvisor}/bin/cadvisor --listen_ip=127.0.0.1 --port=9110 --docker_only=true";
-            Restart = "on-failure";
-            RestartSec = 5;
-            PrivateTmp = true;
-            NoNewPrivileges = lib.mkForce false;
-            ProtectClock = true;
-            ProtectHostname = true;
-            RestrictNamespaces = true;
-            LockPersonality = true;
-            WatchdogSec = "30";
-          };
+          serviceConfig =
+            {
+              ExecStart = "${pkgs.cadvisor}/bin/cadvisor --listen_ip=127.0.0.1 --port=9110 --docker_only=true";
+              NoNewPrivileges = lib.mkForce false;
+            }
+            // mkHardenedServiceConfig {}
+            // mkServiceRestartConfig {watchdogSec = "30";};
         };
       })
 
@@ -618,24 +610,20 @@ in {
               --clickhouse-cluster "default" \
               --clickhouse-replication=false || true
           '';
-          serviceConfig = {
-            Type = "simple";
-            User = "signoz";
-            Group = "signoz";
-            SupplementaryGroups = lib.optional (cfg.components.nodeExporter || cfg.components.cadvisor) "systemd-journal";
-            WorkingDirectory = cfg.settings.queryService.dataDir;
-            ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
-            Restart = "on-failure";
-            RestartSec = 10;
-            PrivateTmp = true;
-            NoNewPrivileges = true;
-            ProtectClock = true;
-            ProtectHostname = true;
-            ProtectKernelLogs = true;
-            RestrictNamespaces = true;
-            LockPersonality = true;
-            WatchdogSec = "30";
-          };
+          serviceConfig =
+            {
+              Type = "simple";
+              User = "signoz";
+              Group = "signoz";
+              SupplementaryGroups = lib.optional (cfg.components.nodeExporter || cfg.components.cadvisor) "systemd-journal";
+              WorkingDirectory = cfg.settings.queryService.dataDir;
+              ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
+            }
+            // mkHardenedServiceConfig {memoryMax = "1G";}
+            // mkServiceRestartConfig {
+              restartSec = "10";
+              watchdogSec = "30";
+            };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {
           receivers =

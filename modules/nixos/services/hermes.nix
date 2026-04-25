@@ -9,6 +9,7 @@
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
     oldStateDir = "/home/${cfg.user}/.hermes";
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig;
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
@@ -140,45 +141,36 @@
           pkgs.git
         ];
 
-        serviceConfig = {
-          Type = "simple";
-          User = cfg.user;
-          Group = cfg.group;
-          ExecStartPre = ["+${migrateScript}" mergeEnvScript];
-          ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
-          WorkingDirectory = cfg.stateDir;
-          Environment = [
-            "HOME=${cfg.stateDir}"
-            "HERMES_HOME=${cfg.stateDir}"
-            "HERMES_MANAGED=true"
-            "MESSAGING_CWD=${cfg.stateDir}/workspace"
-          ];
-          EnvironmentFile = [sopsEnvPath];
-          Restart = "always";
-          RestartSec = cfg.restartSec;
-          RestartForceExitStatus = 75;
-          KillMode = "mixed";
-          KillSignal = "SIGTERM";
-          TimeoutStopSec = cfg.timeoutStopSec;
-          ExecReload = "/bin/kill -USR1 $MAINPID";
-          StandardOutput = "journal";
-          StandardError = "journal";
-          UMask = "0007";
-
-          MemoryMax = "4G";
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          CapabilityBoundingSet = "";
-          ProtectClock = true;
-          ProtectHostname = true;
-          ProtectKernelLogs = true;
-          RestrictNamespaces = true;
-          RestrictSUIDSGID = true;
-          LockPersonality = true;
-          ProtectSystem = "strict";
-          ProtectHome = true;
-          ReadWritePaths = [cfg.stateDir oldStateDir];
-        };
+        serviceConfig =
+          {
+            Type = "simple";
+            User = cfg.user;
+            Group = cfg.group;
+            ExecStartPre = ["+${migrateScript}" mergeEnvScript];
+            ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
+            WorkingDirectory = cfg.stateDir;
+            Environment = [
+              "HOME=${cfg.stateDir}"
+              "HERMES_HOME=${cfg.stateDir}"
+              "HERMES_MANAGED=true"
+              "MESSAGING_CWD=${cfg.stateDir}/workspace"
+            ];
+            EnvironmentFile = [sopsEnvPath];
+            Restart = "always";
+            RestartSec = cfg.restartSec;
+            RestartForceExitStatus = 75;
+            KillMode = "mixed";
+            KillSignal = "SIGTERM";
+            TimeoutStopSec = cfg.timeoutStopSec;
+            ExecReload = "/bin/kill -USR1 $MAINPID";
+            StandardOutput = "journal";
+            StandardError = "journal";
+            UMask = "0007";
+          }
+          // mkHardenedServiceConfig {
+            memoryMax = "4G";
+            readWritePaths = [cfg.stateDir oldStateDir];
+          };
       };
     };
   };
