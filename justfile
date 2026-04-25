@@ -483,17 +483,13 @@ check:
     git status --porcelain || true; \
     echo "✅ System check complete"
 
-# Validate Nix configuration syntax
+# Alias for test-fast
 validate:
-    @echo "🔍 Validating Nix configuration..."
-    nix --extra-experimental-features "nix-command flakes" flake check --no-build
-    @echo "✅ Nix configuration validated"
+    @just test-fast
 
-# Quick Nix syntax check (called by pre-commit hook)
+# Alias for test-fast (pre-commit hook compat)
 check-nix-syntax:
-    @echo "🔍 Checking Nix syntax..."
-    nix --extra-experimental-features "nix-command flakes" flake check --no-build
-    @echo "✅ Nix syntax valid"
+    @just test-fast
 
 # Check for unresolved merge conflict markers in all tracked files
 conflict-check:
@@ -668,23 +664,9 @@ test-fast:
     nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Fast configuration test passed"
 
-# Deploy Home Manager configuration (same as switch, but named for clarity)
+# Alias for switch
 deploy:
-    @echo "🚀 Deploying Home Manager configuration..."
-    @echo "ℹ️  Note: This requires sudo access"
-    @echo "ℹ️  Note: Open new terminal after deployment for shell changes to take effect"
-    @PLATFORM=$(just _detect_platform); \
-    if [ "$$PLATFORM" = "darwin" ]; then \
-        sudo /run/current-system/sw/bin/darwin-rebuild switch --flake ./; \
-    else \
-        nh os switch .; \
-    fi
-    @echo "✅ Home Manager deployment complete!"
-    @echo ""
-    @echo "🔄 Next steps:"
-    @echo "  1. Open new terminal window (required for shell changes)"
-    @echo "  2. Run: just verify"
-    @echo "  3. Run: just test"
+    @just switch
 
 # Verify Home Manager installation and configuration
 verify:

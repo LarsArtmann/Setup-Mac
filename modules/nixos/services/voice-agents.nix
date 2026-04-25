@@ -12,7 +12,6 @@
 
     whisperApiPort = 8000; # OpenAI-compatible API (FastAPI)
     whisperUiPort = 7860; # Gradio WebUI
-    pipecatPort = 8500;
     whisperModelsDir = "/data/models/whisper";
 
     # Docker compose for Whisper ASR - API server mode
@@ -139,7 +138,6 @@
           7880
           whisperApiPort
           whisperUiPort
-          pipecatPort
         ];
         allowedUDPPortRanges = [
           {
