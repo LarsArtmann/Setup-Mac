@@ -9,6 +9,7 @@
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
 
     caddyBind =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
@@ -85,16 +86,13 @@
     systemd.services.caddy = {
       after = ["authelia-main.service"];
       wants = ["authelia-main.service"];
-      serviceConfig = {
-        OOMScoreAdjust = -500;
-        PrivateTmp = true;
-        NoNewPrivileges = lib.mkForce false;
-        ProtectClock = true;
-        ProtectHostname = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
-      };
+      serviceConfig =
+        {
+          OOMScoreAdjust = -500;
+          NoNewPrivileges = lib.mkForce false;
+        }
+        // mkHardenedServiceConfig {}
+        // mkServiceRestartConfig {watchdogSec = "30";};
     };
   };
 }

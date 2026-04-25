@@ -7,6 +7,7 @@
   }: let
     primaryUser = "lars";
     giteaPkg = config.services.gitea.package;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
 
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''
@@ -320,10 +321,9 @@
     systemd = {
       # Harden the main Gitea service (managed by services.gitea)
       services.gitea = {
-        serviceConfig = {
-          WatchdogSec = "30";
-          Restart = "on-failure";
-          RestartSec = "5";
+        serviceConfig = mkServiceRestartConfig {
+          restartSec = "5";
+          watchdogSec = "30";
         };
       };
 
@@ -334,20 +334,20 @@
         wants = ["network-online.target"];
         requires = ["gitea.service"];
         path = [pkgs.curl pkgs.jq pkgs.gh];
-        serviceConfig = {
-          Type = "oneshot";
-          User = primaryUser;
-          EnvironmentFile = [
-            config.sops.templates."gitea-sync.env".path
-            "-/var/lib/gitea/.admin-token.env"
-          ];
-          ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
-          PrivateTmp = true;
-          ProtectClock = true;
-          ProtectHostname = true;
-          RestrictNamespaces = true;
-          LockPersonality = true;
-        };
+        serviceConfig =
+          {
+            Type = "oneshot";
+            User = primaryUser;
+            EnvironmentFile = [
+              config.sops.templates."gitea-sync.env".path
+              "-/var/lib/gitea/.admin-token.env"
+            ];
+            ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
+          }
+          // mkHardenedServiceConfig {
+            protectHome = false;
+            protectSystem = false;
+          };
       };
 
       # Schedule sync every 6 hours
@@ -407,17 +407,14 @@
       after = ["gitea.service"];
       wants = ["gitea.service"];
       wantedBy = ["gitea.service"];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "gitea";
-        Group = "gitea";
-        RemainAfterExit = true;
-        PrivateTmp = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-      };
+      serviceConfig =
+        {
+          Type = "oneshot";
+          User = "gitea";
+          Group = "gitea";
+          RemainAfterExit = true;
+        }
+        // mkHardenedServiceConfig {};
       script = let
         tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
           set -euo pipefail
@@ -470,17 +467,14 @@
       after = ["gitea.service"];
       wants = ["gitea.service"];
       wantedBy = ["gitea.service"];
-      serviceConfig = {
-        Type = "oneshot";
-        User = "gitea";
-        Group = "gitea";
-        RemainAfterExit = true;
-        PrivateTmp = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-      };
+      serviceConfig =
+        {
+          Type = "oneshot";
+          User = "gitea";
+          Group = "gitea";
+          RemainAfterExit = true;
+        }
+        // mkHardenedServiceConfig {};
       script = let
         tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''
           set -euo pipefail
