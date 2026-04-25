@@ -540,6 +540,7 @@
                   inherit nix-colors;
                   inherit nix-ssh-config;
                   inherit (inputs) wallpapers;
+                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
                 };
               };
             }
@@ -619,6 +620,7 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
+                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
                 };
               };
             }

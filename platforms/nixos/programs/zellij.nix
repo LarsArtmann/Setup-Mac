@@ -2,10 +2,10 @@
   pkgs,
   lib,
   config,
-  nix-colors,
+  colorScheme,
   ...
 }: let
-  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+  colors = colorScheme.palette;
 in {
   # Zellij - Modern terminal multiplexer (tmux alternative)
   programs.zellij = {

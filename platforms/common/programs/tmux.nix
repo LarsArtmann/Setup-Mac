@@ -2,10 +2,10 @@
 {
   config,
   pkgs,
-  nix-colors,
+  colorScheme,
   ...
 }: let
-  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+  colors = colorScheme.palette;
 in {
   programs.tmux = {
     enable = true;

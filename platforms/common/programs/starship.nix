@@ -2,10 +2,11 @@
 # Performance-optimized config migrated from dotfiles/.config/starship.toml
 {
   config,
-  nix-colors,
+  pkgs,
+  colorScheme,
   ...
 }: let
-  colors = nix-colors.colorSchemes.catppuccin-mocha.palette;
+  colors = colorScheme.palette;
 in {
   programs.starship = {
     enable = true;
