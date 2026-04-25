@@ -37,8 +37,6 @@
 
   syncEncryptionSecret = builtins.hashString "sha256" "taskchampion-sync-encryption-systemnix";
 in {
-  home.file.".config/taskchampion/encryption_secret".text = syncEncryptionSecret;
-
   programs.taskwarrior = {
     enable = true;
     package = pkgs.taskwarrior3.overrideAttrs {
