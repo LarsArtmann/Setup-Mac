@@ -8,6 +8,7 @@
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
     authPort = 9091;
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
 
     mkClient = {
       client_id,
@@ -198,21 +199,20 @@
     };
 
     systemd.services.authelia-main = {
-      serviceConfig = {
-        StateDirectory = lib.mkForce "authelia-main";
-        StateDirectoryMode = lib.mkForce "0750";
-        PrivateTmp = true;
-        NoNewPrivileges = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        ProtectKernelLogs = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
-        Restart = "on-failure";
-        RestartSec = "5";
-        ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
-      };
+      serviceConfig =
+        {
+          StateDirectory = lib.mkForce "authelia-main";
+          StateDirectoryMode = lib.mkForce "0750";
+          ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
+        }
+        // mkHardenedServiceConfig {
+          protectHome = false;
+          protectSystem = false;
+        }
+        // mkServiceRestartConfig {
+          restartSec = "5";
+          watchdogSec = "30";
+        };
     };
 
     environment.etc."authelia/users_database.yml".source = config.sops.templates.authelia-users-db.path;

@@ -2,6 +2,7 @@
   flake.nixosModules.homepage = {
     config,
     pkgs,
+    lib,
     ...
   }: let
     inherit (config.networking) domain;
@@ -9,32 +10,29 @@
     stateDir = "/var/lib/homepage-dashboard";
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
   in {
     systemd.services.homepage-dashboard = {
       description = "Homepage Dashboard";
       wantedBy = ["multi-user.target"];
       after = ["network.target"];
-      serviceConfig = {
-        ExecStart = "${pkgs.homepage-dashboard}/bin/homepage";
-        WorkingDirectory = stateDir;
-        Environment = [
-          "PORT=${toString port}"
-          "HOMEPAGE_CONFIG_DIR=${stateDir}"
-        ];
-        User = "homepage";
-        Group = "homepage";
-        StateDirectory = "homepage-dashboard";
-        Restart = "on-failure";
-        RestartSec = "5s";
-        PrivateTmp = true;
-        NoNewPrivileges = true;
-        ProtectClock = true;
-        ProtectHostname = true;
-        ProtectKernelLogs = true;
-        RestrictNamespaces = true;
-        LockPersonality = true;
-        WatchdogSec = "30";
-      };
+      serviceConfig =
+        {
+          ExecStart = "${pkgs.homepage-dashboard}/bin/homepage";
+          WorkingDirectory = stateDir;
+          Environment = [
+            "PORT=${toString port}"
+            "HOMEPAGE_CONFIG_DIR=${stateDir}"
+          ];
+          User = "homepage";
+          Group = "homepage";
+          StateDirectory = "homepage-dashboard";
+        }
+        // mkHardenedServiceConfig {}
+        // mkServiceRestartConfig {
+          restartSec = "5s";
+          watchdogSec = "30";
+        };
     };
 
     users.users.homepage = {

@@ -7,6 +7,7 @@
   }: let
     cfg = config.services.comfyui;
     primaryUser = "lars";
+    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
 
     rocmRuntimeLibs = with pkgs; [
       stdenv.cc.cc.lib
@@ -81,26 +82,24 @@
           python313
         ];
 
-        serviceConfig = {
-          Type = "simple";
-          User = cfg.user;
-          Group = "users";
-          WorkingDirectory = toString cfg.package;
-          ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
-          Restart = "on-failure";
-          RestartSec = "10";
-          OOMScoreAdjust = -100;
-
-          SupplementaryGroups = ["render" "video"];
-          PrivateTmp = true;
-          ProtectClock = true;
-          ProtectHostname = true;
-          RestrictNamespaces = true;
-          LockPersonality = true;
-
-          TimeoutStartSec = "300";
-          TimeoutStopSec = "60";
-        };
+        serviceConfig =
+          {
+            Type = "simple";
+            User = cfg.user;
+            Group = "users";
+            WorkingDirectory = toString cfg.package;
+            ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
+            OOMScoreAdjust = -100;
+            SupplementaryGroups = ["render" "video"];
+            TimeoutStartSec = "300";
+            TimeoutStopSec = "60";
+          }
+          // mkHardenedServiceConfig {
+            protectHome = false;
+            protectSystem = false;
+            memoryMax = "8G";
+          }
+          // mkServiceRestartConfig {restartSec = "10";};
       };
     };
   };

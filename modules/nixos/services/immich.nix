@@ -53,13 +53,33 @@
     systemd = {
       services = {
         immich-server.serviceConfig =
-          mkHardenedServiceConfig {memoryMax = "2G"; protectHome = false; protectSystem = false;}
-          // mkServiceRestartConfig {restartSec = "5s"; watchdogSec = "30";}
-          // { Restart = lib.mkForce "on-failure"; RestartSec = lib.mkForce "5s"; };
+          mkHardenedServiceConfig {
+            memoryMax = "2G";
+            protectHome = false;
+            protectSystem = false;
+          }
+          // mkServiceRestartConfig {
+            restartSec = "5s";
+            watchdogSec = "30";
+          }
+          // {
+            Restart = lib.mkForce "on-failure";
+            RestartSec = lib.mkForce "5s";
+          };
         immich-machine-learning.serviceConfig =
-          mkHardenedServiceConfig {memoryMax = "4G"; protectHome = false; protectSystem = false;}
-          // mkServiceRestartConfig {restartSec = "10s"; watchdogSec = "30";}
-          // { Restart = lib.mkForce "on-failure"; RestartSec = lib.mkForce "10s"; };
+          mkHardenedServiceConfig {
+            memoryMax = "4G";
+            protectHome = false;
+            protectSystem = false;
+          }
+          // mkServiceRestartConfig {
+            restartSec = "10s";
+            watchdogSec = "30";
+          }
+          // {
+            Restart = lib.mkForce "on-failure";
+            RestartSec = lib.mkForce "10s";
+          };
         immich-db-backup = {
           description = "Immich PostgreSQL database backup";
           path = [config.services.postgresql.package];
