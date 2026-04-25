@@ -141,4 +141,35 @@ in {
       color.alternate=on color238
     '';
   };
+
+  systemd.user.services.taskwarrior-backup = {
+    Unit = {
+      Description = "Taskwarrior backup — export all tasks as JSON";
+    };
+    Service = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.writeShellScript "taskwarrior-backup" ''
+        set -euo pipefail
+        BACKUP_DIR="$HOME/backups/taskwarrior"
+        mkdir -p "$BACKUP_DIR"
+        STAMP="$(${pkgs.coreutils}/bin/date '+%Y-%m-%d_%H-%M-%S')"
+        ${pkgs.taskwarrior3}/bin/task export > "$BACKUP_DIR/tasks-$STAMP.json"
+        ${pkgs.findutils}/bin/find "$BACKUP_DIR" -name "tasks-*.json" -mtime +30 -delete
+        echo "taskwarrior-backup: exported to tasks-$STAMP.json"
+      ''}";
+    };
+  };
+
+  systemd.user.timers.taskwarrior-backup = {
+    Unit = {
+      Description = "Daily Taskwarrior backup timer";
+    };
+    Timer = {
+      OnCalendar = "daily";
+      Persistent = true;
+    };
+    Install = {
+      WantedBy = ["timers.target"];
+    };
+  };
 }
