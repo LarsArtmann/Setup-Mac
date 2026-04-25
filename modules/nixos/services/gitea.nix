@@ -365,6 +365,7 @@
 
     # Declarative admin user setup (runs in Gitea's preStart)
     systemd.services.gitea = {
+      serviceConfig.WatchdogSec = "30";
       preStart = let
         adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
           set -euo pipefail

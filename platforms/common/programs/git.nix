@@ -198,6 +198,7 @@
       # C/C++
       "*.o"
       "*.a"
+      "*.out"
 
       # Environment and secrets
       ".env"
@@ -224,7 +225,9 @@
 
       # Shared libraries (consolidated)
       "*.so"
-      "*.out"
+
+      # Logs
+      "logs/"
 
       # Generated files
       "*_templ.go" ## https://templ.guide/

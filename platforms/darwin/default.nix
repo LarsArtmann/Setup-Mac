@@ -64,8 +64,8 @@
 
     # Pin Go to version 1.26.1
     nixpkgs.overlays = [
-      (_: prev: {
-        go = prev.go_1_26.overrideAttrs (_: {
+      (_final: prev: {
+        go = prev.go_1_26.overrideAttrs (_oldAttrs: {
           version = "1.26.1";
           src = prev.fetchurl {
             url = "https://go.dev/dl/go1.26.1.src.tar.gz";

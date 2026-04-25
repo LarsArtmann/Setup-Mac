@@ -27,7 +27,7 @@ _: {
       rocmPackages.rocm-comgr
     ];
 
-    ollama-rocm-0_20 = pkgs.ollama-rocm.overrideAttrs (_: rec {
+    ollama-rocm-0_20 = pkgs.ollama-rocm.overrideAttrs (_old: rec {
       version = "0.20.0";
       src = pkgs.fetchFromGitHub {
         owner = "ollama";

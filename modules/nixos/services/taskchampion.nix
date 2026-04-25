@@ -4,9 +4,7 @@
     pkgs,
     lib,
     ...
-  }: let
-    systemd = import ../../../lib/systemd.nix {inherit lib;};
-  in {
+  }: {
     services.taskchampion-sync-server = {
       enable = true;
       host = "127.0.0.1";
@@ -18,8 +16,16 @@
       };
     };
 
-    systemd.services.taskchampion-sync-server.serviceConfig =
-      systemd.mkHardenedServiceConfig {memoryMax = "256M";}
-      // systemd.mkServiceRestartConfig {watchdogSec = "30";};
+    systemd.services.taskchampion-sync-server.serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "5";
+      PrivateTmp = true;
+      NoNewPrivileges = true;
+      ProtectClock = true;
+      ProtectHostname = true;
+      RestrictNamespaces = true;
+      LockPersonality = true;
+      WatchdogSec = "30";
+    };
   };
 }

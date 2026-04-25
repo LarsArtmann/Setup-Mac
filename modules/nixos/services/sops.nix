@@ -9,7 +9,7 @@
       names);
 
   mkKeyedSecrets = file: defaults: keyMap:
-    builtins.mapAttrs (_: key:
+    builtins.mapAttrs (_name: key:
       defaults
       // {
         sopsFile = secretsDir + "/${file}";

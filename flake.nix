@@ -191,7 +191,7 @@
     monitor365Overlay = _final: prev: {
       monitor365 = prev.callPackage ./pkgs/monitor365.nix {
         src = prev.lib.cleanSourceWith {
-          filter = path: _: let
+          filter = path: _type: let
             b = baseNameOf path;
           in
             !(
@@ -349,7 +349,7 @@
                 nativeBuildInputs = [pkgs.deadnix];
               } ''
                 cd ${./.}
-                deadnix --no-lambda-pattern-names --fail . 2>&1 | tee $out
+                deadnix --fail --no-lambda-pattern-names .
               '';
 
             nix-eval-darwin = pkgs.runCommand "nix-eval-darwin" {} ''

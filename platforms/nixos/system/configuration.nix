@@ -151,6 +151,8 @@
     system.stateVersion = "25.11";
 
     services = {
+      udisks2.enable = true;
+
       libinput = {
         enable = true;
         mouse = {
