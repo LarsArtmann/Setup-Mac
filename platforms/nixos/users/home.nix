@@ -3,7 +3,9 @@
   lib,
   nix-ssh-config,
   ...
-}: {
+}: let
+  theme = import ../../common/theme.nix {};
+in {
   imports = [
     ../../common/home-base.nix
     ../programs/shells.nix # NixOS shell configuration
@@ -107,16 +109,16 @@
     NIXOS_OZONE_WL = "1";
 
     # Dark mode preference - respected by many apps and browsers
-    GTK_THEME = "Catppuccin-Mocha-Compact-Lavender-Dark:dark";
+    GTK_THEME = "${theme.gtkThemeName}:dark";
     QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
 
     # Cursor theme for Wayland compositors
     # Cursor size is determined by the cursor theme's built-in sizes
     # Bibata has XL size (96px) built-in
-    XCURSOR_THEME = "Bibata-Modern-Classic";
+    XCURSOR_THEME = theme.cursorTheme;
 
     # Fallback for X11 applications (rarely used)
-    XCURSOR_SIZE = "96";
+    XCURSOR_SIZE = toString theme.cursorSize;
   };
 
   # NixOS-specific packages
@@ -256,32 +258,28 @@
   };
 
   # GTK settings for Catppuccin Mocha theme
-  gtk = let
-    gtkThemeName = "Catppuccin-Mocha-Compact-Lavender-Dark";
-  in {
+  gtk = {
     enable = true;
-    # GTK4 theme inherits from main theme (for Blueman and other GTK4 apps)
-    gtk4.theme.name = gtkThemeName;
-    font = {
-      name = "Sans";
-      size = 16; # Increased for TV viewing (2m distance)
+    gtk4.theme.name = theme.gtkThemeName;
+    font = with theme.font; {
+      inherit name size;
     };
     theme = {
-      name = gtkThemeName;
+      name = theme.gtkThemeName;
       package = pkgs.catppuccin-gtk.override {
-        accents = ["lavender"];
-        size = "compact";
-        variant = "mocha";
+        accents = [theme.accent];
+        size = lib.strings.toLower theme.density;
+        inherit (theme) variant;
       };
     };
     iconTheme = {
-      name = "Papirus-Dark";
+      name = theme.iconTheme;
       package = pkgs.papirus-icon-theme;
     };
     cursorTheme = {
-      name = "Bibata-Modern-Classic";
+      name = theme.cursorTheme;
       package = pkgs.bibata-cursors;
-      size = 96;
+      size = theme.cursorSize;
     };
     # Force dark mode preference for all GTK applications
     gtk3.extraConfig = {
