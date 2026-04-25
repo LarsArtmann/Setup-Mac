@@ -270,6 +270,7 @@ in {
           after = ["signoz.service"];
           wants = ["signoz.service"];
           wantedBy = ["signoz.service"];
+          path = [pkgs.curl pkgs.jq pkgs.coreutils];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
@@ -280,11 +281,21 @@ in {
           script = ''
             SIGNOZ_URL="http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}"
 
-            # Deploy alert rules
+            # Deploy alert rules (idempotent: delete existing by name, then create fresh)
             ${pkgs.coreutils}/bin/echo "Deploying alert rules..."
+            EXISTING_RULES=$(${pkgs.curl}/bin/curl -sf "$SIGNOZ_URL/api/v1/rules" 2>/dev/null || echo '{"data":[]}')
+
             for rule_file in /etc/signoz/rules/*.json; do
               if [ -f "$rule_file" ]; then
-                ${pkgs.coreutils}/bin/echo "  Applying: $(basename $rule_file)"
+                RULE_NAME=$(${pkgs.jq}/bin/jq -r '.data.rule.name // empty' "$rule_file")
+                if [ -n "$RULE_NAME" ]; then
+                  EXISTING_ID=$(echo "$EXISTING_RULES" | ${pkgs.jq}/bin/jq -r --arg n "$RULE_NAME" '.data[] | select(.rule.name == $n) | .id // empty' | head -1)
+                  if [ -n "$EXISTING_ID" ]; then
+                    ${pkgs.coreutils}/bin/echo "  Deleting existing: $RULE_NAME ($EXISTING_ID)"
+                    ${pkgs.curl}/bin/curl -sf -X DELETE "$SIGNOZ_URL/api/v1/rules/$EXISTING_ID" 2>/dev/null || true
+                  fi
+                fi
+                ${pkgs.coreutils}/bin/echo "  Creating: $(basename $rule_file)"
                 ${pkgs.curl}/bin/curl -sf -X POST \
                   -H "Content-Type: application/json" \
                   -d @"$rule_file" \
