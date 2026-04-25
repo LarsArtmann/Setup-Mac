@@ -122,6 +122,9 @@
       flake = false;
     };
 
+    # NixOS hardware profiles (Raspberry Pi, etc.)
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     # Treefmt formatter with auto-discovery for nix fmt
     treefmt-full-flake = {
       url = "github:LarsArtmann/treefmt-full-flake";
@@ -148,6 +151,7 @@
     hermes-agent,
     nix-ssh-config,
     monitor365-src,
+    nixos-hardware,
     treefmt-full-flake,
     ...
   }: let
@@ -591,6 +595,7 @@
           specialArgs = {
             inherit (inputs.self) inputs;
             inherit nix-ssh-config;
+            inherit nixos-hardware;
           };
           modules = [
             {
@@ -626,6 +631,7 @@
               };
             }
             inputs.self.nixosModules.dns-failover
+            nixos-hardware.nixosModules.raspberry-pi-3
             "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             ./platforms/nixos/rpi3/default.nix
           ];

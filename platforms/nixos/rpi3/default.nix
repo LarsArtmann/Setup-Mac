@@ -59,12 +59,6 @@ in {
   system.stateVersion = "25.11";
 
   boot = {
-    loader = {
-      grub.enable = false;
-      generic-extlinux-compatible.enable = true;
-      timeout = 3;
-    };
-    kernelPackages = pkgs.linuxKernel.packages.linux_rpi3;
     tmp.cleanOnBoot = true;
     initrd.availableKernelModules = ["usbhid" "usb_storage" "vc4"];
   };
