@@ -20,17 +20,12 @@ in {
       # PERFORMANCE: Disable greeting for faster startup
       set -g fish_greeting
 
-      # PERFORMANCE: Optimized history settings
-      set -g fish_history_size 5000
-      set -g fish_save_history 5000
-
-      # Additional Fish-specific optimizations
-      set -g fish_autosuggestion_enabled 1
-
       # Note: GOPATH, GOPRIVATE, GONOSUMDB are managed by Home Manager sessionVariables
 
       # GOPATH/bin needs to be in PATH for Go binaries
-      fish_add_path --prepend --global $GOPATH/bin
+      if set -q GOPATH
+        fish_add_path --prepend --global $GOPATH/bin
+      end
     '';
   };
 }

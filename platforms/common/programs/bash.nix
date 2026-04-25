@@ -15,6 +15,12 @@ in {
     # Bash-specific configuration
     initExtra = ''
       export GH_PAGER=""
+
+      # History
+      export HISTCONTROL=ignoredups:erasedups
+      export HISTSIZE=10000
+      export HISTFILESIZE=10000
+      shopt -s histappend checkwinsize autocd
     '';
   };
 }

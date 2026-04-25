@@ -19,6 +19,7 @@ buildGoModule rec {
 
   meta = {
     description = "Auto-activation daemon for EMEET PIXY webcam — face tracking, privacy, noise cancellation";
+    homepage = "https://github.com/LarsArtmann/SystemNix/tree/master/pkgs/emeet-pixyd";
     license = lib.licenses.mit;
     platforms = lib.platforms.linux;
     mainProgram = "emeet-pixyd";
