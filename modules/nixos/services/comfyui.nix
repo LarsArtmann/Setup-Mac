@@ -7,7 +7,7 @@
   }: let
     cfg = config.services.comfyui;
     primaryUser = "lars";
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
 
     rocmRuntimeLibs = with pkgs; [
       stdenv.cc.cc.lib
@@ -93,13 +93,15 @@
             SupplementaryGroups = ["render" "video"];
             TimeoutStartSec = "300";
             TimeoutStopSec = "60";
+            Restart = "on-failure";
+            RestartSec = "10";
+            WatchdogSec = "60";
           }
-          // mkHardenedServiceConfig {
-            protectHome = false;
-            protectSystem = false;
-            memoryMax = "8G";
-          }
-          // mkServiceRestartConfig {restartSec = "10";};
+          // harden {
+            ProtectHome = false;
+            ProtectSystem = false;
+            MemoryMax = "8G";
+          };
       };
     };
   };

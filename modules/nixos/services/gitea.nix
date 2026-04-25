@@ -7,7 +7,7 @@
   }: let
     primaryUser = "lars";
     giteaPkg = config.services.gitea.package;
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
 
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''
@@ -321,9 +321,11 @@
     systemd = {
       # Harden the main Gitea service (managed by services.gitea)
       services.gitea = {
-        serviceConfig = mkServiceRestartConfig {
-          restartSec = "5";
-          watchdogSec = "30";
+        serviceConfig = {
+          Restart = "on-failure";
+          RestartSec = "5";
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 300;
         };
       };
 
@@ -344,9 +346,9 @@
             ];
             ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
           }
-          // mkHardenedServiceConfig {
-            protectHome = false;
-            protectSystem = false;
+          // harden {
+            ProtectHome = false;
+            ProtectSystem = false;
           };
       };
 
@@ -415,7 +417,7 @@
           Group = "gitea";
           RemainAfterExit = true;
         }
-        // mkHardenedServiceConfig {};
+        // harden {};
       script = let
         tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
           set -euo pipefail
@@ -475,7 +477,7 @@
           Group = "gitea";
           RemainAfterExit = true;
         }
-        // mkHardenedServiceConfig {};
+        // harden {};
       script = let
         tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''
           set -euo pipefail

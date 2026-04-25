@@ -1,5 +1,5 @@
 {inputs, ...}: let
-  harden = import ../../lib/systemd.nix;
+  harden = import ../../../lib/systemd.nix;
 in {
   flake.nixosModules.hermes = {
     config,

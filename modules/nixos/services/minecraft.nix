@@ -8,7 +8,7 @@ _: {
     mcVersion = "26.1.2";
     mcJarSha1 = "97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51";
     mcJarUrl = "https://piston-data.mojang.com/v1/objects/${mcJarSha1}/server.jar";
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
 
     minecraft-server-26 = pkgs.stdenv.mkDerivation {
       pname = "minecraft-server";
@@ -130,12 +130,18 @@ _: {
       };
 
       systemd.services.minecraft-server.serviceConfig =
-        mkHardenedServiceConfig {
-          protectHome = false;
-          protectSystem = false;
-          memoryMax = "4G";
+        harden {
+          ProtectHome = false;
+          ProtectSystem = false;
+          MemoryMax = "4G";
         }
-        // mkServiceRestartConfig {watchdogSec = "60";};
+        // {
+          Restart = "on-failure";
+          RestartSec = "5";
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 300;
+          WatchdogSec = "60";
+        };
 
       networking.firewall.extraCommands = ''
         iptables -A nixos-fw -p tcp --dport ${toString cfg.port} -s ${config.networking.local.subnet} -j nixos-fw-accept

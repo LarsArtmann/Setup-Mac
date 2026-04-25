@@ -5,7 +5,7 @@
     lib,
     ...
   }: let
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";
     immichLibraryDir = "${immichMediaDir}/library";
@@ -57,10 +57,13 @@
         fi
       '';
       serviceConfig =
-        mkHardenedServiceConfig {memoryMax = "512M";}
-        // mkServiceRestartConfig {
-          watchdogSec = "30";
-          restartSec = "10s";
+        harden {MemoryMax = "512M";}
+        // {
+          Restart = "on-failure";
+          RestartSec = "10s";
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 300;
+          WatchdogSec = "30";
         };
     };
 

@@ -6,7 +6,7 @@
     ...
   }: let
     cfg = config.services.immich;
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
   in {
     services.immich = {
       enable = true;
@@ -53,32 +53,30 @@
     systemd = {
       services = {
         immich-server.serviceConfig =
-          mkHardenedServiceConfig {
-            memoryMax = "2G";
-            protectHome = false;
-            protectSystem = false;
-          }
-          // mkServiceRestartConfig {
-            restartSec = "5s";
-            watchdogSec = "30";
+          harden {
+            MemoryMax = "2G";
+            ProtectHome = false;
+            ProtectSystem = false;
           }
           // {
             Restart = lib.mkForce "on-failure";
             RestartSec = lib.mkForce "5s";
+            StartLimitBurst = 3;
+            StartLimitIntervalSec = 300;
+            WatchdogSec = "30";
           };
         immich-machine-learning.serviceConfig =
-          mkHardenedServiceConfig {
-            memoryMax = "4G";
-            protectHome = false;
-            protectSystem = false;
-          }
-          // mkServiceRestartConfig {
-            restartSec = "10s";
-            watchdogSec = "30";
+          harden {
+            MemoryMax = "4G";
+            ProtectHome = false;
+            ProtectSystem = false;
           }
           // {
             Restart = lib.mkForce "on-failure";
             RestartSec = lib.mkForce "10s";
+            StartLimitBurst = 3;
+            StartLimitIntervalSec = 300;
+            WatchdogSec = "30";
           };
         immich-db-backup = {
           description = "Immich PostgreSQL database backup";

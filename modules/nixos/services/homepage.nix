@@ -10,7 +10,7 @@
     stateDir = "/var/lib/homepage-dashboard";
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
   in {
     systemd.services.homepage-dashboard = {
       description = "Homepage Dashboard";
@@ -28,10 +28,13 @@
           Group = "homepage";
           StateDirectory = "homepage-dashboard";
         }
-        // mkHardenedServiceConfig {}
-        // mkServiceRestartConfig {
-          restartSec = "5s";
-          watchdogSec = "30";
+        // harden {}
+        // {
+          Restart = "on-failure";
+          RestartSec = "5s";
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 300;
+          WatchdogSec = "30";
         };
     };
 

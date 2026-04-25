@@ -17,21 +17,22 @@ in {
     historyFileSize = 10000;
     historySize = 5000;
 
-    bashOptions = [
+    shellOptions = [
       "cdspell"
       "checkwinsize"
       "cmdhist"
       "histappend"
+      "autocd"
+      "globstar"
+      "nocaseglob"
     ];
 
     initExtra = ''
       export GH_PAGER=""
 
-      # History
       export HISTCONTROL=ignoredups:erasedups
       export HISTSIZE=10000
       export HISTFILESIZE=10000
-      shopt -s histappend checkwinsize autocd globstar nocaseglob
     '';
   };
 }

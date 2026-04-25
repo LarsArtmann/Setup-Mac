@@ -94,7 +94,7 @@ in {
   }: let
     cfg = config.services.signoz;
     packages = mkPackages pkgs;
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
   in {
     options.services.signoz = {
       enable = lib.mkEnableOption "SigNoz observability platform";
@@ -258,10 +258,13 @@ in {
               ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
               ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
             }
-            // mkHardenedServiceConfig {memoryMax = "1G";}
-            // mkServiceRestartConfig {
-              restartSec = "10";
-              watchdogSec = "30";
+            // harden {MemoryMax = "1G";}
+            // {
+              Restart = "on-failure";
+              RestartSec = "10";
+              StartLimitBurst = 3;
+              StartLimitIntervalSec = 300;
+              WatchdogSec = "30";
             };
         };
 
@@ -599,8 +602,14 @@ in {
               ExecStart = "${pkgs.cadvisor}/bin/cadvisor --listen_ip=127.0.0.1 --port=9110 --docker_only=true";
               NoNewPrivileges = lib.mkForce false;
             }
-            // mkHardenedServiceConfig {}
-            // mkServiceRestartConfig {watchdogSec = "30";};
+            // harden {}
+            // {
+              Restart = "on-failure";
+              RestartSec = "5";
+              StartLimitBurst = 3;
+              StartLimitIntervalSec = 300;
+              WatchdogSec = "30";
+            };
         };
       })
 
@@ -630,10 +639,13 @@ in {
               WorkingDirectory = cfg.settings.queryService.dataDir;
               ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             }
-            // mkHardenedServiceConfig {memoryMax = "1G";}
-            // mkServiceRestartConfig {
-              restartSec = "10";
-              watchdogSec = "30";
+            // harden {MemoryMax = "1G";}
+            // {
+              Restart = "on-failure";
+              RestartSec = "10";
+              StartLimitBurst = 3;
+              StartLimitIntervalSec = 300;
+              WatchdogSec = "30";
             };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {

@@ -9,7 +9,7 @@ in {
   }: let
     cfg = config.services.twenty;
     inherit (config.networking) domain;
-    inherit (import ../../../lib/systemd.nix {inherit lib;}) mkHardenedServiceConfig mkServiceRestartConfig;
+    harden = import ../../../lib/systemd.nix;
 
     stateDir = "/var/lib/twenty";
     serverPort = 3200;
@@ -150,12 +150,13 @@ in {
                 ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
                 ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
                 WorkingDirectory = stateDir;
+                Restart = "on-failure";
+                RestartSec = "10s";
               }
-              // mkHardenedServiceConfig {
-                memoryMax = "2G";
-                readWritePaths = [stateDir];
-              }
-              // mkServiceRestartConfig {restartSec = "10s";};
+              // harden {
+                MemoryMax = "2G";
+                ReadWritePaths = [stateDir];
+              };
           };
 
           twenty-db-backup = {
@@ -164,7 +165,7 @@ in {
             requires = ["docker.service"];
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.docker}/bin/docker exec twenty-db-1 pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%Y%m%d_%H%M%S).sql && find ${stateDir}/backup -name \"*.sql\" -mtime +30 -delete'";
+              ExecStart = "${pkgs.bash}/bin/bash -c '${pkgs.docker-compose}/bin/docker-compose -f ${composeFile} exec -T db pg_dump -U ${pgUser} ${pgDb} > ${stateDir}/backup/$(date +%%Y%%m%%d_%%H%%M%%S).sql && find ${stateDir}/backup -name \"*.sql\" -mtime +30 -delete'";
               WorkingDirectory = stateDir;
             };
             preStart = "mkdir -p ${stateDir}/backup";
