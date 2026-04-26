@@ -84,9 +84,15 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 | **Caddy** | 443 | `*.home.lan` | Reverse proxy with sops-managed TLS certs |
 | **Immich** | 2283 | `immich.home.lan` | Self-hosted Google Photos alternative (PostgreSQL + Redis + ML) |
 | **Gitea** | 3000 | `gitea.home.lan` | Self-hosted Git with GitHub mirror sync |
-| **SigNoz** | 4317, 4318 | `signoz.home.lan` | Observability: traces, metrics, logs + node_exporter + cAdvisor |
+| **SigNoz** | 4317, 4318, 8080 | `signoz.home.lan` | Observability: traces, metrics, logs + node_exporter + cAdvisor |
 | **Homepage** | 8082 | `dash.home.lan` | Service overview dashboard |
 | **PhotoMap AI** | 8050 | `photomap.home.lan` | AI-powered photo exploration with UMAP embeddings |
+| **Authelia** | 9091 | `auth.home.lan` | SSO/IDP with OIDC, TOTP, WebAuthn 2FA |
+| **Hermes** | — | — | AI agent gateway (Discord bot, cron scheduler, multi-provider LLM) |
+| **Twenty CRM** | 3200 | `crm.home.lan` | Self-hosted CRM (Docker Compose: PostgreSQL + Redis) |
+| **ComfyUI** | 8188 | `comfyui.home.lan` | AI image generation with ROCm GPU acceleration |
+| **Voice Agents** | 7880 | — | AI voice agent platform (Docker: LiveKit + pipecat) |
+| **TaskChampion** | 10222 | `tasks.home.lan` | Taskwarrior sync server (cross-platform + Android) |
 | **DNS Blocker** | 53, 9090 | — | Unbound + dnsblockd, 25 blocklists, DNS-over-TLS upstream |
 
 ### DNS Blocking
@@ -95,6 +101,7 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 - Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
 - Local `.home.lan` DNS records for all services
 - DNSSEC enabled
+- **DNS failover**: Raspberry Pi 3 secondary resolver with VRRP VIP (planned)
 
 ## NixOS Desktop
 
@@ -103,6 +110,7 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 - **SDDM**: Login manager with Catppuccin Mocha theme
 - **Theme**: Catppuccin Mocha across all applications (GTK, Qt, terminal, browser)
 - **Backup WM**: Sway configured as fallback
+- **Session restore**: Automatic window/workspace recovery after crash or reboot (systemd timer + niri IPC)
 
 ## NixOS Hardware (evo-x2)
 
@@ -147,6 +155,14 @@ just dns-diagnostics    # Full DNS diagnostics
 just immich-status       # Check Immich service status
 just immich-backup       # Run database backup
 just gitea-sync-repos    # Sync GitHub repos to Gitea
+just hermes-status       # Check Hermes gateway status
+just session-status      # Check niri session save state
+just cam-status          # Check EMEET PIXY webcam state
+
+# Taskwarrior
+just task-list           # Show pending tasks
+just task-sync           # Sync with TaskChampion server
+just task-backup         # Export all tasks as JSON
 ```
 
 ## Cross-Platform Programs
@@ -178,8 +194,11 @@ Shared across macOS and NixOS via `platforms/common/programs/`:
 | `nix-amd-npu` | AMD NPU (XDNA) driver |
 | `nix-ssh-config` | Shared SSH configuration |
 | `crush-config` | AI assistant configuration |
+| `hermes-agent` | AI agent gateway (Discord bot) |
 | `nix-colors` | Declarative color schemes |
 | `silent-sddm` | SDDM theme with Catppuccin support |
+| `signoz-src` | SigNoz observability source (built from source) |
+| `nur` | Nix User Repository |
 
 ## CI/CD
 

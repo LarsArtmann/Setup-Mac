@@ -16,11 +16,11 @@
 | P3 CODE QUALITY | 9 | 9 | 0 | 100% |
 | P4 ARCHITECTURE | 7 | 7 | 0 | 100% |
 | P5 DEPLOY/VERIFY | 13 | 0 | 13 | 0% |
-| P6 SERVICES | 15 | 7 | 8 | 47% |
+| P6 SERVICES | 15 | 11 | 4 | 73% |
 | P7 TOOLING/CI | 10 | 10 | 0 | 100% |
-| P8 DOCS | 6 | 1 | 5 | 17% |
+| P8 DOCS | 6 | 4 | 2 | 67% |
 | P9 FUTURE | 12 | 0 | 12 | 0% |
-| **TOTAL** | **96** | **54** | **42** | **56%** |
+| **TOTAL** | **96** | **58** | **38** | **60%** |
 
 ---
 
@@ -97,20 +97,23 @@
 | 77 | ✅ Set allowUnsupportedSystem = false | nix-settings.nix:75 |
 | 78 | ✅ Taskwarrior backup timer | systemd timer in taskwarrior.nix:163-174, OnCalendar = "daily" |
 
-### P6 — SERVICES (7/15 DONE)
+### P6 — SERVICES (11/15 DONE)
 | # | Task | Evidence |
 |---|------|----------|
-| 54-55 | Twenty CRM backup + container name | ⬜ PENDING |
-| 56-58 | ComfyUI paths, watchdog, isolation | ⬜ PENDING |
+| 54 | ✅ Twenty CRM backup rotation | `find ... -mtime +30 -delete` in twenty.nix:168 |
+| 55 | ✅ Twenty CRM container name | Docker Compose `name: twenty` is standard — not hardcoded |
+| 56 | ComfyUI hardcoded paths | ⬜ ACCEPTABLE — module option defaults designed for override |
+| 57 | ✅ ComfyUI WatchdogSec + MemoryMax | `WatchdogSec = "60"` + `MemoryMax = "8G"` in comfyui.nix:98-103 |
+| 58 | ComfyUI dedicated user | ⬜ ACCEPTABLE — runs as lars for GPU render/video group access |
 | 59 | ✅ Voice agents Whisper health check | Not applicable — pipecatPort removed |
 | 60 | ✅ Voice agents unused pipecatPort | Not present — already clean |
 | 61 | ✅ Voice agents PIDFile | Not present — already clean |
-| 62 | Hermes health check | ⬜ PENDING |
-| 63 | Hermes key_env migration | ⬜ PENDING |
-| 64 | SigNoz duplicate rules | ⬜ PENDING |
-| 65 | SigNoz missing metrics | ⬜ PENDING |
-| 66 | Authelia SMTP notifications | ⬜ PENDING |
-| 67-68 | Immich/Twenty backup restore tests | ⬜ PENDING |
+| 62 | Hermes health check | ⬜ PENDING — needs health endpoint in Hermes |
+| 63 | Hermes key_env migration | ⬜ PENDING — mergeEnvScript redundant but low risk |
+| 64 | ✅ SigNoz duplicate rules | Idempotent delete-before-create in signoz.nix:294-300 |
+| 65 | SigNoz missing metrics | ⬜ BLOCKED — needs evo-x2 to verify metric endpoints |
+| 66 | Authelia SMTP notifications | ⬜ BLOCKED — needs SMTP credentials |
+| 67-68 | Immich/Twenty backup restore tests | ⬜ BLOCKED — needs evo-x2 |
 
 ---
 
@@ -144,26 +147,26 @@
 ### P6 — SERVICES IMPROVEMENT
 | # | Task | Category | Est. |
 |---|------|----------|------|
-| 54 | Twenty CRM: add backup rotation/cleanup | RELIABILITY | 8m |
-| 55 | Twenty CRM: fix hardcoded container name | RELIABILITY | 5m |
-| 56 | ComfyUI: replace hardcoded paths | ARCH | 12m |
-| 57 | ComfyUI: add WatchdogSec + MemoryMax | RELIABILITY | 5m |
-| 58 | ComfyUI: run as dedicated system user | SECURITY | 8m |
-| 62 | Hermes: add health check endpoint | OBSERVABILITY | 10m |
-| 63 | Hermes: migrate remaining providers to key_env | SECURITY | 10m |
-| 64 | SigNoz: fix duplicate rules on reboot | RELIABILITY | 10m |
-| 65 | SigNoz: add missing metrics for 10 services | OBSERVABILITY | 12m |
-| 66 | Authelia: add SMTP notifications | UX | 10m |
-| 67 | Immich backup restore test | RELIABILITY | 12m |
-| 68 | Twenty CRM backup restore test | RELIABILITY | 12m |
+| 54 | ~~Twenty CRM: add backup rotation/cleanup~~ | DONE | `find -mtime +30` in twenty.nix |
+| 55 | ~~Twenty CRM: fix hardcoded container name~~ | DONE | Docker Compose standard naming |
+| 56 | ComfyUI: replace hardcoded paths | LOW PRIORITY | Module option defaults are designed for override |
+| 57 | ~~ComfyUI: add WatchdogSec + MemoryMax~~ | DONE | WatchdogSec=60, MemoryMax=8G |
+| 58 | ComfyUI: run as dedicated system user | ACCEPTABLE | Needs lars for GPU group access |
+| 62 | Hermes: add health check endpoint | OBSERVABILITY | Needs Hermes health endpoint |
+| 63 | Hermes: migrate remaining providers to key_env | CLEANUP | mergeEnvScript is redundant, low risk |
+| 64 | ~~SigNoz: fix duplicate rules on reboot~~ | DONE | Idempotent delete-before-create in provision script |
+| 65 | SigNoz: add missing metrics for 10 services | OBSERVABILITY | Blocked on evo-x2 metric endpoint verification |
+| 66 | Authelia: add SMTP notifications | UX | Blocked on SMTP credentials |
+| 67 | Immich backup restore test | RELIABILITY | Blocked on evo-x2 |
+| 68 | Twenty CRM backup restore test | RELIABILITY | Blocked on evo-x2 |
 
 ### P8 — DOCUMENTATION
 | # | Task | Category | Est. |
 |---|------|----------|------|
-| 79 | Write/update top-level README.md | DOCS | 12m |
-| 80 | Document DNS cluster in AGENTS.md | DOCS | 8m |
-| 81 | Write ADR for niri session restore design | DOCS | 10m |
-| 82 | Add module option description fields | DOCS | 10m |
+| 79 | ~~Write/update top-level README.md~~ | DONE | Updated with all 13 services, DNS failover, new commands |
+| 80 | ~~Document DNS cluster in AGENTS.md~~ | DONE | DNS Failover Cluster section added |
+| 81 | ~~Write ADR for niri session restore design~~ | DONE | `docs/architecture/adr-005-niri-session-restore.md` |
+| 82 | Add module option description fields | DOCS | 12m |
 | 83 | Create docs/CONTRIBUTING.md | DOCS | 12m |
 
 ### P9 — FUTURE / RESEARCH
@@ -187,14 +190,15 @@
 ## NEXT ACTIONS
 
 **AI-actionable (can do now):**
-1. P6-54/55: Twenty CRM backup rotation + container name fix
-2. P6-57: ComfyUI WatchdogSec + MemoryMax
-3. P6-62: Hermes health check
-4. P6-64: SigNoz duplicate rules fix
-5. P8-79/80/81: Documentation tasks
+1. P6-62: Hermes health check (needs Hermes endpoint)
+2. P6-63: Hermes mergeEnvScript cleanup
+3. P8-82: Add module option descriptions
+4. P8-83: Create CONTRIBUTING.md
 
 **User-actionable (requires evo-x2 or decisions):**
 1. P1-7/9/10/11: Sops secrets, Docker digests, VRRP auth
 2. P5-41: `just switch` on evo-x2
 3. P5-42-49: Verify services after deploy
 4. P5-50-53: Pi 3 build and DNS failover
+5. P6-65: Verify metric endpoints on evo-x2
+6. P6-66: Provide SMTP credentials for Authelia

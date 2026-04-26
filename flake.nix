@@ -241,8 +241,8 @@
 
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
-      valkey = prev.valkey.overrideAttrs (old: { doCheck = false; });
-      aiocache = prev.python3Packages.aiocache.overrideAttrs (old: { doCheck = false; });
+      valkey = prev.valkey.overrideAttrs (old: {doCheck = false;});
+      aiocache = prev.python3Packages.aiocache.overrideAttrs (old: {doCheck = false;});
     };
   in
     flake-parts.lib.mkFlake {inherit inputs;} {

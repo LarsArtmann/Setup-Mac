@@ -226,6 +226,17 @@ Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server)
 - Local `.home.lan` DNS records for all services
 - Blocklist source: `platforms/nixos/programs/dnsblockd/`
 
+### DNS Failover Cluster
+
+High-availability DNS via Keepalived VRRP (`modules/nixos/services/dns-failover.nix`).
+- Two-node cluster: evo-x2 (primary, priority 100) + Raspberry Pi 3 (backup, priority 50)
+- Virtual IP shared between nodes — LAN clients point to VIP, not individual IPs
+- Health check: tracks `unbound` process — if unbound dies, node loses VIP
+- VRRP garp refresh every 30s for rapid failover detection
+- Module options: `services.dns-failover.{enable, virtualIP, interface, priority, routerID, subnetPrefix, authPassword}`
+- Pi 3 image built via `nixosConfigurations.rpi3-dns` in flake.nix
+- **Status**: Planned — Pi 3 hardware not yet provisioned
+
 ### Taskwarrior + TaskChampion Sync
 
 Task management synced across NixOS, macOS, and Android via TaskChampion sync server.
