@@ -7,8 +7,7 @@
   commonEnvVars = {
     # Core system settings
     EDITOR = "micro"; # micro-full is installed in base.nix
-    VISUAL = "micro";
-    MANPAGER = "less -R";
+    # VISUAL and MANPAGER are set in home-base.nix sessionVariables (single source of truth)
     LANG = "en_US.UTF-8";
 
     # Optimize NIX_PATH for better performance
