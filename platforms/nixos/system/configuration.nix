@@ -156,6 +156,10 @@
       caddy.enable = true;
       gitea.enable = true;
       immich.enable = true;
+      authelia-config.enable = true;
+      photomap.enable = true;
+      homepage.enable = true;
+      taskchampion-config.enable = true;
 
       libinput = {
         enable = true;

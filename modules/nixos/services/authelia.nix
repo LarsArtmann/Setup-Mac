@@ -5,6 +5,7 @@
     pkgs,
     ...
   }: let
+    cfg = config.services.authelia-config;
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
     authPort = 9091;
@@ -29,212 +30,218 @@
       token_endpoint_auth_method = "client_secret_basic";
     };
   in {
-    services.authelia.instances.main = {
-      enable = true;
+    options.services.authelia-config = {
+      enable = lib.mkEnableOption "Authelia SSO/IDP with SystemNix configuration";
+    };
 
-      secrets = {
-        jwtSecretFile = config.sops.secrets.authelia_jwt_secret.path;
-        storageEncryptionKeyFile = config.sops.secrets.authelia_storage_encryption_key.path;
-        oidcHmacSecretFile = config.sops.secrets.authelia_oidc_hmac_secret.path;
-        oidcIssuerPrivateKeyFile = config.sops.secrets.authelia_oidc_issuer_private_key.path;
-      };
+    config = lib.mkIf cfg.enable {
+      services.authelia.instances.main = {
+        enable = true;
 
-      settings = {
-        theme = "dark";
-        default_2fa_method = "totp";
+        secrets = {
+          jwtSecretFile = config.sops.secrets.authelia_jwt_secret.path;
+          storageEncryptionKeyFile = config.sops.secrets.authelia_storage_encryption_key.path;
+          oidcHmacSecretFile = config.sops.secrets.authelia_oidc_hmac_secret.path;
+          oidcIssuerPrivateKeyFile = config.sops.secrets.authelia_oidc_issuer_private_key.path;
+        };
 
-        server = {
-          address = "tcp://127.0.0.1:${toString authPort}/";
-          endpoints = {
-            enable_pprof = false;
-            enable_expvars = false;
+        settings = {
+          theme = "dark";
+          default_2fa_method = "totp";
+
+          server = {
+            address = "tcp://127.0.0.1:${toString authPort}/";
+            endpoints = {
+              enable_pprof = false;
+              enable_expvars = false;
+            };
           };
-        };
 
-        log = {
-          level = "info";
-          format = "text";
-        };
-
-        telemetry.metrics = {
-          enabled = true;
-          address = "tcp://127.0.0.1:9959";
-        };
-
-        totp = {
-          disable = false;
-          issuer = "evo-x2";
-          algorithm = "SHA256";
-          digits = 6;
-          period = 30;
-          skew = 1;
-        };
-
-        webauthn = {
-          disable = false;
-          display_name = "evo-x2";
-          attestation_conveyance_preference = "indirect";
-          selection_criteria = {
-            user_verification = "preferred";
+          log = {
+            level = "info";
+            format = "text";
           };
-        };
 
-        authentication_backend = {
-          password_reset.disable = false;
-          refresh_interval = "5m";
-          file = {
-            path = "/var/lib/authelia-main/users_database.yml";
-            password = {
-              algorithm = "argon2";
-              argon2 = {
-                variant = "argon2id";
-                iterations = 3;
-                memory = 65536;
-                parallelism = 4;
-                key_length = 32;
-                salt_length = 16;
+          telemetry.metrics = {
+            enabled = true;
+            address = "tcp://127.0.0.1:9959";
+          };
+
+          totp = {
+            disable = false;
+            issuer = "evo-x2";
+            algorithm = "SHA256";
+            digits = 6;
+            period = 30;
+            skew = 1;
+          };
+
+          webauthn = {
+            disable = false;
+            display_name = "evo-x2";
+            attestation_conveyance_preference = "indirect";
+            selection_criteria = {
+              user_verification = "preferred";
+            };
+          };
+
+          authentication_backend = {
+            password_reset.disable = false;
+            refresh_interval = "5m";
+            file = {
+              path = "/var/lib/authelia-main/users_database.yml";
+              password = {
+                algorithm = "argon2";
+                argon2 = {
+                  variant = "argon2id";
+                  iterations = 3;
+                  memory = 65536;
+                  parallelism = 4;
+                  key_length = 32;
+                  salt_length = 16;
+                };
               };
             };
           };
-        };
 
-        password_policy = {
-          standard = {
-            enabled = true;
-            min_length = 8;
-            max_length = 128;
-            require_uppercase = true;
-            require_lowercase = true;
-            require_number = true;
-            require_special = true;
+          password_policy = {
+            standard = {
+              enabled = true;
+              min_length = 8;
+              max_length = 128;
+              require_uppercase = true;
+              require_lowercase = true;
+              require_number = true;
+              require_special = true;
+            };
           };
-        };
 
-        session = {
-          name = "authelia_session";
-          same_site = "lax";
-          expiration = "1h";
-          inactivity = "5m";
-          remember_me = "1M";
-          cookies = [
-            {
-              name = "authelia_session";
-              inherit domain;
-              authelia_url = "https://${authHost}";
-              default_redirection_url = "https://dash.${domain}";
-              same_site = "lax";
-              expiration = "1h";
-              inactivity = "5m";
-              remember_me = "1M";
-            }
-          ];
-        };
-
-        regulation = {
-          max_retries = 3;
-          find_time = "2m";
-          ban_time = "5m";
-        };
-
-        storage.local.path = "/var/lib/authelia-main/db.sqlite3";
-
-        notifier = {
-          disable_startup_check = true;
-          filesystem.filename = "/var/lib/authelia-main/notification.txt";
-        };
-
-        access_control = {
-          default_policy = "deny";
-          rules = [
-            {
-              domain = authHost;
-              policy = "bypass";
-            }
-            {
-              domain = "*.${domain}";
-              policy = "two_factor";
-              subject = ["user:lars"];
-            }
-          ];
-        };
-
-        identity_providers.oidc = {
-          lifespans = {
-            access_token = "1h";
-            authorize_code = "1m";
-            id_token = "1h";
-            refresh_token = "90m";
-          };
-          cors = {
-            allowed_origins = ["https://*.${domain}"];
-            endpoints = [
-              "authorization"
-              "token"
-              "revocation"
-              "introspection"
-              "userinfo"
+          session = {
+            name = "authelia_session";
+            same_site = "lax";
+            expiration = "1h";
+            inactivity = "5m";
+            remember_me = "1M";
+            cookies = [
+              {
+                name = "authelia_session";
+                inherit domain;
+                authelia_url = "https://${authHost}";
+                default_redirection_url = "https://dash.${domain}";
+                same_site = "lax";
+                expiration = "1h";
+                inactivity = "5m";
+                remember_me = "1M";
+              }
             ];
           };
-          clients = [
-            (mkClient {
-              client_id = "immich";
-              client_name = "Immich";
-              redirect_uris = [
-                "https://immich.${domain}/auth/login"
-                "https://immich.${domain}/user-settings"
-                "app.immich:///oauth-callback"
+
+          regulation = {
+            max_retries = 3;
+            find_time = "2m";
+            ban_time = "5m";
+          };
+
+          storage.local.path = "/var/lib/authelia-main/db.sqlite3";
+
+          notifier = {
+            disable_startup_check = true;
+            filesystem.filename = "/var/lib/authelia-main/notification.txt";
+          };
+
+          access_control = {
+            default_policy = "deny";
+            rules = [
+              {
+                domain = authHost;
+                policy = "bypass";
+              }
+              {
+                domain = "*.${domain}";
+                policy = "two_factor";
+                subject = ["user:lars"];
+              }
+            ];
+          };
+
+          identity_providers.oidc = {
+            lifespans = {
+              access_token = "1h";
+              authorize_code = "1m";
+              id_token = "1h";
+              refresh_token = "90m";
+            };
+            cors = {
+              allowed_origins = ["https://*.${domain}"];
+              endpoints = [
+                "authorization"
+                "token"
+                "revocation"
+                "introspection"
+                "userinfo"
               ];
-            })
-            (mkClient {
-              client_id = "gitea";
-              client_name = "Gitea";
-              redirect_uris = [
-                "https://gitea.${domain}/user/oauth2/authelia/callback"
-              ];
-            })
-          ];
+            };
+            clients = [
+              (mkClient {
+                client_id = "immich";
+                client_name = "Immich";
+                redirect_uris = [
+                  "https://immich.${domain}/auth/login"
+                  "https://immich.${domain}/user-settings"
+                  "app.immich:///oauth-callback"
+                ];
+              })
+              (mkClient {
+                client_id = "gitea";
+                client_name = "Gitea";
+                redirect_uris = [
+                  "https://gitea.${domain}/user/oauth2/authelia/callback"
+                ];
+              })
+            ];
+          };
         };
       };
-    };
 
-    systemd.services.authelia-main = {
-      serviceConfig = {
-        Restart = lib.mkForce "on-failure";
-        RestartSec = lib.mkForce "5";
-        StateDirectory = lib.mkForce "authelia-main";
-        StateDirectoryMode = lib.mkForce "0750";
-        PrivateTmp = lib.mkForce true;
-        NoNewPrivileges = lib.mkForce true;
-        ProtectClock = lib.mkForce true;
-        ProtectHostname = lib.mkForce true;
-        ProtectKernelLogs = lib.mkForce true;
-        RestrictNamespaces = lib.mkForce true;
-        LockPersonality = lib.mkForce true;
-        WatchdogSec = lib.mkForce "30";
-        ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
+      systemd.services.authelia-main = {
+        serviceConfig = {
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5";
+          StateDirectory = lib.mkForce "authelia-main";
+          StateDirectoryMode = lib.mkForce "0750";
+          PrivateTmp = lib.mkForce true;
+          NoNewPrivileges = lib.mkForce true;
+          ProtectClock = lib.mkForce true;
+          ProtectHostname = lib.mkForce true;
+          ProtectKernelLogs = lib.mkForce true;
+          RestrictNamespaces = lib.mkForce true;
+          LockPersonality = lib.mkForce true;
+          WatchdogSec = lib.mkForce "30";
+          ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
+        };
       };
+
+      environment.etc."authelia/users_database.yml".source = config.sops.templates.authelia-users-db.path;
+
+      sops.templates."authelia-users-db" = {
+        owner = "authelia-main";
+        group = "authelia-main";
+        content = ''
+          users:
+            lars:
+              displayname: "Lars"
+              password: "$2y$12$OvBQyrn36dhLr0CdMYaUkurQvO0PSB9GuSJHx0TjIkI/jm/4Bczpq"
+              email: "lars@auth.home.lan"
+              groups:
+                - admin
+                - dev
+        '';
+      };
+
+      systemd.tmpfiles.rules = [
+        "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
+        "L+ /var/lib/authelia-main/users_database.yml - - - - /etc/authelia/users_database.yml"
+      ];
     };
-
-    environment.etc."authelia/users_database.yml".source = config.sops.templates.authelia-users-db.path;
-
-    sops.templates."authelia-users-db" = {
-      owner = "authelia-main";
-      group = "authelia-main";
-      content = ''
-        users:
-          lars:
-            displayname: "Lars"
-            password: "$2y$12$OvBQyrn36dhLr0CdMYaUkurQvO0PSB9GuSJHx0TjIkI/jm/4Bczpq"
-            email: "lars@auth.home.lan"
-            groups:
-              - admin
-              - dev
-      '';
-    };
-
-    systemd.tmpfiles.rules = [
-      "d /var/lib/authelia-main 0750 authelia-main authelia-main -"
-      "L+ /var/lib/authelia-main/users_database.yml - - - - /etc/authelia/users_database.yml"
-    ];
   };
 }
