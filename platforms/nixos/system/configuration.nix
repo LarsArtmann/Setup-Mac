@@ -160,6 +160,10 @@
       photomap.enable = true;
       homepage.enable = true;
       taskchampion-config.enable = true;
+      display-manager-config.enable = true;
+      audio-config.enable = true;
+      niri-desktop.enable = true;
+      security-hardening.enable = true;
 
       libinput = {
         enable = true;
