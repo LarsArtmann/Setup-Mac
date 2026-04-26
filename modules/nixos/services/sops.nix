@@ -1,4 +1,4 @@
-{inputs, ...}: let
+_: let
   secretsDir = ./../../../platforms/nixos/secrets;
 
   mkSecrets = file: defaults: names:

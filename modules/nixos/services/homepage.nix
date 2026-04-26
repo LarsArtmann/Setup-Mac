@@ -1,4 +1,4 @@
-{inputs, ...}: {
+_: {
   flake.nixosModules.homepage = {
     config,
     pkgs,

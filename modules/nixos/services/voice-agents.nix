@@ -1,4 +1,4 @@
-{inputs, ...}: {
+_: {
   flake.nixosModules.voice-agents = {
     config,
     pkgs,

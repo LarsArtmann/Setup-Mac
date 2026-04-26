@@ -1,4 +1,4 @@
-{inputs, ...}: {
+_: {
   flake.nixosModules.gitea-repos = {
     pkgs,
     lib,

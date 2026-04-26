@@ -13,10 +13,6 @@
     # Optimize NIX_PATH for better performance
     NIX_PATH = lib.mkForce "nixpkgs=flake:nixpkgs";
 
-    # Locale optimization
-    LC_ALL = "en_US.UTF-8";
-    LC_CTYPE = "en_US.UTF-8";
-
     # Development environment enhancements
     NODE_OPTIONS = "--max-old-space-size=4096";
     NPM_CONFIG_AUDIT = "false";

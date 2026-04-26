@@ -1,4 +1,4 @@
-{inputs, ...}: {
+_: {
   flake.nixosModules.default-services = _: {
     virtualisation.docker = {
       enable = true;
