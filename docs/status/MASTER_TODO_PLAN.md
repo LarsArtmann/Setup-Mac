@@ -82,10 +82,10 @@
 | 34 | Create `lib/systemd-harden.nix` shared helper | ARCH | 12m | 20 lines of hardening repeated per service. Extract to helper: `hardenService = { MemoryMax ? "512M", ... }: { ... }`. |
 | 35 | Wire `preferences.nix` to actual GTK/Qt/cursor/font theming | ARCH | 12m | Options declared but nothing consumes them on NixOS. Start with GTK + cursor. |
 | 36 | Convert niri session restore `let` block to NixOS module options | ARCH | 12m | `sessionSaveInterval`, `maxSessionAgeDays`, `fallbackApps` should be proper options. |
-| 37 | Add `options` + `mkIf` to batch 1 of always-on modules (sops, caddy, gitea, immich) | ARCH | 12m | 16 modules have no enable toggle. Start with core 4. |
-| 38 | Add `options` + `mkIf` to batch 2 of always-on modules (authelia, photomap, homepage, taskchampion) | ARCH | 12m | Continue with next 4. |
-| 39 | Add `options` + `mkIf` to batch 3 of always-on modules (display-manager, audio, niri-config, security-hardening) | ARCH | 12m | Continue. |
-| 40 | Add `options` + `mkIf` to batch 4 of always-on modules (monitoring, multi-wm, chromium-policies, steam) | ARCH | 12m | Final 4. |
+| 37 | ✅ `options` + `mkIf` batch 1 (sops, caddy, gitea, immich) — done `bcfe724` | ARCH | 12m | 16 modules have no enable toggle. Start with core 4. |
+| 38 | ✅ `options` + `mkIf` batch 2 (authelia, photomap, homepage, taskchampion) — done `02b8474` | ARCH | 12m | Continue with next 4. |
+| 39 | ✅ `options` + `mkIf` batch 3 (display-manager, audio, niri-config, security-hardening) — done `eb02fcc` | ARCH | 12m | Continue. |
+| 40 | ✅ `options` + `mkIf` batch 4 (monitoring, multi-wm, chromium-policies, steam) — done `8dd8ccc` | ARCH | 12m | Final 4. |
 
 **P4 subtotal: ~84 min**
 
@@ -141,9 +141,9 @@
 
 | # | Task | Category | Est. | Why |
 |---|------|----------|------|-----|
-| 69 | Add GitHub Actions: `nix flake check` on push | CI | 10m | Zero CI exists. Create `.github/workflows/nix-check.yml`. |
-| 70 | Add GitHub Actions: Go test for emeet-pixyd and dnsblockd | CI | 10m | Go packages have tests but no CI to run them. |
-| 71 | Add GitHub Actions: flake.lock auto-update (Renovate/Deps) | CI | 10m | Manual `just update` only. Add automated PRs for input updates. |
+| 69 | ✅ GitHub Actions: nix flake check on push — done `b7e6d34` | CI | 10m | `.github/workflows/nix-check.yml` created. |
+| 70 | ✅ GitHub Actions: Go test for emeet-pixyd + dnsblockd-processor — done `b7e6d34` | CI | 10m | `.github/workflows/go-test.yml` created. |
+| 71 | ✅ GitHub Actions: flake.lock auto-update (weekly Monday 06:00 UTC) — done `b7e6d34` | CI | 10m | `.github/workflows/flake-update.yml` created. |
 | 72 | Fix eval smoke tests (remove `|| true`) | QUALITY | 5m | Eval tests in flake.nix always pass. Remove `|| true`, make them fail on eval errors. |
 | 73 | Consolidate duplicate justfile recipes (validate/check-nix-syntax, switch/deploy) | CLEANUP | 8m | `validate` ≈ `check-nix-syntax`, `switch` ≈ `deploy`. Remove duplicates. |
 | 74 | Replace `nixpkgs-fmt` with `nixfmt-rfc-style` in pre-commit | MODERNIZE | 5m | `nixpkgs-fmt` is deprecated. Update `.pre-commit-config.yaml`. |
