@@ -155,16 +155,9 @@
     treefmt-full-flake,
     ...
   }: let
-    goOverlay = _final: prev: {
-      go = prev.go_1_26.overrideAttrs (_: {
-        version = "1.26.1";
-        src = prev.fetchurl {
-          url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-          hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-        };
-      });
-    };
-
+    # NOTE: goOverlay removed — nixpkgs go_1_26 is already 1.26.1.
+    # Overriding go forced a from-source rebuild that invalidated the
+    # binary cache for the ENTIRE dependency tree (1094 derivations).
     awWatcherOverlay = _final: prev: {
       aw-watcher-utilization = prev.callPackage ./pkgs/aw-watcher-utilization.nix {};
     };
@@ -241,8 +234,8 @@
 
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
-      valkey = prev.valkey.overrideAttrs (old: {doCheck = false;});
-      aiocache = prev.python3Packages.aiocache.overrideAttrs (old: {doCheck = false;});
+      valkey = prev.valkey.overrideAttrs (_old: {doCheck = false;});
+      aiocache = prev.python3Packages.aiocache.overrideAttrs (_old: {doCheck = false;});
     };
   in
     flake-parts.lib.mkFlake {inherit inputs;} {
@@ -294,7 +287,6 @@
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays =
             [
-              goOverlay
               awWatcherOverlay
               jscpdOverlay
               disableTestsOverlay
@@ -441,7 +433,6 @@
                 config.allowUnfree = true;
                 overlays = [
                   nur.overlays.default
-                  goOverlay
                   awWatcherOverlay
                 ];
               };
@@ -512,7 +503,6 @@
                 overlays = [
                   nur.overlays.default
                   inputs.niri.overlays.niri
-                  goOverlay
                   awWatcherOverlay
                   openaudibleOverlay
                   dnsblockdOverlay
@@ -604,7 +594,6 @@
                 config.allowUnfree = true;
                 overlays = [
                   nur.overlays.default
-                  goOverlay
                   dnsblockdOverlay
                 ];
               };
