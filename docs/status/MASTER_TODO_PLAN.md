@@ -18,9 +18,9 @@
 | P5 DEPLOY/VERIFY | 13 | 0 | 13 | 0% |
 | P6 SERVICES | 15 | 11 | 4 | 73% |
 | P7 TOOLING/CI | 10 | 10 | 0 | 100% |
-| P8 DOCS | 6 | 4 | 2 | 67% |
+| P8 DOCS | 6 | 6 | 0 | 100% |
 | P9 FUTURE | 12 | 0 | 12 | 0% |
-| **TOTAL** | **96** | **58** | **38** | **60%** |
+| **TOTAL** | **96** | **60** | **36** | **63%** |
 
 ---
 
@@ -160,14 +160,14 @@
 | 67 | Immich backup restore test | RELIABILITY | Blocked on evo-x2 |
 | 68 | Twenty CRM backup restore test | RELIABILITY | Blocked on evo-x2 |
 
-### P8 — DOCUMENTATION
-| # | Task | Category | Est. |
-|---|------|----------|------|
-| 79 | ~~Write/update top-level README.md~~ | DONE | Updated with all 13 services, DNS failover, new commands |
-| 80 | ~~Document DNS cluster in AGENTS.md~~ | DONE | DNS Failover Cluster section added |
-| 81 | ~~Write ADR for niri session restore design~~ | DONE | `docs/architecture/adr-005-niri-session-restore.md` |
-| 82 | Add module option description fields | DOCS | 12m |
-| 83 | Create docs/CONTRIBUTING.md | DOCS | 12m |
+### P8 — DOCUMENTATION (6/6 DONE)
+| # | Task | Evidence |
+|---|------|----------|
+| 79 | ✅ Write/update top-level README.md | Updated with all 13 services, DNS failover, new commands |
+| 80 | ✅ Document DNS cluster in AGENTS.md | DNS Failover Cluster section added |
+| 81 | ✅ Write ADR for niri session restore design | `docs/architecture/adr-005-niri-session-restore.md` |
+| 82 | ✅ Add module option description fields | All 53 options across 8 service files already have descriptions |
+| 83 | ✅ Create docs/CONTRIBUTING.md | Full contributing guide with patterns, hooks, architecture |
 
 ### P9 — FUTURE / RESEARCH
 | # | Task | Category | Est. |
@@ -189,11 +189,9 @@
 
 ## NEXT ACTIONS
 
-**AI-actionable (can do now):**
-1. P6-62: Hermes health check (needs Hermes endpoint)
-2. P6-63: Hermes mergeEnvScript cleanup
-3. P8-82: Add module option descriptions
-4. P8-83: Create CONTRIBUTING.md
+**AI-actionable (remaining):**
+1. P6-62: Hermes health check (needs Hermes code change — external dependency)
+2. P6-63: Hermes mergeEnvScript cleanup (low risk but needs evo-x2 testing)
 
 **User-actionable (requires evo-x2 or decisions):**
 1. P1-7/9/10/11: Sops secrets, Docker digests, VRRP auth
