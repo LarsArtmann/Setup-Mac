@@ -100,10 +100,8 @@
       glow # Render markdown on the CLI, with pizzazz
 
       # System monitoring
-      bottom
-      procs
       btop
-      htop
+      bottom
 
       # Archive tools
       unzip

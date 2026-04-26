@@ -487,10 +487,6 @@ check:
 validate:
     @just test-fast
 
-# Alias for test-fast (pre-commit hook compat)
-check-nix-syntax:
-    @just test-fast
-
 # Check for unresolved merge conflict markers in all tracked files
 conflict-check:
     @echo "🔍 Checking for merge conflicts..."
@@ -663,10 +659,6 @@ test-fast:
     @echo "🚀 Fast testing Nix configuration (syntax only)..."
     nix --extra-experimental-features "nix-command flakes" flake check --no-build
     @echo "✅ Fast configuration test passed"
-
-# Alias for switch
-deploy:
-    @just switch
 
 # Verify Home Manager installation and configuration
 verify:

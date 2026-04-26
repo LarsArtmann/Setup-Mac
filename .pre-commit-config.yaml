@@ -55,7 +55,7 @@ repos:
       - id: nix-check
         name: nix check (flake validation)
         entry: bash
-        args: [-c, "cd . && just check-nix-syntax"]
+        args: [-c, "cd . && just validate"]
         language: system
         files: \.nix$
         pass_filenames: false
