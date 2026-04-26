@@ -1,20 +1,33 @@
 _: {
-  flake.nixosModules.monitoring = {pkgs, ...}: {
-    environment.systemPackages = with pkgs; [
-      radeontop # AMD GPU specific monitor (CLI, lightweight)
-      # nvtopPackages.amd moved to hardware/amd-gpu.nix (alongside other GPU tools)
-      # amdgpu_top moved to hardware/amd-gpu.nix (available system-wide)
+  flake.nixosModules.monitoring = {
+    config,
+    pkgs,
+    lib,
+    ...
+  }: let
+    cfg = config.services.monitoring-tools;
+  in {
+    options.services.monitoring-tools = {
+      enable = lib.mkEnableOption "System and network monitoring tools";
+    };
 
-      # System monitoring
-      # btop moved to base.nix (available cross-platform)
+    config = lib.mkIf cfg.enable {
+      environment.systemPackages = with pkgs; [
+        radeontop # AMD GPU specific monitor (CLI, lightweight)
+        # nvtopPackages.amd moved to hardware/amd-gpu.nix (alongside other GPU tools)
+        # amdgpu_top moved to hardware/amd-gpu.nix (available system-wide)
 
-      # System monitoring and debugging
-      strace # System call tracer
-      ltrace # Library call tracer
+        # System monitoring
+        # btop moved to base.nix (available cross-platform)
 
-      # Network monitoring
-      nethogs # Network process monitoring
-      iftop # Network bandwidth
-    ];
+        # System monitoring and debugging
+        strace # System call tracer
+        ltrace # Library call tracer
+
+        # Network monitoring
+        nethogs # Network process monitoring
+        iftop # Network bandwidth
+      ];
+    };
   };
 }

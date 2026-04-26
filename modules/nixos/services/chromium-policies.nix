@@ -1,21 +1,20 @@
 _: {
-  flake.nixosModules.chromium-policies =
-    # Force-install extensions via Helium's proxied update URL
-    # No explicit update_url → Helium routes through services.helium.imput.net
-    {
-      config,
-      pkgs,
-      lib,
-      ...
-    }: let
-      # YouTube Shorts Blocker extension by Umut Seven
-      # Open source: https://github.com/umutseven92/shorts-blocker
-      ytShortsBlockerId = "ckagfhpboagdopichicnebandlofghbc";
+  flake.nixosModules.chromium-policies = {
+    config,
+    pkgs,
+    lib,
+    ...
+  }: let
+    cfg = config.services.chromium-policies;
 
-      # OneTab - tab memory saver
-      # https://chromewebstore.google.com/detail/onetab/chphlpgkkbolifaimnlloiipkdnihall
-      oneTabId = "chphlpgkkbolifaimnlloiipkdnihall";
-    in {
+    ytShortsBlockerId = "ckagfhpboagdopichicnebandlofghbc";
+    oneTabId = "chphlpgkkbolifaimnlloiipkdnihall";
+  in {
+    options.services.chromium-policies = {
+      enable = lib.mkEnableOption "Chromium browser with managed extensions and policies";
+    };
+
+    config = lib.mkIf cfg.enable {
       programs.chromium = {
         enable = true;
 
@@ -38,4 +37,5 @@ _: {
         };
       };
     };
+  };
 }

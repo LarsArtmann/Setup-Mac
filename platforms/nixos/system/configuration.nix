@@ -164,6 +164,10 @@
       audio-config.enable = true;
       niri-desktop.enable = true;
       security-hardening.enable = true;
+      monitoring-tools.enable = true;
+      multi-wm.enable = true;
+      chromium-policies.enable = true;
+      steam-config.enable = true;
 
       libinput = {
         enable = true;
