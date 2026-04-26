@@ -39,63 +39,63 @@
       '';
     };
   in {
-    services.caddy = {
-      enable = true;
+    config = lib.mkIf config.services.caddy.enable {
+      services.caddy = {
+        globalConfig = ''
+          auto_https off
+          servers {
+            ${caddyBind}
+            metrics
+          }
+        '';
 
-      globalConfig = ''
-        auto_https off
-        servers {
-          ${caddyBind}
-          metrics
-        }
-      '';
+        virtualHosts = {
+          "auth.${domain}" = {
+            extraConfig = ''
+              ${tlsConfig}
+              reverse_proxy localhost:${toString authPort}
+            '';
+          };
 
-      virtualHosts = {
-        "auth.${domain}" = {
-          extraConfig = ''
-            ${tlsConfig}
-            reverse_proxy localhost:${toString authPort}
-          '';
-        };
-
-        "immich.${domain}" = protectedVHost "immich" config.services.immich.port;
-        "gitea.${domain}" = protectedVHost "gitea" 3000;
-        "dash.${domain}" = protectedVHost "dash" 8082;
-        "photomap.${domain}" = protectedVHost "photomap" 8050;
-        "unsloth.${domain}" = protectedVHost "unsloth" 8888;
-        "signoz.${domain}" = protectedVHost "signoz" 8080;
-        "crm.${domain}" = protectedVHost "crm" 3200;
-        "tasks.${domain}" = {
-          extraConfig = ''
-            ${tlsConfig}
-            reverse_proxy localhost:10222
-          '';
-        };
-        "comfyui.${domain}" = {
-          extraConfig = ''
-            ${tlsConfig}
-            reverse_proxy localhost:8188
-          '';
+          "immich.${domain}" = protectedVHost "immich" config.services.immich.port;
+          "gitea.${domain}" = protectedVHost "gitea" 3000;
+          "dash.${domain}" = protectedVHost "dash" 8082;
+          "photomap.${domain}" = protectedVHost "photomap" 8050;
+          "unsloth.${domain}" = protectedVHost "unsloth" 8888;
+          "signoz.${domain}" = protectedVHost "signoz" 8080;
+          "crm.${domain}" = protectedVHost "crm" 3200;
+          "tasks.${domain}" = {
+            extraConfig = ''
+              ${tlsConfig}
+              reverse_proxy localhost:10222
+            '';
+          };
+          "comfyui.${domain}" = {
+            extraConfig = ''
+              ${tlsConfig}
+              reverse_proxy localhost:8188
+            '';
+          };
         };
       };
-    };
 
-    networking.firewall.allowedTCPPorts = [80 443];
+      networking.firewall.allowedTCPPorts = [80 443];
 
-    systemd.services.caddy = {
-      after = ["authelia-main.service"];
-      wants = ["authelia-main.service"];
-      serviceConfig = {
-        Restart = lib.mkForce "on-failure";
-        RestartSec = lib.mkForce "5";
-        OOMScoreAdjust = lib.mkForce (-500);
-        PrivateTmp = lib.mkForce true;
-        NoNewPrivileges = lib.mkForce false;
-        ProtectClock = lib.mkForce true;
-        ProtectHostname = lib.mkForce true;
-        RestrictNamespaces = lib.mkForce true;
-        LockPersonality = lib.mkForce true;
-        WatchdogSec = lib.mkForce "30";
+      systemd.services.caddy = {
+        after = ["authelia-main.service"];
+        wants = ["authelia-main.service"];
+        serviceConfig = {
+          Restart = lib.mkForce "on-failure";
+          RestartSec = lib.mkForce "5";
+          OOMScoreAdjust = lib.mkForce (-500);
+          PrivateTmp = lib.mkForce true;
+          NoNewPrivileges = lib.mkForce false;
+          ProtectClock = lib.mkForce true;
+          ProtectHostname = lib.mkForce true;
+          RestrictNamespaces = lib.mkForce true;
+          LockPersonality = lib.mkForce true;
+          WatchdogSec = lib.mkForce "30";
+        };
       };
     };
   };

@@ -152,6 +152,10 @@
 
     services = {
       udisks2.enable = true;
+      sops-config.enable = true;
+      caddy.enable = true;
+      gitea.enable = true;
+      immich.enable = true;
 
       libinput = {
         enable = true;

@@ -225,323 +225,324 @@
       systemctl is-active gitea-github-sync.timer && echo "✓ Sync timer: active" || echo "✗ Sync timer: inactive"
     '';
   in {
-    services.gitea = {
-      enable = true;
-      package = pkgs.gitea;
-
-      # SQLite is fine for personal use (<50 repos)
-      database.type = "sqlite3";
-
-      # Enable Git LFS support
-      lfs.enable = true;
-
-      # Automatic weekly backups
-      dump = {
-        enable = true;
-        interval = "weekly";
-      };
-
-      stateDir = "/var/lib/gitea";
-
-      settings = {
-        DEFAULT.APP_NAME = "Local Git Mirror";
-
-        server = {
-          HTTP_PORT = 3000;
-          ROOT_URL = "https://gitea.${config.networking.domain}/";
-          DOMAIN = "gitea.${config.networking.domain}";
-        };
-
-        repository = {
-          DEFAULT_BRANCH = "main";
-          ENABLE_PUSH_CREATE_USER = true;
-          DEFAULT_PUSH_CREATE_PRIVATE = true;
-        };
-
-        # Mirror configuration
-        mirror = {
-          ENABLED = true;
-          DEFAULT_INTERVAL = "8h";
-          MIN_INTERVAL = "10m";
-        };
-
-        # Automatic mirror sync (runs every 30 min)
-        "cron.update_mirrors" = {
-          ENABLED = true;
-          SCHEDULE = "@every 30m";
-          RUN_AT_START = false;
-          PULL_LIMIT = 50;
-          PUSH_LIMIT = 50;
-        };
-
-        # UI preferences
-        ui = {
-          DEFAULT_THEME = "gitea-auto";
-          THEMES = "gitea-auto,gitea-light,gitea-dark,arc-green";
-        };
-
-        # Security (single-user instance)
-        service = {
-          DISABLE_REGISTRATION = true;
-          REQUIRE_SIGNIN_VIEW = false;
-        };
-
-        session = {
-          COOKIE_SECURE = true; # Behind Caddy HTTPS reverse proxy
-        };
-
-        # Logging
-        log = {
-          LEVEL = "Info";
-          ROOT_PATH = "/var/lib/gitea/log";
-        };
-
-        # Performance tuning
-        "git.timeout" = {
-          MIRROR = 600;
-          CLONE = 600;
-          PULL = 600;
-        };
-
-        # CI/CD via Gitea Actions
-        actions = {
-          ENABLED = true;
-          DEFAULT_ACTIONS_URL = "github";
-        };
-
-        # Cleaner footer
-        other = {
-          SHOW_FOOTER_VERSION = false;
-          SHOW_FOOTER_TEMPLATE_LOAD_TIME = false;
-        };
-      };
-    };
-
-    # Systemd configuration
-    systemd = {
-      # Harden the main Gitea service (managed by services.gitea)
+    config = lib.mkIf config.services.gitea.enable {
       services.gitea = {
-        serviceConfig = {
-          Restart = lib.mkForce "on-failure";
-          RestartSec = lib.mkForce "5";
-          StartLimitBurst = lib.mkForce 3;
-          StartLimitIntervalSec = lib.mkForce 300;
+        package = pkgs.gitea;
+
+        # SQLite is fine for personal use (<50 repos)
+        database.type = "sqlite3";
+
+        # Enable Git LFS support
+        lfs.enable = true;
+
+        # Automatic weekly backups
+        dump = {
+          enable = true;
+          interval = "weekly";
+        };
+
+        stateDir = "/var/lib/gitea";
+
+        settings = {
+          DEFAULT.APP_NAME = "Local Git Mirror";
+
+          server = {
+            HTTP_PORT = 3000;
+            ROOT_URL = "https://gitea.${config.networking.domain}/";
+            DOMAIN = "gitea.${config.networking.domain}";
+          };
+
+          repository = {
+            DEFAULT_BRANCH = "main";
+            ENABLE_PUSH_CREATE_USER = true;
+            DEFAULT_PUSH_CREATE_PRIVATE = true;
+          };
+
+          # Mirror configuration
+          mirror = {
+            ENABLED = true;
+            DEFAULT_INTERVAL = "8h";
+            MIN_INTERVAL = "10m";
+          };
+
+          # Automatic mirror sync (runs every 30 min)
+          "cron.update_mirrors" = {
+            ENABLED = true;
+            SCHEDULE = "@every 30m";
+            RUN_AT_START = false;
+            PULL_LIMIT = 50;
+            PUSH_LIMIT = 50;
+          };
+
+          # UI preferences
+          ui = {
+            DEFAULT_THEME = "gitea-auto";
+            THEMES = "gitea-auto,gitea-light,gitea-dark,arc-green";
+          };
+
+          # Security (single-user instance)
+          service = {
+            DISABLE_REGISTRATION = true;
+            REQUIRE_SIGNIN_VIEW = false;
+          };
+
+          session = {
+            COOKIE_SECURE = true; # Behind Caddy HTTPS reverse proxy
+          };
+
+          # Logging
+          log = {
+            LEVEL = "Info";
+            ROOT_PATH = "/var/lib/gitea/log";
+          };
+
+          # Performance tuning
+          "git.timeout" = {
+            MIRROR = 600;
+            CLONE = 600;
+            PULL = 600;
+          };
+
+          # CI/CD via Gitea Actions
+          actions = {
+            ENABLED = true;
+            DEFAULT_ACTIONS_URL = "github";
+          };
+
+          # Cleaner footer
+          other = {
+            SHOW_FOOTER_VERSION = false;
+            SHOW_FOOTER_TEMPLATE_LOAD_TIME = false;
+          };
         };
       };
 
-      # GitHub sync service
-      services.gitea-github-sync = {
-        description = "Sync all GitHub repos to Gitea";
-        after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
-        wants = ["network-online.target"];
-        requires = ["gitea.service"];
-        path = [pkgs.curl pkgs.jq pkgs.gh];
+      # Systemd configuration
+      systemd = {
+        # Harden the main Gitea service (managed by services.gitea)
+        services.gitea = {
+          serviceConfig = {
+            Restart = lib.mkForce "on-failure";
+            RestartSec = lib.mkForce "5";
+            StartLimitBurst = lib.mkForce 3;
+            StartLimitIntervalSec = lib.mkForce 300;
+          };
+        };
+
+        # GitHub sync service
+        services.gitea-github-sync = {
+          description = "Sync all GitHub repos to Gitea";
+          after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
+          wants = ["network-online.target"];
+          requires = ["gitea.service"];
+          path = [pkgs.curl pkgs.jq pkgs.gh];
+          serviceConfig =
+            {
+              Type = "oneshot";
+              User = primaryUser;
+              EnvironmentFile = [
+                config.sops.templates."gitea-sync.env".path
+                "-/var/lib/gitea/.admin-token.env"
+              ];
+              ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
+            }
+            // harden {
+              ProtectHome = false;
+              ProtectSystem = false;
+            };
+        };
+
+        # Schedule sync every 6 hours
+        timers.gitea-github-sync = {
+          description = "Sync GitHub repos to Gitea every 6 hours";
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnBootSec = "5m";
+            OnUnitActiveSec = "6h";
+            Unit = "gitea-github-sync.service";
+            Persistent = true;
+          };
+        };
+      };
+
+      # Declarative admin user setup (runs in Gitea's preStart)
+      systemd.services.gitea = {
+        serviceConfig.WatchdogSec = lib.mkForce "30";
+        preStart = let
+          adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
+            set -euo pipefail
+
+            ADMIN_USER="${primaryUser}"
+            ADMIN_EMAIL="${primaryUser}@local"
+            PASS_FILE="/var/lib/gitea/.admin-password"
+            GITEA=${lib.getExe giteaPkg}
+
+            # Generate password if not exists
+            if [ ! -f "$PASS_FILE" ]; then
+              ${pkgs.coreutils}/bin/head -c 32 /dev/urandom | ${pkgs.coreutils}/bin/base64 > "$PASS_FILE"
+              chmod 600 "$PASS_FILE"
+            fi
+            ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
+
+            # Create admin user if not exists, sync password from file
+            if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
+              echo "Creating Gitea admin user: $ADMIN_USER"
+              $GITEA admin user create \
+                --username "$ADMIN_USER" \
+                --password "$ADMIN_PASS" \
+                --email "$ADMIN_EMAIL" \
+                --admin \
+                --must-change-password=false
+            else
+              echo "Ensuring password matches for $ADMIN_USER"
+              $GITEA admin user change-password \
+                --username "$ADMIN_USER" \
+                --password "$ADMIN_PASS" \
+                --must-change-password=false 2>/dev/null || true
+            fi
+          '';
+        in "${adminSetup}";
+      };
+
+      # Token generation (runs after Gitea is listening)
+      systemd.services.gitea-generate-token = {
+        description = "Generate Gitea API token";
+        after = ["gitea.service"];
+        wants = ["gitea.service"];
+        wantedBy = ["gitea.service"];
         serviceConfig =
           {
             Type = "oneshot";
-            User = primaryUser;
-            EnvironmentFile = [
-              config.sops.templates."gitea-sync.env".path
-              "-/var/lib/gitea/.admin-token.env"
-            ];
-            ExecStart = "${mirrorGithubScript}/bin/gitea-mirror-github";
+            User = "gitea";
+            Group = "gitea";
+            RemainAfterExit = true;
           }
-          // harden {
-            ProtectHome = false;
-            ProtectSystem = false;
-          };
-      };
+          // harden {};
+        script = let
+          tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
+            set -euo pipefail
 
-      # Schedule sync every 6 hours
-      timers.gitea-github-sync = {
-        description = "Sync GitHub repos to Gitea every 6 hours";
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnBootSec = "5m";
-          OnUnitActiveSec = "6h";
-          Unit = "gitea-github-sync.service";
-          Persistent = true;
-        };
-      };
-    };
+            ADMIN_USER="${primaryUser}"
+            TOKEN_FILE="/var/lib/gitea/.admin-token.env"
+            GITEA=${lib.getExe giteaPkg}
+            export GITEA_WORK_DIR=/var/lib/gitea
 
-    # Declarative admin user setup (runs in Gitea's preStart)
-    systemd.services.gitea = {
-      serviceConfig.WatchdogSec = lib.mkForce "30";
-      preStart = let
-        adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
-          set -euo pipefail
+            [ -f "$TOKEN_FILE" ] && exit 0
 
-          ADMIN_USER="${primaryUser}"
-          ADMIN_EMAIL="${primaryUser}@local"
-          PASS_FILE="/var/lib/gitea/.admin-password"
-          GITEA=${lib.getExe giteaPkg}
+            # Wait for Gitea to be ready
+            for i in $(seq 1 30); do
+              if ${pkgs.curl}/bin/curl -s -o /dev/null -w "" "http://localhost:3000/"; then
+                break
+              fi
+              sleep 1
+            done
 
-          # Generate password if not exists
-          if [ ! -f "$PASS_FILE" ]; then
-            ${pkgs.coreutils}/bin/head -c 32 /dev/urandom | ${pkgs.coreutils}/bin/base64 > "$PASS_FILE"
-            chmod 600 "$PASS_FILE"
-          fi
-          ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
-
-          # Create admin user if not exists, sync password from file
-          if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
-            echo "Creating Gitea admin user: $ADMIN_USER"
-            $GITEA admin user create \
-              --username "$ADMIN_USER" \
-              --password "$ADMIN_PASS" \
-              --email "$ADMIN_EMAIL" \
-              --admin \
-              --must-change-password=false
-          else
-            echo "Ensuring password matches for $ADMIN_USER"
-            $GITEA admin user change-password \
-              --username "$ADMIN_USER" \
-              --password "$ADMIN_PASS" \
-              --must-change-password=false 2>/dev/null || true
-          fi
-        '';
-      in "${adminSetup}";
-    };
-
-    # Token generation (runs after Gitea is listening)
-    systemd.services.gitea-generate-token = {
-      description = "Generate Gitea API token";
-      after = ["gitea.service"];
-      wants = ["gitea.service"];
-      wantedBy = ["gitea.service"];
-      serviceConfig =
-        {
-          Type = "oneshot";
-          User = "gitea";
-          Group = "gitea";
-          RemainAfterExit = true;
-        }
-        // harden {};
-      script = let
-        tokenGen = pkgs.writeShellScript "gitea-token-gen" ''
-          set -euo pipefail
-
-          ADMIN_USER="${primaryUser}"
-          TOKEN_FILE="/var/lib/gitea/.admin-token.env"
-          GITEA=${lib.getExe giteaPkg}
-          export GITEA_WORK_DIR=/var/lib/gitea
-
-          [ -f "$TOKEN_FILE" ] && exit 0
-
-          # Wait for Gitea to be ready
-          for i in $(seq 1 30); do
-            if ${pkgs.curl}/bin/curl -s -o /dev/null -w "" "http://localhost:3000/"; then
-              break
-            fi
-            sleep 1
-          done
-
-          TOKEN=""
-          TOKEN_NAME="sync-$(date +%s)"
-
-          # Generate new token via CLI (unique name avoids "already used" errors)
-          TOKEN=$($GITEA admin user generate-access-token \
-            --username "$ADMIN_USER" \
-            --token-name "$TOKEN_NAME" \
-            --scopes all \
-            --raw 2>/dev/null) || TOKEN=""
-
-          # Validate: token must be a 40-char hex string
-          if ! echo "$TOKEN" | ${pkgs.gnugrep}/bin/grep -qE '^[0-9a-f]{40}$'; then
-            echo "CLI token generation failed or returned invalid token, clearing"
             TOKEN=""
-          fi
+            TOKEN_NAME="sync-$(date +%s)"
 
-          if [ -n "$TOKEN" ]; then
-            printf 'GITEA_TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
-            chmod 600 "$TOKEN_FILE"
-            echo "API token written to $TOKEN_FILE"
-          else
-            echo "WARNING: Failed to generate API token"
-          fi
-        '';
-      in "${tokenGen}";
-    };
+            # Generate new token via CLI (unique name avoids "already used" errors)
+            TOKEN=$($GITEA admin user generate-access-token \
+              --username "$ADMIN_USER" \
+              --token-name "$TOKEN_NAME" \
+              --scopes all \
+              --raw 2>/dev/null) || TOKEN=""
 
-    # Runner registration token generation
-    systemd.services.gitea-runner-token = {
-      description = "Generate Gitea Actions runner registration token";
-      after = ["gitea.service"];
-      wants = ["gitea.service"];
-      wantedBy = ["gitea.service"];
-      serviceConfig =
-        {
-          Type = "oneshot";
-          User = "gitea";
-          Group = "gitea";
-          RemainAfterExit = true;
-        }
-        // harden {};
-      script = let
-        tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''
-          set -euo pipefail
-
-          TOKEN_FILE="/var/lib/gitea/.runner-token"
-          GITEA=${lib.getExe giteaPkg}
-          export GITEA_WORK_DIR=/var/lib/gitea
-
-          [ -f "$TOKEN_FILE" ] && exit 0
-
-          for i in $(seq 1 30); do
-            if ${pkgs.curl}/bin/curl -s -o /dev/null "http://localhost:3000/"; then
-              break
+            # Validate: token must be a 40-char hex string
+            if ! echo "$TOKEN" | ${pkgs.gnugrep}/bin/grep -qE '^[0-9a-f]{40}$'; then
+              echo "CLI token generation failed or returned invalid token, clearing"
+              TOKEN=""
             fi
-            sleep 1
-          done
 
-          TOKEN=$($GITEA actions generate-runner-token 2>/dev/null) || TOKEN=""
+            if [ -n "$TOKEN" ]; then
+              printf 'GITEA_TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
+              chmod 600 "$TOKEN_FILE"
+              echo "API token written to $TOKEN_FILE"
+            else
+              echo "WARNING: Failed to generate API token"
+            fi
+          '';
+        in "${tokenGen}";
+      };
 
-          if [ -n "$TOKEN" ]; then
-            printf 'TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
-            chmod 600 "$TOKEN_FILE"
-            echo "Runner registration token written to $TOKEN_FILE"
-          else
-            echo "WARNING: Failed to generate runner registration token"
-          fi
-        '';
-      in "${tokenGen}";
-    };
+      # Runner registration token generation
+      systemd.services.gitea-runner-token = {
+        description = "Generate Gitea Actions runner registration token";
+        after = ["gitea.service"];
+        wants = ["gitea.service"];
+        wantedBy = ["gitea.service"];
+        serviceConfig =
+          {
+            Type = "oneshot";
+            User = "gitea";
+            Group = "gitea";
+            RemainAfterExit = true;
+          }
+          // harden {};
+        script = let
+          tokenGen = pkgs.writeShellScript "gitea-runner-token-gen" ''
+            set -euo pipefail
 
-    # Gitea Actions Runner
-    services.gitea-actions-runner = {
-      package = pkgs.gitea-actions-runner;
-      instances.${config.networking.hostName} = {
-        enable = true;
-        name = config.networking.hostName;
-        url = "http://localhost:3000";
-        tokenFile = "/var/lib/gitea/.runner-token";
-        labels = [
-          "ubuntu-latest:docker://node:22-bookworm"
-          "ubuntu-22.04:docker://node:22-bookworm"
-          "native:host"
-        ];
-        settings = {
-          log.level = "info";
-          runner.capacity = 2;
-          container = {
-            network = "host";
+            TOKEN_FILE="/var/lib/gitea/.runner-token"
+            GITEA=${lib.getExe giteaPkg}
+            export GITEA_WORK_DIR=/var/lib/gitea
+
+            [ -f "$TOKEN_FILE" ] && exit 0
+
+            for i in $(seq 1 30); do
+              if ${pkgs.curl}/bin/curl -s -o /dev/null "http://localhost:3000/"; then
+                break
+              fi
+              sleep 1
+            done
+
+            TOKEN=$($GITEA actions generate-runner-token 2>/dev/null) || TOKEN=""
+
+            if [ -n "$TOKEN" ]; then
+              printf 'TOKEN=%s\n' "$TOKEN" > "$TOKEN_FILE"
+              chmod 600 "$TOKEN_FILE"
+              echo "Runner registration token written to $TOKEN_FILE"
+            else
+              echo "WARNING: Failed to generate runner registration token"
+            fi
+          '';
+        in "${tokenGen}";
+      };
+
+      # Gitea Actions Runner
+      services.gitea-actions-runner = {
+        package = pkgs.gitea-actions-runner;
+        instances.${config.networking.hostName} = {
+          enable = true;
+          name = config.networking.hostName;
+          url = "http://localhost:3000";
+          tokenFile = "/var/lib/gitea/.runner-token";
+          labels = [
+            "ubuntu-latest:docker://node:22-bookworm"
+            "ubuntu-22.04:docker://node:22-bookworm"
+            "native:host"
+          ];
+          settings = {
+            log.level = "info";
+            runner.capacity = 2;
+            container = {
+              network = "host";
+            };
           };
         };
       };
-    };
 
-    # Ensure runner starts after token generation
-    systemd.services."gitea-runner-${config.networking.hostName}" = {
-      after = ["gitea-runner-token.service"];
-      requires = ["gitea-runner-token.service"];
-    };
+      # Ensure runner starts after token generation
+      systemd.services."gitea-runner-${config.networking.hostName}" = {
+        after = ["gitea-runner-token.service"];
+        requires = ["gitea-runner-token.service"];
+      };
 
-    # CLI tools
-    environment.systemPackages = [
-      mirrorGithubScript
-      mirrorStarredScript
-      setupScript
-    ];
+      # CLI tools
+      environment.systemPackages = [
+        mirrorGithubScript
+        mirrorStarredScript
+        setupScript
+      ];
+    };
   };
 }
