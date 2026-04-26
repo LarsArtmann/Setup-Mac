@@ -1,0 +1,50 @@
+name: Go tests
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "pkgs/emeet-pixyd/**"
+      - "pkgs/dnsblockd-processor/**"
+  pull_request:
+    branches: [master]
+    paths:
+      - "pkgs/emeet-pixyd/**"
+      - "pkgs/dnsblockd-processor/**"
+
+jobs:
+  emeet-pixyd:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pkgs/emeet-pixyd
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkgs/emeet-pixyd/go.mod
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race -count=1 ./...
+
+  dnsblockd-processor:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pkgs/dnsblockd-processor
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: pkgs/dnsblockd-processor/go.mod
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Build
+        run: go build ./...
