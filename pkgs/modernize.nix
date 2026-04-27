@@ -27,5 +27,6 @@ in
       homepage = "https://pkg.go.dev/golang.org/x/tools/gopls/internal/analysis/modernize";
       license = lib.licenses.bsd3;
       platforms = lib.platforms.all;
+      mainProgram = "modernize";
     };
   }
