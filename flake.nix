@@ -349,7 +349,7 @@
                 nativeBuildInputs = [pkgs.deadnix];
               } ''
                 cd ${./.}
-                deadnix --fail --no-lambda-pattern-names .
+                deadnix --fail --no-lambda-pattern-names . 2>&1 | tee $out
               '';
 
             nix-eval-darwin = pkgs.runCommand "nix-eval-darwin" {} ''
