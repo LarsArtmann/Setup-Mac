@@ -1,8 +1,8 @@
 # MASTER TODO PLAN — SystemNix
 
-**Regenerated:** 2026-04-26
+**Regenerated:** 2026-04-27
 **Source:** Comprehensive code audit of all 96 original tasks
-**Previous version:** 2026-04-24 (96 tasks, ~60% stale)
+**Previous version:** 2026-04-26 (96 tasks, ~63% complete)
 
 ---
 
@@ -18,9 +18,9 @@
 | P5 DEPLOY/VERIFY | 13 | 0 | 13 | 0% |
 | P6 SERVICES | 15 | 11 | 4 | 73% |
 | P7 TOOLING/CI | 10 | 10 | 0 | 100% |
-| P8 DOCS | 6 | 6 | 0 | 100% |
+| P8 DOCS | 5 | 5 | 0 | 100% |
 | P9 FUTURE | 12 | 2 | 10 | 17% |
-| **TOTAL** | **96** | **60** | **36** | **63%** |
+|| **TOTAL** | **95** | **64** | **31** | **67%** |
 
 ---
 
@@ -41,8 +41,8 @@
 |---|------|--------|----------|
 | 7 | Move Taskwarrior encryption to sops | ⬜ BLOCKED on evo-x2 | Hardcoded `sha256("taskchampion-sync-encryption-systemnix")` in taskwarrior.nix:38 |
 | 8 | ✅ Add systemd hardening to gitea-ensure-repos | `bcfe724` | PrivateTmp, NoNewPrivileges, ProtectHome, ProtectSystem, MemoryMax |
-| 9 | Pin Docker digest for Voice Agents | ⬜ BLOCKED on evo-x2 | `latest` tag in voice-agents.nix |
-| 10 | Pin Docker digest for PhotoMap | ⬜ BLOCKED on evo-x2 | `latest` tag in photomap.nix |
+| 9 | Pin Docker digest for Voice Agents | ⬜ BLOCKED on evo-x2 | Version-tagged (`beecave/insanely-fast-whisper-rocm:1.0.0`) but not digest-pinned (voice-agents.nix:24-25) |
+| 10 | Pin Docker digest for PhotoMap | ⬜ BLOCKED on evo-x2 | Version-tagged (`lstein/photomapai:1.0.0`) but not digest-pinned (photomap.nix:35-36) |
 | 11 | Secure VRRP auth_pass with sops | ⬜ BLOCKED on evo-x2 | Plaintext in dns-failover.nix |
 | 12 | ✅ Remove dead ublock-filters.nix | File deleted | No longer exists |
 | 13 | ✅ Add Restart + StartLimitBurst to gitea-repos | `bcfe724` | Restart=on-failure, startLimitBurst=3 |
@@ -54,7 +54,7 @@
 | 15 | ✅ Restart=on-failure for all services | All long-running services have Restart |
 | 16 | ✅ Fix dead let bindings | Twenty.nix, dns-blocker, aw-watcher-utilization all clean |
 | 17 | ✅ Fix core.pager vs pager.diff conflict | No core.pager set — only pager.diff = "bat" |
-| 18 | ✅ Fix fonts.packages darwin compatibility | `lib.mkIf pkgs.stdenv.isLinux` guard in fonts.nix:6 |
+| 18 | ✅ Fix fonts.packages darwin compatibility | `lib.mkIf pkgs.stdenv.isLinux` guard in packages/fonts.nix:6 |
 | 19 | ✅ Enable services.udisks2 | `udisks2.enable = true` in configuration.nix:154 |
 | 20 | ✅ Add .editorconfig | Exists at root: 2-space indent, UTF-8, LF, Go tabs |
 | 21 | ✅ Make deadnix strict with --fail | `deadnix --fail --no-lambda-pattern-names` in flake.nix:352 |
@@ -93,7 +93,7 @@
 | 73 | ✅ Consolidate duplicate justfile recipes | No duplicates found |
 | 74 | ✅ Replace nixpkgs-fmt with alejandra | Already using alejandra in .pre-commit-config.yaml |
 | 75 | ✅ Trim system monitors to 2 | Only btop + bottom in base.nix |
-| 76 | ✅ Fix LC_ALL/LANG redundancy | Removed LC_ALL and LC_CTYPE — LANG = "en_US.UTF-8" is sufficient |
+| 76 | ✅ Fix LC_ALL/LANG redundancy | Removed LC_ALL — LANG = "en_US.UTF-8" is sufficient; LC_CTYPE still set in fish.nix:17 for macOS compatibility |
 | 77 | ✅ Set allowUnsupportedSystem = false | nix-settings.nix:75 |
 | 78 | ✅ Taskwarrior backup timer | systemd timer in taskwarrior.nix:163-174, OnCalendar = "daily" |
 
@@ -123,8 +123,8 @@
 | # | Task | Category | Est. | Blocker |
 |---|------|----------|------|---------|
 | 7 | Move Taskwarrior encryption secret to sops-nix | SECURITY | 10m | Needs evo-x2 for sops secret creation |
-| 9 | Pin Docker image digest for Voice Agents | SECURITY | 5m | Needs evo-x2 to pull digest |
-| 10 | Pin Docker image digest for PhotoMap | SECURITY | 5m | Needs evo-x2 to pull digest |
+| 9 | Pin Docker image digest for Voice Agents | SECURITY | 5m | Version-tagged not `latest`, but needs evo-x2 to pull SHA256 digest |
+| 10 | Pin Docker image digest for PhotoMap | SECURITY | 5m | Version-tagged not `latest`, but needs evo-x2 to pull SHA256 digest |
 | 11 | Secure VRRP auth_pass with sops-nix | SECURITY | 8m | Needs evo-x2 for sops secret |
 
 ### P5 — DEPLOYMENT & VERIFICATION (all require evo-x2)
@@ -160,16 +160,16 @@
 | 67 | Immich backup restore test | RELIABILITY | Blocked on evo-x2 |
 | 68 | Twenty CRM backup restore test | RELIABILITY | Blocked on evo-x2 |
 
-### P8 — DOCUMENTATION (6/6 DONE)
+### P8 — DOCUMENTATION (5/5 DONE)
 | # | Task | Evidence |
 |---|------|----------|
 | 79 | ✅ Write/update top-level README.md | Updated with all 13 services, DNS failover, new commands |
 | 80 | ✅ Document DNS cluster in AGENTS.md | DNS Failover Cluster section added |
 | 81 | ✅ Write ADR for niri session restore design | `docs/architecture/adr-005-niri-session-restore.md` |
-| 82 | ✅ Add module option description fields | All 53 options across 8 service files already have descriptions |
+| 82 | ✅ Add module option description fields | 86 description fields across 8 service files with mkOption |
 | 83 | ✅ Create docs/CONTRIBUTING.md | Full contributing guide with patterns, hooks, architecture |
 
-### P9 — FUTURE / RESEARCH (2/12 investigated)
+### P9 — FUTURE / RESEARCH (2/10 investigated, tasks 84+86-96)
 | # | Task | Category | Status | Notes |
 |---|------|----------|--------|-------|
 | 85 | Investigate just test intermittent race | RESEARCH | ⯎ DOCUMENTED | `--all-systems` evaluates x86_64-linux on aarch64-darwin — known Nix cross-system limitation, not a code bug |
@@ -192,7 +192,7 @@
 Completed during code quality audit (commit `f4364c2`):
 - Removed 8 dead platform files (628 lines) superseded by flake-parts modules
 - Fixed `{…}:` → `_:` anti-pattern in darwin/environment.nix
-- Fixed `with lib;` anti-pattern in emeet-pixy.nix
+- Fixed `with lib;` anti-pattern in emeet-pixy.nix (signoz.nix:64 still uses `with lib;` — meta block, low risk)
 - Fixed `pkgs.lib.mkForce` → `lib.mkForce` inconsistency in ai-stack.nix
 - Cleaned up commented-out dead imports in configuration.nix
 
@@ -208,6 +208,7 @@ Known remaining low-priority issues:
 **AI-actionable (remaining):**
 1. P6-62: Hermes health check (needs Hermes code change — external dependency)
 2. P6-63: Hermes mergeEnvScript cleanup (low risk but needs evo-x2 testing)
+3. P9-84: (renumbered gap — no task existed, removed from count)
 
 **User-actionable (requires evo-x2 or decisions):**
 1. P1-7/9/10/11: Sops secrets, Docker digests, VRRP auth

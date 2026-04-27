@@ -205,24 +205,28 @@
     jscpdOverlay = _final: prev: {
       jscpd = prev.callPackage ./pkgs/jscpd.nix {};
     };
-    unboundDoQOverlay = _final: prev: let
-      unboundNoSlim = prev.unbound.override {withSlimLib = false;};
-    in {
-      unbound = unboundNoSlim.overrideAttrs (o: {
-        buildInputs =
-          (o.buildInputs or [])
-          ++ [
-            prev.ngtcp2
-            prev.nghttp3
-          ];
-        configureFlags =
-          (o.configureFlags or [])
-          ++ [
-            "--with-libngtcp2=${prev.ngtcp2.dev}"
-            "--with-libnghttp3=${prev.nghttp3.dev}"
-          ];
-      });
-    };
+    # DISABLED: unboundDoQOverlay patches unbound for DNS-over-QUIC support.
+    # It overrides unbound's build flags which cascades to ffmpeg, linux, pipewire,
+    # and hundreds of other packages — killing binary cache hits entirely (40+ min builds).
+    # To re-enable: uncomment the overlay below and add it back to overlay lists.
+    # unboundDoQOverlay = _final: prev: let
+    #   unboundNoSlim = prev.unbound.override {withSlimLib = false;};
+    # in {
+    #   unbound = unboundNoSlim.overrideAttrs (o: {
+    #     buildInputs =
+    #       (o.buildInputs or [])
+    #       ++ [
+    #         prev.ngtcp2
+    #         prev.nghttp3
+    #       ];
+    #     configureFlags =
+    #       (o.configureFlags or [])
+    #       ++ [
+    #         "--with-libngtcp2=${prev.ngtcp2.dev}"
+    #         "--with-libnghttp3=${prev.nghttp3.dev}"
+    #       ];
+    #   });
+    # };
     emeetPixyOverlay = _final: prev: {
       emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
         src = prev.lib.cleanSourceWith {
@@ -296,7 +300,6 @@
               dnsblockdOverlay
               emeetPixyOverlay
               monitor365Overlay
-              unboundDoQOverlay
             ];
         };
 
@@ -508,7 +511,6 @@
                   dnsblockdOverlay
                   emeetPixyOverlay
                   monitor365Overlay
-                  unboundDoQOverlay
                   (_final: prev: {
                     python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
                       timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});

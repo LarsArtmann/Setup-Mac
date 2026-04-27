@@ -290,6 +290,17 @@ _: {
       systemd.tmpfiles.rules = lib.mkIf cfg.autoSync [
         "L /run/gitea-repos-trigger - - - - ${ensureReposScript}/bin/gitea-ensure-repos"
       ];
+
+      # Periodic timer to catch newly-added repos between rebuilds
+      systemd.timers.gitea-ensure-repos = lib.mkIf cfg.autoSync {
+        description = "Ensure GitHub repos are mirrored to Gitea (daily)";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnCalendar = "daily";
+          Persistent = true;
+          RandomizedDelaySec = "30m";
+        };
+      };
     };
   };
 }
