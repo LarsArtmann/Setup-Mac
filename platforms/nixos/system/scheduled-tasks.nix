@@ -40,6 +40,16 @@ in
           };
           wantedBy = ["timers.target"];
         };
+
+        docker-prune = {
+          description = "Weekly Docker system prune";
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnCalendar = "Mon *-*-* 03:00";
+            Persistent = true;
+            RandomizedDelaySec = "1h";
+          };
+        };
       };
 
       services = {
@@ -101,6 +111,18 @@ in
               "WAYLAND_DISPLAY=wayland-1"
               "XDG_RUNTIME_DIR=/run/user/${uid}"
             ];
+            StandardOutput = "journal";
+            StandardError = "journal";
+          };
+        };
+
+        docker-prune = {
+          description = "Prune unused Docker resources";
+          onFailure = ["notify-failure@%n.service"];
+          path = [pkgs.docker];
+          serviceConfig = {
+            Type = "oneshot";
+            ExecStart = "${pkgs.docker}/bin/docker system prune -f --filter until=168h";
             StandardOutput = "journal";
             StandardError = "journal";
           };

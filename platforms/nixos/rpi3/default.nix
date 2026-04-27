@@ -196,11 +196,19 @@ in {
       unbound.reloadIfChanged = true;
       crush-update-providers = {
         description = "Update Crush AI providers";
+        onFailure = ["crush-update-failure.service"];
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.nur.repos.charmbracelet.crush}/bin/crush update-providers";
           StandardOutput = "journal";
           StandardError = "journal";
+        };
+      };
+      crush-update-failure = {
+        description = "Log crush provider update failure";
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.util-linux}/bin/logger -t crush-update-providers -p user.err 'Crush provider update failed — check journalctl -u crush-update-providers'";
         };
       };
     };
