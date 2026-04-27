@@ -10,7 +10,7 @@ _: {
 
     whisperApiPort = 8000; # OpenAI-compatible API (FastAPI)
     whisperUiPort = 7860; # Gradio WebUI
-    whisperModelsDir = "/data/models/whisper";
+    whisperModelsDir = config.services.ai-models.paths.whisper;
 
     # Docker compose for Whisper ASR - API server mode
     # API: http://localhost:8000/v1/audio/transcriptions (OpenAI-compatible)
@@ -84,10 +84,6 @@ _: {
           };
         };
       };
-
-      systemd.tmpfiles.rules = [
-        "d ${whisperModelsDir} 0755 lars users -"
-      ];
 
       users.users.lars.extraGroups = ["docker" "render" "video"];
 

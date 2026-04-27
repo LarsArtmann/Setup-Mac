@@ -47,7 +47,8 @@ _: {
           '';
       });
 
-    unslothDataDir = "/data/unsloth";
+    aiPaths = config.services.ai-models.paths;
+    unslothDataDir = aiPaths.unsloth;
     venvPython = "${unslothDataDir}/venv/bin/python";
     venvPip = "${unslothDataDir}/venv/bin/pip";
     sitePkgs = "${unslothDataDir}/venv/lib/python3.13/site-packages";
@@ -87,7 +88,8 @@ _: {
         services.ollama = {
           enable = true;
           package = pkgs.ollama-rocm;
-          home = "/data/models/ollama";
+          home = aiPaths.ollama;
+          models = aiPaths.ollama-models;
           host = "127.0.0.1";
           port = 11434;
           environmentVariables =
@@ -115,20 +117,8 @@ _: {
           python313
         ];
 
-        systemd.tmpfiles.rules = [
-          "d /data/models/ollama 0755 lars users -"
-          "d /data/models/ollama/models 0775 lars users -"
-          "d /data/models 0755 lars users -"
-        ];
-
         environment.sessionVariables = {
-          OLLAMA_MODELS = "/data/models/ollama/models";
           OLLAMA_HOST = "127.0.0.1:11434";
-          HF_HOME = "/data/cache/huggingface";
-          HUGGINGFACE_HUB_CACHE = "/data/cache/huggingface/hub";
-          TRANSFORMERS_CACHE = "/data/cache/huggingface/transformers";
-          UNSLOTH_MODELS = "/data/models";
-          LLAMA_MODEL_PATH = "/data/models";
         };
       }
 
@@ -263,7 +253,6 @@ _: {
         };
 
         systemd.tmpfiles.rules = [
-          "d ${unslothDataDir} 0755 ${primaryUser} ${primaryGroup} -"
           "d ${unslothDataDir}/workspace 0755 ${primaryUser} ${primaryGroup} -"
           "d ${unslothDataDir}/models 0755 ${primaryUser} ${primaryGroup} -"
           "d ${unslothDataDir}/.unsloth 0755 ${primaryUser} ${primaryGroup} -"

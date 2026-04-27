@@ -159,6 +159,9 @@
       chromium-policies.enable = true;
       steam-config.enable = true;
 
+      # Centralized AI model storage (/data/ai/)
+      ai-models.enable = true;
+
       libinput = {
         enable = true;
         mouse = {

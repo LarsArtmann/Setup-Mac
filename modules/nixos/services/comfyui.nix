@@ -74,7 +74,7 @@ _: {
           // {
             HOME = "/home/${cfg.user}";
             LD_LIBRARY_PATH = lib.makeLibraryPath rocmRuntimeLibs;
-            HF_HOME = "/data/cache/huggingface";
+            HF_HOME = config.services.ai-models.paths.huggingface;
           };
 
         path = with pkgs; [

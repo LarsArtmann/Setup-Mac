@@ -267,6 +267,7 @@
         ./modules/nixos/services/audio.nix
         ./modules/nixos/services/niri-config.nix
         ./modules/nixos/services/security-hardening.nix
+        ./modules/nixos/services/ai-models.nix
         ./modules/nixos/services/ai-stack.nix
         ./modules/nixos/services/monitoring.nix
         ./modules/nixos/services/multi-wm.nix
@@ -570,6 +571,7 @@
             inputs.self.nixosModules.audio
             inputs.self.nixosModules.niri-config
             inputs.self.nixosModules.security-hardening
+            inputs.self.nixosModules.ai-models
             inputs.self.nixosModules.ai-stack
             inputs.self.nixosModules.monitoring
             inputs.self.nixosModules.multi-wm
