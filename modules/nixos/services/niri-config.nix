@@ -17,6 +17,11 @@ _: {
         package = pkgs.niri-unstable;
       };
 
+      # Extract systemd user units (niri.service, niri-shutdown.target) from the package.
+      # The niri-flake module disables the nixpkgs niri module (which does this),
+      # so we must do it here. Without this, the generated niri.service has no ExecStart.
+      systemd.packages = [pkgs.niri-unstable];
+
       environment.systemPackages = with pkgs; [
         xwayland-satellite
       ];
