@@ -113,7 +113,7 @@ _: {
         systemd.services = {
           ollama.serviceConfig = {
             SupplementaryGroups = ["render" "users"];
-            UMask = pkgs.lib.mkForce "0007";
+            UMask = lib.mkForce "0007";
           };
         };
 

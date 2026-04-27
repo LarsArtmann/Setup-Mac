@@ -3,39 +3,38 @@
   lib,
   config,
   ...
-}:
-with lib; let
+}: let
   cfg = config.hardware.emeet-pixy;
 in {
   options.hardware.emeet-pixy = {
-    enable = mkEnableOption "EMEET PIXY webcam auto-activation daemon";
+    enable = lib.mkEnableOption "EMEET PIXY webcam auto-activation daemon";
 
-    user = mkOption {
-      type = types.str;
+    user = lib.mkOption {
+      type = lib.types.str;
       default = "lars";
       description = "User account for the daemon systemd service";
     };
 
-    autoTracking = mkOption {
-      type = types.bool;
+    autoTracking = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       description = "Enable auto face tracking when video call detected";
     };
 
-    autoPrivacy = mkOption {
-      type = types.bool;
+    autoPrivacy = lib.mkOption {
+      type = lib.types.bool;
       default = true;
       description = "Enable privacy mode when no call is active";
     };
 
-    defaultAudio = mkOption {
-      type = types.enum ["nc" "live" "org"];
+    defaultAudio = lib.mkOption {
+      type = lib.types.enum ["nc" "live" "org"];
       default = "nc";
       description = "Default audio mode (nc=noise cancel, live, org=original)";
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
       v4l-utils
     ];
