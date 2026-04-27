@@ -16,6 +16,7 @@ in
           timerConfig = {
             OnCalendar = "00:00";
             Persistent = true;
+            RandomizedDelaySec = "30m";
           };
           wantedBy = ["timers.target"];
         };
@@ -25,6 +26,7 @@ in
           timerConfig = {
             OnCalendar = "Mon *-*-* 04:00";
             Persistent = true;
+            RandomizedDelaySec = "1h";
           };
           wantedBy = ["timers.target"];
         };
@@ -34,6 +36,7 @@ in
           timerConfig = {
             OnCalendar = "*:0/15";
             Persistent = true;
+            RandomizedDelaySec = "5m";
           };
           wantedBy = ["timers.target"];
         };

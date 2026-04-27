@@ -106,6 +106,7 @@ _: {
           timerConfig = {
             OnCalendar = "daily";
             Persistent = true;
+            RandomizedDelaySec = "30m";
           };
         };
       };
