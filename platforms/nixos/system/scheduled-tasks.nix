@@ -5,6 +5,7 @@ in
   {
     pkgs,
     config,
+    lib,
     ...
   }: let
     uid = builtins.toString config.users.users.${primaryUser}.uid;
@@ -42,9 +43,9 @@ in
         };
 
         docker-prune = {
-          description = "Weekly Docker system prune";
+          description = lib.mkForce "Weekly Docker system prune";
           wantedBy = ["timers.target"];
-          timerConfig = {
+          timerConfig = lib.mkForce {
             OnCalendar = "Mon *-*-* 03:00";
             Persistent = true;
             RandomizedDelaySec = "1h";
@@ -117,10 +118,10 @@ in
         };
 
         docker-prune = {
-          description = "Prune unused Docker resources";
+          description = lib.mkForce "Prune unused Docker resources";
           onFailure = ["notify-failure@%n.service"];
           path = [pkgs.docker];
-          serviceConfig = {
+          serviceConfig = lib.mkForce {
             Type = "oneshot";
             ExecStart = "${pkgs.docker}/bin/docker system prune -f --filter until=168h";
             StandardOutput = "journal";
