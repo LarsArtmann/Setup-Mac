@@ -171,7 +171,7 @@ in {
           }
           // harden {
             MemoryMax = "4G";
-            ReadWritePaths = [cfg.stateDir oldStateDir];
+            ReadWritePaths = [cfg.stateDir];
           };
       };
     };
