@@ -55,9 +55,9 @@
 | 16 | ✅ Fix dead let bindings | Twenty.nix, dns-blocker, aw-watcher-utilization all clean |
 | 17 | ✅ Fix core.pager vs pager.diff conflict | No core.pager set — only pager.diff = "bat" |
 | 18 | ✅ Fix fonts.packages darwin compatibility | `lib.mkIf pkgs.stdenv.isLinux` guard in packages/fonts.nix:6 |
-| 19 | ✅ Enable services.udisks2 | `udisks2.enable = true` in configuration.nix:154 |
+| 19 | ✅ Enable services.udisks2 | `udisks2.enable = true` in configuration.nix:144 |
 | 20 | ✅ Add .editorconfig | Exists at root: 2-space indent, UTF-8, LF, Go tabs |
-| 21 | ✅ Make deadnix strict with --fail | `deadnix --fail --no-lambda-pattern-names` in flake.nix:352 |
+| 21 | ✅ Make deadnix strict with --fail | `deadnix --fail --no-lambda-pattern-names` in flake.nix:354 |
 | 22 | ✅ Fix pre-commit statix hook | Configured in .pre-commit-config.yaml:38-44 |
 | 23 | ✅ Add date + commit hash to debug-map.md | Present in header |
 | 24 | ✅ Add meta.homepage to emeet-pixyd | pkgs/emeet-pixyd.nix:22 |
@@ -110,7 +110,7 @@
 | 61 | ✅ Voice agents PIDFile | Not present — already clean |
 | 62 | Hermes health check | ⬜ PENDING — needs health endpoint in Hermes |
 | 63 | Hermes key_env migration | ⬜ PENDING — mergeEnvScript redundant but low risk |
-| 64 | ✅ SigNoz duplicate rules | Idempotent delete-before-create in signoz.nix:294-300 |
+| 64 | ✅ SigNoz duplicate rules | Idempotent delete-before-create in signoz.nix:287-298 |
 | 65 | SigNoz missing metrics | ⬜ BLOCKED — needs evo-x2 to verify metric endpoints |
 | 66 | Authelia SMTP notifications | ⬜ BLOCKED — needs SMTP credentials |
 | 67-68 | Immich/Twenty backup restore tests | ⬜ BLOCKED — needs evo-x2 |
