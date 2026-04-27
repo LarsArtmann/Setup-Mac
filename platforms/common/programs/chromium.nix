@@ -2,7 +2,6 @@
 # Note: Home Manager's extension management works with Chromium, Brave, Vivaldi,
 # but NOT with Google Chrome due to Google Chrome's enterprise policy restrictions.
 {
-  config,
   pkgs,
   lib,
   ...

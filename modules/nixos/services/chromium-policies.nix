@@ -1,7 +1,6 @@
 _: {
   flake.nixosModules.chromium-policies = {
     config,
-    pkgs,
     lib,
     ...
   }: let

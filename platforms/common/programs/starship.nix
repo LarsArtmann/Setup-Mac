@@ -1,8 +1,6 @@
 # Starship Prompt Configuration (Cross-Platform)
 # Performance-optimized config migrated from dotfiles/.config/starship.toml
 {
-  config,
-  pkgs,
   colorScheme,
   ...
 }: let

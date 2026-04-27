@@ -1,7 +1,6 @@
 {
   pkgs,
   nix-ssh-config,
-  config,
   ...
 }: {
   # Import common Home Manager modules

@@ -147,8 +147,6 @@
     niri,
     otel-tui,
     nix-amd-npu,
-    sops-nix,
-    hermes-agent,
     nix-ssh-config,
     monitor365-src,
     nixos-hardware,

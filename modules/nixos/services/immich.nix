@@ -1,7 +1,6 @@
 _: {
   flake.nixosModules.immich = {
     config,
-    pkgs,
     lib,
     ...
   }: let

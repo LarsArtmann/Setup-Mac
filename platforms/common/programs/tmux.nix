@@ -1,6 +1,5 @@
 # 📋 TMUX CONFIGURATION FOR SYSTEMNIX
 {
-  config,
   pkgs,
   colorScheme,
   ...

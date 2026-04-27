@@ -1,4 +1,4 @@
-{lib, ...}: {
+_: {
   ssh-config = {
     enable = true;
     user = "lars";

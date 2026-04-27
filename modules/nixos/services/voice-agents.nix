@@ -3,7 +3,6 @@ _: {
     config,
     pkgs,
     lib,
-    _,
     ...
   }: let
     inherit (config.networking) domain;

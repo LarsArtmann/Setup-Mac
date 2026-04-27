@@ -1,4 +1,4 @@
-{_, ...}: let
+_: let
   version = "0.16.2";
 in {
   flake.nixosModules.twenty = {

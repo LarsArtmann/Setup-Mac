@@ -1,7 +1,6 @@
 _: {
   flake.nixosModules.taskchampion = {
     config,
-    pkgs,
     lib,
     ...
   }: let

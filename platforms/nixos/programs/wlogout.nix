@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+_: {
   # wlogout power menu with Catppuccin Mocha theme and inline SVG icons
   programs.wlogout = {
     enable = true;

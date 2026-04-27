@@ -1,7 +1,6 @@
 _: {
   flake.nixosModules.caddy = {
     config,
-    pkgs,
     lib,
     ...
   }: let

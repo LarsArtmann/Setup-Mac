@@ -1,9 +1,7 @@
 # macOS Chrome/Chromium policy configuration for extension management
 # This configures system-wide Chrome policies via nix-darwin
 {
-  config,
   pkgs,
-  lib,
   ...
 }: let
   # YouTube Shorts Blocker extension by Umut Seven

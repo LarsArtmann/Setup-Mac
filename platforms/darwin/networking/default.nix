@@ -1,4 +1,4 @@
-{lib, ...}: {
+_: {
   # Darwin-specific networking configuration
   # Configures macOS networking settings via nix-darwin
 
