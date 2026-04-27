@@ -127,6 +127,9 @@ in {
     pwvucontrol # Native PipeWire volume control (GTK, Rust)
     signal-desktop # Secure messaging application
 
+    # AI Tools
+    jan # Local AI assistant (data → /data/ai/models/jan via activation)
+
     # XL Cursor theme for TV viewing (2 meters away)
     bibata-cursors
 
