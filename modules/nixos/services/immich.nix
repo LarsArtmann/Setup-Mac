@@ -75,7 +75,8 @@ _: {
               RestartSec = lib.mkForce "10s";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "30";
+              WatchdogSec = lib.mkForce "300";
+              Environment = lib.mkForce "HOME=/var/lib/immich";
             };
           immich-db-backup = {
             description = "Immich PostgreSQL database backup";
