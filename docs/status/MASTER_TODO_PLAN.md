@@ -16,11 +16,11 @@
 | P3 CODE QUALITY | 9 | 9 | 0 | 100% |
 | P4 ARCHITECTURE | 7 | 7 | 0 | 100% |
 | P5 DEPLOY/VERIFY | 13 | 0 | 13 | 0% |
-| P6 SERVICES | 15 | 11 | 4 | 73% |
+| P6 SERVICES | 15 | 9 | 6 | 60% |
 | P7 TOOLING/CI | 10 | 10 | 0 | 100% |
 | P8 DOCS | 5 | 5 | 0 | 100% |
 | P9 FUTURE | 12 | 2 | 10 | 17% |
-|| **TOTAL** | **95** | **64** | **31** | **67%** |
+|| **TOTAL** | **95** | **62** | **33** | **65%** |
 
 ---
 
@@ -97,7 +97,7 @@
 | 77 | ✅ Set allowUnsupportedSystem = false | nix-settings.nix:75 |
 | 78 | ✅ Taskwarrior backup timer | systemd timer in taskwarrior.nix:163-174, OnCalendar = "daily" |
 
-### P6 — SERVICES (11/15 DONE)
+### P6 — SERVICES (9/15 DONE)
 | # | Task | Evidence |
 |---|------|----------|
 | 54 | ✅ Twenty CRM backup rotation | `find ... -mtime +30 -delete` in twenty.nix:168 |
@@ -198,8 +198,8 @@ Completed during code quality audit (commit `f4364c2`):
 
 Known remaining low-priority issues:
 - `HSA_OVERRIDE_GFX_VERSION = "11.5.1"` duplicated in 3 files (hardware-specific constant, minimal DRY benefit from extraction)
-- Hardcoded `/home/lars/` paths in 5 files (acceptable as module option defaults)
-- Hardcoded `"lars"` username in 5 files (acceptable as module option defaults)
+- Hardcoded `/home/lars/` paths in 3 files (acceptable as module option defaults)
+- Hardcoded `"lars"` username in 7 files (acceptable as module option defaults or `primaryUser` locals)
 
 ---
 
@@ -208,7 +208,6 @@ Known remaining low-priority issues:
 **AI-actionable (remaining):**
 1. P6-62: Hermes health check (needs Hermes code change — external dependency)
 2. P6-63: Hermes mergeEnvScript cleanup (low risk but needs evo-x2 testing)
-3. P9-84: (renumbered gap — no task existed, removed from count)
 
 **User-actionable (requires evo-x2 or decisions):**
 1. P1-7/9/10/11: Sops secrets, Docker digests, VRRP auth
