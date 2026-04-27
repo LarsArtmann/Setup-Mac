@@ -11,7 +11,6 @@ _: {
     inherit (pkgs.rocmPackages) rocwmma;
 
     rocmEnv = {
-      ROCBLAS_USE_HIPBLASLT = "1";
       HSA_OVERRIDE_GFX_VERSION = "11.5.1";
       HSA_ENABLE_SDMA = "0";
     };
@@ -134,7 +133,6 @@ _: {
         environment.sessionVariables = {
           OLLAMA_MODELS = "/data/models/ollama/models";
           OLLAMA_HOST = "127.0.0.1:11434";
-          ROCBLAS_USE_HIPBLASLT = "1";
           HF_HOME = "/data/cache/huggingface";
           HUGGINGFACE_HUB_CACHE = "/data/cache/huggingface/hub";
           TRANSFORMERS_CACHE = "/data/cache/huggingface/transformers";
