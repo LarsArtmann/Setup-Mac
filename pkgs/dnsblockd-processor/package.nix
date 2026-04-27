@@ -3,7 +3,7 @@
   buildGoModule,
   src,
 }:
-buildGoModule rec {
+buildGoModule {
   pname = "dnsblockd-processor";
   version = "0.1.0";
 

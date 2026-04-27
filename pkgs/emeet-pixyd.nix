@@ -3,7 +3,7 @@
   buildGoModule,
   src,
 }:
-buildGoModule rec {
+buildGoModule {
   pname = "emeet-pixyd";
   version = "0.2.0";
 

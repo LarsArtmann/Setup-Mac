@@ -2,7 +2,7 @@
   inherit (pkgs) lib;
 in
   # Use buildGo126Module which uses Go 1.26 instead of the default Go version
-  pkgs.buildGo126Module rec {
+  pkgs.buildGo126Module {
     pname = "modernize";
     version = "0-unstable-2025-12-05";
 

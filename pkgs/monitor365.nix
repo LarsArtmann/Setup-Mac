@@ -11,7 +11,7 @@
   lm_sensors,
   src,
 }:
-rustPlatform.buildRustPackage rec {
+rustPlatform.buildRustPackage {
   pname = "monitor365";
   version = "0.1.0";
 
