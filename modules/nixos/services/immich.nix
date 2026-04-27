@@ -80,6 +80,7 @@ _: {
             };
           immich-db-backup = {
             description = "Immich PostgreSQL database backup";
+            onFailure = ["notify-failure@%n.service"];
             path = [config.services.postgresql.package];
             after = ["postgresql.service" "immich-server.service"];
             requires = ["postgresql.service"];

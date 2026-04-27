@@ -249,56 +249,59 @@ _: {
         pkgs.age
       ];
 
-      # Systemd service to ensure repos exist
-      systemd.services.gitea-ensure-repos = lib.mkIf cfg.autoSync {
-        description = "Ensure GitHub repos are mirrored to Gitea";
-        after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
-        wants = ["network-online.target"];
-        requires = ["gitea.service"];
-        startLimitIntervalSec = 300;
-        startLimitBurst = 3;
-        path = [pkgs.curl pkgs.jq pkgs.gh pkgs.sops pkgs.bash];
-        serviceConfig = {
-          Type = "oneshot";
-          User = cfg.user;
-          EnvironmentFile = config.sops.templates."gitea-sync.env".path;
-          ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
-            echo "Waiting for Gitea to be ready..."
-            for i in {1..30}; do
-              if curl -s http://localhost:3000/api/v1/version &>/dev/null; then
-                echo "Gitea is ready!"
-                exit 0
-              fi
-              echo "Gitea not ready yet, attempt $i/30..."
-              sleep 2
-            done
-            echo "Gitea failed to become ready after 60 seconds"
-            exit 1
-          '';
-          ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
-          Restart = "on-failure";
-          RestartSec = "5";
-          PrivateTmp = true;
-          NoNewPrivileges = true;
-          ProtectHome = true;
-          ProtectSystem = "strict";
-          MemoryMax = "512M";
+      # Systemd configuration
+      systemd = lib.mkIf cfg.autoSync {
+        services.gitea-ensure-repos = {
+          description = "Ensure GitHub repos are mirrored to Gitea";
+          after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
+          wants = ["network-online.target"];
+          requires = ["gitea.service"];
+          onFailure = ["notify-failure@%n.service"];
+          startLimitIntervalSec = 300;
+          startLimitBurst = 3;
+          path = [pkgs.curl pkgs.jq pkgs.gh pkgs.sops pkgs.bash];
+          serviceConfig = {
+            Type = "oneshot";
+            User = cfg.user;
+            EnvironmentFile = config.sops.templates."gitea-sync.env".path;
+            ExecStartPre = pkgs.writeShellScript "wait-for-gitea" ''
+              echo "Waiting for Gitea to be ready..."
+              for i in {1..30}; do
+                if curl -s http://localhost:3000/api/v1/version &>/dev/null; then
+                  echo "Gitea is ready!"
+                  exit 0
+                fi
+                echo "Gitea not ready yet, attempt $i/30..."
+                sleep 2
+              done
+              echo "Gitea failed to become ready after 60 seconds"
+              exit 1
+            '';
+            ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
+            Restart = "on-failure";
+            RestartSec = "5";
+            PrivateTmp = true;
+            NoNewPrivileges = true;
+            ProtectHome = true;
+            ProtectSystem = "strict";
+            MemoryMax = "512M";
+          };
         };
-      };
 
-      # Trigger on rebuild if autoSync is enabled
-      systemd.tmpfiles.rules = lib.mkIf cfg.autoSync [
-        "L /run/gitea-repos-trigger - - - - ${ensureReposScript}/bin/gitea-ensure-repos"
-      ];
+        # Trigger on rebuild if autoSync is enabled
+        tmpfiles.rules = [
+          "L /run/gitea-repos-trigger - - - - ${ensureReposScript}/bin/gitea-ensure-repos"
+        ];
 
-      # Periodic timer to catch newly-added repos between rebuilds
-      systemd.timers.gitea-ensure-repos = lib.mkIf cfg.autoSync {
-        description = "Ensure GitHub repos are mirrored to Gitea (daily)";
-        wantedBy = ["timers.target"];
-        timerConfig = {
-          OnCalendar = "daily";
-          Persistent = true;
-          RandomizedDelaySec = "30m";
+        # Periodic timer to catch newly-added repos between rebuilds
+        timers.gitea-ensure-repos = {
+          description = "Ensure GitHub repos are mirrored to Gitea (daily)";
+          wantedBy = ["timers.target"];
+          timerConfig = {
+            OnCalendar = "daily";
+            Persistent = true;
+            RandomizedDelaySec = "30m";
+          };
         };
       };
     };

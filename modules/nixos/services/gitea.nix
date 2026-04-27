@@ -335,6 +335,7 @@ _: {
           after = ["gitea.service" "gitea-generate-token.service" "network-online.target"];
           wants = ["network-online.target"];
           requires = ["gitea.service"];
+          onFailure = ["notify-failure@%n.service"];
           path = [pkgs.curl pkgs.jq pkgs.gh];
           serviceConfig =
             {

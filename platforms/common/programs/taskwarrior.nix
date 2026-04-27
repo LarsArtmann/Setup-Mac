@@ -142,35 +142,48 @@ in {
     '';
   };
 
-  systemd.user.services.taskwarrior-backup = {
-    Unit = {
-      Description = "Taskwarrior backup — export all tasks as JSON";
+  systemd.user = {
+    services = {
+      taskwarrior-backup = {
+        Unit = {
+          Description = "Taskwarrior backup — export all tasks as JSON";
+          OnFailure = ["taskwarrior-backup-failure.service"];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.writeShellScript "taskwarrior-backup" ''
+            set -euo pipefail
+            BACKUP_DIR="$HOME/backups/taskwarrior"
+            mkdir -p "$BACKUP_DIR"
+            STAMP="$(${pkgs.coreutils}/bin/date '+%Y-%m-%d_%H-%M-%S')"
+            ${pkgs.taskwarrior3}/bin/task export > "$BACKUP_DIR/tasks-$STAMP.json"
+            ${pkgs.findutils}/bin/find "$BACKUP_DIR" -name "tasks-*.json" -mtime +30 -delete
+            echo "taskwarrior-backup: exported to tasks-$STAMP.json"
+          ''}";
+        };
+      };
+      taskwarrior-backup-failure = {
+        Unit = {
+          Description = "Notify on taskwarrior backup failure";
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.libnotify}/bin/notify-send -u critical 'Taskwarrior backup failed' 'Check systemctl --user status taskwarrior-backup'";
+        };
+      };
     };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.writeShellScript "taskwarrior-backup" ''
-        set -euo pipefail
-        BACKUP_DIR="$HOME/backups/taskwarrior"
-        mkdir -p "$BACKUP_DIR"
-        STAMP="$(${pkgs.coreutils}/bin/date '+%Y-%m-%d_%H-%M-%S')"
-        ${pkgs.taskwarrior3}/bin/task export > "$BACKUP_DIR/tasks-$STAMP.json"
-        ${pkgs.findutils}/bin/find "$BACKUP_DIR" -name "tasks-*.json" -mtime +30 -delete
-        echo "taskwarrior-backup: exported to tasks-$STAMP.json"
-      ''}";
-    };
-  };
-
-  systemd.user.timers.taskwarrior-backup = {
-    Unit = {
-      Description = "Daily Taskwarrior backup timer";
-    };
-    Timer = {
-      OnCalendar = "daily";
-      Persistent = true;
-      RandomizedDelaySec = "30m";
-    };
-    Install = {
-      WantedBy = ["timers.target"];
+    timers.taskwarrior-backup = {
+      Unit = {
+        Description = "Daily Taskwarrior backup timer";
+      };
+      Timer = {
+        OnCalendar = "daily";
+        Persistent = true;
+        RandomizedDelaySec = "30m";
+      };
+      Install = {
+        WantedBy = ["timers.target"];
+      };
     };
   };
 }
