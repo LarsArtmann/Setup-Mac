@@ -189,6 +189,7 @@ in {
       timerConfig = {
         OnCalendar = "00:00";
         Persistent = true;
+        RandomizedDelaySec = "30m";
       };
       wantedBy = ["timers.target"];
     };

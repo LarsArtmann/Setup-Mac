@@ -54,7 +54,10 @@ in
               "WAYLAND_DISPLAY=wayland-1"
               "XDG_RUNTIME_DIR=/run/user/${uid}"
             ];
-            ExecStart = ''${pkgs.libnotify}/bin/notify-send -u critical "Scheduled task failed" "%i — check journalctl -u %i"'';
+            ExecStart = pkgs.writeShellScript "notify-failure" ''
+              ${pkgs.libnotify}/bin/notify-send -u critical "Scheduled task failed" "%i — check journalctl -u %i" 2>/dev/null || \
+                ${pkgs.util-linux}/bin/logger -t "%i" -p user.err "Scheduled task failed — check journalctl -u %i"
+            '';
             StandardOutput = "journal";
             StandardError = "journal";
           };
