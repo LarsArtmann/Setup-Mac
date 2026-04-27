@@ -16,8 +16,8 @@
       "btrfs_mode": true,
       "btrfs_use_qgroup": true,
       "schedule_monthly": false,
-      "schedule_weekly": true,
-      "schedule_daily": true,
+      "schedule_weekly": false,
+      "schedule_daily": false,
       "schedule_hourly": false,
       "schedule_boot": false,
       "schedule_persist": false,
@@ -48,6 +48,7 @@
       timerConfig = {
         OnCalendar = "daily";
         Persistent = true;
+        RandomizedDelaySec = "30m";
       };
       wantedBy = ["timers.target"];
     };
@@ -102,6 +103,7 @@
       timerConfig = {
         OnCalendar = "daily";
         Persistent = true;
+        RandomizedDelaySec = "1h";
       };
       wantedBy = ["timers.target"];
     };
