@@ -19,7 +19,7 @@
 | P6 SERVICES | 15 | 11 | 4 | 73% |
 | P7 TOOLING/CI | 10 | 10 | 0 | 100% |
 | P8 DOCS | 6 | 6 | 0 | 100% |
-| P9 FUTURE | 12 | 0 | 12 | 0% |
+| P9 FUTURE | 12 | 2 | 10 | 17% |
 | **TOTAL** | **96** | **60** | **36** | **63%** |
 
 ---
@@ -169,21 +169,37 @@
 | 82 | ✅ Add module option description fields | All 53 options across 8 service files already have descriptions |
 | 83 | ✅ Create docs/CONTRIBUTING.md | Full contributing guide with patterns, hooks, architecture |
 
-### P9 — FUTURE / RESEARCH
-| # | Task | Category | Est. |
-|---|------|----------|------|
-| 85 | Investigate just test intermittent race | RESEARCH | 12m |
-| 86 | Create homeModules pattern for HM via flake-parts | ARCH | 12m |
-| 87 | Package ComfyUI as proper Nix derivation | ARCH | 60m+ |
-| 88 | Investigate lldap/Kanidm for unified auth | ARCH | 60m+ |
-| 89 | Migrate Pi 3 from linux-rpi to nixos-hardware | ARCH | 12m |
-| 90 | Migrate SSH config to HM programs.ssh.matchBlocks | ARCH | 12m |
-| 91 | Add NixOS VM tests for critical services | TESTING | 60m+ |
-| 92 | Investigate binary cache (Cachix) | PERF | 30m+ |
-| 93 | Add Waybar module for session restore stats | FEATURE | 10m |
-| 94 | Add real-time save via niri event-stream | FEATURE | 12m |
-| 95 | Add integration tests for session restore | TESTING | 12m |
-| 96 | File nixpkgs issue for hipblaslt Tensile | UPSTREAM | 10m |
+### P9 — FUTURE / RESEARCH (2/12 investigated)
+| # | Task | Category | Status | Notes |
+|---|------|----------|--------|-------|
+| 85 | Investigate just test intermittent race | RESEARCH | ⯎ DOCUMENTED | `--all-systems` evaluates x86_64-linux on aarch64-darwin — known Nix cross-system limitation, not a code bug |
+| 86 | Create homeModules pattern for HM via flake-parts | ARCH | ⯎ | |
+| 87 | Package ComfyUI as proper Nix derivation | ARCH | ⯎ | |
+| 88 | Investigate lldap/Kanidm for unified auth | ARCH | ⯎ | |
+| 89 | Migrate Pi 3 from linux-rpi to nixos-hardware | ARCH | ⯎ | |
+| 90 | Migrate SSH config to HM programs.ssh.matchBlocks | ARCH | ⯎ DOCUMENTED | nix-ssh-config flake provides SSH keys + server config + client hosts — migrating only client hosts would still require the flake |
+| 91 | Add NixOS VM tests for critical services | TESTING | ⯎ | |
+| 92 | Investigate binary cache (Cachix) | PERF | ⯎ | |
+| 93 | Add Waybar module for session restore stats | FEATURE | ⯎ | |
+| 94 | Add real-time save via niri event-stream | FEATURE | ⯎ | |
+| 95 | Add integration tests for session restore | TESTING | ⯎ | |
+| 96 | File nixpkgs issue for hipblaslt Tensile | UPSTREAM | ⯎ | |
+
+---
+
+## PROACTIVE CLEANUP (beyond original plan)
+
+Completed during code quality audit (commit `f4364c2`):
+- Removed 8 dead platform files (628 lines) superseded by flake-parts modules
+- Fixed `{…}:` → `_:` anti-pattern in darwin/environment.nix
+- Fixed `with lib;` anti-pattern in emeet-pixy.nix
+- Fixed `pkgs.lib.mkForce` → `lib.mkForce` inconsistency in ai-stack.nix
+- Cleaned up commented-out dead imports in configuration.nix
+
+Known remaining low-priority issues:
+- `HSA_OVERRIDE_GFX_VERSION = "11.5.1"` duplicated in 3 files (hardware-specific constant, minimal DRY benefit from extraction)
+- Hardcoded `/home/lars/` paths in 5 files (acceptable as module option defaults)
+- Hardcoded `"lars"` username in 5 files (acceptable as module option defaults)
 
 ---
 
