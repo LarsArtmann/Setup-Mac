@@ -101,6 +101,16 @@ in {
     };
   };
 
+  # Jan AI: symlink data folder to centralized /data/ai/models/jan
+  home.activation.jan-data-link = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    JAN_DATA="$HOME/.config/Jan/data"
+    JAN_TARGET="/data/ai/models/jan"
+    if [ -d "$JAN_TARGET" ] && [ ! -L "$JAN_DATA" ]; then
+      $DRY_RUN_CMD rm -rf "$JAN_DATA"
+      $DRY_RUN_CMD ln -sfn "$JAN_TARGET" "$JAN_DATA"
+    fi
+  '';
+
   # NixOS-specific session variables
   home.sessionVariables = {
     # Wayland specific
