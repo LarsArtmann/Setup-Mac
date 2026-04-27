@@ -75,10 +75,6 @@
   };
 
   systemd.user.services = {
-    "niri" = {
-      overrideStrategy = "asDropin";
-      serviceConfig.OOMScoreAdjust = -900;
-    };
     "waybar".serviceConfig.OOMScoreAdjust = -500;
     "pipewire".serviceConfig.OOMScoreAdjust = -500;
   };
