@@ -55,6 +55,7 @@
 
     services.timeshift-backup = {
       description = "Create BTRFS snapshot with Timeshift";
+      onFailure = ["notify-failure@%n.service"];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${pkgs.timeshift}/bin/timeshift --create --scripted";
@@ -63,6 +64,7 @@
 
     services.timeshift-verify = {
       description = "Verify Timeshift snapshot freshness";
+      onFailure = ["notify-failure@%n.service"];
       path = [pkgs.timeshift pkgs.coreutils pkgs.gawk];
       serviceConfig = {
         Type = "oneshot";

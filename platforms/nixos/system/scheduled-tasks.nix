@@ -43,8 +43,26 @@ in
       };
 
       services = {
+        # Reusable failure notification template — use via `OnFailure = "notify-failure@%n.service"`
+        "notify-failure@" = {
+          description = "Notify on failure of %i";
+          serviceConfig = {
+            Type = "oneshot";
+            User = primaryUser;
+            Environment = [
+              "DISPLAY=:0"
+              "WAYLAND_DISPLAY=wayland-1"
+              "XDG_RUNTIME_DIR=/run/user/${uid}"
+            ];
+            ExecStart = ''${pkgs.libnotify}/bin/notify-send -u critical "Scheduled task failed" "%i — check journalctl -u %i"'';
+            StandardOutput = "journal";
+            StandardError = "journal";
+          };
+        };
+
         crush-update-providers = {
           description = "Update Crush AI providers";
+          onFailure = ["notify-failure@%n.service"];
           serviceConfig = {
             Type = "oneshot";
             ExecStart = "${pkgs.nur.repos.charmbracelet.crush}/bin/crush update-providers";
@@ -55,6 +73,7 @@ in
 
         blocklist-auto-update = {
           description = "Download blocklists and update hashes in config";
+          onFailure = ["notify-failure@%n.service"];
           path = [pkgs.git pkgs.nix pkgs.gawk pkgs.gnused pkgs.python3];
           serviceConfig = {
             Type = "oneshot";
@@ -68,6 +87,7 @@ in
 
         service-health-check = {
           description = "Check critical services and notify on failure";
+          onFailure = ["notify-failure@%n.service"];
           path = [pkgs.systemd pkgs.python3 pkgs.libnotify];
           serviceConfig = {
             Type = "oneshot";

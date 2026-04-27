@@ -26,20 +26,6 @@ _: {
       rocmPackages.rocm-comgr
     ];
 
-    ollama-rocm-0_20 = pkgs.ollama-rocm.overrideAttrs (finalAttrs: _old: rec {
-      version = "0.20.0";
-      src = pkgs.fetchFromGitHub {
-        owner = "ollama";
-        repo = "ollama";
-        tag = "v${version}";
-        hash = "sha256-QQKPXdXlsT+uMGGIyqkVZqk6OTa7VHrwDVmgDdgdKOY=";
-      };
-      postPatch = ''
-        substituteInPlace version/version.go \
-          --replace-fail 0.0.0 '${finalAttrs.version}'
-        rm -r app
-      '';
-    });
     llama-cpp-rocwmma =
       (pkgs.llama-cpp.override {
         rocmSupport = true;
@@ -100,7 +86,7 @@ _: {
 
         services.ollama = {
           enable = true;
-          package = ollama-rocm-0_20;
+          package = pkgs.ollama-rocm;
           home = "/data/models/ollama";
           host = "127.0.0.1";
           port = 11434;
