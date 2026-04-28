@@ -1933,3 +1933,58 @@ hermes-restart:
 # Show hermes gateway logs (follow mode)
 hermes-logs:
     @journalctl -u hermes -f --no-pager -n 50
+
+# AI Models — migrate from legacy /data/{models,cache,unsloth} to /data/ai/
+ai-migrate:
+    @echo "=== Migrating AI data to /data/ai/ ==="
+    @echo ""
+    @if [ ! -d /data/ai ]; then echo "Creating /data/ai..."; sudo mkdir -p /data/ai; sudo chown lars:users /data/ai; fi
+    @# Models
+    @if [ -d /data/models ] && [ ! -d /data/ai/models ]; then echo "Moving /data/models → /data/ai/models..."; mv /data/models /data/ai/models; fi
+    @# Cache
+    @if [ -d /data/cache ] && [ ! -d /data/ai/cache ]; then echo "Moving /data/cache → /data/ai/cache..."; mv /data/cache /data/ai/cache; fi
+    @# Unsloth workspace
+    @if [ -d /data/unsloth ] && [ ! -d /data/ai/workspaces/unsloth ]; then echo "Moving /data/unsloth → /data/ai/workspaces/unsloth..."; mkdir -p /data/ai/workspaces; mv /data/unsloth /data/ai/workspaces/unsloth; fi
+    @# Reorganize ollama if it has flat structure from old layout
+    @if [ -d /data/ai/models/ollama ] && [ ! -d /data/ai/models/ollama/models ]; then echo "Creating ollama models subdirectory..."; mkdir -p /data/ai/models/ollama/models; fi
+    @# Create remaining directories
+    @sudo systemd-tmpfiles --create
+    @echo ""
+    @echo "=== Migration complete ==="
+    @echo "Directory structure:"
+    @ls -la /data/ai/
+    @echo ""
+    @echo "Models:"
+    @ls /data/ai/models/ 2>/dev/null || echo "  (empty)"
+    @echo ""
+    @echo "Cache:"
+    @ls /data/ai/cache/ 2>/dev/null || echo "  (empty)"
+    @echo ""
+    @echo "Workspaces:"
+    @ls /data/ai/workspaces/ 2>/dev/null || echo "  (empty)"
+    @echo ""
+    @echo "Run 'just switch' to apply new configuration."
+
+# AI Models — show current storage status
+ai-status:
+    @echo "=== AI Model Storage ==="
+    @echo ""
+    @BASE="/data/ai"
+    @if [ ! -d "$$BASE" ]; then echo "⚠️  /data/ai does not exist yet. Run 'just ai-migrate' first."; exit 0; fi
+    @echo "Directory tree:"
+    @find $$BASE -maxdepth 3 -type d | head -40 | sort
+    @echo ""
+    @echo "Disk usage:"
+    @du -sh $$BASE 2>/dev/null || echo "  (empty)"
+    @for dir in $$BASE/models/*/; do \
+        if [ -d "$$dir" ]; then \
+            size=$$(du -sh "$$dir" 2>/dev/null | cut -f1); \
+            name=$$(basename "$$dir"); \
+            echo "  $$name: $$size"; \
+        fi; \
+    done
+    @echo ""
+    @echo "Environment:"
+    @echo "  OLLAMA_MODELS  = $${OLLAMA_MODELS:-not set}"
+    @echo "  HF_HOME        = $${HF_HOME:-not set}"
+    @echo "  LLAMA_MODEL_PATH = $${LLAMA_MODEL_PATH:-not set}"
