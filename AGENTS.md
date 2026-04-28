@@ -1,6 +1,6 @@
 # SystemNix: AGENT GUIDE
 
-**Last Updated:** 2026-04-04
+**Last Updated:** 2026-04-28
 **Project Type:** Cross-Platform Nix Configuration (macOS + NixOS)
 **Repo:** `github:LarsArtmann/SystemNix`
 
@@ -237,6 +237,59 @@ High-availability DNS via Keepalived VRRP (`modules/nixos/services/dns-failover.
 - Pi 3 image built via `nixosConfigurations.rpi3-dns` in flake.nix
 - **Status**: Planned — Pi 3 hardware not yet provisioned
 
+### Centralized AI Model Storage (`modules/nixos/services/ai-models.nix`)
+
+Unified directory structure for ALL AI models and tool data on NixOS (evo-x2).
+
+**Directory tree (`/data/ai/`):**
+```
+/data/ai/
+├── models/
+│   ├── ollama/         → Ollama service home + model blobs
+│   ├── gguf/           → LLaMA.cpp standalone models
+│   ├── whisper/        → Whisper ASR models
+│   ├── comfyui/        → ComfyUI checkpoints/Loras
+│   ├── jan/            → Jan AI data (symlinked from ~/.config/Jan/data)
+│   ├── vision/         → Vision models (CLIP, etc)
+│   ├── image/          → Image generation models
+│   ├── embeddings/     → Embedding models
+│   └── tts/            → Text-to-speech models
+├── cache/
+│   └── huggingface/    → HuggingFace Hub + Transformers cache
+└── workspaces/
+    └── unsloth/        → Unsloth Studio venv + workspace
+```
+
+**How it works:**
+- `services.ai-models.enable = true` creates all directories via `systemd.tmpfiles.rules`
+- `services.ai-models.paths` attrset provides derived paths for all modules to reference
+- Environment variables (`OLLAMA_MODELS`, `HF_HOME`, `LLAMA_MODEL_PATH`, etc.) are set system-wide
+- All AI services (Ollama, Whisper, ComfyUI, Unsloth) reference `config.services.ai-models.paths.*`
+- Jan AI data folder is symlinked via Home Manager activation (`~/.config/Jan/data` → `/data/ai/models/jan`)
+
+**Module options (`services.ai-models`):**
+| Option | Default | Description |
+|--------|---------|-------------|
+| `enable` | false | Enable centralized AI storage |
+| `baseDir` | "/data/ai" | Root directory for all AI data |
+| `user` | "lars" | File owner |
+| `group` | "users" | File group |
+| `paths` | (derived) | Attrset of all tool-specific paths |
+
+**Migration:**
+```bash
+just ai-migrate    # Move legacy /data/{models,cache,unsloth} → /data/ai/
+just ai-status     # Show current storage status
+```
+
+**Migration MUST happen BEFORE `just switch`** if you have existing models at `/data/models/`.
+
+**Key files:**
+- Module: `modules/nixos/services/ai-models.nix`
+- Enabled in: `platforms/nixos/system/configuration.nix`
+- Jan symlink: `platforms/nixos/users/home.nix` (home.activation)
+- Refactored consumers: `ai-stack.nix`, `voice-agents.nix`, `comfyui.nix`
+
 ### Taskwarrior + TaskChampion Sync
 
 Task management synced across NixOS, macOS, and Android via TaskChampion sync server.
@@ -292,6 +345,7 @@ AI agent task tracking protocol:
 | Darwin HM user definition | Explicit `users.users.larsartmann` in darwin/default.nix | Workaround applied |
 | mkMerge + flake-parts | Use inline config or imports instead of `lib.mkMerge` | Accepted limitation |
 | `wire` not in Nixpkgs | Installed via `go install` (see `go-update-tools-manual` just recipe) | Accepted |
+| AI model migration order | Run `just ai-migrate` BEFORE `just switch` to avoid Ollama seeing empty model dir | Documented |
 
 ## Essential Commands
 
@@ -328,6 +382,10 @@ just task-backup         # Export all tasks as JSON
 # Niri session
 just session-status       # Show session save state (last save, window count, age)
 just session-restore      # Manually trigger session restore
+
+# AI Models
+just ai-migrate           # Migrate legacy AI data → /data/ai/ (run BEFORE switch)
+just ai-status            # Show AI model storage status
 
 # Recovery
 just rollback           # Revert to previous generation
