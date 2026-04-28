@@ -101,87 +101,89 @@ in {
     };
   };
 
-  # Jan AI: symlink data folder to centralized /data/ai/models/jan
-  home.activation.jan-data-link = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    JAN_DATA="$HOME/.config/Jan/data"
-    JAN_TARGET="/data/ai/models/jan"
-    if [ -d "$JAN_TARGET" ] && [ ! -L "$JAN_DATA" ]; then
-      $DRY_RUN_CMD rm -rf "$JAN_DATA"
-      $DRY_RUN_CMD ln -sfn "$JAN_TARGET" "$JAN_DATA"
-    fi
-  '';
+  home = {
+    # Jan AI: symlink data folder to centralized /data/ai/models/jan
+    activation.jan-data-link = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      JAN_DATA="$HOME/.config/Jan/data"
+      JAN_TARGET="/data/ai/models/jan"
+      if [ -d "$JAN_TARGET" ] && [ ! -L "$JAN_DATA" ]; then
+        $DRY_RUN_CMD rm -rf "$JAN_DATA"
+        $DRY_RUN_CMD ln -sfn "$JAN_TARGET" "$JAN_DATA"
+      fi
+    '';
 
-  # NixOS-specific session variables
-  home.sessionVariables = {
-    # Wayland specific
-    MOZ_ENABLE_WAYLAND = "1";
-    QT_QPA_PLATFORM = "wayland";
-    NIXOS_OZONE_WL = "1";
+    # NixOS-specific session variables
+    sessionVariables = {
+      # Wayland specific
+      MOZ_ENABLE_WAYLAND = "1";
+      QT_QPA_PLATFORM = "wayland";
+      NIXOS_OZONE_WL = "1";
 
-    # Dark mode preference - respected by many apps and browsers
-    GTK_THEME = "${theme.gtkThemeName}:dark";
-    QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
+      # Dark mode preference - respected by many apps and browsers
+      GTK_THEME = "${theme.gtkThemeName}:dark";
+      QT_STYLE_OVERRIDE = lib.mkForce "kvantum";
 
-    # Cursor theme for Wayland compositors
-    # Cursor size is determined by the cursor theme's built-in sizes
-    # Bibata has XL size (96px) built-in
-    XCURSOR_THEME = theme.cursorTheme;
+      # Cursor theme for Wayland compositors
+      # Cursor size is determined by the cursor theme's built-in sizes
+      # Bibata has XL size (96px) built-in
+      XCURSOR_THEME = theme.cursorTheme;
 
-    # Fallback for X11 applications (rarely used)
-    XCURSOR_SIZE = toString theme.cursorSize;
+      # Fallback for X11 applications (rarely used)
+      XCURSOR_SIZE = toString theme.cursorSize;
+    };
+
+    # NixOS-specific packages
+    packages = with pkgs; [
+      # GUI Tools
+      pwvucontrol # Native PipeWire volume control (GTK, Rust)
+      signal-desktop # Secure messaging application
+
+      # AI Tools
+      jan # Local AI assistant (data → /data/ai/models/jan via activation)
+
+      # XL Cursor theme for TV viewing (2 meters away)
+      bibata-cursors
+
+      # Development tools
+      gitui # Terminal UI for git
+
+      # Cursor themes
+      adwaita-icon-theme
+      hicolor-icon-theme
+
+      # GTK Theming
+      catppuccin-gtk
+      papirus-icon-theme
+      libsForQt5.qt5ct
+      qt6.qtbase
+
+      # System Tools
+      # Note: rofi moved to multi-wm.nix for system-wide availability
+      # Note: xdg-utils moved to base.nix for cross-platform consistency
+
+      # Desktop packages
+      # Note: kitty managed by programs.kitty above — don't add to packages
+      # Note: cliphist is installed via common/packages/base.nix (Linux-only)
+      dunst
+      libnotify
+      wlogout
+      grimblast
+      swappy
+      playerctl
+      brightnessctl
+      ddcutil
+      wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste)
+      wl-clip-persist # Keeps clipboard content after programs close
+      rofi-calc
+      rofi-emoji
+      zellij # Terminal multiplexer (modern tmux alternative)
+      zed-editor # Modern code editor (Rust-based, collaborative)
+      yazi # Terminal file manager (Rust-based, async, image previews)
+      # Scripts dependencies
+      jq # JSON processing
+      gawk # Text processing
+    ];
   };
-
-  # NixOS-specific packages
-  home.packages = with pkgs; [
-    # GUI Tools
-    pwvucontrol # Native PipeWire volume control (GTK, Rust)
-    signal-desktop # Secure messaging application
-
-    # AI Tools
-    jan # Local AI assistant (data → /data/ai/models/jan via activation)
-
-    # XL Cursor theme for TV viewing (2 meters away)
-    bibata-cursors
-
-    # Development tools
-    gitui # Terminal UI for git
-
-    # Cursor themes
-    adwaita-icon-theme
-    hicolor-icon-theme
-
-    # GTK Theming
-    catppuccin-gtk
-    papirus-icon-theme
-    libsForQt5.qt5ct
-    qt6.qtbase
-
-    # System Tools
-    # Note: rofi moved to multi-wm.nix for system-wide availability
-    # Note: xdg-utils moved to base.nix for cross-platform consistency
-
-    # Desktop packages
-    # Note: kitty managed by programs.kitty above — don't add to packages
-    # Note: cliphist is installed via common/packages/base.nix (Linux-only)
-    dunst
-    libnotify
-    wlogout
-    grimblast
-    swappy
-    playerctl
-    brightnessctl
-    ddcutil
-    wl-clipboard # Wayland clipboard utilities (wl-copy, wl-paste)
-    wl-clip-persist # Keeps clipboard content after programs close
-    rofi-calc
-    rofi-emoji
-    zellij # Terminal multiplexer (modern tmux alternative)
-    zed-editor # Modern code editor (Rust-based, collaborative)
-    yazi # Terminal file manager (Rust-based, async, image previews)
-    # Scripts dependencies
-    jq # JSON processing
-    gawk # Text processing
-  ];
 
   xdg.desktopEntries.helium = {
     name = "Helium";
