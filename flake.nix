@@ -36,10 +36,7 @@
     };
 
     # Add nix-colors for declarative color schemes
-    nix-colors = {
-      url = "github:misterio77/nix-colors";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nix-colors.url = "github:misterio77/nix-colors";
 
     # Add nix-homebrew for declarative Homebrew management
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";

@@ -206,6 +206,21 @@
         whitelist = {
           LartyHD = "8c9ec1ab-f64f-4003-9110-f98a1f0d7f47";
         };
+        client = {
+          enable = true;
+          fov = 100;
+          guiScale = 4;
+          gamma = 1.0;
+          sound = {
+            master = 60;
+            music = 50;
+            noteBlocks = 75;
+            weather = 30;
+            hostile = 60;
+            ambient = 60;
+            voice = 60;
+          };
+        };
       };
 
       # Monitor365 device monitoring agent (disabled: high RAM usage)
