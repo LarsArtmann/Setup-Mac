@@ -36,7 +36,10 @@
     };
 
     # Add nix-colors for declarative color schemes
-    nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors = {
+      url = "github:misterio77/nix-colors";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Add nix-homebrew for declarative Homebrew management
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
@@ -475,6 +478,7 @@
                 extraSpecialArgs = {
                   inherit nix-colors;
                   inherit nix-ssh-config;
+                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
                 };
               };
             }
