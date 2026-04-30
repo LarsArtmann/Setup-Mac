@@ -9,15 +9,15 @@ _: {
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
 
-    caddyBind =
+    bindAddress =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
       then let
         addrs = config.networking.interfaces.${config.services.dns-blocker.blockInterface}.ipv4.addresses;
       in
         if addrs != []
-        then "bind ${(builtins.head addrs).address}"
-        else ""
-      else "";
+        then (builtins.head addrs).address
+        else null
+      else null;
 
     tlsConfig = ''
       tls ${serverCert} ${serverKey}
@@ -42,8 +42,8 @@ _: {
       services.caddy = {
         globalConfig = ''
           auto_https off
+          ${lib.optionalString (bindAddress != null) "default_bind ${bindAddress}"}
           servers {
-            ${caddyBind}
             metrics
           }
         '';
