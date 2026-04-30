@@ -2,9 +2,11 @@
   pkgs,
   lib,
   nix-ssh-config,
+  colorScheme,
   ...
 }: let
   theme = import ../../common/theme.nix {};
+  colors = colorScheme.palette;
 in {
   imports = [
     ../../common/home-base.nix
@@ -56,7 +58,7 @@ in {
         update_check_interval = 0;
         enable_audio_bell = false;
         visual_bell_duration = "0.2";
-        visual_bell_color = "#89b4fa";
+        visual_bell_color = "#${colors.base0D}";
         window_alert_on_bell = true;
       };
     };
@@ -376,28 +378,28 @@ in {
         per_monitor_dpi = false;
       };
       urgency_low = {
-        background = "#1e1e2e90";
-        foreground = "#cdd6f4";
-        frame_color = "#89b4fa";
+        background = "#${colors.base00}90";
+        foreground = "#${colors.base05}";
+        frame_color = "#${colors.base0D}";
         timeout = 5;
-        highlight = "#89b4fa";
-        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-information-symbolic.svg";
+        highlight = "#${colors.base0D}";
+        default_icon = "dialog-information-symbolic";
       };
       urgency_normal = {
-        background = "#1e1e2e90";
-        foreground = "#cdd6f4";
-        frame_color = "#89b4fa";
+        background = "#${colors.base00}90";
+        foreground = "#${colors.base05}";
+        frame_color = "#${colors.base0D}";
         timeout = 8;
-        highlight = "#89b4fa";
-        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-information-symbolic.svg";
+        highlight = "#${colors.base0D}";
+        default_icon = "dialog-information-symbolic";
       };
       urgency_critical = {
-        background = "#1e1e2ef0";
-        foreground = "#f38ba8";
-        frame_color = "#f38ba8";
+        background = "#${colors.base00}f0";
+        foreground = "#${colors.base08}";
+        frame_color = "#${colors.base08}";
         timeout = 0;
-        highlight = "#f38ba8";
-        default_icon = "/usr/share/icons/Papirus-Dark/symbolic/status/dialog-warning-symbolic.svg";
+        highlight = "#${colors.base08}";
+        default_icon = "dialog-warning-symbolic";
       };
     };
   };
