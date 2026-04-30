@@ -23,6 +23,7 @@
         modules-right = [
           "custom/camera"
           "custom/dns-stats"
+          "disk"
           "custom/weather"
           "pulseaudio"
           "network"
@@ -131,6 +132,17 @@
           tooltip-format = "CPU: {temperatureC}°C";
         };
 
+        "disk" = {
+          path = "/";
+          format = " {percentage_used}%";
+          tooltip-format = "Root: {used}/{total} ({percentage_used}%)\n{path}";
+          interval = 30;
+          states = {
+            warning = 80;
+            critical = 90;
+          };
+        };
+
         "network" = {
           format-wifi = " {essid}";
           format-ethernet = " {ipaddr}";
@@ -173,6 +185,7 @@
               *) icon="" ;;
             esac
 
+            class=""
             if [ "$status" = "Paused" ]; then
               class="paused"
               icon=""
@@ -294,7 +307,7 @@
         font-size: 13px;
       }
 
-      #cpu, #memory, #temperature, #network, #pulseaudio,
+      #cpu, #memory, #temperature, #network, #pulseaudio, #disk,
       #custom-clipboard, #custom-dns-stats, #custom-camera, #tray, #custom-power {
         padding: 0 10px;
         color: #a6adc8;
@@ -324,6 +337,15 @@
 
       #cpu.high, #memory.high {
         color: #f38ba8;
+      }
+
+      #disk.warning {
+        color: #f9e2af;
+      }
+
+      #disk.critical {
+        color: #f38ba8;
+        font-weight: bold;
       }
 
       #temperature.critical {
@@ -366,6 +388,7 @@
       #cpu:hover,
       #memory:hover,
       #temperature:hover,
+      #disk:hover,
       #network:hover,
       #pulseaudio:hover,
       #tray:hover,
