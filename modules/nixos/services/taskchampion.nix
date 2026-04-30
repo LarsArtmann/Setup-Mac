@@ -31,7 +31,6 @@ _: {
         ProtectHostname = lib.mkForce true;
         RestrictNamespaces = lib.mkForce true;
         LockPersonality = lib.mkForce true;
-        WatchdogSec = lib.mkForce "30";
       };
     };
   };
