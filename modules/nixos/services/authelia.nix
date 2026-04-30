@@ -216,7 +216,6 @@ _: {
           ProtectKernelLogs = lib.mkForce true;
           RestrictNamespaces = lib.mkForce true;
           LockPersonality = lib.mkForce true;
-          WatchdogSec = lib.mkForce "30";
           ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
         };
       };

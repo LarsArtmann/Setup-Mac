@@ -64,7 +64,6 @@ in {
         ExecStart = "${pkgs.emeet-pixyd}/bin/emeet-pixyd";
         Restart = "on-failure";
         RestartSec = "3";
-        WatchdogSec = "30";
       };
 
       path = [pkgs.v4l-utils pkgs.wireplumber pkgs.libnotify];

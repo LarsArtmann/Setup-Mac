@@ -62,7 +62,6 @@ _: {
               RestartSec = lib.mkForce "5s";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "30";
             };
           immich-machine-learning.serviceConfig =
             harden {
@@ -75,7 +74,6 @@ _: {
               RestartSec = lib.mkForce "10s";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "300";
               Environment = lib.mkForce "HOME=/var/lib/immich";
             };
           immich-db-backup = {
