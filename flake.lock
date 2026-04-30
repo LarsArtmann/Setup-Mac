@@ -53,6 +53,27 @@
         "url": "ssh://git@github.com/LarsArtmann/crush-config"
       }
     },
+    "emeet-pixyd": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1777572112,
+        "narHash": "sha256-Q7t11i6TQcBD3CJ+A+D0rUfAs1/for4VBdILuub4Tvc=",
+        "ref": "master",
+        "rev": "5ed956b3dff3bb32dee0f1ef1bf74d0877c2e577",
+        "revCount": 1,
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
+      },
+      "original": {
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
+      }
+    },
     "flake-compat": {
       "locked": {
         "lastModified": 1696426674,
@@ -850,6 +871,7 @@
     "root": {
       "inputs": {
         "crush-config": "crush-config",
+        "emeet-pixyd": "emeet-pixyd",
         "flake-parts": "flake-parts_2",
         "helium": "helium",
         "hermes-agent": "hermes-agent",

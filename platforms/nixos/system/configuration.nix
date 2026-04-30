@@ -31,7 +31,7 @@
     ../hardware/amd-gpu.nix
     ../hardware/amd-npu.nix
     ../hardware/bluetooth.nix
-    ../hardware/emeet-pixy.nix
+    # emeet-pixy — now loaded via emeet-pixyd flake input NixOS module
     # Import common Nix settings for consistent configuration
     ../../common/core/nix-settings.nix
   ];

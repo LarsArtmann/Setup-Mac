@@ -125,6 +125,12 @@
     # NixOS hardware profiles (Raspberry Pi, etc.)
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
+    # EMEET PIXY webcam auto-activation daemon
+    emeet-pixyd = {
+      url = "git+ssh://git@github.com/LarsArtmann/emeet-pixyd?ref=master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Treefmt formatter with auto-discovery for nix fmt
     treefmt-full-flake = {
       url = "github:LarsArtmann/treefmt-full-flake";
@@ -150,6 +156,7 @@
     nix-ssh-config,
     monitor365-src,
     nixos-hardware,
+    emeet-pixyd,
     treefmt-full-flake,
     ...
   }: let
@@ -225,14 +232,7 @@
     #       ];
     #   });
     # };
-    emeetPixyOverlay = _final: prev: {
-      emeet-pixyd = prev.callPackage ./pkgs/emeet-pixyd.nix {
-        src = prev.lib.cleanSourceWith {
-          filter = path: _type: let b = baseNameOf path; in !(prev.lib.hasSuffix "_test.go" b || b == "package.nix");
-          src = ./pkgs/emeet-pixyd;
-        };
-      };
-    };
+    emeetPixyOverlay = emeet-pixyd.overlays.default;
 
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
@@ -594,6 +594,7 @@
             inputs.self.nixosModules.multi-wm
             inputs.self.nixosModules.chromium-policies
             inputs.self.nixosModules.steam
+            inputs.emeet-pixyd.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];
         };
