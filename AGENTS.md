@@ -347,9 +347,25 @@ Two reusable functions in `lib/systemd/`:
 | File | Purpose | Usage |
 |------|---------|-------|
 | `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix;` then `harden {MemoryMax = "512M";}` |
-| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec, StartLimitBurst, WatchdogSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
+| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec, StartLimitBurst) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
 
 Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
+
+### WatchdogSec / sd_notify Rules
+
+**`WatchdogSec` is ONLY valid for services that implement `sd_notify()` (i.e., `Type = "notify"`).** Setting it on services that don't call `sd_notify()` causes systemd to kill them after the timeout — even though they're running perfectly fine.
+
+**Services that support sd_notify (Type=notify, safe to use WatchdogSec):**
+- Caddy (`modules/nixos/services/caddy.nix`)
+- Gitea (`modules/nixos/services/gitea.nix`)
+
+**Services that do NOT support sd_notify (NEVER set WatchdogSec):**
+- All Python services: Hermes, ComfyUI, Immich ML
+- All Node.js services: Homepage, Immich server
+- Go services without explicit sd_notify: SigNoz, Authelia, cadvisor, EMEET PIXY
+- Rust services without explicit sd_notify: TaskChampion
+
+**Rule:** If a service isn't `Type = "notify"`, do NOT set `WatchdogSec`. The `serviceDefaults` function does NOT include `WatchdogSec` for this reason — pass it explicitly only for sd_notify-capable services.
 
 ## Known Issues
 
