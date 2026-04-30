@@ -353,7 +353,7 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            inherit (pkgs) aw-watcher-utilization jscpd;
+            inherit (pkgs) aw-watcher-utilization jscpd sqlc;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd;
@@ -374,6 +374,7 @@
               gitleaks
               jq
               jscpd
+              sqlc
             ];
           };
         };

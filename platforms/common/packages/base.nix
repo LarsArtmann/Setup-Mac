@@ -152,6 +152,7 @@
       gofumpt
       gotests
       mockgen
+      sqlc
       protoc-gen-go
       buf
       delve
