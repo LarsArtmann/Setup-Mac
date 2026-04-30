@@ -140,7 +140,6 @@ _: {
           RestartSec = lib.mkForce "5";
           StartLimitBurst = lib.mkForce 3;
           StartLimitIntervalSec = lib.mkForce 300;
-          WatchdogSec = lib.mkForce "60";
         };
 
       networking.firewall.extraCommands = ''
