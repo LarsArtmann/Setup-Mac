@@ -326,6 +326,18 @@ AI agent task tracking protocol:
 | SSH config is external | SSH configuration comes from `nix-ssh-config` flake input, not defined locally |
 | Secrets via sops-nix | Secrets are age-encrypted using the SSH host key. Managed in `modules/nixos/services/sops.nix` |
 | BTRFS dual layout | Root uses zstd compression, `/data` uses zstd:3 with async discard. Docker lives on `/data`. |
+| Niri BindsTo patched | Upstream niri.service uses `BindsTo=graphical-session.target` — we replace with `PartOf` + `Restart=always` in `niri-config.nix`. Without this, `just switch` kills niri permanently. |
+
+### lib/systemd Shared Helpers
+
+Two reusable functions in `lib/systemd/`:
+
+| File | Purpose | Usage |
+|------|---------|-------|
+| `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix;` then `harden {MemoryMax = "512M";}` |
+| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec, StartLimitBurst, WatchdogSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
+
+Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
 
 ## Known Issues
 
@@ -346,7 +358,7 @@ just update             # Update flake inputs
 just test-fast          # Syntax-only validation (fast)
 just test               # Full build validation (slow)
 just format             # Format with treefmt + alejandra
-just health             # Health check
+just health             # Cross-platform health check (Nix, flake, direnv, shell, systemd, disk, memory)
 just validate           # nix flake check --no-build
 
 # Go development
