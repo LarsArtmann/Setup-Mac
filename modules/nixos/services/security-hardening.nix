@@ -24,15 +24,15 @@ _: {
         pam.services.sddm.enableGnomeKeyring = true;
 
         # Audit daemon disabled — NixOS 26.05 bug: audit-rules-nixos.service fails with "No rules"
-        # See: https://github.com/NixOS/nixpkgs/issues/483085
-        # TODO: Re-enable after NixOS resolves the audit-rules service bug
+        # Upstream: https://github.com/NixOS/nixpkgs/issues/483085
+        # Re-enable after NixOS resolves the audit-rules service bug
         # auditd.enable = true;
         # auditd.settings = {
         #   log_group = "auditd";
         # };
 
-        # Audit rules configuration (disabled)
-        # TODO: Re-enable after fixing audit kernel module
+        # Audit rules configuration (disabled — blocked by auditd bug above)
+        # Re-enable after auditd is working and kernel audit module is available
         # audit = {
         #   enable = true;
         #   rules = [

@@ -1,9 +1,6 @@
 # Starship Prompt Configuration (Cross-Platform)
 # Performance-optimized config migrated from dotfiles/.config/starship.toml
-{
-  colorScheme,
-  ...
-}: let
+{colorScheme, ...}: let
   colors = colorScheme.palette;
 in {
   programs.starship = {

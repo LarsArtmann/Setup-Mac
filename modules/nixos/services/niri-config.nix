@@ -33,21 +33,24 @@ _: {
           baseText = builtins.readFile "${niriPkg}/lib/systemd/user/${name}";
           text =
             if name == "niri.service"
-            then
-              let
-                noBindsTo = builtins.replaceStrings
-                  ["BindsTo=graphical-session.target"]
-                  ["PartOf=graphical-session.target"]
-                  baseText;
-              in
-                noBindsTo
-                + "\nRestart=on-failure\nRestartSec=2s\nOOMScoreAdjust=-900\n"
-                + "\n[Install]\nWantedBy=graphical-session.target\n"
+            then let
+              noBindsTo =
+                builtins.replaceStrings
+                ["BindsTo=graphical-session.target"]
+                ["PartOf=graphical-session.target"]
+                baseText;
+            in
+              noBindsTo
+              + "\nRestart=always\nRestartSec=2s\nStartLimitBurst=3\nStartLimitIntervalSec=60\nOOMScoreAdjust=-900\n"
+              + "\n[Install]\nWantedBy=graphical-session.target\n"
             else baseText;
-        in { inherit text; };
+        in {inherit text;};
       in
         lib.listToAttrs (map
-          (name: { inherit name; value = mkUnit name; })
+          (name: {
+            inherit name;
+            value = mkUnit name;
+          })
           (lib.filter
             (name: lib.hasSuffix ".service" name || lib.hasSuffix ".target" name)
             (builtins.attrNames unitFiles)));

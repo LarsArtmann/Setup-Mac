@@ -32,8 +32,7 @@ _: {
     config = lib.mkIf cfg.enable {
       virtualisation.oci-containers.containers.photomap = {
         autoStart = true;
-        image = "lstein/photomapai:1.0.0";
-        # TODO: pin to sha256 digest: docker pull lstein/photomapai:1.0.0 && docker inspect --format='{{.RepoDigests}}'
+        image = "lstein/photomapai@sha256:ca975ca6b2a00a7943fec1f578815dccfdbc212630547c70e750c724e981435d";
         ports = ["127.0.0.1:8050:8050"];
         volumes = [
           "${immichUploadDir}:/Pictures/upload:ro"

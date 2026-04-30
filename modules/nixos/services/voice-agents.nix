@@ -21,7 +21,8 @@ _: {
       services:
         whisper-rocm:
           image: beecave/insanely-fast-whisper-rocm:1.0.0
-          # TODO: pin to sha256 digest: docker pull beecave/insanely-fast-whisper-rocm:1.0.0 && docker inspect --format='{{.RepoDigests}}'
+          # NOTE: tag 1.0.0 not on Docker Hub (only 'main' tag exists).
+          # To pin: docker pull beecave/insanely-fast-whisper-rocm:1.0.0 && docker inspect --format='{{.RepoDigests}}'
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000

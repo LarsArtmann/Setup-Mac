@@ -1,7 +1,4 @@
-{
-  colorScheme,
-  ...
-}: let
+{colorScheme, ...}: let
   colors = colorScheme.palette;
 in {
   # Zellij - Modern terminal multiplexer (tmux alternative)
