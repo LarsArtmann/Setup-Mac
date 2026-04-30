@@ -1948,3 +1948,23 @@ ai-status:
     @echo "  OLLAMA_MODELS  = $${OLLAMA_MODELS:-not set}"
     @echo "  HF_HOME        = $${HF_HOME:-not set}"
     @echo "  LLAMA_MODEL_PATH = $${LLAMA_MODEL_PATH:-not set}"
+
+# ========================================
+# todo-list-ai Commands
+# ========================================
+
+# Extract TODOs from a directory using AI (default: mock provider)
+todo-scan *ARGS="":
+    @todo-list-ai {{ ARGS }}
+
+# Extract TODOs from a directory with OpenAI
+todo-scan-openai DIR="./":
+    @todo-list-ai --dir {{ DIR }} --provider openai
+
+# Extract TODOs from a directory with mock provider (no API key needed)
+todo-scan-mock DIR="./":
+    @todo-list-ai --dir {{ DIR }} --provider mock
+
+# Show todo-list-ai version
+todo-version:
+    @todo-list-ai --version 2>/dev/null || echo "todo-list-ai not found in PATH"

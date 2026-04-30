@@ -46,6 +46,9 @@ SystemNix/
 │   ├── netwatch.nix             # Real-time network diagnostics TUI (Rust)
 │   └── openaudible.nix          # Audible audiobook manager (AppImage)
 │
+│   # External flake inputs (packages via overlay)
+│   # todo-list-ai            — AI-powered TODO extraction CLI (github:LarsArtmann/todo-list-ai)
+│
 └── platforms/
     ├── common/                  # Shared (~80%)
     │   ├── home-base.nix        # Imports 14 program modules
@@ -417,6 +420,12 @@ just session-restore      # Manually trigger session restore
 just ai-migrate           # Migrate legacy AI data → /data/ai/ (run BEFORE switch)
 just ai-status            # Show AI model storage status
 
+# todo-list-ai
+just todo-scan             # Extract TODOs from current directory (default: mock)
+just todo-scan-openai DIR  # Extract TODOs with OpenAI
+just todo-scan-mock DIR    # Extract TODOs with mock provider
+just todo-version          # Show todo-list-ai version
+
 # Recovery
 just rollback           # Revert to previous generation
 just backup / just restore NAME
@@ -540,5 +549,6 @@ hermes cron list          # List cron jobs
 | `otel-tui` | OpenTelemetry TUI viewer | Yes |
 | `signoz-src` | SigNoz source (flake=false) | — |
 | `signoz-collector-src` | SigNoz collector source (flake=false) | — |
+| `todo-list-ai` | AI-powered TODO extraction CLI | Yes |
 | `homebrew-bundle` | Homebrew taps (flake=false) | — |
 | `homebrew-cask` | Homebrew cask taps (flake=false) | — |

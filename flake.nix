@@ -136,6 +136,12 @@
       url = "github:LarsArtmann/treefmt-full-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # todo-list-ai — AI-powered CLI tool for extracting TODOs from codebases
+    todo-list-ai = {
+      url = "git+ssh://git@github.com/LarsArtmann/todo-list-ai?ref=master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {
@@ -158,6 +164,7 @@
     nixos-hardware,
     emeet-pixyd,
     treefmt-full-flake,
+    todo-list-ai,
     ...
   }: let
     # NOTE: goOverlay removed — nixpkgs go_1_26 is already 1.26.1.
@@ -238,6 +245,10 @@
     # };
     emeetPixyOverlay = emeet-pixyd.overlays.default;
 
+    todoListAiOverlay = _final: prev: {
+      todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
+    };
+
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
       valkey = prev.valkey.overrideAttrs (_old: {doCheck = false;});
@@ -248,6 +259,7 @@
     sharedOverlays = [
       nur.overlays.default
       awWatcherOverlay
+      todoListAiOverlay
     ];
 
     # Linux-only overlays (custom packages that only make sense on NixOS)
@@ -333,6 +345,7 @@
           overlays =
             [
               awWatcherOverlay
+              todoListAiOverlay
               jscpdOverlay
               disableTestsOverlay
             ]
@@ -353,7 +366,7 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            inherit (pkgs) aw-watcher-utilization jscpd sqlc;
+            inherit (pkgs) aw-watcher-utilization jscpd sqlc todo-list-ai;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd;

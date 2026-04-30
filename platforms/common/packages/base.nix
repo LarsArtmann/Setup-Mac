@@ -192,6 +192,9 @@
       nh
       statix # Lints and suggestions for Nix code
 
+      # AI-powered code analysis
+      todo-list-ai # Extract TODOs from codebases using AI
+
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
     ]
