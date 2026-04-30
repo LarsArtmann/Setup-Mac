@@ -95,7 +95,6 @@ _: {
             TimeoutStopSec = "60";
             Restart = "on-failure";
             RestartSec = "10";
-            WatchdogSec = "60";
           }
           // harden {
             ProtectHome = false;
