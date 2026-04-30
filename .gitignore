@@ -125,15 +125,17 @@ gitea-sync.env
 # Compiled Go binaries (built by Nix, not source)
 pkgs/dnsblockd-processor/dnsblockd-processor
 platforms/nixos/programs/dnsblockd/dnsblockd
-Copy/paste detection report
+# Copy/paste detection report
 /report/jscpd-report.json
-Dependencies
+# Dependencies
 node_modules/
-Test coverage
+# Test coverage
 /coverage
-Add pattern for Templ generated files
+# Templ generated files
 *_templ.go
 # Sensitive files
 secrets*
-# Sensitive files
 *.crt
+
+# direnv build artifacts
+.direnv/
