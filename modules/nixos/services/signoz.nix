@@ -263,7 +263,6 @@ in {
               RestartSec = lib.mkForce "10";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "30";
             };
         };
 
@@ -607,7 +606,6 @@ in {
               RestartSec = lib.mkForce "5";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "30";
             };
         };
       })
@@ -644,7 +642,6 @@ in {
               RestartSec = lib.mkForce "10";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
-              WatchdogSec = lib.mkForce "30";
             };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {
