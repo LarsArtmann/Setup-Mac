@@ -27,6 +27,7 @@ _: {
         # Network monitoring
         nethogs # Network process monitoring
         iftop # Network bandwidth
+        netwatch # Real-time network diagnostics TUI
       ];
     };
   };

@@ -43,6 +43,7 @@ SystemNix/
 │   ├── jscpd.nix                # Copy/paste detector (Node.js)
 │   ├── modernize.nix            # Go modernize tool
 │   ├── monitor365.nix           # Device monitoring agent (Rust)
+│   ├── netwatch.nix             # Real-time network diagnostics TUI (Rust)
 │   └── openaudible.nix          # Audible audiobook manager (AppImage)
 │
 └── platforms/

@@ -186,6 +186,10 @@
       };
     };
 
+    netwatchOverlay = _final: prev: {
+      netwatch = prev.callPackage ./pkgs/netwatch.nix {};
+    };
+
     monitor365Overlay = _final: prev: {
       monitor365 = prev.callPackage ./pkgs/monitor365.nix {
         src = prev.lib.cleanSourceWith {
@@ -252,6 +256,7 @@
       dnsblockdOverlay
       emeetPixyOverlay
       monitor365Overlay
+      netwatchOverlay
     ];
 
     # Python test override (separate because it's NixOS-specific)
@@ -336,6 +341,7 @@
               dnsblockdOverlay
               emeetPixyOverlay
               monitor365Overlay
+              netwatchOverlay
             ];
         };
 
@@ -350,7 +356,7 @@
             inherit (pkgs) aw-watcher-utilization jscpd;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 emeet-pixyd;
+            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd;
           };
 
         # Development shells for different program categories
