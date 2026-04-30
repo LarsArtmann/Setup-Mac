@@ -978,6 +978,12 @@ go-lint *ARGS="./...":
     golangci-lint run {{ ARGS }}
     @echo "✅ Go linting complete"
 
+# Run architecture lint with go-arch-lint
+go-arch-lint *ARGS="":
+    @echo "🏗️  Running architecture linter..."
+    go-arch-lint check {{ ARGS }}
+    @echo "✅ Architecture lint complete"
+
 # Format Go code with gofumpt (stricter than gofmt)
 go-format *ARGS=".":
     @echo "🎨 Formatting Go code with gofumpt..."
@@ -1108,6 +1114,7 @@ go-tools-version:
     @echo -n "protoc-gen-go: "; protoc-gen-go --version 2>/dev/null || echo "installed"
     @echo -n "buf: "; buf --version 2>/dev/null | head -1 || echo "installed"
     @echo -n "delve: "; dlv version | head -1
+    @echo -n "go-arch-lint: "; go-arch-lint version 2>/dev/null || echo "installed"
 
 # Node.js/TypeScript development commands (Nix-managed)
 # Lint TypeScript/JavaScript code with oxlint (faster than ESLint)
