@@ -1,6 +1,6 @@
 # SystemNix: AGENT GUIDE
 
-**Last Updated:** 2026-04-28
+
 **Project Type:** Cross-Platform Nix Configuration (macOS + NixOS)
 **Repo:** `github:LarsArtmann/SystemNix`
 
@@ -104,20 +104,9 @@ imports = [ ../../common/home-base.nix ];
 
 ### Custom Overlays
 
-Eight overlays are defined in `flake.nix`:
 
-| Overlay | Purpose |
-|---------|---------|
-| `goOverlay` | Pins Go to 1.26.1 (overrides default) |
-| `awWatcherOverlay` | Builds `aw-watcher-utilization` from local nix pkg |
-| `jscpdOverlay` | Builds `jscpd` copy/paste detector from npm (all platforms) |
-| `dnsblockdOverlay` | Builds `dnsblockd` + `dnsblockd-processor` from local source (Linux only) |
-| `emeetPixyOverlay` | Builds `emeet-pixyd` from local source (Linux only) |
-| `openaudibleOverlay` | Wraps OpenAudible AppImage (Linux only) |
-| `monitor365Overlay` | Builds `monitor365` CLI agent from flake input source (Linux only) |
-| `unboundDoQOverlay` | Patches unbound for DNS-over-QUIC support (Linux only) |
 
-Go, aw-watcher-utilization, and jscpd overlays are applied on both platforms. The remaining overlays are Linux-only (applied in NixOS config).
+
 
 ### Wrapped Packages (Vimjoyer Pattern)
 
