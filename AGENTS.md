@@ -215,6 +215,18 @@ Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server)
 - Local `.home.lan` DNS records for all services
 - Blocklist source: `platforms/nixos/programs/dnsblockd/`
 
+### Network Configuration (`platforms/nixos/system/local-network.nix`)
+
+Shared IP addresses defined as `networking.local` module options:
+- `networking.local.lanIP` (default: 192.168.1.150) — evo-x2 LAN IP
+- `networking.local.gateway` (default: 192.168.1.1) — default gateway
+- `networking.local.subnet` (default: 192.168.1.0/24) — LAN subnet
+- `networking.local.blockIP` (default: 192.168.1.200) — DNS block page IP
+- `networking.local.virtualIP` (default: 192.168.1.53) — VRRP virtual IP
+- `networking.local.piIP` (default: 192.168.1.151) — Pi 3 backup DNS IP
+
+Both `evo-x2` and `rpi3-dns` import this module. Changing the subnet only requires updating `local-network.nix` defaults.
+
 ### DNS Failover Cluster
 
 High-availability DNS via Keepalived VRRP (`modules/nixos/services/dns-failover.nix`).
