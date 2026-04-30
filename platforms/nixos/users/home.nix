@@ -55,6 +55,9 @@ in {
         confirm_os_window_close = 0;
         update_check_interval = 0;
         enable_audio_bell = false;
+        visual_bell_duration = "0.2";
+        visual_bell_color = "#89b4fa";
+        window_alert_on_bell = true;
       };
     };
 

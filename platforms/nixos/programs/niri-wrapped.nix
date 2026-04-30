@@ -544,7 +544,7 @@ in {
         "Alt+C".action.spawn = sh "cliphist list | rofi -dmenu -p 'Clipboard:' -kb-delete-entry 'Ctrl+Delete' -theme-str 'window {width: 50%;} listview {columns: 1; lines: 12; scrollbar: true; } element {orientation: horizontal; padding: 8px; spacing: 8px; } element-text {horizontal-align: 0.0; vertical-align: 0.5; } scrollbar {enabled: true; width: 4px; padding: 0; } scrollbar-handle {background-color: @selected; border-radius: 2px; }' | cliphist decode | wl-copy";
         "Mod+period".action.spawn = sh "rofi -modi emoji -show emoji -theme-str 'window {width: 40%;}'";
         "Mod+Shift+C".action.spawn = sh "rofi -show calc -modi calc -no-show-match -no-sort -theme-str 'window {width: 30%;}'";
-        "Mod+Shift+N".action.spawn = sh "dunstctl history | rofi -dmenu -p 'Notifications:' -theme-str 'window {width: 60%; height: 60%;}'";
+        "Mod+Shift+N".action.spawn = sh "dunstctl history | ${pkgs.jq}/bin/jq -r '.data[0][] | \"\\(.summary.data[0]string // \\\"\\\") — \\(.body.data[0]string // \\\"\\\") [\\(.timestamp.data[0]string / 1000000 | strftime(\\\"%H:%M\\\"))]\"' 2>/dev/null | ${pkgs.rofi}/bin/rofi -dmenu -p 'Notifications:' -theme-str 'window {width: 60%; height: 60%;} listview {columns: 1; lines: 15;} element {padding: 10px;}' || true";
         "Mod+Shift+E".action.spawn = ["emacs"];
         "Mod+Shift+B".action.spawn = ["firefox"];
         "Mod+Z".action.spawn = ["zed"];

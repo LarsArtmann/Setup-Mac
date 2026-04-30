@@ -18,7 +18,7 @@ in {
       scan_timeout = 100; # 100ms max scanning
 
       # Format: Enhanced prompt with performance budget
-      format = "$directory$git_branch$git_status$golang$nodejs$cmd_duration$character";
+      format = "$directory$git_branch$git_status$nix_shell$golang$nodejs$cmd_duration$character";
 
       # Directory: Minimal path display
       directory = {
@@ -102,7 +102,12 @@ in {
       lua.disabled = true;
       memory_usage.disabled = true;
       nim.disabled = true;
-      nix_shell.disabled = false;
+      nix_shell = {
+        disabled = false;
+        symbol = " ";
+        style = "bold #${colors.base0D}";
+        format = "via [$symbol$state( \\($name\\))]($style) ";
+      };
       nodejs = {
         disabled = false;
         symbol = "⬢ ";

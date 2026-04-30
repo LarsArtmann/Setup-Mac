@@ -174,13 +174,20 @@
             esac
 
             if [ "$status" = "Paused" ]; then
+              class="paused"
               icon=""
             fi
 
             artist=$(echo "$artist" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
             title=$(echo "$title" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
 
-            echo "{\"text\": \"$icon ''${artist} - ''${title}\", \"tooltip\": \"<b>''${status}</b>\\n''${title}\\n''${artist}\"}"
+            if [ -n "$album" ] && [ "$album" != "" ]; then
+              album_tooltip="\nAlbum: $album"
+            else
+              album_tooltip=""
+            fi
+
+            echo "{\"text\": \"$icon ''${artist} - ''${title}\", \"tooltip\": \"<b>''${artist}</b> — ''${title}''${album_tooltip}\nPlayer: $player | $status\", \"class\": \"$class\"}"
           '';
           return-type = "json";
           interval = 2;
@@ -222,7 +229,7 @@
           exec = pkgs.writeShellScript "waybar-weather" ''
             WTTR=$(${pkgs.curl}/bin/curl -sf "wttr.in/?format=3" 2>/dev/null || echo "")
             if [ -z "$WTTR" ]; then
-              echo "N/A"
+              echo '{"text":"N/A","tooltip":"Weather: unavailable","class":"error"}'
               exit 0
             fi
             TEMP=$(echo "$WTTR" | cut -d' ' -f1)
@@ -338,6 +345,42 @@
 
       #custom-power {
         color: #f38ba8;
+      }
+
+      tooltip {
+        background: #1e1e2e;
+        border: 1px solid #45475a;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: #cdd6f4;
+        font-family: "JetBrainsMono Nerd Font";
+        font-size: 13px;
+      }
+
+      tooltip label {
+        color: #cdd6f4;
+        padding: 2px;
+      }
+
+      #clock:hover,
+      #cpu:hover,
+      #memory:hover,
+      #temperature:hover,
+      #network:hover,
+      #pulseaudio:hover,
+      #tray:hover,
+      #custom-weather:hover,
+      #custom-media:hover {
+        color: #cdd6f4;
+        background: #313244;
+      }
+
+      #custom-media.paused {
+        color: #585b70;
+      }
+
+      #custom-weather.error {
+        color: #585b70;
       }
     '';
   };
