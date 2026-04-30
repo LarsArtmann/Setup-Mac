@@ -181,11 +181,8 @@ in {
       wl-clip-persist # Keeps clipboard content after programs close
       rofi-calc
       rofi-emoji
-      zellij # Terminal multiplexer (modern tmux alternative)
       zed-editor # Modern code editor (Rust-based, collaborative)
       yazi # Terminal file manager (Rust-based, async, image previews)
-      # Scripts dependencies
-      jq # JSON processing
       gawk # Text processing
     ];
   };
