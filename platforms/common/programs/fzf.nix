@@ -1,10 +1,7 @@
 # FZF configuration (Cross-Platform)
 # Migrated from dotfiles/.fzf.zsh
 # Home Manager manages completion and keybindings automatically
-{
-  colorScheme,
-  ...
-}: let
+{colorScheme, ...}: let
   colors = colorScheme.palette;
 in {
   programs.fzf = {
@@ -22,7 +19,7 @@ in {
       "--color=bg+:#${colors.base02},bg:#${colors.base00},spinner:#${colors.base06},hl:#${colors.base08}"
       "--color=fg:#${colors.base05},header:#${colors.base08},info:#${colors.base0E},pointer:#${colors.base06}"
       "--color=marker:#${colors.base07},fg+:#${colors.base05},prompt:#${colors.base0E},hl+:#${colors.base08}"
-      "--color=selected-bg:#${colors.base03},border:#${colors.base04},label:#${colors.base04}"
+      "--color=selected-bg:#${colors.base03},border:#${colors.base04},label:#a6adc8"
     ];
 
     # Use ripgrep for better search performance
