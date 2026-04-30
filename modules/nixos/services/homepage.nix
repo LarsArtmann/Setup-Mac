@@ -57,43 +57,6 @@ _: {
         theme: dark
         color: slate
         headerStyle: boxed
-        customCSS: |-
-          :root {
-            --catppuccin-base: #1e1e2e;
-            --catppuccin-mantle: #181825;
-            --catppuccin-crust: #11111b;
-            --catppuccin-surface0: #313244;
-            --catppuccin-surface1: #45475a;
-            --catppuccin-overlay0: #6c7086;
-            --catppuccin-text: #cdd6f4;
-            --catppuccin-subtext: #a6adc8;
-            --catppuccin-lavender: #b4befe;
-            --catppuccin-blue: #89b4fa;
-            --catppuccin-green: #a6e3a1;
-            --catppuccin-red: #f38ba8;
-            --catppuccin-yellow: #f9e2af;
-            --catppuccin-pink: #f5c2e7;
-          }
-          body { background-color: var(--catppuccin-crust) !important; color: var(--catppuccin-text) !important; }
-          .page { background-color: var(--catppuccin-base) !important; }
-          .service-card { background-color: var(--catppuccin-surface0) !important; border-radius: 12px !important; border: 1px solid var(--catppuccin-surface1) !important; color: var(--catppuccin-text) !important; }
-          .service-card:hover { border-color: var(--catppuccin-blue) !important; box-shadow: 0 4px 12px rgba(137,180,250,0.15) !important; }
-          .service-card .service-name { color: var(--catppuccin-text) !important; }
-          .service-card .service-description { color: var(--catppuccin-subtext) !important; }
-          .service-card .service-url { color: var(--catppuccin-lavender) !important; }
-          .group-heading { color: var(--catppuccin-lavender) !important; border-bottom: 1px solid var(--catppuccin-surface1) !important; }
-          .widget { background-color: var(--catppuccin-mantle) !important; color: var(--catppuccin-text) !important; }
-          .greeting-widget { color: var(--catppuccin-lavender) !important; }
-          .resources-widget .resource-label { color: var(--catppuccin-subtext) !important; }
-          .resources-widget .resource-value { color: var(--catppuccin-green) !important; }
-          .status-dot.online { background-color: var(--catppuccin-green) !important; }
-          .status-dot.offline { background-color: var(--catppuccin-red) !important; }
-          .icon { color: var(--catppuccin-lavender) !important; }
-          a { color: var(--catppuccin-blue) !important; }
-          ::-webkit-scrollbar { width: 6px; }
-          ::-webkit-scrollbar-track { background: var(--catppuccin-crust); }
-          ::-webkit-scrollbar-thumb { background: var(--catppuccin-surface1); border-radius: 3px; }
-          ::-webkit-scrollbar-thumb:hover { background: var(--catppuccin-overlay0); }
         layout:
           Infrastructure:
             style: row
@@ -241,6 +204,42 @@ _: {
               uptime: true
         ''}"
         "L+ ${stateDir}/docker.yaml - - - - ${pkgs.writeText "docker.yaml" ""}"
+        "L+ ${stateDir}/custom.css - - - - ${pkgs.writeText "custom.css" ''
+          :root {
+            --catppuccin-base: #1e1e2e;
+            --catppuccin-mantle: #181825;
+            --catppuccin-crust: #11111b;
+            --catppuccin-surface0: #313244;
+            --catppuccin-surface1: #45475a;
+            --catppuccin-overlay0: #6c7086;
+            --catppuccin-text: #cdd6f4;
+            --catppuccin-subtext: #a6adc8;
+            --catppuccin-lavender: #b4befe;
+            --catppuccin-blue: #89b4fa;
+            --catppuccin-green: #a6e3a1;
+            --catppuccin-red: #f38ba8;
+          }
+          body { background-color: var(--catppuccin-crust) !important; color: var(--catppuccin-text) !important; }
+          .page { background-color: var(--catppuccin-base) !important; }
+          .service-card { background-color: var(--catppuccin-surface0) !important; border-radius: 12px !important; border: 1px solid var(--catppuccin-surface1) !important; color: var(--catppuccin-text) !important; }
+          .service-card:hover { border-color: var(--catppuccin-blue) !important; box-shadow: 0 4px 12px rgba(137,180,250,0.15) !important; }
+          .service-card .service-name { color: var(--catppuccin-text) !important; }
+          .service-card .service-description { color: var(--catppuccin-subtext) !important; }
+          .service-card .service-url { color: var(--catppuccin-lavender) !important; }
+          .group-heading { color: var(--catppuccin-lavender) !important; border-bottom: 1px solid var(--catppuccin-surface1) !important; }
+          .widget { background-color: var(--catppuccin-mantle) !important; color: var(--catppuccin-text) !important; }
+          .greeting-widget { color: var(--catppuccin-lavender) !important; }
+          .resources-widget .resource-label { color: var(--catppuccin-subtext) !important; }
+          .resources-widget .resource-value { color: var(--catppuccin-green) !important; }
+          .status-dot.online { background-color: var(--catppuccin-green) !important; }
+          .status-dot.offline { background-color: var(--catppuccin-red) !important; }
+          .icon { color: var(--catppuccin-lavender) !important; }
+          a { color: var(--catppuccin-blue) !important; }
+          ::-webkit-scrollbar { width: 6px; }
+          ::-webkit-scrollbar-track { background: var(--catppuccin-crust); }
+          ::-webkit-scrollbar-thumb { background: var(--catppuccin-surface1); border-radius: 3px; }
+          ::-webkit-scrollbar-thumb:hover { background: var(--catppuccin-overlay0); }
+        ''}"
       ];
     };
   };
