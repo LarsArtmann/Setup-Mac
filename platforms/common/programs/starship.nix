@@ -104,7 +104,7 @@ in {
       nim.disabled = true;
       nix_shell = {
         disabled = false;
-        symbol = " ";
+        symbol = "❄ ";
         style = "bold #${colors.base0D}";
         format = "via [$symbol$state( \\($name\\))]($style) ";
       };
