@@ -9,7 +9,7 @@
   RestartSec ? "5s",
   StartLimitBurst ? 3,
   StartLimitIntervalSec ? 60,
-  WatchdogSec ? "30",
+  WatchdogSec ? "60",
 }: {
   inherit Restart RestartSec StartLimitBurst StartLimitIntervalSec WatchdogSec;
 }

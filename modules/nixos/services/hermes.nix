@@ -166,7 +166,7 @@ in {
             ExecReload = "/bin/kill -USR1 $MAINPID";
             StandardOutput = "journal";
             StandardError = "journal";
-            WatchdogSec = "30";
+            WatchdogSec = "180";
             UMask = "0007";
           }
           // harden {
