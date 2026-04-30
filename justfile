@@ -1537,7 +1537,7 @@ dns-logs:
     @if [ "$(uname)" = "Darwin" ]; then \
         echo "ℹ️  DNS blocker is not configured on Darwin"; \
     else \
-        echo "=== Unbound logs ===" && journalctl -u unbound -f --no-pager -n 50; \
+        echo "=== Unbound logs ===" && journalctl -u unbound --no-pager -n 100; \
     fi
 
 # View dnsblockd logs
@@ -1546,7 +1546,7 @@ dns-logs-blocker:
     @if [ "$(uname)" = "Darwin" ]; then \
         echo "ℹ️  DNS blocker is not configured on Darwin"; \
     else \
-        journalctl -u dnsblockd -f --no-pager -n 50; \
+        journalctl -u dnsblockd --no-pager -n 100; \
     fi
 
 # Restart DNS services
@@ -1681,7 +1681,7 @@ immich-logs:
     @if [ "$(uname)" = "Darwin" ]; then \
         echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
     else \
-        journalctl -u immich-server -f --no-pager -n 50; \
+        journalctl -u immich-server --no-pager -n 100; \
     fi
 
 # View Immich ML logs (check for GPU/CPU provider)
@@ -1690,7 +1690,7 @@ immich-logs-ml:
     @if [ "$(uname)" = "Darwin" ]; then \
         echo "ℹ️  Immich is only configured on NixOS (evo-x2)"; \
     else \
-        journalctl -u immich-machine-learning -f --no-pager -n 50; \
+        journalctl -u immich-machine-learning --no-pager -n 100; \
     fi
 
 # Run Immich database backup manually
@@ -1841,7 +1841,7 @@ cam-restart:
 
 # Show EMEET PIXY daemon logs
 cam-logs:
-    @journalctl --user -u emeet-pixyd -f --no-pager -n 50
+    @journalctl --user -u emeet-pixyd --no-pager -n 100
 
 # Niri Session Commands
 
@@ -1886,8 +1886,12 @@ hermes-status:
 hermes-restart:
     @sudo systemctl restart hermes
 
-# Show hermes gateway logs (follow mode)
+# Show hermes gateway logs (last 200 lines)
 hermes-logs:
+    @journalctl -u hermes --no-pager -n 200
+
+# Follow hermes gateway logs (live tail)
+hermes-logs-follow:
     @journalctl -u hermes -f --no-pager -n 50
 
 # AI Models — migrate from legacy /data/{models,cache,unsloth} to /data/ai/

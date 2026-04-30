@@ -21,6 +21,14 @@ in {
         chmod 600 "$ENV_FILE"
       fi
 
+      # Clean up deprecated keys
+      for dep_key in MESSAGING_CWD; do
+        if grep -q "^''${dep_key}=" "$ENV_FILE" 2>/dev/null; then
+          ${pkgs.gnused}/bin/sed -i "/^''${dep_key}=/d" "$ENV_FILE"
+          echo "hermes-merge: removed deprecated key $dep_key from .env"
+        fi
+      done
+
       # Write non-secret env vars only (secrets come from sops via EnvironmentFile)
       for pair in "OLLAMA_API_KEY=ollama" "TERMINAL_ENV=local"; do
         key="''${pair%%=*}"
@@ -140,6 +148,7 @@ in {
           pkgs.bash
           pkgs.coreutils
           pkgs.git
+          pkgs.libopus
         ];
 
         serviceConfig =
@@ -154,7 +163,7 @@ in {
               "HOME=${cfg.stateDir}"
               "HERMES_HOME=${cfg.stateDir}"
               "HERMES_MANAGED=true"
-              "MESSAGING_CWD=${cfg.stateDir}/workspace"
+              "LD_LIBRARY_PATH=${pkgs.libopus}/lib"
             ];
             EnvironmentFile = [sopsEnvPath];
             Restart = lib.mkForce "always";
