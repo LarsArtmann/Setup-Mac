@@ -259,7 +259,7 @@ in {
             }
             // harden {MemoryMax = lib.mkForce "1G";}
             // {
-              Restart = lib.mkForce "on-failure";
+              Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "10";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
@@ -602,7 +602,7 @@ in {
             }
             // harden {}
             // {
-              Restart = lib.mkForce "on-failure";
+              Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "5";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
@@ -638,7 +638,7 @@ in {
             }
             // harden {MemoryMax = lib.mkForce "1G";}
             // {
-              Restart = lib.mkForce "on-failure";
+              Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "10";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;

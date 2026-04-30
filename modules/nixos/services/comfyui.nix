@@ -93,8 +93,10 @@ _: {
             SupplementaryGroups = ["render" "video"];
             TimeoutStartSec = "300";
             TimeoutStopSec = "60";
-            Restart = "on-failure";
+            Restart = "always";
             RestartSec = "10";
+            StartLimitBurst = 3;
+            StartLimitIntervalSec = 300;
           }
           // harden {
             ProtectHome = false;

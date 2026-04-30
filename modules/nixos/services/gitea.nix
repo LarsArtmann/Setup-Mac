@@ -322,7 +322,7 @@ _: {
         # Harden the main Gitea service (managed by services.gitea)
         services.gitea = {
           serviceConfig = {
-            Restart = lib.mkForce "on-failure";
+            Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5";
             StartLimitBurst = lib.mkForce 3;
             StartLimitIntervalSec = lib.mkForce 300;

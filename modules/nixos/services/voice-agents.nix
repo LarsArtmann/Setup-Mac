@@ -118,8 +118,10 @@ _: {
             ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
             ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down whisper-rocm";
             TimeoutStartSec = 180;
-            Restart = "on-failure";
+            Restart = "always";
             RestartSec = "10";
+            StartLimitBurst = 3;
+            StartLimitIntervalSec = 300;
             PrivateTmp = true;
             ProtectClock = true;
             ProtectHostname = true;

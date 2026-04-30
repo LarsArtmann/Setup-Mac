@@ -808,7 +808,7 @@ in {
               ${pkgs.systemd}/bin/systemctl suspend
             ''
           } before-sleep ${pkgs.swaylock}/bin/swaylock";
-          Restart = "on-failure";
+          Restart = "always";
           RestartSec = "5s";
           TimeoutStartSec = "10s";
           StartLimitBurst = 3;
@@ -825,7 +825,7 @@ in {
         };
         Service = {
           ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
-          Restart = "on-failure";
+          Restart = "always";
           RestartSec = "5s";
           TimeoutStartSec = "10s";
           StartLimitBurst = 3;

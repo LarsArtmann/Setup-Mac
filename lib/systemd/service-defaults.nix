@@ -9,7 +9,7 @@
 # in the service binary. Only pass it for services that implement sd_notify
 # (e.g., Caddy, Gitea). For all others, omit it.
 {
-  Restart ? "on-failure",
+  Restart ? "always",
   RestartSec ? "5s",
   StartLimitBurst ? 3,
   StartLimitIntervalSec ? 60,

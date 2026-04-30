@@ -326,7 +326,7 @@ in {
           ExecStartPre = "+-${initScript}";
           ExecStart = "${dnsblockdWrapper}";
           StateDirectory = "dnsblockd";
-          Restart = "on-failure";
+          Restart = "always";
           RestartSec = "3s";
           StartLimitBurst = 5;
           StartLimitIntervalSec = 60;

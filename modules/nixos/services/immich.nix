@@ -58,7 +58,7 @@ _: {
               ProtectSystem = lib.mkForce false;
             }
             // {
-              Restart = lib.mkForce "on-failure";
+              Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "5s";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;
@@ -70,7 +70,7 @@ _: {
               ProtectSystem = lib.mkForce false;
             }
             // {
-              Restart = lib.mkForce "on-failure";
+              Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "10s";
               StartLimitBurst = lib.mkForce 3;
               StartLimitIntervalSec = lib.mkForce 300;

@@ -150,8 +150,10 @@ in {
                 ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
                 ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
                 WorkingDirectory = stateDir;
-                Restart = "on-failure";
+                Restart = "always";
                 RestartSec = "10s";
+                StartLimitBurst = 3;
+                StartLimitIntervalSec = 300;
               }
               // harden {
                 MemoryMax = "2G";

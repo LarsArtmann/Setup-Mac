@@ -244,8 +244,10 @@ _: {
               User = primaryUser;
               Group = "video";
               WorkingDirectory = "${unslothDataDir}/workspace";
-              Restart = "on-failure";
+              Restart = "always";
               RestartSec = "10s";
+              StartLimitBurst = 3;
+              StartLimitIntervalSec = 300;
               SupplementaryGroups = ["render"];
               TimeoutStartSec = "60";
             };

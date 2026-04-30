@@ -432,7 +432,7 @@ _: {
             MemoryMax = lib.mkForce "4G";
           }
           // {
-            Restart = lib.mkForce "on-failure";
+            Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5";
             StartLimitBurst = lib.mkForce 3;
             StartLimitIntervalSec = lib.mkForce 300;

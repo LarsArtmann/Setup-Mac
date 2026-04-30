@@ -205,8 +205,10 @@ _: {
 
       systemd.services.authelia-main = {
         serviceConfig = {
-          Restart = lib.mkForce "on-failure";
+          Restart = lib.mkForce "always";
           RestartSec = lib.mkForce "5";
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
           StateDirectory = lib.mkForce "authelia-main";
           StateDirectoryMode = lib.mkForce "0750";
           PrivateTmp = lib.mkForce true;

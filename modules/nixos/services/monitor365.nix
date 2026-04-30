@@ -232,7 +232,7 @@ _: {
             Type = "simple";
             ExecStart = "${cfg.package}/bin/monitor365 --config /etc/monitor365/config.toml run";
             WorkingDirectory = cfg.home;
-            Restart = "on-failure";
+            Restart = "always";
             RestartSec = "10";
             KillMode = "mixed";
             TimeoutStopSec = "30";
