@@ -239,6 +239,43 @@
       valkey = prev.valkey.overrideAttrs (_old: {doCheck = false;});
       aiocache = prev.python3Packages.aiocache.overrideAttrs (_old: {doCheck = false;});
     };
+
+    # Shared overlays applied on all machines (Darwin + NixOS)
+    sharedOverlays = [
+      nur.overlays.default
+      awWatcherOverlay
+    ];
+
+    # Linux-only overlays (custom packages that only make sense on NixOS)
+    linuxOnlyOverlays = [
+      openaudibleOverlay
+      dnsblockdOverlay
+      emeetPixyOverlay
+      monitor365Overlay
+    ];
+
+    # Python test override (separate because it's NixOS-specific)
+    pythonTestOverlay = _final: prev: {
+      python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
+        timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});
+        xformers = pyPrev.xformers.overridePythonAttrs (_: {doCheck = false;});
+      });
+    };
+
+    # Shared Home Manager configuration — only user/home file path differs per system
+    sharedHomeManagerConfig = {
+      useGlobalPkgs = true;
+      useUserPackages = true;
+      backupFileExtension = "backup";
+      overwriteBackup = true;
+    };
+
+    # Shared extraSpecialArgs for Home Manager — available in all platform home.nix files
+    sharedHomeManagerSpecialArgs = {
+      inherit nix-colors;
+      inherit nix-ssh-config;
+      colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
+    };
   in
     flake-parts.lib.mkFlake {inherit inputs;} {
       systems = ["aarch64-darwin" "x86_64-linux"];
@@ -433,10 +470,7 @@
               nixpkgs = {
                 hostPlatform = "aarch64-darwin";
                 config.allowUnfree = true;
-                overlays = [
-                  nur.overlays.default
-                  awWatcherOverlay
-                ];
+                overlays = sharedOverlays;
               };
             }
 
@@ -461,23 +495,16 @@
 
             # Define Home Manager configuration inline for top-level visibility
             {
-              # Home Manager configuration
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = "backup";
-                overwriteBackup = true;
-                users.larsartmann = {...}: {
-                  imports = [
-                    ./platforms/darwin/home.nix
-                  ];
+              home-manager =
+                sharedHomeManagerConfig
+                // {
+                  users.larsartmann = {...}: {
+                    imports = [
+                      ./platforms/darwin/home.nix
+                    ];
+                  };
+                  extraSpecialArgs = sharedHomeManagerSpecialArgs;
                 };
-                extraSpecialArgs = {
-                  inherit nix-colors;
-                  inherit nix-ssh-config;
-                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
-                };
-              };
             }
 
             # Core Darwin configuration
@@ -503,21 +530,13 @@
               nixpkgs = {
                 hostPlatform = "x86_64-linux";
                 config.allowUnfree = true;
-                overlays = [
-                  nur.overlays.default
-                  inputs.niri.overlays.niri
-                  awWatcherOverlay
-                  openaudibleOverlay
-                  dnsblockdOverlay
-                  emeetPixyOverlay
-                  monitor365Overlay
-                  (_final: prev: {
-                    python313Packages = prev.python313Packages.overrideScope (_pyFinal: pyPrev: {
-                      timm = pyPrev.timm.overridePythonAttrs (_: {doCheck = false;});
-                      xformers = pyPrev.xformers.overridePythonAttrs (_: {doCheck = false;});
-                    });
-                  })
-                ];
+                overlays =
+                  sharedOverlays
+                  ++ [
+                    inputs.niri.overlays.niri
+                  ]
+                  ++ linuxOnlyOverlays
+                  ++ [pythonTestOverlay];
               };
               system.configurationRevision = inputs.self.rev or inputs.self.dirtyRev or null;
             }
@@ -525,23 +544,20 @@
             nur.modules.nixos.default
 
             {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = "backup";
-                overwriteBackup = true;
-                users.lars = _: {
-                  imports = [
-                    ./platforms/nixos/users/home.nix
-                  ];
+              home-manager =
+                sharedHomeManagerConfig
+                // {
+                  users.lars = _: {
+                    imports = [
+                      ./platforms/nixos/users/home.nix
+                    ];
+                  };
+                  extraSpecialArgs =
+                    sharedHomeManagerSpecialArgs
+                    // {
+                      inherit (inputs) wallpapers;
+                    };
                 };
-                extraSpecialArgs = {
-                  inherit nix-colors;
-                  inherit nix-ssh-config;
-                  inherit (inputs) wallpapers;
-                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
-                };
-              };
             }
 
             # Import the existing NixOS configuration
@@ -604,24 +620,18 @@
             home-manager.nixosModules.home-manager
             nur.modules.nixos.default
             {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                backupFileExtension = "backup";
-                overwriteBackup = true;
-                users.root = _: {
-                  programs.home-manager.enable = true;
-                  home = {
-                    stateVersion = "25.11";
-                    file.".config/crush".source = inputs.crush-config;
+              home-manager =
+                sharedHomeManagerConfig
+                // {
+                  users.root = _: {
+                    programs.home-manager.enable = true;
+                    home = {
+                      stateVersion = "25.11";
+                      file.".config/crush".source = inputs.crush-config;
+                    };
                   };
+                  extraSpecialArgs = sharedHomeManagerSpecialArgs;
                 };
-                extraSpecialArgs = {
-                  inherit nix-colors;
-                  inherit nix-ssh-config;
-                  colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
-                };
-              };
             }
             inputs.self.nixosModules.dns-failover
             nixos-hardware.nixosModules.raspberry-pi-3

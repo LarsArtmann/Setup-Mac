@@ -256,11 +256,11 @@ clean-aggressive:
     echo ""; \
     echo "=== Language Managers ==="; \
     echo "🟢 Cleaning Node.js versions..."; \
-    rm -rf ~/.nvm/versions/node/* || true; \
+    trash ~/.nvm/versions/node/* || true; \
     echo "🐍 Cleaning Python versions..."; \
-    rm -rf ~/.pyenv/versions/* || true; \
+    trash ~/.pyenv/versions/* || true; \
     echo "💎 Cleaning Ruby versions..."; \
-    rm -rf ~/.rbenv/versions/* || true; \
+    trash ~/.rbenv/versions/* || true; \
     echo ""; \
     echo "=== Development Caches ==="; \
     echo "🏗️  Cleaning all build caches..."; \
@@ -595,7 +595,7 @@ clean-backups:
     @echo "🧹 Cleaning old backups (keeping last 10)..."
     #!/usr/bin/env bash
     cd backups 2>/dev/null || exit 0
-    ls -1t | tail -n +11 | xargs rm -rf
+    ls -1t | tail -n +11 | xargs trash 2>/dev/null || ls -1t | tail -n +11 | xargs rm -rf
     echo "✅ Old backups cleaned"
 
 # Quick storage cleanup (no Nix GC, safe to run)

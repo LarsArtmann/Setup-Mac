@@ -1,13 +1,11 @@
 {
+  config,
   pkgs,
   lib,
   ...
 }: let
   blocklists = import ../../shared/dns-blocklists.nix;
-
-  serverIP = "192.168.1.150";
-  piIP = "192.168.1.151";
-  virtualIP = "192.168.1.53";
+  inherit (config.networking.local) lanIP piIP virtualIP gateway subnet;
   interface = "eth0";
   domain = "home.lan";
 
@@ -53,6 +51,7 @@
 in {
   imports = [
     ../../common/core/nix-settings.nix
+    ../system/local-network.nix
   ];
 
   system.stateVersion = "25.11";
@@ -79,7 +78,7 @@ in {
         }
       ];
     };
-    defaultGateway = "192.168.1.1";
+    defaultGateway = gateway;
     nameservers = ["127.0.0.1" "9.9.9.9"];
     firewall = {
       enable = true;
@@ -112,7 +111,7 @@ in {
           access-control = [
             "127.0.0.0/8 allow"
             "::1/128 allow"
-            "192.168.1.0/24 allow"
+            "${subnet} allow"
           ];
 
           num-threads = 2;
@@ -138,7 +137,7 @@ in {
             ++ [''"${domain}." static''];
           local-data =
             map
-            (subdomain: ''"${subdomain}.${domain}. IN A ${serverIP}"'')
+            (subdomain: ''"${subdomain}.${domain}. IN A ${lanIP}"'')
             ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks" "crm"];
         };
 

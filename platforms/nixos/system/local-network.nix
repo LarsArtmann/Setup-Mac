@@ -15,5 +15,20 @@
       default = "192.168.1.1";
       description = "Default gateway IP address";
     };
+    blockIP = lib.mkOption {
+      type = lib.types.str;
+      default = "192.168.1.200";
+      description = "IP address for DNS block page responses";
+    };
+    virtualIP = lib.mkOption {
+      type = lib.types.str;
+      default = "192.168.1.53";
+      description = "VRRP virtual IP for DNS failover cluster";
+    };
+    piIP = lib.mkOption {
+      type = lib.types.str;
+      default = "192.168.1.151";
+      description = "Raspberry Pi 3 DNS backup node IP";
+    };
   };
 }

@@ -12,6 +12,7 @@
 # Blocklists are shared with rpi3-dns via platforms/shared/dns-blocklists.nix
 {config, ...}: let
   inherit (config.networking) domain;
+  inherit (config.networking.local) blockIP virtualIP;
   blocklists = import ../../shared/dns-blocklists.nix;
   lanIP =
     builtins.head
@@ -26,7 +27,7 @@ in {
     dns-blocker = {
       enable = true;
 
-      blockIP = "192.168.1.200";
+      inherit blockIP;
       blockPort = 80;
       blockTLSPort = 443;
       blockInterface = "eno1";
@@ -58,7 +59,7 @@ in {
 
     dns-failover = {
       enable = true;
-      virtualIP = "192.168.1.53";
+      inherit virtualIP;
       interface = "eno1";
       priority = 100;
       routerID = 53;

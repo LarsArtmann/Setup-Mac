@@ -139,3 +139,12 @@ secrets*
 
 # direnv build artifacts
 .direnv/
+
+# Minecraft server runtime artifacts (libraries/, versions/, run/)
+libraries/
+versions/
+*.jar
+
+# One-off dev scripts and benchmark data
+dev/testing/
+download_glm_model.py
