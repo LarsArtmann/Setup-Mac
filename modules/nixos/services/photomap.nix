@@ -7,6 +7,7 @@ _: {
   }: let
     cfg = config.services.photomap;
     harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";
     immichLibraryDir = "${immichMediaDir}/library";
@@ -63,13 +64,7 @@ _: {
         '';
         serviceConfig =
           harden {MemoryMax = "512M";}
-          // {
-            Restart = "on-failure";
-            RestartSec = "10s";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
-            WatchdogSec = "30";
-          };
+          // serviceDefaults {RestartSec = "10s";};
       };
 
       systemd.tmpfiles.rules = [
