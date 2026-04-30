@@ -942,53 +942,7 @@ debug:
 
 # Health check for shell and development environment
 health:
-    @echo "🏥 Running health check for development environment..."
-    @echo ""
-    @echo "=== Shell Configuration ==="
-    @echo -n "Starship prompt: "
-    @if command -v starship >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
-    @echo -n "Fish completions: "
-    @if command -v fish >/dev/null 2>&1; then echo "✅ Working"; else echo "❌ Broken"; fi
-    @echo -n "Fish integration: "
-    @if command -v fish >/dev/null 2>&1; then echo "✅ Working"; else echo "❌ Missing"; fi
-    @echo ""
-    @echo "=== Essential Tools ==="
-    @echo -n "Bun: "
-    @if command -v bun >/dev/null 2>&1; then echo "✅ $(bun --version)"; else echo "❌ Missing"; fi
-    @echo -n "FZF: "
-    @if command -v fzf >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
-    @echo -n "Git: "
-    @if command -v git >/dev/null 2>&1; then echo "✅ $(git --version | cut -d' ' -f3)"; else echo "❌ Missing"; fi
-    @echo -n "Just: "
-    @if command -v just >/dev/null 2>&1; then echo "✅ $(just --version | cut -d' ' -f2)"; else echo "❌ Missing"; fi
-    @echo -n "D2: "
-    @if command -v d2 >/dev/null 2>&1; then echo "✅ $(d2 --version | head -1)"; else echo "❌ Missing"; fi
-    @echo ""
-    @echo "=== Go Development Tools ==="
-    @echo -n "Go: "
-    @if command -v go >/dev/null 2>&1; then echo "✅ $(go version)"; else echo "❌ Missing"; fi
-    @echo -n "gopls: "
-    @if command -v gopls >/dev/null 2>&1; then echo "✅ Available"; else echo "❌ Missing"; fi
-    @echo -n "modernize: "
-    @if command -v modernize >/dev/null 2>&1; then \
-        echo "✅ Built with $(go version -m $(which modernize) 2>&1 | head -1 | awk '{print $NF}')"; \
-    else \
-        echo "❌ Missing"; \
-    fi
-    @echo ""
-    @echo "=== Dotfile Links ==="
-    @echo -n "Fish config: "
-    @if [ -f ~/.config/fish/config.fish ]; then echo "✅ Present"; else echo "❌ Missing"; fi
-    @echo -n "Starship config: "
-    @if [ -f ~/.config/starship.toml ]; then echo "✅ Present"; else echo "❌ Missing"; fi
-    @echo -n "Git config: "
-    @if [ -f ~/.config/git/config ] || [ -f ~/.gitconfig ]; then echo "✅ Present"; else echo "❌ Missing"; fi
-    @echo ""
-    @echo "=== Shell Startup Test ==="
-    @echo -n "Fish startup errors: "
-    @if fish -c 'exit' 2>&1 | grep -q "error\|Error\|ERROR\|WARN"; then echo "❌ Has errors/warnings"; else echo "✅ Clean startup"; fi
-    @echo ""
-    @echo "✅ Health check complete"
+    @./scripts/health-check.sh
 
 # Verify d2 installation and file association
 d2-verify:
@@ -1381,11 +1335,6 @@ doc-update-go-what-you-get:
 
 # Wrapper Management Commands
 # =========================
-
-# Comprehensive system health dashboard
-health-dashboard:
-    @echo "🏥 Launching comprehensive health dashboard..."
-    @./scripts/health-dashboard.sh
 
 # Tmux configuration and session management
 tmux-setup:
