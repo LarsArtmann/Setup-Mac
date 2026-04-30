@@ -33,7 +33,16 @@ _: {
           baseText = builtins.readFile "${niriPkg}/lib/systemd/user/${name}";
           text =
             if name == "niri.service"
-            then baseText + "\n\nOOMScoreAdjust=-900\n"
+            then
+              let
+                noBindsTo = builtins.replaceStrings
+                  ["BindsTo=graphical-session.target"]
+                  ["PartOf=graphical-session.target"]
+                  baseText;
+              in
+                noBindsTo
+                + "\nRestart=on-failure\nRestartSec=2s\nOOMScoreAdjust=-900\n"
+                + "\n[Install]\nWantedBy=graphical-session.target\n"
             else baseText;
         in { inherit text; };
       in
