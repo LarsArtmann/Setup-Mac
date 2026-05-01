@@ -27,15 +27,15 @@ buildGoModule {
   buildInputs = [graphviz];
 
   postPatch = ''
+    cat >> go.mod <<EOF
+replace github.com/larsartmann/cmdguard => ${cmdguard-src}
+replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
+replace github.com/larsartmann/go-output => ${go-output-src}
+replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
+EOF
+  '';
 
   preBuild = "go mod tidy";
-        cat >> go.mod <<EOF
-    replace github.com/larsartmann/cmdguard => ${cmdguard-src}
-    replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
-    replace github.com/larsartmann/go-output => ${go-output-src}
-    replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
-    EOF
-  '';
 
   meta = with lib; {
     description = "Generate visual dependency diagrams from Terraform configurations";

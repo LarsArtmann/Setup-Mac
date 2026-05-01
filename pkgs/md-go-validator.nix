@@ -21,11 +21,11 @@ buildGoModule {
   };
 
   postPatch = ''
-
-  preBuild = "go mod tidy";
     substituteInPlace go.mod \
       --replace '../go-output' '${go-output-src}'
   '';
+
+  preBuild = "go mod tidy";
 
   meta = with lib; {
     description = "Validates code blocks in Markdown files (Go, TypeScript, Rust, Nix, HCL, Templ)";
