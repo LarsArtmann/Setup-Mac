@@ -43,11 +43,8 @@ buildGoModule rec {
 
   proxyVendor = true;
 
-  subPackages = ["cmd/golangci-lint-auto-configure"];
-
   postPatch = ''
-    substituteInPlace go.mod \
-      --replace-fail 'replace github.com/larsartmann/go-finding => ../go-finding' 'replace github.com/larsartmann/go-finding => ${go-finding-src}'
+    echo "replace github.com/larsartmann/go-finding => ${go-finding-src}" >> go.mod
   '';
 
   ldflags = [

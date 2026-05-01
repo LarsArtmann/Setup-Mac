@@ -430,7 +430,15 @@
     #       ];
     #   });
     # };
-    emeetPixyOverlay = emeet-pixyd.overlays.default;
+    emeetPixyOverlay = nixpkgs.lib.composeExtensions emeet-pixyd.overlays.default (_final: prev: {
+      emeet-pixyd = prev.emeet-pixyd.overrideAttrs (old: {
+        postPatch =
+          (old.postPatch or "")
+          + ''
+            rm -rf vendor
+          '';
+      });
+    });
 
     todoListAiOverlay = _final: prev: {
       todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
