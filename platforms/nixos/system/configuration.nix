@@ -112,7 +112,7 @@
     # EMEET PIXY webcam auto-activation
     hardware.emeet-pixy = {
       enable = true;
-      auto = true;
+      auto = "full";
       defaultAudio = "nc";
     };
 

@@ -138,11 +138,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777605175,
-        "narHash": "sha256-NLeARRjI5ZMoeYAfuc8+WxEegY874EotXrg9BO+cc/E=",
+        "lastModified": 1777612597,
+        "narHash": "sha256-tTVShcQw+CqyL68XY0O196fkkj2rNbb4rT3xE8vb4ao=",
         "ref": "master",
-        "rev": "468cd42a91e3893a477e66a9d0adf869bea09ae7",
-        "revCount": 68,
+        "rev": "021b59975474c525fdf81c56745980b3988ded45",
+        "revCount": 71,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
