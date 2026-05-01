@@ -10,6 +10,7 @@
   go-commit-src,
   go-filewatcher-src,
   project-discovery-sdk-src,
+  gogenfilter-src,
 }:
 buildGoModule {
   pname = "projects-management-automation";
@@ -17,7 +18,7 @@ buildGoModule {
 
   inherit src;
 
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-+ghXqBkUtG7weR1nbLsHqzAVUqMPVQ04yL2ZThe9Mak=";
 
   proxyVendor = true;
 
@@ -35,7 +36,10 @@ buildGoModule {
       --replace '/home/lars/projects/go-commit' '${go-commit-src}' \
       --replace '/home/lars/projects/go-filewatcher' '${go-filewatcher-src}' \
       --replace '/home/lars/projects/project-discovery-sdk' '${project-discovery-sdk-src}'
+    echo 'replace github.com/LarsArtmann/gogenfilter => ${gogenfilter-src}' >> go.mod
   '';
+
+  preBuild = "go mod tidy";
 
   meta = with lib; {
     description = "CLI tool for discovering and managing multiple projects with automated Git operations and AI-powered commits";

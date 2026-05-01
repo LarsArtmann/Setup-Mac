@@ -3,8 +3,8 @@
     "art-dupl-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777591321,
-        "narHash": "sha256-VmOa2CHqDJ2wbxFqEqsuMYt3xfn7iG96cWXjX5QNfW0=",
+        "lastModified": 1777600496,
+        "narHash": "sha256-OYQLboUjAm4SyaQmRjv4J+aJhBja0ER09FwnQnvEv6o=",
         "path": "/home/lars/projects/art-dupl",
         "type": "path"
       },
@@ -16,8 +16,8 @@
     "auto-deduplicate-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598640,
-        "narHash": "sha256-pnQR7jhKVHPbKBlfc7v8FO0AXkLA3IlVRjRz6ho6e+A=",
+        "lastModified": 1777602147,
+        "narHash": "sha256-4eQumNfDn8xXaGrQKily/lcVdN/PW+vBnIVrGIpv3NM=",
         "path": "/home/lars/projects/auto-deduplicate",
         "type": "path"
       },
@@ -45,8 +45,8 @@
     "branching-flow-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598642,
-        "narHash": "sha256-L0px2LPaAdro66oVft0GsaD0QHwN7mO6hxRIsmDy3ck=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-8XVSE3e5qY89n9mq5oRzPPi21OS5JNvdH/jkvQmUMjY=",
         "path": "/home/lars/projects/branching-flow",
         "type": "path"
       },
@@ -75,8 +75,8 @@
     "buildflow-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598615,
-        "narHash": "sha256-HYuzyeNFJ/pu0bkatePDuGl7uQgUmB4vhqRsTS+Zv2g=",
+        "lastModified": 1777602147,
+        "narHash": "sha256-bYhQz3p+BJ+ZbjiYetxLK3mFDTmmke9L4SFtZi9ZoCM=",
         "path": "/home/lars/projects/BuildFlow",
         "type": "path"
       },
@@ -88,8 +88,8 @@
     "cmdguard-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777593248,
-        "narHash": "sha256-87k612vO6f2bV7tpLN7CkcqW4WsxpkPxYWDYlJdxjgw=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-XXwiDl4Fs/dEhwOxD7R3WMEQFQNzoxaRUZ5PfpOdhrY=",
         "path": "/home/lars/projects/cmdguard",
         "type": "path"
       },
@@ -101,8 +101,8 @@
     "code-duplicate-analyzer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598646,
-        "narHash": "sha256-HcSL5fYxONnvCNTtpn1kDREUJG6DrEnAVUohDrWVDmA=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-eXHmTttBWQQmBshKJd3UUCHycy23yi7rRdt89IdxBWA=",
         "path": "/home/lars/projects/code-duplicate-analyzer",
         "type": "path"
       },
@@ -138,11 +138,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777580348,
-        "narHash": "sha256-lSjyUSh6L34XeQl2T1UDpipbB7OuM4te3E74bLrGvIw=",
+        "lastModified": 1777600779,
+        "narHash": "sha256-bgGCu6lfnDD3FNMNEdohoLvwoj2EjdxMmI5nDgoETSU=",
         "ref": "master",
-        "rev": "a0a054cf3c81204018b4360e9b012599b4e88442",
-        "revCount": 29,
+        "rev": "71f281e8708a1259009d21d17a6785033bd3c92d",
+        "revCount": 60,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
@@ -155,8 +155,8 @@
     "file-and-image-renamer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777595462,
-        "narHash": "sha256-1M+pFT71aAOWkvmMHcwKPl/Vqwxk+142GwfO/0czvoY=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-ucwecXSDzUUjMzYY12r5G7DotsfsGhT9iBtjAeYmkvc=",
         "path": "/home/lars/projects/file-and-image-renamer",
         "type": "path"
       },
@@ -376,8 +376,8 @@
     "go-auto-upgrade-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598653,
-        "narHash": "sha256-ji6ADz+kRPselFUjN7l6tewaqD/jdmNVpWfTEbApP10=",
+        "lastModified": 1777602791,
+        "narHash": "sha256-Xrs0No6BtKMbtfnZsQX6QVAMtss9QKlWzapjAutK2EQ=",
         "path": "/home/lars/projects/go-auto-upgrade",
         "type": "path"
       },
@@ -389,8 +389,8 @@
     "go-branded-id-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777537421,
-        "narHash": "sha256-V27jLNxoS9iLFE27+Xyj7krjZSo1RvdTcE7LKLXmuEM=",
+        "lastModified": 1777600496,
+        "narHash": "sha256-zIeBjSAqrQ25cXR12c+EM8qBzV0DOXYtgShbo3VQ7CE=",
         "path": "/home/lars/projects/go-branded-id",
         "type": "path"
       },
@@ -402,8 +402,8 @@
     "go-commit-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598653,
-        "narHash": "sha256-9PzVnKCPzouQ9zEvAV/PZHjPA09PAye4ueUvxSFPWhk=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-fH+edCqkMhAW7bniKbqFq6g9kazABaHuyhwmkiZ4SuI=",
         "path": "/home/lars/projects/go-commit",
         "type": "path"
       },
@@ -415,8 +415,8 @@
     "go-composable-business-types-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598654,
-        "narHash": "sha256-1isemteeNhAAKdlY3UMibrmB29lqGmePADiH1HAtV48=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-uFJ8rul1o4cJUM1X5p9mbBFXzC/h1qY24mit2ofwbGs=",
         "path": "/home/lars/projects/go-composable-business-types",
         "type": "path"
       },
@@ -428,8 +428,8 @@
     "go-filewatcher-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598655,
-        "narHash": "sha256-aO5qhMUIzj5Oo9Rx5qVFvqzggoHqmSnqO/24aY6uwsg=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-Pe/c1dacpj//9tegDVJJMiDks0Hiafvkxac37ayDZgo=",
         "path": "/home/lars/projects/go-filewatcher",
         "type": "path"
       },
@@ -441,8 +441,8 @@
     "go-finding-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598655,
-        "narHash": "sha256-LvcUvCBiC899Se82NzYZwvrS9Xi5HLWciW+PHTcO808=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-3fT/zH+cOz8g3xPY5oo+RorsmoQXw4bgI357bT5HMZU=",
         "path": "/home/lars/projects/go-finding",
         "type": "path"
       },
@@ -454,8 +454,8 @@
     "go-functional-fixer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598656,
-        "narHash": "sha256-BwRAp5M3+uzqM9uFuugfOUxFMnvYlOUL5JH21ErTzaY=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-J6qq+A336QkqINrNU43KHLQsNMQo1GRZ2PoH07bEY3Q=",
         "path": "/home/lars/projects/go-functional-fixer",
         "type": "path"
       },
@@ -467,8 +467,8 @@
     "go-output-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777588668,
-        "narHash": "sha256-XPc3/a55O2N52MbdHw2nv/fUYK3j8h8i43Df40oZ23I=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-M7SKhjpMMX6Prsbghx/Zlx7i5Z1IrCav5koPh2fAqJk=",
         "path": "/home/lars/projects/go-output",
         "type": "path"
       },
@@ -480,8 +480,8 @@
     "go-structure-linter-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598658,
-        "narHash": "sha256-ozVDe4kSBCO6ZMoFJ5lnWv+R5Glq2PNOXh9xx9ShMCM=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-zJgbG4u3QLK3Y6QGCQDsjXtnF2XqgAEzoWn5Nl2Mrwk=",
         "path": "/home/lars/projects/go-structure-linter",
         "type": "path"
       },
@@ -493,8 +493,8 @@
     "gogenfilter-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598660,
-        "narHash": "sha256-WvMfTYbnjLceJQKAL8gHMeHXwZRDeuG/atRzLE9yiIU=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-4KibieN8QgsglN9UBJHUxMvgiBHWpPZskBs1gR9dz0A=",
         "path": "/home/lars/projects/gogenfilter",
         "type": "path"
       },
@@ -506,8 +506,8 @@
     "golangci-lint-auto-configure-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777599160,
-        "narHash": "sha256-47GNwogFcpeGO6l9BDetUimEQ9eG+I77ecxuiZTvfDQ=",
+        "lastModified": 1777602847,
+        "narHash": "sha256-Gxw2X2ReyPGXnEOGjuBEfCIzOOuBvvNgU6AUVBXsPX8=",
         "path": "/home/lars/projects/golangci-lint-auto-configure",
         "type": "path"
       },
@@ -549,11 +549,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1777579022,
-        "narHash": "sha256-3CJYaL73FffG2O0dk3X74xbydtgb9JrpzSvD6xOJFwA=",
+        "lastModified": 1777602859,
+        "narHash": "sha256-MtxMBBrcBFZdciDMgwAOeh6xurR8RXc1tNhQstsmsRA=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "1d8068d71d7ca02b0a4c4170fb0dd65eb6ee549c",
+        "rev": "e2e6b6ff1a56d13264ddcac31c5548e895e8e486",
         "type": "github"
       },
       "original": {
@@ -565,8 +565,8 @@
     "hierarchical-errors-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598660,
-        "narHash": "sha256-G3FyqFnI6GQrxYa0THy5R+ms6qPkZP5Uf9m2ddm9u3A=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-Spq+0czmx9063A7qC8Bu3OYxWqZmLDD76jz6yLkh8b8=",
         "path": "/home/lars/projects/hierarchical-errors",
         "type": "path"
       },
@@ -582,11 +582,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777518431,
-        "narHash": "sha256-SwgiG2T5pbyo33Vz7/vUCAhEMgwCK8Pa2nDSx5a6/WE=",
+        "lastModified": 1777594677,
+        "narHash": "sha256-h90sHwoRJLRvaTpZroTvU2JRHDFj0czUafM8eqLe1RI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "2e54a938cdd4c8e414b2518edc3d82308027c670",
+        "rev": "899c08a15beae5da51a5cecd6b2b994777a948da",
         "type": "github"
       },
       "original": {
@@ -614,11 +614,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1777579913,
-        "narHash": "sha256-PeQ23t7xEmN5J/fQUCgJt1YpfsVbrwLrtugvBO2iqrA=",
+        "lastModified": 1777602623,
+        "narHash": "sha256-N/7i7N6OIG8HF1zrqC91E7KBbAOYxnfjWq/KabeCZJk=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "d5c2eb851e7543f13da1a811b7d379e31bcf37db",
+        "rev": "0a69d3430107469963e6e56c22f54fa5d004aa19",
         "type": "github"
       },
       "original": {
@@ -630,8 +630,8 @@
     "library-policy-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598666,
-        "narHash": "sha256-KEsy5JYFkpA+gR533oKdbIJNtK2JuTKLjUCYtGLhMw0=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-hXtMEvY4VzJgTnORTZewyjS+Ij0+YGCIyq21YBEhB5U=",
         "path": "/home/lars/projects/library-policy",
         "type": "path"
       },
@@ -643,8 +643,8 @@
     "md-go-validator-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598667,
-        "narHash": "sha256-ZJ41+yAYcM0ZRhSUN1dGBsRHqupalSQwwbVR5kwrDH0=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-5ulA/Q+5QZ2c2encMJQiQIknTCik7L3V4jpoGHN1nec=",
         "path": "/home/lars/projects/md-go-validator",
         "type": "path"
       },
@@ -656,11 +656,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777540692,
-        "narHash": "sha256-mdmOl35EDIT6jqI3Z8zRcAqPnrY4dsQtWzvBKpfnFCs=",
+        "lastModified": 1777597472,
+        "narHash": "sha256-I2a7rTwCN0ICq2nyRkiQBpxfIJVHQRv5gShtnYdub/Y=",
         "ref": "refs/heads/master",
-        "rev": "8b2ea9b29e9b25426747849a48fd2600dc27d2ef",
-        "revCount": 589,
+        "rev": "95f77a244d1f67a686dfab576ed6661156104367",
+        "revCount": 590,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
@@ -672,8 +672,8 @@
     "mr-sync-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777599429,
-        "narHash": "sha256-zGlVUJrZqKFxw3sY7JUm+2DOUToiDD37O+dZ86r9edo=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-5g3jFARvr6+sR0D+DmASp3j+4RbtJxHKNK+4dyDTHcI=",
         "path": "/home/lars/projects/mr-sync",
         "type": "path"
       },
@@ -1050,11 +1050,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777574402,
-        "narHash": "sha256-c3lRRb0q6vqBmJELZxsKs0+aK2nX0BgSt5RIjZBcW5M=",
+        "lastModified": 1777598946,
+        "narHash": "sha256-X239dAGaU1+gfDj8jKH8GzlqKMcxaVfXOio+uzBOkeE=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "538b8aa21726424a32b8036d74dbe60a6379dfec",
+        "rev": "5d55af01c0f86be583931fe99207fc56c14134b3",
         "type": "github"
       },
       "original": {
@@ -1087,8 +1087,8 @@
     "project-discovery-sdk-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598675,
-        "narHash": "sha256-OQ7NRHLHi9kM4nsUKu20L9+aR+HK3/XxfvGRvfwJUWs=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-xvunziUzwkXXUlXRd1VnbJ/6E+UI+MCreNbPPkqbME0=",
         "path": "/home/lars/projects/project-discovery-sdk",
         "type": "path"
       },
@@ -1100,8 +1100,8 @@
     "project-meta-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598675,
-        "narHash": "sha256-3KKpZXVI/R1LQHgsjf7Qbxpb+ue2KrKIjnMfjEYFJeg=",
+        "lastModified": 1777602148,
+        "narHash": "sha256-KkVKMvyaimDswyRGnUNxelwK0hNy5RFWGR4qu31sR3E=",
         "path": "/home/lars/projects/project-meta",
         "type": "path"
       },
@@ -1113,8 +1113,8 @@
     "projects-management-automation-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598676,
-        "narHash": "sha256-161uqD5sxQRNySrjfrbUJDtCtukc53WQ7dSHjwiTvoA=",
+        "lastModified": 1777602901,
+        "narHash": "sha256-QW/aiwU5yTcP4R/HCXCj27JAOz0YUV+YLZS/5WAklT8=",
         "path": "/home/lars/projects/projects-management-automation",
         "type": "path"
       },
@@ -1392,8 +1392,8 @@
     "template-readme-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598687,
-        "narHash": "sha256-qyKWBR1gKr4RAcWxGmun5tNLX9qeqvta6ScOfX5aRNc=",
+        "lastModified": 1777602149,
+        "narHash": "sha256-iy7JuvDhSnqmHI0tnshfY8gbIi/PNBaMK+Gbn1vWzik=",
         "path": "/home/lars/projects/template-readme",
         "type": "path"
       },
@@ -1405,8 +1405,8 @@
     "terraform-diagrams-aggregator-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598688,
-        "narHash": "sha256-Z5G23TC9C+Th4bw43geWrxt33sO1JxwwQ4j2zLc3d1k=",
+        "lastModified": 1777602149,
+        "narHash": "sha256-dh63mNYTsY/41dnO7sfmMl2xek+dOPuqdMap9su9Pcw=",
         "path": "/home/lars/projects/terraform-diagrams-aggregator",
         "type": "path"
       },
@@ -1418,8 +1418,8 @@
     "terraform-to-d2-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777598688,
-        "narHash": "sha256-xSNTrV02uHpfSFIxAkO6T+BSzAiv5/Nv3VX//va+rZQ=",
+        "lastModified": 1777602149,
+        "narHash": "sha256-2JHkDOrV+ZOLLi76qUNbodGhAs9bgPf+CO8CT19sspY=",
         "path": "/home/lars/projects/terraform-to-d2",
         "type": "path"
       },
@@ -1436,11 +1436,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777592498,
-        "narHash": "sha256-HSrrIEd5500aDyM3DoJcTW2Y5vL+21ny6o6YCdd6ABo=",
+        "lastModified": 1777602489,
+        "narHash": "sha256-7Em2QpzFgWNn85T2A0KNTz3Qq//NBtiiTRZVIKyIuHQ=",
         "ref": "master",
-        "rev": "5aedc2adca9bd54645c985c396ee076c0442a102",
-        "revCount": 258,
+        "rev": "114cd803e1528cc1ea40258943688ab5bc785a89",
+        "revCount": 289,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/todo-list-ai"
       },

@@ -524,7 +524,7 @@
     projectsManagementAutomationOverlay = _final: prev: {
       projects-management-automation = prev.callPackage ./pkgs/projects-management-automation.nix {
         src = cleanGoSource projects-management-automation-src;
-        inherit project-meta-src go-output-src cmdguard-src go-branded-id-src go-commit-src go-filewatcher-src project-discovery-sdk-src;
+        inherit project-meta-src go-output-src cmdguard-src go-branded-id-src go-commit-src go-filewatcher-src project-discovery-sdk-src gogenfilter-src;
       };
     };
 
