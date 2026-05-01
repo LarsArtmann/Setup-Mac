@@ -148,3 +148,5 @@ versions/
 # One-off dev scripts and benchmark data
 dev/testing/
 download_glm_model.py
+# Build artifacts
+/SystemNix
