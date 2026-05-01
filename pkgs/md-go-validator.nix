@@ -21,6 +21,8 @@ buildGoModule {
   };
 
   postPatch = ''
+
+  preBuild = "go mod tidy";
     substituteInPlace go.mod \
       --replace '../go-output' '${go-output-src}'
   '';

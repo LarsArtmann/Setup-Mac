@@ -27,6 +27,8 @@ buildGoModule {
   buildInputs = [graphviz];
 
   postPatch = ''
+
+  preBuild = "go mod tidy";
         cat >> go.mod <<EOF
     replace github.com/larsartmann/cmdguard => ${cmdguard-src}
     replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}

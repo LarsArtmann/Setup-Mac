@@ -23,6 +23,8 @@ buildGoModule {
   };
 
   postPatch = ''
+
+  preBuild = "go mod tidy";
     substituteInPlace go.mod \
       --replace '/home/lars/projects/cmdguard' '${cmdguard-src}' \
       --replace '/home/lars/projects/go-finding' '${go-finding-src}' \

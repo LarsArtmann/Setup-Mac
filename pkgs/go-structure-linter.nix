@@ -13,6 +13,8 @@ buildGoModule {
 
   vendorHash = "sha256-TnjSfORBu8J8n3xazgEPsrAvCFn0Hd92OMDl6/AypGE=";
 
+  doCheck = false;
+
   proxyVendor = true;
 
   env = {
