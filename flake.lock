@@ -33,6 +33,19 @@
         "type": "github"
       }
     },
+    "cmdguard-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777593248,
+        "narHash": "sha256-87k612vO6f2bV7tpLN7CkcqW4WsxpkPxYWDYlJdxjgw=",
+        "path": "/home/lars/projects/cmdguard",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/lars/projects/cmdguard",
+        "type": "path"
+      }
+    },
     "crush-config": {
       "inputs": {
         "flake-parts": "flake-parts",
@@ -72,6 +85,19 @@
         "ref": "master",
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
+      }
+    },
+    "file-and-image-renamer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777595462,
+        "narHash": "sha256-1M+pFT71aAOWkvmMHcwKPl/Vqwxk+142GwfO/0czvoY=",
+        "path": "/home/lars/projects/file-and-image-renamer",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/lars/projects/file-and-image-renamer",
+        "type": "path"
       }
     },
     "flake-compat": {
@@ -280,6 +306,19 @@
         "owner": "numtide",
         "repo": "flake-utils",
         "type": "github"
+      }
+    },
+    "go-output-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777588668,
+        "narHash": "sha256-XPc3/a55O2N52MbdHw2nv/fUYK3j8h8i43Df40oZ23I=",
+        "path": "/home/lars/projects/go-output",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/lars/projects/go-output",
+        "type": "path"
       }
     },
     "helium": {
@@ -888,9 +927,12 @@
     },
     "root": {
       "inputs": {
+        "cmdguard-src": "cmdguard-src",
         "crush-config": "crush-config",
         "emeet-pixyd": "emeet-pixyd",
+        "file-and-image-renamer-src": "file-and-image-renamer-src",
         "flake-parts": "flake-parts_2",
+        "go-output-src": "go-output-src",
         "helium": "helium",
         "hermes-agent": "hermes-agent",
         "home-manager": "home-manager",

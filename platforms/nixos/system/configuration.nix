@@ -162,6 +162,11 @@
       # Centralized AI model storage (/data/ai/)
       ai-models.enable = true;
 
+      # AI-powered screenshot renaming watcher
+      file-and-image-renamer = {
+        enable = true;
+      };
+
       libinput = {
         enable = true;
         mouse = {

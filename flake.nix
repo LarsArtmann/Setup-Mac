@@ -142,6 +142,20 @@
       url = "git+ssh://git@github.com/LarsArtmann/todo-list-ai?ref=master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # file-and-image-renamer — AI-powered screenshot renaming tool + local Go deps
+    file-and-image-renamer-src = {
+      url = "path:/home/lars/projects/file-and-image-renamer";
+      flake = false;
+    };
+    cmdguard-src = {
+      url = "path:/home/lars/projects/cmdguard";
+      flake = false;
+    };
+    go-output-src = {
+      url = "path:/home/lars/projects/go-output";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
@@ -165,6 +179,9 @@
     emeet-pixyd,
     treefmt-full-flake,
     todo-list-ai,
+    file-and-image-renamer-src,
+    cmdguard-src,
+    go-output-src,
     ...
   }: let
     # NOTE: goOverlay removed — nixpkgs go_1_26 is already 1.26.1.
@@ -249,6 +266,12 @@
       todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
     };
 
+    fileAndImageRenamerOverlay = _final: prev: {
+      file-and-image-renamer = prev.callPackage ./pkgs/file-and-image-renamer.nix {
+        inherit file-and-image-renamer-src cmdguard-src go-output-src;
+      };
+    };
+
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
       valkey = prev.valkey.overrideAttrs (_old: {doCheck = false;});
@@ -269,6 +292,7 @@
       emeetPixyOverlay
       monitor365Overlay
       netwatchOverlay
+      fileAndImageRenamerOverlay
     ];
 
     # Python test override (separate because it's NixOS-specific)
@@ -327,6 +351,7 @@
         ./modules/nixos/services/multi-wm.nix
         ./modules/nixos/services/chromium-policies.nix
         ./modules/nixos/services/steam.nix
+        ./modules/nixos/services/file-and-image-renamer.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -355,6 +380,7 @@
               emeetPixyOverlay
               monitor365Overlay
               netwatchOverlay
+              fileAndImageRenamerOverlay
             ];
         };
 
@@ -369,7 +395,7 @@
             inherit (pkgs) aw-watcher-utilization jscpd sqlc todo-list-ai;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd;
+            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd file-and-image-renamer;
           };
 
         # Development shells for different program categories
@@ -614,6 +640,7 @@
             inputs.self.nixosModules.multi-wm
             inputs.self.nixosModules.chromium-policies
             inputs.self.nixosModules.steam
+            inputs.self.nixosModules.file-and-image-renamer
             inputs.emeet-pixyd.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];
