@@ -145,15 +145,15 @@
 
     # file-and-image-renamer — AI-powered screenshot renaming tool + local Go deps
     file-and-image-renamer-src = {
-      url = "path:/home/lars/projects/file-and-image-renamer";
+      url = "git+ssh://git@github.com/LarsArtmann/file-and-image-renamer?ref=master";
       flake = false;
     };
     cmdguard-src = {
-      url = "path:/home/lars/projects/cmdguard";
+      url = "git+ssh://git@github.com/LarsArtmann/cmdguard?ref=master";
       flake = false;
     };
     go-output-src = {
-      url = "path:/home/lars/projects/go-output";
+      url = "git+ssh://git@github.com/LarsArtmann/go-output?ref=master";
       flake = false;
     };
 

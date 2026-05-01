@@ -88,14 +88,18 @@
     "cmdguard-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777604575,
-        "narHash": "sha256-XXwiDl4Fs/dEhwOxD7R3WMEQFQNzoxaRUZ5PfpOdhrY=",
-        "path": "/home/lars/projects/cmdguard",
-        "type": "path"
+        "lastModified": 1777593244,
+        "narHash": "sha256-/lbhxTs3Sk2jF6mMAdNwZFORkuk9ksgzmloTqj7HhnU=",
+        "ref": "master",
+        "rev": "92fc01a78ac04b49b7f160375b791d9a85601d52",
+        "revCount": 458,
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/cmdguard"
       },
       "original": {
-        "path": "/home/lars/projects/cmdguard",
-        "type": "path"
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/cmdguard"
       }
     },
     "code-duplicate-analyzer-src": {
@@ -155,14 +159,18 @@
     "file-and-image-renamer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777604575,
-        "narHash": "sha256-ucwecXSDzUUjMzYY12r5G7DotsfsGhT9iBtjAeYmkvc=",
-        "path": "/home/lars/projects/file-and-image-renamer",
-        "type": "path"
+        "lastModified": 1777596223,
+        "narHash": "sha256-BjRxEPIKr42s1xyBrkvRWgLhrbn4SW29lRs0NJf+/LE=",
+        "ref": "master",
+        "rev": "9e70d9433206da14d4a2b5951e09e533b65243bd",
+        "revCount": 269,
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/file-and-image-renamer"
       },
       "original": {
-        "path": "/home/lars/projects/file-and-image-renamer",
-        "type": "path"
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/file-and-image-renamer"
       }
     },
     "flake-compat": {
@@ -467,14 +475,18 @@
     "go-output-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777604576,
-        "narHash": "sha256-M7SKhjpMMX6Prsbghx/Zlx7i5Z1IrCav5koPh2fAqJk=",
-        "path": "/home/lars/projects/go-output",
-        "type": "path"
+        "lastModified": 1777597560,
+        "narHash": "sha256-8HnCdS1/EZnpUb7AMCSCnmp3hGAJfvSknMjqIgyIadk=",
+        "ref": "master",
+        "rev": "5ca134879f1ab5b9d2e13576f3c27077fd4a75fd",
+        "revCount": 220,
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/go-output"
       },
       "original": {
-        "path": "/home/lars/projects/go-output",
-        "type": "path"
+        "ref": "master",
+        "type": "git",
+        "url": "ssh://git@github.com/LarsArtmann/go-output"
       }
     },
     "go-structure-linter-src": {
