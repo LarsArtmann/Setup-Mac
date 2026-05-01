@@ -255,14 +255,15 @@ in {
               Group = "signoz";
               WorkingDirectory = cfg.settings.queryService.dataDir;
               ExecStart = "${packages.signoz}/bin/signoz server --config /etc/signoz/signoz.yaml";
-              ExecStartPost = "${pkgs.curl}/bin/curl -sf http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version || exit 1";
+              ExecStartPost = "${pkgs.curl}/bin/curl -sf --max-time 3 --retry 30 --retry-delay 1 --retry-all-errors http://${cfg.settings.queryService.host}:${toString cfg.settings.queryService.port}/api/v1/version";
             }
-            // harden {MemoryMax = lib.mkForce "1G";}
+            // harden {
+              MemoryMax = lib.mkForce "1G";
+              ProtectSystem = "full";
+            }
             // {
               Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "10";
-              StartLimitBurst = lib.mkForce 3;
-              StartLimitIntervalSec = lib.mkForce 300;
             };
         };
 
@@ -604,8 +605,6 @@ in {
             // {
               Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "5";
-              StartLimitBurst = lib.mkForce 3;
-              StartLimitIntervalSec = lib.mkForce 300;
             };
         };
       })
@@ -636,12 +635,13 @@ in {
               WorkingDirectory = cfg.settings.queryService.dataDir;
               ExecStart = "${packages.otelCollector}/bin/signoz-otel-collector --config /etc/signoz/collector.yaml";
             }
-            // harden {MemoryMax = lib.mkForce "1G";}
+            // harden {
+              MemoryMax = lib.mkForce "1G";
+              ProtectSystem = "full";
+            }
             // {
               Restart = lib.mkForce "always";
               RestartSec = lib.mkForce "10";
-              StartLimitBurst = lib.mkForce 3;
-              StartLimitIntervalSec = lib.mkForce 300;
             };
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {

@@ -20,9 +20,7 @@ _: {
 
       services:
         whisper-rocm:
-          image: beecave/insanely-fast-whisper-rocm:1.0.0
-          # NOTE: tag 1.0.0 not on Docker Hub (only 'main' tag exists).
-          # To pin: docker pull beecave/insanely-fast-whisper-rocm:1.0.0 && docker inspect --format='{{.RepoDigests}}'
+          image: beecave/insanely-fast-whisper-rocm:main
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000
@@ -99,7 +97,7 @@ _: {
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:1.0.0";
+            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:main";
             TimeoutStartSec = 600;
           };
         };
@@ -120,8 +118,6 @@ _: {
             TimeoutStartSec = 180;
             Restart = "always";
             RestartSec = "10";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
             PrivateTmp = true;
             ProtectClock = true;
             ProtectHostname = true;

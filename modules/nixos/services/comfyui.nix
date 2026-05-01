@@ -82,27 +82,21 @@ _: {
           python313
         ];
 
-        serviceConfig =
-          {
-            Type = "simple";
-            User = cfg.user;
-            Group = "users";
-            WorkingDirectory = toString cfg.package;
-            ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
-            OOMScoreAdjust = -100;
-            SupplementaryGroups = ["render" "video"];
-            TimeoutStartSec = "300";
-            TimeoutStopSec = "60";
-            Restart = "always";
-            RestartSec = "10";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
-          }
-          // harden {
-            ProtectHome = false;
-            ProtectSystem = false;
-            MemoryMax = "8G";
-          };
+        serviceConfig = {
+          Type = "simple";
+          User = cfg.user;
+          Group = "users";
+          WorkingDirectory = toString cfg.package;
+          ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
+          OOMScoreAdjust = -100;
+          SupplementaryGroups = ["render" "video"];
+          TimeoutStartSec = "300";
+          TimeoutStopSec = "60";
+
+          ProtectHome = false;
+          ProtectSystem = false;
+          MemoryMax = "8G";
+        };
       };
     };
   };

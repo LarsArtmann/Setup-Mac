@@ -22,11 +22,15 @@ _: {
         };
       };
 
+      systemd.services.taskchampion-sync-server = {
+        unitConfig = {
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
+        };
+      };
       systemd.services.taskchampion-sync-server.serviceConfig = {
         Restart = lib.mkForce "always";
         RestartSec = lib.mkForce "5";
-        StartLimitBurst = lib.mkForce 3;
-        StartLimitIntervalSec = lib.mkForce 300;
         PrivateTmp = lib.mkForce true;
         NoNewPrivileges = lib.mkForce true;
         ProtectClock = lib.mkForce true;

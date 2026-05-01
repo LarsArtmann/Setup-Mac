@@ -83,11 +83,13 @@ _: {
       systemd.services.caddy = {
         after = ["authelia-main.service"];
         wants = ["authelia-main.service"];
+        unitConfig = {
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
+        };
         serviceConfig = {
           Restart = lib.mkForce "always";
           RestartSec = lib.mkForce "5";
-          StartLimitBurst = lib.mkForce 3;
-          StartLimitIntervalSec = lib.mkForce 300;
           OOMScoreAdjust = lib.mkForce (-500);
           PrivateTmp = lib.mkForce true;
           NoNewPrivileges = lib.mkForce false;
@@ -95,7 +97,6 @@ _: {
           ProtectHostname = lib.mkForce true;
           RestrictNamespaces = lib.mkForce true;
           LockPersonality = lib.mkForce true;
-          WatchdogSec = lib.mkForce "30";
         };
       };
     };

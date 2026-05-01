@@ -280,8 +280,6 @@ _: {
             ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
             Restart = "on-failure";
             RestartSec = "5";
-            StartLimitBurst = 3;
-            StartLimitIntervalSec = 300;
             PrivateTmp = true;
             NoNewPrivileges = true;
             ProtectHome = true;

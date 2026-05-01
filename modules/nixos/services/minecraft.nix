@@ -434,8 +434,6 @@ _: {
           // {
             Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5";
-            StartLimitBurst = lib.mkForce 3;
-            StartLimitIntervalSec = lib.mkForce 300;
           };
 
         networking.firewall.extraCommands = ''

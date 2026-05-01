@@ -204,11 +204,13 @@ _: {
       };
 
       systemd.services.authelia-main = {
+        unitConfig = {
+          StartLimitBurst = lib.mkForce 3;
+          StartLimitIntervalSec = lib.mkForce 300;
+        };
         serviceConfig = {
           Restart = lib.mkForce "always";
           RestartSec = lib.mkForce "5";
-          StartLimitBurst = lib.mkForce 3;
-          StartLimitIntervalSec = lib.mkForce 300;
           StateDirectory = lib.mkForce "authelia-main";
           StateDirectoryMode = lib.mkForce "0750";
           PrivateTmp = lib.mkForce true;
@@ -218,7 +220,7 @@ _: {
           ProtectKernelLogs = lib.mkForce true;
           RestrictNamespaces = lib.mkForce true;
           LockPersonality = lib.mkForce true;
-          ExecStartPost = "${pkgs.curl}/bin/curl -sf http://127.0.0.1:${toString authPort}/api/health || exit 1";
+          ExecStartPost = "${pkgs.curl}/bin/curl -sf --max-time 3 --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:${toString authPort}/api/health";
         };
       };
 

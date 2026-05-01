@@ -281,6 +281,10 @@ in {
         after = ["network-online.target" "unbound.service" "sops-nix.service"];
         wants = ["network-online.target" "sops-nix.service" "unbound.service"];
         wantedBy = ["multi-user.target"];
+        unitConfig = {
+          StartLimitBurst = 5;
+          StartLimitIntervalSec = 60;
+        };
 
         serviceConfig = let
           initScript = pkgs.writeShellScript "dnsblockd-init" ''
@@ -328,8 +332,6 @@ in {
           StateDirectory = "dnsblockd";
           Restart = "always";
           RestartSec = "3s";
-          StartLimitBurst = 5;
-          StartLimitIntervalSec = 60;
 
           SupplementaryGroups = ["unbound"];
           ProtectSystem = "strict";

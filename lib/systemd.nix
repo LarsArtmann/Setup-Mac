@@ -3,17 +3,17 @@
   ProtectSystem ? "strict",
   ProtectHome ? true,
   ReadWritePaths ? [],
+  RestrictNamespaces ? true,
+  NoNewPrivileges ? true,
   CapabilityBoundingSet ? "",
   ...
 }: {
   PrivateTmp = true;
-  NoNewPrivileges = true;
-  inherit CapabilityBoundingSet;
+  inherit CapabilityBoundingSet NoNewPrivileges;
   ProtectClock = true;
   ProtectHostname = true;
   ProtectKernelLogs = true;
-  RestrictNamespaces = true;
   RestrictSUIDSGID = true;
   LockPersonality = true;
-  inherit ProtectSystem ProtectHome MemoryMax ReadWritePaths;
+  inherit ProtectSystem ProtectHome MemoryMax ReadWritePaths RestrictNamespaces;
 }

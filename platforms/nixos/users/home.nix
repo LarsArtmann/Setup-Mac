@@ -111,8 +111,11 @@ in {
     activation.jan-data-link = lib.hm.dag.entryAfter ["writeBoundary"] ''
       JAN_DATA="$HOME/.config/Jan/data"
       JAN_TARGET="/data/ai/models/jan"
-      if [ -d "$JAN_TARGET" ] && [ ! -L "$JAN_DATA" ]; then
-        $DRY_RUN_CMD rm -rf "$JAN_DATA"
+      if [ -d "$JAN_TARGET" ]; then
+        $DRY_RUN_CMD mkdir -p "$(dirname "$JAN_DATA")"
+        if [ ! -L "$JAN_DATA" ]; then
+          $DRY_RUN_CMD rm -rf "$JAN_DATA"
+        fi
         $DRY_RUN_CMD ln -sfn "$JAN_TARGET" "$JAN_DATA"
       fi
     '';

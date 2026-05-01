@@ -38,8 +38,6 @@ _: {
           // {
             Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5s";
-            StartLimitBurst = lib.mkForce 3;
-            StartLimitIntervalSec = lib.mkForce 300;
           };
       };
 

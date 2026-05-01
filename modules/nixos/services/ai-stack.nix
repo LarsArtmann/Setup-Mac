@@ -104,7 +104,10 @@ _: {
 
         systemd.services = {
           ollama.serviceConfig = {
-            SupplementaryGroups = ["render" "users"];
+            DynamicUser = lib.mkForce false;
+            User = "lars";
+            Group = "users";
+            SupplementaryGroups = ["render"];
             UMask = lib.mkForce "0007";
           };
         };
@@ -246,8 +249,6 @@ _: {
               WorkingDirectory = "${unslothDataDir}/workspace";
               Restart = "always";
               RestartSec = "10s";
-              StartLimitBurst = 3;
-              StartLimitIntervalSec = 300;
               SupplementaryGroups = ["render"];
               TimeoutStartSec = "60";
             };

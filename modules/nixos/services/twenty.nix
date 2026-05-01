@@ -1,5 +1,5 @@
 _: let
-  version = "0.16.2";
+  version = "latest";
 in {
   flake.nixosModules.twenty = {
     config,
@@ -152,8 +152,6 @@ in {
                 WorkingDirectory = stateDir;
                 Restart = "always";
                 RestartSec = "10s";
-                StartLimitBurst = 3;
-                StartLimitIntervalSec = 300;
               }
               // harden {
                 MemoryMax = "2G";

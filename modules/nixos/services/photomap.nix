@@ -63,9 +63,11 @@ _: {
           fi
         '';
         serviceConfig =
-          harden {MemoryMax = "512M";}
-          // serviceDefaults {RestartSec = "10s";}
-          // {Restart = lib.mkForce "always";};
+          serviceDefaults {RestartSec = "10s";}
+          // {
+            Restart = lib.mkForce "always";
+            MemoryMax = "512M";
+          };
       };
 
       systemd.tmpfiles.rules = [

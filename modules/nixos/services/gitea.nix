@@ -321,11 +321,13 @@ _: {
       systemd = {
         # Harden the main Gitea service (managed by services.gitea)
         services.gitea = {
+          unitConfig = {
+            StartLimitBurst = lib.mkForce 3;
+            StartLimitIntervalSec = lib.mkForce 300;
+          };
           serviceConfig = {
             Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5";
-            StartLimitBurst = lib.mkForce 3;
-            StartLimitIntervalSec = lib.mkForce 300;
           };
         };
 
