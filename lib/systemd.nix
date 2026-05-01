@@ -1,6 +1,6 @@
 {
   MemoryMax ? "512M",
-  ProtectSystem ? "strict",
+  ProtectSystem ? "full",
   ProtectHome ? true,
   ReadWritePaths ? [],
   RestrictNamespaces ? true,

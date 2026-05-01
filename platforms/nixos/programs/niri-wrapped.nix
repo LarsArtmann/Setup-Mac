@@ -768,13 +768,13 @@ in {
           Description = "awww wallpaper daemon";
           # No After=graphical-session.target — avoids ordering cycle with awww-wallpaper
           PartOf = ["graphical-session.target"];
+          StartLimitBurst = 10;
+          StartLimitIntervalSec = 60;
         };
         Service = {
           ExecStart = "${pkgs.awww}/bin/awww-daemon";
           Restart = "always";
           RestartSec = "2s";
-          StartLimitBurst = 10;
-          StartLimitIntervalSec = 60;
         };
         Install.WantedBy = ["graphical-session.target"];
       };
@@ -801,6 +801,8 @@ in {
           Description = "Idle management daemon";
           After = ["graphical-session.target"];
           PartOf = ["graphical-session.target"];
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 120;
         };
         Service = {
           ExecStart = "${pkgs.swayidle}/bin/swayidle -w timeout 43200 ${
@@ -811,8 +813,6 @@ in {
           Restart = "always";
           RestartSec = "5s";
           TimeoutStartSec = "10s";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 120;
         };
         Install.WantedBy = ["graphical-session.target"];
       };
@@ -822,14 +822,14 @@ in {
           Description = "Clipboard history watcher";
           After = ["graphical-session.target"];
           PartOf = ["graphical-session.target"];
+          StartLimitBurst = 3;
+          StartLimitIntervalSec = 120;
         };
         Service = {
           ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --watch ${pkgs.cliphist}/bin/cliphist store";
           Restart = "always";
           RestartSec = "5s";
           TimeoutStartSec = "10s";
-          StartLimitBurst = 3;
-          StartLimitIntervalSec = 120;
         };
         Install.WantedBy = ["graphical-session.target"];
       };

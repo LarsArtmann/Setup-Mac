@@ -259,7 +259,6 @@ in {
             }
             // harden {
               MemoryMax = lib.mkForce "1G";
-              ProtectSystem = "full";
             }
             // {
               Restart = lib.mkForce "always";
@@ -637,7 +636,6 @@ in {
             }
             // harden {
               MemoryMax = lib.mkForce "1G";
-              ProtectSystem = "full";
             }
             // {
               Restart = lib.mkForce "always";
