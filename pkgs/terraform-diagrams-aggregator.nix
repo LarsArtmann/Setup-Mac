@@ -15,7 +15,7 @@ buildGoModule {
 
   inherit src;
 
-  vendorHash = "sha256-XL1FvUvkh5FOPOQ13KZvN4v17JKyjIxe0u4eoANyxJA=";
+  vendorHash = "";
 
   proxyVendor = true;
 
@@ -27,12 +27,12 @@ buildGoModule {
   buildInputs = [graphviz];
 
   postPatch = ''
-    cat >> go.mod <<EOF
-replace github.com/larsartmann/cmdguard => ${cmdguard-src}
-replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
-replace github.com/larsartmann/go-output => ${go-output-src}
-replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
-EOF
+        cat >> go.mod <<EOF
+    replace github.com/larsartmann/cmdguard => ${cmdguard-src}
+    replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
+    replace github.com/larsartmann/go-output => ${go-output-src}
+    replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
+    EOF
   '';
 
   preBuild = "go mod tidy";
