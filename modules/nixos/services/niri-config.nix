@@ -39,9 +39,18 @@ _: {
                 ["BindsTo=graphical-session.target"]
                 ["PartOf=graphical-session.target"]
                 baseText;
+              unitLimits =
+                builtins.replaceStrings
+                ["[Unit]"]
+                [
+                  ''                    [Unit]
+                    StartLimitBurst=3
+                    StartLimitIntervalSec=60''
+                ]
+                noBindsTo;
             in
-              noBindsTo
-              + "\nRestart=always\nRestartSec=2s\nStartLimitBurst=3\nStartLimitIntervalSec=60\nOOMScoreAdjust=-900\n"
+              unitLimits
+              + "\nRestart=always\nRestartSec=2s\nOOMScoreAdjust=-900\nLimitNPROC=infinity\nLimitNOFILE=524288\n"
               + "\n[Install]\nWantedBy=graphical-session.target\n"
             else baseText;
         in {inherit text;};

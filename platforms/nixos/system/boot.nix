@@ -63,6 +63,23 @@
     "vm.oom_kill_allocating_task" = 0; # Let kernel pick the biggest memory hog (not the allocating process)
   };
 
+  # Raise per-user process limit — default 4096 is too low for desktop + AI workloads
+  # (4832 threads across 297 processes observed, causing niri EAGAIN on thread spawn)
+  security.pam.loginLimits = [
+    {
+      domain = "@users";
+      type = "soft";
+      item = "nproc";
+      value = "65536";
+    }
+    {
+      domain = "@users";
+      type = "hard";
+      item = "nproc";
+      value = "262144";
+    }
+  ];
+
   # Protect critical services from OOM killer
   # sshd: -1000 (maximum protection — remote access is the last resort)
   # NixOS sets -1000 by default for sshd, but be explicit to prevent overrides
