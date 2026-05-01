@@ -432,11 +432,11 @@
     # };
     emeetPixyOverlay = nixpkgs.lib.composeExtensions emeet-pixyd.overlays.default (_final: prev: {
       emeet-pixyd = prev.emeet-pixyd.overrideAttrs (old: {
-        postPatch =
-          (old.postPatch or "")
-          + ''
-            rm -rf vendor
-          '';
+        preBuild =
+          ''
+            chmod -R u+w vendor 2>/dev/null; rm -rf vendor
+          ''
+          + (old.preBuild or "");
       });
     });
 
