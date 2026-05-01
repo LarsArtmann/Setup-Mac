@@ -30,15 +30,17 @@ buildGoModule {
   };
 
   postPatch = ''
-    # Remove existing replace directives that point to absolute paths
+    # Remove existing replace directives that point to absolute or parent paths
     sed -i '/^replace\s\+github\.com\/[Ll]ars[Aa]rtmann.*=> \/.*$/d' go.mod
     sed -i '/^replace\s\+github\.com\/[Ll]ars[Aa]rtmann.*=> \.\.\//d' go.mod
-    # Remove replace blocks (containing LarsArtmann entries)
+    # Remove LarsArtmann entries from replace blocks
     sed -i '/^replace ($/,/^)$/{
       /github\.com\/[Ll]ars[Aa]rtmann/d
     }' go.mod
     # Append fresh replace directives from go-replaces
     echo '${go-replaces}' >> go.mod
+    # Remove self-replace (don't replace the main module with itself)
+    sed -i '/replace github\.com\/[Ll]ars[Aa]rtmann\/${pname} =>/d' go.mod
     ${postPatch}
   '';
 
