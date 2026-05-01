@@ -6,6 +6,8 @@
   graphviz,
   cmdguard-src,
   go-composable-business-types-src,
+  go-output-src,
+  go-branded-id-src,
 }:
 buildGoModule {
   pname = "terraform-diagrams-aggregator";
@@ -13,7 +15,7 @@ buildGoModule {
 
   inherit src;
 
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-XL1FvUvkh5FOPOQ13KZvN4v17JKyjIxe0u4eoANyxJA=";
 
   proxyVendor = true;
 
@@ -25,8 +27,12 @@ buildGoModule {
   buildInputs = [graphviz];
 
   postPatch = ''
-    echo 'replace github.com/larsartmann/cmdguard => ${cmdguard-src}' >> go.mod
-    echo 'replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}' >> go.mod
+        cat >> go.mod <<EOF
+    replace github.com/larsartmann/cmdguard => ${cmdguard-src}
+    replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
+    replace github.com/larsartmann/go-output => ${go-output-src}
+    replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
+    EOF
   '';
 
   meta = with lib; {

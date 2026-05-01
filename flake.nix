@@ -429,8 +429,11 @@
             || b == "bin"
             || b == "result"
             || b == ".crush"
+            || nixpkgs.lib.hasSuffix ".md" b
             || nixpkgs.lib.hasSuffix ".html" b
             || nixpkgs.lib.hasSuffix ".svg" b
+            || b == "go.work"
+            || b == "go.work.sum"
           );
         inherit src;
       };
@@ -534,7 +537,7 @@
     terraformDiagramsAggregatorOverlay = _final: prev: {
       terraform-diagrams-aggregator = prev.callPackage ./pkgs/terraform-diagrams-aggregator.nix {
         src = cleanGoSource terraform-diagrams-aggregator-src;
-        inherit cmdguard-src go-composable-business-types-src;
+        inherit cmdguard-src go-composable-business-types-src go-output-src go-branded-id-src;
       };
     };
 
