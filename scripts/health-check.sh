@@ -16,14 +16,23 @@ PASS=0
 FAIL=0
 WARN=0
 
-ok()   { PASS=$((PASS+1)); echo -e "  ${GREEN}OK${NC}    $1"; }
-warn() { WARN=$((WARN+1)); echo -e "  ${YELLOW}WARN${NC}  $1"; }
-fail() { FAIL=$((FAIL+1)); echo -e "  ${RED}FAIL${NC}  $1"; }
+ok() {
+  PASS=$((PASS + 1))
+  echo -e "  ${GREEN}OK${NC}    $1"
+}
+warn() {
+  WARN=$((WARN + 1))
+  echo -e "  ${YELLOW}WARN${NC}  $1"
+}
+fail() {
+  FAIL=$((FAIL + 1))
+  echo -e "  ${RED}FAIL${NC}  $1"
+}
 info() { echo -e "  ${DIM}INFO${NC}  $1"; }
 section() { echo -e "\n${BOLD}$1${NC}"; }
 
 is_darwin() { [[ "$(uname -s)" == "Darwin" ]]; }
-is_linux()  { [[ "$(uname -s)" == "Linux" ]];  }
+is_linux() { [[ "$(uname -s)" == "Linux" ]]; }
 
 # --- Nix ---
 section "Nix"
@@ -84,9 +93,9 @@ done
 section "Dotfiles"
 for f in ~/.config/fish/config.fish ~/.config/starship.toml ~/.config/git/config; do
   base=$(basename "$(dirname "$f")/$(basename "$f")")
-  if [[ -L "$f" ]]; then
+  if [[ -L $f ]]; then
     ok "$base → $(readlink "$f" | sed 's|.*/nix/store/|/nix/store/...|' | cut -c1-60)"
-  elif [[ -f "$f" ]]; then
+  elif [[ -f $f ]]; then
     warn "$base is regular file (not HM-managed)"
   else
     fail "$base missing"
@@ -123,7 +132,7 @@ if is_linux; then
   # Systemd failed units
   failed_system=$(systemctl --failed --no-legend 2>/dev/null | grep -c "failed" || echo "0")
   failed_user=$(systemctl --user --failed --no-legend 2>/dev/null | grep -c "failed" || echo "0")
-  if [[ "$failed_system" -eq 0 ]] && [[ "$failed_user" -eq 0 ]]; then
+  if [[ $failed_system -eq 0 ]] && [[ $failed_user -eq 0 ]]; then
     ok "no failed systemd units"
   else
     fail "$failed_system system + $failed_user user failed systemd units"
@@ -137,7 +146,7 @@ if is_linux; then
     hm_gen=$(readlink /nix/var/nix/profiles/per-user/$USER/home-manager)
     hm_date=$(stat -c %Y "$hm_gen" 2>/dev/null || echo "0")
     now=$(date +%s)
-    age_days=$(( (now - hm_date) / 86400 ))
+    age_days=$(((now - hm_date) / 86400))
     if [[ $age_days -gt 7 ]]; then
       warn "HM generation is ${age_days}d old (consider: just switch)"
     else
@@ -151,9 +160,9 @@ if is_linux; then
     if mountpoint -q "$mount" 2>/dev/null; then
       pct=$(df "$mount" | awk 'NR==2{print $5}' | tr -d '%')
       free=$(df -h "$mount" | awk 'NR==2{print $4}')
-      if [[ "$pct" -gt 90 ]]; then
+      if [[ $pct -gt 90 ]]; then
         fail "$mount ${pct}% used (${free} free)"
-      elif [[ "$pct" -gt 80 ]]; then
+      elif [[ $pct -gt 80 ]]; then
         warn "$mount ${pct}% used (${free} free)"
       else
         ok "$mount ${pct}% used (${free} free)"
@@ -170,8 +179,8 @@ if is_linux; then
   if [[ -f /proc/meminfo ]]; then
     total=$(awk '/MemTotal/{printf "%.0f", $2/1024/1024}' /proc/meminfo)
     avail=$(awk '/MemAvailable/{printf "%.0f", $2/1024/1024}' /proc/meminfo)
-    used=$(( total - avail ))
-    pct=$(( used * 100 / total ))
+    used=$((total - avail))
+    pct=$((used * 100 / total))
     if [[ $pct -gt 90 ]]; then
       fail "${used}G/${total}G used (${pct}%)"
     elif [[ $pct -gt 80 ]]; then
@@ -197,7 +206,7 @@ elif is_darwin; then
   section "Disk"
   root_pct=$(df / | awk 'NR==2{print $5}' | tr -d '%')
   root_free=$(df -h / | awk 'NR==2{print $4}')
-  if [[ "$root_pct" -gt 90 ]]; then
+  if [[ $root_pct -gt 90 ]]; then
     fail "/ ${root_pct}% used (${root_free} free)"
   else
     ok "/ ${root_pct}% used (${root_free} free)"
