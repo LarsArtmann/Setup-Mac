@@ -431,7 +431,7 @@
     #   });
     # };
     emeetPixyOverlay = nixpkgs.lib.composeExtensions emeet-pixyd.overlays.default (_final: prev: {
-      emeet-pixyd = prev.emeet-pixyd.overrideAttrs (old: {
+      emeet-pixyd = prev.emeet-pixyd.overrideAttrs (_old: {
         vendorHash = "sha256-kbkdbVh2mznktIMK3hm8kIuUSjIoKdqSbW16nKlFO/4=";
       });
     });
