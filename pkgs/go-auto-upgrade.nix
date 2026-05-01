@@ -23,13 +23,13 @@ buildGoModule {
   };
 
   postPatch = ''
-
-  preBuild = "go mod tidy";
     substituteInPlace go.mod \
       --replace '/home/lars/projects/cmdguard' '${cmdguard-src}' \
       --replace '/home/lars/projects/go-finding' '${go-finding-src}' \
       --replace '/home/lars/projects/go-output' '${go-output-src}'
   '';
+
+  preBuild = "go mod tidy";
 
   meta = with lib; {
     description = "Automate Go library upgrades with import rewrites and breaking change detection";
