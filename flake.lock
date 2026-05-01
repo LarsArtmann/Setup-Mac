@@ -75,8 +75,8 @@
     "buildflow-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777615365,
-        "narHash": "sha256-WG/wgbOZEWskA8JuS23rTaI8tRpCkG/aE7MrHQ0Olt0=",
+        "lastModified": 1777615526,
+        "narHash": "sha256-OKyr3XIKx3UqB+DgzdEUSp+ROhTCOyOnpkfSI1WR5rM=",
         "path": "/home/lars/projects/BuildFlow",
         "type": "path"
       },
@@ -492,8 +492,8 @@
     "go-structure-linter-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777615366,
-        "narHash": "sha256-OWdvZVpI/xEnsLSBcJb8xS3H6hW4CIyM5JBGY26TfFw=",
+        "lastModified": 1777615498,
+        "narHash": "sha256-38VFKhsx/u9MOBwO7rBugAykFv6rJjzsTzB6FzTv2Eo=",
         "path": "/home/lars/projects/go-structure-linter",
         "type": "path"
       },
@@ -1430,8 +1430,8 @@
     "terraform-to-d2-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777615392,
-        "narHash": "sha256-laJoPBXyW0FOrpreNAzwSgm2p20Ve6RHtghs95iFV10=",
+        "lastModified": 1777615514,
+        "narHash": "sha256-JlVeO9dVymETN5jBn2mIJPKHUBxg49ohDLfpOYj8hyQ=",
         "path": "/home/lars/projects/terraform-to-d2",
         "type": "path"
       },
