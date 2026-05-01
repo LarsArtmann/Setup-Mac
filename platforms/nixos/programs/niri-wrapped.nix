@@ -7,7 +7,7 @@
   ...
 }: let
   colors = colorScheme.palette;
-  wallpaperDir = wallpapers;
+  wallpaperDir = "$HOME/.local/share/wallpapers";
   cfg = config.services.niri-session;
 
   niri-session-save = pkgs.writeShellApplication {
@@ -364,6 +364,8 @@ in {
   };
 
   config = {
+    home.file.".local/share/wallpapers".source = wallpapers;
+
     programs.niri.settings = {
       prefer-no-csd = true;
 
@@ -766,7 +768,7 @@ in {
       awww-daemon = {
         Unit = {
           Description = "awww wallpaper daemon";
-          # No After=graphical-session.target — avoids ordering cycle with awww-wallpaper
+          After = ["graphical-session.target"];
           PartOf = ["graphical-session.target"];
           StartLimitBurst = 10;
           StartLimitIntervalSec = 60;
