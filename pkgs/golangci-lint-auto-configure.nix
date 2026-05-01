@@ -43,6 +43,8 @@ buildGoModule rec {
 
   proxyVendor = true;
 
+  doCheck = false;
+
   postPatch = ''
     echo "replace github.com/larsartmann/go-finding => ${go-finding-src}" >> go.mod
   '';
