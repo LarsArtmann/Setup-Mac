@@ -5,6 +5,8 @@
   src,
   go-finding-src,
   go-filewatcher-src,
+  go-branded-id-src,
+  gogenfilter-src,
 }:
 buildGoModule {
   pname = "hierarchical-errors";
@@ -22,9 +24,13 @@ buildGoModule {
   };
 
   postPatch = ''
-    substituteInPlace go.mod \
-      --replace '/home/lars/projects/go-finding' '${go-finding-src}'
-    echo 'replace github.com/larsartmann/go-filewatcher => ${go-filewatcher-src}' >> go.mod
+        substituteInPlace go.mod \
+          --replace '/home/lars/projects/go-finding' '${go-finding-src}'
+        cat >> go.mod <<EOF
+    replace github.com/larsartmann/go-filewatcher => ${go-filewatcher-src}
+    replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
+    replace github.com/LarsArtmann/gogenfilter => ${gogenfilter-src}
+    EOF
   '';
 
   meta = with lib; {

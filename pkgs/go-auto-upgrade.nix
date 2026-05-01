@@ -13,7 +13,7 @@ buildGoModule {
 
   inherit src;
 
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-JwzzINFcrE7nnD3sX5qZ8NjE8neM2ZKSME6li/nftKo=";
 
   proxyVendor = true;
 

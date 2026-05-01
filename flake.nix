@@ -497,7 +497,7 @@
     hierarchicalErrorsOverlay = _final: prev: {
       hierarchical-errors = prev.callPackage ./pkgs/hierarchical-errors.nix {
         src = cleanGoSource hierarchical-errors-src;
-        inherit go-finding-src go-filewatcher-src;
+        inherit go-finding-src go-filewatcher-src go-branded-id-src gogenfilter-src;
       };
     };
 
