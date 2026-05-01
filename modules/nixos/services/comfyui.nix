@@ -7,7 +7,6 @@ _: {
   }: let
     cfg = config.services.comfyui;
     primaryUser = "lars";
-    harden = import ../../../lib/systemd.nix;
 
     rocmRuntimeLibs = with pkgs; [
       stdenv.cc.cc.lib
