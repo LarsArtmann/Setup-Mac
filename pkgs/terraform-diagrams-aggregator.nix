@@ -1,47 +1,10 @@
 {
-  lib,
-  buildGoModule,
-  writeText,
+  mkGoTool,
   src,
-  graphviz,
-  cmdguard-src,
-  go-composable-business-types-src,
-  go-output-src,
-  go-branded-id-src,
 }:
-buildGoModule {
-  pname = "terraform-diagrams-aggregator";
-  version = "0.0.0";
-
+mkGoTool {
   inherit src;
-
-  vendorHash = "sha256-XL1FvUvkh5FOPOQ13KZvN4v17JKyjIxe0u4eoANyxJA=";
-
-  proxyVendor = true;
-
-  env = {
-    GOPRIVATE = "github.com/LarsArtmann/*";
-    GIT_CONFIG_GLOBAL = builtins.toFile "gitconfig" "\n[url \"git@github.com:\"]\n\tinsteadOf = https://github.com/\n";
-  };
-
-  buildInputs = [graphviz];
-
-  postPatch = ''
-        cat >> go.mod <<EOF
-    replace github.com/larsartmann/cmdguard => ${cmdguard-src}
-    replace github.com/larsartmann/go-composable-business-types => ${go-composable-business-types-src}
-    replace github.com/larsartmann/go-output => ${go-output-src}
-    replace github.com/larsartmann/go-branded-id => ${go-branded-id-src}
-    EOF
-  '';
-
-  preBuild = "go mod tidy";
-
-  meta = with lib; {
-    description = "Generate visual dependency diagrams from Terraform configurations";
-    homepage = "https://github.com/LarsArtmann/terraform-diagrams-aggregator";
-    license = licenses.mit;
-    platforms = platforms.linux ++ platforms.darwin;
-    mainProgram = "terraform-diagrams-aggregator";
-  };
+  pname = "terraform-diagrams-aggregator";
+  vendorHash = "";
+  description = "Generate visual dependency diagrams from Terraform configurations";
 }
