@@ -13,6 +13,7 @@
   buildInputs ? [],
   nativeBuildInputs ? [],
   preBuild ? "",
+  modTidy ? false,
   doCheck ? false,
   ldflags ? ["-s" "-w"],
   subPackages ? [],
@@ -41,6 +42,23 @@ buildGoModule {
     echo '${go-replaces}' >> go.mod
     # Remove self-replace (don't replace the main module with itself)
     sed -i '/replace github\.com\/[Ll]ars[Aa]rtmann\/${pname} =>/d' go.mod
+    ${lib.optionalString modTidy ''
+      # Prune replace directives for modules not in require to avoid go mod tidy errors
+      awk '
+      BEGIN { in_req=0 }
+      /^require \(/ { in_req=1; next }
+      in_req && /^\)/ { in_req=0; next }
+      in_req { gsub(/ .*/, "", $0); req[$0]=1 }
+      !/^replace / { print; next }
+      /^replace / {
+        # Extract module path: "replace github.com/... => ..."
+        mod = $2
+        if (mod in req) print
+        else if (/=> \.\//) print
+        next
+      }
+      ' go.mod > go.mod.tmp && mv go.mod.tmp go.mod
+    ''}
     ${postPatch}
   '';
 

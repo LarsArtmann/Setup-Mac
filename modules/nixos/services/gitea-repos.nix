@@ -278,7 +278,7 @@ _: {
               exit 1
             '';
             ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
-            Restart = "always";
+            Restart = "on-failure";
             RestartSec = "5";
             StartLimitBurst = 3;
             StartLimitIntervalSec = 300;
