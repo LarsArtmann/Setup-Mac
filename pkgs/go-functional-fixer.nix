@@ -22,7 +22,7 @@ buildGoModule {
 
   postPatch = ''
     substituteInPlace go.mod \
-      --replace '../go-finding' '${go-finding-src}'
+      --replace-fail 'replace github.com/larsartmann/go-finding => ../go-finding' 'replace github.com/larsartmann/go-finding => ${go-finding-src}'
   '';
 
   meta = with lib; {
