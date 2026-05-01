@@ -112,7 +112,7 @@
     # EMEET PIXY webcam auto-activation
     hardware.emeet-pixy = {
       enable = true;
-      auto = "full";
+      auto = "tracking-only";
       defaultAudio = "nc";
     };
 
