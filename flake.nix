@@ -156,6 +156,114 @@
       url = "path:/home/lars/projects/go-output";
       flake = false;
     };
+
+    # golangci-lint-auto-configure — auto-configure golangci-lint for Go projects
+    golangci-lint-auto-configure-src = {
+      url = "path:/home/lars/projects/golangci-lint-auto-configure";
+      flake = false;
+    };
+    go-finding-src = {
+      url = "path:/home/lars/projects/go-finding";
+      flake = false;
+    };
+
+    # LarsArtmann Go CLI tools
+    art-dupl-src = {
+      url = "path:/home/lars/projects/art-dupl";
+      flake = false;
+    };
+    auto-deduplicate-src = {
+      url = "path:/home/lars/projects/auto-deduplicate";
+      flake = false;
+    };
+    branching-flow-src = {
+      url = "path:/home/lars/projects/branching-flow";
+      flake = false;
+    };
+    buildflow-src = {
+      url = "path:/home/lars/projects/BuildFlow";
+      flake = false;
+    };
+    code-duplicate-analyzer-src = {
+      url = "path:/home/lars/projects/code-duplicate-analyzer";
+      flake = false;
+    };
+    go-auto-upgrade-src = {
+      url = "path:/home/lars/projects/go-auto-upgrade";
+      flake = false;
+    };
+    go-functional-fixer-src = {
+      url = "path:/home/lars/projects/go-functional-fixer";
+      flake = false;
+    };
+    go-structure-linter-src = {
+      url = "path:/home/lars/projects/go-structure-linter";
+      flake = false;
+    };
+    hierarchical-errors-src = {
+      url = "path:/home/lars/projects/hierarchical-errors";
+      flake = false;
+    };
+    library-policy-src = {
+      url = "path:/home/lars/projects/library-policy";
+      flake = false;
+    };
+    md-go-validator-src = {
+      url = "path:/home/lars/projects/md-go-validator";
+      flake = false;
+    };
+    project-meta-src = {
+      url = "path:/home/lars/projects/project-meta";
+      flake = false;
+    };
+    projects-management-automation-src = {
+      url = "path:/home/lars/projects/projects-management-automation";
+      flake = false;
+    };
+    template-readme-src = {
+      url = "path:/home/lars/projects/template-readme";
+      flake = false;
+    };
+    terraform-diagrams-aggregator-src = {
+      url = "path:/home/lars/projects/terraform-diagrams-aggregator";
+      flake = false;
+    };
+    terraform-to-d2-src = {
+      url = "path:/home/lars/projects/terraform-to-d2";
+      flake = false;
+    };
+
+    # mr-sync — CLI to keep ~/.mrconfig in sync with GitHub repos
+    mr-sync-src = {
+      url = "path:/home/lars/projects/mr-sync";
+      flake = false;
+    };
+
+    # Shared Go library dependencies (used by multiple tools via go.mod replace)
+    go-branded-id-src = {
+      url = "path:/home/lars/projects/go-branded-id";
+      flake = false;
+    };
+    go-commit-src = {
+      url = "path:/home/lars/projects/go-commit";
+      flake = false;
+    };
+    go-composable-business-types-src = {
+      url = "path:/home/lars/projects/go-composable-business-types";
+      flake = false;
+    };
+    go-filewatcher-src = {
+      url = "path:/home/lars/projects/go-filewatcher";
+      flake = false;
+    };
+    project-discovery-sdk-src = {
+      url = "path:/home/lars/projects/project-discovery-sdk";
+      flake = false;
+    };
+    gogenfilter-src = {
+      url = "path:/home/lars/projects/gogenfilter";
+      flake = false;
+    };
   };
 
   outputs = inputs @ {
@@ -182,6 +290,31 @@
     file-and-image-renamer-src,
     cmdguard-src,
     go-output-src,
+    golangci-lint-auto-configure-src,
+    go-finding-src,
+    art-dupl-src,
+    auto-deduplicate-src,
+    branching-flow-src,
+    buildflow-src,
+    code-duplicate-analyzer-src,
+    go-auto-upgrade-src,
+    go-functional-fixer-src,
+    go-structure-linter-src,
+    hierarchical-errors-src,
+    library-policy-src,
+    md-go-validator-src,
+    project-meta-src,
+    projects-management-automation-src,
+    template-readme-src,
+    terraform-diagrams-aggregator-src,
+    terraform-to-d2-src,
+    go-branded-id-src,
+    go-commit-src,
+    go-composable-business-types-src,
+    go-filewatcher-src,
+    project-discovery-sdk-src,
+    gogenfilter-src,
+    mr-sync-src,
     ...
   }: let
     # NOTE: goOverlay removed — nixpkgs go_1_26 is already 1.26.1.
@@ -272,6 +405,152 @@
       };
     };
 
+    golangciLintAutoConfigureOverlay = _final: prev: {
+      golangci-lint-auto-configure = prev.callPackage ./pkgs/golangci-lint-auto-configure.nix {
+        inherit golangci-lint-auto-configure-src go-finding-src;
+      };
+    };
+
+    # --- LarsArtmann Go CLI tool overlays ---
+
+    # Helper: clean source filter for Go projects
+    cleanGoSource = src:
+      nixpkgs.lib.cleanSourceWith {
+        filter = path: _type: let
+          b = baseNameOf path;
+        in
+          !(
+            b
+            == ".git"
+            || b == "node_modules"
+            || b == "vendor"
+            || b == "target"
+            || b == "dist"
+            || b == "bin"
+            || b == "result"
+            || b == ".crush"
+            || nixpkgs.lib.hasSuffix ".html" b
+            || nixpkgs.lib.hasSuffix ".svg" b
+          );
+        inherit src;
+      };
+
+    artDuplOverlay = _final: prev: {
+      art-dupl = prev.callPackage ./pkgs/art-dupl.nix {
+        src = cleanGoSource art-dupl-src;
+        inherit gogenfilter-src;
+      };
+    };
+
+    autoDeduplicateOverlay = _final: prev: {
+      auto-deduplicate = prev.callPackage ./pkgs/auto-deduplicate.nix {
+        src = cleanGoSource auto-deduplicate-src;
+        inherit art-dupl-src go-commit-src go-filewatcher-src;
+      };
+    };
+
+    branchingFlowOverlay = _final: prev: {
+      branching-flow = prev.callPackage ./pkgs/branching-flow.nix {
+        src = cleanGoSource branching-flow-src;
+        inherit go-finding-src go-output-src;
+      };
+    };
+
+    buildflowOverlay = _final: prev: {
+      buildflow = prev.callPackage ./pkgs/buildflow.nix {
+        src = cleanGoSource buildflow-src;
+        inherit cmdguard-src go-output-src go-branded-id-src;
+      };
+    };
+
+    codeDuplicateAnalyzerOverlay = _final: prev: {
+      code-duplicate-analyzer = prev.callPackage ./pkgs/code-duplicate-analyzer.nix {
+        src = cleanGoSource code-duplicate-analyzer-src;
+        inherit art-dupl-src cmdguard-src go-output-src;
+      };
+    };
+
+    goAutoUpgradeOverlay = _final: prev: {
+      go-auto-upgrade = prev.callPackage ./pkgs/go-auto-upgrade.nix {
+        src = cleanGoSource go-auto-upgrade-src;
+        inherit cmdguard-src go-finding-src go-output-src;
+      };
+    };
+
+    goFunctionalFixerOverlay = _final: prev: {
+      go-functional-fixer = prev.callPackage ./pkgs/go-functional-fixer.nix {
+        src = cleanGoSource go-functional-fixer-src;
+        inherit go-finding-src;
+      };
+    };
+
+    goStructureLinterOverlay = _final: prev: {
+      go-structure-linter = prev.callPackage ./pkgs/go-structure-linter.nix {
+        src = cleanGoSource go-structure-linter-src;
+        inherit go-output-src;
+      };
+    };
+
+    hierarchicalErrorsOverlay = _final: prev: {
+      hierarchical-errors = prev.callPackage ./pkgs/hierarchical-errors.nix {
+        src = cleanGoSource hierarchical-errors-src;
+        inherit go-finding-src go-filewatcher-src;
+      };
+    };
+
+    libraryPolicyOverlay = _final: prev: {
+      library-policy = prev.callPackage ./pkgs/library-policy.nix {
+        src = cleanGoSource library-policy-src;
+      };
+    };
+
+    mdGoValidatorOverlay = _final: prev: {
+      md-go-validator = prev.callPackage ./pkgs/md-go-validator.nix {
+        src = cleanGoSource md-go-validator-src;
+        inherit go-output-src;
+      };
+    };
+
+    projectMetaOverlay = _final: prev: {
+      project-meta = prev.callPackage ./pkgs/project-meta.nix {
+        src = cleanGoSource project-meta-src;
+        inherit go-branded-id-src;
+      };
+    };
+
+    projectsManagementAutomationOverlay = _final: prev: {
+      projects-management-automation = prev.callPackage ./pkgs/projects-management-automation.nix {
+        src = cleanGoSource projects-management-automation-src;
+        inherit project-meta-src go-output-src cmdguard-src go-branded-id-src go-commit-src go-filewatcher-src project-discovery-sdk-src;
+      };
+    };
+
+    templateReadmeOverlay = _final: prev: {
+      template-readme = prev.callPackage ./pkgs/template-readme.nix {
+        src = cleanGoSource template-readme-src;
+      };
+    };
+
+    terraformDiagramsAggregatorOverlay = _final: prev: {
+      terraform-diagrams-aggregator = prev.callPackage ./pkgs/terraform-diagrams-aggregator.nix {
+        src = cleanGoSource terraform-diagrams-aggregator-src;
+        inherit cmdguard-src go-composable-business-types-src;
+      };
+    };
+
+    terraformToD2Overlay = _final: prev: {
+      terraform-to-d2 = prev.callPackage ./pkgs/terraform-to-d2.nix {
+        src = cleanGoSource terraform-to-d2-src;
+        inherit go-composable-business-types-src;
+      };
+    };
+
+    mrSyncOverlay = _final: prev: {
+      mr-sync = prev.callPackage ./pkgs/mr-sync.nix {
+        src = cleanGoSource mr-sync-src;
+      };
+    };
+
     # Disable tests for packages with flaky integration tests in sandboxed builders
     disableTestsOverlay = _final: prev: {
       valkey = prev.valkey.overrideAttrs (_old: {doCheck = false;});
@@ -283,6 +562,24 @@
       nur.overlays.default
       awWatcherOverlay
       todoListAiOverlay
+      golangciLintAutoConfigureOverlay
+      artDuplOverlay
+      autoDeduplicateOverlay
+      branchingFlowOverlay
+      buildflowOverlay
+      codeDuplicateAnalyzerOverlay
+      goAutoUpgradeOverlay
+      goFunctionalFixerOverlay
+      goStructureLinterOverlay
+      hierarchicalErrorsOverlay
+      libraryPolicyOverlay
+      mdGoValidatorOverlay
+      projectMetaOverlay
+      projectsManagementAutomationOverlay
+      templateReadmeOverlay
+      terraformDiagramsAggregatorOverlay
+      terraformToD2Overlay
+      mrSyncOverlay
     ];
 
     # Linux-only overlays (custom packages that only make sense on NixOS)
@@ -372,7 +669,24 @@
               awWatcherOverlay
               todoListAiOverlay
               jscpdOverlay
+              golangciLintAutoConfigureOverlay
               disableTestsOverlay
+              artDuplOverlay
+              autoDeduplicateOverlay
+              branchingFlowOverlay
+              buildflowOverlay
+              codeDuplicateAnalyzerOverlay
+              goAutoUpgradeOverlay
+              goFunctionalFixerOverlay
+              goStructureLinterOverlay
+              hierarchicalErrorsOverlay
+              libraryPolicyOverlay
+              mdGoValidatorOverlay
+              projectMetaOverlay
+              projectsManagementAutomationOverlay
+              templateReadmeOverlay
+              terraformDiagramsAggregatorOverlay
+              terraformToD2Overlay
             ]
             ++ lib.optionals (system == "x86_64-linux") [
               openaudibleOverlay
@@ -392,7 +706,30 @@
             modernize = import ./pkgs/modernize.nix {
               inherit pkgs;
             };
-            inherit (pkgs) aw-watcher-utilization jscpd sqlc todo-list-ai;
+            inherit
+              (pkgs)
+              aw-watcher-utilization
+              jscpd
+              sqlc
+              todo-list-ai
+              golangci-lint-auto-configure
+              art-dupl
+              auto-deduplicate
+              branching-flow
+              buildflow
+              code-duplicate-analyzer
+              go-auto-upgrade
+              go-functional-fixer
+              go-structure-linter
+              hierarchical-errors
+              library-policy
+              md-go-validator
+              project-meta
+              projects-management-automation
+              template-readme
+              terraform-diagrams-aggregator
+              terraform-to-d2
+              ;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
             inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd file-and-image-renamer;

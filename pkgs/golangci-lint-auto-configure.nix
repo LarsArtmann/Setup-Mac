@@ -56,7 +56,10 @@ buildGoModule rec {
     "-X main.version=${version}"
   ];
 
-  env.CGO_ENABLED = 0;
+  env = {
+    CGO_ENABLED = 0;
+    GOWORK = "off";
+  };
 
   meta = with lib; {
     description = "Automatically configure and optimize golangci-lint configurations";

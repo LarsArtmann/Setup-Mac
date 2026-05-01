@@ -1968,3 +1968,11 @@ todo-scan-mock DIR="./":
 # Show todo-list-ai version
 todo-version:
     @todo-list-ai --version 2>/dev/null || echo "todo-list-ai not found in PATH"
+
+# Auto-configure golangci-lint for the current project
+lint-configure *ARGS="":
+    @golangci-lint-auto-configure configure {{ ARGS }}
+
+# Show golangci-lint-auto-configure version
+lint-configure-version:
+    @golangci-lint-auto-configure --version 2>/dev/null || echo "golangci-lint-auto-configure not found in PATH"

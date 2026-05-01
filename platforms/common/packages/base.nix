@@ -195,6 +195,12 @@
       # AI-powered code analysis
       todo-list-ai # Extract TODOs from codebases using AI
 
+      # Go linting automation
+      golangci-lint-auto-configure # Auto-configure golangci-lint for Go projects
+
+      # Repo management
+      mr-sync # Keep ~/.mrconfig in sync with GitHub repos
+
       # Wallpaper management tools (Linux-only)
       imagemagick # Image manipulation for wallpaper management
     ]

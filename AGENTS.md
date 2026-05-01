@@ -44,10 +44,12 @@ SystemNix/
 │   ├── modernize.nix            # Go modernize tool
 │   ├── monitor365.nix           # Device monitoring agent (Rust)
 │   ├── netwatch.nix             # Real-time network diagnostics TUI (Rust)
-│   └── openaudible.nix          # Audible audiobook manager (AppImage)
+│   ├── openaudible.nix          # Audible audiobook manager (AppImage)
+│   └── golangci-lint-auto-configure.nix # golangci-lint auto-configurator (Go)
 │
 │   # External flake inputs (packages via overlay)
 │   # todo-list-ai            — AI-powered TODO extraction CLI (github:LarsArtmann/todo-list-ai)
+│   # golangci-lint-auto-configure — golangci-lint auto-configurator (local path input)
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
@@ -426,6 +428,10 @@ just todo-scan-openai DIR  # Extract TODOs with OpenAI
 just todo-scan-mock DIR    # Extract TODOs with mock provider
 just todo-version          # Show todo-list-ai version
 
+# golangci-lint-auto-configure
+just lint-configure           # Auto-configure golangci-lint for current project
+just lint-configure-version   # Show golangci-lint-auto-configure version
+
 # Recovery
 just rollback           # Revert to previous generation
 just backup / just restore NAME
@@ -550,5 +556,7 @@ hermes cron list          # List cron jobs
 | `signoz-src` | SigNoz source (flake=false) | — |
 | `signoz-collector-src` | SigNoz collector source (flake=false) | — |
 | `todo-list-ai` | AI-powered TODO extraction CLI | Yes |
+| `golangci-lint-auto-configure-src` | golangci-lint auto-configurator (flake=false) | — |
+| `go-finding-src` | go-finding library (flake=false) | — |
 | `homebrew-bundle` | Homebrew taps (flake=false) | — |
 | `homebrew-cask` | Homebrew cask taps (flake=false) | — |
