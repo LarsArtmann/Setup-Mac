@@ -5,6 +5,8 @@ _: {
     ...
   }: let
     cfg = config.services.taskchampion-config;
+    harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.taskchampion-config = {
       enable = lib.mkEnableOption "TaskChampion sync server with SystemNix configuration";
@@ -22,22 +24,9 @@ _: {
         };
       };
 
-      systemd.services.taskchampion-sync-server = {
-        unitConfig = {
-          StartLimitBurst = lib.mkForce 3;
-          StartLimitIntervalSec = lib.mkForce 300;
-        };
-      };
-      systemd.services.taskchampion-sync-server.serviceConfig = {
-        Restart = lib.mkForce "always";
-        RestartSec = lib.mkForce "5";
-        PrivateTmp = lib.mkForce true;
-        NoNewPrivileges = lib.mkForce true;
-        ProtectClock = lib.mkForce true;
-        ProtectHostname = lib.mkForce true;
-        RestrictNamespaces = lib.mkForce true;
-        LockPersonality = lib.mkForce true;
-      };
+      systemd.services.taskchampion-sync-server.serviceConfig =
+        harden {}
+        // serviceDefaults {};
     };
   };
 }

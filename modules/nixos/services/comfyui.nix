@@ -7,6 +7,8 @@ _: {
   }: let
     cfg = config.services.comfyui;
     primaryUser = "lars";
+    harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
 
     rocmRuntimeLibs = with pkgs; [
       stdenv.cc.cc.lib
@@ -81,21 +83,30 @@ _: {
           python313
         ];
 
-        serviceConfig = {
-          Type = "simple";
-          User = cfg.user;
-          Group = "users";
-          WorkingDirectory = toString cfg.package;
-          ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
-          OOMScoreAdjust = -100;
-          SupplementaryGroups = ["render" "video"];
-          TimeoutStartSec = "300";
-          TimeoutStopSec = "60";
-
-          ProtectHome = false;
-          ProtectSystem = false;
-          MemoryMax = "8G";
-        };
+        serviceConfig =
+          harden {
+            ProtectHome = false;
+            ProtectSystem = false;
+            MemoryMax = "8G";
+            ReadWritePaths = [
+              "/home/${cfg.user}"
+              "/data/ai"
+            ];
+          }
+          // serviceDefaults {
+            RestartSec = "10s";
+          }
+          // {
+            Type = "simple";
+            User = cfg.user;
+            Group = "users";
+            WorkingDirectory = toString cfg.package;
+            ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
+            OOMScoreAdjust = -100;
+            SupplementaryGroups = ["render" "video"];
+            TimeoutStartSec = "300";
+            TimeoutStopSec = "60";
+          };
       };
     };
   };

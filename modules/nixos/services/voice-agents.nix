@@ -7,6 +7,8 @@ _: {
   }: let
     inherit (config.networking) domain;
     cfg = config.services.voice-agents;
+    harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
 
     whisperApiPort = 8000; # OpenAI-compatible API (FastAPI)
     whisperUiPort = 7860; # Gradio WebUI
@@ -109,21 +111,19 @@ _: {
           wants = ["whisper-asr-pull.service" "network-online.target"];
           wantedBy = ["multi-user.target"];
           path = [pkgs.docker pkgs.docker-compose];
-          serviceConfig = {
-            Type = "forking";
-            RemainAfterExit = true;
-            ExecStartPre = ["-${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans"];
-            ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
-            ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down whisper-rocm";
-            TimeoutStartSec = 180;
-            Restart = "always";
-            RestartSec = "10";
-            PrivateTmp = true;
-            ProtectClock = true;
-            ProtectHostname = true;
-            RestrictNamespaces = true;
-            LockPersonality = true;
-          };
+          serviceConfig =
+            harden {}
+            // serviceDefaults {
+              RestartSec = "10s";
+            }
+            // {
+              Type = "forking";
+              RemainAfterExit = true;
+              ExecStartPre = ["-${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down --remove-orphans"];
+              ExecStart = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} up -d whisper-rocm";
+              ExecStop = "${pkgs.docker-compose}/bin/docker-compose -f ${whisperComposeFile} down whisper-rocm";
+              TimeoutStartSec = 180;
+            };
         };
       };
 
