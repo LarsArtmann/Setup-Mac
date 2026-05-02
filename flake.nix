@@ -613,6 +613,7 @@
               golangciLintAutoConfigureOverlay
               disableTestsOverlay
               larsGoToolsOverlay
+              mrSyncOverlay
             ]
             ++ lib.optionals (system == "x86_64-linux") [
               openaudibleOverlay
@@ -655,6 +656,7 @@
               template-readme
               terraform-diagrams-aggregator
               terraform-to-d2
+              mr-sync
               ;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
