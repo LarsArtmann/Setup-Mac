@@ -39,7 +39,6 @@ SystemNix/
 │   ├── aw-watcher-utilization.nix # ActivityWatch system utilization watcher (Python)
 │   ├── dnsblockd.nix            # DNS block page server (Go)
 │   ├── dnsblockd-processor/     # DNS blocklist processor (Go)
-│   ├── emeet-pixyd/             # EMEET PIXY webcam daemon (Go)
 │   ├── jscpd.nix                # Copy/paste detector (Node.js)
 │   ├── modernize.nix            # Go modernize tool
 │   ├── monitor365.nix           # Device monitoring agent (Rust)
@@ -49,9 +48,9 @@ SystemNix/
 │   ├── mr-sync.nix              # ~/.mrconfig GitHub sync CLI (Go)
 │   └── file-and-image-renamer.nix # AI screenshot renaming (Go)
 │
-│   # External flake inputs (packages via overlay)
-│   # todo-list-ai            — AI-powered TODO extraction CLI
+│   # External flake inputs (packages via overlay — no local pkgs/ file)
 │   # emeet-pixyd             — EMEET PIXY webcam daemon
+│   # todo-list-ai            — AI-powered TODO extraction CLI
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
@@ -346,7 +345,7 @@ AI agent task tracking protocol:
 |-------|-------------|
 | Darwin HM user | Must define `users.users.larsartmann.home` in `platforms/darwin/default.nix` — Home Manager requires it |
 | Different relative paths | Darwin home.nix uses `../common/`, NixOS uses `../../common/` due to directory depth |
-| Go overlay on Darwin | Darwin doesn't use the Go overlay from perSystem — it defines its own in the darwinConfiguration modules |
+| Darwin overlays | Darwin uses `sharedOverlays` directly (no Linux-only overlays). perSystem applies the same shared + Linux-only overlays. |
 | NixOS overlays separate | NixOS adds `niri.overlays.niri`, `dnsblockdOverlay`, and Python overrides on top of the shared ones |
 | SigNoz built from source | SigNoz is built from source (Go 1.25), not from a pre-built package. Takes significant build time. |
 | crush-config doesn't follow nixpkgs | The crush-config input intentionally does NOT follow nixpkgs (no `inputs.nixpkgs.follows`) |
@@ -447,15 +446,15 @@ just rollback           # Revert to previous generation
 just backup / just restore NAME
 ```
 
-### EMEET PIXY Webcam (`pkgs/emeet-pixyd/`)
+### EMEET PIXY Webcam (`emeet-pixyd` flake input)
 
 Custom Go daemon for the EMEET PIXY dual-camera AI webcam with auto-activation:
 
 | Component | Path | Purpose |
 |-----------|------|---------|
-| Daemon | `pkgs/emeet-pixyd/` | Go binary — call detection, HID control, auto-management |
-| Package | `pkgs/emeet-pixyd.nix` | buildGoModule derivation |
+| Package | `emeet-pixyd` flake input overlay | buildGoModule derivation (no local pkgs/ file) |
 | NixOS module | `platforms/nixos/hardware/emeet-pixy.nix` | udev rules, user systemd service |
+| NixOS module | `inputs.emeet-pixyd.nixosModules.default` | flake-provided NixOS module |
 | Waybar | `platforms/nixos/desktop/waybar.nix` | Camera state indicator |
 
 **Architecture:**
