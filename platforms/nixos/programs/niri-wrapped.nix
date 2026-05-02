@@ -607,6 +607,10 @@ in {
 
       window-rules = [
         {
+          matches = [{app-id = "^org.prismlauncher.PrismLauncher$";}];
+          opacity = 1.0;
+        }
+        {
           matches = [{is-floating = false;}];
           opacity = 0.95;
           geometry-corner-radius = {
