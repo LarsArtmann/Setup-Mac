@@ -99,7 +99,7 @@ _: {
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm:main";
+            ExecStart = "${pkgs.docker}/bin/docker pull beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1";
             TimeoutStartSec = 600;
           };
         };
