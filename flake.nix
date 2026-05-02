@@ -105,7 +105,7 @@
       url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
     };
 
-    wallpapers = {
+    wallpapers-src = {
       url = "git+ssh://git@github.com/LarsArtmann/wallpapers?ref=master";
       flake = false;
     };
@@ -118,7 +118,7 @@
 
     # Monitor365 device monitoring agent source (Rust)
     monitor365-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/monitor365";
+      url = "git+ssh://git@github.com/LarsArtmann/monitor365?ref=master";
       flake = false;
     };
 
@@ -167,101 +167,9 @@
       flake = false;
     };
 
-    # LarsArtmann Go CLI tools
-    art-dupl-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/art-dupl?ref=fork";
-      flake = false;
-    };
-    auto-deduplicate-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/auto-deduplicate?ref=master";
-      flake = false;
-    };
-    branching-flow-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/branching-flow?ref=master";
-      flake = false;
-    };
-    buildflow-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/BuildFlow?ref=master";
-      flake = false;
-    };
-    code-duplicate-analyzer-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/code-duplicate-analyzer?ref=master";
-      flake = false;
-    };
-    go-auto-upgrade-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-auto-upgrade?ref=master";
-      flake = false;
-    };
-    go-functional-fixer-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-functional-fixer?ref=master";
-      flake = false;
-    };
-    go-structure-linter-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-structure-linter?ref=master";
-      flake = false;
-    };
-    hierarchical-errors-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/hierarchical-errors?ref=master";
-      flake = false;
-    };
-    library-policy-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/library-policy?ref=master";
-      flake = false;
-    };
-    md-go-validator-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/md-go-validator?ref=master";
-      flake = false;
-    };
-    project-meta-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/project-meta?ref=master";
-      flake = false;
-    };
-    projects-management-automation-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/projects-management-automation?ref=master";
-      flake = false;
-    };
-    template-readme-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/template-readme?ref=main";
-      flake = false;
-    };
-    terraform-diagrams-aggregator-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/terraform-diagrams-aggregator?ref=master";
-      flake = false;
-    };
-    terraform-to-d2-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/terraform-to-d2?ref=master";
-      flake = false;
-    };
-
     # mr-sync — CLI to keep ~/.mrconfig in sync with GitHub repos
     mr-sync-src = {
       url = "git+ssh://git@github.com/LarsArtmann/mr-sync?ref=master";
-      flake = false;
-    };
-
-    # Shared Go library dependencies (used by multiple tools via go.mod replace)
-    go-branded-id-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-branded-id?ref=master";
-      flake = false;
-    };
-    go-commit-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-commit?ref=master";
-      flake = false;
-    };
-    go-composable-business-types-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-composable-business-types?ref=master";
-      flake = false;
-    };
-    go-filewatcher-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/go-filewatcher?ref=master";
-      flake = false;
-    };
-    project-discovery-sdk-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/project-discovery-sdk?ref=master";
-      flake = false;
-    };
-    gogenfilter-src = {
-      url = "git+ssh://git@github.com/LarsArtmann/gogenfilter?ref=master";
       flake = false;
     };
   };
@@ -292,68 +200,9 @@
     go-output-src,
     golangci-lint-auto-configure-src,
     go-finding-src,
-    art-dupl-src,
-    auto-deduplicate-src,
-    branching-flow-src,
-    buildflow-src,
-    code-duplicate-analyzer-src,
-    go-auto-upgrade-src,
-    go-functional-fixer-src,
-    go-structure-linter-src,
-    hierarchical-errors-src,
-    library-policy-src,
-    md-go-validator-src,
-    project-meta-src,
-    projects-management-automation-src,
-    template-readme-src,
-    terraform-diagrams-aggregator-src,
-    terraform-to-d2-src,
-    go-branded-id-src,
-    go-commit-src,
-    go-composable-business-types-src,
-    go-filewatcher-src,
-    project-discovery-sdk-src,
-    gogenfilter-src,
     mr-sync-src,
     ...
   }: let
-    # Shared Go tool infrastructure — all LarsArtmann Go CLIs use this
-    go-replaces = import ./pkgs/lib/go-replaces.nix {
-      inherit
-        go-output-src
-        go-finding-src
-        cmdguard-src
-        go-branded-id-src
-        go-commit-src
-        go-filewatcher-src
-        project-discovery-sdk-src
-        gogenfilter-src
-        go-composable-business-types-src
-        art-dupl-src
-        buildflow-src
-        branching-flow-src
-        code-duplicate-analyzer-src
-        go-auto-upgrade-src
-        go-functional-fixer-src
-        go-structure-linter-src
-        hierarchical-errors-src
-        library-policy-src
-        md-go-validator-src
-        project-meta-src
-        projects-management-automation-src
-        template-readme-src
-        terraform-diagrams-aggregator-src
-        terraform-to-d2-src
-        golangci-lint-auto-configure-src
-        ;
-    };
-
-    mkGoToolFor = pkgs:
-      import ./pkgs/lib/mk-go-tool.nix {
-        inherit (pkgs) lib buildGoModule;
-        inherit go-replaces;
-      };
-
     # NOTE: goOverlay removed — nixpkgs go_1_26 is already 1.26.1.
     # Overriding go forced a from-source rebuild that invalidated the
     # binary cache for the ENTIRE dependency tree (1094 derivations).
@@ -450,60 +299,30 @@
 
     # --- LarsArtmann Go CLI tool overlays ---
 
-    # Helper: clean source filter for Go projects
-    cleanGoSource = src:
-      nixpkgs.lib.cleanSourceWith {
-        filter = path: _type: let
-          b = baseNameOf path;
-        in
-          !(
-            b
-            == ".git"
-            || b == "node_modules"
-            || b == "vendor"
-            || b == "target"
-            || b == "dist"
-            || b == "bin"
-            || b == "result"
-            || b == ".crush"
-            || nixpkgs.lib.hasSuffix ".md" b
-            || nixpkgs.lib.hasSuffix ".html" b
-            || nixpkgs.lib.hasSuffix ".svg" b
-            || b == "go.work"
-            || b == "go.work.sum"
-          );
-        inherit src;
-      };
-
-    larsGoToolsOverlay = _final: prev: let
-      mkGoTool = mkGoToolFor prev;
-      callGoTool = pkg-file: src:
-        prev.callPackage pkg-file {
-          inherit mkGoTool;
-          src = cleanGoSource src;
-        };
-    in {
-      art-dupl = callGoTool ./pkgs/art-dupl.nix art-dupl-src;
-      auto-deduplicate = callGoTool ./pkgs/auto-deduplicate.nix auto-deduplicate-src;
-      branching-flow = callGoTool ./pkgs/branching-flow.nix branching-flow-src;
-      buildflow = callGoTool ./pkgs/buildflow.nix buildflow-src;
-      code-duplicate-analyzer = callGoTool ./pkgs/code-duplicate-analyzer.nix code-duplicate-analyzer-src;
-      go-auto-upgrade = callGoTool ./pkgs/go-auto-upgrade.nix go-auto-upgrade-src;
-      go-functional-fixer = callGoTool ./pkgs/go-functional-fixer.nix go-functional-fixer-src;
-      go-structure-linter = callGoTool ./pkgs/go-structure-linter.nix go-structure-linter-src;
-      hierarchical-errors = callGoTool ./pkgs/hierarchical-errors.nix hierarchical-errors-src;
-      library-policy = callGoTool ./pkgs/library-policy.nix library-policy-src;
-      md-go-validator = callGoTool ./pkgs/md-go-validator.nix md-go-validator-src;
-      project-meta = callGoTool ./pkgs/project-meta.nix project-meta-src;
-      projects-management-automation = callGoTool ./pkgs/projects-management-automation.nix projects-management-automation-src;
-      template-readme = callGoTool ./pkgs/template-readme.nix template-readme-src;
-      terraform-diagrams-aggregator = callGoTool ./pkgs/terraform-diagrams-aggregator.nix terraform-diagrams-aggregator-src;
-      terraform-to-d2 = callGoTool ./pkgs/terraform-to-d2.nix terraform-to-d2-src;
-    };
-
     mrSyncOverlay = _final: prev: {
       mr-sync = prev.callPackage ./pkgs/mr-sync.nix {
-        src = cleanGoSource mr-sync-src;
+        src = prev.lib.cleanSourceWith {
+          filter = path: _type: let
+            b = baseNameOf path;
+          in
+            !(
+              b
+              == ".git"
+              || b == "node_modules"
+              || b == "vendor"
+              || b == "target"
+              || b == "dist"
+              || b == "bin"
+              || b == "result"
+              || b == ".crush"
+              || prev.lib.hasSuffix ".md" b
+              || prev.lib.hasSuffix ".html" b
+              || prev.lib.hasSuffix ".svg" b
+              || b == "go.work"
+              || b == "go.work.sum"
+            );
+          src = mr-sync-src;
+        };
       };
     };
 
@@ -519,7 +338,6 @@
       awWatcherOverlay
       todoListAiOverlay
       golangciLintAutoConfigureOverlay
-      larsGoToolsOverlay
       mrSyncOverlay
     ];
 
@@ -612,7 +430,6 @@
               jscpdOverlay
               golangciLintAutoConfigureOverlay
               disableTestsOverlay
-              larsGoToolsOverlay
               mrSyncOverlay
             ]
             ++ lib.optionals (system == "x86_64-linux") [
@@ -640,22 +457,6 @@
               sqlc
               todo-list-ai
               golangci-lint-auto-configure
-              art-dupl
-              auto-deduplicate
-              branching-flow
-              buildflow
-              code-duplicate-analyzer
-              go-auto-upgrade
-              go-functional-fixer
-              go-structure-linter
-              hierarchical-errors
-              library-policy
-              md-go-validator
-              project-meta
-              projects-management-automation
-              template-readme
-              terraform-diagrams-aggregator
-              terraform-to-d2
               mr-sync
               ;
           }
@@ -866,7 +667,7 @@
                   extraSpecialArgs =
                     sharedHomeManagerSpecialArgs
                     // {
-                      inherit (inputs) wallpapers;
+                      wallpapers = inputs.wallpapers-src;
                     };
                 };
             }
