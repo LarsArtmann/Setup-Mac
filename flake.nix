@@ -159,109 +159,109 @@
 
     # golangci-lint-auto-configure — auto-configure golangci-lint for Go projects
     golangci-lint-auto-configure-src = {
-      url = "path:/home/lars/projects/golangci-lint-auto-configure";
+      url = "git+ssh://git@github.com/LarsArtmann/golangci-lint-auto-configure?ref=master";
       flake = false;
     };
     go-finding-src = {
-      url = "path:/home/lars/projects/go-finding";
+      url = "git+ssh://git@github.com/LarsArtmann/go-finding?ref=master";
       flake = false;
     };
 
     # LarsArtmann Go CLI tools
     art-dupl-src = {
-      url = "path:/home/lars/projects/art-dupl";
+      url = "git+ssh://git@github.com/LarsArtmann/art-dupl?ref=fork";
       flake = false;
     };
     auto-deduplicate-src = {
-      url = "path:/home/lars/projects/auto-deduplicate";
+      url = "git+ssh://git@github.com/LarsArtmann/auto-deduplicate?ref=master";
       flake = false;
     };
     branching-flow-src = {
-      url = "path:/home/lars/projects/branching-flow";
+      url = "git+ssh://git@github.com/LarsArtmann/branching-flow?ref=master";
       flake = false;
     };
     buildflow-src = {
-      url = "path:/home/lars/projects/BuildFlow";
+      url = "git+ssh://git@github.com/LarsArtmann/BuildFlow?ref=master";
       flake = false;
     };
     code-duplicate-analyzer-src = {
-      url = "path:/home/lars/projects/code-duplicate-analyzer";
+      url = "git+ssh://git@github.com/LarsArtmann/code-duplicate-analyzer?ref=master";
       flake = false;
     };
     go-auto-upgrade-src = {
-      url = "path:/home/lars/projects/go-auto-upgrade";
+      url = "git+ssh://git@github.com/LarsArtmann/go-auto-upgrade?ref=master";
       flake = false;
     };
     go-functional-fixer-src = {
-      url = "path:/home/lars/projects/go-functional-fixer";
+      url = "git+ssh://git@github.com/LarsArtmann/go-functional-fixer?ref=master";
       flake = false;
     };
     go-structure-linter-src = {
-      url = "path:/home/lars/projects/go-structure-linter";
+      url = "git+ssh://git@github.com/LarsArtmann/go-structure-linter?ref=master";
       flake = false;
     };
     hierarchical-errors-src = {
-      url = "path:/home/lars/projects/hierarchical-errors";
+      url = "git+ssh://git@github.com/LarsArtmann/hierarchical-errors?ref=master";
       flake = false;
     };
     library-policy-src = {
-      url = "path:/home/lars/projects/library-policy";
+      url = "git+ssh://git@github.com/LarsArtmann/library-policy?ref=master";
       flake = false;
     };
     md-go-validator-src = {
-      url = "path:/home/lars/projects/md-go-validator";
+      url = "git+ssh://git@github.com/LarsArtmann/md-go-validator?ref=master";
       flake = false;
     };
     project-meta-src = {
-      url = "path:/home/lars/projects/project-meta";
+      url = "git+ssh://git@github.com/LarsArtmann/project-meta?ref=master";
       flake = false;
     };
     projects-management-automation-src = {
-      url = "path:/home/lars/projects/projects-management-automation";
+      url = "git+ssh://git@github.com/LarsArtmann/projects-management-automation?ref=master";
       flake = false;
     };
     template-readme-src = {
-      url = "path:/home/lars/projects/template-readme";
+      url = "git+ssh://git@github.com/LarsArtmann/template-readme?ref=main";
       flake = false;
     };
     terraform-diagrams-aggregator-src = {
-      url = "path:/home/lars/projects/terraform-diagrams-aggregator";
+      url = "git+ssh://git@github.com/LarsArtmann/terraform-diagrams-aggregator?ref=master";
       flake = false;
     };
     terraform-to-d2-src = {
-      url = "path:/home/lars/projects/terraform-to-d2";
+      url = "git+ssh://git@github.com/LarsArtmann/terraform-to-d2?ref=master";
       flake = false;
     };
 
     # mr-sync — CLI to keep ~/.mrconfig in sync with GitHub repos
     mr-sync-src = {
-      url = "path:/home/lars/projects/mr-sync";
+      url = "git+ssh://git@github.com/LarsArtmann/mr-sync?ref=master";
       flake = false;
     };
 
     # Shared Go library dependencies (used by multiple tools via go.mod replace)
     go-branded-id-src = {
-      url = "path:/home/lars/projects/go-branded-id";
+      url = "git+ssh://git@github.com/LarsArtmann/go-branded-id?ref=master";
       flake = false;
     };
     go-commit-src = {
-      url = "path:/home/lars/projects/go-commit";
+      url = "git+ssh://git@github.com/LarsArtmann/go-commit?ref=master";
       flake = false;
     };
     go-composable-business-types-src = {
-      url = "path:/home/lars/projects/go-composable-business-types";
+      url = "git+ssh://git@github.com/LarsArtmann/go-composable-business-types?ref=master";
       flake = false;
     };
     go-filewatcher-src = {
-      url = "path:/home/lars/projects/go-filewatcher";
+      url = "git+ssh://git@github.com/LarsArtmann/go-filewatcher?ref=master";
       flake = false;
     };
     project-discovery-sdk-src = {
-      url = "path:/home/lars/projects/project-discovery-sdk";
+      url = "git+ssh://git@github.com/LarsArtmann/project-discovery-sdk?ref=master";
       flake = false;
     };
     gogenfilter-src = {
-      url = "path:/home/lars/projects/gogenfilter";
+      url = "git+ssh://git@github.com/LarsArtmann/gogenfilter?ref=master";
       flake = false;
     };
   };
@@ -430,11 +430,7 @@
     #       ];
     #   });
     # };
-    emeetPixyOverlay = nixpkgs.lib.composeExtensions emeet-pixyd.overlays.default (_final: prev: {
-      emeet-pixyd = prev.emeet-pixyd.overrideAttrs (_old: {
-        vendorHash = "sha256-kbkdbVh2mznktIMK3hm8kIuUSjIoKdqSbW16nKlFO/4=";
-      });
-    });
+    emeetPixyOverlay = emeet-pixyd.overlays.default;
 
     todoListAiOverlay = _final: prev: {
       todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
