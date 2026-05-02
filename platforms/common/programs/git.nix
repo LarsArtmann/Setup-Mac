@@ -233,9 +233,6 @@
       "*_templ.go" ## https://templ.guide/
       "*.sql.go" ## https://sqlc.dev
 
-      # github.com:LarsArtmann/auto-deduplicate
-      ".auto-deduplicate.lock"
-
       # AI tools
       ".crush"
     ];
