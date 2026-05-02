@@ -3,11 +3,11 @@
     "art-dupl-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777591313,
-        "narHash": "sha256-sF7fwW861gW/vbrhWn69B9yGoo2xhEgiacm1hpJbXOg=",
+        "lastModified": 1777752803,
+        "narHash": "sha256-Pl3l9R5JihMdZhI6ryD4F8KMvldUomDQdPNFMSE5QZs=",
         "ref": "fork",
-        "rev": "bb91232c77f9bc3d04ddd0954a8abeccd8811951",
-        "revCount": 1190,
+        "rev": "e9e65a57904ff188e6bbc73db0f8c4992976de9a",
+        "revCount": 1191,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/art-dupl"
       },
@@ -162,11 +162,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777748285,
-        "narHash": "sha256-DLpz43vE9sfs+QaNJt2AqlB5lLnUkoWgvxPYYk4X1jc=",
+        "lastModified": 1777754004,
+        "narHash": "sha256-ZereR18JkQC7khMZPGJLrPA9jlc20rTDhIrfek48UrY=",
         "ref": "master",
-        "rev": "3e6ffb96f2309ea0dbe3fadfb8d9246897104180",
-        "revCount": 78,
+        "rev": "9b73660a461d40ec4fc9f704ede7cc81410d0239",
+        "revCount": 88,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
@@ -690,11 +690,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1777742080,
-        "narHash": "sha256-S54omun5/hXWaH9ioj0b4yjJhBNRZnryik9JjlWLZqY=",
+        "lastModified": 1777752092,
+        "narHash": "sha256-kL8OqCakeXbs7aP93N8NpWFW3bVo77FPgHm+UlVX+ks=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "eb172d1d92408fa5ae09ba910e64e6cee93f8261",
+        "rev": "fe84947eb1369409570aab34e3e2254dd3d84aca",
         "type": "github"
       },
       "original": {
@@ -1138,11 +1138,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777746808,
-        "narHash": "sha256-zGGOfx9CIVU4WWAtpuB1NRm1bfkHd2NW3pHpTPM3AJo=",
+        "lastModified": 1777755278,
+        "narHash": "sha256-8rjKJXJBObStuvvx6hIkjwG8hOS4QPqleXkb87kTiqc=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "b5410cf1d4c7c5db2bc7ba1cc8e8d19e487f9ee0",
+        "rev": "b21c67d48873ae60eca7d91e1079f766f56b18b2",
         "type": "github"
       },
       "original": {
@@ -1591,11 +1591,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1777067237,
-        "narHash": "sha256-ZULPJbMePAsLVjrdK9d9j3Guq/p31FHJfFdf+SrEIro=",
+        "lastModified": 1777755734,
+        "narHash": "sha256-tkLR3Cpnrjx/+/fbuMei/vrlVIrZbcE+3xwRkfODRRM=",
         "owner": "LarsArtmann",
         "repo": "treefmt-full-flake",
-        "rev": "0e0edc711e96688a1bdbe2728fa4fe8ec2db6883",
+        "rev": "1da39418efe1431ca4f008f81954a116fc7952b8",
         "type": "github"
       },
       "original": {
