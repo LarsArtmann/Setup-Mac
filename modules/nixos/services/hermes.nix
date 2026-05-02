@@ -60,6 +60,11 @@ in {
       ${pkgs.rsync}/bin/rsync -a --chown=${cfg.user}:${cfg.group} "$OLD/" "$NEW/"
       echo "hermes-migrate: migration complete"
     '';
+    opusWrapper = pkgs.writeShellScript "hermes-opus-wrapper" ''
+      export LD_LIBRARY_PATH="${pkgs.libopus}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+      export LD_PRELOAD="${pkgs.libopus}/lib/libopus.so''${LD_PRELOAD:+:$LD_PRELOAD}"
+      exec ${hermesPkg}/bin/hermes gateway run --replace "$@"
+    '';
   in {
     options.services.hermes = {
       enable = lib.mkEnableOption "Hermes AI Agent Gateway";
@@ -157,12 +162,13 @@ in {
             User = cfg.user;
             Group = cfg.group;
             ExecStartPre = ["+${migrateScript}" mergeEnvScript];
-            ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
+            ExecStart = opusWrapper;
             WorkingDirectory = cfg.stateDir;
             Environment = [
               "HOME=${cfg.stateDir}"
               "HERMES_HOME=${cfg.stateDir}"
               "HERMES_MANAGED=true"
+              "GATEWAY_ALLOW_ALL_USERS=true"
               "LD_LIBRARY_PATH=${pkgs.libopus}/lib"
             ];
             EnvironmentFile = [sopsEnvPath];
