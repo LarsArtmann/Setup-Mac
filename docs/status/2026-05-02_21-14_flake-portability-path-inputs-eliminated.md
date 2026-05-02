@@ -2,6 +2,21 @@
 
 **Date:** 2026-05-02 21:14
 **Session Type:** Infrastructure / Build System
+**Updated:** 2026-05-03 — Post-session dead code audit completed
+
+---
+
+## Post-Session Update
+
+22 of the 25 migrated inputs were removed in a follow-up dead-code audit. Only 3 survive:
+- `golangci-lint-auto-configure-src` + `go-finding-src` (dependency)
+- `mr-sync-src`
+
+Also removed: 6 Go library inputs (go-branded-id, go-commit, etc.), `larsGoToolsOverlay`,
+`cleanGoSource`, `mkGoToolFor`, `go-replaces` infrastructure, `.buildflow.yml`, `scripts/buildflow-nix`,
+`pkgs/gomod2nix.toml`, dead gitignore entries.
+
+CI already exists at `.github/workflows/` (nix-check, flake-update, go-test).
 
 ---
 
