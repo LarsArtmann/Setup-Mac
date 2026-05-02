@@ -68,7 +68,12 @@
     bash.initExtra = lib.mkAfter ''
       # NixOS-specific completions
       if [ -d /etc/profiles/per-user/$USER/share/nixos/completions ]; then
-        fpath+=/etc/profiles/per-user/$USER/share/nixos/completions
+        export BASH_COMPLETION_USER_DIR="/etc/profiles/per-user/$USER/share/nixos/completions:$BASH_COMPLETION_USER_DIR"
+      fi
+
+      # COMPLETIONS: Universal completion engine (1000+ commands)
+      if command -v carapace >/dev/null 2>&1; then
+        source <(carapace _carapace bash)
       fi
     '';
   };
