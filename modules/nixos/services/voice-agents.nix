@@ -22,7 +22,7 @@ _: {
 
       services:
         whisper-rocm:
-          image: beecave/insanely-fast-whisper-rocm:main
+          image: beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000
