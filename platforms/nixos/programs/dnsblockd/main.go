@@ -478,7 +478,7 @@ func isLANDomain(domain string) bool {
 
 func urlSafeDomain(domain string) string {
 	for _, r := range domain {
-		if !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') || r == '-' || r == '.') {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') && (r < '0' || r > '9') && r != '-' && r != '.' {
 			return "blocked-domain.invalid"
 		}
 	}
