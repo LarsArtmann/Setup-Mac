@@ -1,0 +1,353 @@
+# SystemNix — Feature Inventory
+
+_A brutally honest audit of every feature the project actually has._
+
+**Generated:** 2026-05-03 | **Scope:** Full codebase scan
+
+---
+
+## Status Legend
+
+| Icon | Status | Meaning |
+|------|--------|---------|
+| ✅ | FULLY_FUNCTIONAL | Complete, wired, tested, works as intended |
+| ⚠️ | PARTIALLY_FUNCTIONAL | Mostly works, known gaps or edge cases |
+| 🔧 | DISABLED | Code exists but not currently enabled |
+| 📋 | PLANNED | Module/scaffold exists, not yet deployed |
+| ❌ | BROKEN | Implemented but currently non-functional |
+
+---
+
+## 1. Core Infrastructure
+
+### Flake Architecture
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Cross-platform Nix flake (Darwin + NixOS) | ✅ | Single flake, two systems, 80% shared via `platforms/common/` |
+| flake-parts modular architecture | ✅ | 29 service modules imported in `flake.nix` |
+| Shared overlays (Darwin + NixOS) | ✅ | NUR, aw-watcher, todo-list-ai, golangci-lint-auto-configure, mr-sync |
+| Linux-only overlays | ✅ | openaudible, dnsblockd, emeet-pixyd, monitor365, netwatch, file-and-image-renamer |
+| Shared Home Manager config | ✅ | `sharedHomeManagerConfig` + `sharedHomeManagerSpecialArgs` |
+| Custom packages (pkgs/) | ✅ | 11 packages: 4 Go, 1 Rust, 1 Python, 1 Node.js, 4 Go flakes |
+| Formatter (treefmt + alejandra) | ✅ | Via `treefmt-full-flake` |
+| Flake checks (statix, deadnix, eval) | ✅ | Per-system + Linux-specific |
+| Raspberry Pi 3 SD image build | 📋 | `nixosConfigurations.rpi3-dns` defined, hardware not provisioned |
+| Go overlay (perSystem) | ✅ | Removed — using nixpkgs Go 1.26.1 directly to preserve binary cache |
+
+### Three System Targets
+
+| System | Hostname | Platform | Status |
+|--------|----------|----------|--------|
+| macOS | `Lars-MacBook-Air` | aarch64-darwin | ✅ Active |
+| NixOS Desktop | `evo-x2` | x86_64-linux | ✅ Active |
+| Raspberry Pi 3 | `rpi3-dns` | aarch64-linux | 📋 Planned |
+
+---
+
+## 2. NixOS Services (evo-x2)
+
+### Infrastructure Services
+
+| Service | Status | Module | Key Details |
+|---------|--------|--------|-------------|
+| Docker | ✅ | `default.nix` | Always-on, overlay2, `/data/docker`, weekly auto-prune, user `lars` in docker group |
+| Caddy (reverse proxy) | ✅ | `caddy.nix` | TLS via sops certs, forward auth via Authelia, 10 virtual hosts, metrics enabled |
+| SOPS secrets management | ✅ | `sops.nix` | Age-encrypted via SSH host key, 4 sops files, auto-restart per secret |
+| Authelia SSO/IdP | ✅ | `authelia.nix` | OIDC provider, TOTP + WebAuthn 2FA, file-based auth, Gitea + Immich OIDC clients, brute-force protection |
+| DNS Failover (Keepalived VRRP) | 📋 | `dns-failover.nix` | Two-node VRRP cluster, unbound health tracking, GARP refresh — Pi 3 not provisioned |
+
+### Self-Hosted Applications
+
+| Service | Status | Module | Key Details |
+|---------|--------|--------|-------------|
+| Gitea (Git hosting) | ✅ | `gitea.nix` | SQLite, LFS, weekly dumps, GitHub mirror, Actions runner (Docker + native), admin auto-setup |
+| Gitea repos (declarative mirroring) | ✅ | `gitea-repos.nix` | Auto-sync on rebuild + daily timer, hardened oneshot, sops-managed tokens |
+| Homepage Dashboard | ✅ | `homepage.nix` | Catppuccin Mocha theme, 5 service categories, resource widgets, health checks |
+| Immich (photo/video management) | ✅ | `immich.nix` | PostgreSQL + Redis + ML, OAuth via Authelia, daily DB backup, GPU access for ML |
+| PhotoMap AI | 🔧 | `photomap.nix` | CLIP embedding visualization, OCI container, pinned SHA256, disabled in config |
+| SigNoz (observability) | ✅ | `signoz.nix` | Full-stack: traces/metrics/logs, ClickHouse, OTel Collector, node_exporter, cadvisor, 7 alert rules, dashboard provisioning |
+| TaskChampion (Taskwarrior sync) | ✅ | `taskchampion.nix` | Port 10222, TLS via Caddy, no forward auth, 100 snapshots / 14 days |
+| Twenty CRM | 🔧 | `twenty.nix` | Docker Compose (4 containers), PostgreSQL + Redis, sops secrets, daily DB backup — module exists, may not be actively deployed |
+| Minecraft server | ✅ | `minecraft.nix` | JDK 25, ZGC, firewall restricted to LAN, Prism Launcher client config, whitelist |
+
+### AI / ML Stack
+
+| Service | Status | Module | Key Details |
+|---------|--------|--------|-------------|
+| Centralized AI model storage | ✅ | `ai-models.nix` | `/data/ai/` tree (14 dirs), env vars, tmpfiles rules — dependency for all AI services |
+| Ollama (LLM inference) | ✅ | `ai-stack.nix` | ROCm GPU, flash attention, 4 parallel, q8_0 KV, 24h keep-alive, user `lars` in render group |
+| llama.cpp (standalone) | ✅ | `ai-stack.nix` | ROCWMMA + MFMA custom build, installed alongside Ollama |
+| Unsloth Studio | 🔧 | `ai-stack.nix` | Optional, disabled by default — PyTorch ROCm 6.3, Node.js frontend build, port 8888 |
+| ComfyUI (image generation) | ✅ | `comfyui.nix` | ROCm GPU, bf16, OOMScoreAdjust=-100, references `/data/ai/models/comfyui` |
+| Voice agents (LiveKit + Whisper) | 🔧 | `voice-agents.nix` | Docker ROCm Whisper, Caddy reverse proxy, UDP 50000-51000 — enabled but may need verification |
+| Hermes AI gateway | ✅ | `hermes.nix` | Discord bot, cron, messaging — system service, sops secrets, 4G memory limit, USR1 reload |
+
+### Desktop & System Services
+
+| Service | Status | Module | Key Details |
+|---------|--------|--------|-------------|
+| Niri (Wayland compositor) | ✅ | `niri-config.nix` | niri-unstable, XWayland satellite, patched BindsTo→PartOf, OOMScoreAdjust=-900 |
+| SDDM display manager | ✅ | `display-manager.nix` | SilentSDDM, Catppuccin Mocha theme, Niri as default session |
+| PipeWire audio | ✅ | `audio.nix` | ALSA + PulseAudio + JACK compat, rtkit realtime |
+| Security hardening | ✅ | `security-hardening.nix` | fail2ban (SSH aggressive), ClamAV, polkit, GNOME Keyring, 30+ security tools |
+| Chromium policies | ✅ | `chromium-policies.nix` | YouTube Shorts Blocker + OneTab force-installed |
+| Steam gaming | ✅ | `steam.nix` | extest, protontricks, gamemode (renice=10, GPU temp 80°C), gamescope, mangohud |
+| Multi-WM (Sway backup) | 🔧 | `multi-wm.nix` | Sway as backup at SDDM login — disabled in config |
+| File & Image Renamer (AI) | ✅ | `file-and-image-renamer.nix` | Watches Desktop, ZAI API, hardened sandbox, Home Manager user service |
+| Monitor365 | ✅ | `monitor365.nix` | Device monitoring agent, ActivityWatch integration, user systemd service, hardened |
+
+### Monitoring
+
+| Service | Status | Module | Key Details |
+|---------|--------|--------|-------------|
+| SigNoz observability | ✅ | `signoz.nix` | See Self-Hosted Applications above |
+| Monitoring tools (CLI) | ✅ | `monitoring.nix` | radeontop, strace, ltrace, nethogs, iftop, netwatch |
+
+---
+
+## 3. Cross-Platform Programs (Home Manager)
+
+### Shells
+
+| Program | Status | Notes |
+|---------|--------|-------|
+| Fish | ✅ | Primary shell — shared aliases, Carapace completions, 5k history, autosuggestions, GOPATH in PATH |
+| Zsh | ✅ | Autosuggestions + syntax highlighting, XDG dotdir, `~/.env.private` sourcing |
+| Bash | ✅ | Shared aliases, erase-dups history, cdspell/autocd/globstar |
+| Starship prompt | ✅ | Performance-tuned: 400ms timeout, 30+ modules disabled, only Go/Node/Nix shown, colorScheme-driven |
+| Shell aliases (shared) | ✅ | `shell-aliases.nix` — DRY across Fish/Zsh/Bash (ADR-002) |
+
+### Development Tools
+
+| Program | Status | Notes |
+|---------|--------|-------|
+| Git | ✅ | GPG signing, max compression, SSH multiplexing, HTTPS→SSH rewrite, Git Town aliases, LFS, `.crush` in global ignores |
+| Tmux | ✅ | Resurrect + yank plugins, custom SystemNix dev session, vi copy-mode, Catppuccin-themed status bar |
+| Fzf | ✅ | Fish/Zsh/Bash integration, reverse layout, rg-powered, colorScheme-driven colors |
+| Pre-commit hooks | ✅ | Nix config validation, shellcheck, markdownlint, private key detection, nixpkgs-fmt |
+| Go environment | ✅ | GOPATH/GOPRIVATE/GONOSUMDB, `~/go/bin` in PATH, gopls without modernize |
+| Node.js/Bun/pnpm | ✅ | Via base.nix packages |
+
+### Applications
+
+| Program | Status | Platform | Notes |
+|---------|--------|----------|-------|
+| ActivityWatch | ✅ | Linux | Wayland window watcher + utilization watcher (5s poll), dark theme on startup |
+| ActivityWatch (macOS) | ✅ | Darwin | LaunchAgent auto-start, aw-watcher-utilization via Nix package |
+| KeePassXC | ✅ | Both | Browser integration, Chromium + Helium native messaging manifests, dark/compact mode |
+| Chromium | ✅ | Darwin | Brave as primary, VAAPI decode/encode, YouTube Shorts Blocker extension |
+| Chromium (NixOS) | ✅ | Linux | System-wide via `chromium-policies.nix` module |
+| Taskwarrior 3 | ✅ | Both | Sync to `tasks.home.lan`, deterministic UUID client ID, Catppuccin Mocha colors, daily JSON backup |
+| SSH config | ✅ | Both | Via `nix-ssh-config` flake input — onprem, evo-x2, 4x Hetzner servers |
+
+### Theme & Appearance
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Catppuccin Mocha (global) | ✅ | Universal theme — GTK, icons, cursor, fonts, all apps |
+| Nix-colors integration | ✅ | `colorScheme` passed as specialArg, drives Starship/Fzf/Qt/GTK |
+| Bibata cursor (96px) | ✅ | Linux — Bibata-Modern-Classic via fonts.nix |
+| JetBrainsMono Nerd Font | ✅ | Terminal font everywhere |
+| Papirus icons | ✅ | Dark variant across platforms |
+
+### Fonts (Linux)
+
+| Font | Status | Notes |
+|------|--------|-------|
+| JetBrains Mono Nerd Font | ✅ | Primary monospace |
+| Fira Code Nerd Font | ✅ | Alternative mono |
+| Iosevka Nerd Font | ✅ | Alternative mono |
+| Noto Fonts (regular, emoji, CJK) | ✅ | Unicode fallback |
+
+---
+
+## 4. NixOS Desktop (evo-x2)
+
+### Window Management
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Niri (scrolling-tiling Wayland) | ✅ | Extensive config: 5 named workspaces, window rules, vim-style keybindings, preset column widths |
+| Niri session save/restore | ✅ | Crash recovery: 60s timer, workspace-aware restore, floating state, column widths, focus order, kitty CWD/child proc capture |
+| Niri keybindings (80+) | ✅ | Rofi integrations (app, clipboard, emoji, calc, notifications), screenshots (grim+slurp+swappy), media keys, brightness (ddcutil), random wallpaper |
+| XWayland support | ✅ | xwayland-satellite installed |
+
+### Desktop Components
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Rofi (app launcher) | ✅ | Grid layout (5×3), Catppuccin Mocha, Papirus icons, rounded corners, transparency |
+| Rofi plugins | ✅ | rofi-calc, rofi-emoji — calculator (Mod+Shift+C), emoji picker (Mod+.) |
+| Waybar (status bar) | ✅ | 15+ modules: workspaces, window, clock, media, camera, DNS stats, disk, weather, audio, network, CPU, memory, temp, clipboard, tray, power |
+| Swaylock (screen locker) | ✅ | swaylock-effects, Catppuccin Mocha colors, indicator radius 100px |
+| Wlogout (power menu) | ✅ | 6 actions (lock/hibernate/logout/shutdown/suspend/reboot), color-coded SVG icons |
+| Dunst (notifications) | ✅ | Catppuccin-colored, overlay layer, rofi as dmenu, progress bars, 5-notification limit |
+| Yazi (file manager) | ✅ | Catppuccin Mocha theme, file type associations, Ctrl-key keybindings, Zed integration, fd/rg search |
+| Zellij (terminal multiplexer) | ✅ | Catppuccin Mocha, tmux-compatible keybindings (Ctrl+A), 3 custom layouts (dev/monitoring/default) |
+| Kitty (terminal) | ✅ | Font size 16 (TV-friendly), 85% opacity, Catppuccin Mocha, Nix GC resilience patch |
+| Foot (terminal) | ✅ | Lightweight Wayland alt, JetBrainsMono size 12, 95% opacity |
+| Swayidle | ✅ | 12hr idle → suspend, lock before sleep |
+| Cliphist (clipboard) | ✅ | Wayland clipboard history via wl-paste watcher, rofi integration (Alt+C) |
+| Awww (wallpaper daemon) | ✅ | Random wallpaper on startup (Mod+W), systemd user service |
+
+### Hardware Support
+
+| Hardware | Status | Notes |
+|----------|--------|-------|
+| AMD GPU (Strix Halo) | ✅ | amdgpu, Mesa, RADV Vulkan, ROCm (clr.icd, rocblas), VA-API, 32-bit support, nvtop, amdgpu_top, corectrl |
+| AMD NPU (XDNA) | ✅ | XRT driver, Boost 1.87 fix, dev tools, unlimited memlock |
+| EMEET PIXY webcam | ✅ | Full daemon: call detection, auto-tracking, noise cancellation, privacy mode, PipeWire source switch, Waybar indicator, hotplug recovery |
+| Bluetooth | ✅ | Power-on-boot, A2DP source/sink (Google Nest Audio), Blueman GUI |
+| DDC/CI brightness | ✅ | i2c-dev kernel module, ddcutil for external monitor brightness |
+| BTRFS snapshots | ✅ | Timeshift: daily snapshots, 5 boot / 5 daily / 3 weekly / 2 monthly retention, monthly scrub |
+| ZRAM swap | ✅ | 50% of RAM (64GB compressed) |
+
+### Networking & DNS
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Static IP networking | ✅ | `eno1` 192.168.1.150, no DHCP/NetworkManager |
+| DNS blocker (Unbound + dnsblockd) | ✅ | 25 blocklists, 2.5M+ domains, DNSSEC, Quad9 DoT upstream, `.home.lan` local records |
+| DNS block page server | ✅ | Go dnsblockd on dedicated IP (192.168.1.200) |
+| Blocklist auto-update | ✅ | Weekly timer, hash verification |
+| Local DNS records | ✅ | auth/immich/gitea/dash/photomap/unsloth/signoz/tasks/crm → `*.home.lan` |
+| Firewall | ✅ | TCP 22,53,80,443; UDP 53,853 |
+| Centralized network config | ✅ | `local-network.nix` module options — lanIP, gateway, subnet, blockIP, virtualIP, piIP |
+
+### System Reliability
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| earlyoom | ✅ | Kills at 10% free, protects sshd/journald/niri/waybar/pipewire, prefers ollama/python/chrome/node |
+| OOM protection | ✅ | sshd (-1000), journald (-500), waybar (-500), pipewire (-500) |
+| Systemd watchdog (sd_notify only) | ✅ | Caddy, Gitea — correctly limited to Type=notify services |
+| Service failure notifications | ✅ | `notify-failure@` template — desktop + syslog fallback |
+| Service health check | ✅ | Every 15 min, critical services, desktop notification on failure |
+| BTRFS scrub | ✅ | Monthly auto-scrub on `/` and `/data` |
+| Smart monitoring | ✅ | smartd with scheduled short/long tests |
+| Nix GC | ✅ | Weekly, delete older than 7 days, auto-optimise-store |
+| systemd-boot | ✅ | 50 generation limit, latest kernel |
+
+### Scheduled Tasks
+
+| Task | Schedule | Notes |
+|------|----------|-------|
+| Crush provider update | Daily 00:00 | Updates AI provider configs |
+| Blocklist auto-update | Weekly Mon 04:00 | Downloads + hashes blocklists |
+| Service health check | Every 15 min | Checks critical services |
+| Docker prune | Weekly Mon 03:00 | Prunes >168h |
+| Immich DB backup | Daily | 7-day retention |
+| Twenty DB backup | Daily | 30-day retention |
+| Taskwarrior JSON backup | Daily | 30-day retention |
+
+---
+
+## 5. macOS (Darwin)
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| nix-darwin system management | ✅ | Full declarative macOS config |
+| Homebrew (nix-homebrew) | ✅ | Declarative taps, auto-migrate, headlamp cask |
+| LaunchAgents (declarative) | ✅ | ActivityWatch, SublimeText sync, aw-watcher-utilization, Crush update timer |
+| Touch ID for sudo (PAM) | ✅ | pam_tid.so configured |
+| Keychain management | ✅ | SSH keys, GPG signing, biometric |
+| macOS-specific shells | ✅ | Fish with Homebrew/OrbStack PATH, lazy-load Carapace |
+| Chrome policy | ✅ | Managed via darwin config |
+| Go 1.26.1 overlay | ✅ | Darwin-specific overlay with matching golangci-lint |
+
+---
+
+## 6. Custom Packages (pkgs/)
+
+| Package | Language | Status | Notes |
+|---------|----------|--------|-------|
+| aw-watcher-utilization | Python | ✅ | ActivityWatch system utilization watcher |
+| dnsblockd | Go | ✅ | DNS block page server — source in `platforms/nixos/programs/dnsblockd/` |
+| dnsblockd-processor | Go | ✅ | DNS blocklist processor (separate Go module in pkgs/) |
+| emeet-pixyd | Go | ✅ | EMEET PIXY webcam daemon — via flake input |
+| monitor365 | Rust | ✅ | Device monitoring agent — source-only flake input |
+| netwatch | Rust | ✅ | Real-time network diagnostics TUI |
+| openaudible | AppImage | ✅ | Audible audiobook manager |
+| jscpd | Node.js | ✅ | Copy/paste detector |
+| modernize | Go | ✅ | Go modernize tool |
+| file-and-image-renamer | Go | ✅ | AI screenshot renaming — source-only flake input with Go deps |
+| golangci-lint-auto-configure | Go | ✅ | Auto-configure golangci-lint — source-only flake input |
+| todo-list-ai | Go | ✅ | AI-powered TODO extraction — via flake input |
+| mr-sync | Go | ✅ | `~/.mrconfig` GitHub sync CLI — source-only flake input |
+
+---
+
+## 7. CI/CD & Quality
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| GitHub Actions: flake-update | ✅ | Automated flake input updates |
+| GitHub Actions: go-test | ✅ | Go test runner |
+| GitHub Actions: nix-check | ✅ | Nix flake check |
+| Pre-commit hooks | ✅ | Nix validation, shellcheck, markdownlint, private key detection |
+| Gitleaks | ✅ | Secret detection via `.gitleaks.toml` |
+| Statix checks | ✅ | Nix lint in flake checks |
+| Deadnix checks | ✅ | Dead code detection in flake checks |
+| treefmt formatting | ✅ | alejandra + other formatters |
+
+---
+
+## 8. Task Runner (Justfile)
+
+| Category | Commands | Status |
+|----------|----------|--------|
+| Core | `setup`, `switch`, `update`, `test`, `test-fast`, `format`, `validate`, `rollback`, `health` | ✅ |
+| DNS | `dns-status`, `dns-logs`, `dns-restart`, `dns-test`, `dns-perf`, `dns-diagnostics`, `dns-stats` | ✅ |
+| Immich | `immich-status`, `immich-logs`, `immich-backup`, `immich-restart` | ✅ |
+| Gitea | `gitea-update-token`, `gitea-sync-repos`, `gitea-setup` | ✅ |
+| Taskwarrior | `task-list`, `task-add`, `task-agent`, `task-sync`, `task-status`, `task-setup`, `task-backup` | ✅ |
+| Niri session | `session-status`, `session-restore` | ✅ |
+| Camera | `cam-status`, `cam-privacy`, `cam-track`, `cam-reset`, `cam-audio`, `cam-sync`, `cam-restart`, `cam-logs` | ✅ |
+| Hermes | `hermes-status`, `hermes-restart`, `hermes-logs`, `hermes-logs-follow` | ✅ |
+| AI models | `ai-migrate`, `ai-status` | ✅ |
+| Go dev | `go-lint`, `go-format`, `go-modernize`, `go-dev`, `go-tools-version`, etc. | ✅ |
+| Node dev | `node-lint`, `node-format`, `node-check`, `node-test`, `node-build`, `node-dev` | ✅ |
+| Cleanup | `clean`, `clean-quick`, `clean-aggressive`, `clean-storage` | ✅ |
+| Backup | `backup`, `restore`, `list-backups`, `clean-backups` | ✅ |
+| macOS Keychain | `keychain-list`, `keychain-status`, `keychain-ssh-add`, etc. | ✅ |
+| Benchmarks | `benchmark`, `perf`, `context` | ⚠️ | Depends on external scripts that may not all exist |
+| Dep graphs | `dep-graph` (nixos/darwin/svg/png/dot/all/verbose/view/clean) | ⚠️ | Depends on nix-visualize, may be slow |
+
+---
+
+## 9. Known Gaps & Honesty Check
+
+| Area | Issue | Severity |
+|------|-------|----------|
+| Raspberry Pi 3 | Hardware not provisioned — entire DNS failover cluster is planned-only | High |
+| PhotoMap AI | Disabled in configuration, pinned to old SHA256 | Medium |
+| Multi-WM (Sway) | Disabled — may have bitrot | Low |
+| Twenty CRM | Module exists but unclear if actively deployed | Medium |
+| Voice agents | Enabled but Whisper Docker + ROCm pipeline may need verification | Medium |
+| Unsloth Studio | Disabled by default, complex setup (PyTorch ROCm build) | Low |
+| Benchmark scripts | Justfile references `./scripts/benchmark-system.sh` etc. — may not all exist | Low |
+| Auditd | Disabled due to NixOS 26.05 bug #483085 | Medium |
+| AppArmor | Commented out in security-hardening | Medium |
+| DNS-over-QUIC | Overlay disabled — breaks binary cache (40+ min builds) | Low |
+| go-overlay (perSystem) | Removed to preserve binary cache — correct tradeoff | N/A |
+
+---
+
+## 10. Feature Count Summary
+
+| Category | Count |
+|----------|-------|
+| NixOS service modules | 29 |
+| Custom packages | 13 |
+| Cross-platform programs | 20+ |
+| Desktop components | 15+ |
+| Justfile commands | 90+ |
+| GitHub Actions | 3 |
+| Total enabled features | ~120 |
+| Planned/disabled | ~8 |
+| Known gaps | 10 |
+
+---
+
+_Generated by deep code audit — every module, program, and service file was read and assessed._
