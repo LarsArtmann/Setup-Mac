@@ -8,12 +8,17 @@ Custom Nix package definitions used across SystemNix. All packages are built via
 |---------|----------|----------|-------------|
 | [dnsblockd](#dnsblockd) | Go | Linux | DNS block page HTTP server |
 | [dnsblockd-processor](#dnsblockd-processor) | Go | Linux | Blocklist processor for dnsblockd |
-| [emeet-pixyd](#emeet-pixyd) | Go | Linux | EMEET PIXY webcam auto-activation daemon |
 | [modernize](#modernize) | Go | All | Go code modernize linter |
 | [jscpd](#jscpd) | Node.js | All | Copy/paste detector for source code |
 | [aw-watcher-utilization](#aw-watcher-utilization) | Python | All | ActivityWatch system utilization watcher |
 | [monitor365](#monitor365) | Rust | Linux | Personal device monitoring agent |
+| [netwatch](#netwatch) | Rust | Linux | Real-time network diagnostics TUI |
 | [openaudible](#openaudible) | AppImage | Linux | Audible audiobook manager |
+| [golangci-lint-auto-configure](#golangci-lint-auto-configure) | Go | All | golangci-lint auto-configurator |
+| [mr-sync](#mr-sync) | Go | All | ~/.mrconfig GitHub repo sync CLI |
+| [file-and-image-renamer](#file-and-image-renamer) | Go | Linux | AI-powered screenshot renaming tool |
+
+> **Note:** emeet-pixyd is provided entirely via the `emeet-pixyd` flake input overlay — no local package file needed.
 
 ---
 
@@ -32,15 +37,6 @@ CLI tool that converts DNS blocklists (hosts, domains, dnsmasq, adblock formats)
 - **Source:** `dnsblockd-processor/` (standalone Go module, no dependencies)
 - **Platform:** Linux only
 - **Usage:** `dnsblockd-processor BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [LIST_FILE NAME]...`
-
-### emeet-pixyd
-
-Auto-activation daemon for the EMEET PIXY dual-camera AI webcam. Detects video call usage via `/proc` scanning and automatically enables face tracking + noise cancellation on call start, privacy mode on call end. Includes a web UI and Waybar integration.
-
-- **Source:** `emeet-pixyd/` (Go module)
-- **Platform:** Linux only
-- **Config:** `platforms/nixos/hardware/emeet-pixy.nix` (NixOS module, udev rules)
-- **Binary alias:** `emeet-pixyd` and `emeet-pixy` both work
 
 ### modernize
 
@@ -74,6 +70,13 @@ Cross-platform personal device monitoring system agent. Rust CLI that collects s
 - **Platform:** Linux only
 - **Builds:** Only the CLI agent binary (`--package monitor365-cli`)
 
+### netwatch
+
+Real-time network diagnostics TUI built in Rust. Shows connectivity, latency, DNS resolution, and port status.
+
+- **Source:** `netwatch.nix` (Rust, fetched from nixpkgs)
+- **Platform:** Linux only
+
 ### openaudible
 
 Desktop application for managing Audible audiobooks. Wrapped AppImage.
@@ -81,6 +84,30 @@ Desktop application for managing Audible audiobooks. Wrapped AppImage.
 - **Source:** `openaudible.nix` (AppImage, unfree)
 - **Platform:** Linux only (x86_64)
 - **Install:** Included in `platforms/common/packages/base.nix` for Linux
+
+### golangci-lint-auto-configure
+
+Automatically configures and optimizes golangci-lint for Go projects.
+
+- **Source:** `golangci-lint-auto-configure.nix` (Go, source from `golangci-lint-auto-configure-src` flake input)
+- **Platform:** All platforms
+- **Install:** Available as `nix build .#golangci-lint-auto-configure`
+
+### mr-sync
+
+CLI tool to keep `~/.mrconfig` in sync with your GitHub repositories.
+
+- **Source:** `mr-sync.nix` (Go, source from `mr-sync-src` flake input)
+- **Platform:** All platforms
+- **Install:** Included in `platforms/common/packages/base.nix`
+
+### file-and-image-renamer
+
+AI-powered screenshot and image renaming tool using GLM-4.6V Vision API.
+
+- **Source:** `file-and-image-renamer.nix` (Go, source from `file-and-image-renamer-src` flake input)
+- **Platform:** Linux only
+- **Config:** `modules/nixos/services/file-and-image-renamer.nix`
 
 ## Adding a New Package
 
