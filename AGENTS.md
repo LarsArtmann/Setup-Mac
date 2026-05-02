@@ -45,11 +45,13 @@ SystemNix/
 │   ├── monitor365.nix           # Device monitoring agent (Rust)
 │   ├── netwatch.nix             # Real-time network diagnostics TUI (Rust)
 │   ├── openaudible.nix          # Audible audiobook manager (AppImage)
-│   └── golangci-lint-auto-configure.nix # golangci-lint auto-configurator (Go)
+│   ├── golangci-lint-auto-configure.nix # golangci-lint auto-configurator (Go)
+│   ├── mr-sync.nix              # ~/.mrconfig GitHub sync CLI (Go)
+│   └── file-and-image-renamer.nix # AI screenshot renaming (Go)
 │
 │   # External flake inputs (packages via overlay)
-│   # todo-list-ai            — AI-powered TODO extraction CLI (github:LarsArtmann/todo-list-ai)
-│   # golangci-lint-auto-configure — golangci-lint auto-configurator (local path input)
+│   # todo-list-ai            — AI-powered TODO extraction CLI
+│   # emeet-pixyd             — EMEET PIXY webcam daemon
 │
 └── platforms/
     ├── common/                  # Shared (~80%)
@@ -110,9 +112,17 @@ imports = [ ../../common/home-base.nix ];
 
 ### Custom Overlays
 
+All private LarsArtmann repos use `git+ssh://git@github.com/LarsArtmann/<name>?ref=<branch>` for flake inputs. No `path:` inputs exist — the flake is fully portable.
 
+**Naming convention:** `-src` suffix = `flake = false` (source-only). No suffix = full flake.
 
+**Active overlays:**
+- `sharedOverlays` — applied on Darwin + NixOS (NUR, aw-watcher, todo-list-ai, golangci-lint-auto-configure, mr-sync)
+- `linuxOnlyOverlays` — NixOS only (openaudible, dnsblockd, emeet-pixyd, monitor365, netwatch, file-and-image-renamer)
+- `disableTestsOverlay` — disables flaky tests for valkey, aiocache
+- `pythonTestOverlay` — NixOS-specific Python test overrides
 
+**Rule:** Never override `vendorHash` from outside a package. Each repo owns its own hash.
 
 ### Wrapped Packages (Vimjoyer Pattern)
 
@@ -174,8 +184,8 @@ systemctl --user list-timers niri-session-save  # Check save timer
 Crush config (`~/.config/crush/`) is a flake input deployed via Home Manager on both platforms:
 
 ```nix
-# flake.nix input
-crush-config.url = "github:LarsArtmann/crush-config";
+# flake.nix input (SSH URL for private repo)
+crush-config.url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
 
 # Both home.nix files
 home.file.".config/crush".source = crush-config;
@@ -560,3 +570,14 @@ hermes cron list          # List cron jobs
 | `go-finding-src` | go-finding library (flake=false) | — |
 | `homebrew-bundle` | Homebrew taps (flake=false) | — |
 | `homebrew-cask` | Homebrew cask taps (flake=false) | — |
+| `monitor365-src` | Device monitoring agent source (flake=false) | — |
+| `mr-sync-src` | ~/.mrconfig GitHub sync CLI (flake=false) | — |
+| `wallpapers-src` | Wallpaper collection (flake=false) | — |
+| `file-and-image-renamer-src` | AI screenshot renamer source (flake=false) | — |
+| `cmdguard-src` | Go command guard library (flake=false) | — |
+| `go-output-src` | Go output library (flake=false) | — |
+| `nixos-hardware` | Hardware profiles (RPi, etc.) | No |
+| `emeet-pixyd` | EMEET PIXY webcam daemon | Yes |
+| `treefmt-full-flake` | Treefmt formatter | Yes |
+
+**All LarsArtmann private repos use `git+ssh://` URLs.** No `path:` inputs remain.
