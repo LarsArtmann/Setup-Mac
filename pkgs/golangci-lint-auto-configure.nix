@@ -43,6 +43,8 @@ buildGoModule rec {
 
   proxyVendor = true;
 
+  subPackages = ["cmd/golangci-lint-auto-configure"];
+
   doCheck = false;
 
   postPatch = ''
