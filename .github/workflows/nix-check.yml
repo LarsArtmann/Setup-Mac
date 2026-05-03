@@ -18,3 +18,12 @@ jobs:
 
       - name: Check flake evaluation
         run: nix flake check --no-build
+
+      - name: Run statix linter
+        run: nix run nixpkgs#statix -- check .
+
+      - name: Run deadnix linter
+        run: nix run nixpkgs#deadnix -- --fail --no-lambda-pattern-names .
+
+      - name: Check Nix formatting
+        run: nix fmt -- --check .

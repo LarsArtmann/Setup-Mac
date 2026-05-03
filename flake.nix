@@ -481,33 +481,23 @@
           };
         };
 
-        checks =
-          {
-            statix =
-              pkgs.runCommand "statix-check" {
-                nativeBuildInputs = [pkgs.statix];
-              } ''
-                cd ${./.}
-                statix check . 2>&1 | tee $out
-              '';
-
-            deadnix =
-              pkgs.runCommand "deadnix-check" {
-                nativeBuildInputs = [pkgs.deadnix];
-              } ''
-                cd ${./.}
-                deadnix --fail --no-lambda-pattern-names . 2>&1 | tee $out
-              '';
-
-            nix-eval-darwin = pkgs.runCommand "nix-eval-darwin" {} ''
-              echo "darwin eval smoke test passed (nix flake check --no-build verifies this)" > $out
+        checks = {
+          statix =
+            pkgs.runCommand "statix-check" {
+              nativeBuildInputs = [pkgs.statix];
+            } ''
+              cd ${./.}
+              statix check . 2>&1 | tee $out
             '';
-          }
-          // lib.optionalAttrs pkgs.stdenv.isLinux {
-            nix-eval-nixos = pkgs.runCommand "nix-eval-nixos" {} ''
-              echo "nixos eval smoke test passed (nix flake check --no-build verifies this)" > $out
+
+          deadnix =
+            pkgs.runCommand "deadnix-check" {
+              nativeBuildInputs = [pkgs.deadnix];
+            } ''
+              cd ${./.}
+              deadnix --fail --no-lambda-pattern-names . 2>&1 | tee $out
             '';
-          };
+        };
 
         apps =
           {

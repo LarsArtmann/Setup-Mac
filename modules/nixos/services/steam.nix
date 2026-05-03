@@ -46,10 +46,7 @@ _: {
       };
 
       environment.systemPackages = with pkgs; [
-        steam
-        gamemode
         mangohud
-        gamescope
       ];
     };
   };

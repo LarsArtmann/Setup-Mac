@@ -52,32 +52,6 @@ _: {
       ];
 
       home-manager.users.${cfg.user} = {
-        xdg.configFile."file-and-image-renamer/watch-wrapper.sh" = {
-          executable = true;
-          text = ''
-            #!/bin/bash
-            set -euo pipefail
-
-            API_KEY_FILE="${cfg.apiKeyFile}"
-
-            if [ ! -f "$API_KEY_FILE" ]; then
-              echo "ERROR: API key file not found: $API_KEY_FILE" >&2
-              exit 1
-            fi
-
-            export ZAI_API_KEY=$(cat "$API_KEY_FILE" | tr -d '\n\r')
-
-            if [ -z "$ZAI_API_KEY" ]; then
-              echo "ERROR: API key is empty in: $API_KEY_FILE" >&2
-              exit 1
-            fi
-
-            export DESKTOP_PATH="${cfg.watchDirectory}"
-
-            exec ${cfg.package}/bin/file-renamer watch
-          '';
-        };
-
         systemd.user.services.file-and-image-renamer = {
           Unit = {
             Description = "File and Image Renamer Watcher";

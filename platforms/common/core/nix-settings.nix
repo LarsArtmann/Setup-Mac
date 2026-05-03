@@ -14,9 +14,7 @@
       builders-use-substitutes = true;
       connect-timeout = 120; # Increased to 120s to handle DNS/IPv6 timeouts
       fallback = true;
-      http-connections = 10; # Reduced to avoid "Too many open files" errors
-      keep-derivations = true;
-      keep-outputs = true;
+      http-connections = 25;
       log-lines = 25;
       max-free = 3000000000; # 3GB
       min-free = 1000000000; # 1GB
@@ -61,11 +59,9 @@
       netrc-file = /etc/nix/netrc
 
       # Flake settings
-      accept-flake-config = true
-      show-trace = true
-
-      # Force IPv4-only for network operations
-      narinfo-cache-negative-ttl = 0
+      accept-flake-config = false
+      show-trace = false
+      narinfo-cache-negative-ttl = 3600
     '';
   };
 

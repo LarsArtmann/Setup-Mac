@@ -169,7 +169,7 @@ _: {
               description = "ActivityWatch API hostname";
             };
             port = lib.mkOption {
-              type = lib.types.int;
+              type = lib.types.port;
               default = 5600;
               description = "ActivityWatch API port";
             };
@@ -195,7 +195,7 @@ _: {
       };
 
       retentionDays = lib.mkOption {
-        type = lib.types.int;
+        type = lib.types.ints.positive;
         default = 90;
         description = "Days to retain events before cleanup";
       };

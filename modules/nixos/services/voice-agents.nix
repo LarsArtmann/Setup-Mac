@@ -63,10 +63,6 @@ _: {
     };
 
     config = lib.mkIf cfg.enable {
-      sops.secrets.livekit_keys = {
-        restartUnits = ["livekit.service"];
-      };
-
       sops.templates."livekit-keys.env" = {
         content = ''
           ${config.sops.placeholder.livekit_keys}

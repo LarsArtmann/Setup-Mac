@@ -14,7 +14,7 @@
       };
 
       accent = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.enum ["rosewater" "flamingo" "pink" "mauve" "red" "maroon" "peach" "yellow" "green" "teal" "sky" "sapphire" "blue" "lavender"];
         default = "lavender";
         description = "Accent color for theme variants";
       };
@@ -44,7 +44,7 @@
       };
 
       cursorSize = lib.mkOption {
-        type = lib.types.int;
+        type = lib.types.ints.positive;
         default = 96;
         description = "Cursor size in pixels";
       };
@@ -56,7 +56,7 @@
           description = "Default UI font";
         };
         size = lib.mkOption {
-          type = lib.types.int;
+          type = lib.types.ints.positive;
           default = 16;
           description = "Default UI font size";
         };
@@ -66,7 +66,7 @@
           description = "Monospace font";
         };
         monoSize = lib.mkOption {
-          type = lib.types.int;
+          type = lib.types.ints.positive;
           default = 16;
           description = "Monospace font size";
         };
