@@ -10,21 +10,9 @@ _: {
 
     inherit (pkgs.rocmPackages) rocwmma;
 
-    rocmEnv = {
-      HSA_OVERRIDE_GFX_VERSION = "11.5.1";
-      HSA_ENABLE_SDMA = "0";
-    };
-
-    rocmRuntimeLibs = with pkgs; [
-      stdenv.cc.cc.lib
-      zstd
-      rocmPackages.clr
-      rocmPackages.rocminfo
-      rocmPackages.rocrand
-      rocmPackages.rocblas
-      rocmPackages.rocm-runtime
-      rocmPackages.rocm-comgr
-    ];
+    rocm = import ../../../lib/rocm.nix {inherit pkgs;};
+    rocmEnv = rocm.env;
+    rocmRuntimeLibs = rocm.runtimeLibs;
 
     llama-cpp-rocwmma =
       (pkgs.llama-cpp.override {

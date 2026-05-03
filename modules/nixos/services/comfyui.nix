@@ -9,26 +9,18 @@ _: {
     primaryUser = "lars";
     harden = import ../../../lib/systemd.nix;
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    rocm = import ../../../lib/rocm.nix {inherit pkgs;};
 
-    rocmRuntimeLibs = with pkgs; [
-      stdenv.cc.cc.lib
-      zstd
-      rocmPackages.clr
-      rocmPackages.rocminfo
-      rocmPackages.rocrand
-      rocmPackages.rocblas
-      rocmPackages.rocm-runtime
-      rocmPackages.rocm-comgr
-    ];
+    rocmRuntimeLibs = rocm.runtimeLibs;
 
-    rocmEnv = {
-      HSA_OVERRIDE_GFX_VERSION = "11.5.1";
-      HSA_ENABLE_SDMA = "0";
-      PYTORCH_HIP_ALLOC_CONF = "garbage_collection_threshold:0.6,max_split_size_mb:128";
-      TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL = "1";
-      TORCH_COMPILE_DISABLE = "1";
-      PYTHONDONTWRITEBYTECODE = "1";
-    };
+    rocmEnv =
+      rocm.env
+      // {
+        PYTORCH_HIP_ALLOC_CONF = "garbage_collection_threshold:0.6,max_split_size_mb:128";
+        TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL = "1";
+        TORCH_COMPILE_DISABLE = "1";
+        PYTHONDONTWRITEBYTECODE = "1";
+      };
   in {
     options.services.comfyui = {
       enable = lib.mkEnableOption "ComfyUI — persistent AI image generation server with GPU model caching";
