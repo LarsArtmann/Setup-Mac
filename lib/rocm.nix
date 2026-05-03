@@ -1,7 +1,7 @@
 {
   pkgs,
   gfxVersion ? "11.5.1",
-}: {
+}: rec {
   runtimeLibs = with pkgs; [
     stdenv.cc.cc.lib
     zstd
