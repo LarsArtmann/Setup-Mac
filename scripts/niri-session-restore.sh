@@ -52,7 +52,6 @@ done
 
 declare -A spawned
 spawned_windows=()
-focused_app=""
 focused_ws=""
 highest_ts=0
 
