@@ -509,11 +509,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777775824,
-        "narHash": "sha256-17o+XHT9MSPEkhAK/zCj7mLlP2c44d4azrrpPcKNgVg=",
+        "lastModified": 1777780580,
+        "narHash": "sha256-ltgZHOMmHUe7an3foHAX+cO+G+Cq+e4/R24n62HCq/0=",
         "ref": "master",
-        "rev": "d1612d19d54a3ac5ebbb9978a7fe62a68a9b19a0",
-        "revCount": 602,
+        "rev": "03f338523d4556b29412b801874e3e1ccdc222bf",
+        "revCount": 610,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
