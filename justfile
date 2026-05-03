@@ -188,19 +188,19 @@ clean:
     echo "🦀 Cleaning Rust/Cargo cache..."; \
     cargo cache --autoclean || echo "  ⚠️  Cargo cache clean failed (cargo-cache not installed?)"; \
     echo "🔧 Cleaning build caches..."; \
-    rm -rf ~/.bun/install/cache || echo "  ⚠️  Bun cache not found"; \
-    rm -rf ~/.gradle/caches/* || echo "  ⚠️  Gradle cache not found"; \
-    rm -rf ~/.cache/puppeteer || echo "  ⚠️  Puppeteer cache not found"; \
-    rm -rf ~/.nuget/packages || echo "  ⚠️  NuGet cache not found"; \
+    trash ~/.bun/install/cache 2>/dev/null || echo "  ⚠️  Bun cache not found"; \
+    trash ~/.gradle/caches/* 2>/dev/null || echo "  ⚠️  Gradle cache not found"; \
+    trash ~/.cache/puppeteer 2>/dev/null || echo "  ⚠️  Puppeteer cache not found"; \
+    trash ~/.nuget/packages 2>/dev/null || echo "  ⚠️  NuGet cache not found"; \
     echo ""; \
     echo "=== System Cache Cleanup ==="; \
     if [ "$PLATFORM" = "darwin" ]; then \
         echo "🔦 Cleaning Spotlight metadata..."; \
-        [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && rm -r ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || echo "  ⚠️  Spotlight metadata not found"; \
+        [ -d ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents ] && trash ~/Library/Metadata/CoreSpotlight/SpotlightKnowledgeEvents || echo "  ⚠️  Spotlight metadata not found"; \
     fi; \
     echo "🗂️  Cleaning system temp files..."; \
-    rm -rf /tmp/nix-build-* || echo "  ⚠️  No nix-build temp files found"; \
-    rm -rf /tmp/nix-shell-* || echo "  ⚠️  No nix-shell temp files found"; \
+    find /tmp -maxdepth 1 -name 'nix-build-*' -print0 2>/dev/null | xargs -0 trash 2>/dev/null || echo "  ⚠️  No nix-build temp files found"; \
+    find /tmp -maxdepth 1 -name 'nix-shell-*' -print0 2>/dev/null | xargs -0 trash 2>/dev/null || echo "  ⚠️  No nix-shell temp files found"; \
     if [ "$PLATFORM" = "darwin" ]; then \
         echo "📱 Cleaning iOS simulators (if Xcode installed)..."; \
         xcrun simctl delete unavailable 2>/dev/null || echo "  ⚠️  Xcode/simulators not found or no unavailable simulators"; \
@@ -230,7 +230,7 @@ clean-quick:
     pnpm store prune || echo "  ⚠️  pnpm not available"; \
     go clean -cache || echo "  ⚠️  Go not available"; \
     echo "🗂️  Cleaning temp files..."; \
-    rm -rf /tmp/nix-build-* /tmp/nix-shell-* || echo "  ⚠️  No temp files found"; \
+    find /tmp -maxdepth 1 \( -name 'nix-build-*' -o -name 'nix-shell-*' \) -print0 2>/dev/null | xargs -0 trash 2>/dev/null || echo "  ⚠️  No temp files found"; \
     echo "🐳 Cleaning Docker (light)..."; \
     docker system prune -f 2>/dev/null || echo "  ⚠️  Docker not available"; \
     echo "✅ Quick cleanup done! (No Nix store changes)"
@@ -270,11 +270,11 @@ clean-aggressive:
     echo ""; \
     echo "=== Development Caches ==="; \
     echo "🏗️  Cleaning all build caches..."; \
-    rm -rf ~/.cache || true && mkdir -p ~/.cache; \
+    trash ~/.cache 2>/dev/null || true && mkdir -p ~/.cache; \
     if [ "$PLATFORM" = "darwin" ]; then \
-        rm -rf ~/Library/Caches/CocoaPods || true; \
-        rm -rf ~/Library/Caches/Homebrew || true; \
-        rm -rf ~/Library/Developer/Xcode/DerivedData || true; \
+        trash ~/Library/Caches/CocoaPods 2>/dev/null || true; \
+        trash ~/Library/Caches/Homebrew 2>/dev/null || true; \
+        trash ~/Library/Developer/Xcode/DerivedData 2>/dev/null || true; \
     fi; \
     echo "🐳 Removing all Docker data..."; \
     docker system prune -af --volumes 2>/dev/null || true; \
