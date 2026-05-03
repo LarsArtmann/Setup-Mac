@@ -709,83 +709,6 @@ env-private:
     @echo "✅ Private environment file created at ~/.env.private"
 
 
-# Network and System Monitoring
-# ==============================
-
-# Start system monitoring with Netdata
-netdata-start:
-    @echo "🔧 Starting Netdata system monitoring..."
-    launchctl load ~/Library/LaunchAgents/com.netdata.agent.plist || netdata -c ~/monitoring/netdata/config/netdata.conf -D
-    @echo "✅ Netdata started - Dashboard available at http://localhost:19999"
-
-# Stop Netdata monitoring
-netdata-stop:
-    @echo "🛑 Stopping Netdata monitoring..."
-    launchctl unload ~/Library/LaunchAgents/com.netdata.agent.plist || sudo killall netdata || echo "Netdata was not running"
-    @echo "✅ Netdata stopped"
-
-# Start network monitoring with ntopng
-ntopng-start:
-    @echo "🌐 Starting ntopng network monitoring..."
-    launchctl load ~/Library/LaunchAgents/com.ntopng.daemon.plist || sudo ntopng --config-file ~/monitoring/ntopng/config/ntopng.conf --daemon
-    @echo "✅ ntopng started - Dashboard available at http://localhost:3000"
-
-# Stop ntopng monitoring
-ntopng-stop:
-    @echo "🛑 Stopping ntopng monitoring..."
-    launchctl unload ~/Library/LaunchAgents/com.ntopng.daemon.plist || sudo killall ntopng || echo "ntopng was not running"
-    @echo "✅ ntopng stopped"
-
-# Start comprehensive monitoring (both tools)
-monitor-all:
-    @echo "📊 Starting comprehensive monitoring..."
-    just netdata-start
-    just ntopng-start
-    @echo "✅ All monitoring tools started"
-    @echo "   Netdata: http://localhost:19999"
-    @echo "   ntopng:  http://localhost:3000"
-
-# Stop all monitoring tools
-monitor-stop:
-    @echo "🛑 Stopping all monitoring tools..."
-    just netdata-stop
-    just ntopng-stop
-    @echo "✅ All monitoring stopped"
-
-# Check monitoring status
-monitor-status:
-    @echo "📊 Checking monitoring status..."
-    @echo "Netdata:" && (pgrep netdata > /dev/null && echo "✅ Running" || echo "❌ Not running")
-    @echo "ntopng:" && (pgrep ntopng > /dev/null && echo "✅ Running" || echo "❌ Not running")
-
-# Restart all monitoring tools
-monitor-restart:
-    @echo "🔄 Restarting monitoring tools..."
-    just monitor-stop
-    sleep 2
-    just monitor-all
-    @echo "✅ Monitoring tools restarted"
-
-
-# ==================================
-
-# Run full performance analysis
-perf-full-analysis:
-    @echo "🚀 Running comprehensive performance analysis..."
-    @just benchmark all
-    @just perf benchmark
-    @just context analyze
-    @just context recommend
-    @just perf report
-    @echo "✅ Full performance analysis complete"
-
-# Setup all automation systems
-automation-setup:
-    @echo "🤖 Setting up all automation systems..."
-    @just perf setup
-    @just context setup
-    @echo "✅ All automation systems setup complete"
-
 # Debug shell startup with verbose logging
 debug:
     @echo "🐛 Running shell startup in debug mode..."
@@ -799,30 +722,35 @@ debug:
 health:
     @./scripts/health-check.sh
 
-# Verify d2 installation and file association
+# Verify d2 installation and file association (macOS only — uses duti)
 d2-verify:
-    @echo "🔍 Verifying d2 installation..."
-    @echo ""
-    @echo "=== D2 Binary ==="
-    @if command -v d2 >/dev/null 2>&1; then \
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" != "darwin" ]; then \
+        echo "❌ This command only works on macOS (uses duti for file associations)"; \
+        exit 1; \
+    fi; \
+    echo "🔍 Verifying d2 installation..."; \
+    echo ""; \
+    echo "=== D2 Binary ==="; \
+    if command -v d2 >/dev/null 2>&1; then \
         echo "✅ Binary found: $$(which d2)"; \
         echo "✅ Version: $$(d2 --version | head -1)"; \
     else \
         echo "❌ d2 binary not found in PATH"; \
-    fi
-    @echo ""
-    @echo "=== D2 File Association ==="
-    @verify_d2=$$(duti -x .d2 2>/dev/null | head -1); \
+    fi; \
+    echo ""; \
+    echo "=== D2 File Association ==="; \
+    verify_d2=$$(duti -x .d2 2>/dev/null | head -1); \
     if [[ "$$verify_d2" == *"Sublime"* ]]; then \
         echo "✅ .d2 → Sublime Text"; \
     else \
         echo "⚠️ .d2 association: $$verify_d2"; \
-    fi
-    @echo ""
-    @echo "=== D2 Syntax Check ==="
-    @echo 'x -> y' | d2 - >/dev/null 2>&1 && echo "✅ D2 syntax works" || echo "❌ D2 syntax check failed"
-    @echo ""
-    @echo "✅ D2 verification complete"
+    fi; \
+    echo ""; \
+    echo "=== D2 Syntax Check ==="; \
+    echo 'x -> y' | d2 - >/dev/null 2>&1 && echo "✅ D2 syntax works" || echo "❌ D2 syntax check failed"; \
+    echo ""; \
+    echo "✅ D2 verification complete"
 
 # Go Development Tools
 # ===================
@@ -1065,37 +993,7 @@ node-tools-version:
     @echo -n "tsgolint: "; tsgolint --version 2>/dev/null | head -1 || echo "installed"
     @echo -n "oxfmt: "; oxfmt --version 2>/dev/null | head -1 || echo "installed"
 
-# Configure Claude AI settings using the Go tool
-claude-config profile="personal" *ARGS="":
-    @echo "🤖 Configuring Claude AI with profile: {{ profile }}"
-    better-claude configure --profile {{ profile }} {{ ARGS }}
-    @echo "✅ Claude configuration complete"
 
-# Configure Claude AI with backup (recommended for production)
-claude-config-safe profile="personal" *ARGS="":
-    @echo "🤖 Configuring Claude AI with profile: {{ profile }} (with backup)"
-    better-claude configure --profile {{ profile }} --backup {{ ARGS }}
-    @echo "✅ Claude configuration complete with backup"
-
-# Create a backup of current Claude configuration
-claude-backup profile="personal":
-    @echo "💾 Creating Claude configuration backup for profile: {{ profile }}"
-    better-claude backup --profile {{ profile }}
-    @echo "✅ Backup complete"
-
-# Restore Claude configuration from backup
-claude-restore backup_file:
-    @echo "🔄 Restoring Claude configuration from: {{ backup_file }}"
-    better-claude restore {{ backup_file }}
-    @echo "✅ Restore complete"
-
-# Test Claude configuration (dry-run mode)
-claude-test profile="personal":
-    @echo "🧪 Testing Claude configuration for profile: {{ profile }} (dry-run)"
-    better-claude configure --profile {{ profile }} --dry-run
-    @echo "✅ Test complete - no changes made"
-
-# Show help with detailed descriptions
 help:
     @echo "SystemNix Task Runner"
     @echo "====================="
@@ -1183,23 +1081,6 @@ help:
     @echo "  disk-monitor-schedule - Show timer schedule"
     @echo ""
     @echo "Run 'just <command>' to execute any task."
-
-# Documentation Management Commands
-# ================================
-
-# Update README.md with Nix-managed tools section
-doc-update-readme:
-    @echo "📝 Updating README.md with Nix-managed tools section..."
-    @printf '%s\n\n### Nix-Managed Development Tools\n\nAll development tools are managed through Nix packages, providing:\n- **Reproducible Builds**: Same tool versions across all machines\n- **Atomic Updates**: Managed via `just update && just switch`\n- **Declarative Configuration**: Tools defined in Nix, not installed imperatively\n- **Easy Rollback**: Revert to previous tool versions instantly\n\n**Go Development Stack:**\nAll Go tools (gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup) are installed via Nix packages defined in `platforms/common/packages/base.nix`.\n\nTo view available Go tools:\n```bash\njust go-tools-version    # Show all Go tool versions\njust go-dev             # Full Go development workflow\n```\n\n**ActivityWatch (macOS):**\nActivityWatch auto-start is managed declaratively via Nix LaunchAgent configuration in `platforms/darwin/services/launchagents.nix`. No manual setup scripts required.\n' "$(head -n 289 README.md)" > README.md.new
-    @tail -n +290 README.md >> README.md.new
-    @mv README.md.new README.md
-    @echo "✅ README.md updated successfully"
-
-# Update Go section in "What You Get" to mention Nix packages
-doc-update-go-what-you-get:
-    @echo "📝 Updating 'What You Get' Go section..."
-    @perl -i -pe 's/Go \(with templ, sqlc, go-tools\)/Go (Nix-managed: gopls, golangci-lint, gofumpt, gotests, mockgen, protoc-gen-go, buf, delve, gup + templ, sqlc, go-tools)/ if $. == 270' README.md
-    @echo "✅ 'What You Get' Go section updated"
 
 # Wrapper Management Commands
 # =========================
