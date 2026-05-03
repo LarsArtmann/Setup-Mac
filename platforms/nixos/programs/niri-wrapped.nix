@@ -314,7 +314,7 @@ in {
     };
 
     maxSessionAgeDays = lib.mkOption {
-      type = lib.types.int;
+      type = lib.types.ints.positive;
       default = 7;
       description = "Maximum age in days before session snapshot is discarded";
     };

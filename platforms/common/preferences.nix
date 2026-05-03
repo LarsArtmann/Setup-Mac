@@ -8,7 +8,7 @@
       };
 
       colorSchemeName = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nonEmptyStr;
         default = "catppuccin-mocha";
         description = "nix-colors scheme name (must exist in nix-colors.colorSchemes)";
       };
@@ -26,19 +26,19 @@
       };
 
       gtkThemeName = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nonEmptyStr;
         default = "Catppuccin-Mocha-Compact-Lavender-Dark";
         description = "Full GTK theme name (must match installed theme)";
       };
 
       iconTheme = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nonEmptyStr;
         default = "Papirus-Dark";
         description = "Icon theme name";
       };
 
       cursorTheme = lib.mkOption {
-        type = lib.types.str;
+        type = lib.types.nonEmptyStr;
         default = "Bibata-Modern-Classic";
         description = "Cursor theme name";
       };
@@ -51,7 +51,7 @@
 
       font = {
         name = lib.mkOption {
-          type = lib.types.str;
+          type = lib.types.nonEmptyStr;
           default = "Sans";
           description = "Default UI font";
         };
@@ -61,7 +61,7 @@
           description = "Default UI font size";
         };
         mono = lib.mkOption {
-          type = lib.types.str;
+          type = lib.types.nonEmptyStr;
           default = "JetBrainsMono Nerd Font";
           description = "Monospace font";
         };

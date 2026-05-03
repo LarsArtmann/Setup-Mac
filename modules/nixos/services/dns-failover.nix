@@ -12,37 +12,36 @@ _: {
       enable = mkEnableOption "DNS failover via Keepalived VRRP";
 
       virtualIP = mkOption {
-        type = types.str;
+        type = types.nonEmptyStr;
         description = "Virtual IP address shared between DNS nodes (clients point to this)";
       };
 
       interface = mkOption {
-        type = types.str;
+        type = types.nonEmptyStr;
         description = "Network interface for VRRP advertisements and virtual IP";
       };
 
       priority = mkOption {
-        type = types.int;
+        type = types.ints.between 0 255;
         default = 100;
         description = "VRRP priority (higher = preferred master). Use 100 for primary, 50 for backup.";
       };
 
       routerID = mkOption {
-        type = types.int;
+        type = types.ints.between 0 255;
         default = 53;
         description = "VRRP router ID (must match on all nodes in the cluster)";
       };
 
       subnetPrefix = mkOption {
-        type = types.int;
+        type = types.ints.between 0 32;
         default = 24;
         description = "Subnet prefix length for the virtual IP";
       };
 
       authPassword = mkOption {
-        type = types.str;
-        default = "DNSClusterVRRP";
-        description = "VRRP authentication password (override with sops for production)";
+        type = types.nonEmptyStr;
+        description = "VRRP authentication password. REQUIRED — must be set per-node. Use sops for production.";
       };
     };
 

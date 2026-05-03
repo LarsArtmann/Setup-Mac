@@ -162,6 +162,7 @@ in {
       priority = 50;
       routerID = 53;
       subnetPrefix = 24;
+      authPassword = "DNSClusterVRRP-evox2";
     };
   };
 
