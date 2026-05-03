@@ -24,19 +24,22 @@ _: {
 
       watchDirectory = lib.mkOption {
         type = lib.types.str;
-        default = "/home/lars/Desktop";
+        default = "/home/${cfg.user}/Desktop";
+        defaultText = "/home/<user>/Desktop";
         description = "Directory to watch for new screenshots";
       };
 
       apiKeyFile = lib.mkOption {
         type = lib.types.str;
-        default = "/home/lars/.zai_api_key";
+        default = "/home/${cfg.user}/.zai_api_key";
+        defaultText = "/home/<user>/.zai_api_key";
         description = "Path to the ZAI API key file";
       };
 
       logDirectory = lib.mkOption {
         type = lib.types.str;
-        default = "/home/lars/.file-renamer/logs";
+        default = "/home/${cfg.user}/.file-renamer/logs";
+        defaultText = "/home/<user>/.file-renamer/logs";
         description = "Directory for watcher log files";
       };
     };

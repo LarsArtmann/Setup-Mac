@@ -34,9 +34,9 @@ _: {
       enable = lib.mkEnableOption "ComfyUI — persistent AI image generation server with GPU model caching";
 
       package = lib.mkOption {
-        type = lib.types.path;
-        default = /home/lars/projects/anime-comic-pipeline/ComfyUI;
-        description = "Path to ComfyUI installation";
+        type = lib.types.str;
+        default = "/home/lars/projects/anime-comic-pipeline/ComfyUI";
+        description = "Path to ComfyUI installation (mutable directory, not copied to store)";
       };
 
       venvPython = lib.mkOption {
@@ -52,7 +52,7 @@ _: {
       };
 
       port = lib.mkOption {
-        type = lib.types.int;
+        type = lib.types.port;
         default = 8188;
         description = "Listen port";
       };
@@ -100,8 +100,8 @@ _: {
             Type = "simple";
             User = cfg.user;
             Group = "users";
-            WorkingDirectory = toString cfg.package;
-            ExecStart = "${cfg.venvPython} ${toString cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
+            WorkingDirectory = cfg.package;
+            ExecStart = "${cfg.venvPython} ${cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
             OOMScoreAdjust = -100;
             SupplementaryGroups = ["render" "video"];
             TimeoutStartSec = "300";

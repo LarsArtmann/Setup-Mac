@@ -33,7 +33,7 @@
     "/data" = {
       device = "/dev/disk/by-uuid/046ea663-da55-48b7-b516-0dcdb87ba710";
       fsType = "btrfs";
-      options = ["compress=zstd:3" "noatime" "ssd" "discard=async" "space_cache=v2"];
+      options = ["compress=zstd:3" "noatime" "ssd" "discard=async" "space_cache=v2" "nofail"];
     };
     "/boot" = {
       device = "/dev/disk/by-uuid/80A3-73A9";

@@ -118,7 +118,8 @@ _: {
 
       home = lib.mkOption {
         type = lib.types.str;
-        default = "/home/lars/.local/share/monitor365";
+        default = "/home/${config.services.monitor365.user}/.local/share/monitor365";
+        defaultText = "/home/<user>/.local/share/monitor365";
         description = "Data directory for event storage";
       };
 

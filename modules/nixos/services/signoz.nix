@@ -135,9 +135,9 @@ in {
                 description = "Bind address for the query service";
               };
               dataDir = lib.mkOption {
-                type = lib.types.path;
+                type = lib.types.str;
                 default = "/var/lib/signoz";
-                description = "Data directory for the query service";
+                description = "Data directory for the query service (runtime path, not copied to store)";
               };
             };
             collector = {

@@ -127,9 +127,13 @@ in {
         chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
         chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
 
-        # Ensure hermes (via 'users' group) can read/write /home/lars
-        if [ -d /home/lars ]; then
-          chmod g+rwx /home/lars
+        # Grant hermes (via 'users' group) read+execute access to the primary user's home
+        # so it can navigate to shared project directories.
+        # NOTE: This uses ACLs instead of broad chmod to avoid making the entire
+        # home directory writable. Only read+execute (r-x) is granted, not write.
+        primaryHome="/home/lars"
+        if [ -d "$primaryHome" ]; then
+          setfacl -m "g:${cfg.group}:r-x" "$primaryHome" 2>/dev/null || chmod g+rx "$primaryHome"
         fi
 
         find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
@@ -184,7 +188,7 @@ in {
             ExecReload = "/bin/kill -USR1 $MAINPID";
             StandardOutput = "journal";
             StandardError = "journal";
-            UMask = "0007";
+            UMask = "0026";
           }
           // harden {
             MemoryMax = "4G";
