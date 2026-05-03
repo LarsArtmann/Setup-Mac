@@ -73,6 +73,15 @@ repos:
         files: ^flake\.lock$
         pass_filenames: false
 
+      # Shell: Static analysis for shell scripts
+      - id: shellcheck
+        name: shellcheck (shell script linter)
+        entry: bash
+        args: [-c, "shellcheck --severity=warning --exclude=SC2312 scripts/*.sh"]
+        language: system
+        files: ^scripts/.*\.sh$
+        pass_filenames: false
+
       # Merge conflict detection across all files
       - id: check-merge-conflicts
         name: check for merge conflicts
@@ -89,13 +98,15 @@ repos:
 # 5. alejandra            - Check code formatting
 # 6. nix-check            - Validate syntax and build
 # 7. flake-lock-validate  - Validate flake.lock JSON integrity
-# 8. check-merge-conflicts - Catch unresolved merge markers
+# 8. shellcheck           - Lint shell scripts in scripts/
+# 9. check-merge-conflicts - Catch unresolved merge markers
 #
 # Tools Used:
-# - gitleaks  (secret detection)
-# - deadnix   (dead code detection)
-# - statix    (linter, 20+ rules)
-# - alejandra (code formatter)
+# - gitleaks   (secret detection)
+# - deadnix    (dead code detection)
+# - statix     (linter, 20+ rules)
+# - alejandra  (code formatter)
+# - shellcheck (shell script analysis)
 # - just       (task runner)
 #
 # All hooks use `--check` mode to enforce standards.

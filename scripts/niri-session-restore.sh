@@ -26,6 +26,7 @@ fi
 if [ -f "$STATE_DIR/timestamp" ]; then
   saved=$(cat "$STATE_DIR/timestamp")
   now=$(date +%s)
+  # shellcheck disable=SC1102
   max_age=$(( @maxSessionAgeDays@ * 86400 ))
   [ $((now - saved)) -gt $max_age ] && { fallback; exit 0; }
 fi
