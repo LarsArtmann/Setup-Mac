@@ -144,10 +144,6 @@ clean:
     @PLATFORM=$(just _detect_platform); \
     echo "🧹 Starting comprehensive system cleanup..."; \
     echo ""; \
-    echo "=== Quick Cache Cleanup ==="; \
-    echo "💡 Tip: Run 'just clean-storage' for safe cache-only cleanup (no sudo)"; \
-    ./scripts/storage-cleanup.sh; \
-    echo ""; \
     echo "=== Nix Store Cleanup ==="; \
     echo "📊 Current store size:"; \
     du -sh /nix/store || echo "Could not measure store size"; \
@@ -598,16 +594,6 @@ clean-backups:
     ls -1t | tail -n +11 | xargs trash 2>/dev/null || ls -1t | tail -n +11 | xargs rm -rf
     echo "✅ Old backups cleaned"
 
-# Quick storage cleanup (no Nix GC, safe to run)
-clean-storage:
-    @echo "🧹 Quick storage cleanup (safe, no sudo required)..."
-    @echo "  Note: This cleans caches, temp files, and build outputs"
-    @echo "  For Nix GC, use 'just clean' (requires sudo)"
-    ./scripts/storage-cleanup.sh
-    @echo "✅ Storage cleanup complete!"
-    @echo "💡 For comprehensive cleanup: just clean"
-    @echo "💡 For Nix GC: sudo nix-collect-garbage -d --delete-older-than 3d && sudo nix-store --optimize"
-
 # Rebuild zsh completion cache
 rebuild-completions:
     @echo "🔄 Rebuilding zsh completion cache..."
@@ -722,98 +708,6 @@ env-private:
     @echo "# export SOME_API_KEY=\"your-key-here\"" >> ~/.env.private
     @echo "✅ Private environment file created at ~/.env.private"
 
-# Benchmark commands - unified interface
-# Usage: just benchmark [all|shells|build|system|files|report|clean|legacy]
-benchmark TYPE="all":
-    @case "{{ TYPE }}" in \
-        all) \
-            echo "🚀 Running comprehensive system benchmarks..."; \
-            ./scripts/benchmark-system.sh; \
-            echo "✅ All benchmarks complete"; \
-            ;; \
-        shells) \
-            echo "🐚 Benchmarking shell startup performance..."; \
-            ./scripts/benchmark-system.sh --shells; \
-            echo "✅ Shell benchmarks complete"; \
-            ;; \
-        build) \
-            echo "🔨 Benchmarking build tools performance..."; \
-            ./scripts/benchmark-system.sh --build-tools; \
-            echo "✅ Build tool benchmarks complete"; \
-            ;; \
-        system) \
-            echo "⚙️  Benchmarking system commands..."; \
-            ./scripts/benchmark-system.sh --system; \
-            echo "✅ System command benchmarks complete"; \
-            ;; \
-        files) \
-            echo "📁 Benchmarking file operations..."; \
-            ./scripts/benchmark-system.sh --file-ops; \
-            echo "✅ File operation benchmarks complete"; \
-            ;; \
-        report) \
-            echo "📊 Generating performance report..."; \
-            ./scripts/benchmark-system.sh --report; \
-            echo "✅ Report generated"; \
-            ;; \
-        clean) \
-            echo "🧹 Cleaning old benchmark results..."; \
-            ./scripts/benchmark-system.sh --cleanup; \
-            echo "✅ Benchmark cleanup complete"; \
-            ;; \
-        legacy) \
-            echo "🏃 Benchmarking shell startup performance (legacy)..."; \
-            echo "Testing zsh startup time (10 runs):"; \
-            hyperfine --warmup 3 --runs 10 'zsh -i -c exit'; \
-            echo ""; \
-            echo "Testing bash startup time for comparison:"; \
-            hyperfine --warmup 3 --runs 10 'bash -i -c exit'; \
-            echo "✅ Legacy benchmark complete"; \
-            ;; \
-        *) \
-            echo "❌ Unknown benchmark type: {{ TYPE }}"; \
-            echo "Usage: just benchmark [all|shells|build|system|files|report|clean|legacy]"; \
-            exit 1; \
-            ;; \
-    esac
-
-# Performance Monitoring commands - unified interface
-# Usage: just perf [setup|benchmark|report|alerts|cache-clear] [args]
-perf ACTION="benchmark" *ARGS="7":
-    @case "{{ ACTION }}" in \
-        setup) \
-            echo "🔧 Setting up performance monitoring..."; \
-            ./scripts/performance-monitor.sh setup-monitoring; \
-            echo "✅ Performance monitoring setup complete"; \
-            ;; \
-        benchmark) \
-            echo "📊 Running performance monitoring benchmark..."; \
-            ./scripts/performance-monitor.sh benchmark-all; \
-            echo "✅ Performance benchmark complete"; \
-            ;; \
-        report) \
-            days="${1:-7}"; \
-            echo "📈 Generating performance report ($$days days)..."; \
-            ./scripts/performance-monitor.sh report "$$days"; \
-            echo "✅ Performance report generated"; \
-            ;; \
-        alerts) \
-            echo "🚨 Showing performance alerts..."; \
-            ./scripts/performance-monitor.sh alerts; \
-            echo "✅ Alerts displayed"; \
-            ;; \
-        cache-clear) \
-            pattern="${1:-*}"; \
-            echo "🧹 Clearing performance cache (pattern: $$pattern)..."; \
-            ./scripts/performance-monitor.sh cache-clear "$$pattern"; \
-            echo "✅ Performance cache cleared"; \
-            ;; \
-        *) \
-            echo "❌ Unknown perf action: {{ ACTION }}"; \
-            echo "Usage: just perf [setup|benchmark|report|alerts|cache-clear] [args]"; \
-            exit 1; \
-            ;; \
-    esac
 
 # Network and System Monitoring
 # ==============================
@@ -872,46 +766,7 @@ monitor-restart:
     just monitor-all
     @echo "✅ Monitoring tools restarted"
 
-# Context Detection and Analysis
-# ==============================
 
-# Context detection commands - unified interface
-# Usage: just context [detect|log|analyze|recommend|setup]
-context ACTION="detect":
-    @case "{{ ACTION }}" in \
-        detect) \
-            echo "🔍 Detecting current shell context..."; \
-            ./scripts/shell-context-detector.sh detect; \
-            echo "✅ Context detection complete"; \
-            ;; \
-        log) \
-            echo "📝 Logging current shell session..."; \
-            ./scripts/shell-context-detector.sh log; \
-            echo "✅ Session logged"; \
-            ;; \
-        analyze) \
-            echo "📊 Analyzing shell usage patterns..."; \
-            ./scripts/shell-context-detector.sh analyze; \
-            echo "✅ Analysis complete"; \
-            ;; \
-        recommend) \
-            echo "💡 Generating loading recommendations..."; \
-            ./scripts/shell-context-detector.sh recommend; \
-            echo "✅ Recommendations generated"; \
-            ;; \
-        setup) \
-            echo "🔧 Creating context-aware loading hook..."; \
-            ./scripts/shell-context-detector.sh create-hook; \
-            echo "✅ Context-aware loading hook created"; \
-            ;; \
-        *) \
-            echo "❌ Unknown context action: {{ ACTION }}"; \
-            echo "Usage: just context [detect|log|analyze|recommend|setup]"; \
-            exit 1; \
-            ;; \
-    esac
-
-# Comprehensive Performance Analysis
 # ==================================
 
 # Run full performance analysis
