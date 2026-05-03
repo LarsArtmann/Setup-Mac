@@ -29,7 +29,7 @@ _A brutally honest audit of every feature the project actually has._
 | Shared overlays (Darwin + NixOS) | ✅ | NUR, aw-watcher, todo-list-ai, golangci-lint-auto-configure, mr-sync |
 | Linux-only overlays | ✅ | openaudible, dnsblockd, emeet-pixyd, monitor365, netwatch, file-and-image-renamer |
 | Shared Home Manager config | ✅ | `sharedHomeManagerConfig` + `sharedHomeManagerSpecialArgs` |
-| Custom packages (pkgs/) | ✅ | 11 packages: 4 Go, 1 Rust, 1 Python, 1 Node.js, 4 Go flakes |
+| Custom packages (pkgs/) | ✅ | 13 packages: 6 Go, 2 Rust, 1 Python, 1 Node.js, 3 via flake inputs |
 | Formatter (treefmt + alejandra) | ✅ | Via `treefmt-full-flake` |
 | Flake checks (statix, deadnix, eval) | ✅ | Per-system + Linux-specific |
 | Raspberry Pi 3 SD image build | 📋 | `nixosConfigurations.rpi3-dns` defined, hardware not provisioned |
@@ -139,7 +139,7 @@ _A brutally honest audit of every feature the project actually has._
 | Chromium | ✅ | Darwin | Brave as primary, VAAPI decode/encode, YouTube Shorts Blocker extension |
 | Chromium (NixOS) | ✅ | Linux | System-wide via `chromium-policies.nix` module |
 | Taskwarrior 3 | ✅ | Both | Sync to `tasks.home.lan`, deterministic UUID client ID, Catppuccin Mocha colors, daily JSON backup |
-| SSH config | ✅ | Both | Via `nix-ssh-config` flake input — onprem, evo-x2, 4x Hetzner servers |
+| SSH config | ✅ | Both | Via `nix-ssh-config` flake input — 7 hosts: onprem, evo-x2, 4× Hetzner private cloud |
 
 ### Theme & Appearance
 
@@ -380,7 +380,7 @@ The DNS blocker is one of the largest custom features in the project — a full 
 
 ## 9. Task Runner (Justfile)
 
-| Category | Commands | Status |
+ | Commands | Status |
 |----------|----------|--------|
 | Core | `setup`, `switch`, `update`, `test`, `test-fast`, `format`, `validate`, `rollback`, `health` | ✅ |
 | DNS | `dns-status`, `dns-logs`, `dns-restart`, `dns-test`, `dns-perf`, `dns-diagnostics`, `dns-stats` | ✅ |
@@ -402,7 +402,7 @@ The DNS blocker is one of the largest custom features in the project — a full 
 
 ---
 
-## 9. Known Gaps & Honesty Check
+## 10. Known Gaps & Honesty Check
 
 | Area | Issue | Severity |
 |------|-------|----------|
@@ -420,20 +420,79 @@ The DNS blocker is one of the largest custom features in the project — a full 
 
 ---
 
-## 10. Feature Count Summary
+---
+
+## 11. Architecture Patterns
+
+### Reusable NixOS Module Patterns
+
+| Pattern | Location | Purpose |
+|---------|----------|---------|
+| Systemd hardening | `lib/systemd.nix` | Reusable function: `harden { MemoryMax = "512M"; }` — PrivateTmp, NoNewPrivileges, ProtectClock, etc. |
+| Service defaults | `lib/systemd/service-defaults.nix` | Restart=always, RestartSec=5s, burst limits. WatchdogSec intentionally excluded (requires sd_notify) |
+| Composable services | `harden {} // serviceDefaults {}` | Nix module merge combines hardening + lifecycle into serviceConfig |
+| Cross-platform preferences | `platforms/common/preferences.nix` | Shared option module — drives macOS dark mode AND Linux GTK theme from single source |
+| Dendritic modules | `modules/nixos/services/*.nix` | Each file is self-contained flake-parts module with own `config` options |
+| Local network options | `platforms/nixos/system/local-network.nix` | `networking.local.*` module options used by both evo-x2 and rpi3-dns |
+| Shared DNS blocklists | `platforms/shared/dns-blocklists.nix` | Blocklist config consumed by both evo-x2 unbound and rpi3-dns |
+
+### Architecture Decision Records (ADRs)
+
+| ADR | Title | Decision |
+|-----|-------|----------|
+| ADR-001 | Home Manager for Darwin | Use HM for unified user config across macOS + NixOS, 80% code sharing |
+| ADR-002 | Cross-shell alias architecture | Single source of truth in `shell-aliases.nix`, imported by Fish/Zsh/Bash |
+| ADR-003 | Ban OpenZFS on macOS | Permanently banned (kernel panics), ZFS allowed on NixOS |
+| ADR-004 | Secrets management | sops-nix with age, SSH host key as master key, 3-2-1 backup required |
+| ADR-005 | Niri session restore | Periodic snapshots via systemd timer, restore on compositor startup |
+
+---
+
+## 12. Improvement Opportunities
+
+### Type Model / Architecture Suggestions
+
+| Area | Current State | Suggestion |
+|------|---------------|------------|
+| dnsblockd categories | Stringly-typed (10 hardcoded strings) | Define `Category` enum type in Go — make impossible states unrepresentable |
+| dnsblockd temp-allow | In-memory map, lost on restart | Persist to SQLite or file — already has `/var/lib` state dir pattern |
+| Nix module options | Many modules use `mkEnableOption` only | Add typed options for key config (ports, paths, timeouts) — enables validation and testing |
+| Service hardening | Per-service `harden {}` calls | Consider `mkHardenedService` wrapper that combines hardening + defaults + common patterns |
+| Overlays | Defined as standalone functions in flake.nix | Extract to `overlays/` directory (already done for some via pkgs/) for discoverability |
+| Shared preferences | Only `preferences.nix` currently | Extend pattern: shared `services.defaults` for common service config (user, group, stateDir) |
+
+### Well-Established Libraries Already In Use
+
+| Library | Purpose | Why Good Choice |
+|---------|---------|-----------------|
+| flake-parts | Modular flake architecture | Standard pattern for complex Nix flakes, enables dendritic modules |
+| sops-nix | Secrets management | Battle-tested, age/GPG/SSH key support, systemd integration |
+| nix-colors | Declarative color schemes | Base16 standard, drives all apps from single source of truth |
+| home-manager | User-level config | Cross-platform, NixOS module integration, declarative dotfiles |
+| nix-homebrew | Homebrew management | Declarative taps/casks, auto-migrate, pinned inputs |
+| niri-flake | Wayland compositor | Wraps niri for NixOS, overlay + module + wrapper-modules pattern |
+
+---
+
+## 13. Feature Count Summary
 
 | Category | Count |
 |----------|-------|
 | NixOS service modules | 29 |
 | Custom packages | 13 |
 | Cross-platform programs | 20+ |
-| Desktop components | 15+ |
+| NixOS desktop components | 15+ |
+| macOS features | 25+ |
+| DNS stack components | 12 |
+| Validation scripts | 8 (4 missing) |
 | Justfile commands | 90+ |
+| Architecture patterns | 7 |
+| ADRs | 5 |
 | GitHub Actions | 3 |
-| Total enabled features | ~120 |
+| **Total enabled features** | **~140** |
 | Planned/disabled | ~8 |
-| Known gaps | 10 |
+| Known gaps | 12 |
 
 ---
 
-_Generated by deep code audit — every module, program, and service file was read and assessed._
+_Generated by deep code audit — every module, program, service file, script, and workflow was read and assessed._
