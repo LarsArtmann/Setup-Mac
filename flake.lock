@@ -100,11 +100,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777770452,
-        "narHash": "sha256-PutjuhD1ayoDdV/x0AXtl0Hjj301pl5wOs/J1+IZH6s=",
+        "lastModified": 1777805444,
+        "narHash": "sha256-myq1ozAoarI4HMgKkFL59Xk87W+831y+9ILAaKTw+pU=",
         "ref": "master",
-        "rev": "d7fc95701af4054678ce198f457d9b39c2394bce",
-        "revCount": 97,
+        "rev": "afb7f44159b8d80a4b3ac9d680e6a13feb193160",
+        "revCount": 98,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
@@ -441,11 +441,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1777798464,
-        "narHash": "sha256-owO2v4WGuQIa3gTI9dgZhFg2tr0bEosRIkH+49IINeo=",
+        "lastModified": 1777805269,
+        "narHash": "sha256-LHBbX/mos0MYzLkShYBtttJAzmGRDpt6qzdVaII/rpE=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "457c7b76cd69089142f7ee02bf26ed5fef9d8741",
+        "rev": "0a97ce6bff49163b74b1d76418c4b1b3f2455b76",
         "type": "github"
       },
       "original": {
@@ -923,11 +923,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777799278,
-        "narHash": "sha256-DhWDQxs7erDcIuMGVztmyxnHbBNWi+Qmqd1qP0qf+jg=",
+        "lastModified": 1777803859,
+        "narHash": "sha256-/c3zOLVXSRJ+xfLUtwVuP9ULsYOcqOGTBck03jwItus=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "f128bc54effd4d84e8fd662c306bf543cbab01ae",
+        "rev": "74754756f254b94edfe641f9c95b3c61893c5554",
         "type": "github"
       },
       "original": {
