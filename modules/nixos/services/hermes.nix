@@ -182,6 +182,7 @@ in {
           }
           // harden {
             MemoryMax = "4G";
+            ProtectHome = false;
             ReadWritePaths = [cfg.stateDir];
           };
       };
