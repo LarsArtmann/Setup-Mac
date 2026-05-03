@@ -145,6 +145,11 @@ Niri is wrapped using the `wrapper-modules` pattern to bake configuration into t
 
 Crash-recovery system for niri window restoration on the NixOS (evo-x2) machine.
 
+**Source files:**
+- `scripts/niri-session-save.sh` — save logic (read niri state + kitty /proc tree)
+- `scripts/niri-session-restore.sh` — restore logic (JSON validation, workspace recreation, window spawning)
+- `platforms/nixos/programs/niri-wrapped.nix` — NixOS module wrapping scripts via `writeShellApplication` + `builtins.readFile`
+
 **How it works:**
 - **Save** (systemd timer, configurable interval default 60s): Snapshots all niri windows, workspaces, and kitty terminal state to `~/.local/state/niri-session/`
 - **Restore** (runs at niri startup via `spawn-at-startup`): Reads snapshot, re-spawns apps on correct workspaces with column widths, floating state, and focus order
@@ -166,7 +171,7 @@ Crash-recovery system for niri window restoration on the NixOS (evo-x2) machine.
 - Notification: `notify-send` on successful restore
 - Save failure: `OnFailure` triggers critical desktop notification
 
-**Configurable via `let` block:**
+**Configurable via `services.niri-session` module options:**
 - `sessionSaveInterval` — timer interval (default `"60s"`)
 - `maxSessionAgeDays` — max age before fallback (default `7`)
 - `fallbackApps` — list of `{app_id, args}` for fallback session
@@ -345,7 +350,7 @@ AI agent task tracking protocol:
 |-------|-------------|
 | Darwin HM user | Must define `users.users.larsartmann.home` in `platforms/darwin/default.nix` — Home Manager requires it |
 | Different relative paths | Darwin home.nix uses `../common/`, NixOS uses `../../common/` due to directory depth |
-| Darwin overlays | Darwin uses `sharedOverlays` directly (no Linux-only overlays). perSystem applies the same shared + Linux-only overlays. |
+| Darwin overlays | Darwin uses `sharedOverlays` directly (no Linux-only overlays). perSystem applies the same shared + Linux-only overlays. No Go overlay — uses nixpkgs default. |
 | NixOS overlays separate | NixOS adds `niri.overlays.niri`, `dnsblockdOverlay`, and Python overrides on top of the shared ones |
 | SigNoz built from source | SigNoz is built from source (Go 1.25), not from a pre-built package. Takes significant build time. |
 | crush-config doesn't follow nixpkgs | The crush-config input intentionally does NOT follow nixpkgs (no `inputs.nixpkgs.follows`) |
@@ -390,6 +395,7 @@ Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
 | mkMerge + flake-parts | Use inline config or imports instead of `lib.mkMerge` | Accepted limitation |
 | `wire` not in Nixpkgs | Installed via `go install` (see `go-update-tools-manual` just recipe) | Accepted |
 | AI model migration order | Run `just ai-migrate` BEFORE `just switch` to avoid Ollama seeing empty model dir | Documented |
+| Go overlay removed on Darwin | nixpkgs `go_1_26` is already 1.26.1; overlay was invalidating 1094 binary cache derivations | Resolved — removed |
 
 ## Essential Commands
 
