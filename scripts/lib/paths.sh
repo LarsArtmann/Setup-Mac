@@ -48,8 +48,8 @@ export USER_CONFIG="$USER_HOME/.config"
 export USER_PROJECTS="$USER_HOME/projects"
 
 # Nix-specific paths
-export NIX_CONFIG_DIR="$DOTFILES_DIR/nix"
-export NIX_CORE_DIR="$NIX_CONFIG_DIR/core"
+export NIX_CONFIG_DIR="$PLATFORMS_DIR/common/core"
+export NIX_CORE_DIR="$NIX_CONFIG_DIR"
 
 # Backup directory
 export BACKUP_DIR="$PROJECT_ROOT/.backups"

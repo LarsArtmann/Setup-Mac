@@ -19,7 +19,7 @@ check_root() {
 
 # Function to check if running on NixOS
 check_nixos() {
-  if [[ ! -f /etc/nixos/configuration.nix ]]; then
+  if [[ ! -f /etc/NIXOS ]]; then
     echo "❌ This script is designed to run on NixOS"
     exit 1
   fi
