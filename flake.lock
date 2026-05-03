@@ -394,11 +394,11 @@
     "golangci-lint-auto-configure-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777771568,
-        "narHash": "sha256-QgYa9asrxxA9kpQ/HSmRCnG+cwc/dCUquP1zvD2BCvU=",
+        "lastModified": 1777774015,
+        "narHash": "sha256-2+zH0QDZSSKNzT4vQmKESoVLJmxNOUrvhJ3RgMwMErk=",
         "ref": "master",
-        "rev": "00201d2e9c31933454c133505e2481aec409bdaa",
-        "revCount": 454,
+        "rev": "5484981dbeb236071b10f71e09e5b1b706035ad6",
+        "revCount": 458,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/golangci-lint-auto-configure"
       },
@@ -509,11 +509,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777771074,
-        "narHash": "sha256-3Y7uI/OThnoH9TqSI94ex+4rqplHgrw6VQl0AvKhLJQ=",
+        "lastModified": 1777774432,
+        "narHash": "sha256-yFvibXcjdtCUtE8iaL0focbFI92eh333pGXwVnQBWcU=",
         "ref": "master",
-        "rev": "6fa58765c8d6e44d489287eb5121dec0bf9c7324",
-        "revCount": 594,
+        "rev": "b4fd47408f6638280c6c36b7d1f6a17689232238",
+        "revCount": 601,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
