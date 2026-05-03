@@ -95,18 +95,28 @@ update:
     @echo "💡 Next steps:"
     @echo "   - Run 'just switch' to apply changes"
 
-# ActivityWatch manual control commands
+# ActivityWatch manual control commands (macOS only)
 activitywatch-start:
-    @echo "🚀 Starting ActivityWatch..."
-    @osascript -e 'tell application "ActivityWatch" to launch'
-    @sleep 3
-    @pgrep -f ActivityWatch > /dev/null && echo "✅ ActivityWatch started" || echo "❌ Failed to start"
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" != "darwin" ]; then \
+        echo "❌ This command only works on macOS (uses osascript)"; \
+        exit 1; \
+    fi; \
+    echo "🚀 Starting ActivityWatch..."; \
+    osascript -e 'tell application "ActivityWatch" to launch'; \
+    sleep 3; \
+    pgrep -f ActivityWatch > /dev/null && echo "✅ ActivityWatch started" || echo "❌ Failed to start"
 
 activitywatch-stop:
-    @echo "🛑 Stopping ActivityWatch..."
-    @pkill -f ActivityWatch || echo "  (ActivityWatch not running)"
-    @sleep 2
-    @pgrep -f ActivityWatch > /dev/null && echo "❌ ActivityWatch still running" || echo "✅ ActivityWatch stopped"
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" != "darwin" ]; then \
+        echo "❌ This command only works on macOS"; \
+        exit 1; \
+    fi; \
+    echo "🛑 Stopping ActivityWatch..."; \
+    pkill -f ActivityWatch || echo "  (ActivityWatch not running)"; \
+    sleep 2; \
+    pgrep -f ActivityWatch > /dev/null && echo "❌ ActivityWatch still running" || echo "✅ ActivityWatch stopped"
 
 # Gitea repository management (NixOS only)
 gitea-update-token:
@@ -929,16 +939,6 @@ tmux-kill:
     @echo "💀 Killing all tmux sessions..."
     tmux kill-server
     @echo "✅ All tmux sessions killed"
-
-tmux-save:
-    @echo "💾 Saving tmux sessions..."
-    tmux run-shell "tmux save-session"
-    @echo "✅ Tmux sessions saved"
-
-tmux-restore:
-    @echo "🔄 Restoring tmux sessions..."
-    tmux run-shell "tmux restore-session"
-    @echo "✅ Tmux sessions restored"
 
 tmux-status:
     @echo "📊 Tmux status:"
