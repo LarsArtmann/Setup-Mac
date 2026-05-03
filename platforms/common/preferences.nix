@@ -1,4 +1,6 @@
-{lib, ...}: {
+{lib, ...}: let
+  theme = import ./theme.nix;
+in {
   options.preferences = {
     appearance = {
       variant = lib.mkOption {
@@ -9,65 +11,65 @@
 
       colorSchemeName = lib.mkOption {
         type = lib.types.nonEmptyStr;
-        default = "catppuccin-mocha";
+        default = theme.colorSchemeName;
         description = "nix-colors scheme name (must exist in nix-colors.colorSchemes)";
       };
 
       accent = lib.mkOption {
         type = lib.types.enum ["rosewater" "flamingo" "pink" "mauve" "red" "maroon" "peach" "yellow" "green" "teal" "sky" "sapphire" "blue" "lavender"];
-        default = "lavender";
+        default = theme.accent;
         description = "Accent color for theme variants";
       };
 
       density = lib.mkOption {
         type = lib.types.enum ["standard" "compact"];
-        default = "compact";
+        default = theme.density;
         description = "UI density — standard or compact";
       };
 
       gtkThemeName = lib.mkOption {
         type = lib.types.nonEmptyStr;
-        default = "Catppuccin-Mocha-Compact-Lavender-Dark";
+        default = theme.gtkThemeName;
         description = "Full GTK theme name (must match installed theme)";
       };
 
       iconTheme = lib.mkOption {
         type = lib.types.nonEmptyStr;
-        default = "Papirus-Dark";
+        default = theme.iconTheme;
         description = "Icon theme name";
       };
 
       cursorTheme = lib.mkOption {
         type = lib.types.nonEmptyStr;
-        default = "Bibata-Modern-Classic";
+        default = theme.cursorTheme;
         description = "Cursor theme name";
       };
 
       cursorSize = lib.mkOption {
         type = lib.types.ints.positive;
-        default = 96;
+        default = theme.cursorSize;
         description = "Cursor size in pixels";
       };
 
       font = {
         name = lib.mkOption {
           type = lib.types.nonEmptyStr;
-          default = "Sans";
+          default = theme.font.name;
           description = "Default UI font";
         };
         size = lib.mkOption {
           type = lib.types.ints.positive;
-          default = 16;
+          default = theme.font.size;
           description = "Default UI font size";
         };
         mono = lib.mkOption {
           type = lib.types.nonEmptyStr;
-          default = "JetBrainsMono Nerd Font";
+          default = theme.font.mono;
           description = "Monospace font";
         };
         monoSize = lib.mkOption {
           type = lib.types.ints.positive;
-          default = 16;
+          default = theme.font.monoSize;
           description = "Monospace font size";
         };
       };

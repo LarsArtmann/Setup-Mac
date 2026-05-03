@@ -1,4 +1,4 @@
-_: rec {
+rec {
   variant = "mocha";
   accent = "lavender";
   density = "compact";

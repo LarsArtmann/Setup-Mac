@@ -1,34 +1,20 @@
 # Import common shell configurations with platform-specific overrides
-{lib, ...}: {
+{lib, ...}: let
+  nixAliases = {
+    nixup = "darwin-rebuild switch --flake .";
+    nixbuild = "darwin-rebuild build --flake .";
+    nixcheck = "darwin-rebuild check --flake .";
+  };
+in {
   imports = [
     ../../common/programs/fish.nix
     ../../common/programs/bash.nix # Added for Bash parity
   ];
 
   programs = {
-    # Override Fish aliases with Darwin-specific ones
-    fish.shellAliases = lib.mkAfter {
-      # Darwin-specific aliases
-      nixup = "darwin-rebuild switch --flake .";
-      nixbuild = "darwin-rebuild build --flake .";
-      nixcheck = "darwin-rebuild check --flake .";
-    };
-
-    # Override Zsh aliases with Darwin-specific ones
-    zsh.shellAliases = lib.mkAfter {
-      # Darwin-specific aliases
-      nixup = "darwin-rebuild switch --flake .";
-      nixbuild = "darwin-rebuild build --flake .";
-      nixcheck = "darwin-rebuild check --flake .";
-    };
-
-    # Override Bash aliases with Darwin-specific ones (FIX: Added for parity)
-    bash.shellAliases = lib.mkAfter {
-      # Darwin-specific aliases
-      nixup = "darwin-rebuild switch --flake .";
-      nixbuild = "darwin-rebuild build --flake .";
-      nixcheck = "darwin-rebuild check --flake .";
-    };
+    fish.shellAliases = lib.mkAfter nixAliases;
+    zsh.shellAliases = lib.mkAfter nixAliases;
+    bash.shellAliases = lib.mkAfter nixAliases;
 
     # Darwin-specific Fish shell initialization
     # OPTIMIZED: Lazy loading and combined operations for faster startup

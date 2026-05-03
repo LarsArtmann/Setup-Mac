@@ -405,6 +405,7 @@
         ./modules/nixos/services/chromium-policies.nix
         ./modules/nixos/services/steam.nix
         ./modules/nixos/services/file-and-image-renamer.nix
+        ./modules/nixos/services/disk-monitor.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -694,6 +695,7 @@
             inputs.self.nixosModules.chromium-policies
             inputs.self.nixosModules.steam
             inputs.self.nixosModules.file-and-image-renamer
+            inputs.self.nixosModules.disk-monitor
             inputs.emeet-pixyd.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];

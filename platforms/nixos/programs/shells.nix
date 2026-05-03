@@ -1,29 +1,15 @@
 # NixOS shell configurations with platform-specific overrides
-{lib, ...}: {
+{lib, ...}: let
+  nixAliases = {
+    nixup = "sudo nixos-rebuild switch --flake .";
+    nixbuild = "sudo nixos-rebuild build --flake .";
+    nixcheck = "sudo nixos-rebuild test --flake .";
+  };
+in {
   programs = {
-    # Override Fish aliases with NixOS-specific ones
-    fish.shellAliases = lib.mkAfter {
-      # NixOS-specific aliases
-      nixup = "sudo nixos-rebuild switch --flake .";
-      nixbuild = "sudo nixos-rebuild build --flake .";
-      nixcheck = "sudo nixos-rebuild test --flake .";
-    };
-
-    # Override Zsh aliases with NixOS-specific ones
-    zsh.shellAliases = lib.mkAfter {
-      # NixOS-specific aliases
-      nixup = "sudo nixos-rebuild switch --flake .";
-      nixbuild = "sudo nixos-rebuild build --flake .";
-      nixcheck = "sudo nixos-rebuild test --flake .";
-    };
-
-    # Override Bash aliases with NixOS-specific ones
-    bash.shellAliases = lib.mkAfter {
-      # NixOS-specific aliases
-      nixup = "sudo nixos-rebuild switch --flake .";
-      nixbuild = "sudo nixos-rebuild build --flake .";
-      nixcheck = "sudo nixos-rebuild test --flake .";
-    };
+    fish.shellAliases = lib.mkAfter nixAliases;
+    zsh.shellAliases = lib.mkAfter nixAliases;
+    bash.shellAliases = lib.mkAfter nixAliases;
 
     # NixOS-specific Fish shell initialization
     fish.shellInit = lib.mkAfter ''

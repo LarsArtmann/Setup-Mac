@@ -7,7 +7,6 @@ _: {
   }: let
     cfg = config.services.homepage;
     inherit (config.networking) domain;
-    port = 8082;
     stateDir = "/var/lib/homepage-dashboard";
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
@@ -15,6 +14,11 @@ _: {
   in {
     options.services.homepage = {
       enable = lib.mkEnableOption "Homepage Dashboard service";
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8082;
+        description = "HTTP port for Homepage Dashboard";
+      };
     };
 
     config = lib.mkIf cfg.enable {
@@ -27,7 +31,7 @@ _: {
             ExecStart = "${pkgs.homepage-dashboard}/bin/homepage";
             WorkingDirectory = stateDir;
             Environment = [
-              "PORT=${toString port}"
+              "PORT=${toString cfg.port}"
               "HOMEPAGE_CONFIG_DIR=${stateDir}"
             ];
             User = "homepage";

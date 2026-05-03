@@ -1176,6 +1176,12 @@ help:
     @echo "  ssh-setup      - Create SSH directories"
     @echo "  rollback       - Emergency rollback to previous generation"
     @echo ""
+    @echo "Disk Monitoring:"
+    @echo "  disk-monitor-status   - Show disk monitor status and current usage"
+    @echo "  disk-monitor-check    - Trigger manual disk check"
+    @echo "  disk-monitor-reset    - Reset notification state (allow re-notifying)"
+    @echo "  disk-monitor-schedule - Show timer schedule"
+    @echo ""
     @echo "Run 'just <command>' to execute any task."
 
 # Documentation Management Commands
@@ -1803,6 +1809,43 @@ ai-status:
     @echo "  OLLAMA_MODELS  = $${OLLAMA_MODELS:-not set}"
     @echo "  HF_HOME        = $${HF_HOME:-not set}"
     @echo "  LLAMA_MODEL_PATH = $${LLAMA_MODEL_PATH:-not set}"
+
+# ========================================
+# Disk Monitor Commands
+# ========================================
+
+# Show disk monitor status and current usage
+disk-monitor-status:
+    @echo "=== Disk Monitor Status ==="
+    @echo ""
+    @echo "Service:"
+    @systemctl is-active disk-monitor.timer 2>/dev/null || echo "  timer not found"
+    @systemctl is-active disk-monitor.service 2>/dev/null || true
+    @echo ""
+    @echo "Monitored filesystems:"
+    @for mp in / /data; do \
+        if mountpoint -q "$$mp" 2>/dev/null; then \
+            df -h "$$mp" | tail -1 | awk '{printf "  %-6s %s used, %s free of %s (%s)\n", ENVIRON["MOUNT"], $$5, $$4, $$2, $$6}' MOUNT="$$mp"; \
+        else \
+            echo "  $$mp — not mounted"; \
+        fi; \
+    done
+    @echo ""
+    @echo "Notification state:"
+    @ls -la ~/.local/state/disk-monitor/ 2>/dev/null || echo "  (no active alerts)"
+
+# Trigger a manual disk check now
+disk-monitor-check:
+    @systemctl start disk-monitor.service && echo "Check completed" || echo "Check failed"
+
+# Reset disk monitor notification state (allows re-notifying)
+disk-monitor-reset:
+    @rm -rf ~/.local/state/disk-monitor/*
+    @echo "Notification state cleared"
+
+# Show disk monitor timer schedule
+disk-monitor-schedule:
+    @systemctl list-timers disk-monitor.timer --no-pager 2>/dev/null || echo "Timer not active"
 
 # ========================================
 # todo-list-ai Commands

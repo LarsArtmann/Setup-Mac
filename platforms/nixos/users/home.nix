@@ -5,7 +5,7 @@
   colorScheme,
   ...
 }: let
-  theme = import ../../common/theme.nix {};
+  theme = import ../../common/theme.nix;
   colors = colorScheme.palette;
 in {
   imports = [

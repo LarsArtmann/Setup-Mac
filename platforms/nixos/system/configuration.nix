@@ -158,6 +158,11 @@
       chromium-policies.enable = true;
       steam-config.enable = true;
 
+      # Disk usage monitoring with desktop notifications at thresholds
+      disk-monitor = {
+        enable = true;
+      };
+
       # Centralized AI model storage (/data/ai/)
       ai-models.enable = true;
 
