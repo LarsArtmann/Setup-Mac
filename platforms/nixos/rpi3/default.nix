@@ -131,8 +131,7 @@ in {
 
           include = toString unboundIncludeFile;
 
-          # Root hints provided by NixOS unbound module via dns-root-data
-          # (removed broken root-hints = ":" override)
+          root-hints = "${pkgs.dns-root-data}/root.hints";
 
           local-zone =
             map (d: ''"${d}" transparent'') blocklists.whitelist

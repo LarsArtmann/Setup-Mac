@@ -63,24 +63,10 @@
       ];
     };
 
-    # Pin Go to version 1.26.1
-    nixpkgs.overlays = [
-      (_final: prev: {
-        go = prev.go_1_26.overrideAttrs (_oldAttrs: {
-          version = "1.26.1";
-          src = prev.fetchurl {
-            url = "https://go.dev/dl/go1.26.1.src.tar.gz";
-            hash = "sha256-MXIpPQSyCdwRRGmOe6E/BHf2uoxf/QvmbCD9vJeF37s=";
-          };
-        });
-      })
-      (final: prev: {
-        # Override golangci-lint to use Go 1.26 instead of default Go version
-        golangci-lint = prev.golangci-lint.override {
-          buildGo126Module = prev.buildGoModule.override {inherit (final) go;};
-        };
-      })
-    ];
+    # NOTE: Go overlay removed — nixpkgs go_1_26 is already 1.26.1.
+    # Overriding go forced a from-source rebuild that invalidated the
+    # binary cache for the ENTIRE dependency tree (1094 derivations).
+    # Matches flake.nix approach — see the goOverlay removal note there.
 
     # Home Manager workaround: Explicit user definition required
     # Home Manager's nix-darwin/default.nix imports ../nixos/common.nix which

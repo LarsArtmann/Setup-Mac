@@ -188,8 +188,7 @@ in {
           # DISABLED: unbound not compiled with ngtcp2; setting quic-port causes fatal warning
           # quic-port = cfg.doqPort;
 
-          # Root hints provided by NixOS unbound module via dns-root-data
-          # (removed broken root-hints = ":" override)
+          root-hints = "${pkgs.dns-root-data}/root.hints";
 
           local-zone =
             map (d: ''"${d}" transparent'') cfg.whitelist
