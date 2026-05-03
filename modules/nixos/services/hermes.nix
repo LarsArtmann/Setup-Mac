@@ -103,6 +103,7 @@ in {
       users.users.${cfg.user} = {
         isSystemUser = true;
         inherit (cfg) group;
+        extraGroups = ["users"];
         home = cfg.stateDir;
         createHome = true;
         description = "Hermes AI Agent Gateway service user";
@@ -125,6 +126,11 @@ in {
         mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
         chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
         chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+
+        # Ensure hermes (via 'users' group) can traverse /home/lars
+        if [ -d /home/lars ]; then
+          chmod g+x /home/lars
+        fi
 
         find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
           -exec chmod g+rw {} + 2>/dev/null || true
