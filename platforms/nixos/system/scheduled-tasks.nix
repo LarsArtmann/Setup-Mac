@@ -9,6 +9,7 @@ in
     ...
   }: let
     uid = builtins.toString config.users.users.${primaryUser}.uid;
+    harden = import ../../../lib/systemd.nix;
   in {
     systemd = {
       timers = {
@@ -140,21 +141,32 @@ in
         };
 
         rust-target-cleanup = {
-          description = "Clean Rust target/ directories over 2GB";
+          description = "Weekly Rust target/ cleanup (dirs >2GB)";
           onFailure = ["notify-failure@%n.service"];
-          path = [pkgs.findutils pkgs.coreutils pkgs.gnused pkgs.libnotify];
-          serviceConfig = {
-            Type = "oneshot";
-            User = primaryUser;
-            ExecStart =
-              pkgs.writeShellScript "rust-target-cleanup" ''
+          path = [pkgs.cargo-sweep pkgs.findutils pkgs.coreutils];
+          serviceConfig =
+            harden {
+              MemoryMax = "256M";
+              ProtectHome = "read-only";
+              ReadWritePaths = ["/home/${primaryUser}/projects"];
+            }
+            // {
+              Type = "oneshot";
+              User = primaryUser;
+              Environment = [
+                "DISPLAY=:0"
+                "WAYLAND_DISPLAY=wayland-1"
+                "XDG_RUNTIME_DIR=/run/user/${uid}"
+              ];
+              ExecStart = pkgs.writeShellScript "rust-target-cleanup" ''
                 set -euo pipefail
 
-                SIZE_THRESHOLD=$((2 * 1024 * 1024))  # 2GB in KB
+                SIZE_THRESHOLD_KB=$((2 * 1024 * 1024))  # 2GB in KB
                 SEARCH_ROOTS=("/home/${primaryUser}/projects")
-                TOTAL_FREED=0
+                TOTAL_FREED_KB=0
                 CLEANED=0
                 SKIPPED=0
+                FAILED=0
 
                 log() { echo "[rust-target-cleanup] $*"; }
 
@@ -165,7 +177,7 @@ in
                     [ -d "$target_dir" ] || continue
                     dir_size_kb=$(${pkgs.coreutils}/bin/du -sk "$target_dir" 2>/dev/null | ${pkgs.coreutils}/bin/cut -f1)
 
-                    if [ -z "$dir_size_kb" ] || [ "$dir_size_kb" -lt "$SIZE_THRESHOLD" ]; then
+                    if [ -z "$dir_size_kb" ] || [ "$dir_size_kb" -lt "$SIZE_THRESHOLD_KB" ]; then
                       SKIPPED=$((SKIPPED + 1))
                       continue
                     fi
@@ -173,50 +185,52 @@ in
                     dir_size_human=$(${pkgs.coreutils}/bin/numfmt --to=iec --suffix=B "$((dir_size_kb * 1024))")
                     project=$(${pkgs.coreutils}/bin/dirname "$target_dir")
 
-                    if [ ! -f "$project/Cargo.toml" ]; then
-                      log "Skipping $target_dir — no Cargo.toml found"
-                      continue
-                    fi
-
-                    # Safety: skip if cargo-lock is held and recent (build in progress)
-                    if [ -f "$target_dir/.cargo-lock" ]; then
-                      lock_age=$(( $(${pkgs.coreutils}/bin/date +%s) - $(${pkgs.coreutils}/bin/stat -c %Y "$target_dir/.cargo-lock" 2>/dev/null || echo 0) ))
-                      if [ "$lock_age" -lt 3600 ]; then
-                        log "Skipping $target_dir — cargo lock held (''${lock_age}s old)"
-                        continue
+                    if [ -f "$project/Cargo.toml" ]; then
+                      log "cargo-sweep --time 7d in $project ($dir_size_human)"
+                      if ${pkgs.cargo-sweep}/bin/cargo-sweep --time 7d --installed 2>/dev/null \
+                         || ${pkgs.cargo-sweep}/bin/cargo-sweep --time 7d; then
+                        new_size_kb=$(${pkgs.coreutils}/bin/du -sk "$target_dir" 2>/dev/null | ${pkgs.coreutils}/bin/cut -f1 || echo 0)
+                        freed_kb=$((dir_size_kb - new_size_kb))
+                        TOTAL_FREED_KB=$((TOTAL_FREED_KB + freed_kb))
+                        CLEANED=$((CLEANED + 1))
+                        freed_human=$(${pkgs.coreutils}/bin/numfmt --to=iec --suffix=B "$((freed_kb * 1024))")
+                        log "Cleaned $project — freed $freed_human"
+                      else
+                        log "cargo-sweep failed for $project, falling back to full removal"
+                        ${pkgs.coreutils}/bin/rm -rf "$target_dir"
+                        TOTAL_FREED_KB=$((TOTAL_FREED_KB + dir_size_kb))
+                        CLEANED=$((CLEANED + 1))
+                        log "Fallback removed $target_dir — freed $dir_size_human"
                       fi
-                    fi
-
-                    log "Removing $target_dir ($dir_size_human)"
-                    if ${pkgs.coreutils}/bin/rm -rf "$target_dir"; then
-                      TOTAL_FREED=$((TOTAL_FREED + dir_size_kb))
-                      CLEANED=$((CLEANED + 1))
-                      log "Cleaned $target_dir — freed $dir_size_human"
                     else
-                      log "FAILED to remove $target_dir"
+                      log "Removing orphaned target/ $target_dir ($dir_size_human)"
+                      if ${pkgs.coreutils}/bin/rm -rf "$target_dir"; then
+                        TOTAL_FREED_KB=$((TOTAL_FREED_KB + dir_size_kb))
+                        CLEANED=$((CLEANED + 1))
+                        log "Removed orphan $target_dir — freed $dir_size_human"
+                      else
+                        FAILED=$((FAILED + 1))
+                        log "FAILED to remove $target_dir"
+                      fi
                     fi
                   done < <(${pkgs.findutils}/bin/find "$root" \
                     -type d \
                     -name target \
-                    -not -path '*/.*' \
-                    -not -path '*/target/*/target')
+                    -not -path '*/.*')
                 done
 
-                TOTAL_FREED_HUMAN=$(${pkgs.coreutils}/bin/numfmt --to=iec --suffix=B "$((TOTAL_FREED * 1024))")
-                log "Done: cleaned $CLEANED dirs, skipped $SKIPPED (under 2GB), freed $TOTAL_FREED_HUMAN"
+                TOTAL_FREED_HUMAN=$(${pkgs.coreutils}/bin/numfmt --to=iec --suffix=B "$((TOTAL_FREED_KB * 1024))")
+                log "Done: cleaned $CLEANED, skipped $SKIPPED (under 2GB), failed $FAILED, freed $TOTAL_FREED_HUMAN"
 
                 if [ "$CLEANED" -gt 0 ]; then
-                  export DISPLAY=:0
-                  export WAYLAND_DISPLAY=wayland-1
-                  export XDG_RUNTIME_DIR=/run/user/${uid}
                   ${pkgs.libnotify}/bin/notify-send -u low \
                     "Rust target/ cleanup" \
                     "Cleaned $CLEANED projects, freed $TOTAL_FREED_HUMAN" 2>/dev/null || true
                 fi
               '';
-            StandardOutput = "journal";
-            StandardError = "journal";
-          };
+              StandardOutput = "journal";
+              StandardError = "journal";
+            };
         };
       };
     };

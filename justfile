@@ -1848,6 +1848,32 @@ disk-monitor-schedule:
     @systemctl list-timers disk-monitor.timer --no-pager 2>/dev/null || echo "Timer not active"
 
 # ========================================
+# Rust Target Cleanup Commands
+# ========================================
+
+# Run Rust target/ cleanup manually (removes artifacts >7 days old from dirs >2GB)
+rust-clean:
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        echo "Rust target/ cleanup timer is only on NixOS"; \
+    else \
+        sudo systemctl start rust-target-cleanup && \
+        journalctl -u rust-target-cleanup --no-pager -n 20; \
+    fi
+
+# Show Rust target/ cleanup timer status
+rust-clean-status:
+    @PLATFORM=$(just _detect_platform); \
+    if [ "$$PLATFORM" = "darwin" ]; then \
+        echo "Rust target/ cleanup timer is only on NixOS"; \
+    else \
+        systemctl list-timers rust-target-cleanup.timer --no-pager; \
+        echo ""; \
+        echo "Last run:"; \
+        journalctl -u rust-target-cleanup --no-pager -n 5; \
+    fi
+
+# ========================================
 # todo-list-ai Commands
 # ========================================
 
