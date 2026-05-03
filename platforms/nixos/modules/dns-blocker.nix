@@ -185,11 +185,11 @@ in {
           include = toString unboundIncludeFile;
 
           # DNS-over-QUIC (DoQ) — RFC 9250
-          # QUIC transport handles encryption natively, no certificates needed
-          quic-port = cfg.doqPort;
+          # DISABLED: unbound not compiled with ngtcp2; setting quic-port causes fatal warning
+          # quic-port = cfg.doqPort;
 
-          # Root hints for full recursive resolution — no third-party resolver sees your queries
-          root-hints = ":";
+          # Root hints provided by NixOS unbound module via dns-root-data
+          # (removed broken root-hints = ":" override)
 
           local-zone =
             map (d: ''"${d}" transparent'') cfg.whitelist

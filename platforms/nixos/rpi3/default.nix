@@ -131,8 +131,8 @@ in {
 
           include = toString unboundIncludeFile;
 
-          # Root hints for full recursive resolution — no third-party resolver sees your queries
-          root-hints = ":";
+          # Root hints provided by NixOS unbound module via dns-root-data
+          # (removed broken root-hints = ":" override)
 
           local-zone =
             map (d: ''"${d}" transparent'') blocklists.whitelist
