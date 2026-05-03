@@ -39,7 +39,7 @@ buildGoModule rec {
     src = golangci-lint-auto-configure-src;
   };
 
-  vendorHash = "sha256-4UxtVH5gP90JTTbysBxgbPqmXJ8hGzcDMglQ59VaKVw=";
+  vendorHash = "sha256-weDpal2fn+800cjk2btNryXOcryxC2eSTfTaqQzN1AY=";
 
   proxyVendor = true;
 
@@ -49,7 +49,16 @@ buildGoModule rec {
 
   postPatch = ''
     echo "replace github.com/larsartmann/go-finding => ${go-finding-src}" >> go.mod
+    if [ "''${dontFixup:-}" != "1" ]; then
+      export GOPROXY="file://$goModules"
+      export GONOSUMCHECK='*'
+      export GONOSUMDB='*'
+    fi
     HOME=$(mktemp -d) go mod tidy
+  '';
+
+  modPostBuild = ''
+    HOME=$(mktemp -d) go mod download all
   '';
 
   ldflags = [
@@ -61,7 +70,6 @@ buildGoModule rec {
   env = {
     CGO_ENABLED = 0;
     GOWORK = "off";
-    GOFLAGS = ["-mod=vendor"];
   };
 
   meta = with lib; {
