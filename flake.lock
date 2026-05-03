@@ -79,11 +79,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1777771736,
-        "narHash": "sha256-ZenuZcNecK2DXHZt98b7cXfBEF/r6MCWRbR663LV/cI=",
+        "lastModified": 1777776088,
+        "narHash": "sha256-CNe0JtJZpg8d84DLPnPb8BdjeLWX5lR53e3YybrTMy4=",
         "ref": "master",
-        "rev": "0d4ec16d3e3580b4ef9c11bc94e32d21f46701b9",
-        "revCount": 257,
+        "rev": "a0b1879cd660e1cbd56698acd398aecfb05a9885",
+        "revCount": 259,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/dnsblockd"
       },
@@ -493,11 +493,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1777771964,
-        "narHash": "sha256-z0mfwJBX03fTaANuGS2eg3M4/4HLWl5SZdbyHVBEy48=",
+        "lastModified": 1777774546,
+        "narHash": "sha256-Fx4LYlTYLiY50hZyVNPF8wIlo4PjmjFD645Yk3ErQRQ=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "9889dc8f74cb741652547b7fa49b40fa176f1584",
+        "rev": "b39349842960a1ecb183baf38248dda641e241bc",
         "type": "github"
       },
       "original": {
