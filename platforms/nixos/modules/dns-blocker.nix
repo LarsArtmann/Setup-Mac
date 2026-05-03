@@ -38,13 +38,13 @@
     fetchedBlocklists
   );
 
-  # Run Go processor at build time instead of Nix eval-time string processing
+  # Run processor at build time — dnsblockd process subcommand
   processedBlocklist =
     pkgs.runCommand "dns-blocker-processed" {
-      nativeBuildInputs = [pkgs.dnsblockd-processor];
+      nativeBuildInputs = [pkgs.dnsblockd];
     } ''
       mkdir -p $out
-      dnsblockd-processor \
+      dnsblockd process \
         ${cfg.blockIP} \
         ${whitelistFile} \
         $out/unbound.conf \
@@ -297,6 +297,23 @@ in {
           '';
           caCert = config.sops.secrets.dnsblockd_ca_cert.path;
           caKey = config.sops.secrets.dnsblockd_ca_key.path;
+          dnsblockdConfigFile = pkgs.writeText "dnsblockd-config.yaml" (
+            lib.generators.toYAML {} {
+              listen_addr = cfg.blockIP;
+              port = cfg.blockPort;
+              tls_port = cfg.blockTLSPort;
+              stats_addr = "127.0.0.1";
+              stats_port = cfg.statsPort;
+              ca_cert_file = "${caCert}";
+              ca_key_file = "${caKey}";
+              blocklist_mapping_file = "${processedBlocklist}/mapping.json";
+              unbound_control = "${pkgs.unbound}/bin/unbound-control";
+              temp_allowlist_path = "/var/lib/dnsblockd/temp-allowlist";
+              tracking_mode = "METADATA_ONLY";
+              tracking_db_path = "/var/lib/dnsblockd/tracking.db";
+            }
+            + lib.optionalString (cfg.categories != {}) "\ncategories_file: ${categoriesJSON}"
+          );
           dnsblockdWrapper = pkgs.writeShellScript "dnsblockd-start" ''
             set -euo pipefail
 
@@ -311,19 +328,7 @@ in {
               sleep 1
             done
 
-            exec ${pkgs.dnsblockd}/bin/dnsblockd \
-              -addr ${cfg.blockIP} \
-              -port ${toString cfg.blockPort} \
-              -tls-port ${toString cfg.blockTLSPort} \
-              -ca-cert "${caCert}" \
-              -ca-key "${caKey}" \
-              -stats-addr 127.0.0.1 \
-              -stats-port ${toString cfg.statsPort} \
-              -blocklist-mapping ${processedBlocklist}/mapping.json \
-              -unbound-control ${pkgs.unbound}/bin/unbound-control \
-              -unbound-socket /run/unbound/unbound.ctl \
-              -allowlist-conf /var/lib/dnsblockd/temp-allowlist.conf \
-              ${lib.optionalString (cfg.categories != {}) "-categories ${categoriesJSON}"}
+            exec ${pkgs.dnsblockd}/bin/dnsblockd serve -c ${dnsblockdConfigFile}
           '';
         in {
           Type = "simple";

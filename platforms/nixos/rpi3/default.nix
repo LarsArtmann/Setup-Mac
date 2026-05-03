@@ -34,10 +34,10 @@
 
   processedBlocklist =
     pkgs.runCommand "dns-blocker-processed" {
-      nativeBuildInputs = [pkgs.dnsblockd-processor];
+      nativeBuildInputs = [pkgs.dnsblockd];
     } ''
       mkdir -p $out
-      dnsblockd-processor \
+      dnsblockd process \
         "0.0.0.0" \
         ${whitelistFile} \
         $out/unbound.conf \

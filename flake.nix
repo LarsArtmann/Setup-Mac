@@ -105,6 +105,12 @@
       url = "git+ssh://git@github.com/LarsArtmann/crush-config?ref=master";
     };
 
+    # dnsblockd — DNS blocklist service with block pages and blocklist processing
+    dnsblockd = {
+      url = "git+ssh://git@github.com/LarsArtmann/dnsblockd?ref=master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     wallpapers-src = {
       url = "git+ssh://git@github.com/LarsArtmann/wallpapers?ref=master";
       flake = false;
@@ -175,6 +181,8 @@
   };
 
   outputs = inputs @ {
+    crush-config,
+    dnsblockd,
     flake-parts,
     nix-darwin,
     nixpkgs,
@@ -215,18 +223,7 @@
     };
 
     dnsblockdOverlay = _final: prev: {
-      dnsblockd = prev.callPackage ./pkgs/dnsblockd.nix {
-        src = prev.lib.cleanSourceWith {
-          filter = path: _: let b = baseNameOf path; in b != "package.nix" && b != "dnsblockd";
-          src = ./platforms/nixos/programs/dnsblockd;
-        };
-      };
-      dnsblockd-processor = prev.callPackage ./pkgs/dnsblockd-processor/package.nix {
-        src = prev.lib.cleanSourceWith {
-          filter = path: _: !prev.lib.hasSuffix (baseNameOf path) ".nix";
-          src = ./pkgs/dnsblockd-processor;
-        };
-      };
+      dnsblockd = dnsblockd.packages.${prev.stdenv.system}.default;
     };
 
     netwatchOverlay = _final: prev: {
@@ -461,7 +458,7 @@
               ;
           }
           // lib.optionalAttrs pkgs.stdenv.isLinux {
-            inherit (pkgs) openaudible dnsblockd dnsblockd-processor monitor365 netwatch emeet-pixyd file-and-image-renamer;
+            inherit (pkgs) openaudible dnsblockd monitor365 netwatch emeet-pixyd file-and-image-renamer;
           };
 
         # Development shells for different program categories
