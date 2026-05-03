@@ -33,8 +33,14 @@ _: {
     protectedVHost = _subdomain: port: {
       extraConfig = ''
         ${tlsConfig}
-        ${forwardAuth}
-        reverse_proxy localhost:${toString port}
+        @external not remote_ip 127.0.0.1/8 192.168.1.0/24
+        handle @external {
+          ${forwardAuth}
+          reverse_proxy localhost:${toString port}
+        }
+        handle {
+          reverse_proxy localhost:${toString port}
+        }
       '';
     };
   in {
