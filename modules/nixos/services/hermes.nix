@@ -45,8 +45,8 @@ in {
       set -euo pipefail
       NEW="${cfg.stateDir}"
 
-      if [ -d "$NEW" ] && [ "$(ls -A "$NEW" 2>/dev/null)" ]; then
-        echo "hermes-migrate: $NEW already populated, skipping migration"
+      if [ -f "$NEW/state.db" ] && [ "$(stat -c%s "$NEW/state.db" 2>/dev/null)" -gt 1048576 ]; then
+        echo "hermes-migrate: $NEW has existing state ($(stat -c%s "$NEW/state.db") bytes), skipping migration"
         exit 0
       fi
 
