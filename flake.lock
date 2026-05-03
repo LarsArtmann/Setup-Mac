@@ -509,11 +509,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777774432,
-        "narHash": "sha256-yFvibXcjdtCUtE8iaL0focbFI92eh333pGXwVnQBWcU=",
+        "lastModified": 1777775824,
+        "narHash": "sha256-17o+XHT9MSPEkhAK/zCj7mLlP2c44d4azrrpPcKNgVg=",
         "ref": "master",
-        "rev": "b4fd47408f6638280c6c36b7d1f6a17689232238",
-        "revCount": 601,
+        "rev": "d1612d19d54a3ac5ebbb9978a7fe62a68a9b19a0",
+        "revCount": 602,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
@@ -923,11 +923,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777763626,
-        "narHash": "sha256-UFwZDbdMezNnxZwikhDR4EWiCPUiEmPXHmqLOrcG34g=",
+        "lastModified": 1777775893,
+        "narHash": "sha256-5NFPzdN5tS2vbE5E1l3DmSoZdA2sNYLwD0d5t2hUgqs=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "3873764e5896bd6da6cf0df17172849ea51ac5eb",
+        "rev": "4ef5d0dd36212ed97f149ab6cf61667a3bb2e53d",
         "type": "github"
       },
       "original": {
