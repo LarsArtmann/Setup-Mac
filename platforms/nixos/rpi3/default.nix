@@ -131,6 +131,9 @@ in {
 
           include = toString unboundIncludeFile;
 
+          # Root hints for full recursive resolution — no third-party resolver sees your queries
+          root-hints = ":";
+
           local-zone =
             map (d: ''"${d}" transparent'') blocklists.whitelist
             ++ map (d: ''"${d}" always_nxdomain'') blocklists.extraDomains
@@ -145,14 +148,6 @@ in {
           control-enable = true;
           control-interface = "/run/unbound/unbound.ctl";
         };
-
-        forward-zone = [
-          {
-            name = ".";
-            forward-addr = blocklists.upstreamDNS;
-            forward-tls-upstream = true;
-          }
-        ];
       };
     };
 

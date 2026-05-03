@@ -10,6 +10,7 @@
 # - Dynamic DNS, badware hosters, safesearch enforcement
 #
 # Blocklists are shared with rpi3-dns via platforms/shared/dns-blocklists.nix
+# DNS resolution: full recursive from root hints (no third-party resolver)
 {config, ...}: let
   inherit (config.networking) domain;
   inherit (config.networking.local) blockIP virtualIP;
@@ -34,7 +35,7 @@ in {
       blockIPPrefix = 24;
       statsPort = 9090;
 
-      inherit (blocklists) blocklists whitelist extraDomains upstreamDNS categories;
+      inherit (blocklists) blocklists whitelist extraDomains categories;
 
       enableDNSSEC = true;
 

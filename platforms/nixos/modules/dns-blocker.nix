@@ -7,9 +7,6 @@
   cfg = config.services.dns-blocker;
   inherit (lib) mkEnableOption mkOption types;
 
-  caCertFile = ./../secrets/dnsblockd-ca.crt;
-  caCertContent = builtins.readFile caCertFile;
-
   categoriesJSON = pkgs.writeText "dnsblockd-categories.json" (builtins.toJSON cfg.categories);
 
   # Fetch each blocklist file at eval time (fast - just metadata lookup)
@@ -130,15 +127,6 @@ in {
       description = "Additional domains to block (not in blocklists)";
     };
 
-    upstreamDNS = mkOption {
-      type = types.listOf types.str;
-      default = [
-        "9.9.9.9@853#dns.quad9.net"
-        "1.1.1.1@853#cloudflare-dns.com"
-      ];
-      description = "Upstream DoT servers (IP@PORT#hostname)";
-    };
-
     enableDNSSEC = mkOption {
       type = types.bool;
       default = true;
@@ -200,6 +188,9 @@ in {
           # QUIC transport handles encryption natively, no certificates needed
           quic-port = cfg.doqPort;
 
+          # Root hints for full recursive resolution — no third-party resolver sees your queries
+          root-hints = ":";
+
           local-zone =
             map (d: ''"${d}" transparent'') cfg.whitelist
             ++ map (d: ''"${d}" always_nxdomain'') cfg.extraDomains;
@@ -209,14 +200,6 @@ in {
           control-enable = true;
           control-interface = "/run/unbound/unbound.ctl";
         };
-
-        forward-zone = [
-          {
-            name = ".";
-            forward-addr = cfg.upstreamDNS;
-            forward-tls-upstream = true;
-          }
-        ];
       };
     };
 
@@ -224,15 +207,13 @@ in {
       ${pkgs.iproute2}/bin/ip addr add ${cfg.blockIP}/32 dev ${cfg.blockInterface} 2>/dev/null || true
     '';
 
-    security.pki.certificates = [caCertContent];
-
     programs.firefox.policies = {
       DNSOverHTTPS = {
         Enabled = false;
         Locked = true;
       };
       Certificates = {
-        Install = [caCertFile];
+        Install = [config.sops.secrets.dnsblockd_ca_cert.path];
       };
       Preferences = {
         "browser.shell.checkDefaultBrowser" = {
