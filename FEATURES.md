@@ -320,7 +320,7 @@ The DNS blocker is one of the largest custom features in the project — a full 
 | iTerm2 | ✅ | Default terminal (`TERMINAL=iTerm2`) |
 | Google Chrome | ✅ | Secondary browser with enterprise policies |
 | JetBrains IDEA | ✅ | Full IDE |
-| Go 1.26.1 overlay | ✅ | Darwin-specific overlay with matching golangci-lint |
+| Go toolchain | ✅ | Uses nixpkgs default Go (1.26.1) — overlay removed to preserve binary cache |
 
 ---
 
