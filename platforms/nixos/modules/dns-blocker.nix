@@ -288,7 +288,7 @@ in {
               ca_cert_file = "${caCert}";
               ca_key_file = "${caKey}";
               blocklist_mapping_file = "${processedBlocklist}/mapping.json";
-              unbound_control = "${pkgs.unbound}/bin/unbound-control";
+              unbound_control = "${config.services.unbound.package}/bin/unbound-control";
               temp_allowlist_path = "/var/lib/dnsblockd/temp-allowlist";
               tracking_mode = "METADATA_ONLY";
               tracking_db_path = "/var/lib/dnsblockd/tracking.db";
