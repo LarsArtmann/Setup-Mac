@@ -233,7 +233,7 @@ _: {
           users:
             lars:
               displayname: "Lars"
-              password: "$2y$12$OvBQyrn36dhLr0CdMYaUkurQvO0PSB9GuSJHx0TjIkI/jm/4Bczpq"
+              password: "$argon2id$v=19$m=65536,t=3,p=4$SFxuhCS1FXCGDpMEyoLgJQ$geJt46OkKpzTfofZeHKNzU6vgr3WtjXzgaOAv9NAo/g"
               email: "lars@auth.home.lan"
               groups:
                 - admin
