@@ -197,11 +197,17 @@ _A brutally honest audit of every feature the project actually has._
 |----------|--------|-------|
 | AMD GPU (Strix Halo) | ✅ | amdgpu, Mesa, RADV Vulkan, ROCm (clr.icd, rocblas), VA-API, 32-bit support, nvtop, amdgpu_top, corectrl |
 | AMD NPU (XDNA) | ✅ | XRT driver, Boost 1.87 fix, dev tools, unlimited memlock |
+| Realtek 2.5G Ethernet | ✅ | `r8125` extra module package (not in mainline kernel) |
+| MediaTek WiFi/BT | ✅ | `mt7925e` module |
 | EMEET PIXY webcam | ✅ | Full daemon: call detection, auto-tracking, noise cancellation, privacy mode, PipeWire source switch, Waybar indicator, hotplug recovery |
 | Bluetooth | ✅ | Power-on-boot, A2DP source/sink (Google Nest Audio), Blueman GUI |
 | DDC/CI brightness | ✅ | i2c-dev kernel module, ddcutil for external monitor brightness |
+| BTRFS root (`/`) | ✅ | zstd compression, noatime |
+| BTRFS data (`/data`) | ✅ | zstd:3 compression, SSD optimizations, async discard, space_cache=v2 — Docker lives here |
+| FAT32 boot (`/boot`) | ✅ | Restrictive masks (fmask=0077, dmask=0077) |
 | BTRFS snapshots | ✅ | Timeshift: daily snapshots, 5 boot / 5 daily / 3 weekly / 2 monthly retention, monthly scrub |
 | ZRAM swap | ✅ | 50% of RAM (64GB compressed) |
+| AMD virtualization | ✅ | KVM-AMD + AMD microcode updates |
 
 ### Networking & DNS
 
@@ -342,10 +348,10 @@ The DNS blocker is one of the largest custom features in the project — a full 
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| GitHub Actions: flake-update | ✅ | Automated flake input updates |
-| GitHub Actions: go-test | ✅ | Go test runner |
-| GitHub Actions: nix-check | ✅ | Nix flake check |
-| Pre-commit hooks | ✅ | Nix validation, shellcheck, markdownlint, private key detection |
+| GitHub Actions: flake-update | ✅ | Weekly Mon 06:00 UTC, runs `nix flake update --commit-lock-file`, opens PR via `peter-evans/create-pull-request` |
+| GitHub Actions: go-test | ✅ | On push/PR to master when `pkgs/dnsblockd-processor/**` changes — `go vet` + `go build` |
+| GitHub Actions: nix-check | ✅ | On push/PR to master — `nix flake check --no-build` (eval-only), magic-nix-cache for speed |
+| Pre-commit hooks | ✅ | Nix validation, shellcheck, markdownlint, private key detection, large files (1MB), TOML/YAML/JSON checks |
 | Gitleaks | ✅ | Secret detection via `.gitleaks.toml` |
 | Statix checks | ✅ | Nix lint in flake checks |
 | Deadnix checks | ✅ | Dead code detection in flake checks |
@@ -353,7 +359,26 @@ The DNS blocker is one of the largest custom features in the project — a full 
 
 ---
 
-## 8. Task Runner (Justfile)
+## 8. Validation & Diagnostic Scripts
+
+| Script | Status | Purpose | Key Features |
+|--------|--------|---------|--------------|
+| `health-check.sh` | ✅ | Cross-platform system health | Nix/direnv/shell validation, NixOS: failed units + disk + HM age, macOS: Homebrew, PASS/FAIL/WARN summary |
+| `nixos-diagnostic.sh` | ✅ | NixOS Home Manager diagnostics | HM version/generation check, `nix flake check`, broken profile detection, remediation steps |
+| `validate-deployment.sh` | ✅ | Pre-deployment validator | Boot config, AMD GPU, Niri, SSH hardening, user/groups, security, generates timestamped report |
+| `test-home-manager.sh` | ✅ | Post-deploy HM integration | Starship, Fish aliases, env vars (EDITOR, LANG), PATH entries, Tmux settings |
+| `test-shell-aliases.sh` | ✅ | ADR-002 alias validation | 8 common + 3 platform aliases across Fish/Zsh/Bash, percentage grading |
+| `ai-integration-test.sh` | ✅ | AI/ML stack validation | Ollama ROCm env vars, ROCm packages, DeepSeek support, OCR, PyTorch ecosystem |
+| `update-crush-latest.sh` | ✅ | Crush version updater | Before/after version, NUR eval, `--switch` flag for auto-activate |
+| `lib/paths.sh` | ✅ | Shared path constants | `PROJECT_ROOT` auto-detect, platform/user/nix paths, helper functions (`is_darwin`, `is_linux`, `ensure_dir`) |
+| `benchmark-system.sh` | ❌ | Referenced by `just benchmark` | Script does not exist |
+| `performance-monitor.sh` | ❌ | Referenced by `just perf` | Script does not exist |
+| `shell-context-detector.sh` | ❌ | Referenced by `just context` | Script does not exist |
+| `storage-cleanup.sh` | ❌ | Referenced by `just clean`/`clean-storage` | Script does not exist |
+
+---
+
+## 9. Task Runner (Justfile)
 
 | Category | Commands | Status |
 |----------|----------|--------|
@@ -371,8 +396,9 @@ The DNS blocker is one of the largest custom features in the project — a full 
 | Cleanup | `clean`, `clean-quick`, `clean-aggressive`, `clean-storage` | ✅ |
 | Backup | `backup`, `restore`, `list-backups`, `clean-backups` | ✅ |
 | macOS Keychain | `keychain-list`, `keychain-status`, `keychain-ssh-add`, etc. | ✅ |
-| Benchmarks | `benchmark`, `perf`, `context` | ⚠️ | Depends on external scripts that may not all exist |
+| Benchmarks | `benchmark`, `perf`, `context` | ❌ | Scripts (`benchmark-system.sh`, `performance-monitor.sh`, `shell-context-detector.sh`) do not exist |
 | Dep graphs | `dep-graph` (nixos/darwin/svg/png/dot/all/verbose/view/clean) | ⚠️ | Depends on nix-visualize, may be slow |
+| Cleanup | `clean`, `clean-storage` | ❌ | References non-existent `storage-cleanup.sh` — `clean-quick` and `clean-aggressive` work |
 
 ---
 
