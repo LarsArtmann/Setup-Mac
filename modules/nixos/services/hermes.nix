@@ -127,9 +127,9 @@ in {
         chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
         chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
 
-        # Ensure hermes (via 'users' group) can traverse /home/lars
+        # Ensure hermes (via 'users' group) can read/write /home/lars
         if [ -d /home/lars ]; then
-          chmod g+x /home/lars
+          chmod g+rwx /home/lars
         fi
 
         find ${cfg.stateDir} -maxdepth 1 \( -name "*.db" -o -name "*.db-wal" -o -name "*.db-shm" -o -name "SOUL.md" \) \
