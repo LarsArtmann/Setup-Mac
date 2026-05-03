@@ -10,7 +10,7 @@ in {
     cfg = config.services.hermes;
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
-    oldStateDir = "/home/.hermes";
+    oldStateDirs = ["/home/lars/.hermes" "/var/lib/hermes"];
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
@@ -43,27 +43,24 @@ in {
 
     migrateScript = pkgs.writeShellScript "hermes-migrate-state" ''
       set -euo pipefail
-      OLD="${oldStateDir}"
       NEW="${cfg.stateDir}"
-
-      if [ ! -d "$OLD" ]; then
-        echo "hermes-migrate: no old state at $OLD, skipping migration"
-        exit 0
-      fi
 
       if [ -d "$NEW" ] && [ "$(ls -A "$NEW" 2>/dev/null)" ]; then
         echo "hermes-migrate: $NEW already populated, skipping migration"
         exit 0
       fi
 
-      echo "hermes-migrate: migrating state from $OLD to $NEW"
-      ${pkgs.rsync}/bin/rsync -a --chown=${cfg.user}:${cfg.group} "$OLD/" "$NEW/"
-      echo "hermes-migrate: migration complete"
-    '';
-    opusWrapper = pkgs.writeShellScript "hermes-opus-wrapper" ''
-      export LD_LIBRARY_PATH="${pkgs.libopus}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-      export LD_PRELOAD="${pkgs.libopus}/lib/libopus.so''${LD_PRELOAD:+:$LD_PRELOAD}"
-      exec ${hermesPkg}/bin/hermes gateway run --replace "$@"
+      for OLD in ${lib.concatStringsSep " " (map (p: "\"${p}\"") oldStateDirs)}; do
+        if [ -d "$OLD" ] && [ "$(ls -A "$OLD" 2>/dev/null)" ]; then
+          echo "hermes-migrate: migrating state from $OLD to $NEW"
+          mkdir -p "$NEW"
+          ${pkgs.rsync}/bin/rsync -a --chown=${cfg.user}:${cfg.group} "$OLD/" "$NEW/"
+          echo "hermes-migrate: migration complete (from $OLD)"
+          exit 0
+        fi
+      done
+
+      echo "hermes-migrate: no old state found, skipping migration"
     '';
   in {
     options.services.hermes = {
@@ -83,7 +80,7 @@ in {
 
       stateDir = lib.mkOption {
         type = lib.types.str;
-        default = "/var/lib/hermes";
+        default = "/home/hermes";
         description = "State directory for Hermes (config, sessions, skills, memories)";
       };
 
@@ -107,7 +104,7 @@ in {
         isSystemUser = true;
         inherit (cfg) group;
         home = cfg.stateDir;
-        createHome = false;
+        createHome = true;
         description = "Hermes AI Agent Gateway service user";
       };
 
@@ -151,9 +148,9 @@ in {
         path = [
           hermesPkg
           pkgs.bash
+          pkgs.binutils
           pkgs.coreutils
           pkgs.git
-          pkgs.libopus
         ];
 
         serviceConfig =
@@ -162,7 +159,7 @@ in {
             User = cfg.user;
             Group = cfg.group;
             ExecStartPre = ["+${migrateScript}" mergeEnvScript];
-            ExecStart = opusWrapper;
+            ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
             WorkingDirectory = cfg.stateDir;
             Environment = [
               "HOME=${cfg.stateDir}"

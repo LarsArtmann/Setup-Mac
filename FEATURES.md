@@ -205,15 +205,36 @@ _A brutally honest audit of every feature the project actually has._
 
 ### Networking & DNS
 
+#### DNS Stack (dnsblockd — ~930 lines of production Go)
+
+The DNS blocker is one of the largest custom features in the project — a full Pi-hole-like system with its own Go application, NixOS module, and processor binary.
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Unbound resolver | ✅ | 2 threads, 32MB msg cache, 64MB rrset cache, DNSSEC, qname minimization, DoT upstream (Quad9 + Cloudflare) |
+| dnsblockd (Go app) | ✅ | ~930-line production Go: dynamic TLS cert generation per domain (SNI-based, CA-signed), Catppuccin-themed block page UI |
+| Blocklist processing | ✅ | Build-time: 25 blocklists fetched via `fetchurl`, processed by `dnsblockd-processor` Go binary into unbound config |
+| 10-category system | ✅ | Advertising 📢, Tracking 👀, Analytics 📊, Malware 🦠, Phishing 🎣, Gambling 🎰, Adult 🔞, Social 💬, Crypto 💰, Scam 🎭 |
+| Temp-allow API | ✅ | Bypass blocks for 5m/15m/60m/24h via web UI, auto-redirects after allow, unbound reload + cache flush |
+| False positive reporting | ✅ | `/api/report` endpoint, last 100 reports in memory |
+| Prometheus metrics | ✅ | `dnsblockd_blocked_total`, `dnsblockd_active_temp_allows`, `dnsblockd_false_positive_reports` on `/metrics` |
+| Stats API (port 9090) | ✅ | Top blocked domains, recent blocks (100), health endpoint, total blocked count, uptime |
+| Firefox policy integration | ✅ | Disables browser DoH, installs CA cert, locks prefs (swipe gestures, default browser check) |
+| NSS CA cert import | ✅ | User service imports CA cert for graphical sessions |
+| sops-nix secrets | ✅ | CA cert/key + server cert/key encrypted at rest |
+| Coverage | ✅ | 2.5M+ domains blocked, `.lan` domains protected, whitelist for immich.app/GitHub/etc, Reddit forced NXDOMAIN |
+| Systemd hardening | ✅ | ProtectSystem=strict, ProtectHome, PrivateTmp, capability restrictions |
+
+#### Network Infrastructure
+
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Static IP networking | ✅ | `eno1` 192.168.1.150, no DHCP/NetworkManager |
-| DNS blocker (Unbound + dnsblockd) | ✅ | 25 blocklists, 2.5M+ domains, DNSSEC, Quad9 DoT upstream, `.home.lan` local records |
-| DNS block page server | ✅ | Go dnsblockd on dedicated IP (192.168.1.200) |
-| Blocklist auto-update | ✅ | Weekly timer, hash verification |
-| Local DNS records | ✅ | auth/immich/gitea/dash/photomap/unsloth/signoz/tasks/crm → `*.home.lan` |
 | Firewall | ✅ | TCP 22,53,80,443; UDP 53,853 |
 | Centralized network config | ✅ | `local-network.nix` module options — lanIP, gateway, subnet, blockIP, virtualIP, piIP |
+| Local DNS records | ✅ | auth/immich/gitea/dash/photomap/unsloth/signoz/tasks/crm → `*.home.lan` |
+| SSH banner | ✅ | Legal warning banner on SSH login |
+| Private cloud cluster | ✅ | 4 Hetzner servers (`private-cloud-hetzner-0` through `-3`) defined in SSH config |
 
 ### System Reliability
 
@@ -245,15 +266,54 @@ _A brutally honest audit of every feature the project actually has._
 
 ## 5. macOS (Darwin)
 
+### System Configuration
+
 | Feature | Status | Notes |
 |---------|--------|-------|
 | nix-darwin system management | ✅ | Full declarative macOS config |
 | Homebrew (nix-homebrew) | ✅ | Declarative taps, auto-migrate, headlamp cask |
-| LaunchAgents (declarative) | ✅ | ActivityWatch, SublimeText sync, aw-watcher-utilization, Crush update timer |
-| Touch ID for sudo (PAM) | ✅ | pam_tid.so configured |
-| Keychain management | ✅ | SSH keys, GPG signing, biometric |
-| macOS-specific shells | ✅ | Fish with Homebrew/OrbStack PATH, lazy-load Carapace |
-| Chrome policy | ✅ | Managed via darwin config |
+| Nix sandbox | ⚠️ | **Explicitly disabled** (`lib.mkForce false`) — macOS sandbox compatibility tradeoff |
+| macOS Application Firewall (ALF) | ✅ | Enabled, allows signed apps, no stealth mode. Per-app rules via Little Snitch |
+| Wake-on-LAN | ✅ | Explicitly disabled (laptop power saving) |
+| Dark mode | ✅ | Driven by shared `preferences.appearance.variant` — not hardcoded, cross-platform |
+| System defaults | ✅ | Fast key repeat (2/15), trackpad tap-to-click + 3-finger drag, Finder list view + path bar |
+| State version | ✅ | nix-darwin `stateVersion = 6` |
+
+### Security
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Touch ID for sudo (PAM) | ✅ | `pam_tid.so` enabled, Apple Watch disabled, **tmux reattach enabled** (fixes TouchID inside multiplexers) |
+| Keychain auto-lock | ✅ | 5-minute inactivity timeout via activation script (`security set-keychain-settings`) |
+| Chrome enterprise policies | ✅ | YouTube Shorts Blocker force-installed, HTTPS-only, sign-in disabled, password manager disabled, Safe Browsing enabled, Manifest V2 preserved |
+| GPG signing | ✅ | OpenPGP for Git commits, osxkeychain credential helper |
+
+### File Associations & Integration
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| File associations (duti) | ✅ | `.txt/.md/.json/.jsonl/.yaml/.yml/.toml/.d2` → Sublime Text 4, `.rtf` → TextEdit |
+| Build-time d2 verification | ✅ | Self-test asserts d2 binary + file associations are correct |
+| Nix Apps Spotlight indexing | ✅ | `mdimport` for `/Applications/Nix Apps` |
+| Launch Services registration | ✅ | `/Applications/Nix Apps` registered on activation |
+
+### Services (LaunchAgents)
+
+| Service | Status | Notes |
+|---------|--------|-------|
+| ActivityWatch auto-start | ✅ | `aw-qt --no-gui`, KeepAlive, background process |
+| SublimeText settings sync | ✅ | Daily at 18:00, exports to dotfiles |
+| aw-watcher-utilization | ✅ | Nix-managed system resource monitor → localhost:5600 |
+| Crush AI provider update | ✅ | Daily at midnight, updates AI provider configs |
+
+### Darwin Packages
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Helium browser | ✅ | Default browser (`BROWSER=helium`), with Widevine DRM + VAAPI hardware accel |
+| iTerm2 | ✅ | Default terminal (`TERMINAL=iTerm2`) |
+| Google Chrome | ✅ | Secondary browser with enterprise policies |
+| JetBrains IDEA | ✅ | Full IDE |
 | Go 1.26.1 overlay | ✅ | Darwin-specific overlay with matching golangci-lint |
 
 ---
@@ -263,7 +323,7 @@ _A brutally honest audit of every feature the project actually has._
 | Package | Language | Status | Notes |
 |---------|----------|--------|-------|
 | aw-watcher-utilization | Python | ✅ | ActivityWatch system utilization watcher |
-| dnsblockd | Go | ✅ | DNS block page server — source in `platforms/nixos/programs/dnsblockd/` |
+| dnsblockd | Go | ✅ | ~930-line DNS blocker: dynamic TLS, temp-allow API, false positive reporting, Prometheus metrics, 10-category system, Catppuccin block page — source in `platforms/nixos/programs/dnsblockd/` |
 | dnsblockd-processor | Go | ✅ | DNS blocklist processor (separate Go module in pkgs/) |
 | emeet-pixyd | Go | ✅ | EMEET PIXY webcam daemon — via flake input |
 | monitor365 | Rust | ✅ | Device monitoring agent — source-only flake input |

@@ -1880,7 +1880,7 @@ session-restore:
 
 # Show hermes gateway status (connected platforms, active agents, uptime)
 hermes-status:
-    @echo "Hermes Gateway Status"; echo "===================="; systemctl status hermes --no-pager 2>/dev/null | head -15; echo ""; echo "State:"; cat /var/lib/hermes/gateway_state.json 2>/dev/null | jq '{pid, gateway_state, active_agents, platforms: .platforms | to_entries | map({(.key): .value.state})}' 2>/dev/null || echo "  No state file"
+    @echo "Hermes Gateway Status"; echo "===================="; systemctl status hermes --no-pager 2>/dev/null | head -15; echo ""; echo "State:"; cat /home/hermes/gateway_state.json 2>/dev/null | jq '{pid, gateway_state, active_agents, platforms: .platforms | to_entries | map({(.key): .value.state})}' 2>/dev/null || echo "  No state file"
 
 # Restart hermes gateway service
 hermes-restart:
