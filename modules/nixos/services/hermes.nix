@@ -11,23 +11,28 @@ in {
     hermesPkg = let
       fixedHash = "sha256-tmKv51gGIHzfT6HqB3zR3mrRIfkmngrW1ad3Gg6n2aE=";
       baseOverlay = inputs.hermes-agent.overlays.default;
-      hermes-agent-inputs = inputs.hermes-agent.inputs;
       patchedOverlay = final: prev: let
         base = baseOverlay final prev;
-        hermesNpmLib = base.hermes-agent.passthru.hermesNpmLib;
         tuiFixed = base.hermes-agent.passthru.hermesTui.overrideAttrs (old: {
-          npmDeps = final.fetchNpmDeps { inherit (old) src; hash = fixedHash; };
+          npmDeps = final.fetchNpmDeps {
+            inherit (old) src;
+            hash = fixedHash;
+          };
         });
         interceptCallPackage = path: args:
-          if builtins.match ".*tui\\.nix" (toString path) != null then tuiFixed
+          if builtins.match ".*tui\\.nix" (toString path) != null
+          then tuiFixed
           else final.callPackage path args;
-      in base // {
-        hermes-agent = base.hermes-agent.override {
-          callPackage = interceptCallPackage;
+      in
+        base
+        // {
+          hermes-agent = base.hermes-agent.override {
+            callPackage = interceptCallPackage;
+          };
         };
-      };
       pkgs' = pkgs.extend patchedOverlay;
-    in pkgs'.hermes-agent;
+    in
+      pkgs'.hermes-agent;
     sopsEnvPath = config.sops.templates."hermes-env".path;
     oldStateDirs = ["/home/lars/.hermes" "/var/lib/hermes"];
     serviceTypes = import ../../../lib/types.nix lib;
