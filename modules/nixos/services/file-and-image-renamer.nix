@@ -7,6 +7,7 @@ _: {
   }: let
     cfg = config.services.file-and-image-renamer;
     harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.file-and-image-renamer = {
       enable = lib.mkEnableOption "File and Image Renamer — AI-powered screenshot renaming watcher";
@@ -65,6 +66,7 @@ _: {
 
           Service =
             harden {MemoryMax = "512M";}
+            // serviceDefaults {RestartSec = "10";}
             // {
               Type = "simple";
               ExecStart = "${cfg.package}/bin/file-renamer watch";
