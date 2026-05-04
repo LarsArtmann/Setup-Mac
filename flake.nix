@@ -336,6 +336,7 @@
       todoListAiOverlay
       golangciLintAutoConfigureOverlay
       mrSyncOverlay
+      jscpdOverlay
     ];
 
     # Linux-only overlays (custom packages that only make sense on NixOS)
@@ -423,7 +424,7 @@
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays =
             sharedOverlays
-            ++ [jscpdOverlay disableTestsOverlay]
+            ++ [disableTestsOverlay]
             ++ lib.optionals (system == "x86_64-linux") linuxOnlyOverlays;
         };
 
@@ -463,7 +464,6 @@
               statix
               gitleaks
               jq
-              jscpd
               sqlc
             ];
           };

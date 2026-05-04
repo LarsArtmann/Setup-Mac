@@ -56,11 +56,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1777534295,
-        "narHash": "sha256-t7K8UhQipMEEmI1JX6OrBVExn5/hylLZdb+un5A8bSQ=",
+        "lastModified": 1777870905,
+        "narHash": "sha256-PlYAoBPmGdZr7dW0vmf4vCqHk/sea7v0dJPrWc8cJHc=",
         "ref": "master",
-        "rev": "108a50055881ec09ceef5827e4f90422300e6c54",
-        "revCount": 104,
+        "rev": "58ee8f54ccdbfa0868387498016f5cf4f433f7d4",
+        "revCount": 105,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/crush-config"
       },
@@ -100,11 +100,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777807078,
-        "narHash": "sha256-Je7Q08ugjJ2j/Xx/1wQdyvB7xaJnQRc3pkghExK1LT8=",
+        "lastModified": 1777870959,
+        "narHash": "sha256-rfI1DW4semqO0P0lCFnF9aslMVeSc63Vfa2uj03TCkQ=",
         "ref": "master",
-        "rev": "d6e28352c70cb73a607c40253197f9fea4d0b24e",
-        "revCount": 100,
+        "rev": "e68cf36c048de3a97f2ec3893d2e8b6ced0c51e8",
+        "revCount": 101,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
@@ -117,11 +117,11 @@
     "file-and-image-renamer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777613369,
-        "narHash": "sha256-Hj5ms12q8qaAp2raxSLMYt2LWE9wxiiT6ZXbdlgvSGg=",
+        "lastModified": 1777870905,
+        "narHash": "sha256-jKX28RY1q61+Me0O1nqmPJjRWKoOzLtQV6TSWc5by0o=",
         "ref": "master",
-        "rev": "6e01cbe803f1b9034e6efb28147a351235a0954d",
-        "revCount": 272,
+        "rev": "b167685a57369f29ddc254fc545e886155c63de1",
+        "revCount": 273,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/file-and-image-renamer"
       },
@@ -394,11 +394,11 @@
     "golangci-lint-auto-configure-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777791432,
-        "narHash": "sha256-fMRxBPObr9PkoqL+HTTmjmAG1im16WJCl6WCGe+FNU8=",
+        "lastModified": 1777870955,
+        "narHash": "sha256-5hPoXLz0qVAmmYwkzP0+xwQ5xNR1N8YwYbrmsPqhCqI=",
         "ref": "master",
-        "rev": "bf98bd26f58bab7c4f8a37858dd21f39bf5a0076",
-        "revCount": 459,
+        "rev": "5b02b02f72492c58796669177e769037ab4a8cb7",
+        "revCount": 460,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/golangci-lint-auto-configure"
       },
@@ -441,11 +441,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1777868983,
-        "narHash": "sha256-nb5A+UMV8vC5shewT0vmZjJBc+FanqaT1noFvp9USR0=",
+        "lastModified": 1777874779,
+        "narHash": "sha256-7ompDVBblFFzb5jFFWxA7i0V/qBZCKN9XVJby4k+0PE=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "95f395027f72c69f06bddcecb08da53cfd10c440",
+        "rev": "a11aed1accc735ae0d7af80d626b33870d4b696c",
         "type": "github"
       },
       "original": {
@@ -509,11 +509,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777795866,
-        "narHash": "sha256-AGl57vpnaf4GMQ4YpjQUL+LgU0iZe6QWwv5V7xoD+r4=",
+        "lastModified": 1777870955,
+        "narHash": "sha256-3UYlnfbQU3lPxeiYkyeCp9rOitJuFszUtOS+G6HfxY4=",
         "ref": "master",
-        "rev": "a8dc975daed8076d4bc1bc8e661cfd5a52d018a2",
-        "revCount": 633,
+        "rev": "31967753a42de534e041300d0d065646fc9c94d8",
+        "revCount": 635,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },

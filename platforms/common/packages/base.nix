@@ -172,6 +172,7 @@
 
       # Code quality
       scc # Sloc, Cloc and Code: fast lines of code counter
+      jscpd # Copy/paste detector for source code
 
       # Infrastructure as Code
       terraform # Infrastructure as Code tool from HashiCorp
