@@ -86,7 +86,7 @@ _: {
               OLLAMA_FLASH_ATTENTION = "1";
               OLLAMA_NUM_PARALLEL = "4";
               OLLAMA_KV_CACHE_TYPE = "q8_0";
-              OLLAMA_KEEP_ALIVE = "24h";
+              OLLAMA_KEEP_ALIVE = "1h";
             };
         };
 
@@ -97,6 +97,7 @@ _: {
             Group = "users";
             SupplementaryGroups = ["render"];
             UMask = lib.mkForce "0007";
+            MemoryMax = "32G";
           };
         };
 

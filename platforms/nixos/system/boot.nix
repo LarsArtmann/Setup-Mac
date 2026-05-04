@@ -31,12 +31,11 @@
       "amdgpu.lockup_timeout=30000"
       "amdgpu.gpu_recovery=1" # Attempt GPU reset on hang instead of leaving GPU in dead state
       "amd_pstate=guided"
-      # GTT: allocate ~128GB for GPU compute memory via Graphics Translation Table
-      # Without this, kernel defaults to ~31GB GTT, crippling AI workloads on unified memory.
-      # Removed in crash fix but root cause was overdrive (now disabled), not GTT sizing.
-      "amdgpu.gttsize=131072"
-      # TTM: increase page limit to ~120GB for GPU page allocations
-      "amdgpu.ttm.pages_limit=31457280"
+      # GTT: allocate 32GB for GPU compute memory via Graphics Translation Table
+      # Limit GPU to 32GB of the 128GB unified memory to keep CPU workloads fed.
+      "amdgpu.gttsize=32768"
+      # TTM: limit GPU page allocations to 32GB
+      "amdgpu.ttm.pages_limit=8388608"
       # IOMMU enabled — required for full 128GB memory mapping on Strix Halo.
       # Previously set to "off" for ~6% memory read improvement, but this prevented
       # the kernel from seeing the upper 64GB of RAM (only 64GB of 128GB visible).
@@ -52,11 +51,11 @@
     binfmt.emulatedSystems = ["aarch64-linux"];
   };
 
-  # TTM memory pool configuration for GPU workloads (128GB unified memory)
+  # TTM memory pool configuration for GPU workloads (32GB limit)
   boot.extraModprobeConfig = ''
-    options amdgpu gttsize=131072
-    options ttm pages_limit=31457280
-    options ttm page_pool_size=31457280
+    options amdgpu gttsize=32768
+    options ttm pages_limit=8388608
+    options ttm page_pool_size=8388608
   '';
 
   # VM sysctl tuning for AI/ML workloads (128GB unified memory)
@@ -99,18 +98,26 @@
 
   # Protect critical services from OOM killer
   # sshd: -1000 (maximum protection — remote access is the last resort)
-  # NixOS sets -1000 by default for sshd, but be explicit to prevent overrides
-  # niri: -900 (compositor death = entire desktop gone, but SSH should outlive it)
-  # caddy: -500 (reverse proxy loss means all services unreachable)
-  # journald: -500 (lost journald = lost crash diagnostics — saw this in the real OOM event)
-  systemd.services = {
-    "sshd".serviceConfig.OOMScoreAdjust = -1000;
-    "systemd-journald".serviceConfig.OOMScoreAdjust = -500;
-  };
+  # journald: -500 (lost journald = lost crash diagnostics)
+  systemd = {
+    services = {
+      "sshd".serviceConfig.OOMScoreAdjust = -1000;
+      "systemd-journald".serviceConfig.OOMScoreAdjust = -500;
+    };
 
-  systemd.user.services = {
-    "waybar".serviceConfig.OOMScoreAdjust = -500;
-    "pipewire".serviceConfig.OOMScoreAdjust = -500;
+    user.services = {
+      "waybar".serviceConfig.OOMScoreAdjust = -500;
+      "pipewire".serviceConfig.OOMScoreAdjust = -500;
+    };
+
+    # ── Resilience: coredump storage limits ───────────────────────────────
+    # AI workloads (PyTorch/ROCm, llama.cpp, Ollama) can produce 50-100GB core
+    # dumps on SIGSEGV. Without limits, a single crash fills /var/lib/systemd/coredump.
+    coredump.extraConfig = ''
+      Storage=external
+      MaxUse=2G
+      KeepFree=5G
+    '';
   };
 
   # Hardware watchdog — last resort: hard-reboots the system if it becomes completely unresponsive.
@@ -146,30 +153,23 @@
         "^(ollama|llama-server|python3|python|node|java|chrome|chromium|generate_happy_girl)$" # Kill these first
       ];
     };
+
+    # ── Resilience: journald size limits ──────────────────────────────────
+    # Without limits, AI services (Ollama, ComfyUI, Hermes) can fill /var/log
+    # with multi-GB logs, causing system failures. 4GB is generous for 128GB RAM.
+    journald.extraConfig = ''
+      SystemMaxUse=4G
+      RuntimeMaxUse=1G
+      MaxFileSec=1week
+      MaxRetentionSec=2week
+    '';
   };
 
-  # Enable ZRAM for compressed swap — fast, reduces pressure on disk swap
+  # Enable ZRAM for compressed swap — absorbs transient pressure before hitting slow disk swap.
+  # 15% of 128GB = ~19GB ZRAM allocation. At 2-3x compression, effective ~38-57GB buffer.
+  # Larger values would steal RAM from AI/GPU workloads (GTT already limits GPU to 32GB).
   zramSwap = {
     enable = true;
-    memoryPercent = 50; # 50% of 128GB = 64GB ZRAM (compresses ~2-3x, effective ~128-192GB buffer)
+    memoryPercent = 15;
   };
-
-  # ── Resilience: journald size limits ──────────────────────────────────
-  # Without limits, AI services (Ollama, ComfyUI, Hermes) can fill /var/log
-  # with multi-GB logs, causing system failures. 4GB is generous for 128GB RAM.
-  services.journald.extraConfig = ''
-    SystemMaxUse=4G
-    RuntimeMaxUse=1G
-    MaxFileSec=1week
-    MaxRetentionSec=2week
-  '';
-
-  # ── Resilience: coredump storage limits ───────────────────────────────
-  # AI workloads (PyTorch/ROCm, llama.cpp, Ollama) can produce 50-100GB core
-  # dumps on SIGSEGV. Without limits, a single crash fills /var/lib/systemd/coredump.
-  systemd.coredump.extraConfig = ''
-    Storage=external
-    MaxUse=2G
-    KeepFree=5G
-  '';
 }
