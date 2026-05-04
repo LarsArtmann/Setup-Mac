@@ -537,6 +537,7 @@ Declarative NixOS module for the Hermes AI agent gateway (Discord bot, cron sche
 - `hermes_discord_bot_token` — Discord bot token
 - `hermes_glm_api_key` — Z.AI/GLM API key
 - `hermes_minimax_api_key` — MiniMax API key
+- `hermes_xiaomi_api_key` — Xiaomi MiMo API key
 - `hermes_fal_key` — fal.ai image generation key
 - `hermes_firecrawl_api_key` — Firecrawl web scraping key
 
