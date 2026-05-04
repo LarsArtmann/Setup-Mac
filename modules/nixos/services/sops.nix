@@ -117,8 +117,6 @@ in {
             XIAOMI_API_KEY=${config.sops.placeholder.hermes_xiaomi_api_key}
             FAL_KEY=${config.sops.placeholder.hermes_fal_key}
             FIRECRAWL_API_KEY=${config.sops.placeholder.hermes_firecrawl_api_key}
-            OLLAMA_API_KEY=ollama
-            TERMINAL_ENV=local
           '';
         };
       };
