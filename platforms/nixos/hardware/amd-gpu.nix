@@ -22,15 +22,9 @@
 
   # AMD GPU performance environment variables
   environment.sessionVariables = {
-    # Graphics driver settings
-    __GLX_VENDOR_LIBRARY_NAME = "mesa";
     LIBVA_DRIVER_NAME = "radeonsi";
     AMD_VULKAN_ICD = "RADV";
-    # Performance optimization
     MESA_VK_WSI_PRESENT_MODE = "immediate";
-    # Remove problematic variables that can cause issues with modern Wayland compositors
-    # WLR_RENDERER_ALLOW_SOFTWARE = "1";  # Only for debugging
-    # WLR_NO_HARDWARE_CURSORS = "1";     # Only if cursor issues occur
   };
 
   # KFD/DRM udev rules for GPU compute access + force high performance for AI workloads
