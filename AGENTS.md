@@ -183,6 +183,23 @@ just session-restore      # Manually trigger session restore
 systemctl --user list-timers niri-session-save  # Check save timer
 ```
 
+### Wallpaper Self-Healing (`scripts/wallpaper-set.sh`)
+
+Automatic wallpaper management with daemon crash recovery:
+
+**Source files:**
+- `scripts/wallpaper-set.sh` — wallpaper setter (random/restore modes, daemon wait loop)
+- `platforms/nixos/programs/niri-wrapped.nix` — awww-daemon + awww-wallpaper systemd services
+
+**Self-healing architecture:**
+- `awww-daemon`: `Restart=always` — systemd auto-restarts after BrokenPipe crash (upstream awww 0.12.0 bug)
+- `awww-wallpaper`: `PartOf=["awww-daemon.service"]` — **automatically restarted by systemd when daemon restarts** (no bash supervisor loop)
+- On daemon crash recovery: uses `awww restore` to restore last displayed image (preserves user choice)
+- On first boot / `Mod+W`: picks random wallpaper from `~/.local/share/wallpapers/`
+- Wallpaper script waits up to 60s for daemon socket before setting
+
+**Do NOT use `BindsTo`** — it kills the wallpaper service when the daemon crashes, preventing recovery. `PartOf` is correct: it propagates restarts without killing. This was a bug introduced in `029a911` that caused permanent wallpaper loss on daemon crash.
+
 ### Crush AI Config Deployment
 
 Crush config (`~/.config/crush/`) is a flake input deployed via Home Manager on both platforms:
@@ -359,6 +376,7 @@ AI agent task tracking protocol:
 | Secrets via sops-nix | Secrets are age-encrypted using the SSH host key. Managed in `modules/nixos/services/sops.nix` |
 | BTRFS dual layout | Root uses zstd compression, `/data` uses zstd:3 with async discard. Docker lives on `/data`. |
 | Niri BindsTo patched | Upstream niri.service uses `BindsTo=graphical-session.target` — we replace with `PartOf` + `Restart=always` in `niri-config.nix`. Without this, `just switch` kills niri permanently. |
+| awww-daemon BrokenPipe | Upstream awww 0.12.0 panics on BrokenPipe at `daemon/src/main.rs:712:32` (Wayland disconnect during suspend/output hotplug). `Restart=always` covers it. Never use `BindsTo` for wallpaper services — use `PartOf` for restart propagation. |
 
 ### lib/systemd Shared Helpers
 
@@ -433,6 +451,13 @@ just task-backup         # Export all tasks as JSON
 # Niri session
 just session-status       # Show session save state (last save, window count, age)
 just session-restore      # Manually trigger session restore
+
+# Wallpaper (self-healing)
+just wallpaper-status     # Show daemon health, image count, outputs
+just wallpaper-random     # Set random wallpaper
+just wallpaper-restore    # Restore last displayed wallpaper
+just wallpaper-restart    # Restart daemon + wallpaper service
+just wallpaper-logs       # Show daemon logs (last 50 lines)
 
 # AI Models
 just ai-migrate           # Migrate legacy AI data → /data/ai/ (run BEFORE switch)
