@@ -396,6 +396,7 @@ Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
 | `wire` not in Nixpkgs | Installed via `go install` (see `go-update-tools-manual` just recipe) | Accepted |
 | AI model migration order | Run `just ai-migrate` BEFORE `just switch` to avoid Ollama seeing empty model dir | Documented |
 | Go overlay removed on Darwin | nixpkgs `go_1_26` is already 1.26.1; overlay was invalidating 1094 binary cache derivations | Resolved — removed |
+| GPU hang recovery | Hermes anime-comic-pipeline (PyTorch/ROCm) SIGSEGV → GPU driver hang → entire desktop frozen. Defense in depth: `kernel.sysrq=1` (REISUB), `kernel.panic=30`, `softlockup_panic=1`, `hung_task_panic=1`, `watchdogd` (SP5100 TCO), `amdgpu.gpu_recovery=1`. See `boot.nix`. | Resolved |
 
 ## Essential Commands
 
