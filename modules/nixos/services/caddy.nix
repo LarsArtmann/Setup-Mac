@@ -5,6 +5,7 @@ _: {
     ...
   }: let
     inherit (config.networking) domain;
+    lanSubnet = config.networking.local.subnet;
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
@@ -33,7 +34,7 @@ _: {
     protectedVHost = _subdomain: port: {
       extraConfig = ''
         ${tlsConfig}
-        @external not remote_ip 127.0.0.1/8 192.168.1.0/24
+        @external not remote_ip 127.0.0.1/8 ${lanSubnet}
         handle @external {
           ${forwardAuth}
           reverse_proxy localhost:${toString port}
