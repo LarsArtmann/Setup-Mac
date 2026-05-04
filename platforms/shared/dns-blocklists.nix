@@ -98,7 +98,7 @@
     {
       name = "HaGeZi-anti-piracy";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/anti.piracy.txt";
-      hash = "sha256-NZWoRgitkvt37u13WxC1bl7DIBt7EBIECtOk0OB7K2s=";
+      hash = "sha256-fDe7aSwyTGRboY45GMwUN6XR/vd8IB6jN5kWuA5z4oY=";
     }
     {
       name = "HaGeZi-dyndns";
