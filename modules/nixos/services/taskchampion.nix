@@ -5,7 +5,7 @@ _: {
     ...
   }: let
     cfg = config.services.taskchampion-config;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.taskchampion-config = {

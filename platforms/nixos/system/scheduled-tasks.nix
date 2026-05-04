@@ -9,7 +9,7 @@ in
     ...
   }: let
     uid = builtins.toString config.users.users.${primaryUser}.uid;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
   in {
     systemd = {
       timers = {

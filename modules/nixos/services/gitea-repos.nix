@@ -6,7 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.gitea-repos;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     # Script to ensure specific GitHub repos are mirrored to Gitea
     ensureReposScript = pkgs.writeShellScriptBin "gitea-ensure-repos" ''

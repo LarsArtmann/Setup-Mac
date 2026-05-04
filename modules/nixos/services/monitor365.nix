@@ -6,7 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.monitor365;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     runtimeDeps = with pkgs; [
       xdotool

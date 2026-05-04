@@ -6,8 +6,6 @@ _: {
     ...
   }: let
     cfg = config.services.file-and-image-renamer;
-    harden = import ../../../lib/systemd.nix;
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.file-and-image-renamer = {
       enable = lib.mkEnableOption "File and Image Renamer — AI-powered screenshot renaming watcher";
@@ -64,23 +62,22 @@ _: {
             StartLimitBurst = 5;
           };
 
-          Service =
-            harden {MemoryMax = "512M";}
-            // serviceDefaults {RestartSec = "10";}
-            // {
-              Type = "simple";
-              ExecStart = "${cfg.package}/bin/file-renamer watch";
-              WorkingDirectory = cfg.watchDirectory;
-              KillMode = "mixed";
-              TimeoutStopSec = "30";
-              StandardOutput = "journal";
-              StandardError = "journal";
+          Service = {
+            Type = "simple";
+            ExecStart = "${cfg.package}/bin/file-renamer watch";
+            WorkingDirectory = cfg.watchDirectory;
+            KillMode = "mixed";
+            Restart = "always";
+            RestartSec = "10";
+            TimeoutStopSec = "30";
+            StandardOutput = "journal";
+            StandardError = "journal";
 
-              Environment = [
-                "DESKTOP_PATH=${cfg.watchDirectory}"
-                "ZAI_API_KEY_FILE=${cfg.apiKeyFile}"
-              ];
-            };
+            Environment = [
+              "DESKTOP_PATH=${cfg.watchDirectory}"
+              "ZAI_API_KEY_FILE=${cfg.apiKeyFile}"
+            ];
+          };
 
           Install = {
             WantedBy = ["graphical-session.target"];

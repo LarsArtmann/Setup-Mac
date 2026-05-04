@@ -6,7 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.photomap;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";

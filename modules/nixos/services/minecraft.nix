@@ -8,7 +8,7 @@ _: {
     mcVersion = "26.1.2";
     mcJarSha1 = "97ccd4c0ed3f81bbb7bfacddd1090b0c56f9bc51";
     mcJarUrl = "https://piston-data.mojang.com/v1/objects/${mcJarSha1}/server.jar";
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     minecraft-server-26 = pkgs.stdenv.mkDerivation {
       pname = "minecraft-server";

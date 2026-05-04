@@ -9,7 +9,7 @@ _: {
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     bindAddress =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
@@ -66,7 +66,6 @@ _: {
           "gitea.${domain}" = protectedVHost "gitea" 3000;
           "dash.${domain}" = protectedVHost "dash" 8082;
           "photomap.${domain}" = protectedVHost "photomap" 8050;
-          "unsloth.${domain}" = protectedVHost "unsloth" 8888;
           "signoz.${domain}" = protectedVHost "signoz" 8080;
           "crm.${domain}" = protectedVHost "crm" 3200;
           "tasks.${domain}" = {

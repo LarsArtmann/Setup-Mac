@@ -5,7 +5,7 @@ _: {
     ...
   }: let
     cfg = config.services.immich;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
   in {
     config = lib.mkIf config.services.immich.enable {
       services.immich = {

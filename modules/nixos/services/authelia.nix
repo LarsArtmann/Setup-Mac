@@ -8,7 +8,7 @@ _: {
     cfg = config.services.authelia-config;
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     authPort = 9091;
 
     mkClient = {

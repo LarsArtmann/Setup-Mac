@@ -1,12 +1,11 @@
-{inputs, ...}: let
-  harden = import ../../../lib/systemd.nix;
-in {
+{inputs, ...}: {
   flake.nixosModules.hermes = {
     config,
     pkgs,
     lib,
     ...
   }: let
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     cfg = config.services.hermes;
     hermesPkg = let
       fixedHash = "sha256-tmKv51gGIHzfT6HqB3zR3mrRIfkmngrW1ad3Gg6n2aE=";

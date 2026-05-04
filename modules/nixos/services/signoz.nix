@@ -93,7 +93,7 @@ in {
   }: let
     cfg = config.services.signoz;
     packages = mkPackages pkgs;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
   in {
     options.services.signoz = {
       enable = lib.mkEnableOption "SigNoz observability platform";

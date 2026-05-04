@@ -9,7 +9,7 @@ in {
   }: let
     cfg = config.services.twenty;
     inherit (config.networking) domain;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     stateDir = "/var/lib/twenty";
     serverPort = 3200;

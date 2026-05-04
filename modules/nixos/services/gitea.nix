@@ -7,7 +7,7 @@ _: {
   }: let
     primaryUser = "lars";
     giteaPkg = config.services.gitea.package;
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''

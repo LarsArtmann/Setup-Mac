@@ -7,7 +7,7 @@ _: {
   }: let
     cfg = config.services.comfyui;
     primaryUser = "lars";
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
     rocm = import ../../../lib/rocm.nix {inherit pkgs;};
 

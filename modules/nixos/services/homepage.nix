@@ -10,7 +10,7 @@ _: {
     stateDir = "/var/lib/homepage-dashboard";
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
-    harden = import ../../../lib/systemd.nix;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.homepage = {
@@ -132,12 +132,6 @@ _: {
                 icon: ollama.png
                 statusStyle: dot
                 siteMonitor: http://localhost:11434/api/tags
-            - Unsloth Studio:
-                href: ${svcUrl "unsloth"}
-                description: AI Model Training & Inference UI
-                icon: jupyter.png
-                statusStyle: dot
-                siteMonitor: ${svcUrl "unsloth"}
 
         - Monitoring:
             - SigNoz:

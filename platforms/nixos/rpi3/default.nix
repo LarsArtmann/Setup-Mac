@@ -140,7 +140,7 @@ in {
           local-data =
             map
             (subdomain: ''"${subdomain}.${domain}. IN A ${lanIP}"'')
-            ["auth" "immich" "gitea" "dash" "photomap" "unsloth" "signoz" "tasks" "crm"];
+            ["auth" "immich" "gitea" "dash" "photomap" "signoz" "tasks" "crm"];
         };
 
         remote-control = {
