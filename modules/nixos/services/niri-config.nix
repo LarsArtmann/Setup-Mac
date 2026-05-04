@@ -37,7 +37,7 @@ _: {
               noBindsTo =
                 builtins.replaceStrings
                 ["BindsTo=graphical-session.target"]
-                ["PartOf=graphical-session.target"]
+                ["Wants=graphical-session.target"]
                 baseText;
               unitLimits =
                 builtins.replaceStrings

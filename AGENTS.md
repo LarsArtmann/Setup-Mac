@@ -375,7 +375,7 @@ AI agent task tracking protocol:
 | SSH config is external | SSH configuration comes from `nix-ssh-config` flake input, not defined locally |
 | Secrets via sops-nix | Secrets are age-encrypted using the SSH host key. Managed in `modules/nixos/services/sops.nix` |
 | BTRFS dual layout | Root uses zstd compression, `/data` uses zstd:3 with async discard. Docker lives on `/data`. |
-| Niri BindsTo patched | Upstream niri.service uses `BindsTo=graphical-session.target` — we replace with `PartOf` + `Restart=always` in `niri-config.nix`. Without this, `just switch` kills niri permanently. |
+| Niri BindsTo patched | Upstream niri.service uses `BindsTo=graphical-session.target` — we replace with `Wants=` in `niri-config.nix`. `BindsTo` kills niri when the target stops during `just switch`; `Wants` pulls in the target (activating waybar etc.) without the hard binding. |
 | awww-daemon BrokenPipe | Upstream awww 0.12.0 panics on BrokenPipe at `daemon/src/main.rs:712:32` (Wayland disconnect during suspend/output hotplug). `Restart=always` covers it. Never use `BindsTo` for wallpaper services — use `PartOf` for restart propagation. |
 
 ### lib/ Shared Helpers
