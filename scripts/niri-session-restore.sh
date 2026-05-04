@@ -27,13 +27,16 @@ if [ -f "$STATE_DIR/timestamp" ]; then
   saved=$(cat "$STATE_DIR/timestamp")
   now=$(date +%s)
   # shellcheck disable=SC1102
-  max_age=$(( @maxSessionAgeDays@ * 86400 ))
-  [ $((now - saved)) -gt $max_age ] && { fallback; exit 0; }
+  max_age=$((@maxSessionAgeDays@ * 86400))
+  [ $((now - saved)) -gt $max_age ] && {
+    fallback
+    exit 0
+  }
 fi
 
 if [ -f "$STATE_DIR/workspaces.json" ] && ! jq '.' "$STATE_DIR/workspaces.json" >/dev/null 2>&1; then
   echo "niri-session-restore: workspaces.json is corrupt, ignoring" >&2
-  echo '[]' > "$STATE_DIR/workspaces.json"
+  echo '[]' >"$STATE_DIR/workspaces.json"
 fi
 
 deduped=$(jq '[
@@ -41,7 +44,10 @@ deduped=$(jq '[
   | if .[0].app_id == "kitty" then .[] else .[0] end
 ]' "$STATE_DIR/windows.json" 2>/dev/null)
 
-[ -z "$deduped" ] || [ "$deduped" = "[]" ] && { fallback; exit 0; }
+[ -z "$deduped" ] || [ "$deduped" = "[]" ] && {
+  fallback
+  exit 0
+}
 
 kitty_state=$(cat "$STATE_DIR/kitty-state.json" 2>/dev/null || echo '[]')
 
@@ -88,60 +94,64 @@ while IFS= read -r win; do
   fi
 
   case "$app_id" in
-    kitty | foot | helium | emacs | firefox | Firefox)
-      skip_width=1 ;;
-    *)
-      skip_width=0 ;;
+  kitty | foot | helium | emacs | firefox | Firefox)
+    skip_width=1
+    ;;
+  *)
+    skip_width=0
+    ;;
   esac
   case "$app_id" in
-    pavucontrol | com.saivert.pwvucontrol | floating | xdg-desktop-portal-gtk)
-      skip_float=1 ;;
-    *)
-      skip_float=0 ;;
+  pavucontrol | com.saivert.pwvucontrol | floating | xdg-desktop-portal-gtk)
+    skip_float=1
+    ;;
+  *)
+    skip_float=0
+    ;;
   esac
 
   case "$app_id" in
-    kitty)
-      entry=$(echo "$kitty_state" | jq -c --argjson pid "$pid" '.[] | select(.pid == $pid)' 2>/dev/null | head -1 || true)
+  kitty)
+    entry=$(echo "$kitty_state" | jq -c --argjson pid "$pid" '.[] | select(.pid == $pid)' 2>/dev/null | head -1 || true)
 
-      if [ -n "$entry" ]; then
-        child_cmd=$(echo "$entry" | jq -r '.child_cmd // empty')
-        child_cwd=$(echo "$entry" | jq -r '.child_cwd // empty')
-        has_e=$(echo "$entry" | jq -r '.args | index("-e") // empty')
+    if [ -n "$entry" ]; then
+      child_cmd=$(echo "$entry" | jq -r '.child_cmd // empty')
+      child_cwd=$(echo "$entry" | jq -r '.child_cwd // empty')
+      has_e=$(echo "$entry" | jq -r '.args | index("-e") // empty')
 
-        if [ -n "$child_cmd" ] && echo "$child_cmd" | grep -q '__atexit__'; then
-          child_cmd=""
-          child_cwd=""
-        fi
+      if [ -n "$child_cmd" ] && echo "$child_cmd" | grep -q '__atexit__'; then
+        child_cmd=""
+        child_cwd=""
+      fi
 
-        if [ -n "$child_cmd" ]; then
-          cwd_arg=()
-          [ -n "$child_cwd" ] && [ "$child_cwd" != "$HOME" ] && cwd_arg=(--directory "$child_cwd")
-          child_safe=$(echo "$child_cmd" | jq -r -R @sh)
-          kitty "${cwd_arg[@]}" -e sh -c "$child_safe; exec fish" &
-        elif [ -n "$has_e" ]; then
-          e_args=()
-          idx=$(echo "$entry" | jq -r '.args | index("-e")')
-          rest=$(echo "$entry" | jq -r --argjson idx "$idx" '.args[($idx + 1):][]')
-          while IFS= read -r arg; do
-            e_args+=("$arg")
-          done < <(echo "$rest")
-          kitty -e "${e_args[@]}" &
-        else
-          kitty &
-        fi
+      if [ -n "$child_cmd" ]; then
+        cwd_arg=()
+        [ -n "$child_cwd" ] && [ "$child_cwd" != "$HOME" ] && cwd_arg=(--directory "$child_cwd")
+        child_safe=$(echo "$child_cmd" | jq -r -R @sh)
+        kitty "${cwd_arg[@]}" -e sh -c "$child_safe; exec fish" &
+      elif [ -n "$has_e" ]; then
+        e_args=()
+        idx=$(echo "$entry" | jq -r '.args | index("-e")')
+        rest=$(echo "$entry" | jq -r --argjson idx "$idx" '.args[($idx + 1):][]')
+        while IFS= read -r arg; do
+          e_args+=("$arg")
+        done < <(echo "$rest")
+        kitty -e "${e_args[@]}" &
       else
         kitty &
       fi
-      ;;
-    signal)
-      signal-desktop &
-      ;;
-    *)
-      if command -v "$app_id" &>/dev/null; then
-        "$app_id" &
-      fi
-      ;;
+    else
+      kitty &
+    fi
+    ;;
+  signal)
+    signal-desktop &
+    ;;
+  *)
+    if command -v "$app_id" &>/dev/null; then
+      "$app_id" &
+    fi
+    ;;
   esac
   sleep 0.5
 

@@ -6,7 +6,7 @@ STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
 mkdir -p "$STATE_DIR"
 
 tmp=$(mktemp)
-if ! niri msg -j windows > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
+if ! niri msg -j windows >"$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
   rm -f "$tmp"
   exit 0
 fi
@@ -19,7 +19,7 @@ fi
 mv "$tmp" "$STATE_DIR/windows.json"
 
 tmp=$(mktemp)
-if ! niri msg -j workspaces > "$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
+if ! niri msg -j workspaces >"$tmp" 2>/dev/null || [ ! -s "$tmp" ]; then
   rm -f "$tmp"
   exit 0
 fi
@@ -80,14 +80,17 @@ done
 
 tmp=$(mktemp)
 if [ ${#kitty_entries[@]} -gt 0 ]; then
-  printf '[%s]\n' "$(IFS=,; echo "${kitty_entries[*]}")" > "$tmp"
+  printf '[%s]\n' "$(
+    IFS=,
+    echo "${kitty_entries[*]}"
+  )" >"$tmp"
 else
-  echo '[]' > "$tmp"
+  echo '[]' >"$tmp"
 fi
 mv "$tmp" "$STATE_DIR/kitty-state.json"
 
 tmp=$(mktemp)
-date +%s > "$tmp"
+date +%s >"$tmp"
 mv "$tmp" "$STATE_DIR/timestamp"
 
 win_count=$(jq 'length' "$STATE_DIR/windows.json" 2>/dev/null || echo "?")

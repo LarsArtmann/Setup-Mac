@@ -51,10 +51,11 @@
       GOPATH = "${config.home.homeDirectory}/go";
 
       # Private Go modules (use SSH instead of public proxy)
-      GOPRIVATE = "github.com/LarsArtmann/*";
+      # Note: Both case variants needed - Go module paths are case-sensitive
+      GOPRIVATE = "github.com/LarsArtmann/*,github.com/larsartmann/*";
 
       # Disable checksum database for private repos
-      GONOSUMDB = "github.com/LarsArtmann/*";
+      GONOSUMDB = "github.com/LarsArtmann/*,github.com/larsartmann/*";
     };
 
     # PATH additions (available to all shells)
