@@ -504,13 +504,13 @@ in {
           Description = "awww wallpaper daemon";
           After = ["graphical-session.target"];
           PartOf = ["graphical-session.target"];
-          StartLimitBurst = 10;
-          StartLimitIntervalSec = 60;
+          StartLimitBurst = 5;
+          StartLimitIntervalSec = 120;
         };
         Service = {
           ExecStart = "${pkgs.awww}/bin/awww-daemon";
           Restart = "always";
-          RestartSec = "2s";
+          RestartSec = "3s";
         };
         Install.WantedBy = ["graphical-session.target"];
       };
@@ -519,15 +519,15 @@ in {
         Unit = {
           Description = "Set random wallpaper";
           After = ["awww-daemon.service"];
-          BindsTo = ["awww-daemon.service"];
+          Wants = ["awww-daemon.service"];
           PartOf = ["graphical-session.target"];
         };
         Service = {
           Type = "oneshot";
           RemainAfterExit = true;
-          ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && for i in $(${pkgs.coreutils}/bin/seq 1 30); do ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3 && break; ${pkgs.coreutils}/bin/sleep 1; done'";
+          ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && for i in $(${pkgs.coreutils}/bin/seq 1 60); do ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3 && break; ${pkgs.coreutils}/bin/sleep 1; done'";
           Restart = "on-failure";
-          RestartSec = "3s";
+          RestartSec = "5s";
         };
         Install.WantedBy = ["graphical-session.target"];
       };
