@@ -8,7 +8,7 @@
     harden = import ../../../lib/systemd.nix {inherit lib;};
     cfg = config.services.hermes;
     hermesPkg = let
-      fixedHash = "sha256-33v2U/w/Pa90AaBpesQt2FIwIbK+VFmIRI/BAYwJxYU=";
+      fixedHash = "sha256-tmKv51gGIHzfT6HqB3zR3mrRIfkmngrW1ad3Gg6n2aE=";
       baseOverlay = inputs.hermes-agent.overlays.default;
       patchedOverlay = final: prev: let
         base = baseOverlay final prev;
