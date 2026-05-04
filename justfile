@@ -424,7 +424,7 @@ clean-backups:
     @echo "🧹 Cleaning old backups (keeping last 10)..."
     #!/usr/bin/env bash
     cd backups 2>/dev/null || exit 0
-    ls -1t | tail -n +11 | xargs trash 2>/dev/null || ls -1t | tail -n +11 | xargs rm -rf
+    ls -1t | tail -n +11 | xargs trash 2>/dev/null || { echo "  trash failed, skipping old backup cleanup"; exit 0; }
     echo "✅ Old backups cleaned"
 
 # Rebuild zsh completion cache
@@ -1538,7 +1538,8 @@ disk-monitor-check:
 
 # Reset disk monitor notification state (allows re-notifying)
 disk-monitor-reset:
-    @rm -rf ~/.local/state/disk-monitor/*
+    @trash ~/.local/state/disk-monitor/* 2>/dev/null || true
+    @rm -f ~/.local/state/disk-monitor/* 2>/dev/null || true
     @echo "Notification state cleared"
 
 # Show disk monitor timer schedule
