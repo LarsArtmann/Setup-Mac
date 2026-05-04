@@ -11,6 +11,7 @@ _: {
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
     harden = import ../../../lib/systemd.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
     options.services.homepage = {
       enable = lib.mkEnableOption "Homepage Dashboard service";
@@ -39,10 +40,7 @@ _: {
             StateDirectory = "homepage-dashboard";
           }
           // harden {}
-          // {
-            Restart = lib.mkForce "always";
-            RestartSec = lib.mkForce "5s";
-          };
+          // serviceDefaults {};
       };
 
       users.users.homepage = {

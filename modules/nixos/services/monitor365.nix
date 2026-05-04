@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.monitor365;
+    harden = import ../../../lib/systemd.nix;
 
     runtimeDeps = with pkgs; [
       xdotool
@@ -246,13 +247,7 @@ _: {
             ];
 
             MemoryMax = "1G";
-            PrivateTmp = true;
-            NoNewPrivileges = true;
-            ProtectClock = true;
-            ProtectHostname = true;
-            RestrictNamespaces = true;
-            LockPersonality = true;
-          };
+          } // harden {};
 
           Install = {
             WantedBy = ["graphical-session.target"];

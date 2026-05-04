@@ -8,6 +8,7 @@ _: {
     cfg = config.services.authelia-config;
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
+    harden = import ../../../lib/systemd.nix;
     authPort = 9091;
 
     mkClient = {
@@ -208,20 +209,15 @@ _: {
           StartLimitBurst = lib.mkForce 3;
           StartLimitIntervalSec = lib.mkForce 300;
         };
-        serviceConfig = {
-          Restart = lib.mkForce "always";
-          RestartSec = lib.mkForce "5";
-          StateDirectory = lib.mkForce "authelia-main";
-          StateDirectoryMode = lib.mkForce "0750";
-          PrivateTmp = lib.mkForce true;
-          NoNewPrivileges = lib.mkForce true;
-          ProtectClock = lib.mkForce true;
-          ProtectHostname = lib.mkForce true;
-          ProtectKernelLogs = lib.mkForce true;
-          RestrictNamespaces = lib.mkForce true;
-          LockPersonality = lib.mkForce true;
-          ExecStartPost = "${pkgs.curl}/bin/curl -sf --max-time 3 --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:${toString authPort}/api/health";
-        };
+        serviceConfig =
+          harden {}
+          // {
+            Restart = lib.mkForce "always";
+            RestartSec = lib.mkForce "5";
+            StateDirectory = lib.mkForce "authelia-main";
+            StateDirectoryMode = lib.mkForce "0750";
+            ExecStartPost = "${pkgs.curl}/bin/curl -sf --max-time 3 --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:${toString authPort}/api/health";
+          };
       };
 
       environment.etc."authelia/users_database.yml".source = config.sops.templates.authelia-users-db.path;

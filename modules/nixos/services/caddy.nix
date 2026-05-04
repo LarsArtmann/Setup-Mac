@@ -9,6 +9,7 @@ _: {
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = 9091;
+    harden = import ../../../lib/systemd.nix;
 
     bindAddress =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
@@ -92,17 +93,13 @@ _: {
           StartLimitBurst = lib.mkForce 3;
           StartLimitIntervalSec = lib.mkForce 300;
         };
-        serviceConfig = {
-          Restart = lib.mkForce "always";
-          RestartSec = lib.mkForce "5";
-          OOMScoreAdjust = lib.mkForce (-500);
-          PrivateTmp = lib.mkForce true;
-          NoNewPrivileges = lib.mkForce false;
-          ProtectClock = lib.mkForce true;
-          ProtectHostname = lib.mkForce true;
-          RestrictNamespaces = lib.mkForce true;
-          LockPersonality = lib.mkForce true;
-        };
+        serviceConfig =
+          harden {NoNewPrivileges = false;}
+          // {
+            Restart = lib.mkForce "always";
+            RestartSec = lib.mkForce "5";
+            OOMScoreAdjust = lib.mkForce (-500);
+          };
       };
     };
   };

@@ -208,7 +208,7 @@ in {
             UMask = "0026";
           }
           // harden {
-            MemoryMax = "4G";
+            MemoryMax = "24G"; # PyTorch + ROCm + HIP libraries require significant GPU memory mapping
             ProtectHome = false;
             ReadWritePaths = [cfg.stateDir];
           };

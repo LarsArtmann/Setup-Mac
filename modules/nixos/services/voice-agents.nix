@@ -10,36 +10,36 @@ _: {
     harden = import ../../../lib/systemd.nix;
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
 
-    whisperApiPort = 8000; # OpenAI-compatible API (FastAPI)
-    whisperUiPort = 7860; # Gradio WebUI
+    whisperUiPort = 7860;
     whisperModelsDir = config.services.ai-models.paths.whisper;
 
-    # Docker compose for Whisper ASR - API server mode
-    # API: http://localhost:8000/v1/audio/transcriptions (OpenAI-compatible)
-    # Docs: http://localhost:8000/docs
+    # Docker compose for Whisper ASR - Gradio UI mode
+    # Image (beecave/insanely-fast-whisper-rocm) provides:
+    #   - /app/app.py    → Gradio WebUI (port 7860)
+    #   - /app/main.py   → Directory watcher (batch processing)
+    #   - insanely-fast-whisper CLI tool
+    # ENTRYPOINT is ["python3"], WORKDIR is /app
+    # Env var: MODEL (not WHISPER_MODEL) controls which model to load
     whisperComposeFile = pkgs.writeText "docker-compose.whisper-asr.yml" ''
-      name: voice-agents
+    name: voice-agents
 
-      services:
-        whisper-rocm:
-          image: beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1
-          container_name: whisper-asr
-          restart: unless-stopped
-          # Start API server (OpenAI-compatible) on port 8000
-          # Image ENTRYPOINT is ["python3"], so command is args only (no "python" prefix)
-          command: -m insanely_fast_whisper_rocm.api --host 0.0.0.0 --port 8000
-          ports:
-            - '${toString whisperApiPort}:8000'
-            - '${toString whisperUiPort}:7860'
-          environment:
-            - WHISPER_MODEL=${cfg.whisperModel}
-            - HSA_OVERRIDE_GFX_VERSION=11.5.1
-          volumes:
-            - ${whisperModelsDir}:/root/.cache/huggingface
-          devices:
-            - /dev/dri:/dev/dri
-            - /dev/kfd:/dev/kfd
-    '';
+    services:
+      whisper-rocm:
+        image: beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1
+        container_name: whisper-asr
+        restart: unless-stopped
+        command: app.py
+        ports:
+          - '${toString whisperUiPort}:7860'
+        environment:
+          - MODEL=${cfg.whisperModel}
+          - HSA_OVERRIDE_GFX_VERSION=11.5.1
+        volumes:
+          - ${whisperModelsDir}:/root/.cache/huggingface
+        devices:
+          - /dev/dri:/dev/dri
+          - /dev/kfd:/dev/kfd
+  '';
   in {
     options.services.voice-agents = {
       enable = lib.mkEnableOption "Voice agents (LiveKit + Whisper ASR)";
@@ -102,7 +102,7 @@ _: {
         };
 
         services.whisper-asr = {
-          description = "Whisper ASR Server - OpenAI-Compatible API (ROCm)";
+          description = "Whisper ASR Server - Gradio WebUI (ROCm)";
           after = ["docker.service" "network-online.target" "whisper-asr-pull.service"];
           requires = ["docker.service"];
           wants = ["whisper-asr-pull.service" "network-online.target"];
@@ -129,7 +129,6 @@ _: {
       networking.firewall = lib.mkIf cfg.openFirewall {
         allowedTCPPorts = [
           7880
-          whisperApiPort
           whisperUiPort
         ];
         allowedUDPPortRanges = [

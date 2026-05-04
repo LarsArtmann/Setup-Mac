@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.gitea-repos;
+    harden = import ../../../lib/systemd.nix;
 
     # Script to ensure specific GitHub repos are mirrored to Gitea
     ensureReposScript = pkgs.writeShellScriptBin "gitea-ensure-repos" ''
@@ -280,12 +281,7 @@ _: {
             ExecStart = "${ensureReposScript}/bin/gitea-ensure-repos";
             Restart = "on-failure";
             RestartSec = "5";
-            PrivateTmp = true;
-            NoNewPrivileges = true;
-            ProtectHome = true;
-            ProtectSystem = "strict";
-            MemoryMax = "512M";
-          };
+          } // harden {ProtectSystem = "strict"; MemoryMax = "512M";};
         };
 
         # Trigger on rebuild if autoSync is enabled

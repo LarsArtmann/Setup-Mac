@@ -1434,6 +1434,43 @@ session-restore:
     @echo "Triggering session restore..."
     @niri-session-restore
 
+# Wallpaper Commands
+
+# Show wallpaper status (daemon, current image, service health, image count)
+wallpaper-status:
+    @echo "Wallpaper Status"; echo "================"; \
+    echo ""; \
+    echo "Daemon:"; \
+    systemctl --user is-active awww-daemon >/dev/null 2>&1 && echo "  awww-daemon: running" || echo "  awww-daemon: stopped"; \
+    echo ""; \
+    echo "Service:"; \
+    systemctl --user is-active awww-wallpaper >/dev/null 2>&1 && echo "  awww-wallpaper: active" || echo "  awww-wallpaper: inactive"; \
+    echo ""; \
+    echo "Images ($$HOME/.local/share/wallpapers):"; \
+    count=$$(ls $$HOME/.local/share/wallpapers/*.{jpg,jpeg,png,webp} 2>/dev/null | wc -l); \
+    echo "  $$count wallpaper(s) available"; \
+    echo ""; \
+    if command -v awww >/dev/null 2>&1 && systemctl --user is-active awww-daemon >/dev/null 2>&1; then \
+      echo "Outputs:"; \
+      awww query 2>/dev/null || echo "  (query failed)"; \
+    fi
+
+# Set random wallpaper via Mod+W keybind logic
+wallpaper-random:
+    @wallpaper-set random
+
+# Restore last displayed wallpaper
+wallpaper-restore:
+    @wallpaper-set restore
+
+# Restart wallpaper daemon and set wallpaper
+wallpaper-restart:
+    @systemctl --user restart awww-daemon awww-wallpaper
+
+# Show wallpaper daemon logs (last 50 lines)
+wallpaper-logs:
+    @journalctl --user -u awww-daemon -u awww-wallpaper --no-pager -n 50
+
 # Hermes Agent Gateway Commands
 
 # Show hermes gateway status (connected platforms, active agents, uptime)
