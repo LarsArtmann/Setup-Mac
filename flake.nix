@@ -149,6 +149,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # library-policy — Banned/vulnerable library detector for Go projects
+    library-policy = {
+      url = "git+ssh://git@github.com/LarsArtmann/library-policy?ref=master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # file-and-image-renamer — AI-powered screenshot renaming tool + local Go deps
     file-and-image-renamer-src = {
       url = "git+ssh://git@github.com/LarsArtmann/file-and-image-renamer?ref=master";
@@ -203,6 +209,7 @@
     emeet-pixyd,
     treefmt-full-flake,
     todo-list-ai,
+    library-policy,
     file-and-image-renamer-src,
     cmdguard-src,
     go-output-src,
@@ -282,6 +289,10 @@
       todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
     };
 
+    libraryPolicyOverlay = _final: prev: {
+      library-policy = library-policy.packages.${prev.stdenv.system}.default;
+    };
+
     fileAndImageRenamerOverlay = _final: prev: {
       file-and-image-renamer = prev.callPackage ./pkgs/file-and-image-renamer.nix {
         inherit file-and-image-renamer-src cmdguard-src go-output-src;
@@ -334,6 +345,7 @@
       nur.overlays.default
       awWatcherOverlay
       todoListAiOverlay
+      libraryPolicyOverlay
       golangciLintAutoConfigureOverlay
       mrSyncOverlay
       jscpdOverlay
@@ -442,6 +454,7 @@
               jscpd
               sqlc
               todo-list-ai
+              library-policy
               golangci-lint-auto-configure
               mr-sync
               ;

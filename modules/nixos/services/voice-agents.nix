@@ -26,7 +26,8 @@ _: {
           container_name: whisper-asr
           restart: unless-stopped
           # Start API server (OpenAI-compatible) on port 8000
-          command: python -m insanely_fast_whisper_rocm.api --host 0.0.0.0 --port 8000
+          # Image ENTRYPOINT is ["python3"], so command is args only (no "python" prefix)
+          command: -m insanely_fast_whisper_rocm.api --host 0.0.0.0 --port 8000
           ports:
             - '${toString whisperApiPort}:8000'
             - '${toString whisperUiPort}:7860'

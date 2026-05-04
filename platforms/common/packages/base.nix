@@ -199,6 +199,9 @@
       # Go linting automation
       golangci-lint-auto-configure # Auto-configure golangci-lint for Go projects
 
+      # Library governance
+      library-policy # Banned/vulnerable library detector for Go projects
+
       # Repo management
       mr-sync # Keep ~/.mrconfig in sync with GitHub repos
 

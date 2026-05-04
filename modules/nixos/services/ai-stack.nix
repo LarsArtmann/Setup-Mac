@@ -97,7 +97,6 @@ _: {
             Group = "users";
             SupplementaryGroups = ["render"];
             UMask = lib.mkForce "0007";
-            MemoryMax = "32G";
           };
         };
 
