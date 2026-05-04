@@ -441,11 +441,11 @@
         "uv2nix": "uv2nix_2"
       },
       "locked": {
-        "lastModified": 1777805643,
-        "narHash": "sha256-9zOABImrzLy2usGCt2EI+igNvJ13jq+qfmWKwCDJU9E=",
+        "lastModified": 1777868983,
+        "narHash": "sha256-nb5A+UMV8vC5shewT0vmZjJBc+FanqaT1noFvp9USR0=",
         "owner": "NousResearch",
         "repo": "hermes-agent",
-        "rev": "6f2dab248a6cc8591af46e5deb2dc939c2b43146",
+        "rev": "95f395027f72c69f06bddcecb08da53cfd10c440",
         "type": "github"
       },
       "original": {
@@ -461,11 +461,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777780644,
-        "narHash": "sha256-CYpc+mk28rmcQWGygeM8CA+Z8SZYy8BOyQtiW18spao=",
+        "lastModified": 1777852249,
+        "narHash": "sha256-XdbGWnFlX4McOEG5NioVsp35Ic6XL/rXnp8as71cu6o=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "b9311028044a9e9b2cf27db15ef0a87d464e212d",
+        "rev": "c909892de502b4de9e92838a503c09a9c8ebe4aa",
         "type": "github"
       },
       "original": {
@@ -493,11 +493,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1777796563,
-        "narHash": "sha256-AbO+MovPEWCLyKIj60qUWOSqSbJSVoGhF28QnCqxv3A=",
+        "lastModified": 1777865730,
+        "narHash": "sha256-OIExTJJt9+s7JcVDF1NGtUzTahQckcVCYEv6fiOz1Co=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "1e45d507af08e3f0926d93efe8f29f3d8c045f3b",
+        "rev": "f1b2390c858af91e7055549438c73ab0e0d95b1c",
         "type": "github"
       },
       "original": {
@@ -526,11 +526,11 @@
     "mr-sync-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777600518,
-        "narHash": "sha256-ZI1NOwqG0V/pGrNrbLxrxqK6pcReoDElpgXs8oH0hho=",
+        "lastModified": 1777807949,
+        "narHash": "sha256-d3aIkxC4FZ6VOCZG7uhiZahz/co1XveUOuAwL//A/FI=",
         "ref": "master",
-        "rev": "ce302d22e3c78dac01bf7c54b88d6e25d8150c2d",
-        "revCount": 23,
+        "rev": "bb94a8f0e6b0078ebc08afbb9810f5c3419c4a85",
+        "revCount": 24,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/mr-sync"
       },
@@ -552,11 +552,11 @@
         "xwayland-satellite-unstable": "xwayland-satellite-unstable"
       },
       "locked": {
-        "lastModified": 1777737732,
-        "narHash": "sha256-k5mLtKOpLNdhMHY1TPGcAFefnWDctZsYQ6X4YDvLFhU=",
+        "lastModified": 1777815637,
+        "narHash": "sha256-jQnoHmnFgUWYDNosplgd5eFnUTT0MtEj2w9HCA4g1C0=",
         "owner": "sodiboo",
         "repo": "niri-flake",
-        "rev": "73b10d69d6c8b3836ff6581004024282f0a4cd15",
+        "rev": "945748d71d3422d4f1dada2cd10222e34ed9d767",
         "type": "github"
       },
       "original": {
@@ -848,11 +848,11 @@
     },
     "nixpkgs-stable": {
       "locked": {
-        "lastModified": 1777428379,
-        "narHash": "sha256-ypxFOeDz+CqADEQNL72haqGjvZQdBR5Vc7pyx2JDttI=",
+        "lastModified": 1777673416,
+        "narHash": "sha256-5c2POKPOjU40Kh0MirOdScBLG0bu9TAuPYAtPRNZMBs=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "755f5aa91337890c432639c60b6064bb7fe67769",
+        "rev": "26ef669cffa904b6f6832ab57b77892a37c1a671",
         "type": "github"
       },
       "original": {
@@ -923,11 +923,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777803859,
-        "narHash": "sha256-/c3zOLVXSRJ+xfLUtwVuP9ULsYOcqOGTBck03jwItus=",
+        "lastModified": 1777867959,
+        "narHash": "sha256-ZPmFipeRTef8MQ8qMwASizY6I8A+Y6Wy10o7hOduUqQ=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "74754756f254b94edfe641f9c95b3c61893c5554",
+        "rev": "d143cbafc59dabd254b9fe7e558d4907e2ece265",
         "type": "github"
       },
       "original": {
@@ -944,11 +944,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777264824,
-        "narHash": "sha256-P1zBs0Tua7aEbq29ai8hXSWpBTUBknFhmpcr5g9SDs0=",
+        "lastModified": 1777861426,
+        "narHash": "sha256-ql3RDPjZyA9aFQkzfttBfXTRer95baNyEuXHKyluLb0=",
         "owner": "ymtdzzz",
         "repo": "otel-tui",
-        "rev": "2fa13dae8bd1c531e0239e3f5353b62668b7e508",
+        "rev": "f170edbb1f174d665f2c018d6e7e9e84edd7860c",
         "type": "github"
       },
       "original": {
