@@ -1,4 +1,4 @@
-{lib, ...}: {
+{lib}: {
   MemoryMax ? "512M",
   ProtectSystem ? "full",
   ProtectHome ? true,
@@ -7,18 +7,24 @@
   NoNewPrivileges ? true,
   CapabilityBoundingSet ? "",
   ...
-}: {
+}: let
+  isOverride = v: builtins.isAttrs v && v ? _type && v._type == "override";
+  mkDefault' = v:
+    if isOverride v
+    then v
+    else lib.mkDefault v;
+in {
   PrivateTmp = lib.mkDefault true;
   ProtectClock = lib.mkDefault true;
   ProtectHostname = lib.mkDefault true;
   ProtectKernelLogs = lib.mkDefault true;
   RestrictSUIDSGID = lib.mkDefault true;
   LockPersonality = lib.mkDefault true;
-  ProtectSystem = lib.mkDefault ProtectSystem;
-  ProtectHome = lib.mkDefault ProtectHome;
-  MemoryMax = lib.mkDefault MemoryMax;
-  ReadWritePaths = lib.mkDefault ReadWritePaths;
-  RestrictNamespaces = lib.mkDefault RestrictNamespaces;
-  NoNewPrivileges = lib.mkDefault NoNewPrivileges;
-  CapabilityBoundingSet = lib.mkDefault CapabilityBoundingSet;
+  ProtectSystem = mkDefault' ProtectSystem;
+  ProtectHome = mkDefault' ProtectHome;
+  MemoryMax = mkDefault' MemoryMax;
+  ReadWritePaths = mkDefault' ReadWritePaths;
+  RestrictNamespaces = mkDefault' RestrictNamespaces;
+  NoNewPrivileges = mkDefault' NoNewPrivileges;
+  CapabilityBoundingSet = mkDefault' CapabilityBoundingSet;
 }
