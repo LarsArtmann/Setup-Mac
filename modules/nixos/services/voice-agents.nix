@@ -106,6 +106,8 @@ _: {
           requires = ["docker.service"];
           wants = ["whisper-asr-pull.service" "network-online.target"];
           wantedBy = ["multi-user.target"];
+          startLimitBurst = 3;
+          startLimitIntervalSec = 60;
           path = [pkgs.docker pkgs.docker-compose];
           serviceConfig =
             harden {}

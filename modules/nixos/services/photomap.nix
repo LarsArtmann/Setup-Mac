@@ -55,6 +55,8 @@ _: {
         after = ["immich-server.service" "postgresql.service" "network-online.target"];
         wants = ["immich-server.service" "network-online.target"];
         requires = ["immich-server.service" "postgresql.service"];
+        startLimitBurst = 3;
+        startLimitIntervalSec = 60;
         preStart = ''
           if [ ! -f ${photomapDataDir}/config/config.yaml ]; then
             cp ${photomapConfig} ${photomapDataDir}/config/config.yaml

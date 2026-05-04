@@ -61,6 +61,8 @@ _: {
         description = "ComfyUI — Persistent AI Image Generation Server";
         after = ["network.target"];
         wantedBy = ["multi-user.target"];
+        startLimitBurst = 3;
+        startLimitIntervalSec = 60;
 
         environment =
           rocmEnv

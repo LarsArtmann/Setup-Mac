@@ -24,9 +24,13 @@ _: {
         };
       };
 
-      systemd.services.taskchampion-sync-server.serviceConfig =
-        harden {}
-        // serviceDefaults {};
+      systemd.services.taskchampion-sync-server = {
+        startLimitBurst = 3;
+        startLimitIntervalSec = 60;
+        serviceConfig =
+          harden {}
+          // serviceDefaults {};
+      };
     };
   };
 }
