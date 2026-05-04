@@ -8,22 +8,22 @@
     {
       name = "HaGeZi-ultimate";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/ultimate.txt";
-      hash = "sha256-vEvOoAHSnmk9TyukGWlCEtgy/34EF08cbwPtsKknKLU=";
+      hash = "sha256-Bm9mDbR85rzMIDTPCwAR41POB4w6C8n4mFJ7bFVq9xY=";
     }
     {
       name = "HaGeZi-tif";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/tif.txt";
-      hash = "sha256-f9B9vq2e17xb/jItHG3GAuaAtOLU5pPi6iawLp/9UcI=";
+      hash = "sha256-H4wO12D9bxJBy8W6iuCVOsy3KmXtTYoKMw/MwynCLCE=";
     }
     {
       name = "HaGeZi-doh";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/doh.txt";
-      hash = "sha256-D7PPYZVdPdN8Lz0CLPNPI01+/PKc6Nd3hriCPSLHzf4=";
+      hash = "sha256-fUSaa6yUPLWUwoTeE9FbBX23A31O99iV64AAJg9pu74=";
     }
     {
       name = "HaGeZi-bypass-full";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/doh-vpn-proxy-bypass.txt";
-      hash = "sha256-R9o5JSeoG3/fjbo3meXEPY2YQkeaD/H18WkXQzQPBEY=";
+      hash = "sha256-cOV0jP4P22ymuf87MSMysK0PS/dkTp+zNcupFSAYUD8=";
     }
     {
       name = "HaGeZi-native-apple";
@@ -73,7 +73,7 @@
     {
       name = "HaGeZi-native-winoffice";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/hosts/native.winoffice.txt";
-      hash = "sha256-gZGuxmOsIg6tUwXwNyguawBRyWL4sb4gSgvs5IHk0GY=";
+      hash = "sha256-4oWFsuTTItkNy2RD+sL5AuZfc2PHYAsWLWwW1oZFHRQ=";
     }
     {
       name = "HaGeZi-native-tiktok-extended";
@@ -83,12 +83,12 @@
     {
       name = "HaGeZi-gambling";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/gambling.txt";
-      hash = "sha256-tRFNSFVnOvSx+/ml1rj1zQgTUlTuGdo0yLNdIdyiHB8=";
+      hash = "sha256-I3AIMjBgk1DgiUvtFeSBBVs5ZclxTNUL8S/DdskE4MM=";
     }
     {
       name = "HaGeZi-nsfw";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/nsfw.txt";
-      hash = "sha256-7yVyeX3YvSkvpuu4j//1/WGPWbwmFQVBW14Cfjz6eYQ=";
+      hash = "sha256-QqBemkM3Nu729aD1dCQ/JIwdXm7u/4ee2EwQ4F+mVjQ=";
     }
     {
       name = "HaGeZi-social";
@@ -98,12 +98,12 @@
     {
       name = "HaGeZi-anti-piracy";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/anti.piracy.txt";
-      hash = "sha256-DPu9VySsQV3cqw0bJWK/6QyLP40jG/mr2tVWoeDTdws=";
+      hash = "sha256-NZWoRgitkvt37u13WxC1bl7DIBt7EBIECtOk0OB7K2s=";
     }
     {
       name = "HaGeZi-dyndns";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/dyndns.txt";
-      hash = "sha256-0XB4ipv7vqpjnkPYv4SWXzMBq2x/vkestM6G1AznmiY=";
+      hash = "sha256-XcKCT5e9YWAVGsAT9DZL4b/UgfDMkyhdia11CTYx+SU=";
     }
     {
       name = "HaGeZi-hoster";
@@ -113,7 +113,7 @@
     {
       name = "HaGeZi-urlshortener";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/dnsmasq/urlshortener.txt";
-      hash = "sha256-TG0HT/WD9nYi/pzmWpOidYYOiXSdOoTg+dxcx44qsPo=";
+      hash = "sha256-syUHS/AQv3Kn5krREcD8FLboTTaC4zVDfCUDYtnhj+E=";
     }
     {
       name = "HaGeZi-nosafesearch";
@@ -123,7 +123,7 @@
     {
       name = "HaGeZi-dga7";
       url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/dga7.txt";
-      hash = "sha256-lztAF5w4a4gimHw1VXjJeua6AzQhDrOxNUJNk5k9oyk=";
+      hash = "sha256-INdgYRPcHLUic7PI9MozMn6eqZe464rB9Nc8npjGnaY=";
     }
   ];
 
