@@ -21,7 +21,7 @@ wait_for_daemon() {
 set_random() {
   local img
   img=$(ls "$wallpaper_dir"/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1)
-  if [[ -z "$img" ]]; then
+  if [[ -z $img ]]; then
     echo "No wallpaper images found in $wallpaper_dir" >&2
     return 1
   fi
@@ -31,14 +31,14 @@ set_random() {
 wait_for_daemon || exit 1
 
 case "$mode" in
-  restore)
-    awww restore 2>/dev/null || set_random
-    ;;
-  random)
-    set_random
-    ;;
-  *)
-    echo "Usage: $0 <random|restore> [wallpaper_dir]" >&2
-    exit 1
-    ;;
+restore)
+  awww restore 2>/dev/null || set_random
+  ;;
+random)
+  set_random
+  ;;
+*)
+  echo "Usage: $0 <random|restore> [wallpaper_dir]" >&2
+  exit 1
+  ;;
 esac

@@ -71,8 +71,6 @@ _: {
               Type = "simple";
               ExecStart = "${cfg.package}/bin/file-renamer watch";
               WorkingDirectory = cfg.watchDirectory;
-              Restart = "always";
-              RestartSec = "10";
               KillMode = "mixed";
               TimeoutStopSec = "30";
               StandardOutput = "journal";

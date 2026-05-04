@@ -21,25 +21,25 @@ _: {
     # ENTRYPOINT is ["python3"], WORKDIR is /app
     # Env var: MODEL (not WHISPER_MODEL) controls which model to load
     whisperComposeFile = pkgs.writeText "docker-compose.whisper-asr.yml" ''
-    name: voice-agents
+      name: voice-agents
 
-    services:
-      whisper-rocm:
-        image: beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1
-        container_name: whisper-asr
-        restart: unless-stopped
-        command: app.py
-        ports:
-          - '${toString whisperUiPort}:7860'
-        environment:
-          - MODEL=${cfg.whisperModel}
-          - HSA_OVERRIDE_GFX_VERSION=11.5.1
-        volumes:
-          - ${whisperModelsDir}:/root/.cache/huggingface
-        devices:
-          - /dev/dri:/dev/dri
-          - /dev/kfd:/dev/kfd
-  '';
+      services:
+        whisper-rocm:
+          image: beecave/insanely-fast-whisper-rocm@sha256:1fa17f91846d30748751089a7ef37b490a8e3ec46e8ba4a1df15c28d1e60d3c1
+          container_name: whisper-asr
+          restart: unless-stopped
+          command: app.py
+          ports:
+            - '${toString whisperUiPort}:7860'
+          environment:
+            - MODEL=${cfg.whisperModel}
+            - HSA_OVERRIDE_GFX_VERSION=11.5.1
+          volumes:
+            - ${whisperModelsDir}:/root/.cache/huggingface
+          devices:
+            - /dev/dri:/dev/dri
+            - /dev/kfd:/dev/kfd
+    '';
   in {
     options.services.voice-agents = {
       enable = lib.mkEnableOption "Voice agents (LiveKit + Whisper ASR)";
