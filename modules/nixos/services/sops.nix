@@ -91,6 +91,7 @@ in {
             hermes_discord_bot_token = "discord_bot_token";
             hermes_glm_api_key = "glm_api_key";
             hermes_minimax_api_key = "minimax_api_key";
+            hermes_xiaomi_api_key = "xiaomi_api_key";
             hermes_fal_key = "fal_key";
             hermes_firecrawl_api_key = "firecrawl_api_key";
           };
@@ -113,6 +114,7 @@ in {
             DISCORD_BOT_TOKEN=${config.sops.placeholder.hermes_discord_bot_token}
             GLM_API_KEY=${config.sops.placeholder.hermes_glm_api_key}
             MINIMAX_API_KEY=${config.sops.placeholder.hermes_minimax_api_key}
+            XIAOMI_API_KEY=${config.sops.placeholder.hermes_xiaomi_api_key}
             FAL_KEY=${config.sops.placeholder.hermes_fal_key}
             FIRECRAWL_API_KEY=${config.sops.placeholder.hermes_firecrawl_api_key}
             OLLAMA_API_KEY=ollama
