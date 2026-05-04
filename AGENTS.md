@@ -116,7 +116,7 @@ All private LarsArtmann repos use `git+ssh://git@github.com/LarsArtmann/<name>?r
 **Naming convention:** `-src` suffix = `flake = false` (source-only). No suffix = full flake.
 
 **Active overlays:**
-- `sharedOverlays` — applied on Darwin + NixOS (NUR, aw-watcher, todo-list-ai, golangci-lint-auto-configure, mr-sync)
+- `sharedOverlays` — applied on Darwin + NixOS (NUR, aw-watcher, todo-list-ai, golangci-lint-auto-configure, mr-sync, library-policy)
 - `linuxOnlyOverlays` — NixOS only (openaudible, dnsblockd, emeet-pixyd, monitor365, netwatch, file-and-image-renamer)
 - `disableTestsOverlay` — disables flaky tests for valkey, aiocache
 - `pythonTestOverlay` — NixOS-specific Python test overrides
@@ -606,6 +606,7 @@ hermes cron list          # List cron jobs
 | `signoz-src` | SigNoz source (flake=false) | — |
 | `signoz-collector-src` | SigNoz collector source (flake=false) | — |
 | `todo-list-ai` | AI-powered TODO extraction CLI | Yes |
+| `library-policy` | Banned/vulnerable library detector for Go projects | Yes |
 | `golangci-lint-auto-configure-src` | golangci-lint auto-configurator (flake=false) | — |
 | `go-finding-src` | go-finding library (flake=false) | — |
 | `homebrew-bundle` | Homebrew taps (flake=false) | — |
