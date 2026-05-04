@@ -10,7 +10,7 @@ in
       owner = "golang";
       repo = "tools";
       rev = "ecc727ef4e92b7170abe1881910c4c8773800196";
-      sha256 = "sha256-fPG8//DWA0mzqZkYasiBdB5hw5FDRkr/3+ZXm7fNHRg=";
+      hash = "sha256-fPG8//DWA0mzqZkYasiBdB5hw5FDRkr/3+ZXm7fNHRg=";
     };
 
     # Build only the modernize subdirectory

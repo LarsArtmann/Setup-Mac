@@ -21,12 +21,7 @@ rustPlatform.buildRustPackage rec {
 
   nativeBuildInputs = [pkg-config];
 
-  buildInputs =
-    [
-      libpcap
-    ]
-    ++ lib.optionals stdenv.isLinux [
-    ];
+  buildInputs = [libpcap];
 
   meta = with lib; {
     description = "Real-time network diagnostics TUI — interfaces, connections, packets, health probes, and AI insights";
