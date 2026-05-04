@@ -517,17 +517,14 @@ in {
 
       awww-wallpaper = {
         Unit = {
-          Description = "Set random wallpaper";
+          Description = "Set random wallpaper (self-healing via PartOf)";
           After = ["awww-daemon.service"];
-          Wants = ["awww-daemon.service"];
-          PartOf = ["graphical-session.target"];
+          PartOf = ["awww-daemon.service" "graphical-session.target"];
         };
         Service = {
           Type = "oneshot";
           RemainAfterExit = true;
           ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && for i in $(${pkgs.coreutils}/bin/seq 1 60); do ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3 && break; ${pkgs.coreutils}/bin/sleep 1; done'";
-          Restart = "on-failure";
-          RestartSec = "5s";
         };
         Install.WantedBy = ["graphical-session.target"];
       };

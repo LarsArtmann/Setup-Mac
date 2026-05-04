@@ -16,7 +16,8 @@
     kernelPackages = pkgs.linuxPackages_latest;
 
     # Load I2C module for DDC/CI monitor brightness control
-    kernelModules = ["i2c-dev"];
+    # Load pstore for kernel panic/oops log capture in UEFI NVRAM
+    kernelModules = ["i2c-dev" "pstore"];
 
     # AMD GPU + NPU optimization kernel parameters for Strix Halo (128GB unified memory)
     kernelParams = [
@@ -40,6 +41,12 @@
       # Previously set to "off" for ~6% memory read improvement, but this prevented
       # the kernel from seeing the upper 64GB of RAM (only 64GB of 128GB visible).
       "amd_iommu=on"
+      # ── pstore: kernel panic/oops log capture in UEFI NVRAM ──────────
+      # Survives reboots — critical for diagnosing GPU driver hangs and kernel
+      # panics when journald never gets to flush. systemd-pstore auto-mounts /sys/fs/pstore.
+      "pstore.backend=efi"
+      "pstore.record_console=true"
+      "pstore.max_reason=3" # PANIC, OOPS, and WARN
     ];
 
     binfmt.emulatedSystems = ["aarch64-linux"];
@@ -146,4 +153,23 @@
     enable = true;
     memoryPercent = 50; # 50% of 128GB = 64GB ZRAM (compresses ~2-3x, effective ~128-192GB buffer)
   };
+
+  # ── Resilience: journald size limits ──────────────────────────────────
+  # Without limits, AI services (Ollama, ComfyUI, Hermes) can fill /var/log
+  # with multi-GB logs, causing system failures. 4GB is generous for 128GB RAM.
+  services.journald.extraConfig = ''
+    SystemMaxUse=4G
+    RuntimeMaxUse=1G
+    MaxFileSec=1week
+    MaxRetentionSec=2week
+  '';
+
+  # ── Resilience: coredump storage limits ───────────────────────────────
+  # AI workloads (PyTorch/ROCm, llama.cpp, Ollama) can produce 50-100GB core
+  # dumps on SIGSEGV. Without limits, a single crash fills /var/lib/systemd/coredump.
+  systemd.coredump.extraConfig = ''
+    Storage=external
+    MaxUse=2G
+    KeepFree=5G
+  '';
 }
