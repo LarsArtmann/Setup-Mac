@@ -538,26 +538,31 @@ in {
                 OUT="/var/lib/prometheus-node-exporter/textfile_collectors/amdgpu.prom"
                 TMP="''${OUT}.tmp"
 
+                strip_pct() {
+                  local val="$1"
+                  "''${val%\%}"
+                }
+
                 {
                   for card in /sys/class/drm/card*/device/gpu_busy_percent; do
                     if [ -f "$card" ]; then
-                      pct=$(cat "$card")
+                      pct=$(cat "$card" | tr -d '%\n')
                       card_name=$(echo "$card" | grep -oP 'card\d+')
-                      echo "node_amdgpu_gpu_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                      echo "node_amdgpu_gpu_busy_percent{card=\"''${card_name}\"} ''${pct}"
                     fi
                   done
 
                   for mem in /sys/class/drm/card*/device/mem_busy_percent; do
                     if [ -f "$mem" ]; then
-                      pct=$(cat "$mem")
+                      pct=$(cat "$mem" | tr -d '%\n')
                       card_name=$(echo "$mem" | grep -oP 'card\d+')
-                      echo "node_amdgpu_mem_busy_percent{card=\"''${card_name}\"} ''${pct%?}"
+                      echo "node_amdgpu_mem_busy_percent{card=\"''${card_name}\"} ''${pct}"
                     fi
                   done
 
                   for temp in /sys/class/drm/card*/device/gpu_temp; do
                     if [ -f "$temp" ]; then
-                      millideg=$(cat "$temp")
+                      millideg=$(cat "$temp" | tr -d '\n')
                       card_name=$(echo "$temp" | grep -oP 'card\d+')
                       echo "node_amdgpu_gpu_temp_celsius{card=\"''${card_name}\"} $(awk "BEGIN{printf \"%.1f\", ''${millideg}/1000}")"
                     fi
@@ -565,7 +570,7 @@ in {
 
                   for vram in /sys/class/drm/card*/device/mem_info_vram_total /sys/class/drm/card*/device/mem_info_vram_used; do
                     if [ -f "$vram" ]; then
-                      bytes=$(cat "$vram")
+                      bytes=$(cat "$vram" | tr -d '\n')
                       card_name=$(echo "$vram" | grep -oP 'card\d+')
                       metric=$(echo "$vram" | awk -F/ '{print $NF}')
                       echo "node_amdgpu_''${metric}_bytes{card=\"''${card_name}\"} ''${bytes}"

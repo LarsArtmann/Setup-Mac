@@ -9,7 +9,9 @@ buildGoModule {
 
   inherit src;
 
-  vendorHash = "sha256-+GH+8TVyAVwS+9ZDV2EeXJfcOrEO/+7gSrn7eM8D/Sg=";
+  vendorHash = "sha256-NBfpRc+el41FiogJ7iN3I853ilQ8JogiXPpslhsNNH0=";
+
+  proxyVendor = true;
 
   meta = with lib; {
     description = "CLI tool to keep ~/.mrconfig in sync with your GitHub repos";

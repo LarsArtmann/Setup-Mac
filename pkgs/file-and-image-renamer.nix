@@ -45,8 +45,14 @@ buildGoModule rec {
   # In the nix sandbox we substitute them with the actual source from flake inputs.
   postPatch = ''
     substituteInPlace go.mod \
-      --replace-fail 'replace github.com/larsartmann/cmdguard => /home/lars/projects/cmdguard' 'replace github.com/larsartmann/cmdguard => ${cmdguard-src}' \
-      --replace-fail 'replace github.com/larsartmann/go-output => /home/lars/projects/go-output' 'replace github.com/larsartmann/go-output => ${go-output-src}'
+      --replace-warn 'replace github.com/larsartmann/cmdguard => /home/lars/projects/cmdguard' 'replace github.com/larsartmann/cmdguard => ${cmdguard-src}' \
+      --replace-warn 'replace github.com/larsartmann/go-output => /home/lars/projects/go-output' 'replace github.com/larsartmann/go-output => ${go-output-src}'
+    if ! grep -q 'replace github.com/larsartmann/cmdguard' go.mod; then
+      echo -e '\nreplace github.com/larsartmann/cmdguard => ${cmdguard-src}' >> go.mod
+    fi
+    if ! grep -q 'replace github.com/larsartmann/go-output' go.mod; then
+      echo -e '\nreplace github.com/larsartmann/go-output => ${go-output-src}' >> go.mod
+    fi
   '';
 
   ldflags = ["-s" "-w"];

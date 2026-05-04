@@ -11,7 +11,7 @@ mode="${1:-random}"
 wallpaper_dir="${2:-$HOME/.local/share/wallpapers}"
 
 wait_for_daemon() {
-  for i in $(seq 1 60); do
+  for _ in $(seq 1 60); do
     awww query >/dev/null 2>&1 && return 0
     sleep 1
   done
@@ -20,7 +20,7 @@ wait_for_daemon() {
 
 set_random() {
   local img
-  img=$(ls "$wallpaper_dir"/*.{jpg,jpeg,png,webp} 2>/dev/null | shuf -n1)
+  img=$(find "$wallpaper_dir" -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) | shuf -n1)
   if [[ -z $img ]]; then
     echo "No wallpaper images found in $wallpaper_dir" >&2
     return 1
