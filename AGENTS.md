@@ -378,16 +378,21 @@ AI agent task tracking protocol:
 | Niri BindsTo patched | Upstream niri.service uses `BindsTo=graphical-session.target` — we replace with `PartOf` + `Restart=always` in `niri-config.nix`. Without this, `just switch` kills niri permanently. |
 | awww-daemon BrokenPipe | Upstream awww 0.12.0 panics on BrokenPipe at `daemon/src/main.rs:712:32` (Wayland disconnect during suspend/output hotplug). `Restart=always` covers it. Never use `BindsTo` for wallpaper services — use `PartOf` for restart propagation. |
 
-### lib/systemd Shared Helpers
+### lib/ Shared Helpers
 
-Two reusable functions in `lib/systemd/`:
+Reusable functions in `lib/`, with a centralized entry point at `lib/default.nix`:
 
 | File | Purpose | Usage |
 |------|---------|-------|
+| `lib/default.nix` | Central entry point — re-exports all helpers | `myLib = import ../../../lib {inherit lib;};` then `myLib.systemd.harden {}` |
 | `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix;` then `harden {MemoryMax = "512M";}` |
-| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec, StartLimitBurst) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
+| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
+| `lib/types.nix` | Reusable NixOS module option constructors (ports, user/group, delays) | `serviceTypes = import ../../../lib/types.nix lib;` then `serviceTypes.systemdServiceIdentity {}` |
+| `lib/rocm.nix` | ROCm GPU runtime library lists and env vars | `rocm = import ../../../lib/rocm.nix {inherit pkgs;};` then `rocm.env` / `rocm.makeLdLibraryPath lib` |
 
 Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
+
+**Adoption status:** All 12 service modules that manage systemd services now use `harden {}` from the shared lib. 5 modules use `serviceDefaults {}`. No service should manually inline `PrivateTmp`, `NoNewPrivileges`, etc. — always use the shared helpers.
 
 ### WatchdogSec / sd_notify Rules
 
