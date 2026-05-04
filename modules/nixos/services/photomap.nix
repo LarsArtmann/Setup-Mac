@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.photomap;
+    harden = import ../../../lib/systemd.nix;
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";
@@ -64,10 +65,10 @@ _: {
           fi
         '';
         serviceConfig =
-          serviceDefaults {RestartSec = "10s";}
+          harden {MemoryMax = "512M";}
+          // serviceDefaults {RestartSec = "10s";}
           // {
             Restart = lib.mkForce "always";
-            MemoryMax = "512M";
           };
       };
 
