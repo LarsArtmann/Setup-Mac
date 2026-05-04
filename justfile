@@ -1023,22 +1023,21 @@ dep-graph ACTION="darwin":
             ;; \
         view) \
             echo "👀 Opening dependency graph..."; \
+            OPENER=$$(command -v xdg-open 2>/dev/null || command -v open 2>/dev/null || echo ""); \
+            if [ -z "$$OPENER" ]; then echo "❌ No file opener found (xdg-open or open)"; exit 1; fi; \
             if [ -f docs/architecture/SystemNix-Darwin.svg ]; then \
-                open docs/architecture/SystemNix-Darwin.svg; \
+                $$OPENER docs/architecture/SystemNix-Darwin.svg; \
             elif [ -f docs/architecture/SystemNix-Darwin.png ]; then \
-                open docs/architecture/SystemNix-Darwin.png; \
+                $$OPENER docs/architecture/SystemNix-Darwin.png; \
             elif [ -f docs/architecture/SystemNix-NixOS.svg ]; then \
-                open docs/architecture/SystemNix-NixOS.svg; \
+                $$OPENER docs/architecture/SystemNix-NixOS.svg; \
             else \
                 echo "❌ No dependency graph found. Run 'just dep-graph darwin' first."; \
             fi; \
             ;; \
         clean) \
             echo "🧹 Cleaning dependency graphs..."; \
-            rm -f docs/architecture/SystemNix-*.{svg,png,dot}; \
-            rm -f docs/architecture/*.svg; \
-            rm -f docs/architecture/*.png; \
-            rm -f docs/architecture/*.dot; \
+            find docs/architecture -maxdepth 1 -type f \( -name "*.svg" -o -name "*.png" -o -name "*.dot" \) -print0 2>/dev/null | xargs -0 trash 2>/dev/null || true; \
             echo "✅ Dependency graphs cleaned"; \
             ;; \
         update) \

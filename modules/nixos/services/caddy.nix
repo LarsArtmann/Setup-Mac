@@ -49,9 +49,7 @@ _: {
         globalConfig = ''
           auto_https off
           ${lib.optionalString (bindAddress != null) "default_bind ${bindAddress}"}
-          servers {
-            metrics
-          }
+          metrics
         '';
 
         virtualHosts = {
