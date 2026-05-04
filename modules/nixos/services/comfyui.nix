@@ -95,6 +95,12 @@ _: {
             User = cfg.user;
             Group = "users";
             WorkingDirectory = cfg.package;
+            ExecCondition = "${pkgs.writeShellScript "comfyui-check-venv" ''
+              if [ ! -x "${cfg.venvPython}" ]; then
+                echo "comfyui: Python venv not found at ${cfg.venvPython}, skipping startup"
+                exit 1
+              fi
+            ''}";
             ExecStart = "${cfg.venvPython} ${cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
             OOMScoreAdjust = -100;
             SupplementaryGroups = ["render" "video"];
