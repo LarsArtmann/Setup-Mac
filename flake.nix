@@ -422,22 +422,9 @@
           config.allowUnfree = true;
           config.allowBroken = false; ## <-- THIS MUST ALWAYS BE FALSE!
           overlays =
-            [
-              awWatcherOverlay
-              todoListAiOverlay
-              jscpdOverlay
-              golangciLintAutoConfigureOverlay
-              disableTestsOverlay
-              mrSyncOverlay
-            ]
-            ++ lib.optionals (system == "x86_64-linux") [
-              openaudibleOverlay
-              dnsblockdOverlay
-              emeetPixyOverlay
-              monitor365Overlay
-              netwatchOverlay
-              fileAndImageRenamerOverlay
-            ];
+            sharedOverlays
+            ++ [jscpdOverlay disableTestsOverlay]
+            ++ lib.optionals (system == "x86_64-linux") linuxOnlyOverlays;
         };
 
         # Use treefmt-full-flake's formatter which includes alejandra in PATH
