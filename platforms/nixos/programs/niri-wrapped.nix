@@ -35,6 +35,12 @@
       fallbackCommands
     ] (builtins.readFile ../../../scripts/niri-session-restore.sh);
   };
+
+  wallpaper-set = pkgs.writeShellApplication {
+    name = "wallpaper-set";
+    runtimeInputs = with pkgs; [awww coreutils];
+    text = builtins.readFile ../../../scripts/wallpaper-set.sh;
+  };
 in {
   options.services.niri-session = {
     sessionSaveInterval = lib.mkOption {
@@ -289,7 +295,7 @@ in {
         "Mod+Shift+P".action.power-off-monitors = {};
         "Mod+Shift+S".action.suspend = {};
 
-        "Mod+W".action.spawn = sh "img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3";
+        "Mod+W".action.spawn = sh "${wallpaper-set}/bin/wallpaper-set random ${wallpaperDir}";
 
         "Mod+Shift+F11".action.spawn = sh "mkdir -p ~/Pictures/screenshots && grim -g \"$(slurp)\" /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
         "Mod+F11".action.spawn = sh "mkdir -p ~/Pictures/screenshots && grim /tmp/screenshot.png && wl-copy < /tmp/screenshot.png && swappy -f /tmp/screenshot.png";
@@ -517,14 +523,14 @@ in {
 
       awww-wallpaper = {
         Unit = {
-          Description = "Set random wallpaper (self-healing via PartOf)";
+          Description = "Set wallpaper (self-healing via PartOf)";
           After = ["awww-daemon.service"];
           PartOf = ["awww-daemon.service" "graphical-session.target"];
         };
         Service = {
           Type = "oneshot";
           RemainAfterExit = true;
-          ExecStart = "${pkgs.bash}/bin/bash -c 'img=$(${pkgs.coreutils}/bin/ls ${wallpaperDir}/*.{jpg,jpeg,png,webp} 2>/dev/null | ${pkgs.coreutils}/bin/shuf -n1) && [ -n \"$img\" ] && for i in $(${pkgs.coreutils}/bin/seq 1 60); do ${pkgs.awww}/bin/awww img \"$img\" --transition-type random --transition-duration 3 && break; ${pkgs.coreutils}/bin/sleep 1; done'";
+          ExecStart = "${wallpaper-set}/bin/wallpaper-set restore ${wallpaperDir}";
         };
         Install.WantedBy = ["graphical-session.target"];
       };
