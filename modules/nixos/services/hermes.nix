@@ -11,6 +11,7 @@ in {
     hermesPkg = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default;
     sopsEnvPath = config.sops.templates."hermes-env".path;
     oldStateDirs = ["/home/lars/.hermes" "/var/lib/hermes"];
+    serviceTypes = import ../../../lib/types.nix lib;
 
     mergeEnvScript = pkgs.writeShellScript "hermes-merge-env" ''
       set -euo pipefail
@@ -84,17 +85,9 @@ in {
         description = "State directory for Hermes (config, sessions, skills, memories)";
       };
 
-      restartSec = lib.mkOption {
-        type = lib.types.str;
-        default = "5";
-        description = "Seconds to wait before restarting after failure";
-      };
+      restartSec = serviceTypes.restartDelay "5";
 
-      timeoutStopSec = lib.mkOption {
-        type = lib.types.str;
-        default = "120";
-        description = "Seconds to wait for graceful shutdown before SIGKILL";
-      };
+      timeoutStopSec = serviceTypes.stopTimeout "120";
     };
 
     config = lib.mkIf cfg.enable {
