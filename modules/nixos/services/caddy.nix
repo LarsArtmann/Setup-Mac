@@ -93,11 +93,15 @@ _: {
           StartLimitIntervalSec = lib.mkForce 300;
         };
         serviceConfig =
-          harden {NoNewPrivileges = false;}
+          harden {
+            NoNewPrivileges = false;
+            CapabilityBoundingSet = "CAP_NET_ADMIN CAP_NET_BIND_SERVICE";
+          }
           // {
             Restart = lib.mkForce "always";
             RestartSec = lib.mkForce "5";
             OOMScoreAdjust = lib.mkForce (-500);
+            AmbientCapabilities = "CAP_NET_ADMIN CAP_NET_BIND_SERVICE";
           };
       };
     };
