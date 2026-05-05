@@ -10,6 +10,7 @@ in {
     cfg = config.services.twenty;
     inherit (config.networking) domain;
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
 
     stateDir = "/var/lib/twenty";
     serverPort = cfg.port;
@@ -155,13 +156,12 @@ in {
                 ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
                 ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
                 WorkingDirectory = stateDir;
-                Restart = "always";
-                RestartSec = "10s";
               }
               // harden {
                 MemoryMax = "2G";
                 ReadWritePaths = [stateDir];
-              };
+              }
+              // serviceDefaults {RestartSec = "10s";};
           };
 
           twenty-db-backup = {

@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
     inherit (config.users) primaryUser;
     primaryGroup = "users";
 
@@ -235,18 +236,18 @@ _: {
             unitConfig = {
               ConditionPathExists = setupDone;
             };
-            serviceConfig = {
-              Type = "simple";
-              ExecStartPre = "${venvPip} install --no-cache-dir structlog";
-              ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
-              User = primaryUser;
-              Group = "video";
-              WorkingDirectory = "${unslothDataDir}/workspace";
-              Restart = "always";
-              RestartSec = "10s";
-              SupplementaryGroups = ["render"];
-              TimeoutStartSec = "60";
-            };
+            serviceConfig =
+              {
+                Type = "simple";
+                ExecStartPre = "${venvPip} install --no-cache-dir structlog";
+                ExecStart = "${venvPython} ${studioBackend}/run.py --host 127.0.0.1 --port 8888";
+                User = primaryUser;
+                Group = "video";
+                WorkingDirectory = "${unslothDataDir}/workspace";
+                SupplementaryGroups = ["render"];
+                TimeoutStartSec = "60";
+              }
+              // serviceDefaults {RestartSec = "10s";};
           };
         };
 
