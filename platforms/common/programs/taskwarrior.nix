@@ -142,7 +142,7 @@ in {
     '';
   };
 
-  systemd.user = {
+  systemd.user = lib.mkIf pkgs.stdenv.isLinux {
     services = {
       taskwarrior-backup = {
         Unit = {
