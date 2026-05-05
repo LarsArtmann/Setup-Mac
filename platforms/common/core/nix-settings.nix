@@ -16,8 +16,8 @@
       fallback = true;
       http-connections = 25;
       log-lines = 25;
-      max-free = 3000000000; # 3GB
-      min-free = 1000000000; # 1GB
+      max-free = lib.mkDefault 100000000000; # 100GB — stop GC when 100GB free reached
+      min-free = lib.mkDefault 5000000000; # 5GB — trigger GC when only 5GB free
       sandbox = true; # Strict sandboxing for security
       # Force IPv4-only binary caches
       substituters = [
