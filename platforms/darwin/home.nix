@@ -1,8 +1,4 @@
-{
-  pkgs,
-  nix-ssh-config,
-  ...
-}: {
+{nix-ssh-config, ...}: {
   imports = [
     ../common/home-base.nix
     ./programs/shells.nix

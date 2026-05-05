@@ -180,7 +180,7 @@ if is_linux; then
         missing_harden="$missing_harden $(basename "$f")"
       fi
     done
-    if [[ -z "$missing_harden" ]]; then
+    if [[ -z $missing_harden ]]; then
       ok "all service modules use harden{}"
     else
       warn "modules missing harden{}:$missing_harden"

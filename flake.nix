@@ -187,7 +187,6 @@
   };
 
   outputs = inputs @ {
-    crush-config,
     dnsblockd,
     flake-parts,
     nix-darwin,
