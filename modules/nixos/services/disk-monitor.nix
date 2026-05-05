@@ -7,6 +7,7 @@ _: {
   }: let
     cfg = config.services.disk-monitor;
     inherit (config.users) primaryUser;
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     uid = builtins.toString config.users.users.${cfg.user}.uid;
 
     checkScript = pkgs.writeShellScript "disk-monitor-check" ''
@@ -127,18 +128,23 @@ _: {
         services.disk-monitor = {
           description = "Check disk usage and notify on threshold breaches";
           onFailure = ["notify-failure@%n.service"];
-          serviceConfig = {
-            Type = "oneshot";
-            User = cfg.user;
-            Environment = [
-              "DISPLAY=:0"
-              "WAYLAND_DISPLAY=wayland-1"
-              "XDG_RUNTIME_DIR=/run/user/${uid}"
-            ];
-            ExecStart = checkScript;
-            StandardOutput = "journal";
-            StandardError = "journal";
-          };
+          serviceConfig =
+            {
+              Type = "oneshot";
+              User = cfg.user;
+              Environment = [
+                "DISPLAY=:0"
+                "WAYLAND_DISPLAY=wayland-1"
+                "XDG_RUNTIME_DIR=/run/user/${uid}"
+              ];
+              ExecStart = checkScript;
+              StandardOutput = "journal";
+              StandardError = "journal";
+            }
+            // harden {
+              ProtectHome = false;
+              NoNewPrivileges = false;
+            };
         };
       };
     };

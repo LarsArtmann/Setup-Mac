@@ -5,6 +5,7 @@ _: {
     lib,
     ...
   }: let
+    harden = import ../../../lib/systemd.nix {inherit lib;};
     inherit (config.users) primaryUser;
     primaryGroup = "users";
 
@@ -91,13 +92,19 @@ _: {
         };
 
         systemd.services = {
-          ollama.serviceConfig = {
-            DynamicUser = lib.mkForce false;
-            User = primaryUser;
-            Group = "users";
-            SupplementaryGroups = ["render"];
-            UMask = lib.mkForce "0007";
-          };
+          ollama.serviceConfig =
+            {
+              DynamicUser = lib.mkForce false;
+              User = primaryUser;
+              Group = "users";
+              SupplementaryGroups = ["render"];
+              UMask = lib.mkForce "0007";
+            }
+            // harden {
+              MemoryMax = "32G";
+              ProtectHome = false;
+              NoNewPrivileges = false;
+            };
         };
 
         environment.systemPackages = with pkgs; [
