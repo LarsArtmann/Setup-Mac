@@ -103,6 +103,7 @@
     services = {
       "sshd".serviceConfig.OOMScoreAdjust = -1000;
       "systemd-journald".serviceConfig.OOMScoreAdjust = -500;
+      "dbus-broker".serviceConfig.OOMScoreAdjust = -500;
     };
 
     user.services = {
@@ -148,7 +149,7 @@
       enableNotifications = true; # Desktop notification before killing
       extraArgs = [
         "--avoid"
-        "^(systemd|sshd|niri|waybar|kitty|fish|pipewire)$" # Never kill these
+        "^(systemd|sshd|dbus-broker|niri|waybar|kitty|fish|pipewire)$" # Never kill these
         "--prefer"
         "^(ollama|llama-server|python3|python|node|java|chrome|chromium|generate_happy_girl)$" # Kill these first
       ];
