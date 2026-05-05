@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.disk-monitor;
+    inherit (config.users) primaryUser;
     uid = builtins.toString config.users.users.${cfg.user}.uid;
 
     checkScript = pkgs.writeShellScript "disk-monitor-check" ''
@@ -106,7 +107,7 @@ _: {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
+        default = primaryUser;
         description = "User to send desktop notifications to";
       };
     };

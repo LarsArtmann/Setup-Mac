@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.gitea-repos;
+    inherit (config.users) primaryUser;
     harden = import ../../../lib/systemd.nix {inherit lib;};
 
     # Script to ensure specific GitHub repos are mirrored to Gitea
@@ -222,7 +223,7 @@ _: {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
+        default = primaryUser;
         description = "User account for running sync services (needs gh CLI access)";
       };
 

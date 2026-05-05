@@ -5,7 +5,7 @@ _: {
     config,
     ...
   }: let
-    primaryUser = "lars";
+    inherit (config.users) primaryUser;
     giteaPkg = config.services.gitea.package;
     harden = import ../../../lib/systemd.nix {inherit lib;};
 

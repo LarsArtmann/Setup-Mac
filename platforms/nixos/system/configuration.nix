@@ -16,6 +16,7 @@
     ./boot.nix
     ./networking.nix
     ./local-network.nix
+    ./primary-user.nix
     ./dns-blocker-config.nix # DNS blocker with unbound + block page (replaces Technitium)
     ./snapshots.nix # BTRFS snapshots with Timeshift
     ./scheduled-tasks.nix # Daily scheduled tasks (crush update-providers, etc.)
@@ -246,7 +247,7 @@
       # SSH server with hardening (from nix-ssh-config)
       ssh-server = {
         enable = true;
-        allowUsers = ["lars"];
+        allowUsers = [config.users.primaryUser];
         passwordAuthentication = false;
         allowRootLogin = false;
         authorizedKeys = [nix-ssh-config.sshKeys.lars];

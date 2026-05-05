@@ -5,7 +5,7 @@ _: {
     lib,
     ...
   }: let
-    primaryUser = "lars";
+    inherit (config.users) primaryUser;
     primaryGroup = "users";
 
     inherit (pkgs.rocmPackages) rocwmma;
@@ -93,7 +93,7 @@ _: {
         systemd.services = {
           ollama.serviceConfig = {
             DynamicUser = lib.mkForce false;
-            User = "lars";
+            User = primaryUser;
             Group = "users";
             SupplementaryGroups = ["render"];
             UMask = lib.mkForce "0007";

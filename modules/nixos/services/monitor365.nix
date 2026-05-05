@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.monitor365;
+    inherit (config.users) primaryUser;
 
     runtimeDeps = with pkgs; [
       xdotool
@@ -112,7 +113,7 @@ _: {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
+        default = primaryUser;
         description = "User account for the monitoring agent";
       };
 

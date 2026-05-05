@@ -5,6 +5,7 @@ _: {
     ...
   }: let
     cfg = config.services.ai-models;
+    inherit (config.users) primaryUser;
   in {
     options.services.ai-models = {
       enable =
@@ -19,7 +20,7 @@ _: {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
+        default = primaryUser;
         description = "User owning AI model files";
       };
 

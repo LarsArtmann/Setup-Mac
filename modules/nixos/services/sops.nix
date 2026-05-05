@@ -23,6 +23,7 @@ in {
     ...
   }: let
     cfg = config.services.sops-config;
+    inherit (config.users) primaryUser;
   in {
     options.services.sops-config = {
       enable = lib.mkEnableOption "sops-nix secret definitions for SystemNix services";
@@ -36,7 +37,7 @@ in {
         secrets =
           {}
           // mkSecrets "secrets.yaml" {
-            owner = "lars";
+            owner = primaryUser;
             group = "users";
             restartUnits = ["gitea-github-sync.service" "gitea-ensure-repos.service"];
           } ["gitea_token" "github_token" "github_user"]
@@ -97,7 +98,7 @@ in {
           };
 
         templates."gitea-sync.env" = {
-          owner = "lars";
+          owner = primaryUser;
           group = "users";
           content = ''
             GITEA_TOKEN=${config.sops.placeholder.gitea_token}

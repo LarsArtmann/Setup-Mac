@@ -6,6 +6,7 @@ _: {
     ...
   }: let
     cfg = config.services.file-and-image-renamer;
+    inherit (config.users) primaryUser;
   in {
     options.services.file-and-image-renamer = {
       enable = lib.mkEnableOption "File and Image Renamer — AI-powered screenshot renaming watcher";
@@ -18,7 +19,7 @@ _: {
 
       user = lib.mkOption {
         type = lib.types.str;
-        default = "lars";
+        default = primaryUser;
         description = "User account to run the watcher service as";
       };
 
