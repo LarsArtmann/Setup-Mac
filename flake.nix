@@ -29,12 +29,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Add nix-visualize for Nix configuration visualization
-    nix-visualize = {
-      url = "github:craigmbooth/nix-visualize";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # Add nix-colors for declarative color schemes
     nix-colors.url = "github:misterio77/nix-colors";
 
@@ -194,7 +188,6 @@
     home-manager,
     helium,
     nur,
-    nix-visualize,
     nix-colors,
     nix-homebrew,
     homebrew-bundle,
@@ -560,7 +553,6 @@
             inherit nixpkgs;
             inherit helium;
             inherit nur;
-            inherit nix-visualize;
             inherit nix-colors;
             inherit otel-tui;
           };
@@ -617,7 +609,6 @@
             inherit (inputs.self) inputs;
             inherit helium;
             inherit nur;
-            inherit nix-visualize;
             inherit nix-colors;
             inherit niri;
             inherit otel-tui;
