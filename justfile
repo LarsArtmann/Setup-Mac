@@ -140,7 +140,7 @@ clean:
     echo ""
     echo "=== Temp Files ==="
     find /tmp -maxdepth 1 \( -name 'nix-build-*' -o -name 'nix-shell-*' \) \
-        -print0 2>/dev/null | xargs -0 rm -rf 2>/dev/null || true
+        -print0 2>/dev/null | xargs -0 trash 2>/dev/null || true
     echo ""
     echo "=== Docker ==="
     docker system prune -f 2>/dev/null || true
@@ -560,7 +560,7 @@ disk-check:
 [group('disk')]
 [linux]
 disk-reset:
-    @rm -rf ~/.local/state/disk-monitor/* 2>/dev/null || true
+    @trash ~/.local/state/disk-monitor/* 2>/dev/null || true
     @echo "Notification state cleared"
 
 # Run Rust target/ cleanup (artifacts >7 days from dirs >2GB)
