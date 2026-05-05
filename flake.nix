@@ -411,6 +411,7 @@
         ./modules/nixos/services/steam.nix
         ./modules/nixos/services/file-and-image-renamer.nix
         ./modules/nixos/services/disk-monitor.nix
+        ./modules/nixos/services/manifest.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -686,6 +687,7 @@
             inputs.self.nixosModules.steam
             inputs.self.nixosModules.file-and-image-renamer
             inputs.self.nixosModules.disk-monitor
+            inputs.self.nixosModules.manifest
             inputs.emeet-pixyd.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];

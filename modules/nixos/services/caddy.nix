@@ -74,6 +74,7 @@ _: {
               reverse_proxy localhost:${toString config.services.taskchampion-sync-server.port}
             '';
           };
+          "manifest.${domain}" = protectedVHost "manifest" config.services.manifest.port;
           "comfyui.${domain}" = {
             extraConfig = ''
               ${tlsConfig}

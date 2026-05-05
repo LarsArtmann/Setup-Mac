@@ -140,6 +140,12 @@ _: {
                 icon: signoz.png
                 statusStyle: dot
                 siteMonitor: ${svcUrl "signoz"}
+            - Manifest:
+                href: ${svcUrl "manifest"}
+                description: Smart LLM Router (Cost Optimization)
+                icon: ai.png
+                statusStyle: dot
+                siteMonitor: ${svcUrl "manifest"}/api/v1/health
             - Node Exporter:
                 description: System Metrics (CPU, RAM, Disk, Network)
                 icon: prometheus.png

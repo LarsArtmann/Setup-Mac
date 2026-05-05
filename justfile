@@ -1489,6 +1489,27 @@ hermes-logs:
 hermes-logs-follow:
     @journalctl -u hermes -f --no-pager -n 50
 
+# Show Manifest LLM router status
+manifest-status:
+    @echo "Manifest LLM Router Status"; echo "========================="; systemctl status manifest --no-pager 2>/dev/null | head -15
+
+# Restart Manifest LLM router service
+manifest-restart:
+    @sudo systemctl restart manifest
+
+# Show Manifest logs (last 200 lines)
+manifest-logs:
+    @journalctl -u manifest --no-pager -n 200
+
+# Follow Manifest logs (live tail)
+manifest-logs-follow:
+    @journalctl -u manifest -f --no-pager -n 50
+
+# Backup Manifest database
+manifest-backup:
+    @sudo systemctl start manifest-db-backup && echo "✅ Backup complete" || echo "❌ Backup failed"
+    @echo "Location: /var/lib/manifest/backup/"
+
 # AI Models — migrate from legacy /data/{models,cache,unsloth} to /data/ai/
 ai-migrate:
     @echo "=== Migrating AI data to /data/ai/ ==="

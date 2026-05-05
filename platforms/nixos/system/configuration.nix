@@ -156,6 +156,11 @@
       chromium-policies.enable = true;
       steam-config.enable = true;
 
+      # Manifest — Smart LLM router for AI agents (cost optimization)
+      manifest = {
+        enable = true;
+      };
+
       # Disk usage monitoring with desktop notifications at thresholds
       disk-monitor = {
         enable = true;
