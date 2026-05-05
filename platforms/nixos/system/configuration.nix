@@ -144,7 +144,8 @@
       gitea.enable = true;
       immich.enable = true;
       authelia-config.enable = true;
-      photomap.enable = true;
+      # photomap — disabled: podman config permission issue
+      # photomap.enable = true;
       homepage.enable = true;
       taskchampion-config.enable = true;
       display-manager-config.enable = true;
