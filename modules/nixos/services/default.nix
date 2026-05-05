@@ -12,7 +12,5 @@ _: {
         data-root = "/data/docker";
       };
     };
-
-    users.users.lars.extraGroups = ["docker"];
   };
 }

@@ -83,8 +83,6 @@ _: {
         };
       };
 
-      users.users.lars.extraGroups = ["docker" "render" "video"];
-
       systemd = {
         services.whisper-asr-pull = {
           description = "Pull Whisper ASR Docker Image";
