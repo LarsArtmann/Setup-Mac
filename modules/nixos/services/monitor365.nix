@@ -6,7 +6,6 @@ _: {
     ...
   }: let
     cfg = config.services.monitor365;
-    harden = import ../../../lib/systemd.nix {inherit lib;};
 
     runtimeDeps = with pkgs; [
       xdotool
@@ -230,26 +229,24 @@ _: {
             StartLimitBurst = 5;
           };
 
-          Service =
-            {
-              Type = "simple";
-              ExecStart = "${cfg.package}/bin/monitor365 --config /etc/monitor365/config.toml run";
-              WorkingDirectory = cfg.home;
-              Restart = "always";
-              RestartSec = "10";
-              KillMode = "mixed";
-              TimeoutStopSec = "30";
-              StandardOutput = "journal";
-              StandardError = "journal";
+          Service = {
+            Type = "simple";
+            ExecStart = "${cfg.package}/bin/monitor365 --config /etc/monitor365/config.toml run";
+            WorkingDirectory = cfg.home;
+            Restart = "always";
+            RestartSec = "10";
+            KillMode = "mixed";
+            TimeoutStopSec = "30";
+            StandardOutput = "journal";
+            StandardError = "journal";
 
-              Environment = [
-                "PATH=${runtimePath}:/run/wrappers/bin:%h/.nix-profile/bin:/run/current-system/sw/bin"
-                "DISPLAY=:0"
-              ];
+            Environment = [
+              "PATH=${runtimePath}:/run/wrappers/bin:%h/.nix-profile/bin:/run/current-system/sw/bin"
+              "DISPLAY=:0"
+            ];
 
-              MemoryMax = "1G";
-            }
-            // harden {};
+            MemoryMax = "1G";
+          };
 
           Install = {
             WantedBy = ["graphical-session.target"];
