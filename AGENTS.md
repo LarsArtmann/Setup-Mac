@@ -65,6 +65,7 @@ SystemNix/
     │   └── programs/shells.nix  # darwin-rebuild aliases
     └── nixos/                   # NixOS
         ├── system/configuration.nix  # Main system entry
+        ├── system/primary-user.nix    # Shared primaryUser option (default: "lars")
         ├── system/boot.nix      # systemd-boot, kernel params, ZRAM
         ├── system/networking.nix # Static IP, firewall
         ├── system/dns-blocker-config.nix  # Unbound + dnsblockd
@@ -360,6 +361,7 @@ AI agent task tracking protocol:
 - **2-space indentation** for Nix files
 - **Open new terminal** after `just switch` (shell changes need new session)
 - **`config.allowBroken = false`** — must stay false in flake.nix
+- **Caddy port references** — always use `config.services.<name>.port`, never hardcode in caddy.nix
 
 ### Non-Obvious Gotchas
 
@@ -380,19 +382,36 @@ AI agent task tracking protocol:
 
 ### lib/ Shared Helpers
 
-Reusable functions in `lib/`, with a centralized entry point at `lib/default.nix`:
+Reusable functions in `lib/` — imported directly by relative path:
 
 | File | Purpose | Usage |
 |------|---------|-------|
-| `lib/default.nix` | Central entry point — re-exports all helpers | `myLib = import ../../../lib {inherit lib;};` then `myLib.systemd.harden {}` |
-| `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix;` then `harden {MemoryMax = "512M";}` |
+| `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix {inherit lib;};` then `harden {MemoryMax = "512M";}` |
 | `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
 | `lib/types.nix` | Reusable NixOS module option constructors (ports, user/group, delays) | `serviceTypes = import ../../../lib/types.nix lib;` then `serviceTypes.systemdServiceIdentity {}` |
 | `lib/rocm.nix` | ROCm GPU runtime library lists and env vars | `rocm = import ../../../lib/rocm.nix {inherit pkgs;};` then `rocm.env` / `rocm.makeLdLibraryPath lib` |
 
 Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
 
-**Adoption status:** All 12 service modules that manage systemd services now use `harden {}` from the shared lib. 5 modules use `serviceDefaults {}`. No service should manually inline `PrivateTmp`, `NoNewPrivileges`, etc. — always use the shared helpers.
+**Adoption status:** All service modules that manage systemd services use `harden {}` from the shared lib. 8 modules use `serviceDefaults {}`. No service should manually inline `PrivateTmp`, `NoNewPrivileges`, etc. — always use the shared helpers.
+
+### Caddy Port References
+
+Caddy reverse-proxy ports are derived from service module options — NOT hardcoded:
+
+| Service | Caddy Reference |
+|---------|----------------|
+| Authelia | `config.services.authelia-config.port` |
+| Immich | `config.services.immich.port` |
+| Gitea | `config.services.gitea.settings.server.HTTP_PORT` |
+| Homepage | `config.services.homepage.port` |
+| PhotoMap | `config.services.photomap.port` |
+| SigNoz | `config.services.signoz.settings.queryService.port` |
+| Twenty | `config.services.twenty.port` |
+| TaskChampion | `config.services.taskchampion-sync-server.port` |
+| ComfyUI | `config.services.comfyui.port` |
+
+**Rule:** When adding a new service behind caddy, always define a `port` option in the service module and reference it in `caddy.nix`. Never hardcode port numbers in caddy.
 
 ### WatchdogSec / sd_notify Rules
 
@@ -601,7 +620,6 @@ hermes cron list          # List cron jobs
 | `silent-sddm` | SDDM theme | Yes |
 | `nur` | Nix User Repository | Yes |
 | `helium` | Helium browser | Yes |
-| `nix-visualize` | Dependency visualization | Yes |
 | `otel-tui` | OpenTelemetry TUI viewer | Yes |
 | `signoz-src` | SigNoz source (flake=false) | — |
 | `signoz-collector-src` | SigNoz collector source (flake=false) | — |
