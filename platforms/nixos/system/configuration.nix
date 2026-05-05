@@ -89,14 +89,14 @@
     # AccountsService avatar for SDDM login/lock screen
     services.accounts-daemon.enable = true;
     systemd.tmpfiles.rules = [
-      "L+ /var/lib/AccountsService/icons/lars - - - - ${../../../assets/avatar.png}"
+      "L+ /var/lib/AccountsService/icons/${config.users.primaryUser} - - - - ${../../../assets/avatar.png}"
     ];
 
-    # Ensure Home Manager profile directory exists for user lars
+    # Ensure Home Manager profile directory exists
     # This is required for home-manager.useUserPackages = true to work properly
     system.activationScripts.home-manager-profile-dirs = ''
-      mkdir -p /nix/var/nix/profiles/per-user/lars
-      chown lars:users /nix/var/nix/profiles/per-user/lars
+      mkdir -p /nix/var/nix/profiles/per-user/${config.users.primaryUser}
+      chown ${config.users.primaryUser}:users /nix/var/nix/profiles/per-user/${config.users.primaryUser}
     '';
 
     programs.obs-studio = {
