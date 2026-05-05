@@ -14,7 +14,7 @@ During **save**, walk `/proc` for each terminal window's PID to capture the chil
 kitty --directory /path/to/project -e sh -c "nvim; exec fish"
 ```
 
-Falls back to bare terminal when no child process is found (current behavior).
+When no child process is found (user just has a shell running), it spawns a bare terminal as it does today.
 
 ## Working Proof of Concept
 
