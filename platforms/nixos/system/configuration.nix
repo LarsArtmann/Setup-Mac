@@ -54,9 +54,6 @@
   # Wrap all configuration in config attribute
   config = {
     # dnsblockd CA is trusted via security.pki.certificates in the dns-blocker module
-
-    # Define color scheme and utilities
-    colorScheme = nix-colors.colorSchemes.catppuccin-mocha;
     colorSchemeLib = nix-colors.lib;
 
     # Fix for Home Manager + xdg.portal integration
