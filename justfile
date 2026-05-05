@@ -189,18 +189,9 @@ dns-restart:
 [linux]
 dns-diagnostics:
     #!/usr/bin/env bash
-    echo "=== Status ==="
-    echo "Unbound:   $(systemctl is-active unbound 2>/dev/null || echo 'not found')"
-    echo "dnsblockd: $(systemctl is-active dnsblockd 2>/dev/null || echo 'not found')"
+    just dns-status
     echo ""
-    echo "=== Resolution ==="
-    echo "google.com:      $(dig google.com +short 2>/dev/null | head -1 || echo 'FAIL')"
-    BLOCKED=$(dig doubleclick.net +short 2>/dev/null)
-    if [[ -z "$BLOCKED" || "$BLOCKED" == 192.168.1.* ]]; then
-        echo "doubleclick.net: BLOCKED"
-    else
-        echo "doubleclick.net: NOT BLOCKED ($BLOCKED)"
-    fi
+    just dns-test
     echo ""
     echo "=== Recent Logs ==="
     journalctl -u unbound -u dnsblockd --no-pager -n 20
