@@ -35,6 +35,11 @@ switch:
 update:
     nix flake update
 
+# Self-update Nix to latest version (run 'just switch' after)
+[group('core')]
+update-nix:
+    nix upgrade-nix
+
 # Emergency rollback to previous generation
 [group('core')]
 rollback:
@@ -112,6 +117,11 @@ health:
 [group('quality')]
 pre-commit-run:
     pre-commit run --all-files
+
+# Install pre-commit hooks
+[group('quality')]
+pre-commit-install:
+    pre-commit install
 
 # ═══════════════════════════════════════════════════════════════════
 #  Clean
