@@ -9,7 +9,7 @@ just setup                # First-time setup after clone
 just switch               # Apply config (auto-detects platform)
 just test-fast            # Syntax check before committing
 just format               # Auto-format all Nix files
-just validate             # nix flake check --no-build
+just health               # System health check
 ```
 
 ## Architecture
@@ -130,7 +130,7 @@ Only override in platform dirs for things that genuinely differ.
 ```bash
 just test-fast            # Fast syntax-only check
 just test                 # Full build validation
-just validate             # nix flake check --no-build
+just check                # System status, git, disk usage
 just health               # System health check
 just format               # Auto-format and verify
 ```
