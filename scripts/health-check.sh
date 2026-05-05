@@ -110,7 +110,7 @@ if command -v go >/dev/null 2>&1; then
     if command -v "$tool" >/dev/null 2>&1; then
       ok "$tool available"
     else
-      warn "$tool not found (run: just go-dev)"
+      warn "$tool not found (run: just switch to install via Nix)"
     fi
   done
 else
