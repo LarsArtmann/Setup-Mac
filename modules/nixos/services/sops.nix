@@ -100,6 +100,7 @@ in {
           owner = "lars";
           group = "users";
           content = ''
+            GITEA_TOKEN=${config.sops.placeholder.gitea_token}
             GITHUB_TOKEN=${config.sops.placeholder.github_token}
             GITHUB_USER=${config.sops.placeholder.github_user}
           '';
