@@ -45,6 +45,21 @@ check_service cadvisor
 check_service authelia
 check_service taskchampion-sync-server
 
+# User service checks (graphical session)
+check_user_service() {
+    if systemctl --user is-active --quiet "$1" 2>/dev/null; then
+        return 0
+    else
+        FAILED="$FAILED\n  $1 (user)"
+        return 1
+    fi
+}
+
+check_user_service waybar
+check_user_service awww-daemon
+check_user_service swayidle
+check_user_service emeet-pixyd
+
 # URL checks
 check_url "http://localhost:2283" "immich-web"
 check_url "http://immich.lan" "caddy-proxy"

@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{lib, pkgs, ...}: {
   programs.waybar = {
     enable = true;
     systemd.enable = true;
@@ -406,5 +406,16 @@
         color: #585b70;
       }
     '';
+  };
+
+  systemd.user.services.waybar = {
+    Service = {
+      Restart = lib.mkForce "always";
+      RestartSec = "3s";
+    };
+    Unit = {
+      StartLimitBurst = 5;
+      StartLimitIntervalSec = 120;
+    };
   };
 }

@@ -129,6 +129,22 @@ if is_linux; then
     warn "niri not running (graphical session may be inactive)"
   fi
 
+  # Graphical session target — critical for waybar, cliphist, swayidle, wallpaper
+  if systemctl --user is-active graphical-session.target >/dev/null 2>&1; then
+    ok "graphical-session.target active"
+  else
+    fail "graphical-session.target NOT active — waybar and other graphical services will not start"
+    info "  This usually means niri.service is missing Wants=graphical-session.target"
+    info "  Check: systemctl --user status graphical-session.target"
+  fi
+
+  # Waybar — the most visible service
+  if systemctl --user is-active waybar >/dev/null 2>&1; then
+    ok "waybar running"
+  else
+    fail "waybar NOT running — system bar is down"
+  fi
+
   # Systemd failed units
   failed_system=$(systemctl --failed --no-legend 2>/dev/null | grep -c "failed" || echo "0")
   failed_user=$(systemctl --user --failed --no-legend 2>/dev/null | grep -c "failed" || echo "0")
@@ -151,6 +167,23 @@ if is_linux; then
       warn "HM generation is ${age_days}d old (consider: just switch)"
     else
       ok "HM generation is ${age_days}d old"
+    fi
+  fi
+
+  # Harden adoption audit — services with serviceConfig should use shared lib
+  section "Service Harden Adoption"
+  if [[ -d modules/nixos/services ]]; then
+    missing_harden=""
+    for f in modules/nixos/services/*.nix; do
+      [[ "$(basename "$f")" == "default.nix" ]] && continue
+      if grep -q "serviceConfig" "$f" 2>/dev/null && ! grep -q "harden" "$f" 2>/dev/null; then
+        missing_harden="$missing_harden $(basename "$f")"
+      fi
+    done
+    if [[ -z "$missing_harden" ]]; then
+      ok "all service modules use harden{}"
+    else
+      warn "modules missing harden{}:$missing_harden"
     fi
   fi
 
