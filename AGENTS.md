@@ -442,64 +442,62 @@ Caddy reverse-proxy ports are derived from service module options — NOT hardco
 
 ## Essential Commands
 
+Run `just` (or `just --list`) to see all recipes grouped by category. Key commands:
+
 ```bash
 # Core
 just setup              # Initial setup after clone
 just switch             # Apply config (detects platform automatically)
 just update             # Update flake inputs
+just rollback           # Revert to previous generation
+just check              # System status, git status, disk usage
+
+# Quality
 just test-fast          # Syntax-only validation (fast)
 just test               # Full build validation (slow)
 just format             # Format with treefmt + alejandra
-just health             # Cross-platform health check (Nix, flake, direnv, shell, systemd, disk, memory)
-just validate           # nix flake check --no-build
+just health             # Cross-platform health check
 
-# Go development
-just go-dev             # Full workflow (format, lint, test, build)
-just go-tools-version   # Show all tool versions
+# Clean
+just clean              # Clean Nix store, caches, temp files, Docker
 
-# NixOS services
-just dns-diagnostics    # DNS stack diagnostics
-just immich-status       # Immich service status
-just immich-backup       # Database backup
-just gitea-sync-repos    # Sync GitHub → Gitea
+# Services (NixOS only)
+just dns-diagnostics    # Full DNS stack diagnostics
+just immich-status      # Immich service status + backup count
+just immich-backup      # Database backup
+just gitea-sync-repos   # Sync GitHub → Gitea
+just hermes-status      # Hermes gateway status
+just manifest-status    # Manifest LLM router status
 
-# Taskwarrior
+# Desktop (NixOS only)
+just cam-status         # Camera state (tracking, audio, position)
+just cam-privacy        # Toggle privacy mode
+just wallpaper-status   # Wallpaper daemon health + images
+just session-status     # Niri session save state
+just reload             # Reload niri config (no rebuild)
+
+# Taskwarrior (cross-platform)
 just task-list           # Show pending tasks (next report)
 just task-add <desc>     # Add a new task
 just task-agent <desc>   # Add AI-tracked task (+agent source:crush)
 just task-sync           # Sync with TaskChampion server
 just task-status         # Show task counts + sync config
-just task-setup          # Per-device: generate client ID + set encryption secret
+just task-setup          # Per-device auto-config info
 just task-backup         # Export all tasks as JSON
 
-# Niri session
-just session-status       # Show session save state (last save, window count, age)
-just session-restore      # Manually trigger session restore
-
-# Wallpaper (self-healing)
-just wallpaper-status     # Show daemon health, image count, outputs
-just wallpaper-random     # Set random wallpaper
-just wallpaper-restore    # Restore last displayed wallpaper
-just wallpaper-restart    # Restart daemon + wallpaper service
-just wallpaper-logs       # Show daemon logs (last 50 lines)
-
-# AI Models
+# AI Models (NixOS only)
 just ai-migrate           # Migrate legacy AI data → /data/ai/ (run BEFORE switch)
 just ai-status            # Show AI model storage status
 
-# todo-list-ai
-just todo-scan             # Extract TODOs from current directory (default: mock)
+# Tools (cross-platform)
+just todo-scan             # Extract TODOs (default: mock provider)
 just todo-scan-openai DIR  # Extract TODOs with OpenAI
-just todo-scan-mock DIR    # Extract TODOs with mock provider
-just todo-version          # Show todo-list-ai version
+just lint-configure        # Auto-configure golangci-lint
 
-# golangci-lint-auto-configure
-just lint-configure           # Auto-configure golangci-lint for current project
-just lint-configure-version   # Show golangci-lint-auto-configure version
-
-# Recovery
-just rollback           # Revert to previous generation
-just backup / just restore NAME
+# Disk (NixOS only)
+just disk-status         # Disk monitor + filesystem usage
+just disk-check          # Trigger manual disk check
+just rust-clean          # Rust target/ cleanup
 ```
 
 ### EMEET PIXY Webcam (`emeet-pixyd` flake input)
