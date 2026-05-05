@@ -99,11 +99,16 @@
   # Protect critical services from OOM killer
   # sshd: -1000 (maximum protection — remote access is the last resort)
   # journald: -500 (lost journald = lost crash diagnostics)
+  # dbus-broker: -500 (D-Bus IPC — death breaks logind/DRM master/session management)
+  # systemd-logind: -500 (session/seat management — death breaks niri DRM master)
+  # systemd-udevd: -500 (device node management — death breaks /dev/dri/* access)
   systemd = {
     services = {
       "sshd".serviceConfig.OOMScoreAdjust = -1000;
       "systemd-journald".serviceConfig.OOMScoreAdjust = -500;
       "dbus-broker".serviceConfig.OOMScoreAdjust = -500;
+      "systemd-logind".serviceConfig.OOMScoreAdjust = -500;
+      "systemd-udevd".serviceConfig.OOMScoreAdjust = -500;
     };
 
     user.services = {
@@ -149,9 +154,9 @@
       enableNotifications = true; # Desktop notification before killing
       extraArgs = [
         "--avoid"
-        "^(systemd|sshd|dbus-broker|niri|waybar|kitty|fish|pipewire)$" # Never kill these
+        "^(systemd|sshd|dbus-broker|systemd-logind|systemd-udevd|systemd-journald|niri|waybar|kitty|fish|pipewire|pipewire-pulse|wireplumber|swayidle|dunst)$" # Never kill these
         "--prefer"
-        "^(ollama|llama-server|python3|python|node|java|chrome|chromium|generate_happy_girl)$" # Kill these first
+        "^(ollama|llama-server|python3|python|node|java|chrome|chromium|helium|vtsls|tsserver|rust-analyzer|generate_happy_girl|cargo|clang|go)$" # Kill these first
       ];
     };
 

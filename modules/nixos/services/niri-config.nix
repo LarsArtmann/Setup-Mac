@@ -7,6 +7,11 @@ _: {
   }: let
     cfg = config.services.niri-desktop;
     niriPkg = pkgs.niri-unstable;
+    drmHealthcheck = pkgs.writeShellApplication {
+      name = "niri-drm-healthcheck";
+      runtimeInputs = with pkgs; [procps systemd];
+      text = builtins.readFile ../../../scripts/niri-drm-healthcheck.sh;
+    };
   in {
     options.services.niri-desktop = {
       enable = lib.mkEnableOption "Niri Wayland compositor with XWayland support";
@@ -76,6 +81,24 @@ _: {
       environment.systemPackages = with pkgs; [
         xwayland-satellite
       ];
+
+      # DRM zombie healthcheck: detects niri stuck in DRM error loop
+      # (alive but screen dead) and force-kills it so Restart=always triggers.
+      systemd.user.services.niri-drm-healthcheck = {
+        description = "Detect niri DRM zombie state and force restart";
+        serviceConfig.Type = "oneshot";
+        serviceConfig.ExecStart = "${drmHealthcheck}/bin/niri-drm-healthcheck";
+      };
+
+      systemd.user.timers.niri-drm-healthcheck = {
+        description = "Check niri DRM health every 60 seconds";
+        wantedBy = ["timers.target"];
+        timerConfig = {
+          OnBootSec = "60s";
+          OnUnitActiveSec = "60s";
+          AccuracySec = "10s";
+        };
+      };
     };
   };
 }

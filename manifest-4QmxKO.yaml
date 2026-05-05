@@ -1,3 +1,0 @@
-manifest_auth_secret: "CHANGE_ME_random_32char_base64_string_1"
-manifest_encryption_key: "CHANGE_ME_random_32char_base64_string_2"
-manifest_db_password: "CHANGE_ME_random_24char_base64_string_3"
