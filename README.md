@@ -131,24 +131,20 @@ All services are defined as flake-parts modules and reverse-proxied through Cadd
 just setup              # Initial setup (run once after clone)
 just switch             # Apply configuration changes
 just update             # Update flake inputs and packages
+just update-nix         # Self-update Nix to latest version
 just test               # Validate configuration (full build)
 just test-fast          # Syntax-only validation (fast)
+just check              # System status, git, disk usage
 
-# Development
-just dev                # Format, lint, test
+# Quality
 just format             # Format code with treefmt + alejandra
 just health             # System health check
-just validate           # Nix flake validation
+just pre-commit-install # Install pre-commit hooks
+just pre-commit-run     # Run all hooks on all files
 
 # Maintenance
-just clean              # Comprehensive cleanup (caches, old packages)
-just backup             # Backup configuration
+just clean              # Comprehensive cleanup (Nix, caches, temp, Docker)
 just rollback           # Revert to previous generation
-just check              # Check for outdated packages
-
-# Go development
-just go-dev             # Full Go workflow (format, lint, test, build)
-just go-tools-version   # Show all Go tool versions
 
 # NixOS services
 just dns-diagnostics    # Full DNS diagnostics
@@ -156,6 +152,7 @@ just immich-status       # Check Immich service status
 just immich-backup       # Run database backup
 just gitea-sync-repos    # Sync GitHub repos to Gitea
 just hermes-status       # Check Hermes gateway status
+just manifest-status     # Check Manifest LLM router status
 just session-status      # Check niri session save state
 just cam-status          # Check EMEET PIXY webcam state
 
