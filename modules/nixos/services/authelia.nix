@@ -9,7 +9,7 @@ _: {
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    authPort = 9091;
+    authPort = cfg.port;
 
     mkClient = {
       client_id,
@@ -33,6 +33,11 @@ _: {
   in {
     options.services.authelia-config = {
       enable = lib.mkEnableOption "Authelia SSO/IDP with SystemNix configuration";
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 9091;
+        description = "Port for the Authelia authentication server";
+      };
     };
 
     config = lib.mkIf cfg.enable {

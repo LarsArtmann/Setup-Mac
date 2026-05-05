@@ -12,7 +12,7 @@ in {
     harden = import ../../../lib/systemd.nix {inherit lib;};
 
     stateDir = "/var/lib/twenty";
-    serverPort = 3200;
+    serverPort = cfg.port;
 
     pgUser = "postgres";
     pgDb = "twenty";
@@ -102,6 +102,11 @@ in {
   in {
     options.services.twenty = {
       enable = lib.mkEnableOption "Twenty CRM";
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 3200;
+        description = "Host port for the Twenty CRM server";
+      };
     };
 
     config = lib.mkIf cfg.enable {

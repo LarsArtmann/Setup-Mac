@@ -28,13 +28,18 @@ _: {
   in {
     options.services.photomap = {
       enable = lib.mkEnableOption "PhotoMap AI service";
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8050;
+        description = "Port for the PhotoMap web interface";
+      };
     };
 
     config = lib.mkIf cfg.enable {
       virtualisation.oci-containers.containers.photomap = {
         autoStart = true;
         image = "lstein/photomapai@sha256:ca975ca6b2a00a7943fec1f578815dccfdbc212630547c70e750c724e981435d";
-        ports = ["127.0.0.1:8050:8050"];
+        ports = ["127.0.0.1:${toString cfg.port}:${toString cfg.port}"];
         volumes = [
           "${immichUploadDir}:/Pictures/upload:ro"
           "${immichLibraryDir}:/Pictures/library:ro"
@@ -45,7 +50,7 @@ _: {
           "${photomapDataDir}/data:/root/.local/share/photomap"
         ];
         extraOptions = [
-          "--health-cmd=python3 -c \"import urllib.request;urllib.request.urlopen('http://localhost:8050/')\""
+          "--health-cmd=python3 -c \"import urllib.request;urllib.request.urlopen('http://localhost:${toString cfg.port}/')\""
           "--health-interval=30s"
           "--health-timeout=10s"
           "--health-retries=3"
