@@ -8,7 +8,7 @@ _: {
     lanSubnet = config.networking.local.subnet;
     serverCert = config.sops.secrets.dnsblockd_server_cert.path;
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
-    authPort = 9091;
+    authPort = config.services.authelia-config.port;
     harden = import ../../../lib/systemd.nix {inherit lib;};
 
     bindAddress =
@@ -63,21 +63,21 @@ _: {
           };
 
           "immich.${domain}" = protectedVHost "immich" config.services.immich.port;
-          "gitea.${domain}" = protectedVHost "gitea" 3000;
-          "dash.${domain}" = protectedVHost "dash" 8082;
-          "photomap.${domain}" = protectedVHost "photomap" 8050;
-          "signoz.${domain}" = protectedVHost "signoz" 8080;
-          "crm.${domain}" = protectedVHost "crm" 3200;
+          "gitea.${domain}" = protectedVHost "gitea" config.services.gitea.settings.server.HTTP_PORT;
+          "dash.${domain}" = protectedVHost "dash" config.services.homepage.port;
+          "photomap.${domain}" = protectedVHost "photomap" config.services.photomap.port;
+          "signoz.${domain}" = protectedVHost "signoz" config.services.signoz.settings.queryService.port;
+          "crm.${domain}" = protectedVHost "crm" config.services.twenty.port;
           "tasks.${domain}" = {
             extraConfig = ''
               ${tlsConfig}
-              reverse_proxy localhost:10222
+              reverse_proxy localhost:${toString config.services.taskchampion-sync-server.port}
             '';
           };
           "comfyui.${domain}" = {
             extraConfig = ''
               ${tlsConfig}
-              reverse_proxy localhost:8188
+              reverse_proxy localhost:${toString config.services.comfyui.port}
             '';
           };
         };
