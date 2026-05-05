@@ -18,7 +18,7 @@
       log-lines = 25;
       max-free = lib.mkDefault 100000000000; # 100GB — stop GC when 100GB free reached
       min-free = lib.mkDefault 5000000000; # 5GB — trigger GC when only 5GB free
-      sandbox = true; # Strict sandboxing for security
+      sandbox = lib.mkDefault (!pkgs.stdenv.isDarwin);
       # Force IPv4-only binary caches
       substituters = [
         "https://cache.nixos.org/"
