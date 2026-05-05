@@ -29,30 +29,28 @@ buildGoModule rec {
         || b == "batch-processing.log"
         || lib.hasSuffix ".plist" b
         || lib.hasSuffix ".toml" b
-        || (lib.hasSuffix ".md" b && b != "go.mod" && b != "go.sum")
+        || lib.hasSuffix ".md" b
       );
     src = file-and-image-renamer-src;
   };
 
-  vendorHash = "sha256-KSAkJXZ+40jkceXUv0+CFxUO9otFTOvMl3hq8mfCvXA=";
+  vendorHash = "sha256-JPL3Am/8w3EccJaU/KN/NYyDEuLy+Y9GlSkV00i/DGc=";
 
   proxyVendor = true;
 
   subPackages = ["cmd/file-renamer"];
 
-  # Patch go.mod replace directives to point to nix store paths.
-  # The local replace directives (/home/lars/projects/...) only work on the dev machine.
-  # In the nix sandbox we substitute them with the actual source from flake inputs.
   postPatch = ''
     substituteInPlace go.mod \
       --replace-warn 'replace github.com/larsartmann/cmdguard => /home/lars/projects/cmdguard' 'replace github.com/larsartmann/cmdguard => ${cmdguard-src}' \
       --replace-warn 'replace github.com/larsartmann/go-output => /home/lars/projects/go-output' 'replace github.com/larsartmann/go-output => ${go-output-src}'
-    if ! grep -q 'replace github.com/larsartmann/cmdguard' go.mod; then
+    if ! grep -q 'replace github.com/larsartmann/cmdguard => ${cmdguard-src}' go.mod; then
       echo -e '\nreplace github.com/larsartmann/cmdguard => ${cmdguard-src}' >> go.mod
     fi
-    if ! grep -q 'replace github.com/larsartmann/go-output' go.mod; then
+    if ! grep -q 'replace github.com/larsartmann/go-output => ${go-output-src}' go.mod; then
       echo -e '\nreplace github.com/larsartmann/go-output => ${go-output-src}' >> go.mod
     fi
+
   '';
 
   ldflags = ["-s" "-w"];

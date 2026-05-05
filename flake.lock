@@ -117,11 +117,11 @@
     "file-and-image-renamer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777929051,
-        "narHash": "sha256-akSpS/h6PXL8Aua4NJrhJCx8b16/EV1KKK7xa7CetH0=",
+        "lastModified": 1777976167,
+        "narHash": "sha256-Y+DCgr0KcyMHx4cwRsfimRDvi/lD+wafAeXHXFXCo4g=",
         "ref": "master",
-        "rev": "f2e18bd908fb6491a329d34d314f8f405a146ab1",
-        "revCount": 276,
+        "rev": "506ac730c0efec64d4baaabea6795ae0026c270e",
+        "revCount": 277,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/file-and-image-renamer"
       },
