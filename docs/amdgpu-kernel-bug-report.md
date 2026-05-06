@@ -33,9 +33,9 @@ amdgpu:     3.64.0 (module)
 ```
 Kernel:              7.0.1 #1-NixOS PREEMPT(lazy) x86_64
 Kernel config:       CONFIG_DRM_AMDGPU=m, CONFIG_DRM_AMD_DC=y, CONFIG_AMD_PSTATE=guided
-NixOS:               26.05.20260423.01fbdee (config: e68cf647)
+NixOS:               26.05.20260423.01fbdee (config: e68cf647983924b1c5449dff2b1566ae39e0658a)
 Compositor:          niri (Wayland, scrollable-tiling)
-Config repo:         https://github.com/LarsArtmann/SystemNix (commit e68cf64)
+Config repo:         https://github.com/LarsArtmann/SystemNix (commit e68cf647983924b1c5449dff2b1566ae39e0658a)
 ```
 
 ## Kernel boot parameters (relevant)
