@@ -129,7 +129,7 @@
         };
 
         "temperature" = {
-          hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
+          thermal-zone = 0;
           critical-threshold = 80;
           format = "{icon} {temperatureC}°C";
           format-icons = ["" "" ""];
