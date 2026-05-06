@@ -16,8 +16,8 @@ Only recovery: full system reboot.
 
 ```
 CPU/APU:    AMD Ryzen AI Max+ 395 (Strix Halo, gfx1151, 16C/32T)
-GPU:        AMD [1002:1586] integrated (same die as CPU)
-PCI:        0000:c5:00.0
+GPU:        AMD [1002:1586] Strix Halo [Radeon 8060S Graphics] (same die as CPU)
+PCI:        0000:c5:00.0 (class 0380, rev c1)
 VRAM:       65536M LPDDR5 (256-bit, unified with system RAM)
 Display:    DCN 3.5.1 (Display Core v3.2.369)
 SMU:        smu_v14_0_0
