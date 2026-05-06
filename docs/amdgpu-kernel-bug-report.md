@@ -104,7 +104,9 @@ After the crashed unbind:
 $ echo 0000:c5:00.0 > /sys/bus/pci/drivers/amdgpu/bind
 ```
 
-- Command hangs indefinitely (no return, must Ctrl+C or kill)
+- Command hangs indefinitely — not interruptible by Ctrl+C, SIGINT, or SIGTERM.
+  Only closing the SSH terminal (killing the session) recovers. The process is
+  stuck in uninterruptible sleep (D state) in kernel space.
 - No DRM devices appear in `/sys/class/drm/` (only `version` file remains)
 - No PCI device listed under `/sys/bus/pci/drivers/amdgpu/`
 - No kernel log output from amdgpu during bind attempt
