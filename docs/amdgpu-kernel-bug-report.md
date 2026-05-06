@@ -141,6 +141,40 @@ CPU from boosting above minimum frequency even under full load.
 This confirms the amdgpu crash has side effects beyond just the GPU — it corrupts
 shared silicon infrastructure (SMU, ISP power domains) that affects the entire SoC.
 
+### Diagnostic data collected while bug was active:
+
+```
+# CPU frequency stuck BELOW configured minimum
+scaling_driver:          amd-pstate
+amd_pstate status:       guided
+amd_pstate prefcore:     enabled
+boost:                   1 (enabled)
+scaling_min_freq:        2000000 (2.0 GHz)
+scaling_max_freq:        5187500 (5.1 GHz)
+scaling_cur_freq:        ~603000 (600 MHz)   ← BELOW scaling_min_freq!
+cpuinfo_cur_freq:        (empty)              ← kernel cannot read HW freq
+energy_performance_preference: (empty)        ← not set at all
+scaling_available_frequencies: (empty)        ← no frequencies listed
+
+# All cores identical
+cpu0-cpu3: all at ~603 MHz
+
+# GPU driver state after crashed unbind
+/sys/class/drm/:         only "version" file (no card0/card1/renderD128)
+/sys/bus/pci/drivers/amdgpu/: no PCI device bound
+amdgpu module:           still loaded but no hardware attached
+
+# Kernel timing anomalies (after oops)
+perf: interrupt took too long (2508 > 2500), lowering kernel.perf_event_max_sample_rate to 79000
+perf: interrupt took too long (3344 > 3135), lowering kernel.perf_event_max_sample_rate to 59000
+hrtimer: interrupt took 307571 ns   ← 307us hrtimer latency, normally <10us
+```
+
+The kernel oops at 04:46:29 left `irqs disabled` (noted in the oops: `note: tee[1700675] exited with irqs disabled`).
+This may have left a CPU core with interrupts disabled, causing cascading timing issues.
+However, the CPU frequency stuck at 600 MHz appeared significantly later (user reports ~30+ minutes),
+suggesting it's not just an immediate oops side-effect but rather a gradual SMU state corruption.
+
 ## Expected Behavior
 
 1. Driver unbind should not NULL-deref — `isp_genpd_remove_device()` should handle
