@@ -95,12 +95,7 @@ in {
             hermes_xiaomi_api_key = "xiaomi_api_key";
             hermes_fal_key = "fal_key";
             hermes_firecrawl_api_key = "firecrawl_api_key";
-          }
-          // mkSecrets "secrets.yaml" {
-            owner = primaryUser;
-            group = "users";
-            restartUnits = ["file-and-image-renamer.service"];
-          } ["zai_api_key"];
+          };
 
         templates."gitea-sync.env" = {
           owner = primaryUser;

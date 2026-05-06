@@ -32,9 +32,9 @@ _: {
 
       apiKeyFile = lib.mkOption {
         type = lib.types.str;
-        default = config.sops.secrets.zai_api_key.path;
-        defaultText = "config.sops.secrets.zai_api_key.path";
-        description = "Path to the ZAI API key file (sops-decrypted secret)";
+        default = "/home/${cfg.user}/.zai_api_key";
+        defaultText = "/home/<user>/.zai_api_key";
+        description = "Path to the ZAI API key file";
       };
 
       logDirectory = lib.mkOption {
