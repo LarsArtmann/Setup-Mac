@@ -406,11 +406,11 @@
     "go-finding-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1778009234,
-        "narHash": "sha256-F6fREaoYPI2iPSvZoKJjTGq01iogPx4vtct19o5fdF0=",
+        "lastModified": 1778035040,
+        "narHash": "sha256-xXLI5wDtrjDNMpNQiBBdsq43eSWMHp/0LVBZLGJE6gI=",
         "ref": "master",
-        "rev": "db0996be97c6c893c3e4a1e352e118eec1b68c01",
-        "revCount": 457,
+        "rev": "b5e59c17760b3f417ae067f99dd39d3870d039c4",
+        "revCount": 458,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/go-finding"
       },
@@ -539,11 +539,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1778031335,
-        "narHash": "sha256-riQLmLEK3oET+28HenGXJf9OL3Ou4f0UQfSatXMhs0M=",
+        "lastModified": 1778036645,
+        "narHash": "sha256-X5i4DZjnAQ3EEVIu0GKzPyqrGk8d6N4al0YPROSfEOQ=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "0a4b83f1eb713265f2afdfd3853f66da6008867d",
+        "rev": "43a8003cbc045f4954cea29637a3ea0ef58edefb",
         "type": "github"
       },
       "original": {
@@ -579,11 +579,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1778027568,
-        "narHash": "sha256-HLgWQQQ2x1R9wOlhcg36sQDl+PfJjSVgjJxseFakkV8=",
+        "lastModified": 1778040484,
+        "narHash": "sha256-Ae0BbzuHO8t1k9yktdmV0p0npA+EdQKqnQ21txYXc5c=",
         "ref": "master",
-        "rev": "2f372bf52476e68eb8d3c817530e9e9009d3407a",
-        "revCount": 640,
+        "rev": "c94c3eae063a571894efcc74c809ab45055c882d",
+        "revCount": 642,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },
@@ -1006,11 +1006,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778033624,
-        "narHash": "sha256-eGmo2YtmFg7DTEMZiCJodJv+UT/FhUNxrxA6wABw5Bg=",
+        "lastModified": 1778040572,
+        "narHash": "sha256-DD6AeD/7TDfX5l9f+LvPt5mIlJXlnGrWfSw42DFBZrI=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "110d7bddbe490b909486134fd32ed46fe62b4087",
+        "rev": "271b33888a6167ecedd1cd92d1bdd8fe552603ce",
         "type": "github"
       },
       "original": {
