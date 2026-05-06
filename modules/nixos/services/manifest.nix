@@ -38,6 +38,7 @@ _: {
               NODE_ENV: production
               MANIFEST_MODE: selfhosted
               MANIFEST_TELEMETRY_DISABLED: "1"
+              CORS_ORIGIN: "http://localhost:${toString manifestPort}"
             depends_on:
               postgres:
                 condition: service_healthy

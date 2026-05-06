@@ -8,7 +8,7 @@
     harden = import ../../../lib/systemd.nix {inherit lib;};
     cfg = config.services.hermes;
     hermesPkg = let
-      fixedHash = "sha256-MLcLhjTF6dgdvNBtJWzo8Nh19eNh/ZitD2b07nm61Tc=";
+      fixedHash = "sha256-Chz+NW9NXqboXHOa6PKwf5bhAkkcFtKNhvKWwg2XSPc=";
       baseOverlay = inputs.hermes-agent.overlays.default;
       patchedOverlay = final: prev: let
         base = baseOverlay final prev;
@@ -68,6 +68,19 @@
     migrateScript = pkgs.writeShellScript "hermes-migrate-state" ''
       set -euo pipefail
       NEW="${cfg.stateDir}"
+
+      # Auto-recover malformed SQLite databases
+      DB="$NEW/state.db"
+      if [ -f "$DB" ]; then
+        INTEGRITY=$(${pkgs.sqlite}/bin/sqlite3 "$DB" "PRAGMA integrity_check;" 2>&1 || echo "error")
+        if [ "$INTEGRITY" != "ok" ]; then
+          BACKUP="$DB.malformed-$(date +%Y%m%d-%H%M%S)"
+          echo "hermes-migrate: SQLite database malformed, backing up to $BACKUP"
+          mv "$DB" "$BACKUP"
+          # Remove WAL/SHM sidecars too
+          rm -f "$DB-wal" "$DB-shm"
+        fi
+      fi
 
       if [ -f "$NEW/state.db" ] && [ "$(stat -c%s "$NEW/state.db" 2>/dev/null)" -gt 1048576 ]; then
         echo "hermes-migrate: $NEW has existing state ($(stat -c%s "$NEW/state.db") bytes), skipping migration"
@@ -134,14 +147,14 @@
         "d ${cfg.stateDir}/memories  2770 ${cfg.user} ${cfg.group} -"
         "d ${cfg.stateDir}/cron      2770 ${cfg.user} ${cfg.group} -"
         "d ${cfg.stateDir}/cache     2770 ${cfg.user} ${cfg.group} -"
-        "d ${cfg.stateDir}/logs      2770 ${cfg.user} ${cfg.group} -"
+        "d ${cfg.stateDir}/logs/curator 2770 ${cfg.user} ${cfg.group} -"
         "d ${cfg.stateDir}/workspace 2770 ${cfg.user} ${cfg.group} -"
       ];
 
       system.activationScripts."hermes-setup" = lib.stringAfter (["users"] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
-        mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+        mkdir -p ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs/curator,workspace}
         chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
-        chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,workspace}
+        chmod 2770 ${cfg.stateDir} ${cfg.stateDir}/{sessions,skills,memories,cron,cache,logs,logs/curator,workspace}
 
         # Grant hermes (via 'users' group) read+execute access to the primary user's home
         # so it can navigate to shared project directories.
