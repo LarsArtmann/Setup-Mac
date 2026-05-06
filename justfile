@@ -516,6 +516,19 @@ ai-status:
     echo ""
     echo "OLLAMA_MODELS  = ${OLLAMA_MODELS:-not set}"
     echo "HF_HOME        = ${HF_HOME:-not set}"
+    echo "PYTORCH_CUDA_ALLOC_CONF = ${PYTORCH_CUDA_ALLOC_CONF:-not set}"
+
+# Run Python with GPU memory capped at 95% (default) or custom fraction
+# Usage: just gpu-python script.py        (95% GPU memory)
+#        just gpu-python 0.8 script.py    (80% GPU memory)
+[group('ai')]
+[linux]
+gpu-python FRACTION_OR_FILE="0.95" *ARGS="":
+    #!/usr/bin/env bash
+    if [[ "{{ FRACTION_OR_FILE }}" == .* || "{{ FRACTION_OR_FILE }}" == *".py" ]]; then
+        exec gpu-python "{{ FRACTION_OR_FILE }}" {{ ARGS }}
+    fi
+    exec gpu-python "$@" {{ ARGS }}
 
 # ═══════════════════════════════════════════════════════════════════
 #  Tools

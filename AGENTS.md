@@ -400,6 +400,17 @@ Caddy reverse-proxy ports are derived from service module options — NOT hardco
 
 **Rule:** When adding a new service behind caddy, always define a `port` option in the service module and reference it in `caddy.nix`. Never hardcode port numbers in caddy.
 
+### GPU Compute Headroom for Niri
+
+AI workloads on the iGPU can starve niri (Wayland compositor) of GPU cycles, causing desktop lag. Since AMD APUs lack MPS-style GPU scheduling, headroom is preserved via memory fraction limiting:
+
+- `PYTORCH_CUDA_ALLOC_CONF=per_process_memory_fraction:0.95` — caps PyTorch/Ollama GPU memory to 95%, leaving VRAM free for niri rendering
+- `OLLAMA_NUM_PARALLEL=2` — reduced from 4 to limit concurrent GPU batches (more idle gaps for niri)
+- Set system-wide in `environment.sessionVariables` so all PyTorch processes respect it
+- `gpu-python` wrapper: `gpu-python script.py` or `GPU_MEM_FRACTION=0.8 gpu-python script.py` for ad-hoc scripts
+
+**Files:** `ai-stack.nix` (Ollama env + system env + gpu-python wrapper), `comfyui.nix` (ComfyUI alloc conf)
+
 ### WatchdogSec / sd_notify Rules
 
 **`WatchdogSec` is ONLY valid for services that implement `sd_notify()` (i.e., `Type = "notify"`).** Setting it on services that don't call `sd_notify()` causes systemd to kill them after the timeout — even though they're running perfectly fine.
