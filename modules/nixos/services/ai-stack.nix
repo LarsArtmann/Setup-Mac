@@ -86,7 +86,7 @@ _: {
             rocmEnv
             // {
               OLLAMA_FLASH_ATTENTION = "1";
-              OLLAMA_NUM_PARALLEL = "4";
+              OLLAMA_NUM_PARALLEL = "2";
               OLLAMA_KV_CACHE_TYPE = "q8_0";
               OLLAMA_KEEP_ALIVE = "1h";
             };
@@ -100,12 +100,22 @@ _: {
               Group = "users";
               SupplementaryGroups = ["render"];
               UMask = lib.mkForce "0007";
+              Slice = "system-ai.slice";
+              CPUWeight = 50;
             }
             // harden {
               MemoryMax = "32G";
               ProtectHome = false;
               NoNewPrivileges = false;
             };
+        };
+
+        systemd.slices.system-ai = {
+          description = "AI workloads — reduced CPU priority to preserve iGPU headroom for niri";
+          wantedBy = ["multi-user.target"];
+          sliceConfig = {
+            CPUWeight = 50;
+          };
         };
 
         environment.systemPackages = with pkgs; [

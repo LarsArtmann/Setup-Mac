@@ -104,6 +104,8 @@ _: {
             ExecStart = "${cfg.venvPython} ${cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
             OOMScoreAdjust = -100;
             SupplementaryGroups = ["render" "video"];
+            Slice = "system-ai.slice";
+            CPUWeight = 50;
             TimeoutStartSec = "300";
             TimeoutStopSec = "60";
           };
