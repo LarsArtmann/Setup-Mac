@@ -68,7 +68,7 @@ _A brutally honest audit of every feature the project actually has._
 | PhotoMap AI | 🔧 | `photomap.nix` | CLIP embedding visualization, OCI container, pinned SHA256, disabled in config |
 | SigNoz (observability) | ✅ | `signoz.nix` | Full-stack: traces/metrics/logs, ClickHouse, OTel Collector, node_exporter, cadvisor, 7 alert rules, dashboard provisioning |
 | TaskChampion (Taskwarrior sync) | ✅ | `taskchampion.nix` | Port 10222, TLS via Caddy, no forward auth, 100 snapshots / 14 days |
-| Twenty CRM | 🔧 | `twenty.nix` | Docker Compose (4 containers), PostgreSQL + Redis, sops secrets, daily DB backup — module exists, may not be actively deployed |
+| Twenty CRM | ✅ | `twenty.nix` | Docker Compose (4 containers), PostgreSQL + Redis, sops secrets, daily DB backup, Caddy at crm.home.lan |
 | Minecraft server | ✅ | `minecraft.nix` | JDK 25, ZGC, firewall restricted to LAN, Prism Launcher client config, whitelist |
 
 ### AI / ML Stack
