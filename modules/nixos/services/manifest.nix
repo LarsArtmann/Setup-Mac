@@ -152,6 +152,7 @@ _: {
             path = [pkgs.docker pkgs.docker-compose];
 
             preStart = ''
+              ${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down --remove-orphans || true
               cp ${config.sops.templates."manifest-env".path} ${stateDir}/.env
               chmod 600 ${stateDir}/.env
             '';
@@ -159,8 +160,10 @@ _: {
             serviceConfig =
               {
                 ExecStart = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} up --remove-orphans";
-                ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down";
+                ExecStop = "${pkgs.docker-compose}/bin/docker-compose --env-file ${stateDir}/.env -f ${composeFile} down --timeout 30";
                 WorkingDirectory = stateDir;
+                TimeoutStopSec = "60";
+                KillMode = "process";
               }
               // harden {
                 MemoryMax = "2G";
