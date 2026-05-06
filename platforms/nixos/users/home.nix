@@ -222,13 +222,21 @@ in {
       '';
 
       # Niri session manager — declarative app mappings
-      # Prevents duplicate browser spawns and maps app_ids to launch commands
+      # Prevents duplicate spawns and maps niri app_ids to actual launch commands
       "niri-session-manager/config.toml".text = ''
         [single_instance_apps]
         apps = [
             "helium",
             "firefox",
-            "signal"
+            "Firefox",
+            "signal",
+            "Slack",
+            "discord",
+            "vesktop",
+            "telegramdesktop",
+            "Spotify",
+            "spotify",
+            "org.keepassxc.KeePassXC",
         ]
 
         [skip_apps]
@@ -236,6 +244,8 @@ in {
 
         [app_mappings]
         "signal" = ["signal-desktop"]
+        "telegramdesktop" = ["telegram-desktop"]
+        "org.keepassxc.KeePassXC" = ["keepassxc"]
       '';
 
       "zed/settings.json".source = ../programs/zed/settings.json;
