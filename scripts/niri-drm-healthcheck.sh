@@ -11,8 +11,8 @@ set -eu
 pgrep -x niri >/dev/null 2>&1 || exit 0
 
 # Check the last 20 niri log lines for persistent DRM errors
-drm_errors=$(journalctl --user -u niri --no-pager -n 20 --since "30 sec ago" 2>/dev/null \
-  | grep -cE "Permission denied|DeviceMissing" || true)
+drm_errors=$(journalctl --user -u niri --no-pager -n 20 --since "30 sec ago" 2>/dev/null |
+  grep -cE "Permission denied|DeviceMissing" || true)
 
 if [ "$drm_errors" -ge 10 ]; then
   echo "niri DRM zombie detected ($drm_errors DRM errors in 30s). Triggering GPU recovery."

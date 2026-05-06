@@ -37,7 +37,7 @@ pkill -x niri 2>/dev/null || true
 sleep 1
 
 log "Unbinding $DRIVER from $GPU_PCI..."
-echo "$GPU_PCI" > "$UNBIND" 2>/dev/null || {
+echo "$GPU_PCI" >"$UNBIND" 2>/dev/null || {
   log "ERROR: unbind failed. Device may be in use."
   exit 1
 }
@@ -46,7 +46,7 @@ echo "$GPU_PCI" > "$UNBIND" 2>/dev/null || {
 sleep 2
 
 log "Rebinding $DRIVER to $GPU_PCI..."
-echo "$GPU_PCI" > "$BIND" 2>/dev/null || {
+echo "$GPU_PCI" >"$BIND" 2>/dev/null || {
   log "ERROR: rebind failed. MANUAL INTERVENTION REQUIRED."
   log "Run: echo $GPU_PCI > $BIND"
   exit 1
@@ -75,8 +75,8 @@ systemctl --user start niri.service
 sleep 3
 
 # Verify niri is healthy
-drm_errors=$(journalctl --user -u niri --no-pager -n 10 --since "5 sec ago" 2>/dev/null \
-  | grep -cE "Permission denied|DeviceMissing" || true)
+drm_errors=$(journalctl --user -u niri --no-pager -n 10 --since "5 sec ago" 2>/dev/null |
+  grep -cE "Permission denied|DeviceMissing" || true)
 
 if [ "$drm_errors" -ge 5 ]; then
   log "ERROR: niri still has DRM errors after recovery. Reboot required."

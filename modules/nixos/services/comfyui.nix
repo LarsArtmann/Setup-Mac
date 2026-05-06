@@ -16,7 +16,7 @@ _: {
     rocmEnv =
       rocm.env
       // {
-        PYTORCH_HIP_ALLOC_CONF = "garbage_collection_threshold:0.6,max_split_size_mb:128";
+        PYTORCH_HIP_ALLOC_CONF = "garbage_collection_threshold:0.6,max_split_size_mb:128,per_process_memory_fraction:0.95";
         TORCH_ROCM_AOTRITON_ENABLE_EXPERIMENTAL = "1";
         TORCH_COMPILE_DISABLE = "1";
         PYTHONDONTWRITEBYTECODE = "1";
@@ -104,8 +104,6 @@ _: {
             ExecStart = "${cfg.venvPython} ${cfg.package}/main.py --listen ${cfg.host} --port ${toString cfg.port} --bf16-unet --bf16-vae --bf16-text-enc";
             OOMScoreAdjust = -100;
             SupplementaryGroups = ["render" "video"];
-            Slice = "system-ai.slice";
-            CPUWeight = 50;
             TimeoutStartSec = "300";
             TimeoutStopSec = "60";
           };

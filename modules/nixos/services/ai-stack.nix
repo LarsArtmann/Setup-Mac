@@ -89,6 +89,7 @@ _: {
               OLLAMA_NUM_PARALLEL = "2";
               OLLAMA_KV_CACHE_TYPE = "q8_0";
               OLLAMA_KEEP_ALIVE = "1h";
+              PYTORCH_CUDA_ALLOC_CONF = "per_process_memory_fraction:0.95";
             };
         };
 
@@ -114,10 +115,19 @@ _: {
           poppler-utils
           jupyter
           python313
+          (pkgs.writeShellScriptBin "gpu-python" ''
+            exec env \
+              PYTORCH_CUDA_ALLOC_CONF="per_process_memory_fraction:''${GPU_MEM_FRACTION:-0.95}" \
+              HSA_OVERRIDE_GFX_VERSION=11.5.1 \
+              HSA_ENABLE_SDMA=0 \
+              LD_LIBRARY_PATH="${rocm.makeLdLibraryPath lib}" \
+              "''${@}"
+          '')
         ];
 
         environment.sessionVariables = {
           OLLAMA_HOST = "127.0.0.1:11434";
+          PYTORCH_CUDA_ALLOC_CONF = "per_process_memory_fraction:0.95";
         };
       }
 
