@@ -1,7 +1,9 @@
 {pkgs, ...}: {
   programs.rofi = {
     enable = true;
-    package = pkgs.rofi;
+    package = pkgs.rofi.override {
+      plugins = with pkgs; [rofi-calc rofi-emoji];
+    };
 
     theme = builtins.toFile "catppuccin-grid.rasi" ''
       * {
