@@ -206,6 +206,11 @@ dns-diagnostics:
     echo "=== Recent Logs ==="
     journalctl -u unbound -u dnsblockd --no-pager -n 20
 
+# Update DNS blocklist URLs to latest commits and recompute SRI hashes
+[group('services')]
+dns-update:
+    ./scripts/dns-update.sh
+
 # Immich service status (server, ML, postgres, redis, backup timer)
 [group('services')]
 [linux]

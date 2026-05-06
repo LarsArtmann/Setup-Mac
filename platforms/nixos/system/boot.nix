@@ -133,7 +133,6 @@
     watchdogd = {
       enable = true;
       settings = {
-        device = "/dev/watchdog0";
         timeout = 30; # Hard reset after 30s without a kick
         interval = 10; # Pet the watchdog every 10s
         safe-exit = true; # Disable WDT on clean shutdown

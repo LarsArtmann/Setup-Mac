@@ -47,7 +47,11 @@
           wrapProgram $out/bin/helium \
             --add-flags "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder,AcceleratedVideoDecoder,AcceleratedVideoEncoder" \
             --add-flags "--ignore-gpu-blocklist" \
-            --add-flags "--enable-zero-copy"
+            --add-flags "--enable-zero-copy" \
+            --add-flags "--restore-last-session" \
+            --add-flags "--disable-session-crashed-bubble" \
+            --add-flags "--disable-backgrounding-occluded-windows" \
+            --add-flags "--disable-renderer-backgrounding"
         '';
       }
     else heliumPackage;

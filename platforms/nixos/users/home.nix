@@ -221,6 +221,23 @@ in {
         color-scheme=dark
       '';
 
+      # Niri session manager — declarative app mappings
+      # Prevents duplicate browser spawns and maps app_ids to launch commands
+      "niri-session-manager/config.toml".text = ''
+        [single_instance_apps]
+        apps = [
+            "helium",
+            "firefox",
+            "signal"
+        ]
+
+        [skip_apps]
+        apps = []
+
+        [app_mappings]
+        "signal" = ["signal-desktop"]
+      '';
+
       "zed/settings.json".source = ../programs/zed/settings.json;
       "swappy/config".text = ''
         [Default]

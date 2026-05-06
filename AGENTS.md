@@ -161,6 +161,8 @@ Automatic window save/restore for the NixOS (evo-x2) machine via [niri-session-m
 
 **Enabled in:** `platforms/nixos/system/configuration.nix` (`services.niri-session-manager.enable = true`)
 
+**TOML config:** Managed declaratively via Home Manager in `platforms/nixos/users/home.nix` (`xdg.configFile."niri-session-manager/config.toml"`). Contains `single_instance_apps` (helium, firefox, signal) and `app_mappings` (signal → signal-desktop).
+
 **Known limitation:** Does not restore terminal child processes (e.g. kitty running `btop`/`nvim`) or CWD. See `docs/niri-session-migration.md` for context and upstream issue tracking.
 
 **Commands:**
@@ -424,6 +426,9 @@ Caddy reverse-proxy ports are derived from service module options — NOT hardco
 | AI model migration order | Run `just ai-migrate` BEFORE `just switch` to avoid Ollama seeing empty model dir | Documented |
 | Go overlay removed on Darwin | nixpkgs `go_1_26` is already 1.26.1; overlay was invalidating 1094 binary cache derivations | Resolved — removed |
 | GPU hang recovery | Hermes anime-comic-pipeline (PyTorch/ROCm) SIGSEGV → GPU driver hang → entire desktop frozen. Defense in depth: `kernel.sysrq=1` (REISUB), `kernel.panic=30`, `softlockup_panic=1`, `hung_task_panic=1`, `watchdogd` (SP5100 TCO), `amdgpu.gpu_recovery=1`. See `boot.nix`. | Resolved |
+| Helium "RESTORE TABS" on every launch | Chromium writes `exit_type=Normal` only on clean JS-initiated shutdown; SIGTERM from session stop leaves it as `Crashed`. Fixed with `--restore-last-session --disable-session-crashed-bubble` wrapper flags. | Resolved |
+| watchdogd nixpkgs module broken for `device` | NixOS `services.watchdogd.settings.device` generates `device = /dev/watchdog0` but watchdogd v4.1 expects titled section `device /dev/watchdog0 { ... }`. Workaround: omit `device` from settings (default `/dev/watchdog` is the SP5100 TCO). Do NOT set `device` in `settings`. Upstream nixpkgs bug. | Workaround applied |
+| watchdogd `reset-reason` section fails | The `file` key in `reset-reason` section also fails to parse (nixpkgs module generates unquoted string paths). Only `timeout`, `interval`, `safe-exit`, and monitor plugins (`meminfo`, `filenr`, `loadavg`) work. | Accepted — no reset tracking |
 
 ## Essential Commands
 
@@ -448,6 +453,7 @@ just clean              # Clean Nix store, caches, temp files, Docker
 
 # Services (NixOS only)
 just dns-diagnostics    # Full DNS stack diagnostics
+just dns-update         # Update blocklist commits + recompute SRI hashes
 just immich-status      # Immich service status + backup count
 just immich-backup      # Database backup
 just gitea-sync-repos   # Sync GitHub → Gitea

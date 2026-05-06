@@ -13,6 +13,8 @@ _: {
     stateDir = "/var/lib/manifest";
     manifestPort = cfg.port;
 
+    secretsDir = ./../../../platforms/nixos/secrets;
+
     composeFile =
       pkgs.writeText "manifest-docker-compose.yml"
       ''
@@ -44,7 +46,7 @@ _: {
                 - "CMD"
                 - "node"
                 - "-e"
-                - "const p=process.env.PORT||'${toString manifestPort}';fetch(`http://127.0.0.1/$${p}/api/v1/health`).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+                - "const p=process.env.PORT||'${toString manifestPort}';fetch(`http://127.0.0.1:$${p}/api/v1/health`).then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
               interval: 30s
               timeout: 5s
               start_period: 90s
@@ -122,6 +124,7 @@ _: {
         secrets = builtins.listToAttrs (map (name: {
           inherit name;
           value = {
+            sopsFile = secretsDir + "/manifest.yaml";
             owner = "root";
             group = "root";
             restartUnits = ["manifest.service"];
