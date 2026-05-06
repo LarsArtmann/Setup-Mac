@@ -131,6 +131,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Niri session manager — automatic window save/restore
+    niri-session-manager = {
+      url = "github:MTeaHead/niri-session-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Treefmt formatter with auto-discovery for nix fmt
     treefmt-full-flake = {
       url = "github:LarsArtmann/treefmt-full-flake";
@@ -199,6 +205,7 @@
     monitor365-src,
     nixos-hardware,
     emeet-pixyd,
+    niri-session-manager,
     treefmt-full-flake,
     todo-list-ai,
     library-policy,
@@ -686,6 +693,7 @@
             inputs.self.nixosModules.chromium-policies
             inputs.self.nixosModules.steam
             inputs.self.nixosModules.file-and-image-renamer
+            inputs.niri-session-manager.nixosModules.niri-session-manager
             inputs.self.nixosModules.disk-monitor
             inputs.self.nixosModules.manifest
             inputs.emeet-pixyd.nixosModules.default

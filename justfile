@@ -385,35 +385,28 @@ wallpaper-restart:
 wallpaper-logs:
     @journalctl --user -u awww-daemon -u awww-wallpaper --no-pager -n 50
 
-# Niri session save status (last save, window count, age)
+# Niri session manager status
 [group('desktop')]
 [linux]
 session-status:
-    #!/usr/bin/env bash
-    STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/niri-session"
-    if [ ! -f "$STATE_DIR/windows.json" ]; then
-        echo "No session data found"
-        exit 0
-    fi
-    echo "Niri Session Status"
-    echo "==================="
-    if [ -f "$STATE_DIR/timestamp" ]; then
-        saved=$(cat "$STATE_DIR/timestamp")
-        now=$(date +%s)
-        age_min=$(( (now - saved) / 60 ))
-        echo "Last save: $age_min minutes ago"
-    fi
-    echo "Windows:   $(jq 'length' "$STATE_DIR/windows.json" 2>/dev/null || echo '?')"
-    echo "Kitty:     $(jq '[.[] | select(.app_id == "kitty")] | length' "$STATE_DIR/windows.json" 2>/dev/null || echo '?')"
-    echo "Floating:  $(jq '[.[] | select(.is_floating == true)] | length' "$STATE_DIR/windows.json" 2>/dev/null || echo '?')"
-    echo ""
-    systemctl --user list-timers niri-session-save 2>/dev/null || echo "Timer not active"
+    @echo "Niri Session Manager Status"
+    @echo "============================"
+    @systemctl --user status niri-session-manager --no-pager 2>/dev/null || echo "Service not active"
+    @echo ""
+    @echo "Session file:"
+    @ls -la ~/.local/share/niri-session-manager/session.json 2>/dev/null || echo "  No session file found"
+    @echo ""
+    @echo "Backups:"
+    @ls -la ~/.local/share/niri-session-manager/*.bak 2>/dev/null || echo "  No backups found"
+    @echo ""
+    @echo "Config:"
+    @cat ~/.config/niri-session-manager/config.toml 2>/dev/null || echo "  No config file found"
 
 # Manually trigger niri session restore
 [group('desktop')]
 [linux]
 session-restore:
-    @niri-session-restore
+    @systemctl --user restart niri-session-manager
 
 # Reload niri compositor config (no rebuild needed)
 [group('desktop')]

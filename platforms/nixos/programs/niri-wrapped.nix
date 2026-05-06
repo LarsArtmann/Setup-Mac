@@ -8,33 +8,6 @@
 }: let
   colors = colorScheme.palette;
   wallpaperDir = "$HOME/.local/share/wallpapers";
-  cfg = config.services.niri-session;
-
-  fallbackCommands = lib.concatStringsSep "\n      " (lib.forEach (lib.range 0 ((lib.length cfg.fallbackApps) - 1)) (i: let
-    app = lib.elemAt cfg.fallbackApps i;
-    cmd =
-      if app.args == []
-      then app.app_id
-      else "${app.app_id} ${lib.concatStringsSep " " app.args}";
-  in
-    if i == 0
-    then "${cmd} &"
-    else "sleep 0.3\n      ${cmd} &"));
-
-  niri-session-save = pkgs.writeShellApplication {
-    name = "niri-session-save";
-    runtimeInputs = with pkgs; [niri-unstable jq procps coreutils];
-    text = builtins.readFile ../../../scripts/niri-session-save.sh;
-  };
-
-  niri-session-restore = pkgs.writeShellApplication {
-    name = "niri-session-restore";
-    runtimeInputs = with pkgs; [niri-unstable jq coreutils procps libnotify];
-    text = builtins.replaceStrings ["@maxSessionAgeDays@" "@fallbackCommands@"] [
-      (toString cfg.maxSessionAgeDays)
-      fallbackCommands
-    ] (builtins.readFile ../../../scripts/niri-session-restore.sh);
-  };
 
   wallpaper-set = pkgs.writeShellApplication {
     name = "wallpaper-set";
@@ -42,63 +15,6 @@
     text = builtins.readFile ../../../scripts/wallpaper-set.sh;
   };
 in {
-  options.services.niri-session = {
-    sessionSaveInterval = lib.mkOption {
-      type = lib.types.str;
-      default = "60s";
-      description = "Systemd timer interval for saving niri session state";
-    };
-
-    maxSessionAgeDays = lib.mkOption {
-      type = lib.types.ints.positive;
-      default = 7;
-      description = "Maximum age in days before session snapshot is discarded";
-    };
-
-    fallbackApps = lib.mkOption {
-      type = lib.types.listOf (lib.types.submodule {
-        options = {
-          app_id = lib.mkOption {
-            type = lib.types.str;
-            description = "Application ID to spawn";
-          };
-          args = lib.mkOption {
-            type = lib.types.listOf lib.types.str;
-            default = [];
-            description = "Arguments to pass to the application";
-          };
-        };
-      });
-      default = [
-        {
-          app_id = "kitty";
-          args = [];
-        }
-        {
-          app_id = "kitty";
-          args = ["-e" "btop"];
-        }
-        {
-          app_id = "kitty";
-          args = ["-e" "nvtop"];
-        }
-        {
-          app_id = "amdgpu_top";
-          args = [];
-        }
-        {
-          app_id = "helium";
-          args = [];
-        }
-        {
-          app_id = "signal-desktop";
-          args = [];
-        }
-      ];
-      description = "Fallback applications to spawn when no valid session exists";
-    };
-  };
-
   config = {
     home.file.".local/share/wallpapers".source = wallpapers;
 
@@ -106,10 +22,6 @@ in {
       prefer-no-csd = true;
 
       screenshot-path = "~/Pictures/screenshots/%Y-%m-%d %H-%M-%S.png";
-
-      spawn-at-startup = [
-        {argv = ["${niri-session-restore}/bin/niri-session-restore"];}
-      ];
 
       xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
 
@@ -572,34 +484,6 @@ in {
         };
         Install.WantedBy = ["graphical-session.target"];
       };
-      niri-session-save = {
-        Unit = {
-          Description = "Save niri session state for crash recovery";
-          After = ["graphical-session.target"];
-          PartOf = ["graphical-session.target"];
-          OnFailure = ["niri-session-save-failure.service"];
-        };
-        Service = {
-          Type = "oneshot";
-          ExecStart = "${niri-session-save}/bin/niri-session-save";
-        };
-      };
-      niri-session-save-failure = {
-        Unit.Description = "Notify on niri session save failure";
-        Service = {
-          Type = "oneshot";
-          ExecStart = "${pkgs.libnotify}/bin/notify-send -u critical 'Session Save Failed' 'The niri session save timer failed. Check systemctl --user status niri-session-save'";
-        };
-      };
-    };
-
-    systemd.user.timers.niri-session-save = {
-      Unit.Description = "Periodically save niri session state";
-      Timer = {
-        OnBootSec = cfg.sessionSaveInterval;
-        OnUnitActiveSec = cfg.sessionSaveInterval;
-      };
-      Install.WantedBy = ["timers.target"];
     };
   };
 }

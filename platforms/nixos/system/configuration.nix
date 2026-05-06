@@ -151,6 +151,7 @@
       display-manager-config.enable = true;
       audio-config.enable = true;
       niri-desktop.enable = true;
+      niri-session-manager.enable = true;
       security-hardening.enable = true;
       monitoring-tools.enable = true;
       multi-wm.enable = true;

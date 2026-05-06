@@ -142,46 +142,31 @@ Niri is wrapped using the `wrapper-modules` pattern to bake configuration into t
 
 **Limitation:** `lib.mkMerge` does not work with flake-parts modules.
 
-### Niri Session Save/Restore (`platforms/nixos/programs/niri-wrapped.nix`)
+### Niri Session Manager (`niri-session-manager` flake input)
 
-Crash-recovery system for niri window restoration on the NixOS (evo-x2) machine.
-
-**Source files:**
-- `scripts/niri-session-save.sh` — save logic (read niri state + kitty /proc tree)
-- `scripts/niri-session-restore.sh` — restore logic (JSON validation, workspace recreation, window spawning)
-- `platforms/nixos/programs/niri-wrapped.nix` — NixOS module wrapping scripts via `writeShellApplication` + `builtins.readFile`
+Automatic window save/restore for the NixOS (evo-x2) machine via [niri-session-manager](https://github.com/MTeaHead/niri-session-manager) (Rust).
 
 **How it works:**
-- **Save** (systemd timer, configurable interval default 60s): Snapshots all niri windows, workspaces, and kitty terminal state to `~/.local/state/niri-session/`
-- **Restore** (runs at niri startup via `spawn-at-startup`): Reads snapshot, re-spawns apps on correct workspaces with column widths, floating state, and focus order
-- **Fallback**: If no session exists or snapshot is >7 days old (configurable), uses hardcoded default apps
+- Periodic save (configurable interval, default 15min) via `niri_ipc` async IPC
+- Automatic restore on startup — spawns apps on their saved workspaces
+- Backup rotation with configurable retention
+- App ID → command mapping via TOML config (`$XDG_CONFIG_HOME/niri-session-manager/config.toml`)
+- Single-instance dedup and skip-apps support
+- Retry logic with configurable attempts/delay
 
-**Saved data:**
-- `windows.json` — from `niri msg -j windows` (app_id, pid, workspace_id, is_floating, layout.tile_size, focus_timestamp)
-- `workspaces.json` — from `niri msg -j workspaces` (workspace names + IDs)
-- `kitty-state.json` — per-kitty-window: PID, args, CWD, child process command + CWD (walks `/proc` tree, uses `tpgid` for foreground process detection)
-- `timestamp` — epoch seconds of last save
+**Storage:**
+- Session: `$XDG_DATA_HOME/niri-session-manager/session.json`
+- Backups: `$XDG_DATA_HOME/niri-session-manager/session-{timestamp}.bak`
+- Config: `$XDG_CONFIG_HOME/niri-session-manager/config.toml`
 
-**Restore features:**
-- Workspace-aware: pre-creates named workspaces, spawns each app on correct workspace
-- Floating state: restores `is_floating` via `niri msg action move-window-to-floating`
-- Column widths: restores via `SetColumnWidth` with proportion calculated from `tile_size / output_width`
-- Focus order: uses `focus_timestamp` to identify and refocus the last-active window
-- Deduplication: skips non-kitty apps already running (via `pgrep`)
-- JSON validation: validates all JSON files before parsing, falls back gracefully if corrupt
-- Notification: `notify-send` on successful restore
-- Save failure: `OnFailure` triggers critical desktop notification
+**Enabled in:** `platforms/nixos/system/configuration.nix` (`services.niri-session-manager.enable = true`)
 
-**Configurable via `services.niri-session` module options:**
-- `sessionSaveInterval` — timer interval (default `"60s"`)
-- `maxSessionAgeDays` — max age before fallback (default `7`)
-- `fallbackApps` — list of `{app_id, args}` for fallback session
+**Known limitation:** Does not restore terminal child processes (e.g. kitty running `btop`/`nvim`) or CWD. See `docs/niri-session-migration.md` for context and upstream issue tracking.
 
 **Commands:**
 ```bash
-just session-status       # Show last save time, window count, session age
-just session-restore      # Manually trigger session restore
-systemctl --user list-timers niri-session-save  # Check save timer
+just session-status       # Show session manager status + session file
+just session-restore      # Restart session manager (triggers restore)
 ```
 
 ### Wallpaper Self-Healing (`scripts/wallpaper-set.sh`)
@@ -473,7 +458,7 @@ just manifest-status    # Manifest LLM router status
 just cam-status         # Camera state (tracking, audio, position)
 just cam-privacy        # Toggle privacy mode
 just wallpaper-status   # Wallpaper daemon health + images
-just session-status     # Niri session save state
+just session-status     # Niri session manager status
 just reload             # Reload niri config (no rebuild)
 
 # Taskwarrior (cross-platform)
@@ -635,6 +620,7 @@ hermes cron list          # List cron jobs
 | `go-output-src` | Go output library (flake=false) | — |
 | `nixos-hardware` | Hardware profiles (RPi, etc.) | No |
 | `emeet-pixyd` | EMEET PIXY webcam daemon | Yes |
+| `niri-session-manager` | Niri window save/restore (Rust) | Yes |
 | `treefmt-full-flake` | Treefmt formatter | Yes |
 
 **All LarsArtmann private repos use `git+ssh://` URLs.** No `path:` inputs remain.
