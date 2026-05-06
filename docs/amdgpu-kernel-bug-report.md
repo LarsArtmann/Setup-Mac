@@ -122,6 +122,25 @@ After the OOM event kills dbus-broker and logind:
 - The ISP (Image Signal Processor) block appears to be part of the corruption,
   as the crash is in ISP genpd cleanup code
 
+## Bug 4: CPU Power Management Broken After Driver Crash
+
+After the `isp_genpd_remove_device` kernel oops, CPU frequency becomes stuck at
+the minimum base clock (600 MHz) even at 100% load across all 16 cores:
+
+- All cores at 98-100% utilization
+- All cores locked to ~600 MHz (max capable: 5.1 GHz)
+- `scaling_governor` = schedutil, `scaling_max_freq` = 5187500 — governor looks correct
+- Temperature: 89°C, Power: 144W — NOT thermal throttling
+- `amd_pstate` = guided mode
+
+On AMD Strix Halo (Ryzen AI Max+ 395), the CPU and GPU share the same die. The
+SMU (System Management Unit) manages power and frequency for both. The crashed
+amdgpu driver appears to have corrupted or locked the SMU state, preventing the
+CPU from boosting above minimum frequency even under full load.
+
+This confirms the amdgpu crash has side effects beyond just the GPU — it corrupts
+shared silicon infrastructure (SMU, ISP power domains) that affects the entire SoC.
+
 ## Expected Behavior
 
 1. Driver unbind should not NULL-deref — `isp_genpd_remove_device()` should handle
@@ -132,6 +151,9 @@ After the OOM event kills dbus-broker and logind:
 
 3. GPU reset should actually reset the DRM state, not just report "reset done" while
    leaving DRM in an unrecoverable state.
+
+4. Driver crash should not corrupt shared SoC infrastructure (SMU). CPU frequency
+   management must remain independent of GPU driver state.
 
 ## Additional Context
 
