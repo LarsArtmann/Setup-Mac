@@ -39,7 +39,7 @@ buildGoModule rec {
     src = golangci-lint-auto-configure-src;
   };
 
-  vendorHash = "sha256-DKEevMn2/kdr+Vn2Ivnba88Mb3SgbgrcjDInfAJ3dN0=";
+  vendorHash = "sha256-UxDQsGFdx+1VXztp+KRoJc6N3iyPQrFMe1+DiRLhpnw=";
 
   proxyVendor = true;
 
