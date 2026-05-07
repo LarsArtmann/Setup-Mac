@@ -284,8 +284,41 @@
     # };
     emeetPixyOverlay = emeet-pixyd.overlays.default;
 
-    todoListAiOverlay = _final: prev: {
-      todo-list-ai = todo-list-ai.packages.${prev.stdenv.system}.default;
+    # Upstream todo-list-ai has a stale outputHash on its bun-based deps derivation.
+    # On upgrade: remove fixedHash, let upstream hash attempt, if it fails:
+    #   1. Delete the hash below
+    #   2. Run: nix build .#todo-list-ai --no-link 2>&1 | grep got
+    #   3. Paste the correct hash here
+    todoListAiFixedHash = "sha256-gK2KiswUrC4iym1X0r8Ykof1H8Fb2keBsc9X0PPQPPU=";
+
+    todoListAiOverlay = _final: prev: let
+      upstream = todo-list-ai.packages.${prev.stdenv.system}.default;
+      inherit (prev) bun;
+      patchedDeps = prev.stdenv.mkDerivation {
+        name = "todo-list-ai-deps";
+        src = upstream.src;
+        nativeBuildInputs = [bun];
+        buildPhase = "bun install --frozen-lockfile";
+        installPhase = "rm -rf node_modules/.cache && cp -r node_modules $out";
+        outputHashAlgo = "sha256";
+        outputHashMode = "recursive";
+        outputHash = todoListAiFixedHash;
+        dontFixup = true;
+      };
+    in {
+      todo-list-ai = upstream.overrideAttrs (_: {
+        buildPhase = ''
+          runHook preBuild
+          cp -r ${patchedDeps} node_modules
+          chmod -R u+w node_modules
+          find node_modules -type f -exec grep -q '^#!/usr/bin/env node' {} \; -print0 \
+            | xargs -0 -r sed -i '1s|^#!/usr/bin/env node|#!${bun}/bin/bun|'
+          patchShebangs node_modules/.bin
+
+          bun build ./index.ts --compile --outfile ./dist/todo-list-ai
+          runHook postBuild
+        '';
+      });
     };
 
     libraryPolicyOverlay = _final: prev: {
@@ -419,6 +452,7 @@
         ./modules/nixos/services/file-and-image-renamer.nix
         ./modules/nixos/services/disk-monitor.nix
         ./modules/nixos/services/manifest.nix
+        ./modules/nixos/services/gatus-config.nix
         # SSH module now loaded from nix-ssh-config flake input
       ];
 
@@ -696,6 +730,7 @@
             inputs.niri-session-manager.nixosModules.niri-session-manager
             inputs.self.nixosModules.disk-monitor
             inputs.self.nixosModules.manifest
+            inputs.self.nixosModules.gatus-config
             inputs.emeet-pixyd.nixosModules.default
             ./platforms/nixos/system/configuration.nix
           ];

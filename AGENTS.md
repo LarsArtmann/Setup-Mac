@@ -232,6 +232,31 @@ SigNoz is the sole observability platform (replaces Prometheus + Grafana). Full 
 - `nodeExporter` — node_exporter (default: enabled)
 - `cadvisor` — container metrics (default: enabled)
 
+### Gatus Health Check Monitor
+
+Self-contained flake-parts module (`modules/nixos/services/gatus-config.nix`) wrapping the **nixpkgs `services.gatus` module**. Monitors 15 endpoints across all services with SQLite storage.
+
+| Component | Port | Purpose |
+|-----------|------|---------|
+| Gatus | 8083 | Health check dashboard (`status.home.lan`) |
+
+**Module:** `modules/nixos/services/gatus-config.nix` (flake-parts)
+**Enabled via:** `services.gatus-config.enable = true` in configuration.nix
+**Virtual host:** `status.home.lan` via Caddy (forward auth protected)
+**Storage:** SQLite at `/var/lib/gatus/gatus.db`
+**Systemd hardening:** `harden{}` + `serviceDefaults{}` in module
+**All endpoints use `http://localhost`** — no TLS issues with self-signed certs
+
+**Monitored endpoints:**
+| Group | Endpoints |
+|-------|-----------|
+| Infrastructure | Caddy (metrics), Authelia, Homepage, DNS Resolver, DNS Blocker |
+| Development | Gitea |
+| Media | Immich |
+| Monitoring | SigNoz, Manifest, Node Exporter, cAdvisor |
+| Productivity | TaskChampion, Twenty CRM |
+| AI | Ollama, ComfyUI |
+
 ### NixOS DNS Blocker
 
 Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server).
@@ -397,8 +422,9 @@ Caddy reverse-proxy ports are derived from service module options — NOT hardco
 | Twenty | `config.services.twenty.port` |
 | TaskChampion | `config.services.taskchampion-sync-server.port` |
 | ComfyUI | `config.services.comfyui.port` |
+| Gatus | `config.services.gatus-config.port` (via nixpkgs `settings.web.port`) |
 
-**Rule:** When adding a new service behind caddy, always define a `port` option in the service module and reference it in `caddy.nix`. Never hardcode port numbers in caddy.
+**Rule:** When adding a new service behind caddy, always define a `port` option in the service module and reference it in `caddy.nix`. Never hardcode port numbers in caddy. For nixpkgs modules, use the module's own port option (e.g., `settings.web.port`).
 
 ### GPU Compute Headroom for Niri
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Service health checker for evo-x2
-# Checks critical services and sends desktop notification on failure
+# Checks systemd service state and sends desktop notification on failure.
+# Gatus handles HTTP/TCP endpoint monitoring — this script focuses on systemd state only.
 set -euo pipefail
 
 export DISPLAY=:0
@@ -8,8 +9,10 @@ export WAYLAND_DISPLAY=wayland-1
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
 
 FAILED=""
+TOTAL=0
 
 check_service() {
+    TOTAL=$((TOTAL + 1))
     if systemctl is-active --quiet "$1" 2>/dev/null; then
         return 0
     else
@@ -18,35 +21,8 @@ check_service() {
     fi
 }
 
-check_url() {
-    if python3 -c "import urllib.request; urllib.request.urlopen('$1', timeout=5)" 2>/dev/null; then
-        return 0
-    else
-        FAILED="$FAILED\n  $2"
-        return 1
-    fi
-}
-
-# Service checks
-check_service caddy
-check_service immich-server
-check_service immich-machine-learning
-check_service postgresql
-check_service unbound
-check_service dnsblockd
-check_service gitea
-check_service ollama
-check_service homepage-dashboard
-check_service signoz-query-service
-check_service signoz-otel-collector
-check_service clickhouse
-check_service node_exporter
-check_service cadvisor
-check_service authelia
-check_service taskchampion-sync-server
-
-# User service checks (graphical session)
 check_user_service() {
+    TOTAL=$((TOTAL + 1))
     if systemctl --user is-active --quiet "$1" 2>/dev/null; then
         return 0
     else
@@ -55,29 +31,43 @@ check_user_service() {
     fi
 }
 
+# === System services ===
+check_service caddy
+check_service unbound
+check_service dnsblockd
+check_service gitea
+check_service immich-server
+check_service immich-machine-learning
+check_service postgresql
+check_service ollama
+check_service homepage-dashboard
+check_service signoz
+check_service signoz-collector
+check_service clickhouse
+check_service authelia
+check_service taskchampion-sync-server
+check_service hermes
+check_service comfyui
+check_service manifest
+check_service twenty
+check_service minecraft-server
+check_service gatus
+check_service prometheus-node-exporter
+
+# === User services (graphical session) ===
 check_user_service waybar
 check_user_service awww-daemon
 check_user_service swayidle
 check_user_service emeet-pixyd
+check_user_service niri-session-manager
 
-# URL checks
-check_url "http://localhost:2283" "immich-web"
-check_url "http://immich.lan" "caddy-proxy"
-check_url "http://127.0.0.1:9090/stats" "dnsblockd-stats"
-check_url "http://localhost:8082" "homepage-web"
-check_url "http://localhost:3000" "gitea-web"
-check_url "http://localhost:11434/api/tags" "ollama-api"
-check_url "http://localhost:8080" "signoz-web"
-check_url "http://localhost:4318/health" "otel-collector"
-check_url "http://localhost:9091/-/healthy" "authelia-health"
-check_url "http://localhost:9100/metrics" "node-exporter"
-check_url "http://localhost:9110/metrics" "cadvisor"
-
+# === Report ===
 if [ -n "$FAILED" ]; then
-    notify-send -u critical "Health Check FAILED" "$(echo -e "$FAILED")"
+    FAILED_COUNT=$((TOTAL - (TOTAL - $(echo -e "$FAILED" | grep -c '.' 2>/dev/null || echo 0))))
+    notify-send -u critical "Health Check: services down" "$(echo -e "$FAILED")" 2>/dev/null || true
     echo "FAILED:$(echo -e "$FAILED")"
     exit 1
 else
-    echo "OK: all services healthy"
+    echo "OK: $TOTAL/$TOTAL services active"
     exit 0
 fi

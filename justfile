@@ -261,6 +261,15 @@ hermes-logs N="200":
 hermes-restart:
     sudo systemctl restart hermes
 
+# Gatus health check dashboard status
+[group('services')]
+[linux]
+gatus-status:
+    systemctl status gatus --no-pager 2>/dev/null | head -15
+    @echo ""
+    @echo "Dashboard: https://status.home.lan"
+    @curl -sf http://localhost:8083/api/v1/endpoints/status 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Endpoints: {len(d)} monitored')" 2>/dev/null || echo "API: not responding yet"
+
 # Manifest LLM router status
 [group('services')]
 [linux]

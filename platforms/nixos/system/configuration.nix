@@ -154,6 +154,7 @@
       niri-session-manager.enable = true;
       security-hardening.enable = true;
       monitoring-tools.enable = true;
+      gatus-config.enable = true;
       multi-wm.enable = true;
       chromium-policies.enable = true;
       steam-config.enable = true;

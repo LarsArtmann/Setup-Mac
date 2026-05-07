@@ -117,11 +117,11 @@
     "file-and-image-renamer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1778051074,
-        "narHash": "sha256-xKZ517prSvTDTjmCaI+lv3bdnf3GfX6VA2n+AWtBIag=",
+        "lastModified": 1778141531,
+        "narHash": "sha256-A/+5dbuj5cVrYdHXVnDsp4PxuJMSjASGF3otBqpD6zc=",
         "ref": "master",
-        "rev": "d266da4c6f93cc71529db04d3371a1791510fbcb",
-        "revCount": 279,
+        "rev": "6f61f2a5a687b4f28ca26f9c35f03c04a62ddf95",
+        "revCount": 280,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/file-and-image-renamer"
       },
@@ -563,11 +563,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1778135692,
-        "narHash": "sha256-QWL8Nt8EYMSuM9+VOIpseP62EUzITFuUw9U6NoHuV9o=",
+        "lastModified": 1778140757,
+        "narHash": "sha256-Jtpx3uNQeJwoQ0/AI1tPe9EucNLHWRwxRwrxedGsF4o=",
         "ref": "master",
-        "rev": "f60e2f5741985a915ef94ffda1a9d57550fc027b",
-        "revCount": 694,
+        "rev": "c2da8cdf32810216705e2e204e6f8a8d5a467408",
+        "revCount": 697,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/library-policy"
       },
@@ -580,11 +580,11 @@
     "monitor365-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1778135813,
-        "narHash": "sha256-O7qiNH7I0O9OUkCI5DhnUxxcQe3wz0oqmSi83En3tbo=",
+        "lastModified": 1778140532,
+        "narHash": "sha256-qYogJOP/PHLHGCnNYoExC90skBaYHytZ722r7aSjoYI=",
         "ref": "master",
-        "rev": "5b9417b5a7f87d7297dfa276b9ff5ea4650a27ec",
-        "revCount": 654,
+        "rev": "c9d8b7fb089d4dd7028a1ec587ebd4a6431a4d6d",
+        "revCount": 656,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/monitor365"
       },

@@ -81,6 +81,7 @@ _: {
               reverse_proxy localhost:${toString config.services.comfyui.port}
             '';
           };
+          "status.${domain}" = protectedVHost "status" config.services.gatus-config.port;
         };
       };
 

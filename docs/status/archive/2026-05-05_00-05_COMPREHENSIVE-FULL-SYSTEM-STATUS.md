@@ -309,4 +309,91 @@ This should be investigated **before** `just switch` to avoid running out of spa
 
 ---
 
+## Retrospective Review (2026-05-07, Session 44)
+
+**Reviewed by:** Crush (GLM-5.1)
+**Purpose:** Verify factual accuracy against codebase state 48 hours after publication.
+
+### Metrics Accuracy
+
+| Metric in Report | Actual (May 7) | Verdict |
+|---|---|---|
+| 24 service modules | 37 unique NixOS modules | ⚠️ Undercounted by 13 (modules added in sessions 24-43) |
+| 50+ just recipes | 67 | ⚠️ Undercounted |
+| 324 status docs | 349 (19 active + 330 archive) | ✅ Roughly correct (archive grew) |
+| 128GB RAM, 62GB visible | Session 43 reports 62G used / 62G total, 20G available | ✅ Correct pattern |
+| Root 91% full | Session 43 reports 84% (82G free) | ✅ Improved — cleanup worked |
+| /data 74% full | Session 43 reports 83% (140G free) | ⚠️ Grew from 74→83% in 48h |
+
+### "NOT STARTED" Items — Resolution Status (48h later)
+
+| # | Task | Status | When Resolved |
+|---|---|---|---|
+| 1 | `just switch` on evo-x2 | ✅ Deployed in session 28A + session 33 | May 5 17:00 |
+| 2 | Verify pstore works after reboot | ✅ No pstore entries = no panics (confirmed session 43) | Ongoing |
+| 3 | Verify GPU shows 32GB in btop/nvtop | ✅ Session 43: 383M used / 64G total | Verified |
+| 4 | Test Ollama inference | ✅ Ollama confirmed working (GPU busy 0% when idle) | Sessions 28-33 |
+| 7 | TODO_LIST.md | ❌ Still does not exist | — |
+| 8 | Kernel crash dumps (kdump) | ❌ Not done | — |
+| 11 | TPM auto-unlock | ❌ Not done | — |
+| 15 | CI/CD for `just test` | ❌ Not done | — |
+| 16 | SSH CA-signed certs | ❌ Not done | — |
+| 17 | ClickHouse MemoryMax | ❓ Not verified | — |
+| 18 | coredumpctl vacuum timer | ❓ Not verified | — |
+| 20 | ollama.loadModels | ❓ Not verified | — |
+| 22 | docs/status/ cleanup | ✅ Done — 330 files now in archive/ | Sessions 29-31 |
+
+### "PARTIALLY DONE" Items — Current Status
+
+| # | Item | Status |
+|---|---|---|
+| 1 | ai-stack.nix hardening | ⚠️ `per_process_memory_fraction=0.95` added (session 42), but no `harden()` on ollama service |
+| 2 | gatus.nix | ❌ Still dead code — never imported in flake.nix |
+| 3 | DNS failover cluster | ❌ Pi 3 still not provisioned |
+| 4 | security-hardening.nix | ⚠️ auditd still disabled |
+| 5 | lib/default.nix | ❓ Not verified |
+| 6 | AGENTS.md | ✅ Updated — 652 lines, comprehensive |
+| 7 | FEATURES.md | ✅ Updated — 498 lines |
+| 8 | monitor365 MemoryMax bug | ❓ Not verified (still disabled) |
+| 9 | Untracked files | ✅ wallpaper-set.sh committed |
+| 10 | voice-agents.nix | ✅ Committed |
+
+### "TOTALLY FUCKED UP" Items — Resolution
+
+| # | Issue | Status |
+|---|---|---|
+| 1 | Root partition 91% full | ✅ Improved to 84% (82G free) — cleanup/deploy happened |
+| 2 | Only 62GB RAM visible | ✅ Expected behavior, documented |
+| 3 | Ollama MemoryMax overreach | ✅ Reverted |
+| 4 | Gatus module dead code | ❌ Still dead code |
+| 5 | monitor365 MemoryMax bug | ❓ Not verified (disabled) |
+| 6 | Stale health checks | ✅ Rewired to current stack — but service-health-check now fails every 15 min (session 43) |
+| 7 | ZRAM changed without being asked | ✅ Corrected to 25% |
+| 8 | Nix attr duplication | ✅ Fixed |
+| 9 | 324 status docs | ✅ Archived to 330 in archive/ |
+
+### Structural Issues With This Report
+
+1. **Module count was stale when written** — Reported "24 modules, 20 enabled" but the Module Health Matrix below it lists 31 modules. The two sections contradict each other.
+
+2. **"Root partition 91% full is emergency"** — Was real but resolved within hours via cleanup. The report framed it as requiring immediate action "before `just switch`" but the deploy happened anyway (session 28A) without disk issues.
+
+3. **Mixed time horizons in Top 25** — "Fix root partition" (emergency) alongside "CI/CD pipeline" (future sprint). The list would have been more actionable split into "P0: next 30 min" (5 items) and "P1-P4: this week" (20 items).
+
+4. **Photomap listed as "✅ Working"** in Module Health Matrix — but session 28 report lists it as "failing." By session 33+, it was disabled (`# photomap — disabled: podman config permission issue`). The matrix was either outdated when written or the status changed rapidly.
+
+5. **Gatus listed as "🔴 Dead code"** — Accurate then and still accurate 48h later. This is the most actionable finding that was never acted on.
+
+6. **AI Stack marked "⚠️ Partial" for no harden/MemoryMax** — Session 42 added `per_process_memory_fraction=0.95` but didn't add `harden()`. Partially addressed, partially still outstanding.
+
+### Key Takeaways for Future Reports
+
+1. **Module Health Matrix is the most valuable section** — It immediately shows which modules need attention. This pattern should be preserved in every status report.
+
+2. **Revisit "emergency" claims** — 91% disk was resolved in hours. Marking it as P0 was correct, but the follow-through (clean + deploy) should have been noted in the next report rather than leaving it as "emergency" in the historical record.
+
+3. **Gatus has been dead code across 4+ status reports** — flagged every time, never wired in. Either wire it in or remove the module.
+
+4. **service-health-check was "fixed" but is now failing again** — Session 23 rewired it to SigNoz, but by session 43 it fails every 15 min. The "fix" was structural (correct endpoints) but the underlying services may be down.
+
 _Arte in Aeternum_

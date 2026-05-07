@@ -111,7 +111,7 @@ in {
       service-health-check = {
         description = "Check critical services and notify on failure";
         onFailure = ["notify-failure@%n.service"];
-        path = [pkgs.systemd pkgs.python3 pkgs.libnotify];
+        path = [pkgs.systemd pkgs.libnotify];
         serviceConfig = {
           Type = "oneshot";
           ExecStart = "${pkgs.writeShellScript "service-health-check" (builtins.readFile ../scripts/service-health-check)}";

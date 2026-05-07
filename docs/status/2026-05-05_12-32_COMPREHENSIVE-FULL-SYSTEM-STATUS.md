@@ -235,3 +235,71 @@ aafa1bb chore(sessions): commit accumulated work from sessions 24-27
 3573374 feat(sops): add GITEA_TOKEN to hermes env template
 cc486cd fix(pkgs): file-and-image-renamer — broken preBuild syntax + vendorHash update
 ```
+
+---
+
+## Retrospective Review (2026-05-07, Session 44)
+
+**Reviewed by:** Crush (GLM-5.1)
+**Purpose:** Verify factual accuracy against codebase state 48 hours after publication.
+
+### Metrics Accuracy
+
+| Metric in Report | Actual (May 7) | Verdict |
+|---|---|---|
+| 31 service modules | 37 unique NixOS modules | ⚠️ Undercounted by 6 |
+| 9 custom packages | 9 (`ls pkgs/`) | ✅ Correct |
+| 747 flake.nix lines | 747 | ✅ Correct |
+| ~30 flake inputs | 35 root inputs | ⚠️ Undercounted |
+| 86 status reports | 349 (19 active + 330 archive) | ❌ Wrong when written — archive already existed |
+| 67 just recipes | 67 | ✅ Correct |
+
+### "NOT STARTED" Items — Resolution Status (48h later)
+
+| # | Task | Status | When Resolved |
+|---|---|---|---|
+| 1 | Investigate 3 failing services | ✅ Caddy + ComfyUI fixed (session 33). PhotoMap intentionally disabled (podman perms). | May 5 17:00 |
+| 4 | Docker digest pinning (Voice Agents + PhotoMap) | ✅ Both digest-pinned | Sessions 29-34 |
+| 5 | Test file-and-image-renamer without replace directives | ✅ Resolved — postPatch handles replaces correctly | Session 28 |
+| 9 | Archive old status reports | ✅ Done — 330 files in `archive/` | Sessions 29-31 |
+
+Still outstanding:
+
+| Task | Priority | Blocker |
+|---|---|---|
+| Taskwarrior encryption → sops | P1 | Still hardcoded hash in `taskwarrior.nix:87` |
+| VRRP auth → sops | P1 | Not verified |
+| Fix service-health-check | P0 | Still failing every 15 min (confirmed session 43) |
+| Deploy pending changes | P0 | 3+ commits NOT deployed as of session 43 |
+| file-and-image-renamer upstream flake | P2 | Not done |
+| Docs freshness check | P4 | Not done |
+| Pi 3 provisioning | P5 | Hardware |
+
+### Structural Issues Identified
+
+1. **"3 services failing" was actually 1** — PhotoMap is disabled by design (`# photomap — disabled: podman config permission issue`). Caddy and ComfyUI were transient failures fixed hours later. Reporting all 3 as equally P0 was misleading.
+
+2. **Metrics were guessed, not measured** — "86 files in docs/status/" was wrong when written. The archive/ directory already existed. Should have run `find docs/status/ -name '*.md' | wc -l`.
+
+3. **"Top 25" list mixed time horizons** — "Push unpushed commit" (1 min) sat alongside "ZFS send/recv" (4 hr). Effective triage would separate "next 4 hours" from "this quarter."
+
+4. **P5 Deploy/Verify at 0% was overstated** — Mixed verifiable infrastructure checks with speculative future work.
+
+5. **Historical completion percentages unverifiable** — "P0 CRITICAL 6/6 100%" came from the retired `MASTER_TODO_PLAN.md`. Cannot validate from the report itself.
+
+6. **MASTER_TODO_PLAN.md flagged as "8 days stale"** — It was later archived. Should have noted it was being replaced by `FEATURES.md`.
+
+### What Was Accurate and Useful
+
+- Architecture overview remains correct and valuable
+- "TOTALLY FUCKED UP" section correctly identified real issues
+- Session timeline provides good historical context
+- watchdogd nixpkgs bug documentation still accurate
+- GPU compute scheduling analysis (no AMD MPS equivalent) remains the fundamental constraint
+
+### Key Takeaways for Future Reports
+
+1. **Run commands for metrics** — `find`, `wc -l`, `grep -c` instead of guessing
+2. **Distinguish "disabled" from "broken"** — prevents false urgency
+3. **Separate "do today" from "do this quarter"** — 5-7 items max for "next 4 hours"
+4. **Verify deploy state before publishing** — 3 items marked "NOT STARTED" had already been fixed in parallel sessions
