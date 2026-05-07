@@ -406,11 +406,11 @@
     "go-finding-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1778051926,
-        "narHash": "sha256-R7tnVodwGxe+OcDuZKWm9v54oL0nXvTQ2OIgE3mwPV4=",
+        "lastModified": 1778079309,
+        "narHash": "sha256-rgLrNEx45b8ZxhyLY8vfYNPjiVYuG9eeZVLsGpHUj5U=",
         "ref": "master",
-        "rev": "bb0141a4c3ba27100cdac0a49f85cd28c881a60c",
-        "revCount": 480,
+        "rev": "56cc6b20d3f74776c3845cdd70078a5acb9b60c9",
+        "revCount": 496,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/go-finding"
       },
@@ -508,11 +508,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778009629,
-        "narHash": "sha256-nUoQtf4Zq7DRYJrfv904hjrxjAlWVP6a1pNNFKx3FCg=",
+        "lastModified": 1778110974,
+        "narHash": "sha256-7V7bW5uZSdKPRmemMQUulXRffnlnjRj5N/HGHOsOda8=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "00ed86e58bb6979a7921859fd1615d19382eac5c",
+        "rev": "75fac363324f18d2b83a30fd916e509d2a02fb0e",
         "type": "github"
       },
       "original": {
@@ -540,11 +540,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1778057658,
-        "narHash": "sha256-RTgnhjqU73YhAxncquoOfYPvPlGvE3D84qhfbpjomGw=",
+        "lastModified": 1778122690,
+        "narHash": "sha256-wuBGBNkcu2UJUTMK4fD9mpOUDjd2j18U0gGn+vdn6qE=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "89b5869ba844b623fbef1848fbb3d24b5e1e4122",
+        "rev": "a11e8bb93d246674c4aa57254651222746c4901c",
         "type": "github"
       },
       "original": {
@@ -1007,11 +1007,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778056987,
-        "narHash": "sha256-mrPqJm6HESStbi0zImbiEGMXrNAIx3jWSd9OAant8/s=",
+        "lastModified": 1778125923,
+        "narHash": "sha256-gzVdenm+sF+JcUmnovNenG3u6oNF5yuvS6X+3oCF6to=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "32c1784fb696b1560349b10c3520f9cb5e9d343e",
+        "rev": "7889a78326f7c030daec85b36d3d29449fbbb9db",
         "type": "github"
       },
       "original": {
@@ -1310,11 +1310,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778032507,
-        "narHash": "sha256-ieiLp058ceBcFGaoULtNLxGZRtLvMG+/GWak9XGV544=",
+        "lastModified": 1778052425,
+        "narHash": "sha256-O+khIuxUL37bv9ioqLMn225XTua3ROC8VhbkDExcwLU=",
         "ref": "master",
-        "rev": "326dbb5b682f6236d9b04af8e5383f6fd5bfbfc3",
-        "revCount": 317,
+        "rev": "22d38f0334a61b9cdcd1e84c2a957a1c433777ca",
+        "revCount": 327,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/todo-list-ai"
       },
