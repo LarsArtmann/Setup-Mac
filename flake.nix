@@ -292,7 +292,7 @@
     todoListAiFixedHash = "sha256-gK2KiswUrC4iym1X0r8Ykof1H8Fb2keBsc9X0PPQPPU=";
 
     todoListAiOverlay = _final: prev: let
-      inherit (prev) bun;
+      bun = prev.bun;
       upstream = todo-list-ai.packages.${prev.stdenv.system}.default;
       patchedDeps = prev.stdenv.mkDerivation {
         name = "todo-list-ai-deps";
