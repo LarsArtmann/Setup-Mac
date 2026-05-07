@@ -143,7 +143,7 @@ _: {
           MemoryMax = "512M";
           ReadWritePaths = ["/var/lib/gatus"];
         }
-        // serviceDefaults {};
+        // serviceDefaults {Restart = "on-failure";};
     };
   };
 }
