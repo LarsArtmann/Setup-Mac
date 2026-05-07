@@ -5,146 +5,145 @@ _: {
     ...
   }: let
     cfg = config.services.gatus-config;
-    inherit (config.networking) domain;
     harden = import ../../../lib/systemd.nix {inherit lib;};
     serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
   in {
-  options.services.gatus-config = {
-    enable = lib.mkEnableOption "Gatus health check monitoring with pre-configured endpoints";
+    options.services.gatus-config = {
+      enable = lib.mkEnableOption "Gatus health check monitoring with pre-configured endpoints";
 
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 8083;
-      description = "HTTP port for Gatus web interface";
-    };
-  };
-
-  config = lib.mkIf cfg.enable {
-    services.gatus = {
-      enable = true;
-      settings = {
-        web.port = cfg.port;
-        storage = {
-          type = "sqlite";
-          path = "/var/lib/gatus/gatus.db";
-          caching = true;
-        };
-        endpoints = [
-          {
-            name = "Caddy";
-            group = "Infrastructure";
-            url = "http://localhost:2019/metrics";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Authelia";
-            group = "Infrastructure";
-            url = "http://localhost:${toString config.services.authelia-config.port}/api/health";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Gitea";
-            group = "Development";
-            url = "http://localhost:${toString config.services.gitea.settings.server.HTTP_PORT}/api/v1/nodeinfo";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Homepage";
-            group = "Infrastructure";
-            url = "http://localhost:${toString config.services.homepage.port}";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Immich";
-            group = "Media";
-            url = "http://localhost:${toString config.services.immich.port}/api/server-info/ping";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "SigNoz";
-            group = "Monitoring";
-            url = "http://localhost:${toString config.services.signoz.settings.queryService.port}";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Manifest";
-            group = "Monitoring";
-            url = "http://localhost:${toString config.services.manifest.port}/api/v1/health";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "TaskChampion";
-            group = "Productivity";
-            url = "tcp://127.0.0.1:${toString config.services.taskchampion-sync-server.port}";
-            interval = "60s";
-            conditions = ["[CONNECTED] == true"];
-          }
-          {
-            name = "Twenty CRM";
-            group = "Productivity";
-            url = "http://localhost:${toString config.services.twenty.port}/healthz";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Ollama";
-            group = "AI";
-            url = "http://localhost:11434/api/tags";
-            interval = "60s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "ComfyUI";
-            group = "AI";
-            url = "http://localhost:${toString config.services.comfyui.port}";
-            interval = "60s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "Node Exporter";
-            group = "Monitoring";
-            url = "http://localhost:9100/metrics";
-            interval = "60s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "cAdvisor";
-            group = "Monitoring";
-            url = "http://localhost:9110/metrics";
-            interval = "60s";
-            conditions = ["[STATUS] == 200"];
-          }
-          {
-            name = "DNS Resolver";
-            group = "Infrastructure";
-            url = "tcp://127.0.0.1:53";
-            interval = "60s";
-            conditions = ["[CONNECTED] == true"];
-          }
-          {
-            name = "DNS Blocker";
-            group = "Infrastructure";
-            url = "http://localhost:9090/health";
-            interval = "30s";
-            conditions = ["[STATUS] == 200"];
-          }
-        ];
+      port = lib.mkOption {
+        type = lib.types.port;
+        default = 8083;
+        description = "HTTP port for Gatus web interface";
       };
     };
 
-    systemd.services.gatus.serviceConfig =
-      harden {
-        MemoryMax = "512M";
-        ReadWritePaths = ["/var/lib/gatus"];
-      }
-      // serviceDefaults {};
-  };
+    config = lib.mkIf cfg.enable {
+      services.gatus = {
+        enable = true;
+        settings = {
+          web.port = cfg.port;
+          storage = {
+            type = "sqlite";
+            path = "/var/lib/gatus/gatus.db";
+            caching = true;
+          };
+          endpoints = [
+            {
+              name = "Caddy";
+              group = "Infrastructure";
+              url = "http://localhost:2019/metrics";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Authelia";
+              group = "Infrastructure";
+              url = "http://localhost:${toString config.services.authelia-config.port}/api/health";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Gitea";
+              group = "Development";
+              url = "http://localhost:${toString config.services.gitea.settings.server.HTTP_PORT}/api/v1/nodeinfo";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Homepage";
+              group = "Infrastructure";
+              url = "http://localhost:${toString config.services.homepage.port}";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Immich";
+              group = "Media";
+              url = "http://localhost:${toString config.services.immich.port}/api/server-info/ping";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "SigNoz";
+              group = "Monitoring";
+              url = "http://localhost:${toString config.services.signoz.settings.queryService.port}";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Manifest";
+              group = "Monitoring";
+              url = "http://localhost:${toString config.services.manifest.port}/api/v1/health";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "TaskChampion";
+              group = "Productivity";
+              url = "tcp://127.0.0.1:${toString config.services.taskchampion-sync-server.port}";
+              interval = "60s";
+              conditions = ["[CONNECTED] == true"];
+            }
+            {
+              name = "Twenty CRM";
+              group = "Productivity";
+              url = "http://localhost:${toString config.services.twenty.port}/healthz";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Ollama";
+              group = "AI";
+              url = "http://localhost:11434/api/tags";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "ComfyUI";
+              group = "AI";
+              url = "http://localhost:${toString config.services.comfyui.port}";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Node Exporter";
+              group = "Monitoring";
+              url = "http://localhost:9100/metrics";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "cAdvisor";
+              group = "Monitoring";
+              url = "http://localhost:9110/metrics";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "DNS Resolver";
+              group = "Infrastructure";
+              url = "tcp://127.0.0.1:53";
+              interval = "60s";
+              conditions = ["[CONNECTED] == true"];
+            }
+            {
+              name = "DNS Blocker";
+              group = "Infrastructure";
+              url = "http://localhost:9090/health";
+              interval = "30s";
+              conditions = ["[STATUS] == 200"];
+            }
+          ];
+        };
+      };
+
+      systemd.services.gatus.serviceConfig =
+        harden {
+          MemoryMax = "512M";
+          ReadWritePaths = ["/var/lib/gatus"];
+        }
+        // serviceDefaults {};
+    };
   };
 }

@@ -35,6 +35,8 @@ repos:
         pass_filenames: true
 
       # Nix: Linter and antipattern detection
+      # Note: W04 "Assignment instead of inherit" is excluded — false positive
+      # on mkDerivation attrs like nativeBuildInputs = [pkg].
       - id: statix
         name: statix (Nix linter)
         entry: bash
