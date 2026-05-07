@@ -7,7 +7,8 @@ _: {
   }: let
     cfg = config.services.photomap;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
     immichMediaDir = config.services.immich.mediaLocation;
     immichUploadDir = "${immichMediaDir}/upload";
     immichLibraryDir = "${immichMediaDir}/library";
@@ -28,11 +29,7 @@ _: {
   in {
     options.services.photomap = {
       enable = lib.mkEnableOption "PhotoMap AI service";
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 8050;
-        description = "Port for the PhotoMap web interface";
-      };
+      port = serviceTypes.servicePort 8050 "Port for the PhotoMap web interface";
     };
 
     config = lib.mkIf cfg.enable {
@@ -71,10 +68,7 @@ _: {
         '';
         serviceConfig =
           harden {MemoryMax = "512M";}
-          // serviceDefaults {RestartSec = "10s";}
-          // {
-            Restart = lib.mkForce "always";
-          };
+          // serviceDefaults {RestartSec = "10s";};
       };
 
       systemd.tmpfiles.rules = [

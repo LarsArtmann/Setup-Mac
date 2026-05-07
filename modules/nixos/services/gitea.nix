@@ -8,6 +8,7 @@ _: {
     inherit (config.users) primaryUser;
     giteaPkg = config.services.gitea.package;
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
 
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''
@@ -325,10 +326,45 @@ _: {
             StartLimitBurst = lib.mkForce 3;
             StartLimitIntervalSec = lib.mkForce 300;
           };
-          serviceConfig = {
-            Restart = lib.mkForce "always";
-            RestartSec = lib.mkForce "5";
-          };
+          serviceConfig =
+            serviceDefaults {}
+            // {
+              WatchdogSec = lib.mkForce "30";
+            };
+          preStart = let
+            adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
+              set -euo pipefail
+
+              ADMIN_USER="${primaryUser}"
+              ADMIN_EMAIL="${primaryUser}@local"
+              PASS_FILE="/var/lib/gitea/.admin-password"
+              GITEA=${lib.getExe giteaPkg}
+
+              # Generate password if not exists
+              if [ ! -f "$PASS_FILE" ]; then
+                ${pkgs.coreutils}/bin/head -c 32 /dev/urandom | ${pkgs.coreutils}/bin/base64 > "$PASS_FILE"
+                chmod 600 "$PASS_FILE"
+              fi
+              ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
+
+              # Create admin user if not exists, sync password from file
+              if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
+                echo "Creating Gitea admin user: $ADMIN_USER"
+                $GITEA admin user create \
+                  --username "$ADMIN_USER" \
+                  --password "$ADMIN_PASS" \
+                  --email "$ADMIN_EMAIL" \
+                  --admin \
+                  --must-change-password=false
+              else
+                echo "Ensuring password matches for $ADMIN_USER"
+                $GITEA admin user change-password \
+                  --username "$ADMIN_USER" \
+                  --password "$ADMIN_PASS" \
+                  --must-change-password=false 2>/dev/null || true
+              fi
+            '';
+          in "${adminSetup}";
         };
 
         # GitHub sync service
@@ -366,45 +402,6 @@ _: {
             Persistent = true;
           };
         };
-      };
-
-      # Declarative admin user setup (runs in Gitea's preStart)
-      systemd.services.gitea = {
-        serviceConfig.WatchdogSec = lib.mkForce "30";
-        preStart = let
-          adminSetup = pkgs.writeShellScript "gitea-admin-setup" ''
-            set -euo pipefail
-
-            ADMIN_USER="${primaryUser}"
-            ADMIN_EMAIL="${primaryUser}@local"
-            PASS_FILE="/var/lib/gitea/.admin-password"
-            GITEA=${lib.getExe giteaPkg}
-
-            # Generate password if not exists
-            if [ ! -f "$PASS_FILE" ]; then
-              ${pkgs.coreutils}/bin/head -c 32 /dev/urandom | ${pkgs.coreutils}/bin/base64 > "$PASS_FILE"
-              chmod 600 "$PASS_FILE"
-            fi
-            ADMIN_PASS="$(${pkgs.coreutils}/bin/head -n1 "$PASS_FILE" | ${pkgs.coreutils}/bin/tr -d '\n')"
-
-            # Create admin user if not exists, sync password from file
-            if ! $GITEA admin user list | grep -q "$ADMIN_USER"; then
-              echo "Creating Gitea admin user: $ADMIN_USER"
-              $GITEA admin user create \
-                --username "$ADMIN_USER" \
-                --password "$ADMIN_PASS" \
-                --email "$ADMIN_EMAIL" \
-                --admin \
-                --must-change-password=false
-            else
-              echo "Ensuring password matches for $ADMIN_USER"
-              $GITEA admin user change-password \
-                --username "$ADMIN_USER" \
-                --password "$ADMIN_PASS" \
-                --must-change-password=false 2>/dev/null || true
-            fi
-          '';
-        in "${adminSetup}";
       };
 
       # Token generation (runs after Gitea is listening)

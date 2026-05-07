@@ -6,6 +6,7 @@ _: {
   }: let
     cfg = config.services.immich;
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
   in {
     config = lib.mkIf config.services.immich.enable {
       services.immich = {
@@ -57,19 +58,15 @@ _: {
               ProtectHome = lib.mkForce false;
               ProtectSystem = lib.mkForce false;
             }
-            // {
-              Restart = lib.mkForce "always";
-              RestartSec = lib.mkForce "5s";
-            };
+            // serviceDefaults {};
           immich-machine-learning.serviceConfig =
             harden {
               MemoryMax = "4G";
               ProtectHome = lib.mkForce false;
               ProtectSystem = lib.mkForce false;
             }
+            // serviceDefaults {RestartSec = "10s";}
             // {
-              Restart = lib.mkForce "always";
-              RestartSec = lib.mkForce "10s";
               Environment = lib.mkForce "HOME=/var/lib/immich";
             };
           immich-db-backup = {

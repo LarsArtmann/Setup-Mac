@@ -9,6 +9,8 @@ _: {
     inherit (config.networking) domain;
     authHost = "auth.${domain}";
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
     authPort = cfg.port;
 
     mkClient = {
@@ -33,11 +35,7 @@ _: {
   in {
     options.services.authelia-config = {
       enable = lib.mkEnableOption "Authelia SSO/IDP with SystemNix configuration";
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 9091;
-        description = "Port for the Authelia authentication server";
-      };
+      port = serviceTypes.servicePort 9091 "Port for the Authelia authentication server";
     };
 
     config = lib.mkIf cfg.enable {
@@ -216,9 +214,8 @@ _: {
         };
         serviceConfig =
           harden {}
+          // serviceDefaults {}
           // {
-            Restart = lib.mkForce "always";
-            RestartSec = lib.mkForce "5";
             StateDirectory = lib.mkForce "authelia-main";
             StateDirectoryMode = lib.mkForce "0750";
             ExecStartPost = "${pkgs.curl}/bin/curl -sf --max-time 3 --retry 30 --retry-delay 1 --retry-all-errors http://127.0.0.1:${toString authPort}/api/health";

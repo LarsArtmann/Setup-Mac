@@ -1,8 +1,10 @@
 # Common systemd service defaults for long-running daemons.
 #
 # Usage in service modules:
-#   serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+#   serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
 #   serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};
+#
+# All values use lib.mkForce to override nixpkgs module defaults where needed.
 #
 # WatchdogSec is NOT included by default — it requires sd_notify() support
 # in the service binary. Only pass it for services that implement sd_notify
@@ -15,9 +17,10 @@
 #     startLimitIntervalSec = 60;
 #     serviceConfig = harden {} // serviceDefaults {};
 #   };
-{
+lib: {
   Restart ? "always",
   RestartSec ? "5s",
 }: {
-  inherit Restart RestartSec;
+  Restart = lib.mkForce Restart;
+  RestartSec = lib.mkForce RestartSec;
 }

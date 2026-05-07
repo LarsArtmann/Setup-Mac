@@ -94,6 +94,7 @@ in {
     cfg = config.services.signoz;
     packages = mkPackages pkgs;
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
   in {
     options.services.signoz = {
       enable = lib.mkEnableOption "SigNoz observability platform";
@@ -260,10 +261,7 @@ in {
             // harden {
               MemoryMax = lib.mkForce "1G";
             }
-            // {
-              Restart = lib.mkForce "always";
-              RestartSec = lib.mkForce "10";
-            };
+            // serviceDefaults {RestartSec = "10";};
         };
 
         systemd.services.signoz-provision = {
@@ -606,10 +604,7 @@ in {
               NoNewPrivileges = lib.mkForce false;
             }
             // harden {}
-            // {
-              Restart = lib.mkForce "always";
-              RestartSec = lib.mkForce "5";
-            };
+            // serviceDefaults {};
         };
       })
 
@@ -642,10 +637,7 @@ in {
             // harden {
               MemoryMax = lib.mkForce "1G";
             }
-            // {
-              Restart = lib.mkForce "always";
-              RestartSec = lib.mkForce "10";
-            };
+            // serviceDefaults {RestartSec = "10";};
         };
         environment.etc."signoz/collector.yaml".text = lib.generators.toYAML {} {
           receivers =

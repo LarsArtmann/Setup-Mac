@@ -8,7 +8,8 @@ _: {
     cfg = config.services.comfyui;
     inherit (config.users) primaryUser;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
     rocm = import ../../../lib/rocm.nix {inherit pkgs;};
 
     rocmRuntimeLibs = rocm.runtimeLibs;
@@ -43,11 +44,7 @@ _: {
         description = "Listen host";
       };
 
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 8188;
-        description = "Listen port";
-      };
+      port = serviceTypes.servicePort 8188 "Listen port";
 
       user = lib.mkOption {
         type = lib.types.str;

@@ -6,6 +6,7 @@
     ...
   }: let
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
     cfg = config.services.hermes;
     hermesPkg = let
       # Upstream hermes-agent has a stale npmDepsHash in nix/tui.nix.
@@ -213,8 +214,6 @@
               "LD_LIBRARY_PATH=${pkgs.libopus}/lib"
             ];
             EnvironmentFile = [sopsEnvPath];
-            Restart = lib.mkForce "always";
-            RestartSec = lib.mkForce cfg.restartSec;
             RestartForceExitStatus = 75;
             KillMode = "mixed";
             KillSignal = "SIGTERM";
@@ -224,6 +223,7 @@
             StandardError = "journal";
             UMask = "0026";
           }
+          // serviceDefaults {RestartSec = cfg.restartSec;}
           // harden {
             MemoryMax = "24G"; # PyTorch + ROCm + HIP libraries require significant GPU memory mapping
             ProtectHome = false;

@@ -11,15 +11,12 @@ _: {
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
   in {
     options.services.homepage = {
       enable = lib.mkEnableOption "Homepage Dashboard service";
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 8082;
-        description = "HTTP port for Homepage Dashboard";
-      };
+      port = serviceTypes.servicePort 8082 "HTTP port for Homepage Dashboard";
     };
 
     config = lib.mkIf cfg.enable {

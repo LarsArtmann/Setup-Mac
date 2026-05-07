@@ -6,7 +6,7 @@ _: {
     ...
   }: let
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
     inherit (config.users) primaryUser;
     primaryGroup = "users";
 
@@ -102,6 +102,7 @@ _: {
               SupplementaryGroups = ["render"];
               UMask = lib.mkForce "0007";
             }
+            // serviceDefaults {}
             // harden {
               MemoryMax = "32G";
               ProtectHome = false;

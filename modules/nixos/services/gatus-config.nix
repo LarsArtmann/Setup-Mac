@@ -6,16 +6,13 @@ _: {
   }: let
     cfg = config.services.gatus-config;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
   in {
     options.services.gatus-config = {
       enable = lib.mkEnableOption "Gatus health check monitoring with pre-configured endpoints";
 
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 8083;
-        description = "HTTP port for Gatus web interface";
-      };
+      port = serviceTypes.servicePort 8083 "HTTP port for Gatus web interface";
     };
 
     config = lib.mkIf cfg.enable {

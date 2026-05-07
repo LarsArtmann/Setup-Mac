@@ -264,6 +264,7 @@ Custom DNS blocking stack: Unbound (resolver) + dnsblockd (Go block page server)
 - Upstream: Quad9 (DNS-over-TLS) + Cloudflare fallback
 - Local `.home.lan` DNS records for all services
 - Blocklist source: `platforms/nixos/programs/dnsblockd/`
+- **CA cert trusted system-wide** via `security.pki.certificates` in `dns-blocker-config.nix` — the dnsblockd CA is embedded as a string (public cert, not a secret) so all services and tools trust `*.home.lan` TLS certificates
 
 ### Network Configuration (`platforms/nixos/system/local-network.nix`)
 
@@ -399,7 +400,7 @@ Reusable functions in `lib/` — imported directly by relative path:
 | File | Purpose | Usage |
 |------|---------|-------|
 | `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix {inherit lib;};` then `harden {MemoryMax = "512M";}` |
-| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix;` then `serviceDefaults {}` |
+| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;` then `serviceDefaults {}` |
 | `lib/types.nix` | Reusable NixOS module option constructors (ports, user/group, delays) | `serviceTypes = import ../../../lib/types.nix lib;` then `serviceTypes.systemdServiceIdentity {}` |
 | `lib/rocm.nix` | ROCm GPU runtime library lists and env vars | `rocm = import ../../../lib/rocm.nix {inherit pkgs;};` then `rocm.env` / `rocm.makeLdLibraryPath lib` |
 

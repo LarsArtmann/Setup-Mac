@@ -8,7 +8,8 @@ _: {
     cfg = config.services.manifest;
     inherit (config.networking) domain;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
 
     stateDir = "/var/lib/manifest";
     manifestPort = cfg.port;
@@ -108,11 +109,7 @@ _: {
   in {
     options.services.manifest = {
       enable = lib.mkEnableOption "Manifest LLM router";
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 2099;
-        description = "Host port for the Manifest dashboard";
-      };
+      port = serviceTypes.servicePort 2099 "Host port for the Manifest dashboard";
       imageTag = lib.mkOption {
         type = lib.types.str;
         default = "latest";

@@ -53,6 +53,7 @@ check_service twenty
 check_service minecraft-server
 check_service gatus
 check_service prometheus-node-exporter
+check_service whisper-asr
 
 # === User services (graphical session) ===
 check_user_service waybar

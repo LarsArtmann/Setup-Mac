@@ -10,6 +10,7 @@ _: {
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = config.services.authelia-config.port;
     harden = import ../../../lib/systemd.nix {inherit lib;};
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
 
     bindAddress =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"
@@ -99,9 +100,8 @@ _: {
             NoNewPrivileges = false;
             CapabilityBoundingSet = "CAP_NET_ADMIN CAP_NET_BIND_SERVICE";
           }
+          // serviceDefaults {}
           // {
-            Restart = lib.mkForce "always";
-            RestartSec = lib.mkForce "5";
             OOMScoreAdjust = lib.mkForce (-500);
             AmbientCapabilities = "CAP_NET_ADMIN CAP_NET_BIND_SERVICE";
           };

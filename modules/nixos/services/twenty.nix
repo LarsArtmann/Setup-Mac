@@ -10,7 +10,8 @@ in {
     cfg = config.services.twenty;
     inherit (config.networking) domain;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix;
+    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceTypes = import ../../../lib/types.nix lib;
 
     stateDir = "/var/lib/twenty";
     serverPort = cfg.port;
@@ -103,11 +104,7 @@ in {
   in {
     options.services.twenty = {
       enable = lib.mkEnableOption "Twenty CRM";
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 3200;
-        description = "Host port for the Twenty CRM server";
-      };
+      port = serviceTypes.servicePort 3200 "Host port for the Twenty CRM server";
     };
 
     config = lib.mkIf cfg.enable {
