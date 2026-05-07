@@ -6,6 +6,9 @@
 #
 # All values use lib.mkForce to override nixpkgs module defaults where needed.
 #
+# For Home Manager user services (where mkForce is invalid), use serviceDefaultsUser:
+#   serviceDefaultsUser {} // { RestartSec = "10s"; }
+#
 # WatchdogSec is NOT included by default — it requires sd_notify() support
 # in the service binary. Only pass it for services that implement sd_notify
 # (e.g., Caddy, Gitea). For all others, omit it.
@@ -17,10 +20,24 @@
 #     startLimitIntervalSec = 60;
 #     serviceConfig = harden {} // serviceDefaults {};
 #   };
-lib: {
-  Restart ? "always",
-  RestartSec ? "5s",
-}: {
-  Restart = lib.mkForce Restart;
-  RestartSec = lib.mkForce RestartSec;
+lib: let
+  mkDefaults = useMkForce: {
+    Restart ? "always",
+    RestartSec ? "5s",
+  }: {
+    Restart =
+      if useMkForce
+      then lib.mkForce Restart
+      else Restart;
+    RestartSec =
+      if useMkForce
+      then lib.mkForce RestartSec
+      else RestartSec;
+  };
+in {
+  # System services (valid with mkForce)
+  serviceDefaults = mkDefaults true;
+
+  # Home Manager user services (no mkForce — HM doesn't support it)
+  serviceDefaultsUser = mkDefaults false;
 }

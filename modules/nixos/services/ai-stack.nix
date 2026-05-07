@@ -6,7 +6,7 @@ _: {
     ...
   }: let
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
     inherit (config.users) primaryUser;
     primaryGroup = "users";
 

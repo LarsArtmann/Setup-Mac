@@ -8,7 +8,7 @@ _: {
     cfg = config.services.gitea-repos;
     inherit (config.users) primaryUser;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
 
     # Script to ensure specific GitHub repos are mirrored to Gitea
     ensureReposScript = pkgs.writeShellScriptBin "gitea-ensure-repos" ''

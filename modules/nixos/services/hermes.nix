@@ -6,7 +6,7 @@
     ...
   }: let
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
     cfg = config.services.hermes;
     hermesPkg = let
       # Upstream hermes-agent has a stale npmDepsHash in nix/tui.nix.

@@ -10,7 +10,7 @@ _: {
     serverKey = config.sops.secrets.dnsblockd_server_key.path;
     authPort = config.services.authelia-config.port;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
 
     bindAddress =
       if config.services.dns-blocker.enable && config.services.dns-blocker.blockInterface != "lo"

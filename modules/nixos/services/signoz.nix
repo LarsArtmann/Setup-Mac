@@ -94,7 +94,7 @@ in {
     cfg = config.services.signoz;
     packages = mkPackages pkgs;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
   in {
     options.services.signoz = {
       enable = lib.mkEnableOption "SigNoz observability platform";

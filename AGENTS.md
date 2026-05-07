@@ -25,7 +25,7 @@ SystemNix/
 ├── justfile                     # Task runner — ALWAYS use this over raw Nix commands
 │
 ├── modules/nixos/services/      # NixOS service modules (flake-parts)
-│   ├── default.nix              # Docker
+│   ├── default.nix              # Docker + Nix GC timer
 │   ├── caddy.nix                # Reverse proxy (TLS via sops)
 │   ├── gitea.nix                # Git hosting + GitHub mirror
 │   ├── homepage.nix             # Service dashboard
@@ -234,7 +234,7 @@ SigNoz is the sole observability platform (replaces Prometheus + Grafana). Full 
 
 ### Gatus Health Check Monitor
 
-Self-contained flake-parts module (`modules/nixos/services/gatus-config.nix`) wrapping the **nixpkgs `services.gatus` module**. Monitors 15 endpoints across all services with SQLite storage.
+Self-contained flake-parts module (`modules/nixos/services/gatus-config.nix`) wrapping the **nixpkgs `services.gatus` module**. Monitors 18 endpoints across all services with SQLite storage.
 
 | Component | Port | Purpose |
 |-----------|------|---------|
@@ -255,7 +255,8 @@ Self-contained flake-parts module (`modules/nixos/services/gatus-config.nix`) wr
 | Media | Immich |
 | Monitoring | SigNoz, Manifest, Node Exporter, cAdvisor |
 | Productivity | TaskChampion, Twenty CRM |
-| AI | Ollama, ComfyUI |
+| AI | Ollama, ComfyUI, Whisper ASR, LiveKit |
+| Infrastructure | Docker Daemon |
 
 ### NixOS DNS Blocker
 
@@ -400,13 +401,14 @@ Reusable functions in `lib/` — imported directly by relative path:
 | File | Purpose | Usage |
 |------|---------|-------|
 | `lib/systemd.nix` | Security hardening (PrivateTmp, NoNewPrivileges, ProtectSystem, etc.) | `harden = import ../../../lib/systemd.nix {inherit lib;};` then `harden {MemoryMax = "512M";}` |
-| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) | `serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;` then `serviceDefaults {}` |
+| `lib/systemd/service-defaults.nix` | Common service defaults (Restart, RestartSec) — returns attrset with `.serviceDefaults` (system, uses mkForce) and `.serviceDefaultsUser` (user services, no mkForce) | `sd = import ../../../lib/systemd/service-defaults.nix lib;` then `sd.serviceDefaults {}` or `sd.serviceDefaultsUser {}` |
 | `lib/types.nix` | Reusable NixOS module option constructors (ports, user/group, delays) | `serviceTypes = import ../../../lib/types.nix lib;` then `serviceTypes.systemdServiceIdentity {}` |
 | `lib/rocm.nix` | ROCm GPU runtime library lists and env vars | `rocm = import ../../../lib/rocm.nix {inherit pkgs;};` then `rocm.env` / `rocm.makeLdLibraryPath lib` |
+| `lib/go-output-submodules.nix` | Generates `require`+`replace` directives for go-output workspace sub-modules | `import ../lib/go-output-submodules.nix go-output-src` in postPatch |
 
 Combining: `serviceConfig = harden {MemoryMax = "1G";} // serviceDefaults {};`
 
-**Adoption status:** All service modules that manage systemd services use `harden {}` from the shared lib. 8 modules use `serviceDefaults {}`. No service should manually inline `PrivateTmp`, `NoNewPrivileges`, etc. — always use the shared helpers.
+**Adoption status:** All service modules that manage systemd services use `harden {}` from the shared lib. 17 modules use `serviceDefaults {}`. No service should manually inline `PrivateTmp`, `NoNewPrivileges`, etc. — always use the shared helpers. For Home Manager user services, use `serviceDefaultsUser` (no `mkForce`).
 
 ### Caddy Port References
 

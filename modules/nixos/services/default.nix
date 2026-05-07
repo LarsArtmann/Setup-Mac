@@ -1,5 +1,9 @@
 _: {
-  flake.nixosModules.default-services = _: {
+  flake.nixosModules.default-services = {
+    config,
+    lib,
+    ...
+  }: {
     virtualisation.docker = {
       enable = true;
       enableOnBoot = true;
@@ -11,6 +15,12 @@ _: {
       daemon.settings = {
         data-root = "/data/docker";
       };
+    };
+
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
     };
   };
 }

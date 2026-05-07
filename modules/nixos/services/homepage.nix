@@ -11,7 +11,7 @@ _: {
 
     svcUrl = subdomain: "https://${subdomain}.${domain}";
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
     serviceTypes = import ../../../lib/types.nix lib;
   in {
     options.services.homepage = {

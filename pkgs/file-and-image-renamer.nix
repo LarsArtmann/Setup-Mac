@@ -52,10 +52,7 @@ buildGoModule rec {
     fi
 
     # go-output sub-modules (Go workspace modules — separate go.mod per dir)
-    for sub in enum escape table sort; do
-      echo "require github.com/larsartmann/go-output/$sub v0.0.0" >> go.mod
-      echo "replace github.com/larsartmann/go-output/$sub => ${go-output-src}/$sub" >> go.mod
-    done
+    ${import ../lib/go-output-submodules.nix go-output-src}
   '';
 
   ldflags = ["-s" "-w"];

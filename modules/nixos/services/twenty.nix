@@ -10,7 +10,7 @@ in {
     cfg = config.services.twenty;
     inherit (config.networking) domain;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
     serviceTypes = import ../../../lib/types.nix lib;
 
     stateDir = "/var/lib/twenty";

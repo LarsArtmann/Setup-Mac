@@ -8,7 +8,7 @@ _: {
     inherit (config.users) primaryUser;
     giteaPkg = config.services.gitea.package;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
 
     # Script to mirror all user repos from GitHub
     mirrorGithubScript = pkgs.writeShellScriptBin "gitea-mirror-github" ''

@@ -6,7 +6,7 @@ _: {
   }: let
     cfg = config.services.gatus-config;
     harden = import ../../../lib/systemd.nix {inherit lib;};
-    serviceDefaults = import ../../../lib/systemd/service-defaults.nix lib;
+    serviceDefaults = (import ../../../lib/systemd/service-defaults.nix lib).serviceDefaults;
     serviceTypes = import ../../../lib/types.nix lib;
   in {
     options.services.gatus-config = {
@@ -130,6 +130,30 @@ _: {
               url = "http://localhost:9090/health";
               interval = "30s";
               conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "Whisper ASR";
+              group = "AI";
+              url = "http://localhost:7860";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+            }
+            {
+              name = "LiveKit";
+              group = "AI";
+              url = "tcp://127.0.0.1:7880";
+              interval = "60s";
+              conditions = ["[CONNECTED] == true"];
+            }
+            {
+              name = "Docker Daemon";
+              group = "Infrastructure";
+              url = "http://localhost:9110/metrics";
+              interval = "60s";
+              conditions = ["[STATUS] == 200"];
+              client = {
+                insecure = true;
+              };
             }
           ];
         };
