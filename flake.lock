@@ -100,11 +100,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1778191035,
-        "narHash": "sha256-yiosMRCOAc7y3NI/O50xwMNjLzzCdC8QUqpbLLEFUa0=",
+        "lastModified": 1778191329,
+        "narHash": "sha256-PeOlxkYEFxTh2rL3q2Eozi50QxBHOSPslR0/AozA/jg=",
         "ref": "master",
-        "rev": "bef4686ac8f9851a270aada9f45fdafc547d5216",
-        "revCount": 120,
+        "rev": "deb7a8294b414e385ebb5aa9090ef264fada2890",
+        "revCount": 121,
         "type": "git",
         "url": "ssh://git@github.com/LarsArtmann/emeet-pixyd"
       },
@@ -540,11 +540,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1778190895,
-        "narHash": "sha256-7pSX9dHBhSoS6pMVJvFoikPTcpBvTNTpSWWM4Akwnn4=",
+        "lastModified": 1778190937,
+        "narHash": "sha256-+A0aHCEGVDccrEAGtCKFmarAWnr7ox55pnI8rnKR/kk=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "6f194a8e7c1dc70af2c9db2507bfef9909ddf052",
+        "rev": "36612b7c19f8ec92b7b71d55e8f28377cc2293f5",
         "type": "github"
       },
       "original": {
