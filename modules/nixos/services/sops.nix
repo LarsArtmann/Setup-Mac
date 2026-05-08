@@ -95,7 +95,12 @@ in {
             hermes_xiaomi_api_key = "xiaomi_api_key";
             hermes_fal_key = "fal_key";
             hermes_firecrawl_api_key = "firecrawl_api_key";
-          };
+          }
+          // mkSecrets "openseo.yaml" {
+            owner = "openseo";
+            group = "openseo";
+            restartUnits = ["openseo.service"];
+          } ["dataforseo_api_key"];
 
         templates."gitea-sync.env" = {
           owner = primaryUser;
@@ -119,6 +124,16 @@ in {
             XIAOMI_API_KEY=${config.sops.placeholder.hermes_xiaomi_api_key}
             FAL_KEY=${config.sops.placeholder.hermes_fal_key}
             FIRECRAWL_API_KEY=${config.sops.placeholder.hermes_firecrawl_api_key}
+          '';
+        };
+
+        templates."openseo-env" = {
+          owner = "openseo";
+          group = "openseo";
+          mode = "0400";
+          restartUnits = ["openseo.service"];
+          content = ''
+            DATAFORSEO_API_KEY=${config.sops.placeholder.dataforseo_api_key}
           '';
         };
       };
