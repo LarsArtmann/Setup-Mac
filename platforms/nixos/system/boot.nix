@@ -7,6 +7,7 @@
   boot = {
     # Systemd boot configuration
     loader = {
+      timeout = 2;
       systemd-boot.enable = true;
       systemd-boot.configurationLimit = 50; # Limit to 50 generations to prevent /boot full
       efi.canTouchEfiVariables = true;
