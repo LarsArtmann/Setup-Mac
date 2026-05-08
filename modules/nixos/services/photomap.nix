@@ -55,8 +55,8 @@ _: {
       };
 
       systemd.services.podman-photomap = {
-        after = ["immich-server.service" "postgresql.service" "network-online.target"];
-        wants = ["immich-server.service" "network-online.target"];
+        after = ["immich-server.service" "postgresql.service"];
+        wants = ["immich-server.service"];
         requires = ["immich-server.service" "postgresql.service"];
         startLimitBurst = 3;
         startLimitIntervalSec = 60;

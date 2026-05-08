@@ -25,6 +25,10 @@
       # The kernel warns: "amdgpu: Overdrive is enabled, please disable it before reporting any bugs"
       # Re-enable only if you need manual fan/clk control and accept the instability risk.
       # "amdgpu.ppfeaturemask=0xfffd7fff"
+      # TPM disabled — saves ~4.3s device enumeration at boot. Not used for measured boot or sealed secrets.
+      # Re-enable if you need: TPM-sealed disk encryption (systemd-cryptenroll),
+      # measured boot / remote attestation, or Secure Boot with UKI signing.
+      "tpm.disabled=1"
       "amdgpu.deepfl=1"
       # Increase ring lockup timeout (default 10s) — prevents false-positive GPU resets
       # under heavy compute/ML workloads on Strix Halo

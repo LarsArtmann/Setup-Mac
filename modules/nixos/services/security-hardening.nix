@@ -97,6 +97,13 @@ _: {
         clamav.updater.enable = true;
       };
 
+      # ClamAV: socket-activated only — don't block graphical.target at boot.
+      # On-demand when something actually scans; freshclam timer keeps signatures current.
+      systemd.services.clamav-daemon = {
+        wantedBy = lib.mkForce [];
+        after = lib.mkForce ["basic.target"];
+      };
+
       # Auditd group disabled (not needed without auditd)
       # users.groups.auditd = {};
 

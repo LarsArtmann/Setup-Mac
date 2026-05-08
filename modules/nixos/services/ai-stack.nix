@@ -137,8 +137,8 @@ _: {
         systemd.services = {
           unsloth-setup = {
             description = "Unsloth Studio - First-time setup (non-blocking)";
-            after = ["network-online.target"];
-            wants = ["network-online.target"];
+            after = [];
+            wants = [];
             wantedBy = ["unsloth-studio.service"];
             path = with pkgs; [
               python313
