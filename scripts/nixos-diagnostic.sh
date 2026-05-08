@@ -127,11 +127,9 @@ provide_remediation() {
   echo "3. Rebuild configuration:"
   echo "   sudo nixos-rebuild switch --flake .#evo-x2"
   echo ""
-  echo "4. If still failing, try a more aggressive cleanup:"
-  echo "   sudo systemctl stop nix-daemon"
-  echo "   sudo rm -rf /nix/var/nix/db"
+  echo "4. If still failing, try cleaning the Nix store:"
+  echo "   sudo nix-collect-garbage -d"
   echo "   sudo nix-store --optimise"
-  echo "   sudo systemctl start nix-daemon"
   echo "   sudo nixos-rebuild switch --flake .#evo-x2"
 }
 

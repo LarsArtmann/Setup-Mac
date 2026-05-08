@@ -7,7 +7,6 @@ Custom Nix package definitions used across SystemNix. All packages are built via
 | Package | Language | Platform | Description |
 |---------|----------|----------|-------------|
 | [dnsblockd](#dnsblockd) | Go | Linux | DNS block page HTTP server |
-| [dnsblockd-processor](#dnsblockd-processor) | Go | Linux | Blocklist processor for dnsblockd |
 | [modernize](#modernize) | Go | All | Go code modernize linter |
 | [jscpd](#jscpd) | Node.js | All | Copy/paste detector for source code |
 | [aw-watcher-utilization](#aw-watcher-utilization) | Python | All | ActivityWatch system utilization watcher |
@@ -29,14 +28,6 @@ Lightweight HTTP server that serves block pages for DNS-filtered domains. Paired
 - **Source:** `dnsblockd.nix` (derivation) + inline Go source in flake
 - **Platform:** Linux only
 - **Config:** `platforms/nixos/system/dns-blocker-config.nix`
-
-### dnsblockd-processor
-
-CLI tool that converts DNS blocklists (hosts, domains, dnsmasq, adblock formats) into Unbound `local-data` entries and a domain-to-list mapping JSON file. Run during NixOS activation to regenerate the block list.
-
-- **Source:** `dnsblockd-processor/` (standalone Go module, no dependencies)
-- **Platform:** Linux only
-- **Usage:** `dnsblockd-processor BLOCK_IP WHITELIST_FILE UNBOUND_OUTPUT MAPPING_OUTPUT [LIST_FILE NAME]...`
 
 ### modernize
 

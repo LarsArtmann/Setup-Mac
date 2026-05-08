@@ -219,7 +219,7 @@ The DNS blocker is one of the largest custom features in the project — a full 
 |-----------|--------|-------|
 | Unbound resolver | ✅ | 2 threads, 32MB msg cache, 64MB rrset cache, DNSSEC, qname minimization, DoT upstream (Quad9 + Cloudflare) |
 | dnsblockd (Go app) | ✅ | ~930-line production Go: dynamic TLS cert generation per domain (SNI-based, CA-signed), Catppuccin-themed block page UI |
-| Blocklist processing | ✅ | Build-time: 25 blocklists fetched via `fetchurl`, processed by `dnsblockd-processor` Go binary into unbound config |
+| Blocklist processing | ✅ | Build-time: 25 blocklists fetched via `fetchurl`, processed by `dnsblockd process` (external dnsblockd repo) into unbound config |
 | 10-category system | ✅ | Advertising 📢, Tracking 👀, Analytics 📊, Malware 🦠, Phishing 🎣, Gambling 🎰, Adult 🔞, Social 💬, Crypto 💰, Scam 🎭 |
 | Temp-allow API | ✅ | Bypass blocks for 5m/15m/60m/24h via web UI, auto-redirects after allow, unbound reload + cache flush |
 | False positive reporting | ✅ | `/api/report` endpoint, last 100 reports in memory |
@@ -330,7 +330,6 @@ The DNS blocker is one of the largest custom features in the project — a full 
 |---------|----------|--------|-------|
 | aw-watcher-utilization | Python | ✅ | ActivityWatch system utilization watcher |
 | dnsblockd | Go | ✅ | ~930-line DNS blocker: dynamic TLS, temp-allow API, false positive reporting, Prometheus metrics, 10-category system, Catppuccin block page — source in `platforms/nixos/programs/dnsblockd/` |
-| dnsblockd-processor | Go | ✅ | DNS blocklist processor (separate Go module in pkgs/) |
 | emeet-pixyd | Go | ✅ | EMEET PIXY webcam daemon — via flake input |
 | monitor365 | Rust | ✅ | Device monitoring agent — source-only flake input |
 | netwatch | Rust | ✅ | Real-time network diagnostics TUI |
@@ -349,7 +348,6 @@ The DNS blocker is one of the largest custom features in the project — a full 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | GitHub Actions: flake-update | ✅ | Weekly Mon 06:00 UTC, runs `nix flake update --commit-lock-file`, opens PR via `peter-evans/create-pull-request` |
-| GitHub Actions: go-test | ✅ | On push/PR to master when `pkgs/dnsblockd-processor/**` changes — `go vet` + `go build` |
 | GitHub Actions: nix-check | ✅ | On push/PR to master — `nix flake check --no-build` (eval-only), magic-nix-cache for speed |
 | Pre-commit hooks | ✅ | Nix validation, shellcheck, markdownlint, private key detection, large files (1MB), TOML/YAML/JSON checks |
 | Gitleaks | ✅ | Secret detection via `.gitleaks.toml` |

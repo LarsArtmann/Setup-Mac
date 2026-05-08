@@ -100,7 +100,7 @@ in {
         path = [pkgs.git pkgs.nix pkgs.gawk pkgs.gnused pkgs.python3];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.writeShellScript "blocklist-hash-updater" (builtins.readFile ../scripts/blocklist-hash-updater)}";
+          ExecStart = "${pkgs.writeShellScript "dns-update" (builtins.readFile ../../../scripts/dns-update.sh)}";
           WorkingDirectory = "/home/${primaryUser}/projects/SystemNix";
           User = primaryUser;
           StandardOutput = "journal";

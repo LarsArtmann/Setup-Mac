@@ -3,24 +3,32 @@ _: {
     config,
     lib,
     ...
-  }: {
-    virtualisation.docker = {
-      enable = true;
-      enableOnBoot = true;
-      autoPrune = {
-        enable = true;
-        dates = "weekly";
-      };
-      storageDriver = "overlay2";
-      daemon.settings = {
-        data-root = "/data/docker";
-      };
+  }: let
+    cfg = config.services.default-services;
+  in {
+    options.services.default-services = {
+      enable = lib.mkEnableOption "Default system services (Docker + Nix GC timer)" // {default = true;};
     };
 
-    nix.gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
+    config = lib.mkIf cfg.enable {
+      virtualisation.docker = {
+        enable = true;
+        enableOnBoot = true;
+        autoPrune = {
+          enable = true;
+          dates = "weekly";
+        };
+        storageDriver = "overlay2";
+        daemon.settings = {
+          data-root = "/data/docker";
+        };
+      };
+
+      nix.gc = {
+        automatic = true;
+        dates = "weekly";
+        options = "--delete-older-than 7d";
+      };
     };
   };
 }
