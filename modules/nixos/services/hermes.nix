@@ -71,9 +71,23 @@
       done
     '';
 
+    fixPermissionsScript = pkgs.writeShellScript "hermes-fix-permissions" ''
+      set -euo pipefail
+      echo "hermes-perms: fixing ownership and permissions in ${cfg.stateDir}"
+      chown -R ${cfg.user}:${cfg.group} ${cfg.stateDir}
+      # Ensure all directories are traversable and writable by owner
+      find ${cfg.stateDir} -type d -exec chmod 2770 {} + 2>/dev/null || true
+      find ${cfg.stateDir} -type f -exec chmod 0660 {} + 2>/dev/null || true
+    '';
+
     migrateScript = pkgs.writeShellScript "hermes-migrate-state" ''
       set -euo pipefail
       NEW="${cfg.stateDir}"
+
+      # Disable BTRFS Copy-on-Write on state directory to prevent SQLite corruption
+      if command -v chattr &>/dev/null; then
+        chattr +C "$NEW" 2>/dev/null || true
+      fi
 
       # Auto-recover malformed SQLite databases
       DB="$NEW/state.db"
@@ -85,6 +99,9 @@
           mv "$DB" "$BACKUP"
           # Remove WAL/SHM sidecars too
           rm -f "$DB-wal" "$DB-shm"
+        else
+          # Enforce WAL mode for resilience
+          ${pkgs.sqlite}/bin/sqlite3 "$DB" "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;" 2>/dev/null || true
         fi
       fi
 
@@ -203,7 +220,7 @@
             Type = "simple";
             User = cfg.user;
             Group = cfg.group;
-            ExecStartPre = ["+${migrateScript}" mergeEnvScript];
+            ExecStartPre = ["+${fixPermissionsScript}" "+${migrateScript}" mergeEnvScript];
             ExecStart = "${hermesPkg}/bin/hermes gateway run --replace";
             WorkingDirectory = cfg.stateDir;
             Environment = [
